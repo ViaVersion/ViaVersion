@@ -1,0 +1,7 @@
+Howdy Partner:
+
+[-] Fix arrows going down.
+[-] Make teleport relative if not 1024 diff.
+[-] Fix boats / minecarts if possible otherwise tell them nicely they don't work.
+[-] Cry because how long it took to get this far haha.
+[-] Clean up so we're not using NMS and more reflection based :)
