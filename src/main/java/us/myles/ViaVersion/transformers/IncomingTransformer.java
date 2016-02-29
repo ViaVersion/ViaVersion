@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.transformers;
 
-import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.ItemStack;
@@ -16,7 +15,6 @@ import us.myles.ViaVersion.packets.State;
 import java.io.IOException;
 
 public class IncomingTransformer {
-    private static Gson gson = new Gson();
     private final Channel channel;
     private final ConnectionInfo info;
     private final ViaVersionInitializer init;
