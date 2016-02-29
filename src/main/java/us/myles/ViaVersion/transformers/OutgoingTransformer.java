@@ -158,7 +158,7 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(id, output);
             short slot = input.readShort();
 
-            if (slot > 1) {
+            if (slot > 0) {
                 slot += 1; // add 1 so it's now 2-5
             }
             PacketUtil.writeVarInt(slot, output);
