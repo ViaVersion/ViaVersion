@@ -90,11 +90,11 @@ public class OutgoingTransformer {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
             int x = input.readByte();
-            output.writeShort(x);
+            output.writeShort(x * 128);
             int y = input.readByte();
-            output.writeShort(y);
+            output.writeShort(y * 128);
             int z = input.readByte();
-            output.writeShort(z);
+            output.writeShort(z * 128);
 
             byte yaw = input.readByte();
             output.writeByte(yaw);
@@ -110,11 +110,11 @@ public class OutgoingTransformer {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
             short x = (short) (input.readByte());
-            output.writeShort(x);
+            output.writeShort(x * 128);
             short y = (short) (input.readByte());
-            output.writeShort(y);
+            output.writeShort(y * 128);
             short z = (short) (input.readByte());
-            output.writeShort(z);
+            output.writeShort(z * 128);
 
             boolean onGround = input.readBoolean();
             output.writeBoolean(onGround);
