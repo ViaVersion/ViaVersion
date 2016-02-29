@@ -42,17 +42,14 @@ public class IncomingTransformer {
             System.out.println("Packet Type: " + packet + " New ID: " + packetID + " Original: " + original);
         }
         if (packet == PacketType.PLAY_TP_CONFIRM) {
-            System.out.println("Cancelling TP Confirm");
             throw new CancelException();
         }
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.HANDSHAKE) {
-            System.out.println("Readable Bytes: " + input.readableBytes());
             int protVer = PacketUtil.readVarInt(input);
             info.setProtocol(protVer);
             PacketUtil.writeVarInt(protVer <= 102 ? protVer : 47, output); // pretend to be older
 
-            System.out.println("Incoming prot ver: " + protVer);
             if (protVer <= 102) {
                 // Not 1.9 remove pipes
                 this.init.remove();
@@ -137,13 +134,11 @@ public class IncomingTransformer {
             short skinParts = input.readUnsignedByte();
             output.writeByte(skinParts);
 
-            int mainHand = PacketUtil.readVarInt(input);
-            System.out.println("Main hand: " + mainHand);
+            PacketUtil.readVarInt(input);
             return;
         }
         if (packet == PacketType.PLAY_ANIMATION_REQUEST) {
-            int hand = PacketUtil.readVarInt(input);
-            System.out.println("Animation request " + hand);
+            PacketUtil.readVarInt(input);
             return;
         }
         if (packet == PacketType.PLAY_USE_ENTITY) {
@@ -161,7 +156,7 @@ public class IncomingTransformer {
                 output.writeFloat(targetZ);
             }
             if (type == 0 || type == 2) {
-                int hand = PacketUtil.readVarInt(input); // lel
+                PacketUtil.readVarInt(input);
             }
             return;
         }
@@ -171,7 +166,6 @@ public class IncomingTransformer {
             int face = PacketUtil.readVarInt(input);
             output.writeByte(face);
             int hand = PacketUtil.readVarInt(input);
-            System.out.println("hand: " + hand);
             // write item in hand
             output.writeShort(-1);
 
@@ -189,8 +183,6 @@ public class IncomingTransformer {
             // Simulate using item :)
             output.writeLong(-1L);
             output.writeByte(-1);
-            int hand = PacketUtil.readVarInt(input);
-            System.out.println("hand: " + hand);
             // write item in hand
             output.writeShort(-1);
 

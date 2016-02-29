@@ -48,7 +48,7 @@ public class OutgoingTransformer {
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
         }
-        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE)
+        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && !packet.name().toLowerCase().contains("entity"))
             System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
         if (packet.getPacketID() != -1) {
             packetID = packet.getNewPacketID();
@@ -58,7 +58,6 @@ public class OutgoingTransformer {
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.PLAY_NAMED_SOUND_EFFECT) {
             // TODO: Port this over
-            System.out.println("cancelling");
             throw new CancelException();
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
@@ -113,11 +112,11 @@ public class OutgoingTransformer {
         if (packet == PacketType.PLAY_ENTITY_RELATIVE_MOVE) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
-            int x = input.readByte();
+            short x = (short) (input.readByte());
             output.writeShort(x);
-            int y = input.readByte();
+            short y = (short) (input.readByte());
             output.writeShort(y);
-            int z = input.readByte();
+            short z = (short) (input.readByte());
             output.writeShort(z);
 
             boolean onGround = input.readBoolean();
@@ -290,12 +289,7 @@ public class OutgoingTransformer {
             output.writeByte(pitch);
             byte yaw = input.readByte();
             output.writeByte(yaw);
-            // We don't use currentItem short lel
-
-            // transform entity meta data ugh
-            // get data watcher
             try {
-                System.out.println("Last Packet Type: " + info.getLastPacket().getClass().getName());
                 DataWatcher dw = Core.getPrivateField(info.getLastPacket(), "i", DataWatcher.class);
                 transformMetadata(dw, output);
             } catch (NoSuchFieldException e) {
@@ -333,7 +327,6 @@ public class OutgoingTransformer {
             input.readBytes(data);
             boolean sk = false;
             if (info.getLastPacket() instanceof PacketPlayOutMapChunkBulk) {
-
                 try {
                     sk = Core.getPrivateField(info.getLastPacket(), "d", boolean.class);
                 } catch (NoSuchFieldException e) {
@@ -450,14 +443,12 @@ public class OutgoingTransformer {
                             break;
                         case Position:
                             BlockPosition blockposition = (BlockPosition) obj.b();
-
                             packetdataserializer.writeInt(blockposition.getX());
                             packetdataserializer.writeInt(blockposition.getY());
                             packetdataserializer.writeInt(blockposition.getZ());
                             break;
                         case Vector3F:
                             Vector3f vector3f = (Vector3f) obj.b();
-
                             packetdataserializer.writeFloat(vector3f.getX());
                             packetdataserializer.writeFloat(vector3f.getY());
                             packetdataserializer.writeFloat(vector3f.getZ());
