@@ -1,17 +1,15 @@
-# ViaVersion
+# ViaVersion 0.2
 **Allows the connection of 1.8 clients to 1.9**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
 **Don't use late bind**
 
-**As of this point it is not finished, I need to fix:**
-
-Entity Movement Sync (Teleporting)
+**As of this point it doesn't have everything, I need to fix:**
 
 Attempt to make boats nicer when they don't work
 
-Use reflection more.
+Remap spawn eggs
 
 
 
@@ -26,6 +24,8 @@ Credits:
 **MCProtocolLib** (used for chunk reading & some of writing.)
 
 **Myself** (harhar)
+
+**Matsv** (Movement Fix)
 
 
 License:

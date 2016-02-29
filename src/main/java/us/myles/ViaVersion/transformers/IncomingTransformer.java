@@ -66,6 +66,16 @@ public class IncomingTransformer {
             }
             return;
         }
+        if (packet == PacketType.PLAY_UPDATE_SIGN_REQUEST) {
+            Long location = input.readLong();
+            output.writeLong(location);
+            for (int i = 0; i < 4; i++) {
+                String line = PacketUtil.readString(input);
+                line = "{\"text\":\"" + line + "\"}";
+                PacketUtil.writeString(line, output);
+            }
+            return;
+        }
         if (packet == PacketType.PLAY_TAB_COMPLETE_REQUEST) {
             String text = PacketUtil.readString(input);
             PacketUtil.writeString(text, output);

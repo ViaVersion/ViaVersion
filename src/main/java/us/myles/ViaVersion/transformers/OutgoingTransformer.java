@@ -270,6 +270,17 @@ public class OutgoingTransformer {
             }
             return;
         }
+        if(packet == PacketType.PLAY_UPDATE_SIGN){
+            Long location = input.readLong();
+            output.writeLong(location);
+            for(int i = 0;i<4;i++){
+                String line = PacketUtil.readString(input);
+                if(line.startsWith("\"")){
+                    line = "{\"text\":" + line + "}";
+                }
+                PacketUtil.writeString(line, output);
+            }
+        }
         if (packet == PacketType.PLAY_SPAWN_PLAYER) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
