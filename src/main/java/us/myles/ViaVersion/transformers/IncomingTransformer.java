@@ -2,15 +2,14 @@ package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import us.myles.ViaVersion.CancelException;
-import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.PacketUtil;
-import us.myles.ViaVersion.ReflectionUtil;
+import org.bukkit.inventory.ItemStack;
+import us.myles.ViaVersion.*;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class IncomingTransformer {
     private final Channel channel;
@@ -168,8 +167,23 @@ public class IncomingTransformer {
             int face = PacketUtil.readVarInt(input);
             output.writeByte(face);
             int hand = PacketUtil.readVarInt(input);
-            // write item in hand
-            output.writeShort(-1);
+            
+            ItemStack inHand = Core.getHandItem(info);
+            Object item = null;
+            try {
+                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
+                item = m.invoke(null, inHand);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            PacketUtil.writeItem(item, output);
 
             short curX = input.readUnsignedByte();
             output.writeByte(curX);

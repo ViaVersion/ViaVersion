@@ -8,6 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 
@@ -65,6 +66,24 @@ public class Core extends JavaPlugin {
             }).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.out.println("Error fetching entity ");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ItemStack getHandItem(final ConnectionInfo info) {
+        try {
+            return Bukkit.getScheduler().callSyncMethod(getPlugin(Core.class), new Callable<ItemStack>() {
+                @Override
+                public ItemStack call() throws Exception {
+                    if (info.getPlayer() != null) {
+                        return info.getPlayer().getItemInHand();
+                    }
+                    return null;
+                }
+            }).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            System.out.println("Error fetching hand item ");
             e.printStackTrace();
             return null;
         }
