@@ -338,4 +338,22 @@ public class PacketUtil {
         return output;
     }
 
+    public static void writeItem(Object value, ByteBuf output) {
+        try {
+            Class<?> serializer = ReflectionUtil.nms("PacketDataSerializer");
+            Object init = serializer.getDeclaredConstructor(ByteBuf.class).newInstance(output);
+            Method toCall = init.getClass().getDeclaredMethod("a", ReflectionUtil.nms("ItemStack"));
+            toCall.invoke(init, value);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 }

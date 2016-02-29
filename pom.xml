@@ -21,12 +21,28 @@
     </build>
     <dependencies>
         <dependency>
-            <!-- Sorry about this path >:( I promise to fix it when I stop using NMS :) -->
-            <groupId>org.spigot</groupId>
-            <artifactId>spigot1.8</artifactId>
-            <version>1.8</version>
-            <scope>system</scope>
-            <systemPath>E:/spigot_server.jar</systemPath>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.0.20.Final</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

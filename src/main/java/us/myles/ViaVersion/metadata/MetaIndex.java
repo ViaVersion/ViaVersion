@@ -1,8 +1,5 @@
 package us.myles.ViaVersion.metadata;
 
-import net.minecraft.server.v1_8_R3.Entity;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.EntityTypes;
 import org.bukkit.entity.*;
 
 public enum MetaIndex {
@@ -164,11 +161,10 @@ public enum MetaIndex {
 
     public static MetaIndex getIndex(Entity entity, int index) {
         EntityType type;
-        if (entity instanceof EntityPlayer) {
+        if (entity instanceof Player) {
             type = EntityType.PLAYER;
         } else {
-            int entityID = EntityTypes.a(entity);
-            type = EntityType.fromId(entityID);
+            type = entity.getType();
         }
         return getIndex(type, index);
     }

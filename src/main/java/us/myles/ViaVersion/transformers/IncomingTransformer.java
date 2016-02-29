@@ -2,17 +2,15 @@ package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import net.minecraft.server.v1_8_R3.ItemStack;
-import net.minecraft.server.v1_8_R3.PacketDataSerializer;
-import net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.PacketUtil;
+import us.myles.ViaVersion.ReflectionUtil;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class IncomingTransformer {
     private final Channel channel;
@@ -97,23 +95,29 @@ public class IncomingTransformer {
             byte button = input.readByte();
             short action = input.readShort();
             byte mode = input.readByte();
-            PacketDataSerializer pds = new PacketDataSerializer(input);
-            ItemStack slotItem = null;
-            try {
-                slotItem = pds.i();
-            } catch (IOException e) {
-            }
             if (slot == 45 && windowID == 0) {
-                channel.writeAndFlush(new PacketPlayOutSetSlot(windowID, slot, null)); // slot is empty
-                slot = -999; // we're evil, they'll throw item on the ground
+                try {
+                    Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
+                    Object setSlotPacket = setSlot.getConstructors()[1].newInstance(windowID, slot, null);
+                    channel.writeAndFlush(setSlotPacket); // slot is empty
+                    slot = -999; // we're evil, they'll throw item on the ground
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
             }
             output.writeByte(windowID);
             output.writeShort(slot);
             output.writeByte(button);
             output.writeShort(action);
             output.writeByte(mode);
-            PacketDataSerializer pdss = new PacketDataSerializer(output);
-            pdss.a(slotItem);
+            output.writeBytes(input);
             return;
         }
         if (packet == PacketType.PLAY_CLIENT_SETTINGS) {

@@ -4,16 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import net.minecraft.server.v1_8_R3.*;
-import net.minecraft.server.v1_8_R3.ItemStack;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.inventory.*;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-import us.myles.ViaVersion.CancelException;
-import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.Core;
-import us.myles.ViaVersion.PacketUtil;
+import us.myles.ViaVersion.*;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
@@ -22,6 +17,8 @@ import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class OutgoingTransformer {
@@ -171,7 +168,7 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(id, output);
 
             try {
-                List dw = Core.getPrivateField(info.getLastPacket(), "b", List.class);
+                List dw = ReflectionUtil.get(info.getLastPacket(), "b", List.class);
                 // get entity via entityID, not preferred but we need it.
                 Entity entity = Core.getEntity(info.getUUID(), id);
                 if (entity != null) {
@@ -262,11 +259,13 @@ public class OutgoingTransformer {
             short vZ = input.readShort();
             output.writeShort(vZ);
             try {
-                DataWatcher dw = Core.getPrivateField(info.getLastPacket(), "l", DataWatcher.class);
-                transformMetadata(dw, output);
+                Object dataWatcher = ReflectionUtil.get(info.getLastPacket(), "l", ReflectionUtil.nms("DataWatcher"));
+                transformMetadata(dataWatcher, output);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
             return;
@@ -290,11 +289,13 @@ public class OutgoingTransformer {
             byte yaw = input.readByte();
             output.writeByte(yaw);
             try {
-                DataWatcher dw = Core.getPrivateField(info.getLastPacket(), "i", DataWatcher.class);
-                transformMetadata(dw, output);
+                Object dataWatcher = ReflectionUtil.get(info.getLastPacket(), "i", ReflectionUtil.nms("DataWatcher"));
+                transformMetadata(dataWatcher, output);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
@@ -326,9 +327,9 @@ public class OutgoingTransformer {
             byte[] data = new byte[size];
             input.readBytes(data);
             boolean sk = false;
-            if (info.getLastPacket() instanceof PacketPlayOutMapChunkBulk) {
+            if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
                 try {
-                    sk = Core.getPrivateField(info.getLastPacket(), "d", boolean.class);
+                    sk = ReflectionUtil.get(info.getLastPacket(), "d", boolean.class);
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
@@ -351,113 +352,124 @@ public class OutgoingTransformer {
         output.writeBytes(input);
     }
 
-    private void transformMetadata(DataWatcher dw, ByteBuf output) {
+    private void transformMetadata(Object dw, ByteBuf output) {
         // get entity
         try {
-            transformMetadata(Core.getPrivateField(dw, "a", Entity.class), dw.b(), output);
+            Class<?> nmsClass = ReflectionUtil.nms("Entity");
+            Object nmsEntity = ReflectionUtil.get(dw, "a", nmsClass);
+            Class<?> craftClass = ReflectionUtil.obc("entity.CraftEntity");
+            Method bukkitMethod = craftClass.getDeclaredMethod("getEntity", ReflectionUtil.obc("CraftServer"), nmsClass);
+
+            Object entity = bukkitMethod.invoke(null, Bukkit.getServer(), nmsEntity);
+            transformMetadata((Entity) entity, (List) ReflectionUtil.invoke(dw, "b"), output);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
-    private void transformMetadata(Entity entity, List<DataWatcher.WatchableObject> dw, ByteBuf output) {
-        PacketDataSerializer packetdataserializer = new PacketDataSerializer(output);
+    private void transformMetadata(Entity entity, List dw, ByteBuf output) {
+        try {
+            if (dw != null) {
+                short id = -1;
+                int data = -1;
 
-        if (dw != null) {
-            short id = -1;
-            int data = -1;
-
-            Iterator<DataWatcher.WatchableObject> iterator = dw.iterator();
-            while (iterator.hasNext()) {
-                DataWatcher.WatchableObject obj = iterator.next();
-                MetaIndex metaIndex = MetaIndex.getIndex(entity, obj.a());
-                if (metaIndex.getNewType() != NewType.Discontinued) {
-                    if (metaIndex.getNewType() != NewType.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
-                        output.writeByte(metaIndex.getNewIndex());
-                        output.writeByte(metaIndex.getNewType().getTypeID());
-                    }
-                    switch (metaIndex.getNewType()) {
-                        case Byte:
-                            // convert from int, byte
-                            if (metaIndex.getOldType() == Type.Byte) {
-                                packetdataserializer.writeByte(((Byte) obj.b()).byteValue());
-                            }
-                            if (metaIndex.getOldType() == Type.Int) {
-                                packetdataserializer.writeByte(((Integer) obj.b()).byteValue());
-                            }
-                            break;
-                        case OptUUID:
-                            String owner = (String) obj.b();
-                            UUID toWrite = null;
-                            if (owner.length() != 0) {
-                                try {
-                                    toWrite = UUID.fromString(owner);
-                                } catch (Exception ignored) {
+                Iterator iterator = dw.iterator();
+                while (iterator.hasNext()) {
+                    Object watchableObj = iterator.next(); //
+                    MetaIndex metaIndex = MetaIndex.getIndex(entity, (int) ReflectionUtil.invoke(watchableObj, "a"));
+                    if (metaIndex.getNewType() != NewType.Discontinued) {
+                        if (metaIndex.getNewType() != NewType.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
+                            output.writeByte(metaIndex.getNewIndex());
+                            output.writeByte(metaIndex.getNewType().getTypeID());
+                        }
+                        Object value = ReflectionUtil.invoke(watchableObj, "b");
+                        switch (metaIndex.getNewType()) {
+                            case Byte:
+                                // convert from int, byte
+                                if (metaIndex.getOldType() == Type.Byte) {
+                                    output.writeByte(((Byte) value).byteValue());
                                 }
-                            }
-                            packetdataserializer.writeBoolean(toWrite != null);
-                            if (toWrite != null)
-                                packetdataserializer.a(toWrite);
-                            break;
-                        case BlockID:
-                            // if we have both sources :))
-                            if (metaIndex.getOldType() == Type.Byte) {
-                                data = ((Byte) obj.b()).byteValue();
-                            }
-                            if (metaIndex.getOldType() == Type.Short) {
-                                id = ((Short) obj.b()).shortValue();
-                            }
-                            if (id != -1 && data != -1) {
-                                int combined = id << 4 | data;
-                                data = -1;
-                                id = -1;
-                                PacketUtil.writeVarInt(combined, output);
-                            }
-                            break;
-                        case VarInt:
-                            // convert from int, short, byte
-                            if (metaIndex.getOldType() == Type.Byte) {
-                                PacketUtil.writeVarInt(((Byte) obj.b()).intValue(), output);
-                            }
-                            if (metaIndex.getOldType() == Type.Short) {
-                                PacketUtil.writeVarInt(((Short) obj.b()).intValue(), output);
-                            }
-                            if (metaIndex.getOldType() == Type.Int) {
-                                PacketUtil.writeVarInt(((Integer) obj.b()).intValue(), output);
-                            }
-                            break;
-                        case Float:
-                            packetdataserializer.writeFloat(((Float) obj.b()).floatValue());
-                            break;
-                        case String:
-                            packetdataserializer.a((String) obj.b());
-                            break;
-                        case Boolean:
-                            packetdataserializer.writeBoolean(((Byte) obj.b()).byteValue() != 0);
-                            break;
-                        case Slot:
-                            ItemStack itemstack = (ItemStack) obj.b();
-                            packetdataserializer.a(itemstack);
-                            break;
-                        case Position:
-                            BlockPosition blockposition = (BlockPosition) obj.b();
-                            packetdataserializer.writeInt(blockposition.getX());
-                            packetdataserializer.writeInt(blockposition.getY());
-                            packetdataserializer.writeInt(blockposition.getZ());
-                            break;
-                        case Vector3F:
-                            Vector3f vector3f = (Vector3f) obj.b();
-                            packetdataserializer.writeFloat(vector3f.getX());
-                            packetdataserializer.writeFloat(vector3f.getY());
-                            packetdataserializer.writeFloat(vector3f.getZ());
+                                if (metaIndex.getOldType() == Type.Int) {
+                                    output.writeByte(((Integer) value).byteValue());
+                                }
+                                break;
+                            case OptUUID:
+                                String owner = (String) value;
+                                UUID toWrite = null;
+                                if (owner.length() != 0) {
+                                    try {
+                                        toWrite = UUID.fromString(owner);
+                                    } catch (Exception ignored) {
+                                    }
+                                }
+                                output.writeBoolean(toWrite != null);
+                                if (toWrite != null)
+                                    PacketUtil.writeUUID((UUID) value, output);
+                                break;
+                            case BlockID:
+                                // if we have both sources :))
+                                if (metaIndex.getOldType() == Type.Byte) {
+                                    data = ((Byte) value).byteValue();
+                                }
+                                if (metaIndex.getOldType() == Type.Short) {
+                                    id = ((Short) value).shortValue();
+                                }
+                                if (id != -1 && data != -1) {
+                                    int combined = id << 4 | data;
+                                    data = -1;
+                                    id = -1;
+                                    PacketUtil.writeVarInt(combined, output);
+                                }
+                                break;
+                            case VarInt:
+                                // convert from int, short, byte
+                                if (metaIndex.getOldType() == Type.Byte) {
+                                    PacketUtil.writeVarInt(((Byte) value).intValue(), output);
+                                }
+                                if (metaIndex.getOldType() == Type.Short) {
+                                    PacketUtil.writeVarInt(((Short) value).intValue(), output);
+                                }
+                                if (metaIndex.getOldType() == Type.Int) {
+                                    PacketUtil.writeVarInt(((Integer) value).intValue(), output);
+                                }
+                                break;
+                            case Float:
+                                output.writeFloat(((Float) value).floatValue());
+                                break;
+                            case String:
+                                PacketUtil.writeString((String) value, output);
+                                break;
+                            case Boolean:
+                                output.writeBoolean(((Byte) value).byteValue() != 0);
+                                break;
+                            case Slot:
+                                PacketUtil.writeItem(value, output);
+                                break;
+                            case Position:
+                                output.writeInt((int) ReflectionUtil.invoke(value, "getX"));
+                                output.writeInt((int) ReflectionUtil.invoke(value, "getY"));
+                                output.writeInt((int) ReflectionUtil.invoke(value, "getZ"));
+                                break;
+                            case Vector3F:
+                                output.writeFloat((float) ReflectionUtil.invoke(value, "getX"));
+                                output.writeFloat((float) ReflectionUtil.invoke(value, "getY"));
+                                output.writeFloat((float) ReflectionUtil.invoke(value, "getZ"));
+                        }
                     }
                 }
             }
+            output.writeByte(255);
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        output.writeByte(255);
-
 
     }
 

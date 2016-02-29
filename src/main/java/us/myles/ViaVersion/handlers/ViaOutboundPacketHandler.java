@@ -1,15 +1,14 @@
 package us.myles.ViaVersion.handlers;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.server.v1_8_R3.Packet;
-import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunkBulk;
-import net.minecraft.server.v1_8_R3.World;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.Core;
+import us.myles.ViaVersion.ReflectionUtil;
+
+import java.lang.reflect.Constructor;
 
 public class ViaOutboundPacketHandler extends ChannelOutboundHandlerAdapter {
     private final ConnectionInfo info;
@@ -17,21 +16,26 @@ public class ViaOutboundPacketHandler extends ChannelOutboundHandlerAdapter {
     public ViaOutboundPacketHandler(Channel c, ConnectionInfo info) {
         this.info = info;
     }
+
     @Override
     public void write(ChannelHandlerContext channelHandlerContext, Object o, ChannelPromise channelPromise) throws Exception {
-        if(o instanceof Packet){
+        if (!(o instanceof ByteBuf)) {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at byte level :) */
-            if(o instanceof PacketPlayOutMapChunkBulk){
-                PacketPlayOutMapChunkBulk bulk = (PacketPlayOutMapChunkBulk) o;
-                int[] locX = Core.getPrivateField(bulk, "a", int[].class);
-                int[] locZ = Core.getPrivateField(bulk, "b", int[].class);
+            if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
+                int[] locX = ReflectionUtil.get(o, "a", int[].class);
+                int[] locZ = ReflectionUtil.get(o, "b", int[].class);
 
-                World world = Core.getPrivateField(bulk, "world", World.class);
-                for(int i = 0;i<locX.length;i++){
+                Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
+                Class<?> mapChunk = ReflectionUtil.nms("PacketPlayOutMapChunk");
+                Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
+                for (int i = 0; i < locX.length; i++) {
                     int x = locX[i];
                     int z = locZ[i];
-                    channelHandlerContext.write(new PacketPlayOutMapChunk(world.getChunkAt(x, z), true, 65535)); // magic was 65535
+                    // world invoke function
+                    Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
+                    Object packet = constructor.newInstance(chunk, true, 65535);
+                    channelHandlerContext.write(packet);
                 }
                 return;
             }
