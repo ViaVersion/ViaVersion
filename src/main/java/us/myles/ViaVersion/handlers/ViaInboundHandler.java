@@ -37,6 +37,8 @@ public class ViaInboundHandler extends ChannelInboundHandlerAdapter {
                 incomingTransformer.transform(id, bytebuf, newPacket);
             } catch (CancelException e) {
                 return;
+            } finally {
+                bytebuf.release();
             }
             if (compression) {
                 // recompress :)

@@ -5,10 +5,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import net.minecraft.server.v1_8_R3.Entity;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
-import net.minecraft.server.v1_8_R3.ServerConnection;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Player;
@@ -33,16 +30,19 @@ public class Core extends JavaPlugin {
         try {
             injectPacketHandler();
         } catch (Exception e) {
+            System.out.println("Unable to inject handlers, this version only supports 1.8.8.");
             e.printStackTrace();
-            System.out.println("Unable to inject handlers, this version only supports 1.8.");
         }
     }
 
-    public void injectPacketHandler() throws NoSuchFieldException, IllegalAccessException {
+    public void injectPacketHandler() throws Exception {
         MinecraftServer server = MinecraftServer.getServer();
         ServerConnection connection = server.getServerConnection();
 
         List<ChannelFuture> futures = getPrivateField(connection, "g", List.class);
+        if(futures.size() == 0){
+            throw new Exception("Could not find server to inject (late bind?)");
+        }
 
         for (ChannelFuture future : futures) {
             ChannelPipeline pipeline = future.channel().pipeline();
