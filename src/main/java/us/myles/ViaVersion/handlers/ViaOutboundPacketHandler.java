@@ -1,15 +1,13 @@
 package us.myles.ViaVersion.handlers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 
+@ChannelHandler.Sharable
 public class ViaOutboundPacketHandler extends ChannelOutboundHandlerAdapter {
     private final ConnectionInfo info;
 

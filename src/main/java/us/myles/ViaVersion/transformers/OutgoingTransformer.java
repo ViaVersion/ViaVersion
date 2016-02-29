@@ -327,12 +327,12 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             return;
         }
-        if(packet == PacketType.PLAY_TEAM) {
+        if (packet == PacketType.PLAY_TEAM) {
             String teamName = PacketUtil.readString(input);
             PacketUtil.writeString(teamName, output);
             byte mode = input.readByte();
             output.writeByte(mode);
-            if(mode == 0 || mode == 2){
+            if (mode == 0 || mode == 2) {
                 PacketUtil.writeString(PacketUtil.readString(input), output);
                 PacketUtil.writeString(PacketUtil.readString(input), output);
                 PacketUtil.writeString(PacketUtil.readString(input), output);
@@ -420,15 +420,24 @@ public class OutgoingTransformer {
     }
 
     private void transformMetadata(Entity entity, List dw, ByteBuf output) {
-        try {
-            if (dw != null) {
-                short id = -1;
-                int data = -1;
+        if (dw != null) {
+            short id = -1;
+            int data = -1;
 
-                Iterator iterator = dw.iterator();
-                while (iterator.hasNext()) {
-                    Object watchableObj = iterator.next(); //
-                    MetaIndex metaIndex = MetaIndex.getIndex(entity, (int) ReflectionUtil.invoke(watchableObj, "a"));
+            Iterator iterator = dw.iterator();
+            while (iterator.hasNext()) {
+                Object watchableObj = iterator.next(); //
+                MetaIndex metaIndex = null;
+                try {
+                    metaIndex = MetaIndex.getIndex(entity, (int) ReflectionUtil.invoke(watchableObj, "a"));
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                try {
                     if (metaIndex.getNewType() != NewType.Discontinued) {
                         if (metaIndex.getNewType() != NewType.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
                             output.writeByte(metaIndex.getNewIndex());
@@ -507,13 +516,20 @@ public class OutgoingTransformer {
                                 output.writeFloat((float) ReflectionUtil.invoke(value, "getY"));
                                 output.writeFloat((float) ReflectionUtil.invoke(value, "getZ"));
                         }
+
                     }
+                } catch (Exception e) {
+                    if (entity != null) {
+                        System.out.println("An error occurred with entity meta data for " + entity.getType());
+                        System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
+                        System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
+                    }
+                    e.printStackTrace();
                 }
             }
-            output.writeByte(255);
-        }catch(Exception e){
-            e.printStackTrace();
         }
+        output.writeByte(255);
+
 
     }
 
