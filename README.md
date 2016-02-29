@@ -3,15 +3,13 @@
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
+**Don't use late bind**
+
 **As of this point it is not finished, I need to fix:**
 
-Entity Movement Sync
-
-Teleporting (perhaps)
+Entity Movement Sync (Teleporting)
 
 Attempt to make boats nicer when they don't work
-
-Verify slot IDs to prevent dual wielding :)
 
 Use reflection more.
 
