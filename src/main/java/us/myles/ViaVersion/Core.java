@@ -24,7 +24,10 @@ public class Core extends JavaPlugin {
         try {
             injectPacketHandler();
         } catch (Exception e) {
-            System.out.println("Unable to inject handlers, are you on 1.8?");
+            if(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null){
+                System.out.println("This plugin is not compatible with protocol lib.");
+            }
+            System.out.println("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
     }

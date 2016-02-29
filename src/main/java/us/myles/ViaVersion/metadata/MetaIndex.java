@@ -171,7 +171,10 @@ public enum MetaIndex {
 
     public static MetaIndex getIndex(EntityType type, int index) {
         Class<? extends org.bukkit.entity.Entity> entityClass = type.getEntityClass();
-
+        if(entityClass == null){
+            System.out.println("Could not get entity class for " + type);
+            return null;
+        }
         for (MetaIndex mi : MetaIndex.values()) {
             if (mi.getIndex() == index) {
                 if (mi.getApplicableClass().isAssignableFrom(entityClass) ||

@@ -19,6 +19,7 @@ import us.myles.ViaVersion.packets.State;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.*;
 
 public class OutgoingTransformer {
@@ -45,7 +46,7 @@ public class OutgoingTransformer {
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
         }
-//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && !packet.name().toLowerCase().contains("entity"))
+//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().contains("look")))
 //            System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
         if (packet.getPacketID() != -1) {
             packetID = packet.getNewPacketID();
@@ -334,7 +335,7 @@ public class OutgoingTransformer {
                 output.writeByte(input.readByte());
                 PacketUtil.writeString(PacketUtil.readString(input), output);
 
-                PacketUtil.readString(input); // collission rule :)
+                PacketUtil.writeString("", output); // collission rule :)
             }
             output.writeBytes(input);
             return;
