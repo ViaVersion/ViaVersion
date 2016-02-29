@@ -317,7 +317,7 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(damage, output);
             byte scale = input.readByte();
             output.writeByte(scale);
-            input.readBoolean();
+            output.writeBoolean(true);
             output.writeBytes(input);
             return;
         }
