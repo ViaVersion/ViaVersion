@@ -3,15 +3,17 @@ package us.myles.ViaVersion.transformers;
 import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.PacketDataSerializer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.Core;
 import us.myles.ViaVersion.PacketUtil;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+
+import java.io.IOException;
 
 public class IncomingTransformer {
     private static Gson gson = new Gson();
@@ -72,7 +74,7 @@ public class IncomingTransformer {
             }
             return;
         }
-        if(packet == PacketType.PLAY_TAB_COMPLETE_REQUEST){
+        if (packet == PacketType.PLAY_TAB_COMPLETE_REQUEST) {
             String text = PacketUtil.readString(input);
             PacketUtil.writeString(text, output);
             input.readBoolean(); // assume command
@@ -90,6 +92,33 @@ public class IncomingTransformer {
             output.writeLong(pos);
             short face = input.readUnsignedByte();
             output.writeByte(face);
+            return;
+        }
+        if (packet == PacketType.PLAY_CLICK_WINDOW) {
+            // if placed in new slot, reject :)
+            int windowID = input.readUnsignedByte();
+            short slot = input.readShort();
+
+            byte button = input.readByte();
+            short action = input.readShort();
+            byte mode = input.readByte();
+            PacketDataSerializer pds = new PacketDataSerializer(input);
+            ItemStack slotItem = null;
+            try {
+                slotItem = pds.i();
+            } catch (IOException e) {
+            }
+            if (slot == 45 && windowID == 0) {
+                channel.writeAndFlush(new PacketPlayOutSetSlot(windowID, slot, null)); // slot is empty
+                slot = -999; // we're evil, they'll throw item on the ground
+            }
+            output.writeByte(windowID);
+            output.writeShort(slot);
+            output.writeByte(button);
+            output.writeShort(action);
+            output.writeByte(mode);
+            PacketDataSerializer pdss = new PacketDataSerializer(output);
+            pdss.a(slotItem);
             return;
         }
         if (packet == PacketType.PLAY_CLIENT_SETTINGS) {
