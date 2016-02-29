@@ -24,7 +24,7 @@ public class Core extends JavaPlugin {
         try {
             injectPacketHandler();
         } catch (Exception e) {
-            System.out.println("Unable to inject handlers, this version only supports 1.8.8.");
+            System.out.println("Unable to inject handlers, are you on 1.8?");
             e.printStackTrace();
         }
     }

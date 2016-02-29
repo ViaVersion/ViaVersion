@@ -114,7 +114,7 @@ public enum PacketType {
     PLAY_UPDATE_HEALTH(State.PLAY, Direction.OUTGOING, 0x06, 0x3E),
     PLAY_SCOREBOARD_OBJ(State.PLAY, Direction.OUTGOING, 0x3B, 0x3F),
     PLAY_SET_PASSENGERS(State.PLAY, Direction.OUTGOING, -1, 0x40),
-    PLAY_TEAMS(State.PLAY, Direction.OUTGOING, 0x3E, 0x41),
+    PLAY_TEAM(State.PLAY, Direction.OUTGOING, 0x3E, 0x41),
     PLAY_UPDATE_SCORE(State.PLAY, Direction.OUTGOING, 0x3C, 0x42),
     PLAY_SPAWN_POSITION(State.PLAY, Direction.OUTGOING, 0x05, 0x43),
     PLAY_TIME_UPDATE(State.PLAY, Direction.OUTGOING, 0x03, 0x44),

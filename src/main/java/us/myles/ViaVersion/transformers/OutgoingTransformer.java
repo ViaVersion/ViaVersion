@@ -45,8 +45,8 @@ public class OutgoingTransformer {
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
         }
-        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && !packet.name().toLowerCase().contains("entity"))
-            System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
+//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && !packet.name().toLowerCase().contains("entity"))
+//            System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
         if (packet.getPacketID() != -1) {
             packetID = packet.getNewPacketID();
         }
@@ -299,6 +299,33 @@ public class OutgoingTransformer {
                 e.printStackTrace();
             }
 
+            return;
+        }
+        if(packet == PacketType.PLAY_MAP) {
+            int damage = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(damage, output);
+            byte scale = input.readByte();
+            output.writeByte(scale);
+            input.readBoolean();
+            output.writeBytes(input);
+            return;
+        }
+        if(packet == PacketType.PLAY_TEAM) {
+            String teamName = PacketUtil.readString(input);
+            PacketUtil.writeString(teamName, output);
+            byte mode = input.readByte();
+            output.writeByte(mode);
+            if(mode == 0 || mode == 2){
+                PacketUtil.writeString(PacketUtil.readString(input), output);
+                PacketUtil.writeString(PacketUtil.readString(input), output);
+                PacketUtil.writeString(PacketUtil.readString(input), output);
+
+                output.writeByte(input.readByte());
+                PacketUtil.writeString(PacketUtil.readString(input), output);
+
+                PacketUtil.readString(input); // collission rule :)
+            }
+            output.writeBytes(input);
             return;
         }
         if (packet == PacketType.PLAY_CHUNK_DATA) {

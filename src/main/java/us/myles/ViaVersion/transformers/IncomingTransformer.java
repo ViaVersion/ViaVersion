@@ -33,9 +33,9 @@ public class IncomingTransformer {
         if (packet.getPacketID() != -1) {
             packetID = packet.getPacketID();
         }
-        if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
-            System.out.println("Packet Type: " + packet + " New ID: " + packetID + " Original: " + original);
-        }
+//        if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
+//            System.out.println("Packet Type: " + packet + " New ID: " + packetID + " Original: " + original);
+//        }
         if (packet == PacketType.PLAY_TP_CONFIRM) {
             throw new CancelException();
         }
@@ -167,7 +167,7 @@ public class IncomingTransformer {
             int face = PacketUtil.readVarInt(input);
             output.writeByte(face);
             int hand = PacketUtil.readVarInt(input);
-            
+
             ItemStack inHand = Core.getHandItem(info);
             Object item = null;
             try {
