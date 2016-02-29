@@ -271,13 +271,18 @@ public class OutgoingTransformer {
             }
             return;
         }
-        if(packet == PacketType.PLAY_UPDATE_SIGN){
+        if (packet == PacketType.PLAY_UPDATE_SIGN) {
             Long location = input.readLong();
             output.writeLong(location);
-            for(int i = 0;i<4;i++){
+            for (int i = 0; i < 4; i++) {
                 String line = PacketUtil.readString(input);
-                if(line.startsWith("\"")){
-                    line = "{\"text\":" + line + "}";
+                if (line == null || line.equalsIgnoreCase("null")) {
+                    line = "{\"text\":\"\"}";
+                } else {
+                    if (!line.startsWith("\"") && !line.startsWith("{"))
+                        line = "\"" + line + "\"";
+                    if (line.startsWith("\""))
+                        line = "{\"text\":" + line + "}";
                 }
                 PacketUtil.writeString(line, output);
             }
