@@ -478,7 +478,7 @@ public class OutgoingTransformer {
                                 }
                                 output.writeBoolean(toWrite != null);
                                 if (toWrite != null)
-                                    PacketUtil.writeUUID((UUID) value, output);
+                                    PacketUtil.writeUUID((UUID) toWrite, output);
                                 break;
                             case BlockID:
                                 // if we have both sources :))
