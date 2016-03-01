@@ -167,6 +167,8 @@ public enum PacketType {
     }
 
     public static PacketType findNewPacket(State state, Direction direction, int id) {
+    	if(id == -1)
+    		return null;
         for (PacketType pt : values()) {
             if (pt.getNewPacketID() == id && id != -1
                     && pt.getState() == state
@@ -177,6 +179,8 @@ public enum PacketType {
     }
 
     public static PacketType findOldPacket(State state, Direction direction, int id) {
+    	if(id == -1)
+    		return null;
         for (PacketType pt : values()) {
             if (pt.getPacketID() == id && id != -1
                     && pt.getState() == state
