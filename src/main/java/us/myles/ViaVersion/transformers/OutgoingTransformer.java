@@ -25,6 +25,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static us.myles.ViaVersion.PacketUtil.*;
+
 public class OutgoingTransformer {
     private static Gson gson = new Gson();
     private final Channel channel;
@@ -72,10 +74,25 @@ public class OutgoingTransformer {
             output.writeBytes(input);
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
-            int id = input.readInt();
-            output.writeInt(id);
-            int target = input.readInt();
-            output.writeInt(target);
+            int passenger = input.readInt();
+            int vehicle = input.readInt();
+            boolean lead = input.readBoolean();
+            if (!lead){
+                output.clear();
+                writeVarInt(PacketType.PLAY_SET_PASSENGERS.getNewPacketID(),output);
+                writeVarInt(vehicle,output);
+                writeVarIntArray(Collections.singletonList(passenger),output);
+                return;
+            }
+            output.writeInt(passenger);
+            output.writeInt(vehicle);
+            return;
+        }
+        if (packet == PacketType.PLAY_DISCONNECT){
+            String reason = readString(input);
+            if (reason.startsWith("\""))
+                reason = "{\"text\":" + reason + "}";
+            writeString(reason,output);
             return;
         }
         if (packet == PacketType.PLAY_ENTITY_TELEPORT) {

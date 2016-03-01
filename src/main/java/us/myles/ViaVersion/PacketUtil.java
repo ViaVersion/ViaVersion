@@ -184,6 +184,13 @@ public class PacketUtil {
         }
     }
 
+    public static void writeVarIntArray(List<Integer> integers, ByteBuf output) {
+        writeVarInt(integers.size(),output);
+        for (Integer i  : integers){
+            writeVarInt(i,output);
+        }
+    }
+
     public static int readVarShort(ByteBuf buf) {
         int low = buf.readUnsignedShort();
         int high = 0;
