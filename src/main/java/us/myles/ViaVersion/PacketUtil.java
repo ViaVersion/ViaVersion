@@ -363,4 +363,17 @@ public class PacketUtil {
             e.printStackTrace();
         }
     }
+
+    public static long[] readBlockPosition(ByteBuf buf) {
+        long val = buf.readLong();
+        long x = (val >> 38); // signed
+        long y = (val >> 26) & 0xfff; // unsigned
+        // this shifting madness is used to preserve sign
+        long z = (val << 38) >> 38; // signed
+        return new long[]{x, y, z};
+    }
+
+    public static void writeBlockPosition(ByteBuf buf, long x, long y, long z) {
+        buf.writeLong(((x & 0x3ffffff) << 38) | ((y & 0xfff) << 26) | (z & 0x3ffffff));
+    }
 }
