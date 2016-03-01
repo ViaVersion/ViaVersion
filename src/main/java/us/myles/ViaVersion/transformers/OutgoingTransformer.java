@@ -25,6 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static us.myles.ViaVersion.PacketUtil.readString;
+import static us.myles.ViaVersion.PacketUtil.writeString;
+
 public class OutgoingTransformer {
     private static Gson gson = new Gson();
     private final Channel channel;
@@ -76,6 +79,13 @@ public class OutgoingTransformer {
             output.writeInt(id);
             int target = input.readInt();
             output.writeInt(target);
+            return;
+        }
+        if (packet == PacketType.PLAY_DISCONNECT){
+            String reason = readString(input);
+            if (reason.startsWith("\""))
+                reason = "{\"text\":" + reason + "}";
+            writeString(reason,output);
             return;
         }
         if (packet == PacketType.PLAY_ENTITY_TELEPORT) {
