@@ -223,35 +223,31 @@ public enum SoundEffect {
     MOB_SKELETON_DEATH("mob.skeleton.death", "entity.skeleton.death", SoundCategory.HOSTILE),
     MOB_HORSE_HIT("mob.horse.hit", "entity.horse.hurt", SoundCategory.NEUTRAL),
     MOB_VILLAGER_HIT("mob.villager.hit", "entity.villager.hurt", SoundCategory.NEUTRAL),
-    MOB_HORSE_SKELETON_IDLE("mob.horse.skeleton.idle", "entity.skeleton_horse.ambient", SoundCategory.NEUTRAL);
-
-    //NOT ALL SOUNDS INCLUDED!
-    //Missing all new 1.9 sounds
-    //Missing (1.8 sound names):
-    //records.ward
-    //music.game.nether
-    //music.game.end.dragon
-    //mob.rabbit.death
-    //records.chirp
-    //records.13
-    //records.11
-    //music.game.end.credits
-    //records.mellohi
-    //music.game
-    //records.mall
-    //records.stal
-    //records.far
-    //records.blocks
-    //music.game.creative
-    //records.wait
-    //music.menu
-    //music.game.end
-    //mob.rabbit.hurt
-    //records.cat
-    //mob.guardian.idle
-    //mob.rabbit.hop
-    //mob.rabbit.idle
-    //records.strad
+    MOB_HORSE_SKELETON_IDLE("mob.horse.skeleton.idle", "entity.skeleton_horse.ambient", SoundCategory.NEUTRAL),
+    RECORDS_CHIRP("records.chirp", "record.chirp", SoundCategory.RECORD),
+    MOB_RABBIT_HURT("mob.rabbit.hurt", "entity.rabbit.hurt", SoundCategory.NEUTRAL),
+    RECORDS_STAL("records.stal", "record.stal", SoundCategory.RECORD),
+    MUSIC_GAME_NETHER("music.game.nether", "music.nether", SoundCategory.MUSIC),
+    MUSIC_MENU("music.menu", "music.menu", SoundCategory.MUSIC),
+    RECORDS_MELLOHI("records.mellohi", "record.mellohi", SoundCategory.RECORD),
+    RECORDS_CAT("records.cat", "record.cat", SoundCategory.RECORD),
+    RECORDS_FAR("records.far", "record.far", SoundCategory.RECORD),
+    MUSIC_GAME_END_DRAGON("music.game.end.dragon", "music.dragon", SoundCategory.MUSIC),
+    MOB_RABBIT_DEATH("mob.rabbit.death", "entity.rabbit.death", SoundCategory.NEUTRAL),
+    MOB_RABBIT_IDLE("mob.rabbit.idle", "entity.rabbit.ambient", SoundCategory.NEUTRAL),
+    MUSIC_GAME_END("music.game.end", "music.end", SoundCategory.MUSIC),
+    MUSIC_GAME("music.game", "music.game", SoundCategory.MUSIC),
+    MOB_GUARDIAN_IDLE("mob.guardian.idle", "null", SoundCategory.HOSTILE),
+    RECORDS_WARD("records.ward", "record.ward", SoundCategory.RECORD),
+    RECORDS_13("records.13", "record.13", SoundCategory.RECORD),
+    MOB_RABBIT_HOP("mob.rabbit.hop", "entity.rabbit.jump", SoundCategory.NEUTRAL),
+    RECORDS_STRAD("records.strad", "record.strad", SoundCategory.RECORD),
+    RECORDS_11("records.11", "record.11", SoundCategory.RECORD),
+    RECORDS_MALL("records.mall", "record.mall", SoundCategory.RECORD),
+    RECORDS_BLOCKS("records.blocks", "record.blocks", SoundCategory.RECORD),
+    RECORDS_WAIT("records.wait", "record.wait", SoundCategory.RECORD),
+    MUSIC_GAME_END_CREDITS("music.game.end.credits", "music.credits", SoundCategory.MUSIC),
+    MUSIC_GAME_CREATIVE("music.game.creative", "music.creative", SoundCategory.MUSIC);
 
     private String name;
     private String newname;

@@ -113,7 +113,7 @@ public enum MetaIndex {
     FIREWORK_INFO(Firework.class, 8, Type.Slot, 5, NewType.Slot),
     // item frame
     ITEMFRAME_ITEM(ItemFrame.class, 8, Type.Slot, 5, NewType.Slot),
-    ITEMFRAME_ROTATION(ItemFrame.class, 9, Type.Byte, 5, NewType.VarInt),
+    ITEMFRAME_ROTATION(ItemFrame.class, 9, Type.Byte, 6, NewType.VarInt),
     // ender crystal
     ENDERCRYSTAL_HEALTH(EnderCrystal.class, 8, Type.Int, NewType.Discontinued),;
 
