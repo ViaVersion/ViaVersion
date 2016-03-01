@@ -263,6 +263,20 @@ public class OutgoingTransformer {
 
             return;
         }
+        if (packet == PacketType.PLAY_OPEN_WINDOW){
+            int windowId = input.readUnsignedByte();
+            String type = readString(input);
+            String windowTitle = readString(input);
+
+            if (windowTitle.startsWith("\""))
+                windowTitle = "{\"text\":" + windowTitle + "}";;
+
+            output.writeByte(windowId);
+            writeString(type,output);
+            writeString(windowTitle,output);
+            output.writeBytes(input);
+            return;
+        }
         if (packet == PacketType.PLAY_SPAWN_MOB) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
