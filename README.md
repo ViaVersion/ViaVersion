@@ -1,4 +1,4 @@
-# ViaVersion 0.3.2
+# ViaVersion 0.3.3
 **Allows the connection of 1.8 clients to 1.9**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
@@ -20,18 +20,21 @@ Some items with JSON data cause crashing due to the change in how strict minecra
 This took hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
 
 
-Credits:
+Sources:
 --------
 
 **wiki.vg** (Protocol info, though I did have to find a lot myself)
 
 **MCProtocolLib** (used for chunk reading & some of writing.)
 
+Contributors:
+--------
+
 **Myself** (harhar)
 
-**Matsv** (Movement Fix / Correcting my stupidity)
+**Matsv/StatBoom**
 
-**HugoDaBosss** (Sounds fix)
+**HugoDaBosss**
 
 License:
 --------
