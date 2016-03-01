@@ -7,7 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.PacketUtil;
+import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.transformers.IncomingTransformer;
 
 @ChannelHandler.Sharable

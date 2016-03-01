@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.PacketUtil;
+import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 
 @ChannelHandler.Sharable

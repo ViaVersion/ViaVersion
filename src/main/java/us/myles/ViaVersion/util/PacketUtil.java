@@ -1,4 +1,4 @@
-package us.myles.ViaVersion;
+package us.myles.ViaVersion.util;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;

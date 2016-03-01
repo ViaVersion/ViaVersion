@@ -3,7 +3,7 @@ package us.myles.ViaVersion.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.ReflectionUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 

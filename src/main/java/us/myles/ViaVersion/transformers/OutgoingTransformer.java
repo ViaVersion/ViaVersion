@@ -17,13 +17,16 @@ import us.myles.ViaVersion.metadata.Type;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.sounds.SoundEffect;
+import us.myles.ViaVersion.util.EntityUtil;
+import us.myles.ViaVersion.util.PacketUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static us.myles.ViaVersion.PacketUtil.*;
+import static us.myles.ViaVersion.util.PacketUtil.*;
 
 public class OutgoingTransformer {
     private static Gson gson = new Gson();
