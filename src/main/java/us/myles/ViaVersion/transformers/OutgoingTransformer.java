@@ -237,12 +237,16 @@ public class OutgoingTransformer {
 
             int data = input.readInt();
             output.writeInt(data);
-
-            short vX = input.readableBytes() >= 16 ? input.readShort() : 0;
+            
+            short vX = 0, vY = 0, vZ = 0;
+            if(data > 0)
+            {
+            	vX = input.readShort();
+            	vY = input.readShort();
+            	vZ = input.readShort();
+            }
             output.writeShort(vX);
-            short vY = input.readableBytes() >= 16 ? input.readShort() : 0;
             output.writeShort(vY);
-            short vZ = input.readableBytes() >= 16 ? input.readShort() : 0;
             output.writeShort(vZ);
 
             return;

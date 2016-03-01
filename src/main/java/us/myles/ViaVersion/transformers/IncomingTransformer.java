@@ -2,7 +2,10 @@ package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
 import us.myles.ViaVersion.*;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.packets.PacketType;
@@ -89,11 +92,8 @@ public class IncomingTransformer {
                 throw new CancelException();
             }
             output.writeByte(status);
-            // read position
-            Long pos = input.readLong();
-            output.writeLong(pos);
-            short face = input.readUnsignedByte();
-            output.writeByte(face);
+            // write remaining bytes
+            output.writeBytes(input);
             return;
         }
         if (packet == PacketType.PLAY_CLICK_WINDOW) {
@@ -205,16 +205,30 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_USE_ITEM) {
             output.clear();
-            PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
-            // Simulate using item :)
-            output.writeLong(-1L);
-            output.writeByte(-1);
-            // write item in hand
-            output.writeShort(-1);
-
-            output.writeByte(-1);
-            output.writeByte(-1);
-            output.writeByte(-1);
+	        PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
+	        // Simulate using item :)
+	        output.writeLong(-1L);
+	        output.writeByte(255);
+	        // write item in hand
+	        ItemStack inHand = Core.getHandItem(info);
+            Object item = null;
+            try {
+                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
+                item = m.invoke(null, inHand);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            PacketUtil.writeItem(item, output);
+	
+	        output.writeByte(-1);
+	        output.writeByte(-1);
+	        output.writeByte(-1);
             return;
         }
         output.writeBytes(input);
