@@ -36,7 +36,7 @@ public class IncomingTransformer {
 //        if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
 //            System.out.println("Packet Type: " + packet + " New ID: " + packetID + " Original: " + original);
 //        }
-        if (packet == PacketType.PLAY_TP_CONFIRM) {
+        if (packet == PacketType.PLAY_TP_CONFIRM || packet == PacketType.PLAY_VEHICLE_MOVE_REQUEST) { //TODO handle client-sided horse riding
             throw new CancelException();
         }
         PacketUtil.writeVarInt(packetID, output);
