@@ -376,4 +376,13 @@ public class PacketUtil {
     public static void writeBlockPosition(ByteBuf buf, long x, long y, long z) {
         buf.writeLong(((x & 0x3ffffff) << 38) | ((y & 0xfff) << 26) | (z & 0x3ffffff));
     }
+
+    public static int[] readVarInts(int amount, ByteBuf input) {
+        int data[] = new int[amount];
+        for (int index = 0; index < amount; index++) {
+            data[index] = PacketUtil.readVarInt(input);
+        }
+
+        return data;
+    }
 }
