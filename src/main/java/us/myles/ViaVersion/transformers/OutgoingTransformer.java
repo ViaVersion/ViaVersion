@@ -15,7 +15,7 @@ import us.myles.ViaVersion.*;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
-import us.myles.ViaVersion.metadata.SoundEffect;
+import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.metadata.Type;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
@@ -23,7 +23,6 @@ import us.myles.ViaVersion.packets.State;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 import java.util.*;
 
 public class OutgoingTransformer {
