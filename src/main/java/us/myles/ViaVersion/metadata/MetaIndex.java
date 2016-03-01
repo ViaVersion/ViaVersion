@@ -72,7 +72,7 @@ public enum MetaIndex {
     // creeper
     CREEPER_FUSE(Creeper.class, 16, Type.Byte, 11, NewType.VarInt), // -1 idle, 1 is fuse
     CREEPER_ISPOWERED(Creeper.class, 17, Type.Byte, 12, NewType.Boolean),
-    CREEPER_ISIGNITED(Creeper.class, 18, Type.Byte, 13, NewType.Boolean), // TODO: Write on wiki.vg for current prot
+    CREEPER_ISIGNITED(Creeper.class, 18, Type.Byte, 13, NewType.Boolean),
     // ghast
     GHAST_ISATTACKING(Ghast.class, 16, Type.Byte, 11, NewType.Boolean),
     // slime
@@ -89,7 +89,7 @@ public enum MetaIndex {
     WITHER_TARGET3(Wither.class, 19, Type.Int, 13, NewType.VarInt),
     WITHER_INVULN_TIME(Wither.class, 20, Type.Int, 14, NewType.VarInt),
     // guardian
-    GUARDIAN_INFO(Guardian.class, 16, Type.Byte, 11, NewType.Byte),
+    GUARDIAN_INFO(Guardian.class, 16, Type.Int, 11, NewType.Byte),
     GUARDIAN_TARGET(Guardian.class, 17, Type.Int, 12, NewType.VarInt),
     // boat
     BOAT_SINCEHIT(Boat.class, 17, Type.Int, 5, NewType.VarInt),
