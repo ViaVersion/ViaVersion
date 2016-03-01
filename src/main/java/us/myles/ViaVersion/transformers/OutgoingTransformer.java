@@ -71,7 +71,6 @@ public class OutgoingTransformer {
             PacketUtil.writeString(newname, output);
             PacketUtil.writeVarInt(catid, output);
             output.writeBytes(input);
-            System.out.println(name + " : " + newname + " : " + catid + (effect != null ? effect.name() : ""));
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
             int id = input.readInt();
