@@ -159,16 +159,6 @@ public enum MetaIndex {
         return this.clazz;
     }
 
-    public static MetaIndex getIndex(Entity entity, int index) {
-        EntityType type;
-        if (entity instanceof Player) {
-            type = EntityType.PLAYER;
-        } else {
-            type = entity.getType();
-        }
-        return getIndex(type, index);
-    }
-
     public static MetaIndex getIndex(EntityType type, int index) {
         Class<? extends org.bukkit.entity.Entity> entityClass = type.getEntityClass();
         if(entityClass == null){
