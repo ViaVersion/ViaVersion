@@ -2,23 +2,20 @@ package us.myles.ViaVersion.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-
 import us.myles.ViaVersion.*;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
-import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.metadata.Type;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.sounds.SoundEffect;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -60,14 +57,13 @@ public class OutgoingTransformer {
         // By default no transform
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.PLAY_NAMED_SOUND_EFFECT) {
-        	String name = PacketUtil.readString(input);
+            String name = PacketUtil.readString(input);
             SoundEffect effect = SoundEffect.getByName(name);
             int catid = 0;
             String newname = name;
-            if(effect != null)
-            {
-            	catid = effect.getCategory().getId();
-            	newname = effect.getNewName();
+            if (effect != null) {
+                catid = effect.getCategory().getId();
+                newname = effect.getNewName();
             }
             PacketUtil.writeString(newname, output);
             PacketUtil.writeVarInt(catid, output);
@@ -77,22 +73,30 @@ public class OutgoingTransformer {
             int passenger = input.readInt();
             int vehicle = input.readInt();
             boolean lead = input.readBoolean();
-            if (!lead){
+            if (!lead) {
                 output.clear();
-                writeVarInt(PacketType.PLAY_SET_PASSENGERS.getNewPacketID(),output);
-                writeVarInt(vehicle,output);
-                writeVarIntArray(Collections.singletonList(passenger),output);
+                writeVarInt(PacketType.PLAY_SET_PASSENGERS.getNewPacketID(), output);
+                writeVarInt(vehicle, output);
+                writeVarIntArray(Collections.singletonList(passenger), output);
                 return;
             }
             output.writeInt(passenger);
             output.writeInt(vehicle);
             return;
         }
-        if (packet == PacketType.PLAY_DISCONNECT){
+        if (packet == PacketType.PLAY_DISCONNECT) {
             String reason = readString(input);
-            if (reason.startsWith("\""))
-                reason = "{\"text\":" + reason + "}";
-            writeString(reason,output);
+            writeString(fixJson(reason), output);
+            return;
+        }
+        if (packet == PacketType.PLAY_TITLE) {
+            int action = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(action, output);
+            if (action == 0 || action == 1) {
+                String text = PacketUtil.readString(input);
+                PacketUtil.writeString(fixJson(text), output);
+            }
+            output.writeBytes(input);
             return;
         }
         if (packet == PacketType.PLAY_ENTITY_TELEPORT) {
@@ -263,17 +267,14 @@ public class OutgoingTransformer {
 
             return;
         }
-        if (packet == PacketType.PLAY_OPEN_WINDOW){
+        if (packet == PacketType.PLAY_OPEN_WINDOW) {
             int windowId = input.readUnsignedByte();
             String type = readString(input);
             String windowTitle = readString(input);
 
-            if (windowTitle.startsWith("\""))
-                windowTitle = "{\"text\":" + windowTitle + "}";;
-
             output.writeByte(windowId);
-            writeString(type,output);
-            writeString(windowTitle,output);
+            writeString(type, output);
+            writeString(fixJson(windowTitle), output);
             output.writeBytes(input);
             return;
         }
@@ -320,15 +321,7 @@ public class OutgoingTransformer {
             output.writeLong(location);
             for (int i = 0; i < 4; i++) {
                 String line = PacketUtil.readString(input);
-                if (line == null || line.equalsIgnoreCase("null")) {
-                    line = "{\"text\":\"\"}";
-                } else {
-                    if (!line.startsWith("\"") && !line.startsWith("{"))
-                        line = "\"" + line + "\"";
-                    if (line.startsWith("\""))
-                        line = "{\"text\":" + line + "}";
-                }
-                PacketUtil.writeString(line, output);
+                PacketUtil.writeString(fixJson(line), output);
             }
         }
         if (packet == PacketType.PLAY_SPAWN_PLAYER) {
@@ -362,7 +355,7 @@ public class OutgoingTransformer {
 
             return;
         }
-        if(packet == PacketType.PLAY_MAP) {
+        if (packet == PacketType.PLAY_MAP) {
             int damage = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(damage, output);
             byte scale = input.readByte();
@@ -438,6 +431,18 @@ public class OutgoingTransformer {
             return;
         }
         output.writeBytes(input);
+    }
+
+    private String fixJson(String line) {
+        if (line == null || line.equalsIgnoreCase("null")) {
+            line = "{\"text\":\"\"}";
+        } else {
+            if (!line.startsWith("\"") && !line.startsWith("{"))
+                line = "\"" + line + "\"";
+            if (line.startsWith("\""))
+                line = "{\"text\":" + line + "}";
+        }
+        return line;
     }
 
     private void transformMetadata(Object dw, ByteBuf output) {
