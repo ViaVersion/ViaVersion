@@ -20,7 +20,7 @@ public enum PacketType {
     /* Play serverbound */
     PLAY_TP_CONFIRM(State.PLAY, Direction.INCOMING, -1, 0x00),
     PLAY_TAB_COMPLETE_REQUEST(State.PLAY, Direction.INCOMING, 0x14, 0x01),
-    PLAY_CLICHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02),
+    PLAY_CHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02),
     PLAY_CLIENT_STATUS(State.PLAY, Direction.INCOMING, 0x16, 0x03),
     PLAY_CLIENT_SETTINGS(State.PLAY, Direction.INCOMING, 0x15, 0x04),
     PLAY_CONFIRM_TRANS(State.PLAY, Direction.INCOMING, 0x0F, 0x05),

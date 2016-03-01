@@ -222,6 +222,7 @@ public class OutgoingTransformer {
             }
             return;
         }
+
         if (packet == PacketType.PLAY_SPAWN_GLOBAL_ENTITY) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
@@ -375,6 +376,14 @@ public class OutgoingTransformer {
                 String line = PacketUtil.readString(input);
                 PacketUtil.writeString(fixJson(line), output);
             }
+        }
+        if(packet == PacketType.PLAY_CHAT_MESSAGE) {
+            String chat = PacketUtil.readString(input);
+            PacketUtil.writeString(fixJson(chat), output);
+
+            byte pos = input.readByte();
+            output.writeByte(pos);
+            return;
         }
         if (packet == PacketType.PLAY_JOIN_GAME) {
             int id = input.readInt();
