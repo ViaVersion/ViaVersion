@@ -242,7 +242,7 @@ public class OutgoingTransformer {
         if (packet == PacketType.PLAY_DESTROY_ENTITIES) {
             int count = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(count, output);
-            
+
             int[] toDestroy = PacketUtil.readVarInts(count, input);
             for (int entityID : toDestroy) {
                 clientEntityTypes.remove(entityID);
