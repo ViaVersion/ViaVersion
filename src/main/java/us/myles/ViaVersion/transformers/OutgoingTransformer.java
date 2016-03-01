@@ -267,6 +267,23 @@ public class OutgoingTransformer {
 
             return;
         }
+        if (packet == PacketType.PLAY_SPAWN_PAINTING) {
+            int id = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(id, output);
+
+            PacketUtil.writeUUID(getUUID(id), output);
+
+            String title = PacketUtil.readString(input);
+            PacketUtil.writeString(title, output);
+
+            long[] position = PacketUtil.readBlockPosition(input);
+            PacketUtil.writeBlockPosition(output, position[0], position[1], position[2]);
+
+            byte direction = input.readByte();
+            output.writeByte(direction);
+
+            return;
+        }
         if (packet == PacketType.PLAY_OPEN_WINDOW) {
             int windowId = input.readUnsignedByte();
             String type = readString(input);
