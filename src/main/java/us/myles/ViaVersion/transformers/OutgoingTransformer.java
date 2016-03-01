@@ -2,16 +2,20 @@ package us.myles.ViaVersion.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
+
 import us.myles.ViaVersion.*;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
+import us.myles.ViaVersion.metadata.SoundEffect;
 import us.myles.ViaVersion.metadata.Type;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
@@ -55,8 +59,19 @@ public class OutgoingTransformer {
         // By default no transform
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.PLAY_NAMED_SOUND_EFFECT) {
-            // TODO: Port this over
-            throw new CancelException();
+        	String name = PacketUtil.readString(input);
+            SoundEffect effect = SoundEffect.getByName(name);
+            int catid = 0;
+            String newname = name;
+            if(effect != null)
+            {
+            	catid = effect.getCategory().getId();
+            	newname = effect.getNewName();
+            }
+            PacketUtil.writeString(newname, output);
+            PacketUtil.writeVarInt(catid, output);
+            output.writeBytes(input);
+            System.out.println(name + " : " + newname + " : " + catid + (effect != null ? effect.name() : ""));
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
             int id = input.readInt();
