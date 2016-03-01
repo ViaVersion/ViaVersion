@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
 import us.myles.ViaVersion.*;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
@@ -29,6 +30,7 @@ public class OutgoingTransformer {
     private final Channel channel;
     private final ConnectionInfo info;
     private final ViaVersionInitializer init;
+    private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
     private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
 
@@ -177,7 +179,9 @@ public class OutgoingTransformer {
         if (packet == PacketType.LOGIN_SUCCESS) {
             String uu = PacketUtil.readString(input);
             PacketUtil.writeString(uu, output);
-            info.setUUID(UUID.fromString(uu));
+            UUID uniqueId = UUID.fromString(uu);
+            info.setUUID(uniqueId);
+            plugin.setPorted(uniqueId, true);
             output.writeBytes(input);
             return;
         }
@@ -205,7 +209,7 @@ public class OutgoingTransformer {
             try {
                 List dw = ReflectionUtil.get(info.getLastPacket(), "b", List.class);
                 // get entity via entityID, not preferred but we need it.
-                Entity entity = Core.getEntity(info.getUUID(), id);
+                Entity entity = ViaVersionPlugin.getEntity(info.getUUID(), id);
                 if (entity != null) {
                     transformMetadata(entity, dw, output);
                 } else {
