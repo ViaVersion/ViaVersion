@@ -177,8 +177,11 @@ public enum MetaIndex {
         }
         for (MetaIndex mi : MetaIndex.values()) {
             if (mi.getIndex() == index) {
-                if (mi.getApplicableClass().isAssignableFrom(entityClass) ||
-                        mi.getApplicableClass().equals(entityClass)) {
+                // To fix issue with armour stands colliding with new values
+                if(mi.getApplicableClass().equals(LivingEntity.class)) continue;
+
+                if ((mi.getApplicableClass().isAssignableFrom(entityClass) ||
+                        mi.getApplicableClass().equals(entityClass))) {
                     return mi;
                 }
             }
