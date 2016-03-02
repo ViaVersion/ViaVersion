@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
-import us.myles.ViaVersion.listeners.MinecartListener;
+import us.myles.ViaVersion.listeners.VehicleListener;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 setPorted(e.getPlayer().getUniqueId(), false);
             }
         }, this);
-        Bukkit.getPluginManager().registerEvents(new MinecartListener(),this);
+        Bukkit.getPluginManager().registerEvents(new VehicleListener(),this);
     }
 
     public void injectPacketHandler() throws Exception {
