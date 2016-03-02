@@ -551,6 +551,17 @@ public class OutgoingTransformer {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
+                if (metaIndex == null) {
+                    try {
+                        System.out.println("Meta Data for " + type + ": Not found, ID: " + (int) ReflectionUtil.invoke(watchableObj, "a"));
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
                 try {
                     if (metaIndex.getNewType() != NewType.Discontinued) {
                         if (metaIndex.getNewType() != NewType.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
@@ -635,8 +646,10 @@ public class OutgoingTransformer {
                 } catch (Exception e) {
                     if (type != null) {
                         System.out.println("An error occurred with entity meta data for " + type);
-                        System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
-                        System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
+                        if (metaIndex != null) {
+                            System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
+                            System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
+                        }
                     }
                     e.printStackTrace();
                 }

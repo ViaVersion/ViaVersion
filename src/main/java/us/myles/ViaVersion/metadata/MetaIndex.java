@@ -88,6 +88,8 @@ public enum MetaIndex {
     WITHER_TARGET2(Wither.class, 18, Type.Int, 12, NewType.VarInt),
     WITHER_TARGET3(Wither.class, 19, Type.Int, 13, NewType.VarInt),
     WITHER_INVULN_TIME(Wither.class, 20, Type.Int, 14, NewType.VarInt),
+    // wither skull
+    WITHERSKULL_INVULN(WitherSkull.class, 10, Type.Byte, 5, NewType.Boolean),
     // guardian
     GUARDIAN_INFO(Guardian.class, 16, Type.Int, 11, NewType.Byte),
     GUARDIAN_TARGET(Guardian.class, 17, Type.Int, 12, NewType.VarInt),
