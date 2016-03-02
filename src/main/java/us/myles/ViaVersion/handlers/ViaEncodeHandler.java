@@ -79,7 +79,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                 if (!(cause instanceof CancelException)
                         && !(cause instanceof ClosedChannelException)) {
                     if (cause instanceof Exception)
-                        throw (Exception) cause;
+                        cause.printStackTrace();
                 }
             }
         }

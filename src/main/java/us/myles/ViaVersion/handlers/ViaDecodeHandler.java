@@ -51,8 +51,9 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                     && !(cause.getCause() instanceof ClosedChannelException)) {
                 if (!(cause instanceof CancelException)
                         && !(cause instanceof ClosedChannelException)) {
-                    if (cause instanceof Exception)
-                        throw (Exception) cause;
+                    if (cause instanceof Exception){
+                        cause.printStackTrace();
+                    }
                 }
             }
         }
