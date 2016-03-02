@@ -2,7 +2,6 @@ package us.myles.ViaVersion.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import org.bukkit.entity.EntityType;
