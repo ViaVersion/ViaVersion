@@ -10,11 +10,11 @@ import us.myles.ViaVersion.transformers.OutgoingTransformer;
 @ChannelHandler.Sharable
 public class ViaOutboundHandler extends ChannelOutboundHandlerAdapter {
     private final OutgoingTransformer outgoingTransformer;
-    private final ViaVersionInitializer init;
+    private final ConnectionInfo info;
 
-    public ViaOutboundHandler(Channel c, ConnectionInfo info, ViaVersionInitializer init) {
-        this.init = init;
-        this.outgoingTransformer = new OutgoingTransformer(c, info, init);
+    public ViaOutboundHandler(ConnectionInfo info) {
+        this.info = info;
+        this.outgoingTransformer = new OutgoingTransformer(info);
     }
 
     @Override

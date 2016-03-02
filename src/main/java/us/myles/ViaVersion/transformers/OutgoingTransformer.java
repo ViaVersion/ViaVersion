@@ -2,9 +2,7 @@ package us.myles.ViaVersion.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import org.bukkit.entity.EntityType;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
@@ -12,7 +10,6 @@ import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
 import us.myles.ViaVersion.metadata.Type;
@@ -31,18 +28,14 @@ import static us.myles.ViaVersion.util.PacketUtil.*;
 
 public class OutgoingTransformer {
     private static Gson gson = new Gson();
-    private final Channel channel;
     private final ConnectionInfo info;
-    private final ViaVersionInitializer init;
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
     private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
     private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
 
-    public OutgoingTransformer(Channel channel, ConnectionInfo info, ViaVersionInitializer init) {
-        this.channel = channel;
+    public OutgoingTransformer(ConnectionInfo info) {
         this.info = info;
-        this.init = init;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {

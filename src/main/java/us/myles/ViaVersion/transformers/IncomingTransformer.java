@@ -1,13 +1,10 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import us.myles.ViaVersion.*;
-import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -17,14 +14,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class IncomingTransformer {
-    private final Channel channel;
     private final ConnectionInfo info;
-    private final ViaVersionInitializer init;
 
-    public IncomingTransformer(Channel channel, ConnectionInfo info, ViaVersionInitializer init) {
-        this.channel = channel;
+    public IncomingTransformer(ConnectionInfo info) {
         this.info = info;
-        this.init = init;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
@@ -51,8 +44,10 @@ public class IncomingTransformer {
             PacketUtil.writeVarInt(protVer <= 102 ? protVer : 47, output); // pretend to be older
 
             if (protVer <= 102) {
-                // Not 1.9 remove pipes
-                this.init.remove();
+                // not 1.9, remove pipes
+                info.getChannel().pipeline().remove("via_incoming");
+                info.getChannel().pipeline().remove("via_outgoing");
+                info.getChannel().pipeline().remove("via_outgoing2");
             }
             String serverAddress = PacketUtil.readString(input);
             PacketUtil.writeString(serverAddress, output);
@@ -110,7 +105,7 @@ public class IncomingTransformer {
                 try {
                     Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
                     Object setSlotPacket = setSlot.getConstructors()[1].newInstance(windowID, slot, null);
-                    channel.writeAndFlush(setSlotPacket); // slot is empty
+                    info.getChannel().writeAndFlush(setSlotPacket); // slot is empty
                     slot = -999; // we're evil, they'll throw item on the ground
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();

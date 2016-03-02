@@ -1,5 +1,6 @@
 package us.myles.ViaVersion;
 
+import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.packets.State;
@@ -7,11 +8,16 @@ import us.myles.ViaVersion.packets.State;
 import java.util.UUID;
 
 public class ConnectionInfo {
+    private final SocketChannel channel;
     private int protocol = 0;
     private State state = State.HANDSHAKE;
     private int compression = 0;
     private Object lastPacket;
     private java.util.UUID UUID;
+
+    public ConnectionInfo(SocketChannel socketChannel) {
+        this.channel = socketChannel;
+    }
 
     public int getProtocol() {
         return protocol;
@@ -55,5 +61,9 @@ public class ConnectionInfo {
 
     public Player getPlayer() {
         return UUID == null ? null : Bukkit.getPlayer(UUID);
+    }
+
+    public SocketChannel getChannel() {
+        return channel;
     }
 }

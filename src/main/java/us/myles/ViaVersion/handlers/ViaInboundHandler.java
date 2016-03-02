@@ -13,11 +13,9 @@ import us.myles.ViaVersion.transformers.IncomingTransformer;
 @ChannelHandler.Sharable
 public class ViaInboundHandler extends ChannelInboundHandlerAdapter {
     private final IncomingTransformer incomingTransformer;
-    private final ViaVersionInitializer init;
 
-    public ViaInboundHandler(Channel c, ConnectionInfo info, ViaVersionInitializer init) {
-        this.init = init;
-        this.incomingTransformer = new IncomingTransformer(c, info, init);
+    public ViaInboundHandler(ConnectionInfo info) {
+        this.incomingTransformer = new IncomingTransformer(info);
     }
 
     @Override

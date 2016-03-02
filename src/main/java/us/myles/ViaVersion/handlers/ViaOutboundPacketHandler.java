@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
 public class ViaOutboundPacketHandler extends ChannelOutboundHandlerAdapter {
     private final ConnectionInfo info;
 
-    public ViaOutboundPacketHandler(Channel c, ConnectionInfo info) {
+    public ViaOutboundPacketHandler(ConnectionInfo info) {
         this.info = info;
     }
 
