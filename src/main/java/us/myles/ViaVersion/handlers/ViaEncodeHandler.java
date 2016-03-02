@@ -53,7 +53,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
         if (bytebuf.readableBytes() == 0) {
             throw new CancelException();
         }
-        if(info.isActive()) {
+        if (info.isActive()) {
             int id = PacketUtil.readVarInt(bytebuf);
             // Transform
             ByteBuf oldPacket = bytebuf.copy();
@@ -71,9 +71,13 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if(!(cause.getCause() instanceof CancelException))  {
-            if(cause instanceof Exception){
-                throw (Exception) cause;
+        if (!(cause.getCause().getCause() instanceof CancelException)) {
+            if (!(cause.getCause() instanceof CancelException)) {
+                if (!(cause instanceof CancelException)) {
+                    System.out.println("throwing");
+                    if (cause instanceof Exception)
+                        throw (Exception) cause;
+                }
             }
         }
     }

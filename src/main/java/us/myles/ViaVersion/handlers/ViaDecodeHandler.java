@@ -44,9 +44,13 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (!(cause.getCause() instanceof CancelException)) {
-            if (cause instanceof Exception) {
-                throw (Exception) cause;
+        if (!(cause.getCause().getCause() instanceof CancelException)) {
+            if (!(cause.getCause() instanceof CancelException)) {
+                if (!(cause instanceof CancelException)) {
+                    System.out.println("throwing");
+                    if (cause instanceof Exception)
+                        throw (Exception) cause;
+                }
             }
         }
     }
