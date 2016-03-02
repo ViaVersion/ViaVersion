@@ -516,7 +516,7 @@ public class OutgoingTransformer {
         return line;
     }
 
-    private void transformMetadata(int entityID, Object dw, ByteBuf output) {
+    private void transformMetadata(int entityID, Object dw, ByteBuf output) throws CancelException {
         // get entity
         try {
             transformMetadata(entityID, (List) ReflectionUtil.invoke(dw, "b"), output);
@@ -529,11 +529,11 @@ public class OutgoingTransformer {
         }
     }
 
-    private void transformMetadata(int entityID, List dw, ByteBuf output) {
+    private void transformMetadata(int entityID, List dw, ByteBuf output) throws CancelException {
         EntityType type = clientEntityTypes.get(entityID);
         if (type == null) {
             System.out.println("Unable to get entity for ID: " + entityID);
-            return;
+            throw new CancelException();
         }
         if (dw != null) {
             short id = -1;
