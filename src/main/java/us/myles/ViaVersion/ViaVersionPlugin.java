@@ -34,14 +34,17 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public void onEnable() {
         ViaVersion.setInstance(this);
-        System.out.println("ViaVersion enabled, injecting. (Allows 1.8 to be accessed via 1.9)");
+        if(System.getProperty("ViaVersion") != null){
+            getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
+            return;
+        }
+
+        getLogger().info("ViaVersion enabled, injecting. (Allows 1.8 to be accessed via 1.9)");
         try {
             injectPacketHandler();
+            System.setProperty("ViaVersion", getDescription().getVersion());
         } catch (Exception e) {
-            if(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null){
-                System.out.println("This plugin is not compatible with protocol lib.");
-            }
-            System.out.println("Unable to inject handlers, are you on 1.8? ");
+            getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
         Bukkit.getPluginManager().registerEvents(new Listener() {
@@ -59,7 +62,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
         List<ChannelFuture> futures = ReflectionUtil.get(connection, "g", List.class);
         if (futures.size() == 0) {
-            throw new Exception("Could not find server to inject (late bind?)");
+            throw new Exception("Could not find server to inject (Please ensure late-bind in your spigot.yml is false)");
         }
 
         for (ChannelFuture future : futures) {

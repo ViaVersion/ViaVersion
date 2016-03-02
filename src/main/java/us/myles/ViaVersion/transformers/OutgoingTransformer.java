@@ -290,7 +290,6 @@ public class OutgoingTransformer {
             int id = PacketUtil.readVarInt(input);
             clientEntityTypes.put(id, EntityType.EXPERIENCE_ORB);
             PacketUtil.writeVarInt(id, output);
-
             double x = input.readInt();
             output.writeDouble(x / 32D);
             double y = input.readInt();
@@ -309,7 +308,6 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(id, output);
 
             PacketUtil.writeUUID(getUUID(id), output);
-
             String title = PacketUtil.readString(input);
             PacketUtil.writeString(title, output);
 
@@ -533,7 +531,8 @@ public class OutgoingTransformer {
         EntityType type = clientEntityTypes.get(entityID);
         if (type == null) {
             System.out.println("Unable to get entity for ID: " + entityID);
-            throw new CancelException();
+            output.writeByte(255);
+            return;
         }
         if (dw != null) {
             short id = -1;

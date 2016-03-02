@@ -9,11 +9,12 @@ import java.util.UUID;
 
 public class ConnectionInfo {
     private final SocketChannel channel;
-    private int protocol = 0;
-    private State state = State.HANDSHAKE;
-    private int compression = 0;
     private Object lastPacket;
     private java.util.UUID UUID;
+    private State state = State.HANDSHAKE;
+    private int protocol = 0;
+    private int compression = 0;
+    private boolean active = true;
 
     public ConnectionInfo(SocketChannel socketChannel) {
         this.channel = socketChannel;
@@ -65,5 +66,13 @@ public class ConnectionInfo {
 
     public SocketChannel getChannel() {
         return channel;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
