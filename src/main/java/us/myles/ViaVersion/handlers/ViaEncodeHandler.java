@@ -26,11 +26,10 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf bytebuf) throws Exception {
         // handle the packet type
-        if (o == null) return;
         if (!(o instanceof ByteBuf)) {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
-            if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
+            if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
                 int[] locX = ReflectionUtil.get(o, "a", int[].class);
                 int[] locZ = ReflectionUtil.get(o, "b", int[].class);
 
@@ -62,6 +61,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             try {
                 outgoingTransformer.transform(id, oldPacket, bytebuf);
             } catch (CancelException e) {
+                bytebuf.clear();
                 return;
             } finally {
                 oldPacket.release();

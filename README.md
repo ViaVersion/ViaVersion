@@ -1,4 +1,4 @@
-# ViaVersion 0.4.0
+# ViaVersion 0.4.1
 **Allows the connection of 1.8 clients to 1.9**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,

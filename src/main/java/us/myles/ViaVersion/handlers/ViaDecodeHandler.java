@@ -1,15 +1,12 @@
 package us.myles.ViaVersion.handlers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.transformers.IncomingTransformer;
+import us.myles.ViaVersion.util.PacketUtil;
 
 import java.util.List;
 
