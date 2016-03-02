@@ -106,6 +106,13 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             return;
         }
+        if (packet == PacketType.PLAY_PLAYER_LIST_HEADER_FOOTER) {
+            String header = readString(input);
+            String footer = readString(input);
+            writeString(fixJson(header), output);
+            writeString(fixJson(footer), output);
+            return;
+        }
         if (packet == PacketType.PLAY_ENTITY_TELEPORT) {
             // Port this so that it relative moves :P
             int id = PacketUtil.readVarInt(input);
