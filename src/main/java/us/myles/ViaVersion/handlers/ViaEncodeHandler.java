@@ -44,14 +44,14 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                     Object packet = constructor.newInstance(chunk, true, 65535);
                     ctx.pipeline().writeAndFlush(packet);
                 }
-                bytebuf.clear();
-                return;
+                bytebuf.readBytes(bytebuf.readableBytes());
+                throw new CancelException();
             }
             // call minecraft encoder
             PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
         }
         if (bytebuf.readableBytes() == 0) {
-            return;
+            throw new CancelException();
         }
         if(info.isActive()) {
             int id = PacketUtil.readVarInt(bytebuf);
@@ -61,12 +61,20 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             try {
                 outgoingTransformer.transform(id, oldPacket, bytebuf);
             } catch (CancelException e) {
-                bytebuf.clear();
-                return;
+                bytebuf.readBytes(bytebuf.readableBytes());
+                throw e;
             } finally {
                 oldPacket.release();
             }
         }
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if(!(cause.getCause() instanceof CancelException))  {
+            if(cause instanceof Exception){
+                throw (Exception) cause;
+            }
+        }
+    }
 }

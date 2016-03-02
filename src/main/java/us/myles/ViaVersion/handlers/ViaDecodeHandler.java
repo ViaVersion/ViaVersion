@@ -24,8 +24,8 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
         // use transformers
-        if(bytebuf.readableBytes() > 0) {
-            if(info.isActive()) {
+        if (bytebuf.readableBytes() > 0) {
+            if (info.isActive()) {
                 int id = PacketUtil.readVarInt(bytebuf);
                 // Transform
                 ByteBuf newPacket = ctx.alloc().buffer();
@@ -33,7 +33,8 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                     incomingTransformer.transform(id, bytebuf, newPacket);
                     bytebuf = newPacket;
                 } catch (CancelException e) {
-                    return;
+                    bytebuf.readBytes(bytebuf.readableBytes());
+                    throw e;
                 }
             }
             // call minecraft decoder
@@ -41,5 +42,13 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
         }
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (!(cause.getCause() instanceof CancelException)) {
+            if (cause instanceof Exception) {
+                throw (Exception) cause;
+            }
+        }
+    }
 
 }
