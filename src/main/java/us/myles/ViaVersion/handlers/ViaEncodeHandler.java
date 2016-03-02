@@ -10,6 +10,7 @@ import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
+import java.nio.channels.ClosedChannelException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
     private final ConnectionInfo info;
@@ -71,10 +72,12 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (!(cause.getCause().getCause() instanceof CancelException)) {
-            if (!(cause.getCause() instanceof CancelException)) {
-                if (!(cause instanceof CancelException)) {
-                    System.out.println("throwing");
+        if (!(cause.getCause().getCause() instanceof CancelException)
+                && !(cause.getCause().getCause() instanceof ClosedChannelException)) {
+            if (!(cause.getCause() instanceof CancelException)
+                    && !(cause.getCause() instanceof ClosedChannelException)) {
+                if (!(cause instanceof CancelException)
+                        && !(cause instanceof ClosedChannelException)) {
                     if (cause instanceof Exception)
                         throw (Exception) cause;
                 }

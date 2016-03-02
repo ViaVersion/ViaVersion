@@ -8,6 +8,7 @@ import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.transformers.IncomingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 
+import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
 public class ViaDecodeHandler extends ByteToMessageDecoder {
@@ -44,10 +45,12 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (!(cause.getCause().getCause() instanceof CancelException)) {
-            if (!(cause.getCause() instanceof CancelException)) {
-                if (!(cause instanceof CancelException)) {
-                    System.out.println("throwing");
+        if (!(cause.getCause().getCause() instanceof CancelException)
+                && !(cause.getCause().getCause() instanceof ClosedChannelException)) {
+            if (!(cause.getCause() instanceof CancelException)
+                    && !(cause.getCause() instanceof ClosedChannelException)) {
+                if (!(cause instanceof CancelException)
+                        && !(cause instanceof ClosedChannelException)) {
                     if (cause instanceof Exception)
                         throw (Exception) cause;
                 }
