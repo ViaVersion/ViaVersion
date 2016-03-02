@@ -8,18 +8,32 @@ import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 
+import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.ViaVersionAPI;
+import us.myles.ViaVersion.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.util.ReflectionUtil;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class Core extends JavaPlugin {
+public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
+
+    private final Set<UUID> portedPlayers = Collections.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
+
     @Override
     public void onEnable() {
+        ViaVersion.setInstance(this);
         System.out.println("ViaVersion enabled, injecting. (Allows 1.8 to be accessed via 1.9)");
         try {
             injectPacketHandler();
@@ -30,6 +44,12 @@ public class Core extends JavaPlugin {
             System.out.println("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
+        Bukkit.getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void onPlayerQuit(PlayerQuitEvent e) {
+                setPorted(e.getPlayer().getUniqueId(), false);
+            }
+        }, this);
     }
 
     public void injectPacketHandler() throws Exception {
@@ -51,32 +71,22 @@ public class Core extends JavaPlugin {
         }
     }
 
+    @Override
+    public boolean isPorted(Player player) {
+        return portedPlayers.contains(player.getUniqueId());
+    }
 
-    public static Entity getEntity(final UUID player, final int id) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(getPlugin(Core.class), new Callable<Entity>() {
-                @Override
-                public Entity call() throws Exception {
-                    Player p = Bukkit.getPlayer(player);
-                    if (p == null) return null;
-                    for (Entity e : p.getWorld().getEntities()) {
-                        if (e.getEntityId() == id) {
-                            return e;
-                        }
-                    }
-                    return null;
-                }
-            }).get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            System.out.println("Error fetching entity ");
-            e.printStackTrace();
-            return null;
+    public void setPorted(UUID id, boolean value) {
+        if (value) {
+            portedPlayers.add(id);
+        } else {
+            portedPlayers.remove(id);
         }
     }
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
         try {
-            return Bukkit.getScheduler().callSyncMethod(getPlugin(Core.class), new Callable<ItemStack>() {
+            return Bukkit.getScheduler().callSyncMethod(getPlugin(ViaVersionPlugin.class), new Callable<ItemStack>() {
                 @Override
                 public ItemStack call() throws Exception {
                     if (info.getPlayer() != null) {

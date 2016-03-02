@@ -1,7 +1,7 @@
 package org.spacehq.mc.protocol.data.game.chunk;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.PacketUtil;
+import us.myles.ViaVersion.util.PacketUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;

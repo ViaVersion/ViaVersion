@@ -3,7 +3,7 @@ package us.myles.ViaVersion.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.ReflectionUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 
@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
 public class ViaOutboundPacketHandler extends ChannelOutboundHandlerAdapter {
     private final ConnectionInfo info;
 
-    public ViaOutboundPacketHandler(Channel c, ConnectionInfo info) {
+    public ViaOutboundPacketHandler(ConnectionInfo info) {
         this.info = info;
     }
 

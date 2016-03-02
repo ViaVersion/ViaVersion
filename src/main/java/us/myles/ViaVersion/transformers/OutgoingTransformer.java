@@ -2,43 +2,40 @@ package us.myles.ViaVersion.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-
-import us.myles.ViaVersion.*;
-import us.myles.ViaVersion.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
-import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.metadata.Type;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.sounds.SoundEffect;
+import us.myles.ViaVersion.util.EntityUtil;
+import us.myles.ViaVersion.util.PacketUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
-import static us.myles.ViaVersion.PacketUtil.*;
+import static us.myles.ViaVersion.util.PacketUtil.*;
 
 public class OutgoingTransformer {
     private static Gson gson = new Gson();
-    private final Channel channel;
     private final ConnectionInfo info;
-    private final ViaVersionInitializer init;
+    private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
     private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
+    private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
 
-    public OutgoingTransformer(Channel channel, ConnectionInfo info, ViaVersionInitializer init) {
-        this.channel = channel;
+    public OutgoingTransformer(ConnectionInfo info) {
         this.info = info;
-        this.init = init;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
@@ -60,14 +57,13 @@ public class OutgoingTransformer {
         // By default no transform
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.PLAY_NAMED_SOUND_EFFECT) {
-        	String name = PacketUtil.readString(input);
+            String name = PacketUtil.readString(input);
             SoundEffect effect = SoundEffect.getByName(name);
             int catid = 0;
             String newname = name;
-            if(effect != null)
-            {
-            	catid = effect.getCategory().getId();
-            	newname = effect.getNewName();
+            if (effect != null) {
+                catid = effect.getCategory().getId();
+                newname = effect.getNewName();
             }
             PacketUtil.writeString(newname, output);
             PacketUtil.writeVarInt(catid, output);
@@ -77,22 +73,37 @@ public class OutgoingTransformer {
             int passenger = input.readInt();
             int vehicle = input.readInt();
             boolean lead = input.readBoolean();
-            if (!lead){
+            if (!lead) {
                 output.clear();
-                writeVarInt(PacketType.PLAY_SET_PASSENGERS.getNewPacketID(),output);
-                writeVarInt(vehicle,output);
-                writeVarIntArray(Collections.singletonList(passenger),output);
+                writeVarInt(PacketType.PLAY_SET_PASSENGERS.getNewPacketID(), output);
+                writeVarInt(vehicle, output);
+                writeVarIntArray(Collections.singletonList(passenger), output);
                 return;
             }
             output.writeInt(passenger);
             output.writeInt(vehicle);
             return;
         }
-        if (packet == PacketType.PLAY_DISCONNECT){
+        if (packet == PacketType.PLAY_DISCONNECT) {
             String reason = readString(input);
-            if (reason.startsWith("\""))
-                reason = "{\"text\":" + reason + "}";
-            writeString(reason,output);
+            writeString(fixJson(reason), output);
+            return;
+        }
+        if (packet == PacketType.PLAY_TITLE) {
+            int action = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(action, output);
+            if (action == 0 || action == 1) {
+                String text = PacketUtil.readString(input);
+                PacketUtil.writeString(fixJson(text), output);
+            }
+            output.writeBytes(input);
+            return;
+        }
+        if (packet == PacketType.PLAY_PLAYER_LIST_HEADER_FOOTER) {
+            String header = readString(input);
+            String footer = readString(input);
+            writeString(fixJson(header), output);
+            writeString(fixJson(footer), output);
             return;
         }
         if (packet == PacketType.PLAY_ENTITY_TELEPORT) {
@@ -173,7 +184,9 @@ public class OutgoingTransformer {
         if (packet == PacketType.LOGIN_SUCCESS) {
             String uu = PacketUtil.readString(input);
             PacketUtil.writeString(uu, output);
-            info.setUUID(UUID.fromString(uu));
+            UUID uniqueId = UUID.fromString(uu);
+            info.setUUID(uniqueId);
+            plugin.setPorted(uniqueId, true);
             output.writeBytes(input);
             return;
         }
@@ -201,13 +214,7 @@ public class OutgoingTransformer {
             try {
                 List dw = ReflectionUtil.get(info.getLastPacket(), "b", List.class);
                 // get entity via entityID, not preferred but we need it.
-                Entity entity = Core.getEntity(info.getUUID(), id);
-                if (entity != null) {
-                    transformMetadata(entity, dw, output);
-                } else {
-                    // Died before we could get to it. rip
-                    throw new CancelException();
-                }
+                transformMetadata(id, dw, output);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -215,13 +222,42 @@ public class OutgoingTransformer {
             }
             return;
         }
-        if (packet == PacketType.PLAY_SPAWN_OBJECT) {
+
+        if (packet == PacketType.PLAY_SPAWN_GLOBAL_ENTITY) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
 
+            // only used for lightning
+            byte type = input.readByte();
+            clientEntityTypes.put(id, EntityType.LIGHTNING);
+            output.writeByte(type);
+
+            double x = input.readInt();
+            output.writeDouble(x / 32D);
+            double y = input.readInt();
+            output.writeDouble(y / 32D);
+            double z = input.readInt();
+            output.writeDouble(z / 32D);
+            return;
+        }
+        if (packet == PacketType.PLAY_DESTROY_ENTITIES) {
+            int count = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(count, output);
+
+            int[] toDestroy = PacketUtil.readVarInts(count, input);
+            for (int entityID : toDestroy) {
+                clientEntityTypes.remove(entityID);
+                PacketUtil.writeVarInt(entityID, output);
+            }
+            return;
+        }
+        if (packet == PacketType.PLAY_SPAWN_OBJECT) {
+            int id = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(id, output);
             PacketUtil.writeUUID(getUUID(id), output);
 
             byte type = input.readByte();
+            clientEntityTypes.put(id, EntityUtil.getTypeFromID(type, true));
             output.writeByte(type);
 
             double x = input.readInt();
@@ -237,13 +273,12 @@ public class OutgoingTransformer {
 
             int data = input.readInt();
             output.writeInt(data);
-            
+
             short vX = 0, vY = 0, vZ = 0;
-            if(data > 0)
-            {
-            	vX = input.readShort();
-            	vY = input.readShort();
-            	vZ = input.readShort();
+            if (data > 0) {
+                vX = input.readShort();
+                vY = input.readShort();
+                vZ = input.readShort();
             }
             output.writeShort(vX);
             output.writeShort(vY);
@@ -251,8 +286,9 @@ public class OutgoingTransformer {
 
             return;
         }
-        if (packet == PacketType.PLAY_SPAWN_XP_ORB) { // TODO: Verify
+        if (packet == PacketType.PLAY_SPAWN_XP_ORB) {
             int id = PacketUtil.readVarInt(input);
+            clientEntityTypes.put(id, EntityType.EXPERIENCE_ORB);
             PacketUtil.writeVarInt(id, output);
 
             double x = input.readInt();
@@ -267,13 +303,44 @@ public class OutgoingTransformer {
 
             return;
         }
+        if (packet == PacketType.PLAY_SPAWN_PAINTING) {
+            int id = PacketUtil.readVarInt(input);
+            clientEntityTypes.put(id, EntityType.PAINTING);
+            PacketUtil.writeVarInt(id, output);
+
+            PacketUtil.writeUUID(getUUID(id), output);
+
+            String title = PacketUtil.readString(input);
+            PacketUtil.writeString(title, output);
+
+            long[] position = PacketUtil.readBlockPosition(input);
+            PacketUtil.writeBlockPosition(output, position[0], position[1], position[2]);
+
+            byte direction = input.readByte();
+            output.writeByte(direction);
+
+            return;
+        }
+        if (packet == PacketType.PLAY_OPEN_WINDOW) {
+            int windowId = input.readUnsignedByte();
+            String type = readString(input);
+            String windowTitle = readString(input);
+
+            output.writeByte(windowId);
+            writeString(type, output);
+            writeString(fixJson(windowTitle), output);
+            output.writeBytes(input);
+            return;
+        }
         if (packet == PacketType.PLAY_SPAWN_MOB) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
 
             PacketUtil.writeUUID(getUUID(id), output);
             short type = input.readUnsignedByte();
+            clientEntityTypes.put(id, EntityUtil.getTypeFromID(type, false));
             output.writeByte(type);
+
             double x = input.readInt();
             output.writeDouble(x / 32D);
             double y = input.readInt();
@@ -295,7 +362,7 @@ public class OutgoingTransformer {
             output.writeShort(vZ);
             try {
                 Object dataWatcher = ReflectionUtil.get(info.getLastPacket(), "l", ReflectionUtil.nms("DataWatcher"));
-                transformMetadata(dataWatcher, output);
+                transformMetadata(id, dataWatcher, output);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -310,21 +377,28 @@ public class OutgoingTransformer {
             output.writeLong(location);
             for (int i = 0; i < 4; i++) {
                 String line = PacketUtil.readString(input);
-                if (line == null || line.equalsIgnoreCase("null")) {
-                    line = "{\"text\":\"\"}";
-                } else {
-                    if (!line.startsWith("\"") && !line.startsWith("{"))
-                        line = "\"" + line + "\"";
-                    if (line.startsWith("\""))
-                        line = "{\"text\":" + line + "}";
-                }
-                PacketUtil.writeString(line, output);
+                PacketUtil.writeString(fixJson(line), output);
             }
+        }
+        if (packet == PacketType.PLAY_CHAT_MESSAGE) {
+            String chat = PacketUtil.readString(input);
+            PacketUtil.writeString(fixJson(chat), output);
+
+            byte pos = input.readByte();
+            output.writeByte(pos);
+            return;
+        }
+        if (packet == PacketType.PLAY_JOIN_GAME) {
+            int id = input.readInt();
+            clientEntityTypes.put(id, EntityType.PLAYER);
+            output.writeInt(id);
+            output.writeBytes(input);
+            return;
         }
         if (packet == PacketType.PLAY_SPAWN_PLAYER) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
-
+            clientEntityTypes.put(id, EntityType.PLAYER);
             UUID playerUUID = PacketUtil.readUUID(input);
             PacketUtil.writeUUID(playerUUID, output);
 
@@ -341,7 +415,7 @@ public class OutgoingTransformer {
             output.writeByte(yaw);
             try {
                 Object dataWatcher = ReflectionUtil.get(info.getLastPacket(), "i", ReflectionUtil.nms("DataWatcher"));
-                transformMetadata(dataWatcher, output);
+                transformMetadata(id, dataWatcher, output);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -352,7 +426,7 @@ public class OutgoingTransformer {
 
             return;
         }
-        if(packet == PacketType.PLAY_MAP) {
+        if (packet == PacketType.PLAY_MAP) {
             int damage = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(damage, output);
             byte scale = input.readByte();
@@ -430,30 +504,37 @@ public class OutgoingTransformer {
         output.writeBytes(input);
     }
 
-    private void transformMetadata(Object dw, ByteBuf output) {
+    private String fixJson(String line) {
+        if (line == null || line.equalsIgnoreCase("null")) {
+            line = "{\"text\":\"\"}";
+        } else {
+            if (!line.startsWith("\"") && !line.startsWith("{"))
+                line = "\"" + line + "\"";
+            if (line.startsWith("\""))
+                line = "{\"text\":" + line + "}";
+        }
+        return line;
+    }
+
+    private void transformMetadata(int entityID, Object dw, ByteBuf output) {
         // get entity
         try {
-            Class<?> nmsClass = ReflectionUtil.nms("Entity");
-            Object nmsEntity = ReflectionUtil.get(dw, "a", nmsClass);
-            Class<?> craftClass = ReflectionUtil.obc("entity.CraftEntity");
-            Method bukkitMethod = craftClass.getDeclaredMethod("getEntity", ReflectionUtil.obc("CraftServer"), nmsClass);
-
-            Object entity = bukkitMethod.invoke(null, Bukkit.getServer(), nmsEntity);
-            transformMetadata((Entity) entity, (List) ReflectionUtil.invoke(dw, "b"), output);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            transformMetadata(entityID, (List) ReflectionUtil.invoke(dw, "b"), output);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
-    private void transformMetadata(Entity entity, List dw, ByteBuf output) {
+    private void transformMetadata(int entityID, List dw, ByteBuf output) {
+        EntityType type = clientEntityTypes.get(entityID);
+        if (type == null) {
+            System.out.println("Unable to get entity for ID: " + entityID);
+            return;
+        }
         if (dw != null) {
             short id = -1;
             int data = -1;
@@ -463,7 +544,7 @@ public class OutgoingTransformer {
                 Object watchableObj = iterator.next(); //
                 MetaIndex metaIndex = null;
                 try {
-                    metaIndex = MetaIndex.getIndex(entity, (int) ReflectionUtil.invoke(watchableObj, "a"));
+                    metaIndex = MetaIndex.getIndex(type, (int) ReflectionUtil.invoke(watchableObj, "a"));
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
@@ -553,8 +634,8 @@ public class OutgoingTransformer {
 
                     }
                 } catch (Exception e) {
-                    if (entity != null) {
-                        System.out.println("An error occurred with entity meta data for " + entity.getType());
+                    if (type != null) {
+                        System.out.println("An error occurred with entity meta data for " + type);
                         System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
                         System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
                     }

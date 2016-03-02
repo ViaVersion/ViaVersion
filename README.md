@@ -1,4 +1,4 @@
-# ViaVersion 0.3.3
+# ViaVersion 0.3.7
 **Allows the connection of 1.8 clients to 1.9**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
@@ -12,9 +12,6 @@ Attempt to make boats nicer when they don't work
 Remap spawn eggs
 
 If you have a bug with entities, please report the full stack trace
-
-Some items with JSON data cause crashing due to the change in how strict minecraft is.
-
 
 
 This took hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
@@ -32,9 +29,11 @@ Contributors:
 
 **Myself** (harhar)
 
-**Matsv/StatBoom**
+**Matsv/StamBoom**
 
 **HugoDaBosss**
+
+**SanderGielisse**
 
 License:
 --------

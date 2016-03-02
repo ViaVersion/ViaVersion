@@ -1,4 +1,4 @@
-package us.myles.ViaVersion;
+package us.myles.ViaVersion.util;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -362,5 +362,27 @@ public class PacketUtil {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    public static long[] readBlockPosition(ByteBuf buf) {
+        long val = buf.readLong();
+        long x = (val >> 38); // signed
+        long y = (val >> 26) & 0xfff; // unsigned
+        // this shifting madness is used to preserve sign
+        long z = (val << 38) >> 38; // signed
+        return new long[]{x, y, z};
+    }
+
+    public static void writeBlockPosition(ByteBuf buf, long x, long y, long z) {
+        buf.writeLong(((x & 0x3ffffff) << 38) | ((y & 0xfff) << 26) | (z & 0x3ffffff));
+    }
+
+    public static int[] readVarInts(int amount, ByteBuf input) {
+        int data[] = new int[amount];
+        for (int index = 0; index < amount; index++) {
+            data[index] = PacketUtil.readVarInt(input);
+        }
+
+        return data;
     }
 }

@@ -39,7 +39,7 @@ public class NetUtil {
 
     public static Column readOldChunkData(int x, int z, boolean isFullChunk, int bitmask, byte[] input, boolean checkForSky, boolean hasSkyLight) {
         int pos = 0;
-        int expected = 0;
+        int expected = isFullChunk ? 256 : 0;
         boolean sky = false;
         ShortBuffer buf = ByteBuffer.wrap(input).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
         // 0 = Calculate expected length and determine if the packet has skylight.
@@ -85,7 +85,7 @@ public class NetUtil {
                     }
 
                     if(pass == 3) {
-                        if(chunks[ind].getSkyLight() != null) {
+                        if(sky) {
                             NibbleArray3d skylight = chunks[ind].getSkyLight();
                             System.arraycopy(input, pos, skylight.getData(), 0, skylight.getData().length);
                             pos += skylight.getData().length;

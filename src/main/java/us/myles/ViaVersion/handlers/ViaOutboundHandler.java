@@ -4,17 +4,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.PacketUtil;
+import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 
 @ChannelHandler.Sharable
 public class ViaOutboundHandler extends ChannelOutboundHandlerAdapter {
     private final OutgoingTransformer outgoingTransformer;
-    private final ViaVersionInitializer init;
+    private final ConnectionInfo info;
 
-    public ViaOutboundHandler(Channel c, ConnectionInfo info, ViaVersionInitializer init) {
-        this.init = init;
-        this.outgoingTransformer = new OutgoingTransformer(c, info, init);
+    public ViaOutboundHandler(ConnectionInfo info) {
+        this.info = info;
+        this.outgoingTransformer = new OutgoingTransformer(info);
     }
 
     @Override
