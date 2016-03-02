@@ -10,9 +10,7 @@ import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.metadata.MetaIndex;
-import us.myles.ViaVersion.metadata.NewType;
-import us.myles.ViaVersion.metadata.Type;
+import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.sounds.SoundEffect;
@@ -21,7 +19,6 @@ import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static us.myles.ViaVersion.util.PacketUtil.*;
@@ -211,15 +208,7 @@ public class OutgoingTransformer {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
 
-            try {
-                List dw = ReflectionUtil.get(info.getLastPacket(), "b", List.class);
-                // get entity via entityID, not preferred but we need it.
-                transformMetadata(id, dw, output);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            transformMetadata(id, input, output);
             return;
         }
 
@@ -358,16 +347,8 @@ public class OutgoingTransformer {
             output.writeShort(vY);
             short vZ = input.readShort();
             output.writeShort(vZ);
-            try {
-                Object dataWatcher = ReflectionUtil.get(info.getLastPacket(), "l", ReflectionUtil.nms("DataWatcher"));
-                transformMetadata(id, dataWatcher, output);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+
+            transformMetadata(id, input, output);
             return;
         }
         if (packet == PacketType.PLAY_UPDATE_SIGN) {
@@ -411,16 +392,8 @@ public class OutgoingTransformer {
             output.writeByte(pitch);
             byte yaw = input.readByte();
             output.writeByte(yaw);
-            try {
-                Object dataWatcher = ReflectionUtil.get(info.getLastPacket(), "i", ReflectionUtil.nms("DataWatcher"));
-                transformMetadata(id, dataWatcher, output);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+
+            transformMetadata(id, input, output);
 
             return;
         }
@@ -514,150 +487,15 @@ public class OutgoingTransformer {
         return line;
     }
 
-    private void transformMetadata(int entityID, Object dw, ByteBuf output) throws CancelException {
-        // get entity
-        try {
-            transformMetadata(entityID, (List) ReflectionUtil.invoke(dw, "b"), output);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void transformMetadata(int entityID, List dw, ByteBuf output) throws CancelException {
+    private void transformMetadata(int entityID, ByteBuf input, ByteBuf output) throws CancelException {
         EntityType type = clientEntityTypes.get(entityID);
         if (type == null) {
             System.out.println("Unable to get entity for ID: " + entityID);
             output.writeByte(255);
             return;
         }
-        if (dw != null) {
-            short id = -1;
-            int data = -1;
-
-            Iterator iterator = dw.iterator();
-            while (iterator.hasNext()) {
-                Object watchableObj = iterator.next(); //
-                MetaIndex metaIndex = null;
-                try {
-                    metaIndex = MetaIndex.getIndex(type, (int) ReflectionUtil.invoke(watchableObj, "a"));
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                if (metaIndex == null) {
-                    try {
-                        System.out.println("Meta Data for " + type + ": Not found, ID: " + (int) ReflectionUtil.invoke(watchableObj, "a"));
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    if (metaIndex.getNewType() != NewType.Discontinued) {
-                        if (metaIndex.getNewType() != NewType.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
-                            output.writeByte(metaIndex.getNewIndex());
-                            output.writeByte(metaIndex.getNewType().getTypeID());
-                        }
-                        Object value = ReflectionUtil.invoke(watchableObj, "b");
-                        switch (metaIndex.getNewType()) {
-                            case Byte:
-                                // convert from int, byte
-                                if (metaIndex.getOldType() == Type.Byte) {
-                                    output.writeByte(((Byte) value).byteValue());
-                                }
-                                if (metaIndex.getOldType() == Type.Int) {
-                                    output.writeByte(((Integer) value).byteValue());
-                                }
-                                break;
-                            case OptUUID:
-                                String owner = (String) value;
-                                UUID toWrite = null;
-                                if (owner.length() != 0) {
-                                    try {
-                                        toWrite = UUID.fromString(owner);
-                                    } catch (Exception ignored) {
-                                    }
-                                }
-                                output.writeBoolean(toWrite != null);
-                                if (toWrite != null)
-                                    PacketUtil.writeUUID((UUID) toWrite, output);
-                                break;
-                            case BlockID:
-                                // if we have both sources :))
-                                if (metaIndex.getOldType() == Type.Byte) {
-                                    data = ((Byte) value).byteValue();
-                                }
-                                if (metaIndex.getOldType() == Type.Short) {
-                                    id = ((Short) value).shortValue();
-                                }
-                                if (id != -1 && data != -1) {
-                                    int combined = id << 4 | data;
-                                    data = -1;
-                                    id = -1;
-                                    PacketUtil.writeVarInt(combined, output);
-                                }
-                                break;
-                            case VarInt:
-                                // convert from int, short, byte
-                                if (metaIndex.getOldType() == Type.Byte) {
-                                    PacketUtil.writeVarInt(((Byte) value).intValue(), output);
-                                }
-                                if (metaIndex.getOldType() == Type.Short) {
-                                    PacketUtil.writeVarInt(((Short) value).intValue(), output);
-                                }
-                                if (metaIndex.getOldType() == Type.Int) {
-                                    PacketUtil.writeVarInt(((Integer) value).intValue(), output);
-                                }
-                                break;
-                            case Float:
-                                output.writeFloat(((Float) value).floatValue());
-                                break;
-                            case String:
-                                PacketUtil.writeString((String) value, output);
-                                break;
-                            case Boolean:
-                                output.writeBoolean(((Byte) value).byteValue() != 0);
-                                break;
-                            case Slot:
-                                PacketUtil.writeItem(value, output);
-                                break;
-                            case Position:
-                                output.writeInt((int) ReflectionUtil.invoke(value, "getX"));
-                                output.writeInt((int) ReflectionUtil.invoke(value, "getY"));
-                                output.writeInt((int) ReflectionUtil.invoke(value, "getZ"));
-                                break;
-                            case Vector3F:
-                                output.writeFloat((float) ReflectionUtil.invoke(value, "getX"));
-                                output.writeFloat((float) ReflectionUtil.invoke(value, "getY"));
-                                output.writeFloat((float) ReflectionUtil.invoke(value, "getZ"));
-                        }
-
-                    }
-                } catch (Exception e) {
-                    if (type != null) {
-                        System.out.println("An error occurred with entity meta data for " + type);
-                        if (metaIndex != null) {
-                            System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
-                            System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
-                        }
-                    }
-                    e.printStackTrace();
-                }
-            }
-        }
-        output.writeByte(255);
-
-
+        List<MetadataRewriter.Entry> list = MetadataRewriter.readMetadata1_8(type, input);
+        MetadataRewriter.writeMetadata1_9(type, list, output);
     }
 
 

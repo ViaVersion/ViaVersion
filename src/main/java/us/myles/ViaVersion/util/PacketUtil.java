@@ -373,6 +373,26 @@ public class PacketUtil {
         }
     }
 
+    public static Object readItem(ByteBuf output) {
+        try {
+            Class<?> serializer = ReflectionUtil.nms("PacketDataSerializer");
+            Object init = serializer.getDeclaredConstructor(ByteBuf.class).newInstance(output);
+            Method toCall = init.getClass().getDeclaredMethod("i");
+            return toCall.invoke(init);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+		return null;
+    }
+
     public static long[] readBlockPosition(ByteBuf buf) {
         long val = buf.readLong();
         long x = (val >> 38); // signed
