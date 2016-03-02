@@ -84,28 +84,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         }
     }
 
-    public static Entity getEntity(final UUID player, final int id) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(getPlugin(ViaVersionPlugin.class), new Callable<Entity>() {
-                @Override
-                public Entity call() throws Exception {
-                    Player p = Bukkit.getPlayer(player);
-                    if (p == null) return null;
-                    for (Entity e : p.getWorld().getEntities()) {
-                        if (e.getEntityId() == id) {
-                            return e;
-                        }
-                    }
-                    return null;
-                }
-            }).get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            System.out.println("Error fetching entity ");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static ItemStack getHandItem(final ConnectionInfo info) {
         try {
             return Bukkit.getScheduler().callSyncMethod(getPlugin(ViaVersionPlugin.class), new Callable<ItemStack>() {

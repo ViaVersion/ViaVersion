@@ -212,7 +212,7 @@ public class IncomingTransformer {
 	        output.writeLong(-1L);
 	        output.writeByte(255);
 	        // write item in hand
-	        ItemStack inHand = Core.getHandItem(info);
+	        ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             Object item = null;
             try {
                 Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
