@@ -273,13 +273,12 @@ public class OutgoingTransformer {
 
             int data = input.readInt();
             output.writeInt(data);
-            
+
             short vX = 0, vY = 0, vZ = 0;
-            if(data > 0)
-            {
-            	vX = input.readShort();
-            	vY = input.readShort();
-            	vZ = input.readShort();
+            if (data > 0) {
+                vX = input.readShort();
+                vY = input.readShort();
+                vZ = input.readShort();
             }
             output.writeShort(vX);
             output.writeShort(vY);
@@ -381,7 +380,7 @@ public class OutgoingTransformer {
                 PacketUtil.writeString(fixJson(line), output);
             }
         }
-        if(packet == PacketType.PLAY_CHAT_MESSAGE) {
+        if (packet == PacketType.PLAY_CHAT_MESSAGE) {
             String chat = PacketUtil.readString(input);
             PacketUtil.writeString(fixJson(chat), output);
 

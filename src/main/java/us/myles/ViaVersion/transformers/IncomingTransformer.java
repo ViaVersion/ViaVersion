@@ -1,10 +1,10 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
-
 import org.bukkit.inventory.ItemStack;
-
-import us.myles.ViaVersion.*;
+import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -202,12 +202,12 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_USE_ITEM) {
             output.clear();
-	        PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
-	        // Simulate using item :)
-	        output.writeLong(-1L);
-	        output.writeByte(255);
-	        // write item in hand
-	        ItemStack inHand = ViaVersionPlugin.getHandItem(info);
+            PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
+            // Simulate using item :)
+            output.writeLong(-1L);
+            output.writeByte(255);
+            // write item in hand
+            ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             Object item = null;
             try {
                 Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
@@ -222,10 +222,10 @@ public class IncomingTransformer {
                 e.printStackTrace();
             }
             PacketUtil.writeItem(item, output);
-	
-	        output.writeByte(-1);
-	        output.writeByte(-1);
-	        output.writeByte(-1);
+
+            output.writeByte(-1);
+            output.writeByte(-1);
+            output.writeByte(-1);
             return;
         }
         output.writeBytes(input);
