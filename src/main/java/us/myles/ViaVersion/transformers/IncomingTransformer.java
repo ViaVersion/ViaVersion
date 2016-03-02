@@ -1,27 +1,31 @@
 package us.myles.ViaVersion.transformers;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.bukkit.inventory.ItemStack;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import org.bukkit.inventory.ItemStack;
-import us.myles.ViaVersion.*;
-import us.myles.ViaVersion.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.handlers.ViaInboundHandler;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 public class IncomingTransformer {
+	
+	private final ViaInboundHandler handler;
     private final Channel channel;
     private final ConnectionInfo info;
-    private final ViaVersionInitializer init;
 
-    public IncomingTransformer(Channel channel, ConnectionInfo info, ViaVersionInitializer init) {
+    public IncomingTransformer(ViaInboundHandler viaInboundHandler, Channel channel, ConnectionInfo info) {
+    	this.handler = viaInboundHandler;
         this.channel = channel;
         this.info = info;
-        this.init = init;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
@@ -48,8 +52,8 @@ public class IncomingTransformer {
             PacketUtil.writeVarInt(protVer <= 102 ? protVer : 47, output); // pretend to be older
 
             if (protVer <= 102) {
-                // Not 1.9 remove pipes
-                this.init.remove();
+                // not 1.9, remove pipes
+                this.handler.remove();
             }
             String serverAddress = PacketUtil.readString(input);
             PacketUtil.writeString(serverAddress, output);

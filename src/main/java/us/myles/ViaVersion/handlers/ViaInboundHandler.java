@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.socket.SocketChannel;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -13,11 +14,17 @@ import us.myles.ViaVersion.transformers.IncomingTransformer;
 @ChannelHandler.Sharable
 public class ViaInboundHandler extends ChannelInboundHandlerAdapter {
     private final IncomingTransformer incomingTransformer;
-    private final ViaVersionInitializer init;
+    private final SocketChannel socketChannel;
 
-    public ViaInboundHandler(Channel c, ConnectionInfo info, ViaVersionInitializer init) {
-        this.init = init;
-        this.incomingTransformer = new IncomingTransformer(c, info, init);
+    public ViaInboundHandler(SocketChannel c, ConnectionInfo info) {
+        this.socketChannel = c;
+        this.incomingTransformer = new IncomingTransformer(this, c, info);
+    }
+    
+    public void remove(){
+        socketChannel.pipeline().remove("via_incoming");
+        socketChannel.pipeline().remove("via_outgoing");
+        socketChannel.pipeline().remove("via_outgoing2");
     }
 
     @Override
