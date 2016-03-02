@@ -1,9 +1,9 @@
-# ViaVersion 0.3.7
+# ViaVersion 0.4.0
 **Allows the connection of 1.8 clients to 1.9**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
-**Don't use late bind nor ProtocolLib**
+**Don't use late bind*
 
 **As of this point it doesn't have everything, I need to fix:**
 
