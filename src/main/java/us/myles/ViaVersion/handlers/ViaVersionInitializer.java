@@ -3,6 +3,8 @@ package us.myles.ViaVersion.handlers;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.ConnectionInfo;
 
 import java.lang.reflect.Method;
@@ -27,12 +29,10 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         // Add originals
         this.method.invoke(this.oldInit, socketChannel);
         // Add our transformers
-        ViaInboundHandler inbound = new ViaInboundHandler(info);
-        ViaOutboundHandler outbound = new ViaOutboundHandler(info);
-        ViaOutboundPacketHandler outbound2 = new ViaOutboundPacketHandler(info);
-        socketChannel.pipeline().addBefore("decoder", "via_incoming", inbound);
-        socketChannel.pipeline().addBefore("packet_handler", "via_outgoing2", outbound2);
-        socketChannel.pipeline().addBefore("encoder", "via_outgoing", outbound);
+        ViaEncodeHandler encoder = new ViaEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
+        ViaDecodeHandler decoder = new ViaDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
 
+        socketChannel.pipeline().replace("encoder", "encoder", encoder);
+        socketChannel.pipeline().replace("decoder", "decoder", decoder);
     }
 }

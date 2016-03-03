@@ -18,4 +18,8 @@ public enum Type {
     public int getTypeID() {
         return typeID;
     }
+
+    public static Type byId(int id) {
+        return values()[id];
+    }
 }

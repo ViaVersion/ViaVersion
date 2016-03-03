@@ -45,9 +45,7 @@ public class IncomingTransformer {
 
             if (protVer <= 102) {
                 // not 1.9, remove pipes
-                info.getChannel().pipeline().remove("via_incoming");
-                info.getChannel().pipeline().remove("via_outgoing");
-                info.getChannel().pipeline().remove("via_outgoing2");
+                info.setActive(false);
             }
             String serverAddress = PacketUtil.readString(input);
             PacketUtil.writeString(serverAddress, output);
@@ -105,7 +103,7 @@ public class IncomingTransformer {
                 try {
                     Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
                     Object setSlotPacket = setSlot.getConstructors()[1].newInstance(windowID, slot, null);
-                    info.getChannel().writeAndFlush(setSlotPacket); // slot is empty
+                    info.getChannel().pipeline().writeAndFlush(setSlotPacket); // slot is empty
                     slot = -999; // we're evil, they'll throw item on the ground
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();

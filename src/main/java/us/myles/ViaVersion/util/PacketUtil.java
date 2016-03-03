@@ -42,29 +42,38 @@ public class PacketUtil {
         }
     }
 
-    public static ByteBuf decompress(ChannelHandlerContext ctx, ByteBuf msg) {
-        ByteToMessageDecoder x = (ByteToMessageDecoder) ctx.pipeline().get("decompress");
+    public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) {
         List<Object> output = new ArrayList<Object>();
         try {
-            PacketUtil.DECODE_METHOD.invoke(x, ctx, msg, output);
+            PacketUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+        return output;
+    }
+
+    public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) {
+        try {
+            PacketUtil.ENCODE_METHOD.invoke(encoder, ctx, msg, output);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ByteBuf decompress(ChannelHandlerContext ctx, ByteBuf msg) {
+        ByteToMessageDecoder x = (ByteToMessageDecoder) ctx.pipeline().get("decompress");
+        List<Object> output = callDecode(x, ctx, msg);
         return output.size() == 0 ? null : (ByteBuf) output.get(0);
     }
 
     public static ByteBuf compress(ChannelHandlerContext ctx, ByteBuf msg) {
         MessageToByteEncoder x = (MessageToByteEncoder) ctx.pipeline().get("compress");
         ByteBuf output = ctx.alloc().buffer();
-        try {
-            PacketUtil.ENCODE_METHOD.invoke(x, ctx, msg, output);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        callEncode(x, ctx, msg, output);
         return output;
     }
 
@@ -185,9 +194,9 @@ public class PacketUtil {
     }
 
     public static void writeVarIntArray(List<Integer> integers, ByteBuf output) {
-        writeVarInt(integers.size(),output);
-        for (Integer i  : integers){
-            writeVarInt(i,output);
+        writeVarInt(integers.size(), output);
+        for (Integer i : integers) {
+            writeVarInt(i, output);
         }
     }
 
@@ -362,6 +371,26 @@ public class PacketUtil {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Object readItem(ByteBuf output) {
+        try {
+            Class<?> serializer = ReflectionUtil.nms("PacketDataSerializer");
+            Object init = serializer.getDeclaredConstructor(ByteBuf.class).newInstance(output);
+            Method toCall = init.getClass().getDeclaredMethod("i");
+            return toCall.invoke(init);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+		return null;
     }
 
     public static long[] readBlockPosition(ByteBuf buf) {
