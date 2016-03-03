@@ -34,6 +34,7 @@ public class OutgoingTransformer {
     private boolean cancel = false;
     private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
     private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
+    private Map<Integer, Integer> vehicleMap = new HashMap<>();
 
     public OutgoingTransformer(ConnectionInfo info) {
         this.info = info;
@@ -82,8 +83,17 @@ public class OutgoingTransformer {
             if (!lead) {
                 output.clear();
                 writeVarInt(PacketType.PLAY_SET_PASSENGERS.getNewPacketID(), output);
-                writeVarInt(vehicle, output);
-                writeVarIntArray(Collections.singletonList(passenger), output);
+                if (vehicle == -1) {
+                    if (!vehicleMap.containsKey(passenger))
+                        throw new CancelException();
+                    vehicle = vehicleMap.remove(passenger);
+                    writeVarInt(vehicle,output);
+                    writeVarIntArray(Collections.<Integer>emptyList(), output);
+                } else{
+                    writeVarInt(vehicle, output);
+                    writeVarIntArray(Collections.singletonList(passenger), output);
+                    vehicleMap.put(passenger,vehicle);
+                }
                 return;
             }
             output.writeInt(passenger);
