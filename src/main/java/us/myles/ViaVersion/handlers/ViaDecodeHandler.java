@@ -31,6 +31,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 ByteBuf newPacket = ctx.alloc().buffer();
                 try {
                     incomingTransformer.transform(id, bytebuf, newPacket);
+                    bytebuf.readBytes(bytebuf.readableBytes());
                     bytebuf = newPacket;
                 } catch (CancelException e) {
                     bytebuf.readBytes(bytebuf.readableBytes());
