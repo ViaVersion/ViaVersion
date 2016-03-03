@@ -2,10 +2,14 @@ package us.myles.ViaVersion.transformers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import io.netty.buffer.ByteBuf;
+
 import org.bukkit.entity.EntityType;
+import org.json.simple.parser.JSONParser;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
+
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -487,6 +491,13 @@ public class OutgoingTransformer {
             if (line.startsWith("\""))
                 line = "{\"text\":" + line + "}";
         }
+        try {
+        	new JSONParser().parse(line);
+        }
+        catch (org.json.simple.parser.ParseException e) {
+        	System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
+			return "{\"text\":\"\"}";
+		}
         return line;
     }
 
