@@ -441,7 +441,7 @@ public class OutgoingTransformer {
                 output.writeByte(input.readByte());
                 PacketUtil.writeString(PacketUtil.readString(input), output);
 
-                PacketUtil.writeString("", output); // collission rule :)
+                PacketUtil.writeString("never", output); // collission rule :)
             }
             output.writeBytes(input);
             return;
