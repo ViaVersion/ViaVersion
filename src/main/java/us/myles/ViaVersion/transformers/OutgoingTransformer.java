@@ -11,7 +11,7 @@ import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.api.slot.ItemSlotRewriter;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;

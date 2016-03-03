@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.slot.ItemSlotRewriter;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -13,7 +13,6 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class IncomingTransformer {
     private final ConnectionInfo info;
@@ -181,7 +180,7 @@ public class IncomingTransformer {
 
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             try {
-                us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                ItemSlotRewriter.ItemStack item = ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
                 ItemSlotRewriter.writeItemStack(item, output);
             } catch (Exception e) {
@@ -205,7 +204,7 @@ public class IncomingTransformer {
             // write item in hand
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             try {
-                us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
                 ItemSlotRewriter.writeItemStack(item, output);
             } catch (Exception e) {

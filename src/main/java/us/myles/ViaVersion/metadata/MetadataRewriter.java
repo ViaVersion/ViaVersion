@@ -11,8 +11,8 @@ import org.bukkit.util.Vector;
 
 import io.netty.buffer.ByteBuf;
 
-import us.myles.ViaVersion.api.slot.ItemSlotRewriter;
-import us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
+import us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack;
 import us.myles.ViaVersion.util.PacketUtil;
 
 public class MetadataRewriter {
