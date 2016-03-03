@@ -428,6 +428,20 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             return;
         }
+        if (packet == PacketType.PLAY_ENTITY_EFFECT) {
+            int id = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(id, output);
+            byte effectID = input.readByte();
+            output.writeByte(effectID);
+            byte amplifier = input.readByte();
+            output.writeByte(amplifier);
+            int duration = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(duration, output);
+            // we need to write as a byte instead of boolean
+            boolean hideParticles = input.readBoolean();
+            output.writeByte(hideParticles ? 1 : 0);
+            return;
+        }
         if (packet == PacketType.PLAY_TEAM) {
             String teamName = PacketUtil.readString(input);
             PacketUtil.writeString(teamName, output);
