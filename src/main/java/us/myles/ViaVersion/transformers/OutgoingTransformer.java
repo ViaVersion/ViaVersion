@@ -393,6 +393,9 @@ public class OutgoingTransformer {
             byte yaw = input.readByte();
             output.writeByte(yaw);
 
+            // next field is Current Item, this was removed in 1.9 so we'll ignore it
+            input.readShort();
+
             transformMetadata(id, input, output);
 
             return;
