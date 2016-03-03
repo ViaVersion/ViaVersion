@@ -24,6 +24,10 @@ Sources:
 
 **MCProtocolLib** (used for chunk reading & some of writing.)
 
+**OpenNBT** (used for slot rewriting)
+
+
+
 Contributors:
 --------
 
@@ -33,6 +37,7 @@ Contributors:
 **SanderGielisse**
 **Paulomart**
 **gigosaurus**
+**fillefilip8**
 
 **Chat: ** https://gitter.im/MylesIsCool/ViaVersion
 
