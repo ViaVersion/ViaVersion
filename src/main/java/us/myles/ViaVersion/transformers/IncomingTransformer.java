@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -126,7 +127,7 @@ public class IncomingTransformer {
             output.writeByte(button);
             output.writeShort(action);
             output.writeByte(mode);
-            output.writeBytes(input);
+            ItemSlotRewriter.rewrite1_9To1_8(input, output);
             return;
         }
         if (packet == PacketType.PLAY_CLIENT_SETTINGS) {
@@ -179,21 +180,13 @@ public class IncomingTransformer {
             int hand = PacketUtil.readVarInt(input);
 
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            Object item = null;
             try {
-                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
-                item = m.invoke(null, inHand);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+                us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
+                ItemSlotRewriter.writeItemStack(item, output);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            PacketUtil.writeItem(item, output);
 
             short curX = input.readUnsignedByte();
             output.writeByte(curX);
@@ -211,25 +204,24 @@ public class IncomingTransformer {
             output.writeByte(255);
             // write item in hand
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            Object item = null;
             try {
-                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
-                item = m.invoke(null, inHand);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+                us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
+                ItemSlotRewriter.writeItemStack(item, output);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            PacketUtil.writeItem(item, output);
 
             output.writeByte(-1);
             output.writeByte(-1);
             output.writeByte(-1);
             return;
+        }
+        if (packet == PacketType.PLAY_CREATIVE_INVENTORY_ACTION) {
+            short slot = input.readShort();
+            output.writeShort(slot);
+
+            ItemSlotRewriter.rewrite1_9To1_8(input, output);
         }
         output.writeBytes(input);
     }

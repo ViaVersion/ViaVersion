@@ -1,6 +1,11 @@
 name: ViaVersion
 main: us.myles.ViaVersion.ViaVersionPlugin
 author: _MylesC
-version: 0.4.6
+version: ${version}
 load: startup
 loadbefore: [ProtocolLib, ProxyPipe]
+commands:
+  viaversion:
+    description: Shows ViaVersion Version and more.
+    permission: viaversion.admin
+    aliases: [viaver]
