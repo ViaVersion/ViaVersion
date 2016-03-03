@@ -1,0 +1,9 @@
+#Welcome to ViaVersion - Join from 1.9
+
+#Messages:
+
+GeneralError: "An error occurred"
+OtherMessage: "There was a problem receiving data"
+
+#Default: 4, if you change this will reset your config!
+configversion: 4 
