@@ -10,6 +10,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -102,7 +103,9 @@ public class IncomingTransformer {
             if (slot == 45 && windowID == 0) {
                 try {
                     Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
-                    Object setSlotPacket = setSlot.getConstructors()[1].newInstance(windowID, slot, null);
+                    Constructor setSlotConstruct = setSlot.getDeclaredConstructor(int.class, int.class, ReflectionUtil.nms("ItemStack"));
+                    // properly construct
+                    Object setSlotPacket = setSlotConstruct.newInstance(windowID, slot, null);
                     info.getChannel().pipeline().writeAndFlush(setSlotPacket); // slot is empty
                     slot = -999; // we're evil, they'll throw item on the ground
                 } catch (ClassNotFoundException e) {
@@ -112,6 +115,8 @@ public class IncomingTransformer {
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                 }
 

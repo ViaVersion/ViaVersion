@@ -12,12 +12,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public void onEnable() {
         ViaVersion.setInstance(this);
-        if(System.getProperty("ViaVersion") != null){
+        if (System.getProperty("ViaVersion") != null) {
             getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
             return;
         }
@@ -58,18 +58,29 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
         Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
         Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
-
-        List<ChannelFuture> futures = ReflectionUtil.get(connection, "g", List.class);
-        if (futures.size() == 0) {
-            throw new Exception("Could not find server to inject (Please ensure late-bind in your spigot.yml is false)");
+        // loop through all fields checking if list
+        boolean injected = false;
+        for (Field field : connection.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = field.get(connection);
+            if (value instanceof List) {
+                for (Object o : (List) value) {
+                    if (o instanceof ChannelFuture) {
+                        ChannelFuture future = (ChannelFuture) o;
+                        ChannelPipeline pipeline = future.channel().pipeline();
+                        ChannelHandler bootstrapAcceptor = pipeline.first();
+                        ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                        ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
+                        ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+                        injected = true;
+                    } else {
+                        break; // not the right list.
+                    }
+                }
+            }
         }
-
-        for (ChannelFuture future : futures) {
-            ChannelPipeline pipeline = future.channel().pipeline();
-            ChannelHandler bootstrapAcceptor = pipeline.first();
-            ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-            ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
-            ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+        if (!injected) {
+            throw new Exception("Could not find server to inject (Please ensure late-bind in your spigot.yml is false)");
         }
     }
 

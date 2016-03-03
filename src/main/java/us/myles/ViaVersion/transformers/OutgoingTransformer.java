@@ -50,7 +50,7 @@ public class OutgoingTransformer {
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
         }
-//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().contains("look")))
+//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().toLowerCase().contains("look")))
 //            System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
         if (packet.getPacketID() != -1) {
             packetID = packet.getNewPacketID();
@@ -60,6 +60,7 @@ public class OutgoingTransformer {
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.PLAY_NAMED_SOUND_EFFECT) {
             String name = PacketUtil.readString(input);
+
             SoundEffect effect = SoundEffect.getByName(name);
             int catid = 0;
             String newname = name;
@@ -511,7 +512,7 @@ public class OutgoingTransformer {
         output.writeBytes(input);
     }
 
-    private String fixJson(String line) {
+    public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {
             line = "{\"text\":\"\"}";
         } else {
