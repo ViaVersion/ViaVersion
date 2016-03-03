@@ -115,6 +115,55 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             return;
         }
+        if (packet == PacketType.PLAY_PLAYER_LIST_ITEM) {
+            int action = readVarInt(input);
+            writeVarInt(action, output);
+            int players = readVarInt(input);
+            writeVarInt(players, output);
+
+            // loop through players
+            for (int i = 0; i < players; i++) {
+                UUID uuid = readUUID(input);
+                writeUUID(uuid, output);
+                if (action == 0) { // add player
+                    writeString(readString(input), output); // name
+
+                    int properties = readVarInt(input);
+                    writeVarInt(properties, output);
+
+                    // loop through properties
+                    for (int j = 0; j < properties; j++) {
+                        writeString(readString(input), output); // name
+                        writeString(readString(input), output); // value
+                        boolean isSigned = input.readBoolean();
+                        output.writeBoolean(isSigned);
+                        if (isSigned) {
+                            writeString(readString(input), output); // signature
+                        }
+                    }
+
+                    writeVarInt(readVarInt(input), output); // gamemode
+                    writeVarInt(readVarInt(input), output); // ping
+                    boolean hasDisplayName = input.readBoolean();
+                    output.writeBoolean(hasDisplayName);
+                    if (hasDisplayName) {
+                        writeString(fixJson(readString(input)), output); // display name
+                    }
+                } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
+                    writeVarInt(readVarInt(input), output);
+                } else if (action == 3) { // update display name
+                    boolean hasDisplayName = input.readBoolean();
+                    output.writeBoolean(hasDisplayName);
+                    if (hasDisplayName) {
+                        writeString(fixJson(readString(input)), output); // display name
+                    }
+                } else if (action == 4) { // remove player
+                    // no fields
+                }
+            }
+
+            return;
+        }
         if (packet == PacketType.PLAY_PLAYER_LIST_HEADER_FOOTER) {
             String header = readString(input);
             String footer = readString(input);
