@@ -65,9 +65,7 @@ public class OutgoingTransformer {
             String newname = name;
             if (effect != null) {
                 if (effect.isBreakPlaceSound()) {
-                    input.readBytes(input.readableBytes());
-                    output.clear();
-                    return;
+                    throw new CancelException();
                 }
                 catid = effect.getCategory().getId();
                 newname = effect.getNewName();

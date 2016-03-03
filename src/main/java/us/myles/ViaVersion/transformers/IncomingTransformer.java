@@ -204,7 +204,7 @@ public class IncomingTransformer {
             // write item in hand
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             try {
-                us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                ItemSlotRewriter.ItemStack item = ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
                 ItemSlotRewriter.writeItemStack(item, output);
             } catch (Exception e) {
