@@ -14,6 +14,7 @@ import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
@@ -64,11 +65,11 @@ public class OutgoingTransformer {
             int catid = 0;
             String newname = name;
             if (effect != null) {
-            	if(effect.isBreakPlaceSound()) {
-            		input.readBytes(input.readableBytes());
-            		output.clear();
-            		return;
-            	}
+                if(effect.isBreakPlaceSound()) {
+                    input.readBytes(input.readableBytes());
+                    output.clear();
+                    return;
+                }
                 catid = effect.getCategory().getId();
                 newname = effect.getNewName();
             }
@@ -221,7 +222,9 @@ public class OutgoingTransformer {
                 slot += 1; // add 1 so it's now 2-5
             }
             PacketUtil.writeVarInt(slot, output);
-            output.writeBytes(input);
+            
+            ItemSlotRewriter.rewrite1_8To1_9(input, output);
+            return;
         }
         if (packet == PacketType.PLAY_ENTITY_METADATA) {
             int id = PacketUtil.readVarInt(input);
@@ -336,6 +339,28 @@ public class OutgoingTransformer {
             writeString(type, output);
             writeString(fixJson(windowTitle), output);
             output.writeBytes(input);
+            return;
+        }
+        if (packet == PacketType.PLAY_SET_SLOT) {
+            int windowId = input.readUnsignedByte();
+            output.writeByte(windowId);
+
+            short slot = input.readShort();
+            output.writeShort(slot);
+
+            ItemSlotRewriter.rewrite1_8To1_9(input, output);
+            return;
+        }
+        if (packet == PacketType.PLAY_WINDOW_ITEMS) {
+            int windowId = input.readUnsignedByte();
+            output.writeByte(windowId);
+
+            short count = input.readShort();
+            output.writeShort(count);
+
+            for (int i = 0; i < count; i++) {
+                ItemSlotRewriter.rewrite1_8To1_9(input, output);
+            }
             return;
         }
         if (packet == PacketType.PLAY_SPAWN_MOB) {
@@ -521,11 +546,11 @@ public class OutgoingTransformer {
                 line = "{\"text\":" + line + "}";
         }
         try {
-        	new JSONParser().parse(line);
+            new JSONParser().parse(line);
         }
         catch (org.json.simple.parser.ParseException e) {
-        	System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
-        	return "{\"text\":\"\"}";
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
+            return "{\"text\":\"\"}";
         }
         return line;
     }
