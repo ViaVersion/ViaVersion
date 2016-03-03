@@ -1,28 +1,23 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import us.myles.ViaVersion.*;
-import us.myles.ViaVersion.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.util.PacketUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class IncomingTransformer {
-    private final Channel channel;
     private final ConnectionInfo info;
-    private final ViaVersionInitializer init;
 
-    public IncomingTransformer(Channel channel, ConnectionInfo info, ViaVersionInitializer init) {
-        this.channel = channel;
+    public IncomingTransformer(ConnectionInfo info) {
         this.info = info;
-        this.init = init;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
@@ -49,8 +44,8 @@ public class IncomingTransformer {
             PacketUtil.writeVarInt(protVer <= 102 ? protVer : 47, output); // pretend to be older
 
             if (protVer <= 102) {
-                // Not 1.9 remove pipes
-                this.init.remove();
+                // not 1.9, remove pipes
+                info.setActive(false);
             }
             String serverAddress = PacketUtil.readString(input);
             PacketUtil.writeString(serverAddress, output);
@@ -108,7 +103,7 @@ public class IncomingTransformer {
                 try {
                     Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
                     Object setSlotPacket = setSlot.getConstructors()[1].newInstance(windowID, slot, null);
-                    channel.writeAndFlush(setSlotPacket); // slot is empty
+                    info.getChannel().pipeline().writeAndFlush(setSlotPacket); // slot is empty
                     slot = -999; // we're evil, they'll throw item on the ground
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -178,7 +173,7 @@ public class IncomingTransformer {
             output.writeByte(face);
             int hand = PacketUtil.readVarInt(input);
 
-            ItemStack inHand = Core.getHandItem(info);
+            ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             Object item = null;
             try {
                 Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
@@ -205,12 +200,12 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_USE_ITEM) {
             output.clear();
-	        PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
-	        // Simulate using item :)
-	        output.writeLong(-1L);
-	        output.writeByte(255);
-	        // write item in hand
-	        ItemStack inHand = Core.getHandItem(info);
+            PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
+            // Simulate using item :)
+            output.writeLong(-1L);
+            output.writeByte(255);
+            // write item in hand
+            ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             Object item = null;
             try {
                 Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
@@ -225,10 +220,10 @@ public class IncomingTransformer {
                 e.printStackTrace();
             }
             PacketUtil.writeItem(item, output);
-	
-	        output.writeByte(-1);
-	        output.writeByte(-1);
-	        output.writeByte(-1);
+
+            output.writeByte(-1);
+            output.writeByte(-1);
+            output.writeByte(-1);
             return;
         }
         output.writeBytes(input);

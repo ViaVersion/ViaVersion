@@ -1,4 +1,4 @@
-package us.myles.ViaVersion;
+package us.myles.ViaVersion.util;
 
 import org.bukkit.Bukkit;
 

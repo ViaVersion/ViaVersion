@@ -20,7 +20,7 @@ public enum PacketType {
     /* Play serverbound */
     PLAY_TP_CONFIRM(State.PLAY, Direction.INCOMING, -1, 0x00),
     PLAY_TAB_COMPLETE_REQUEST(State.PLAY, Direction.INCOMING, 0x14, 0x01),
-    PLAY_CLICHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02),
+    PLAY_CHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02),
     PLAY_CLIENT_STATUS(State.PLAY, Direction.INCOMING, 0x16, 0x03),
     PLAY_CLIENT_SETTINGS(State.PLAY, Direction.INCOMING, 0x15, 0x04),
     PLAY_CONFIRM_TRANS(State.PLAY, Direction.INCOMING, 0x0F, 0x05),
@@ -96,7 +96,7 @@ public enum PacketType {
     PLAY_COMBAT_EVENT(State.PLAY, Direction.OUTGOING, 0x42, 0x2C),
     PLAY_PLAYER_LIST_ITEM(State.PLAY, Direction.OUTGOING, 0x38, 0x2D),
     PLAY_PLAYER_POSITION_LOOK(State.PLAY, Direction.OUTGOING, 0x08, 0x2E),
-    PLAY_USE_BED(State.PLAY, Direction.OUTGOING, 0x2F, 0x2F),
+    PLAY_USE_BED(State.PLAY, Direction.OUTGOING, 0x0A, 0x2F),
     PLAY_DESTROY_ENTITIES(State.PLAY, Direction.OUTGOING, 0x13, 0x30),
     PLAY_REMOVE_ENTITY_EFFECT(State.PLAY, Direction.OUTGOING, 0x1E, 0x31),
     PLAY_RESOURCE_PACK_SEND(State.PLAY, Direction.OUTGOING, 0x48, 0x32),
