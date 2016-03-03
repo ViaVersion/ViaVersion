@@ -282,8 +282,7 @@ public enum SoundEffect {
         return cat;
     }
     
-    public boolean isBreakPlaceSound()
-    {
+    public boolean isBreakPlaceSound() {
     	return breaksound;
     }
 

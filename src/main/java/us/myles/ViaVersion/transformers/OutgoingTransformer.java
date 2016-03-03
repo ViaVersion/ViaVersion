@@ -59,8 +59,7 @@ public class OutgoingTransformer {
             int catid = 0;
             String newname = name;
             if (effect != null) {
-            	if(effect.isBreakPlaceSound())
-            	{
+            	if(effect.isBreakPlaceSound()) {
             		input.readBytes(input.readableBytes());
             		output.clear();
             		return;
