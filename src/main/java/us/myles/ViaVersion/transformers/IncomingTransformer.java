@@ -83,7 +83,7 @@ public class IncomingTransformer {
             return;
         }
         if (packet == PacketType.PLAY_PLAYER_DIGGING) {
-            byte status = input.readByte();
+            int status = input.readByte() & 0xFF; // unsign
             if (status == 6) { // item swap
                 throw new CancelException();
             }
