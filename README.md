@@ -34,6 +34,10 @@ Contributors:
 **Paulomart**
 **gigosaurus**
 
+**Chat: ** https://gitter.im/MylesIsCool/ViaVersion
+
+We use it to collaborate and solve errors, sign in with github.
+
 License:
 --------
 
@@ -41,3 +45,5 @@ You may modify this work, all rights are still owned by myself excluding any fil
 
 
 Thanks!
+
+
