@@ -1,4 +1,4 @@
-package us.myles.ViaVersion;
+package us.myles.ViaVersion.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -19,7 +19,7 @@ public class ViaVersionCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender.hasPermission("viaversion.admin")) {
             if (args.length == 0) {
-                sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion() + "&b by &6_MylesC"));
+                sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion()));
                 sender.sendMessage(color("&6Commands:"));
                 sender.sendMessage(color("&2/viaversion list &7- &6Shows lists of all 1.9 clients and 1.8 clients."));
             } else if (args.length == 1) {

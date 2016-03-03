@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
+import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
