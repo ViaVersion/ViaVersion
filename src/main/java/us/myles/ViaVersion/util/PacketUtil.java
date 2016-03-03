@@ -3,6 +3,8 @@ package us.myles.ViaVersion.util;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -11,6 +13,9 @@ import us.myles.ViaVersion.chunks.PacketChunk;
 import us.myles.ViaVersion.chunks.PacketChunkData;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -20,6 +25,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
+
+import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 public class PacketUtil {
     private static Method DECODE_METHOD;
@@ -39,6 +47,25 @@ public class PacketUtil {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             System.out.println("Netty issue?");
+        }
+    }
+
+    public static CompoundTag readNBT(ByteBuf input) throws IOException {
+        int readerIndex = input.readerIndex();
+        byte b = input.readByte();
+        if (b == 0) {
+            return null;
+        } else {
+            input.readerIndex(readerIndex);
+            return (CompoundTag) NBTIO.readTag(new DataInputStream(new ByteBufInputStream(input)));
+        }
+    }
+
+    public static void writeNBT(ByteBuf output, CompoundTag tag) throws IOException {
+        if (tag == null) {
+            output.writeByte(0);
+        } else {
+            NBTIO.writeTag(new DataOutputStream(new ByteBufOutputStream(output)), tag);
         }
     }
 
@@ -352,45 +379,6 @@ public class PacketUtil {
             output.set(toShift + i, temp.get(i));
         }
         return output;
-    }
-
-    public static void writeItem(Object value, ByteBuf output) {
-        try {
-            Class<?> serializer = ReflectionUtil.nms("PacketDataSerializer");
-            Object init = serializer.getDeclaredConstructor(ByteBuf.class).newInstance(output);
-            Method toCall = init.getClass().getDeclaredMethod("a", ReflectionUtil.nms("ItemStack"));
-            toCall.invoke(init, value);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Object readItem(ByteBuf output) {
-        try {
-            Class<?> serializer = ReflectionUtil.nms("PacketDataSerializer");
-            Object init = serializer.getDeclaredConstructor(ByteBuf.class).newInstance(output);
-            Method toCall = init.getClass().getDeclaredMethod("i");
-            return toCall.invoke(init);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static long[] readBlockPosition(ByteBuf buf) {

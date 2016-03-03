@@ -27,6 +27,18 @@ public class ReflectionUtil {
         return m.invoke(o);
     }
 
+    public static <T> T getStatic(Class<?> clazz, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(f);
+        field.setAccessible(true);
+        return (T) field.get(null);
+    }
+
+    public static <T> T get(Object instance, Class<?> clazz, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(f);
+        field.setAccessible(true);
+        return (T) field.get(instance);
+    }
+
     public static <T> T get(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
         Field field = o.getClass().getDeclaredField(f);
         field.setAccessible(true);
