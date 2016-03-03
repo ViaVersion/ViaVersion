@@ -170,7 +170,7 @@ public enum PacketType {
     	if(id == -1)
     		return null;
         for (PacketType pt : values()) {
-            if (pt.getNewPacketID() == id && id != -1
+            if (pt.getNewPacketID() == id
                     && pt.getState() == state
                     && pt.getDirection() == direction)
                 return pt;
@@ -182,7 +182,7 @@ public enum PacketType {
     	if(id == -1)
     		return null;
         for (PacketType pt : values()) {
-            if (pt.getPacketID() == id && id != -1
+            if (pt.getPacketID() == id
                     && pt.getState() == state
                     && pt.getDirection() == direction)
                 return pt;

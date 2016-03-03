@@ -252,11 +252,13 @@ public enum SoundEffect {
     private String name;
     private String newname;
     private SoundCategory cat;
+    private boolean breaksound;
 
     SoundEffect(String name, String newname, SoundCategory cat) {
         this.cat = cat;
         this.newname = newname;
         this.name = name;
+        this.breaksound = name.startsWith("dig.");
     }
 
     public static SoundEffect getByName(String name) {
@@ -278,6 +280,10 @@ public enum SoundEffect {
 
     public SoundCategory getCategory() {
         return cat;
+    }
+    
+    public boolean isBreakPlaceSound() {
+    	return breaksound;
     }
 
 }
