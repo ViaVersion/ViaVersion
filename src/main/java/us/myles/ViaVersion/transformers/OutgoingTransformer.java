@@ -26,8 +26,6 @@ import java.util.*;
 import static us.myles.ViaVersion.util.PacketUtil.*;
 
 public class OutgoingTransformer {
-    private static JSONParser parser = new JSONParser();
-
     private final ConnectionInfo info;
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
@@ -240,7 +238,7 @@ public class OutgoingTransformer {
         if (packet == PacketType.STATUS_RESPONSE) {
             String original = PacketUtil.readString(input);
             try {
-                JSONObject json = (JSONObject) parser.parse(original);
+                JSONObject json = (JSONObject) new JSONParser().parse(original);
                 JSONObject version = (JSONObject) json.get("version");
                 version.put("protocol", info.getProtocol());
                 PacketUtil.writeString(json.toJSONString(), output);
@@ -597,9 +595,9 @@ public class OutgoingTransformer {
                 line = "{\"text\":" + line + "}";
         }
         try {
-            parser.parse(line);
-        } catch (org.json.simple.parser.ParseException e) {
-            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
+            new JSONParser().parse(line);
+        } catch (Exception e) {
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
             return "{\"text\":\"\"}";
         }
         return line;
