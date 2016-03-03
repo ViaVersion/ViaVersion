@@ -72,14 +72,10 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (!(cause.getCause().getCause() instanceof CancelException)
-                && !(cause.getCause().getCause() instanceof ClosedChannelException)) {
-            if (!(cause.getCause() instanceof CancelException)
-                    && !(cause.getCause() instanceof ClosedChannelException)) {
-                if (!(cause instanceof CancelException)
-                        && !(cause instanceof ClosedChannelException)) {
-                    if (cause instanceof Exception)
-                        cause.printStackTrace();
+        if (!(cause.getCause().getCause() instanceof CancelException)) {
+            if (!(cause.getCause() instanceof CancelException)) {
+                if (!(cause instanceof CancelException)) {
+                    super.exceptionCaught(ctx, cause);
                 }
             }
         }
