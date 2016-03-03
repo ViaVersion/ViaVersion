@@ -9,4 +9,5 @@ public interface ViaVersionAPI {
      * @return
      */
     boolean isPorted(Player player);
+    String getVersion();
 }

@@ -52,6 +52,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 setPorted(e.getPlayer().getUniqueId(), false);
             }
         }, this);
+        getCommand("viaversion").setExecutor(new ViaVersionCommand());
     }
 
     public void injectPacketHandler() throws Exception {
@@ -76,6 +77,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public boolean isPorted(Player player) {
         return portedPlayers.contains(player.getUniqueId());
+    }
+
+    @Override
+    public String getVersion() {
+        return getDescription().getVersion();
     }
 
     public void setPorted(UUID id, boolean value) {

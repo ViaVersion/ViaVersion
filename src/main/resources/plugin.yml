@@ -4,3 +4,5 @@ author: _MylesC
 version: ${version}
 load: startup
 loadbefore: [ProtocolLib, ProxyPipe]
+commands:
+  viaversion:
