@@ -1,15 +1,12 @@
 package us.myles.ViaVersion.transformers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import io.netty.buffer.ByteBuf;
-
 import org.bukkit.entity.EntityType;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -28,7 +25,8 @@ import java.util.*;
 import static us.myles.ViaVersion.util.PacketUtil.*;
 
 public class OutgoingTransformer {
-    private static Gson gson = new Gson();
+    private static JSONParser parser = new JSONParser();
+
     private final ConnectionInfo info;
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
@@ -65,11 +63,11 @@ public class OutgoingTransformer {
             int catid = 0;
             String newname = name;
             if (effect != null) {
-            	if(effect.isBreakPlaceSound()) {
-            		input.readBytes(input.readableBytes());
-            		output.clear();
-            		return;
-            	}
+                if (effect.isBreakPlaceSound()) {
+                    input.readBytes(input.readableBytes());
+                    output.clear();
+                    return;
+                }
                 catid = effect.getCategory().getId();
                 newname = effect.getNewName();
             }
@@ -88,12 +86,12 @@ public class OutgoingTransformer {
                     if (!vehicleMap.containsKey(passenger))
                         throw new CancelException();
                     vehicle = vehicleMap.remove(passenger);
-                    writeVarInt(vehicle,output);
+                    writeVarInt(vehicle, output);
                     writeVarIntArray(Collections.<Integer>emptyList(), output);
-                } else{
+                } else {
                     writeVarInt(vehicle, output);
                     writeVarIntArray(Collections.singletonList(passenger), output);
-                    vehicleMap.put(passenger,vehicle);
+                    vehicleMap.put(passenger, vehicle);
                 }
                 return;
             }
@@ -193,9 +191,14 @@ public class OutgoingTransformer {
 
         if (packet == PacketType.STATUS_RESPONSE) {
             String original = PacketUtil.readString(input);
-            JsonObject object = gson.fromJson(original, JsonObject.class);
-            object.get("version").getAsJsonObject().addProperty("protocol", info.getProtocol());
-            PacketUtil.writeString(gson.toJson(object), output);
+            try {
+                JSONObject json = (JSONObject) parser.parse(original);
+                JSONObject version = (JSONObject) json.get("version");
+                version.put("protocol", info.getProtocol());
+                PacketUtil.writeString(json.toJSONString(), output);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             return;
         }
         if (packet == PacketType.LOGIN_SUCCESS) {
@@ -522,11 +525,10 @@ public class OutgoingTransformer {
                 line = "{\"text\":" + line + "}";
         }
         try {
-        	new JSONParser().parse(line);
-        }
-        catch (org.json.simple.parser.ParseException e) {
-        	System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
-        	return "{\"text\":\"\"}";
+            parser.parse(line);
+        } catch (org.json.simple.parser.ParseException e) {
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
+            return "{\"text\":\"\"}";
         }
         return line;
     }

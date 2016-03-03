@@ -390,7 +390,7 @@ public class PacketUtil {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-		return null;
+        return null;
     }
 
     public static long[] readBlockPosition(ByteBuf buf) {
@@ -413,5 +413,13 @@ public class PacketUtil {
         }
 
         return data;
+    }
+
+    public static boolean containsCause(Throwable t, Class<? extends Throwable> c) {
+        while (t != null) {
+            t = t.getCause();
+            if (c.isAssignableFrom(t.getClass())) return true;
+        }
+        return false;
     }
 }
