@@ -496,7 +496,7 @@ public class OutgoingTransformer {
         }
         catch (org.json.simple.parser.ParseException e) {
         	System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
-			return "{\"text\":\"\"}";
+        	return "{\"text\":\"\"}";
         }
         return line;
     }
