@@ -86,10 +86,10 @@ public class MetadataRewriter {
                             PacketUtil.writeString((String) value, output);
                             break;
                         case Boolean:
-                        	if(metaIndex == MetaIndex.AGEABLE_AGE)
-                        		output.writeBoolean(((Byte) value).byteValue() < 0);
-                        	else
-                        		output.writeBoolean(((Byte) value).byteValue() != 0);
+                            if(metaIndex == MetaIndex.AGEABLE_AGE)
+                                output.writeBoolean(((Byte) value).byteValue() < 0);
+                            else
+                                output.writeBoolean(((Byte) value).byteValue() != 0);
                             break;
                         case Slot:
                             PacketUtil.writeItem(value, output);
