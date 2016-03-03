@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>ViaVersion</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.4.6</version>
     <build>
         <plugins>
             <plugin>
@@ -18,6 +18,12 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
     <dependencies>
         <dependency>
