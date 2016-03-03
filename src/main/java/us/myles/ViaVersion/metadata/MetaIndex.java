@@ -27,7 +27,7 @@ public enum MetaIndex {
     STAND_LL_POS(ArmorStand.class, 15, Type.Rotation, NewType.Vector3F),
     STAND_RL_POS(ArmorStand.class, 16, Type.Rotation, NewType.Vector3F),
     // human, discountined?
-    PLAYER_SKIN_FLAGS(HumanEntity.class, 10, Type.Byte, NewType.Discontinued), // unsigned on 1.8
+    PLAYER_SKIN_FLAGS(HumanEntity.class, 10, Type.Byte, 12, NewType.Byte), // unsigned on 1.8
     PLAYER_HUMAN_BYTE(HumanEntity.class, 16, Type.Byte, NewType.Discontinued), // unused on 1.8
     PLAYER_ADDITIONAL_HEARTS(HumanEntity.class, 17, Type.Float, NewType.Discontinued),
     PLAYER_SCORE(HumanEntity.class, 18, Type.Int, NewType.Discontinued),
