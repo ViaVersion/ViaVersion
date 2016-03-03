@@ -65,7 +65,7 @@ public class ItemSlotRewriter {
                     tag = new CompoundTag("tag");
                 }
                 CompoundTag entityTag = new CompoundTag("EntityTag");
-                StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get(item.data));
+                StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get(Integer.valueOf(item.data)));
                 entityTag.put(id);
                 tag.put(entityTag);
                 item.tag = tag;
@@ -184,7 +184,7 @@ public class ItemSlotRewriter {
         register(200, "EnderCrystal");
     }
 
-    private static void register(int id, String name) {
+    private static void register(Integer id, String name) {
         ENTTIY_ID_TO_NAME.put(id, name);
         ENTTIY_NAME_TO_ID.put(name, id);
     }
