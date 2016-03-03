@@ -175,25 +175,11 @@ public class IncomingTransformer {
             int hand = PacketUtil.readVarInt(input);
 
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            Object item = null;
             try {
-                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
-                item = m.invoke(null, inHand);
+                us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
                 ItemSlotRewriter.writeItemStack(item, output);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (NoSuchFieldException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -213,25 +199,11 @@ public class IncomingTransformer {
             output.writeByte(255);
             // write item in hand
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            Object item = null;
             try {
-                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
-                item = m.invoke(null, inHand);
+                us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack item = us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
                 ItemSlotRewriter.writeItemStack(item, output);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (NoSuchFieldException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

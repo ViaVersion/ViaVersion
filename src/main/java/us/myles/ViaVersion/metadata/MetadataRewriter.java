@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 import io.netty.buffer.ByteBuf;
 
 import us.myles.ViaVersion.api.slot.ItemSlotRewriter;
+import us.myles.ViaVersion.api.slot.ItemSlotRewriter.ItemStack;
 import us.myles.ViaVersion.util.PacketUtil;
 
 public class MetadataRewriter {
@@ -93,8 +94,9 @@ public class MetadataRewriter {
                                 output.writeBoolean(((Byte) value).byteValue() != 0);
                             break;
                         case Slot:
-                            ItemSlotRewriter.fixIdsFrom1_8To1_9(value);
-                            ItemSlotRewriter.writeItemStack(value, output);
+                            ItemStack item = (ItemStack) value;
+                            ItemSlotRewriter.fixIdsFrom1_8To1_9(item);
+                            ItemSlotRewriter.writeItemStack(item, output);
                             break;
                         case Position:
                             Vector vector = (Vector) value;

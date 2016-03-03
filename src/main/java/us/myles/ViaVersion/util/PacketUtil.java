@@ -3,6 +3,8 @@ package us.myles.ViaVersion.util;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -11,6 +13,9 @@ import us.myles.ViaVersion.chunks.PacketChunk;
 import us.myles.ViaVersion.chunks.PacketChunkData;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -20,6 +25,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
+
+import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 public class PacketUtil {
     private static Method DECODE_METHOD;
@@ -39,6 +47,25 @@ public class PacketUtil {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             System.out.println("Netty issue?");
+        }
+    }
+
+    public static CompoundTag readNBT(ByteBuf input) throws IOException {
+        int readerIndex = input.readerIndex();
+        byte b = input.readByte();
+        if (b == 0) {
+            return null;
+        } else {
+            input.readerIndex(readerIndex);
+            return (CompoundTag) NBTIO.readTag(new DataInputStream(new ByteBufInputStream(input)));
+        }
+    }
+
+    public static void writeNBT(ByteBuf output, CompoundTag tag) throws IOException {
+        if (tag == null) {
+            output.writeByte(0);
+        } else {
+            NBTIO.writeTag(new DataOutputStream(new ByteBufOutputStream(output)), tag);
         }
     }
 
