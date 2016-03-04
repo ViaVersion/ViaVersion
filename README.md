@@ -5,14 +5,6 @@ This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
 **Don't use late bind*
 
-**As of this point it doesn't have everything, I need to fix:**
-
-Attempt to make boats nicer when they don't work
-
-Remap potions
-
-If you have a bug with entities, please report the full stack trace
-
 
 This took hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
 
