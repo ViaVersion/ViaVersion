@@ -122,6 +122,7 @@ public class ItemSlotRewriter {
     public static ItemStack readItemStack(ByteBuf input) throws IOException {
         short id = input.readShort();
         if (id < 0) {
+
             return null;
         } else {
             ItemStack item = new ItemStack();
@@ -146,10 +147,10 @@ public class ItemSlotRewriter {
 
     public static class ItemStack {
 
-        private short id;
-        private byte amount;
-        private short data;
-        private CompoundTag tag;
+        public short id;
+        public byte amount;
+        public short data;
+        public CompoundTag tag;
 
         public static ItemStack fromBukkit(org.bukkit.inventory.ItemStack stack) {
             ItemStack item = new ItemStack();

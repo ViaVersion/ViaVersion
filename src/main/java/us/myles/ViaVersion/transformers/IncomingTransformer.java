@@ -1,7 +1,13 @@
 package us.myles.ViaVersion.transformers;
 
+import com.avaje.ebeaninternal.server.cluster.Packet;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -11,8 +17,10 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 
 public class IncomingTransformer {
     private final ConnectionInfo info;
@@ -170,6 +178,26 @@ public class IncomingTransformer {
                 PacketUtil.readVarInt(input);
             }
             return;
+        }
+        if(packet == PacketType.PLAY_PLUGIN_MESSAGE_REQUEST) {
+            String name = PacketUtil.readString(input);
+            PacketUtil.writeString(name, output);
+            byte[] b = new byte[input.readableBytes()];
+            input.readBytes(b);
+            // patch books
+            if(name.equals("MC|BSign")){
+                ByteBuf in = Unpooled.wrappedBuffer(b);
+                try {
+                    ItemSlotRewriter.ItemStack stack = ItemSlotRewriter.readItemStack(in);
+                    stack.id = (short) Material.WRITTEN_BOOK.getId();
+                    // write
+                    ItemSlotRewriter.writeItemStack(stack, output);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+            output.writeBytes(b);
         }
         if (packet == PacketType.PLAY_PLAYER_BLOCK_PLACEMENT) {
             Long position = input.readLong();

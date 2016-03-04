@@ -1,20 +1,25 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
+import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -95,6 +100,17 @@ public class OutgoingTransformer {
             output.writeInt(passenger);
             output.writeInt(vehicle);
             return;
+        }
+        if (packet == PacketType.PLAY_PLUGIN_MESSAGE) {
+            String name = PacketUtil.readString(input);
+            PacketUtil.writeString(name, output);
+            byte[] b = new byte[input.readableBytes()];
+            input.readBytes(b);
+            // patch books
+            if(name.equals("MC|BOpen")){
+                PacketUtil.writeVarInt(0, output);
+            }
+            output.writeBytes(b);
         }
         if (packet == PacketType.PLAY_DISCONNECT) {
             String reason = readString(input);
@@ -271,7 +287,7 @@ public class OutgoingTransformer {
                 slot += 1; // add 1 so it's now 2-5
             }
             PacketUtil.writeVarInt(slot, output);
-            
+
             ItemSlotRewriter.rewrite1_8To1_9(input, output);
             return;
         }
