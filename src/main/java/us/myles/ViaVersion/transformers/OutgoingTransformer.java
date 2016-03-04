@@ -1,17 +1,12 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-import org.spacehq.opennbt.tag.builtin.ListTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
-import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -34,6 +29,7 @@ public class OutgoingTransformer {
     private final ConnectionInfo info;
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
+
     private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
     private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
     private Map<Integer, Integer> vehicleMap = new HashMap<>();
@@ -107,7 +103,7 @@ public class OutgoingTransformer {
             byte[] b = new byte[input.readableBytes()];
             input.readBytes(b);
             // patch books
-            if(name.equals("MC|BOpen")){
+            if (name.equals("MC|BOpen")) {
                 PacketUtil.writeVarInt(0, output);
             }
             output.writeBytes(b);
@@ -268,7 +264,7 @@ public class OutgoingTransformer {
             PacketUtil.writeString(uu, output);
             UUID uniqueId = UUID.fromString(uu);
             info.setUUID(uniqueId);
-            plugin.setPorted(uniqueId, true);
+            plugin.addPortedClient(info);
             output.writeBytes(input);
             return;
         }
@@ -412,7 +408,6 @@ public class OutgoingTransformer {
 
             short slot = input.readShort();
             output.writeShort(slot);
-
             ItemSlotRewriter.rewrite1_8To1_9(input, output);
             return;
         }
@@ -563,18 +558,18 @@ public class OutgoingTransformer {
             output.writeBoolean(groundUp);
 
             int bitMask = input.readUnsignedShort();
-
-            if (bitMask == 0 && groundUp) {
-                output.clear();
-                PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
-                output.writeInt(chunkX);
-                output.writeInt(chunkZ);
-                return;
-            }
             int size = PacketUtil.readVarInt(input);
-
             byte[] data = new byte[size];
             input.readBytes(data);
+//            if (bitMask == 0 && groundUp) {
+//                // if 256
+//                output.clear();
+//                PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
+//                output.writeInt(chunkX);
+//                output.writeInt(chunkZ);
+//                System.out.println("Sending unload chunk " + chunkX + " " + chunkZ + " - " + size + " bulk: " + bulk);
+//                return;
+//            }
             boolean sk = false;
             if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
                 try {

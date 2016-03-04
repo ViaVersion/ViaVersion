@@ -1,26 +1,21 @@
 package us.myles.ViaVersion.transformers;
 
-import com.avaje.ebeaninternal.server.cluster.Packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.spacehq.opennbt.tag.builtin.ListTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
-import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 
 public class IncomingTransformer {
     private final ConnectionInfo info;
@@ -108,6 +103,7 @@ public class IncomingTransformer {
             byte button = input.readByte();
             short action = input.readShort();
             byte mode = input.readByte();
+            // if the action is on an elytra armour slot
             if (slot == 45 && windowID == 0) {
                 try {
                     Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
