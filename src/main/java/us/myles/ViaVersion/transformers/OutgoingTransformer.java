@@ -103,7 +103,7 @@ public class OutgoingTransformer {
             byte[] b = new byte[input.readableBytes()];
             input.readBytes(b);
             // patch books
-            if(name.equals("MC|BOpen")){
+            if (name.equals("MC|BOpen")) {
                 PacketUtil.writeVarInt(0, output);
             }
             output.writeBytes(b);
@@ -558,18 +558,18 @@ public class OutgoingTransformer {
             output.writeBoolean(groundUp);
 
             int bitMask = input.readUnsignedShort();
-
-            if (bitMask == 0 && groundUp) {
-                output.clear();
-                PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
-                output.writeInt(chunkX);
-                output.writeInt(chunkZ);
-                return;
-            }
             int size = PacketUtil.readVarInt(input);
-
             byte[] data = new byte[size];
             input.readBytes(data);
+//            if (bitMask == 0 && groundUp) {
+//                // if 256
+//                output.clear();
+//                PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
+//                output.writeInt(chunkX);
+//                output.writeInt(chunkZ);
+//                System.out.println("Sending unload chunk " + chunkX + " " + chunkZ + " - " + size + " bulk: " + bulk);
+//                return;
+//            }
             boolean sk = false;
             if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
                 try {
