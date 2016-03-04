@@ -24,11 +24,17 @@ Contributors:
 --------
 
 **Myself** (harhar)
+
 **Matsv/StamBoom**
+
 **HugoDaBosss**
+
 **SanderGielisse**
+
 **Paulomart**
+
 **gigosaurus**
+
 **fillefilip8**
 
 **Chat: ** https://gitter.im/MylesIsCool/ViaVersion
