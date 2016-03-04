@@ -198,7 +198,7 @@ public enum SoundEffect {
     MOB_ENDERMEN_SCREAM("mob.endermen.scream", "entity.endermen.scream", SoundCategory.HOSTILE),
     MOB_CAT_HITT("mob.cat.hitt", "entity.cat.hurt", SoundCategory.NEUTRAL),
     MOB_MAGMACUBE_SMALL("mob.magmacube.small", "entity.small_magmacube.squish", SoundCategory.HOSTILE),
-    FIRE_IGNITE("fire.ignite", "item.flintandsteel.use", SoundCategory.BLOCK),
+    FIRE_IGNITE("fire.ignite", "item.flintandsteel.use", SoundCategory.BLOCK, true),
     MOB_ENDERDRAGON_HIT("mob.enderdragon.hit", "entity.enderdragon.hurt", SoundCategory.HOSTILE),
     MOB_ZOMBIE_HURT("mob.zombie.hurt", "entity.zombie_villager.hurt", SoundCategory.HOSTILE),
     RANDOM_EXPLODE("random.explode", "block.end_gateway.spawn", SoundCategory.BLOCK),
@@ -259,6 +259,13 @@ public enum SoundEffect {
         this.newname = newname;
         this.name = name;
         this.breaksound = name.startsWith("dig.");
+    }
+    
+    SoundEffect(String name, String newname, SoundCategory cat, boolean shouldIgnore) {
+        this.cat = cat;
+        this.newname = newname;
+        this.name = name;
+        this.breaksound = name.startsWith("dig.") || shouldIgnore;
     }
 
     public static SoundEffect getByName(String name) {
