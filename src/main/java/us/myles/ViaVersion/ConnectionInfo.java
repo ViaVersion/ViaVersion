@@ -1,5 +1,7 @@
 package us.myles.ViaVersion;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -74,5 +76,10 @@ public class ConnectionInfo {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public void sendRawPacket(ByteBuf packet) {
+        ChannelHandler handler = channel.pipeline().get("encoder");
+        channel.pipeline().context(handler).writeAndFlush(packet);
     }
 }

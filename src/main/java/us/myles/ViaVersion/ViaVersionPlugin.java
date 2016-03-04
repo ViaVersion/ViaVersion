@@ -1,5 +1,6 @@
 package us.myles.ViaVersion;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
@@ -16,12 +17,12 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.listeners.ArmorFix;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
-    private final Set<UUID> portedPlayers = Collections.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
+    private final Map<UUID, ConnectionInfo> portedPlayers = new ConcurrentHashMap<UUID, ConnectionInfo>();
 
     @Override
     public void onEnable() {
@@ -50,9 +51,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPlayerQuit(PlayerQuitEvent e) {
-                setPorted(e.getPlayer().getUniqueId(), false);
+                removePortedClient(e.getPlayer().getUniqueId());
             }
         }, this);
+        Bukkit.getPluginManager().registerEvents(new ArmorFix(), this);
         getCommand("viaversion").setExecutor(new ViaVersionCommand());
     }
 
@@ -88,7 +90,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     @Override
     public boolean isPorted(Player player) {
-        return portedPlayers.contains(player.getUniqueId());
+        return portedPlayers.containsKey(player.getUniqueId());
     }
 
     @Override
@@ -96,12 +98,18 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getDescription().getVersion();
     }
 
-    public void setPorted(UUID id, boolean value) {
-        if (value) {
-            portedPlayers.add(id);
-        } else {
-            portedPlayers.remove(id);
-        }
+    public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
+        if (!isPorted(player)) throw new IllegalArgumentException("This player is not on 1.9");
+        ConnectionInfo ci = portedPlayers.get(player.getUniqueId());
+        ci.sendRawPacket(packet);
+    }
+
+    public void addPortedClient(ConnectionInfo info) {
+        portedPlayers.put(info.getUUID(), info);
+    }
+
+    public void removePortedClient(UUID clientID) {
+        portedPlayers.remove(clientID);
     }
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
