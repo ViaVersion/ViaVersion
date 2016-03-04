@@ -77,6 +77,7 @@ public class OutgoingTransformer {
         	int effectid = input.readInt();
         	if(effectid >= 1000 && effectid < 2000) //Sound effect
         		throw new CancelException();
+        	output.writeInt(effectid);
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
             int passenger = input.readInt();
