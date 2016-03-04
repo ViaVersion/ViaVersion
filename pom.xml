@@ -5,7 +5,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>ViaVersion</artifactId>
-    <version>0.4.8</version>
+    <version>0.4.9</version>
     <build>
         <finalName>ViaVersion-${version}</finalName>
         <plugins>
