@@ -117,7 +117,7 @@ public class MetadataRewriter {
                 }
             } catch (Exception e) {
                 if (type != null) {
-                    System.out.println("An error occurred with entity meta data for " + type);
+                    System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.oldID);
                     if (metaIndex != null) {
                         System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
                         System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
@@ -138,23 +138,23 @@ public class MetadataRewriter {
             MetaIndex index = MetaIndex.getIndex(entityType, id);
             switch (type) {
                 case Byte:
-                    entries.add(new Entry(index, buf.readByte()));
+                    entries.add(new Entry(index, buf.readByte(), id));
                     break;
                 case Short:
-                    entries.add(new Entry(index, buf.readShort()));
+                    entries.add(new Entry(index, buf.readShort(), id));
                     break;
                 case Int:
-                    entries.add(new Entry(index, buf.readInt()));
+                    entries.add(new Entry(index, buf.readInt(), id));
                     break;
                 case Float:
-                    entries.add(new Entry(index, buf.readFloat()));
+                    entries.add(new Entry(index, buf.readFloat(), id));
                     break;
                 case String:
-                    entries.add(new Entry(index, PacketUtil.readString(buf)));
+                    entries.add(new Entry(index, PacketUtil.readString(buf), id));
                     break;
                 case Slot: {
                     try {
-                        entries.add(new Entry(index, ItemSlotRewriter.readItemStack(buf)));
+                        entries.add(new Entry(index, ItemSlotRewriter.readItemStack(buf), id));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -164,14 +164,14 @@ public class MetadataRewriter {
                     int x = buf.readInt();
                     int y = buf.readInt();
                     int z = buf.readInt();
-                    entries.add(new Entry(index, new Vector(x, y, z)));
+                    entries.add(new Entry(index, new Vector(x, y, z), id));
                     break;
                 }
                 case Rotation: {
                     float x = buf.readFloat();
                     float y = buf.readFloat();
                     float z = buf.readFloat();
-                    entries.add(new Entry(index, new EulerAngle(x, y, z)));
+                    entries.add(new Entry(index, new EulerAngle(x, y, z), id));
                     break;
                 }
                 default:
@@ -184,12 +184,14 @@ public class MetadataRewriter {
 
     public static class Entry {
 
+        private final int oldID;
         private MetaIndex index;
         private Object value;
 
-        private Entry(MetaIndex index, Object value) {
+        private Entry(MetaIndex index, Object value, int id) {
             this.index = index;
             this.value = value;
+            this.oldID = id;
         }
     }
 }
