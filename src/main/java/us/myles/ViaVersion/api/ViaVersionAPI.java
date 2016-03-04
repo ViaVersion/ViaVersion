@@ -24,4 +24,10 @@ public interface ViaVersionAPI {
      * @throws IllegalArgumentException If not on 1.9 throws IllegalArg
      */
     void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException;
+
+    /**
+     * Obtain if global debug is enabled
+     * @return true if debug is enabled
+     */
+    boolean isDebug();
 }

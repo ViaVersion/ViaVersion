@@ -44,14 +44,17 @@ public class OutgoingTransformer {
         }
 
         PacketType packet = PacketType.getOutgoingPacket(info.getState(), packetID);
-
+        int original = packetID;
+        if (packet.getPacketID() != -1) {
+            packetID = packet.getNewPacketID();
+        }
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
         }
-//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().toLowerCase().contains("look")))
-//            System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
-        if (packet.getPacketID() != -1) {
-            packetID = packet.getNewPacketID();
+        if (ViaVersion.getInstance().isDebug()) {
+            if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().toLowerCase().contains("look"))) {
+                System.out.println("Direction " + packet.getDirection().name() + " Packet Type: " + packet + " New ID: " + packetID + " Original: " + original + " Size: " + input.readableBytes());
+            }
         }
 
         // By default no transform
@@ -254,9 +257,9 @@ public class OutgoingTransformer {
         }
 
         if (packet == PacketType.STATUS_RESPONSE) {
-            String original = PacketUtil.readString(input);
+            String originalStatus = PacketUtil.readString(input);
             try {
-                JSONObject json = (JSONObject) new JSONParser().parse(original);
+                JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
                 JSONObject version = (JSONObject) json.get("version");
                 version.put("protocol", info.getProtocol());
                 PacketUtil.writeString(json.toJSONString(), output);

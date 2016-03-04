@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     private final Map<UUID, ConnectionInfo> portedPlayers = new ConcurrentHashMap<UUID, ConnectionInfo>();
+    private boolean debug = false;
 
     @Override
     public void onEnable() {
@@ -58,7 +59,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
         Bukkit.getPluginManager().registerEvents(new ArmorListener(this), this);
 
-        getCommand("viaversion").setExecutor(new ViaVersionCommand());
+        getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
     }
 
     public void injectPacketHandler() throws Exception {
@@ -105,6 +106,15 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         if (!isPorted(player)) throw new IllegalArgumentException("This player is not on 1.9");
         ConnectionInfo ci = portedPlayers.get(player.getUniqueId());
         ci.sendRawPacket(packet);
+    }
+
+    @Override
+    public boolean isDebug() {
+        return this.debug;
+    }
+
+    public void setDebug(boolean value) {
+        this.debug = value;
     }
 
     public void addPortedClient(ConnectionInfo info) {

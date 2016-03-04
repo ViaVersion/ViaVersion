@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 
 import java.util.ArrayList;
@@ -14,6 +15,11 @@ import java.util.List;
  * Created by fillefilip8 on 2016-03-03.
  */
 public class ViaVersionCommand implements CommandExecutor {
+    private final ViaVersionPlugin plugin;
+
+    public ViaVersionCommand(ViaVersionPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -37,12 +43,17 @@ public class ViaVersionCommand implements CommandExecutor {
                     sender.sendMessage(color("&8[&61.9&8]: &b" + portedPlayers.toString()));
                     sender.sendMessage(color("&8[&61.8&8]: &b" + normalPlayers.toString()));
                 }
+                if (args[0].equalsIgnoreCase("debug")) {
+                    plugin.setDebug(!plugin.isDebug());
+                    sender.sendMessage(color("&6Debug mode is now " + (plugin.isDebug() ? "&aenabled" : "&cdisabled")));
+                }
             }
 
         }
         return false;
     }
-    public String color(String string){
+
+    public String color(String string) {
         return string.replace("&", "§");
     }
 }

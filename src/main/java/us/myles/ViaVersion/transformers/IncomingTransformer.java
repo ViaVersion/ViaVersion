@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.slot.ItemSlotRewriter;
@@ -35,9 +36,11 @@ public class IncomingTransformer {
         if (packet.getPacketID() != -1) {
             packetID = packet.getPacketID();
         }
-//        if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
-//            System.out.println("Packet Type: " + packet + " New ID: " + packetID + " Original: " + original);
-//        }
+        if (ViaVersion.getInstance().isDebug()) {
+            if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
+                System.out.println("Direction " + packet.getDirection().name() + " Packet Type: " + packet + " New ID: " + packetID + " Original: " + original + " Size: " + input.readableBytes());
+            }
+        }
         if (packet == PacketType.PLAY_TP_CONFIRM || packet == PacketType.PLAY_VEHICLE_MOVE_REQUEST) { //TODO handle client-sided horse riding
             throw new CancelException();
         }
@@ -175,13 +178,13 @@ public class IncomingTransformer {
             }
             return;
         }
-        if(packet == PacketType.PLAY_PLUGIN_MESSAGE_REQUEST) {
+        if (packet == PacketType.PLAY_PLUGIN_MESSAGE_REQUEST) {
             String name = PacketUtil.readString(input);
             PacketUtil.writeString(name, output);
             byte[] b = new byte[input.readableBytes()];
             input.readBytes(b);
             // patch books
-            if(name.equals("MC|BSign")){
+            if (name.equals("MC|BSign")) {
                 ByteBuf in = Unpooled.wrappedBuffer(b);
                 try {
                     ItemSlotRewriter.ItemStack stack = ItemSlotRewriter.readItemStack(in);
