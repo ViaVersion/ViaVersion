@@ -6,18 +6,23 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
@@ -28,11 +33,38 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
+	
+	public static Plugin plugin;
+	public static String pluginVersion;
+	public static String GeneralError;
+	public static String OtherMessage;
+	public static int config_version;
 
-    private final Set<UUID> portedPlayers = Collections.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
-
+	private final Set<UUID> portedPlayers = Collections.newSetFromMap(new ConcurrentHashMap<UUID, Boolean>());
     @Override
     public void onEnable() {
+    	
+    	plugin = this;
+		pluginVersion = getDescription().getVersion();
+		saveDefaultConfig();
+		config_version = getConfig().getInt("configversion");
+		
+		if (config_version == 4) {
+			getLogger().info("Config up to date and loaded!");
+		} else {
+			getLogger().warning("Config is not up to date! Creating a new conf and renaming the old one to 'config_old.yml' ");
+			File configFile = new File(plugin.getDataFolder(), "config.yml");
+			File oldConfigFile = new File(plugin.getDataFolder(), "config_old.yml");
+			if (oldConfigFile.exists()) {
+				oldConfigFile.delete();
+			}
+			configFile.renameTo(oldConfigFile);
+			saveDefaultConfig();
+		}
+
+		GeneralError = getConfig().getString("GeneralError");
+		OtherMessage = getConfig().getString("OtherMessage");
+    	
         ViaVersion.setInstance(this);
         if (System.getProperty("ViaVersion") != null) {
             getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
