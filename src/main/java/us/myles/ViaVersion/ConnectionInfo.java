@@ -78,8 +78,13 @@ public class ConnectionInfo {
         this.active = active;
     }
 
-    public void sendRawPacket(ByteBuf packet) {
-        ChannelHandler handler = channel.pipeline().get("encoder");
-        channel.pipeline().context(handler).writeAndFlush(packet);
+    public void sendRawPacket(final ByteBuf packet) {
+        final ChannelHandler handler = channel.pipeline().get("encoder");
+        channel.eventLoop().submit(new Runnable() {
+            @Override
+            public void run() {
+                channel.pipeline().context(handler).writeAndFlush(packet);
+            }
+        });
     }
 }

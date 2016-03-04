@@ -15,9 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
+import us.myles.ViaVersion.armor.ArmorListener;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
-import us.myles.ViaVersion.listeners.ArmorFix;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -48,13 +48,16 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
+
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPlayerQuit(PlayerQuitEvent e) {
                 removePortedClient(e.getPlayer().getUniqueId());
             }
         }, this);
-        Bukkit.getPluginManager().registerEvents(new ArmorFix(), this);
+
+        Bukkit.getPluginManager().registerEvents(new ArmorListener(this), this);
+
         getCommand("viaversion").setExecutor(new ViaVersionCommand());
     }
 
