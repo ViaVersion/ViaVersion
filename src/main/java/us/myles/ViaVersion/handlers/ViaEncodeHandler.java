@@ -10,7 +10,6 @@ import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
-import java.nio.channels.ClosedChannelException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
     private final ConnectionInfo info;
