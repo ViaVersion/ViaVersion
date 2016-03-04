@@ -1,17 +1,15 @@
 package us.myles.ViaVersion.slot;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import io.netty.buffer.ByteBuf;
 import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
-
-import io.netty.buffer.ByteBuf;
-
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.util.PacketUtil;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ItemSlotRewriter {
 
@@ -48,7 +46,35 @@ public class ItemSlotRewriter {
                     CompoundTag entityTag = tag.get("EntityTag");
                     if (entityTag.get("id") instanceof StringTag) {
                         StringTag id = entityTag.get("id");
-                        data = ENTTIY_NAME_TO_ID.get(id.getValue());
+                        if (ENTTIY_NAME_TO_ID.containsKey(id.getValue()))
+                            data = ENTTIY_NAME_TO_ID.get(id.getValue());
+                    }
+                }
+                item.tag = null;
+                item.data = (short) data;
+            }
+            if (item.id == Material.POTION.getId()) {
+                CompoundTag tag = item.tag;
+                int data = 0;
+                if (tag != null && tag.get("Potion") instanceof StringTag) {
+                    StringTag potion = tag.get("Potion");
+                    String potionName = potion.getValue().replace("minecraft:", "");
+                    if (POTION_NAME_TO_ID.containsKey(potionName)) {
+                        data = POTION_NAME_TO_ID.get(potionName);
+                    }
+                }
+                item.tag = null;
+                item.data = (short) data;
+            }
+            if (item.id == 438) {
+                CompoundTag tag = item.tag;
+                int data = 0;
+                item.id = (short) Material.POTION.getId();
+                if (tag != null && tag.get("Potion") instanceof StringTag) {
+                    StringTag potion = tag.get("Potion");
+                    String potionName = potion.getValue().replace("minecraft:", "");
+                    if (POTION_NAME_TO_ID.containsKey(potionName)) {
+                        data = POTION_NAME_TO_ID.get(potionName) + 8192;
                     }
                 }
                 item.tag = null;
@@ -65,9 +91,28 @@ public class ItemSlotRewriter {
                     tag = new CompoundTag("tag");
                 }
                 CompoundTag entityTag = new CompoundTag("EntityTag");
-                StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get(Integer.valueOf(item.data)));
-                entityTag.put(id);
-                tag.put(entityTag);
+                if (ENTTIY_ID_TO_NAME.containsKey(Integer.valueOf(item.data))) {
+                    StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get(Integer.valueOf(item.data)));
+                    entityTag.put(id);
+                    tag.put(entityTag);
+                }
+                item.tag = tag;
+                item.data = 0;
+            }
+            if (item.id == Material.POTION.getId()) {
+                CompoundTag tag = item.tag;
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                if(item.data >= 16384){
+                    item.id = 438; // splash id
+                    item.data = (short) (item.data - 8192);
+                }
+                if (POTION_ID_TO_NAME.containsKey(Integer.valueOf(item.data))) {
+                    String name = POTION_ID_TO_NAME.get(Integer.valueOf(item.data));
+                    StringTag potion = new StringTag("Potion", "minecraft:" + name);
+                    tag.put(potion);
+                }
                 item.tag = tag;
                 item.data = 0;
             }
@@ -119,73 +164,133 @@ public class ItemSlotRewriter {
     private static Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
     private static Map<Integer, String> ENTTIY_ID_TO_NAME = new HashMap<>();
 
+    private static Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
+    private static Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
+
     static {
-        register(1, "Item");
-        register(2, "XPOrb");
-        register(7, "ThrownEgg");
-        register(8, "LeashKnot");
-        register(9, "Painting");
-        register(10, "Arrow");
-        register(11, "Snowball");
-        register(12, "Fireball");
-        register(13, "SmallFireball");
-        register(14, "ThrownEnderpearl");
-        register(15, "EyeOfEnderSignal");
-        register(16, "ThrownPotion");
-        register(17, "ThrownExpBottle");
-        register(18, "ItemFrame");
-        register(19, "WitherSkull");
-        register(20, "PrimedTnt");
-        register(21, "FallingSand");
-        register(22, "FireworksRocketEntity");
-        register(30, "ArmorStand");
-        register(40, "MinecartCommandBlock");
-        register(41, "Boat");
-        register(42, "MinecartRideable");
-        register(43, "MinecartChest");
-        register(44, "MinecartFurnace");
-        register(45, "MinecartTNT");
-        register(46, "MinecartHopper");
-        register(47, "MinecartSpawner");
-        register(48, "Mob");
-        register(49, "Monster");
-        register(50, "Creeper");
-        register(51, "Skeleton");
-        register(52, "Spider");
-        register(53, "Giant");
-        register(54, "Zombie");
-        register(55, "Slime");
-        register(56, "Ghast");
-        register(57, "PigZombie");
-        register(58, "Enderman");
-        register(59, "CaveSpider");
-        register(60, "Silverfish");
-        register(61, "Blaze");
-        register(62, "LavaSlime");
-        register(63, "EnderDragon");
-        register(64, "WitherBoss");
-        register(65, "Bat");
-        register(66, "Witch");
-        register(67, "Endermite");
-        register(68, "Guardian");
-        register(90, "Pig");
-        register(91, "Sheep");
-        register(92, "Cow");
-        register(93, "Chicken");
-        register(94, "Squid");
-        register(95, "Wolf");
-        register(96, "MushroomCow");
-        register(97, "SnowMan");
-        register(98, "Ozelot");
-        register(99, "VillagerGolem");
-        register(100, "EntityHorse");
-        register(101, "Rabbit");
-        register(120, "Villager");
-        register(200, "EnderCrystal");
+        /* Entities */
+        registerEntity(1, "Item");
+        registerEntity(2, "XPOrb");
+        registerEntity(7, "ThrownEgg");
+        registerEntity(8, "LeashKnot");
+        registerEntity(9, "Painting");
+        registerEntity(10, "Arrow");
+        registerEntity(11, "Snowball");
+        registerEntity(12, "Fireball");
+        registerEntity(13, "SmallFireball");
+        registerEntity(14, "ThrownEnderpearl");
+        registerEntity(15, "EyeOfEnderSignal");
+        registerEntity(16, "ThrownPotion");
+        registerEntity(17, "ThrownExpBottle");
+        registerEntity(18, "ItemFrame");
+        registerEntity(19, "WitherSkull");
+        registerEntity(20, "PrimedTnt");
+        registerEntity(21, "FallingSand");
+        registerEntity(22, "FireworksRocketEntity");
+        registerEntity(30, "ArmorStand");
+        registerEntity(40, "MinecartCommandBlock");
+        registerEntity(41, "Boat");
+        registerEntity(42, "MinecartRideable");
+        registerEntity(43, "MinecartChest");
+        registerEntity(44, "MinecartFurnace");
+        registerEntity(45, "MinecartTNT");
+        registerEntity(46, "MinecartHopper");
+        registerEntity(47, "MinecartSpawner");
+        registerEntity(48, "Mob");
+        registerEntity(49, "Monster");
+        registerEntity(50, "Creeper");
+        registerEntity(51, "Skeleton");
+        registerEntity(52, "Spider");
+        registerEntity(53, "Giant");
+        registerEntity(54, "Zombie");
+        registerEntity(55, "Slime");
+        registerEntity(56, "Ghast");
+        registerEntity(57, "PigZombie");
+        registerEntity(58, "Enderman");
+        registerEntity(59, "CaveSpider");
+        registerEntity(60, "Silverfish");
+        registerEntity(61, "Blaze");
+        registerEntity(62, "LavaSlime");
+        registerEntity(63, "EnderDragon");
+        registerEntity(64, "WitherBoss");
+        registerEntity(65, "Bat");
+        registerEntity(66, "Witch");
+        registerEntity(67, "Endermite");
+        registerEntity(68, "Guardian");
+        registerEntity(90, "Pig");
+        registerEntity(91, "Sheep");
+        registerEntity(92, "Cow");
+        registerEntity(93, "Chicken");
+        registerEntity(94, "Squid");
+        registerEntity(95, "Wolf");
+        registerEntity(96, "MushroomCow");
+        registerEntity(97, "SnowMan");
+        registerEntity(98, "Ozelot");
+        registerEntity(99, "VillagerGolem");
+        registerEntity(100, "EntityHorse");
+        registerEntity(101, "Rabbit");
+        registerEntity(120, "Villager");
+        registerEntity(200, "EnderCrystal");
+
+        /* Potions */
+        registerPotion(0, "water");
+        registerPotion(64, "mundane");
+        registerPotion(32, "thick");
+        registerPotion(16, "awkward");
+
+        registerPotion(8198, "night_vision");
+        registerPotion(8262, "long_night_vision");
+
+        registerPotion(8206, "invisibility");
+        registerPotion(8270, "long_invisibility");
+
+        registerPotion(8203, "leaping");
+        registerPotion(8267, "long_leaping");
+        registerPotion(8235, "strong_leaping");
+
+        registerPotion(8195, "fire_resistance");
+        registerPotion(8259, "long_fire_resistance");
+
+        registerPotion(8194, "swiftness");
+        registerPotion(8258, "long_swiftness");
+        registerPotion(8226, "strong_swiftness");
+
+        registerPotion(8202, "slowness");
+        registerPotion(8266, "long_slowness");
+
+        registerPotion(8205, "water_breathing");
+        registerPotion(8269, "long_water_breathing");
+
+        registerPotion(8197, "healing");
+        registerPotion(8229, "strong_healing");
+
+        registerPotion(8204, "harming");
+        registerPotion(8236, "strong_harming");
+
+        registerPotion(8196, "poison");
+        registerPotion(8260, "long_poison");
+        registerPotion(8228, "strong_poison");
+
+        registerPotion(8193, "regeneration");
+        registerPotion(8257, "long_regeneration");
+        registerPotion(8225, "strong_regeneration");
+
+        registerPotion(8201, "strength");
+        registerPotion(8265, "long_strength");
+        registerPotion(8233, "strong_strength");
+
+        registerPotion(8200, "weakness");
+        registerPotion(8264, "long_weakness");
+
     }
 
-    private static void register(Integer id, String name) {
+    private static void registerEntity(Integer id, String name) {
         ENTTIY_ID_TO_NAME.put(id, name);
         ENTTIY_NAME_TO_ID.put(name, id);
+    }
+
+    private static void registerPotion(Integer id, String name) {
+        POTION_ID_TO_NAME.put(id, name);
+        POTION_NAME_TO_ID.put(name, id);
     }
 }
