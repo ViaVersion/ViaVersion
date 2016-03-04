@@ -564,7 +564,7 @@ public class OutgoingTransformer {
 
             int bitMask = input.readUnsignedShort();
 
-            if (bitMask == 0) {
+            if (bitMask == 0 && groundUp) {
                 output.clear();
                 PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
                 output.writeInt(chunkX);
