@@ -73,6 +73,11 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(catid, output);
             output.writeBytes(input);
         }
+        if (packet == PacketType.PLAY_EFFECT) {
+        	int effectid = input.readInt();
+        	if(effectid >= 1000 && effectid < 2000) //Sound effect
+        		throw new CancelException();
+        }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
             int passenger = input.readInt();
             int vehicle = input.readInt();
