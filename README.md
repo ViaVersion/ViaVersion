@@ -1,17 +1,9 @@
-# ViaVersion 0.4.6
-**Allows the connection of 1.8 clients to 1.9**
+# ViaVersion 0.4.9
+**Allows the connection of 1.9 clients to 1.8**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
-**Don't use late bind*
-
-**As of this point it doesn't have everything, I need to fix:**
-
-Attempt to make boats nicer when they don't work
-
-Remap spawn eggs
-
-If you have a bug with entities, please report the full stack trace
+###**Don't use late bind*
 
 
 This took hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
@@ -24,15 +16,26 @@ Sources:
 
 **MCProtocolLib** (used for chunk reading & some of writing.)
 
+**OpenNBT** (used for slot rewriting)
+
+
+
 Contributors:
 --------
 
 **Myself** (harhar)
+
 **Matsv/StamBoom**
+
 **HugoDaBosss**
+
 **SanderGielisse**
+
 **Paulomart**
+
 **gigosaurus**
+
+**fillefilip8**
 
 **Chat: ** https://gitter.im/MylesIsCool/ViaVersion
 

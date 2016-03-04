@@ -1,15 +1,17 @@
 package us.myles.ViaVersion.transformers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import io.netty.buffer.ByteBuf;
-
+import io.netty.buffer.Unpooled;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-
+import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -17,6 +19,7 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion.util.PacketUtil;
@@ -28,7 +31,6 @@ import java.util.*;
 import static us.myles.ViaVersion.util.PacketUtil.*;
 
 public class OutgoingTransformer {
-    private static Gson gson = new Gson();
     private final ConnectionInfo info;
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
@@ -50,7 +52,7 @@ public class OutgoingTransformer {
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
         }
-//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().contains("look")))
+//        if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().toLowerCase().contains("look")))
 //            System.out.println("Packet Type: " + packet + " Original ID: " + packetID + " State:" + info.getState());
         if (packet.getPacketID() != -1) {
             packetID = packet.getNewPacketID();
@@ -60,15 +62,14 @@ public class OutgoingTransformer {
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.PLAY_NAMED_SOUND_EFFECT) {
             String name = PacketUtil.readString(input);
+
             SoundEffect effect = SoundEffect.getByName(name);
             int catid = 0;
             String newname = name;
             if (effect != null) {
-            	if(effect.isBreakPlaceSound()) {
-            		input.readBytes(input.readableBytes());
-            		output.clear();
-            		return;
-            	}
+                if (effect.isBreakPlaceSound()) {
+                    throw new CancelException();
+                }
                 catid = effect.getCategory().getId();
                 newname = effect.getNewName();
             }
@@ -87,18 +88,29 @@ public class OutgoingTransformer {
                     if (!vehicleMap.containsKey(passenger))
                         throw new CancelException();
                     vehicle = vehicleMap.remove(passenger);
-                    writeVarInt(vehicle,output);
+                    writeVarInt(vehicle, output);
                     writeVarIntArray(Collections.<Integer>emptyList(), output);
-                } else{
+                } else {
                     writeVarInt(vehicle, output);
                     writeVarIntArray(Collections.singletonList(passenger), output);
-                    vehicleMap.put(passenger,vehicle);
+                    vehicleMap.put(passenger, vehicle);
                 }
                 return;
             }
             output.writeInt(passenger);
             output.writeInt(vehicle);
             return;
+        }
+        if (packet == PacketType.PLAY_PLUGIN_MESSAGE) {
+            String name = PacketUtil.readString(input);
+            PacketUtil.writeString(name, output);
+            byte[] b = new byte[input.readableBytes()];
+            input.readBytes(b);
+            // patch books
+            if(name.equals("MC|BOpen")){
+                PacketUtil.writeVarInt(0, output);
+            }
+            output.writeBytes(b);
         }
         if (packet == PacketType.PLAY_DISCONNECT) {
             String reason = readString(input);
@@ -113,6 +125,55 @@ public class OutgoingTransformer {
                 PacketUtil.writeString(fixJson(text), output);
             }
             output.writeBytes(input);
+            return;
+        }
+        if (packet == PacketType.PLAY_PLAYER_LIST_ITEM) {
+            int action = readVarInt(input);
+            writeVarInt(action, output);
+            int players = readVarInt(input);
+            writeVarInt(players, output);
+
+            // loop through players
+            for (int i = 0; i < players; i++) {
+                UUID uuid = readUUID(input);
+                writeUUID(uuid, output);
+                if (action == 0) { // add player
+                    writeString(readString(input), output); // name
+
+                    int properties = readVarInt(input);
+                    writeVarInt(properties, output);
+
+                    // loop through properties
+                    for (int j = 0; j < properties; j++) {
+                        writeString(readString(input), output); // name
+                        writeString(readString(input), output); // value
+                        boolean isSigned = input.readBoolean();
+                        output.writeBoolean(isSigned);
+                        if (isSigned) {
+                            writeString(readString(input), output); // signature
+                        }
+                    }
+
+                    writeVarInt(readVarInt(input), output); // gamemode
+                    writeVarInt(readVarInt(input), output); // ping
+                    boolean hasDisplayName = input.readBoolean();
+                    output.writeBoolean(hasDisplayName);
+                    if (hasDisplayName) {
+                        writeString(fixJson(readString(input)), output); // display name
+                    }
+                } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
+                    writeVarInt(readVarInt(input), output);
+                } else if (action == 3) { // update display name
+                    boolean hasDisplayName = input.readBoolean();
+                    output.writeBoolean(hasDisplayName);
+                    if (hasDisplayName) {
+                        writeString(fixJson(readString(input)), output); // display name
+                    }
+                } else if (action == 4) { // remove player
+                    // no fields
+                }
+            }
+
             return;
         }
         if (packet == PacketType.PLAY_PLAYER_LIST_HEADER_FOOTER) {
@@ -192,9 +253,14 @@ public class OutgoingTransformer {
 
         if (packet == PacketType.STATUS_RESPONSE) {
             String original = PacketUtil.readString(input);
-            JsonObject object = gson.fromJson(original, JsonObject.class);
-            object.get("version").getAsJsonObject().addProperty("protocol", info.getProtocol());
-            PacketUtil.writeString(gson.toJson(object), output);
+            try {
+                JSONObject json = (JSONObject) new JSONParser().parse(original);
+                JSONObject version = (JSONObject) json.get("version");
+                version.put("protocol", info.getProtocol());
+                PacketUtil.writeString(json.toJSONString(), output);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             return;
         }
         if (packet == PacketType.LOGIN_SUCCESS) {
@@ -221,7 +287,9 @@ public class OutgoingTransformer {
                 slot += 1; // add 1 so it's now 2-5
             }
             PacketUtil.writeVarInt(slot, output);
-            output.writeBytes(input);
+
+            ItemSlotRewriter.rewrite1_8To1_9(input, output);
+            return;
         }
         if (packet == PacketType.PLAY_ENTITY_METADATA) {
             int id = PacketUtil.readVarInt(input);
@@ -338,6 +406,28 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             return;
         }
+        if (packet == PacketType.PLAY_SET_SLOT) {
+            int windowId = input.readUnsignedByte();
+            output.writeByte(windowId);
+
+            short slot = input.readShort();
+            output.writeShort(slot);
+
+            ItemSlotRewriter.rewrite1_8To1_9(input, output);
+            return;
+        }
+        if (packet == PacketType.PLAY_WINDOW_ITEMS) {
+            int windowId = input.readUnsignedByte();
+            output.writeByte(windowId);
+
+            short count = input.readShort();
+            output.writeShort(count);
+
+            for (int i = 0; i < count; i++) {
+                ItemSlotRewriter.rewrite1_8To1_9(input, output);
+            }
+            return;
+        }
         if (packet == PacketType.PLAY_SPAWN_MOB) {
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
@@ -428,6 +518,20 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             return;
         }
+        if (packet == PacketType.PLAY_ENTITY_EFFECT) {
+            int id = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(id, output);
+            byte effectID = input.readByte();
+            output.writeByte(effectID);
+            byte amplifier = input.readByte();
+            output.writeByte(amplifier);
+            int duration = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(duration, output);
+            // we need to write as a byte instead of boolean
+            boolean hideParticles = input.readBoolean();
+            output.writeByte(hideParticles ? 1 : 0);
+            return;
+        }
         if (packet == PacketType.PLAY_TEAM) {
             String teamName = PacketUtil.readString(input);
             PacketUtil.writeString(teamName, output);
@@ -460,7 +564,7 @@ public class OutgoingTransformer {
 
             int bitMask = input.readUnsignedShort();
 
-            if (bitMask == 0) {
+            if (bitMask == 0 && groundUp) {
                 output.clear();
                 PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
                 output.writeInt(chunkX);
@@ -497,7 +601,7 @@ public class OutgoingTransformer {
         output.writeBytes(input);
     }
 
-    private String fixJson(String line) {
+    public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {
             line = "{\"text\":\"\"}";
         } else {
@@ -507,11 +611,10 @@ public class OutgoingTransformer {
                 line = "{\"text\":" + line + "}";
         }
         try {
-        	new JSONParser().parse(line);
-        }
-        catch (org.json.simple.parser.ParseException e) {
-        	System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github!");
-        	return "{\"text\":\"\"}";
+            new JSONParser().parse(line);
+        } catch (Exception e) {
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+            return "{\"text\":\"\"}";
         }
         return line;
     }

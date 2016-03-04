@@ -1,17 +1,26 @@
 package us.myles.ViaVersion.transformers;
 
+import com.avaje.ebeaninternal.server.cluster.Packet;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 
 public class IncomingTransformer {
     private final ConnectionInfo info;
@@ -82,7 +91,7 @@ public class IncomingTransformer {
             return;
         }
         if (packet == PacketType.PLAY_PLAYER_DIGGING) {
-            byte status = input.readByte();
+            int status = input.readByte() & 0xFF; // unsign
             if (status == 6) { // item swap
                 throw new CancelException();
             }
@@ -102,7 +111,9 @@ public class IncomingTransformer {
             if (slot == 45 && windowID == 0) {
                 try {
                     Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
-                    Object setSlotPacket = setSlot.getConstructors()[1].newInstance(windowID, slot, null);
+                    Constructor setSlotConstruct = setSlot.getDeclaredConstructor(int.class, int.class, ReflectionUtil.nms("ItemStack"));
+                    // properly construct
+                    Object setSlotPacket = setSlotConstruct.newInstance(windowID, slot, null);
                     info.getChannel().pipeline().writeAndFlush(setSlotPacket); // slot is empty
                     slot = -999; // we're evil, they'll throw item on the ground
                 } catch (ClassNotFoundException e) {
@@ -113,6 +124,8 @@ public class IncomingTransformer {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
                 }
 
             }
@@ -121,7 +134,7 @@ public class IncomingTransformer {
             output.writeByte(button);
             output.writeShort(action);
             output.writeByte(mode);
-            output.writeBytes(input);
+            ItemSlotRewriter.rewrite1_9To1_8(input, output);
             return;
         }
         if (packet == PacketType.PLAY_CLIENT_SETTINGS) {
@@ -166,6 +179,26 @@ public class IncomingTransformer {
             }
             return;
         }
+        if(packet == PacketType.PLAY_PLUGIN_MESSAGE_REQUEST) {
+            String name = PacketUtil.readString(input);
+            PacketUtil.writeString(name, output);
+            byte[] b = new byte[input.readableBytes()];
+            input.readBytes(b);
+            // patch books
+            if(name.equals("MC|BSign")){
+                ByteBuf in = Unpooled.wrappedBuffer(b);
+                try {
+                    ItemSlotRewriter.ItemStack stack = ItemSlotRewriter.readItemStack(in);
+                    stack.id = (short) Material.WRITTEN_BOOK.getId();
+                    // write
+                    ItemSlotRewriter.writeItemStack(stack, output);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+            output.writeBytes(b);
+        }
         if (packet == PacketType.PLAY_PLAYER_BLOCK_PLACEMENT) {
             Long position = input.readLong();
             output.writeLong(position);
@@ -174,21 +207,13 @@ public class IncomingTransformer {
             int hand = PacketUtil.readVarInt(input);
 
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            Object item = null;
             try {
-                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
-                item = m.invoke(null, inHand);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+                ItemSlotRewriter.ItemStack item = ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
+                ItemSlotRewriter.writeItemStack(item, output);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            PacketUtil.writeItem(item, output);
 
             short curX = input.readUnsignedByte();
             output.writeByte(curX);
@@ -206,25 +231,24 @@ public class IncomingTransformer {
             output.writeByte(255);
             // write item in hand
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            Object item = null;
             try {
-                Method m = ReflectionUtil.obc("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
-                item = m.invoke(null, inHand);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+                ItemSlotRewriter.ItemStack item = ItemSlotRewriter.ItemStack.fromBukkit(inHand);
+                ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
+                ItemSlotRewriter.writeItemStack(item, output);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            PacketUtil.writeItem(item, output);
 
             output.writeByte(-1);
             output.writeByte(-1);
             output.writeByte(-1);
             return;
+        }
+        if (packet == PacketType.PLAY_CREATIVE_INVENTORY_ACTION) {
+            short slot = input.readShort();
+            output.writeShort(slot);
+
+            ItemSlotRewriter.rewrite1_9To1_8(input, output);
         }
         output.writeBytes(input);
     }
