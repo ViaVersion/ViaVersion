@@ -137,7 +137,6 @@ public class ItemSlotRewriter {
                     if (!(pages.get(i) instanceof StringTag))
                         continue;
                     StringTag page = pages.get(i);
-                    System.out.println("page: " + page);
                     page.setValue(OutgoingTransformer.fixJson(page.getValue()));
                 }
                 item.tag = tag;
