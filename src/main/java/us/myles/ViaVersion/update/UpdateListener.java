@@ -15,8 +15,10 @@ public class UpdateListener implements Listener {
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		if(e.getPlayer().hasPermission("viaversion.update"))
+		if(e.getPlayer().hasPermission("viaversion.update")
+				&& plugin.getConfig().getBoolean("checkforupdates", true)) {
 			UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId(), plugin);
+		}
 	}
 
 }

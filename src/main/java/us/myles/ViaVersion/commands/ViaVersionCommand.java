@@ -28,6 +28,7 @@ public class ViaVersionCommand implements CommandExecutor {
                 sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion()));
                 sender.sendMessage(color("&6Commands:"));
                 sender.sendMessage(color("&2/viaversion list &7- &6Shows lists of all 1.9 clients and 1.8 clients."));
+                sender.sendMessage(color("&2/viaversion dontbugme &7- &6Toggle checking for updates."));
             } else if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("list")) {
                     List<String> portedPlayers = new ArrayList<String>();
@@ -46,6 +47,12 @@ public class ViaVersionCommand implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("debug")) {
                     plugin.setDebug(!plugin.isDebug());
                     sender.sendMessage(color("&6Debug mode is now " + (plugin.isDebug() ? "&aenabled" : "&cdisabled")));
+                }
+                if (args[0].equalsIgnoreCase("dontbugme")) {
+                    boolean newValue = !plugin.getConfig().getBoolean("checkforupdates", true);
+                    plugin.getConfig().set("checkforupdates", newValue);
+                    plugin.saveConfig();
+                    sender.sendMessage(color("&6We will " + (newValue ? "&anotify you about updates." : "&cnot tell you about updates.")));
                 }
             }
 

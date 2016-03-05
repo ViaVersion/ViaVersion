@@ -6,7 +6,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.armor.ArmorListener;
@@ -60,20 +58,20 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
-        
+
         this.config = getFileConfiguration();
-        if(!config.contains("checkforupdates")) {
-        	config.set("checkforupdates", true);
-        	try {
-				config.save(configFile);
-			} catch (IOException e1) {
-				this.getLogger().info("Unabled to write config.yml!");
-				e1.printStackTrace();
-			}
+        if (!config.contains("checkforupdates")) {
+            config.set("checkforupdates", true);
+            try {
+                config.save(configFile);
+            } catch (IOException e1) {
+                this.getLogger().info("Unabled to write config.yml!");
+                e1.printStackTrace();
+            }
         }
-        if(config.getBoolean("checkforupdates")) {
-        	Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
-        	UpdateUtil.sendUpdateMessage(this);
+        if (config.getBoolean("checkforupdates")) {
+            Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
+            UpdateUtil.sendUpdateMessage(this);
         }
 
         Bukkit.getPluginManager().registerEvents(new Listener() {
@@ -151,19 +149,19 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     public void removePortedClient(UUID clientID) {
         portedPlayers.remove(clientID);
     }
-    
+
     private FileConfiguration getFileConfiguration() {
-    	if(!this.getDataFolder().exists())
-    		this.getDataFolder().mkdirs();
-    	this.configFile = new File(this.getDataFolder(), "config.yml");
-    	if(!this.configFile.exists())
-			try {
-				this.configFile.createNewFile();
-			} catch (IOException e) {
-				this.getLogger().info("Unable to create config.yml!");
-				e.printStackTrace();
-			}
-    	return YamlConfiguration.loadConfiguration(this.configFile);
+        if (!this.getDataFolder().exists())
+            this.getDataFolder().mkdirs();
+        this.configFile = new File(this.getDataFolder(), "config.yml");
+        if (!this.configFile.exists())
+            try {
+                this.configFile.createNewFile();
+            } catch (IOException e) {
+                this.getLogger().info("Unable to create config.yml!");
+                e.printStackTrace();
+            }
+        return YamlConfiguration.loadConfiguration(this.configFile);
     }
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
