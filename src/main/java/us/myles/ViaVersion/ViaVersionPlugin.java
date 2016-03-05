@@ -47,6 +47,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         ViaVersion.setInstance(this);
         if (System.getProperty("ViaVersion") != null) {
             getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
+            getLogger().severe("Some features may not work.");
             return;
         }
 
@@ -166,7 +167,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
         try {
-            return Bukkit.getScheduler().callSyncMethod(getPlugin(ViaVersionPlugin.class), new Callable<ItemStack>() {
+            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<ItemStack>() {
                 @Override
                 public ItemStack call() throws Exception {
                     if (info.getPlayer() != null) {
