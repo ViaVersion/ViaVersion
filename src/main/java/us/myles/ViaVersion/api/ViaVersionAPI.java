@@ -38,13 +38,22 @@ public interface ViaVersionAPI {
 
     /**
      * Returns all ported players. (1.9 players)
+     * Warning: This returns a unmodifiable map.
      * @return Map<UUID, ConnectionInfo> of all ported players.
      */
     Map<UUID, ConnectionInfo> getPortedPlayers();
 
     /**
      * Returns all non ported players. (1.8 players)
+     * Warning: This returns a unmodifiable list.
      * @return List<UUID> of all non ported players.
      */
     List<UUID> getNonPortedPlayers();
+
+    /**
+     * Returns all ported players. (1.9 players)
+     * Warning: This returns a unmodifiable list.
+     * @return List<UUID> of all ported players.
+     */
+    List<UUID> getPortedPlayersList();
 }

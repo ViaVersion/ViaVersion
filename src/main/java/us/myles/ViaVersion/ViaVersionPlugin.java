@@ -127,6 +127,15 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return Collections.unmodifiableList(nonPortedPlayers);
     }
 
+    @Override
+    public List<UUID> getPortedPlayersList() {
+        List<UUID> players = new ArrayList<UUID>();
+        for(UUID uuid : portedPlayers.keySet()){
+            players.add(uuid);
+        }
+        return Collections.unmodifiableList(players);
+    }
+
     public void setDebug(boolean value) {
         this.debug = value;
     }
