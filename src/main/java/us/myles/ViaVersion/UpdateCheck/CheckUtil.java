@@ -52,7 +52,7 @@ public class CheckUtil {
     }
 
 
-    public static void Update(Player p) {
+    public static void update(Player p) {
     	double thisversion = ViaVersionPlugin.version;
     	
     	boolean update = getResource(thisversion);
