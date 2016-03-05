@@ -30,7 +30,7 @@ public class NetUtil {
             }
         }
 
-        if(fullChunk) {
+        if(fullChunk && column.getBiomeData() != null) {
             out.writeBytes(column.getBiomeData());
         }
 
@@ -103,7 +103,8 @@ public class NetUtil {
         }
 
         byte biomeData[] = null;
-        if(isFullChunk) {
+        if(isFullChunk && (pos + 256 <= input.length)) {
+
             biomeData = new byte[256];
             System.arraycopy(input, pos, biomeData, 0, biomeData.length);
         }
