@@ -560,25 +560,24 @@ public class OutgoingTransformer {
         	if(action == 1) { // update spawner
         		try {
         			DataInputStream stream = new DataInputStream(new ByteBufInputStream(input));
-					CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
-					String entity = (String) tag.get("EntityId").getValue();
-					CompoundTag spawn = new CompoundTag("SpawnData");
-					spawn.put(new StringTag("id", entity));
-					tag.put(spawn);
-					PacketUtil.writeBlockPosition(output, pos[0], pos[1], pos[2]);
-					output.writeByte(action);
-					DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
-					NBTIO.writeTag(out, tag);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
+				String entity = (String) tag.get("EntityId").getValue();
+				CompoundTag spawn = new CompoundTag("SpawnData");
+				spawn.put(new StringTag("id", entity));
+				tag.put(spawn);
+				PacketUtil.writeBlockPosition(output, pos[0], pos[1], pos[2]);
+				output.writeByte(action);
+				DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
+				NBTIO.writeTag(out, tag);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         		return;
         	}
         	PacketUtil.writeBlockPosition(output, pos[0], pos[1], pos[2]);
-			output.writeByte(action);
-			output.writeBytes(input, input.readableBytes());
-			return;
+		output.writeByte(action);
+		output.writeBytes(input, input.readableBytes());
+		return;
         }
         if (packet == PacketType.PLAY_CHUNK_DATA) {
             // We need to catch unloading chunk packets as defined by wiki.vg
