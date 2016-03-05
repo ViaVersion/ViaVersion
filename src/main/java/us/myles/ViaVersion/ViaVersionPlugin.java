@@ -21,10 +21,7 @@ import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -116,7 +113,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     @Override
     public Map<UUID, ConnectionInfo> getPortedPlayers() {
-        return portedPlayers;
+        return Collections.unmodifiableMap(portedPlayers);
     }
 
     @Override
@@ -127,7 +124,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 nonPortedPlayers.add(p.getUniqueId());
             }
         }
-        return nonPortedPlayers;
+        return Collections.unmodifiableList(nonPortedPlayers);
     }
 
     public void setDebug(boolean value) {
