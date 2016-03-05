@@ -1,7 +1,7 @@
 name: ViaVersion
 main: us.myles.ViaVersion.ViaVersionPlugin
 author: _MylesC
-version: ${version}
+version: ${project.version}
 load: startup
 loadbefore: [ProtocolLib, ProxyPipe]
 commands:
