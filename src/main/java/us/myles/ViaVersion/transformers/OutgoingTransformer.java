@@ -656,10 +656,14 @@ public class OutgoingTransformer {
         if (line == null || line.equalsIgnoreCase("null")) {
             line = "{\"text\":\"\"}";
         } else {
-            if (!line.startsWith("\"") && !line.startsWith("{"))
-                line = "\"" + line + "\"";
-            if (line.startsWith("\""))
+            if (!line.startsWith("\"") && !line.startsWith("{")) {
+                JSONObject obj = new JSONObject();
+                obj.put("text", line);
+                line = obj.toJSONString();
+            }
+            if (line.startsWith("\"")) {
                 line = "{\"text\":" + line + "}";
+            }
         }
         try {
             new JSONParser().parse(line);
