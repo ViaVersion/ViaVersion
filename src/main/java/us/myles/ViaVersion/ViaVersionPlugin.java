@@ -21,6 +21,7 @@ import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -111,6 +112,22 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public boolean isDebug() {
         return this.debug;
+    }
+
+    @Override
+    public Map<UUID, ConnectionInfo> getPortedPlayers() {
+        return portedPlayers;
+    }
+
+    @Override
+    public List<UUID> getNonPortedPlayers() {
+        List<UUID> nonPortedPlayers = new ArrayList<UUID>();
+        for(Player p : Bukkit.getOnlinePlayers()){
+            if(!isPorted(p)){
+                nonPortedPlayers.add(p.getUniqueId());
+            }
+        }
+        return nonPortedPlayers;
     }
 
     public void setDebug(boolean value) {

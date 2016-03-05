@@ -2,6 +2,11 @@ package us.myles.ViaVersion.api;
 
 import io.netty.buffer.ByteBuf;
 import org.bukkit.entity.Player;
+import us.myles.ViaVersion.ConnectionInfo;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public interface ViaVersionAPI {
     /**
@@ -30,4 +35,16 @@ public interface ViaVersionAPI {
      * @return true if debug is enabled
      */
     boolean isDebug();
+
+    /**
+     * Returns all ported players. (1.9 players)
+     * @return Map<UUID, ConnectionInfo> of all ported players.
+     */
+    Map<UUID, ConnectionInfo> getPortedPlayers();
+
+    /**
+     * Returns all non ported players. (1.8 players)
+     * @return List<UUID> of all non ported players.
+     */
+    List<UUID> getNonPortedPlayers();
 }
