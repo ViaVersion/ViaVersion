@@ -57,7 +57,7 @@ public class UpdateUtil {
 
                         @Override
                         public void run() {
-                            Bukkit.getLogger().info(PREFIX + message);
+                            plugin.getLogger().warning(message);
                         }
                     }.runTask(plugin);
                 }
@@ -75,10 +75,7 @@ public class UpdateUtil {
         if (current.compareTo(newest) < 0)
             return "There is a newer version available: " + newest.toString();
         else if (console) {
-            if (current.compareTo(newest) == 0)
-                return "You are running the newest version: " + current;
-            else
-                return "You are running a newer version than is released!";
+            return "You are running a newer version than is released!";
         }
         return null;
     }
@@ -86,7 +83,7 @@ public class UpdateUtil {
     private static String getNewestVersion() {
         String result = "";
         try {
-            URL url = new URL(URL + PLUGIN);
+            URL url = new URL(URL + PLUGIN + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
             connection.addRequestProperty("User-Agent", "Mozilla/4.76");
