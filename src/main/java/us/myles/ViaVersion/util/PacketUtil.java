@@ -8,6 +8,8 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.chunks.MagicBitSet;
 import us.myles.ViaVersion.chunks.PacketChunk;
 import us.myles.ViaVersion.chunks.PacketChunkData;
@@ -25,9 +27,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
-
-import org.spacehq.opennbt.NBTIO;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 public class PacketUtil {
     private static Method DECODE_METHOD;
@@ -406,7 +405,8 @@ public class PacketUtil {
     public static boolean containsCause(Throwable t, Class<? extends Throwable> c) {
         while (t != null) {
             t = t.getCause();
-            if (c.isAssignableFrom(t.getClass())) return true;
+            if (t != null)
+                if (c.isAssignableFrom(t.getClass())) return true;
         }
         return false;
     }
