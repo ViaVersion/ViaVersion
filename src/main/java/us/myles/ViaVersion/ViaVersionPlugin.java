@@ -18,6 +18,7 @@ import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.armor.ArmorListener;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.listeners.CommandBlockListener;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -58,6 +59,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         }, this);
 
         Bukkit.getPluginManager().registerEvents(new ArmorListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new CommandBlockListener(this), this);
 
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
     }
