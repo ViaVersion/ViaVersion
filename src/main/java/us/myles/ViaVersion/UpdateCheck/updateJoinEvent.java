@@ -9,7 +9,7 @@ public class updateJoinEvent implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		if (e.getPlayer().hasPermission("ViaVersion.newupdate")) {
-			CheckUtil.Update(e.getPlayer());
+			CheckUtil.update(e.getPlayer());
 		}
 	}
 }
