@@ -3,11 +3,15 @@ package us.myles.ViaVersion.slot;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.ListTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,7 +108,7 @@ public class ItemSlotRewriter {
                 if (tag == null) {
                     tag = new CompoundTag("tag");
                 }
-                if(item.data >= 16384){
+                if (item.data >= 16384) {
                     item.id = 438; // splash id
                     item.data = (short) (item.data - 8192);
                 }
@@ -115,6 +119,27 @@ public class ItemSlotRewriter {
                 }
                 item.tag = tag;
                 item.data = 0;
+            }
+            if (item.id == Material.WRITTEN_BOOK.getId()) {
+                CompoundTag tag = item.tag;
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                ListTag pages = tag.get("pages");
+                if (pages == null) {
+                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(OutgoingTransformer.fixJson(""))));
+                    tag.put(pages);
+                    item.tag = tag;
+                    return;
+                }
+
+                for (int i = 0; i < pages.size(); i++) {
+                    if (!(pages.get(i) instanceof StringTag))
+                        continue;
+                    StringTag page = pages.get(i);
+                    page.setValue(OutgoingTransformer.fixJson(page.getValue()));
+                }
+                item.tag = tag;
             }
         }
     }
