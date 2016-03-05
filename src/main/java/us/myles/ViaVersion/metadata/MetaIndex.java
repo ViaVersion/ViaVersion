@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.metadata;
 
 import org.bukkit.entity.*;
+import org.bukkit.entity.minecart.CommandMinecart;
 
 public enum MetaIndex {
 
@@ -105,6 +106,9 @@ public enum MetaIndex {
     MINECART_BLOCK(Minecart.class, 20, Type.Int, 8, NewType.VarInt),
     MINECART_BLOCK_Y(Minecart.class, 21, Type.Int, 9, NewType.VarInt),
     MINECART_SHOWBLOCK(Minecart.class, 22, Type.Byte, 10, NewType.Boolean),
+    // Command minecart (they are still broken)
+    MINECART_COMMANDBLOCK_COMMAND(CommandMinecart.class,23,Type.String,11,NewType.String),
+    MINECART_COMMANDBLOCK_OUTPUT(CommandMinecart.class,24,Type.String,12,NewType.Chat),
     // furnace cart
     FURNACECART_ISPOWERED(org.bukkit.entity.minecart.PoweredMinecart.class, 16, Type.Byte, 11, NewType.Boolean),
     // item drop

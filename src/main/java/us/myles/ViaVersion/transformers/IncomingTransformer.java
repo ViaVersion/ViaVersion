@@ -195,6 +195,24 @@ public class IncomingTransformer {
                     e.printStackTrace();
                 }
                 return;
+            } else if (name.equals("MC|AutoCmd")) {
+                ByteBuf in = Unpooled.wrappedBuffer(b);
+                int x = in.readInt();
+                int y = in.readInt();
+                int z = in.readInt();
+                String command = PacketUtil.readString(in);
+                boolean flag = in.readBoolean();
+
+                output.clear();
+                PacketUtil.writeVarInt(PacketType.PLAY_PLUGIN_MESSAGE_REQUEST.getPacketID(), output);
+                PacketUtil.writeString("MC|AdvCdm", output);
+                output.writeByte(0);
+                output.writeInt(x);
+                output.writeInt(y);
+                output.writeInt(z);
+                PacketUtil.writeString(command, output);
+                output.writeBoolean(flag);
+                return;
             }
             output.writeBytes(b);
         }

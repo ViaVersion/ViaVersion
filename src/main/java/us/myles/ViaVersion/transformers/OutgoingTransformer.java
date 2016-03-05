@@ -3,7 +3,6 @@ package us.myles.ViaVersion.transformers;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -11,9 +10,9 @@ import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
 import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
-
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -86,10 +85,10 @@ public class OutgoingTransformer {
             output.writeBytes(input);
         }
         if (packet == PacketType.PLAY_EFFECT) {
-        	int effectid = input.readInt();
-        	if(effectid >= 1000 && effectid < 2000) //Sound effect
-        		throw new CancelException();
-        	output.writeInt(effectid);
+            int effectid = input.readInt();
+            if (effectid >= 1000 && effectid < 2000) //Sound effect
+                throw new CancelException();
+            output.writeInt(effectid);
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
             int passenger = input.readInt();
@@ -564,29 +563,43 @@ public class OutgoingTransformer {
             return;
         }
         if (packet == PacketType.PLAY_UPDATE_BLOCK_ENTITY) {
-        	long[] pos = PacketUtil.readBlockPosition(input);
-        	int action = input.readUnsignedByte();
-        	if(action == 1) { // update spawner
-        		try {
-        			DataInputStream stream = new DataInputStream(new ByteBufInputStream(input));
-				CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
-				String entity = (String) tag.get("EntityId").getValue();
-				CompoundTag spawn = new CompoundTag("SpawnData");
-				spawn.put(new StringTag("id", entity));
-				tag.put(spawn);
-				PacketUtil.writeBlockPosition(output, pos[0], pos[1], pos[2]);
-				output.writeByte(action);
-				DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
-				NBTIO.writeTag(out, tag);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-        		return;
-        	}
-        	PacketUtil.writeBlockPosition(output, pos[0], pos[1], pos[2]);
-		output.writeByte(action);
-		output.writeBytes(input, input.readableBytes());
-		return;
+            long[] pos = PacketUtil.readBlockPosition(input);
+            PacketUtil.writeBlockPosition(output, pos[0], pos[1], pos[2]);
+            int action = input.readUnsignedByte();
+            output.writeByte(action);
+            if (action == 1) { // update spawner
+                try {
+                    DataInputStream stream = new DataInputStream(new ByteBufInputStream(input));
+                    CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
+                    String entity = (String) tag.get("EntityId").getValue();
+                    CompoundTag spawn = new CompoundTag("SpawnData");
+                    spawn.put(new StringTag("id", entity));
+                    tag.put(spawn);
+                    DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
+                    NBTIO.writeTag(out, tag);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+            if (action == 2) { //Update commandblock
+                try {
+                    CompoundTag nbt = readNBT(input);
+                    if (nbt == null)
+                        throw new CancelException();
+                    //Thanks http://www.minecraftforum.net/forums/minecraft-discussion/redstone-discussion-and/command-blocks/2488148-1-9-nbt-changes-and-additions#TileAllCommandBlocks
+                    nbt.put(new ByteTag("powered", (byte) 0));
+                    nbt.put(new ByteTag("auto", (byte) 0));
+                    nbt.put(new ByteTag("conditionMet", (byte) 0));
+                    writeNBT(output, nbt);
+                    return;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new CancelException();
+                }
+            }
+            output.writeBytes(input, input.readableBytes());
+            return;
         }
         if (packet == PacketType.PLAY_CHUNK_DATA) {
             // We need to catch unloading chunk packets as defined by wiki.vg
