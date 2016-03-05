@@ -58,7 +58,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         }, this);
 
         Bukkit.getPluginManager().registerEvents(new ArmorListener(this), this);
-
+        Bukkit.getPluginManager().registerEvents(new updateJoinEvent(), this);
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
     }
 
