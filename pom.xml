@@ -7,7 +7,7 @@
     <artifactId>ViaVersion</artifactId>
     <version>0.5.1</version>
     <build>
-        <finalName>ViaVersion-${project.version}</finalName>
+        <finalName>ViaVersion-${version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -27,7 +27,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>3.5.1</version>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.7</source>
