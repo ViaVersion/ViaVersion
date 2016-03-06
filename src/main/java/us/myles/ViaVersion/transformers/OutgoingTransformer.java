@@ -636,7 +636,7 @@ public class OutgoingTransformer {
                         NBTIO.writeTag(out, tag);
                     }
                     else if(tag != null) { // EntityID does not exist
-                    	CompoundTag spawn = new CompoundTag("SpawnData");
+                        CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
                         tag.put(spawn);
                         DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
