@@ -77,8 +77,12 @@ public class UpdateUtil {
                 return null;
             }
         }
-
-        Version current = new Version(ViaVersion.getInstance().getVersion());
+        Version current;
+        try {
+            current = new Version(ViaVersion.getInstance().getVersion());
+        } catch (IllegalArgumentException e) {
+            return "You are using a debug/custom version, consider updating.";
+        }
         Version newest = new Version(newestString);
         if (current.compareTo(newest) < 0)
             return "There is a newer version available: " + newest.toString();
