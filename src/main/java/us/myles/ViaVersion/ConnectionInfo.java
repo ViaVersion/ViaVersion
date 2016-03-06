@@ -18,6 +18,7 @@ public class ConnectionInfo {
     private int protocol = 0;
     private int compression = 0;
     private boolean active = true;
+    private String username;
 
     public ConnectionInfo(SocketChannel socketChannel) {
         this.channel = socketChannel;
@@ -99,5 +100,13 @@ public class ConnectionInfo {
 
     public void closeWindow() {
         this.openWindow = null;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

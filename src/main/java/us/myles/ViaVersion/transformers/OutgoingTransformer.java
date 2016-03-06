@@ -253,10 +253,6 @@ public class OutgoingTransformer {
             return;
 
         }
-        // If login success
-        if (packet == PacketType.LOGIN_SUCCESS) {
-            info.setState(State.PLAY);
-        }
         if (packet == PacketType.LOGIN_SETCOMPRESSION) {
             int factor = PacketUtil.readVarInt(input);
             info.setCompression(factor);
@@ -277,12 +273,16 @@ public class OutgoingTransformer {
             return;
         }
         if (packet == PacketType.LOGIN_SUCCESS) {
-            String uu = PacketUtil.readString(input);
-            PacketUtil.writeString(uu, output);
-            UUID uniqueId = UUID.fromString(uu);
+            info.setState(State.PLAY);
+
+            String uuid = PacketUtil.readString(input);
+            PacketUtil.writeString(uuid, output);
+            UUID uniqueId = UUID.fromString(uuid);
             info.setUUID(uniqueId);
             plugin.addPortedClient(info);
-            output.writeBytes(input);
+            String username = PacketUtil.readString(input);
+            info.setUsername(username);
+            PacketUtil.writeString(username, output);
             return;
         }
 
@@ -548,6 +548,10 @@ public class OutgoingTransformer {
             clientEntityTypes.put(id, EntityType.PLAYER);
             output.writeInt(id);
             output.writeBytes(input);
+            // send fake team
+            if (plugin.isAutoTeam()) {
+                sendTeamPacket(true);
+            }
             return;
         }
         if (packet == PacketType.PLAY_SPAWN_PLAYER) {
@@ -612,7 +616,33 @@ public class OutgoingTransformer {
                 output.writeByte(input.readByte());
                 PacketUtil.writeString(PacketUtil.readString(input), output);
 
-                PacketUtil.writeString("", output); // collission rule :)
+                PacketUtil.writeString(plugin.isPreventCollision() ? "never" : "", output); // collission rule :)
+
+                output.writeByte(input.readByte());
+            }
+            if (mode == 0 || mode == 3 || mode == 4) {
+                // add players
+                int count = PacketUtil.readVarInt(input);
+                PacketUtil.writeVarInt(count, output);
+
+                for (int i = 0; i < count; i++) {
+                    String name = PacketUtil.readString(input);
+                    if (plugin.isAutoTeam() && name.equalsIgnoreCase(info.getUsername())) {
+                        if (mode == 4) {
+                            // since removing add to auto team
+                            plugin.run(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sendTeamPacket(true);
+                                }
+                            }, false);
+                        } else {
+                            // since adding remove from auto team
+                            sendTeamPacket(false);
+                        }
+                    }
+                    PacketUtil.writeString(name, output);
+                }
             }
             output.writeBytes(input);
             return;
@@ -627,22 +657,20 @@ public class OutgoingTransformer {
                     int index = input.readerIndex();
                     DataInputStream stream = new DataInputStream(new ByteBufInputStream(input));
                     CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
-                    if(tag != null && tag.contains("EntityId")) {
+                    if (tag != null && tag.contains("EntityId")) {
                         String entity = (String) tag.get("EntityId").getValue();
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", entity));
                         tag.put(spawn);
                         DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
                         NBTIO.writeTag(out, tag);
-                    }
-                    else if(tag != null) { // EntityID does not exist
+                    } else if (tag != null) { // EntityID does not exist
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
                         tag.put(spawn);
                         DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
                         NBTIO.writeTag(out, tag);
-                    }
-                    else { //There doesn't exist any NBT tag
+                    } else { //There doesn't exist any NBT tag
                         input.readerIndex(index);
                         output.writeBytes(input, input.readableBytes());
                     }
@@ -720,12 +748,48 @@ public class OutgoingTransformer {
         }
         output.writeBytes(input);
     }
+    private void sendCreateTeam() {
+        ByteBuf buf = info.getChannel().alloc().buffer();
+        PacketUtil.writeVarInt(PacketType.PLAY_TEAM.getNewPacketID(), buf);
+        PacketUtil.writeString("viaversion", buf);
+        buf.writeByte(0); // make team
+        PacketUtil.writeString("viaversion", buf);
+        PacketUtil.writeString("", buf); // prefix
+        PacketUtil.writeString("", buf); // suffix
+        buf.writeByte(0); // friendly fire
+        PacketUtil.writeString("", buf); // nametags
+        PacketUtil.writeString("never", buf); // collision rule :)
+        buf.writeByte(0); // color
+        PacketUtil.writeVarInt(0, buf); // player count
+        info.sendRawPacket(buf);
+    }
+    private void sendTeamPacket(boolean b) {
+        ByteBuf buf = info.getChannel().alloc().buffer();
+        PacketUtil.writeVarInt(PacketType.PLAY_TEAM.getNewPacketID(), buf);
+        PacketUtil.writeString("viaversion", buf); // Use viaversion as name
+        if (b) {
+            // add
+            buf.writeByte(0); // make team
+            PacketUtil.writeString("viaversion", buf);
+            PacketUtil.writeString("", buf); // prefix
+            PacketUtil.writeString("", buf); // suffix
+            buf.writeByte(0); // friendly fire
+            PacketUtil.writeString("", buf); // nametags
+            PacketUtil.writeString("never", buf); // collision rule :)
+            buf.writeByte(0); // color
+            PacketUtil.writeVarInt(1, buf); // player count
+            PacketUtil.writeString(info.getUsername(), buf); // us
+        } else {
+            buf.writeByte(1); // remove team
+        }
+        info.sendRawPacket(buf);
+    }
 
     public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {
             line = "{\"text\":\"\"}";
         } else {
-            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{")|| !line.endsWith("}"))) {
+            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
                 JSONObject obj = new JSONObject();
                 obj.put("text", line);
                 return obj.toJSONString();

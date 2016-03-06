@@ -28,6 +28,7 @@ import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -156,6 +157,16 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public boolean isSyncedChunks() {
         return getConfig().getBoolean("sync-chunks", true);
+    }
+
+    public boolean isPreventCollision() {
+        return getConfig().getBoolean("prevent-collision", true);
+    }
+
+    public boolean isAutoTeam() {
+        // Collision has to be enabled first
+        if(!isPreventCollision()) return false;
+        return getConfig().getBoolean("auto-team", true);
     }
 
     public void setDebug(boolean value) {
