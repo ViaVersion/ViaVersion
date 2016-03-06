@@ -28,9 +28,7 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -39,12 +37,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     private final Map<UUID, ConnectionInfo> portedPlayers = new ConcurrentHashMap<UUID, ConnectionInfo>();
     private boolean debug = false;
-    private FileConfiguration config;
-    private File configFile;
 
     @Override
     public void onEnable() {
         ViaVersion.setInstance(this);
+        saveDefaultConfig();
         if (System.getProperty("ViaVersion") != null) {
             getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
             getLogger().severe("Some features may not work.");
@@ -59,18 +56,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
-
-        this.config = getFileConfiguration();
-        if (!config.contains("checkforupdates")) {
-            config.set("checkforupdates", true);
-            try {
-                config.save(configFile);
-            } catch (IOException e1) {
-                this.getLogger().info("Unabled to write config.yml!");
-                e1.printStackTrace();
-            }
-        }
-        if (config.getBoolean("checkforupdates")) {
+        if (getConfig().getBoolean("checkforupdates")) {
             Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
             UpdateUtil.sendUpdateMessage(this);
         }
@@ -139,6 +125,31 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return this.debug;
     }
 
+    @Override
+    public Map<UUID, ConnectionInfo> getPortedPlayers() {
+        return Collections.unmodifiableMap(portedPlayers);
+    }
+
+    @Override
+    public List<UUID> getNonPortedPlayers() {
+        List<UUID> nonPortedPlayers = new ArrayList<UUID>();
+        for(Player p : Bukkit.getOnlinePlayers()){
+            if(!isPorted(p)){
+                nonPortedPlayers.add(p.getUniqueId());
+            }
+        }
+        return Collections.unmodifiableList(nonPortedPlayers);
+    }
+
+    @Override
+    public List<UUID> getPortedPlayersList() {
+        List<UUID> players = new ArrayList<UUID>();
+        for(UUID uuid : portedPlayers.keySet()){
+            players.add(uuid);
+        }
+        return Collections.unmodifiableList(players);
+    }
+
     public void setDebug(boolean value) {
         this.debug = value;
     }
@@ -149,20 +160,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public void removePortedClient(UUID clientID) {
         portedPlayers.remove(clientID);
-    }
-
-    private FileConfiguration getFileConfiguration() {
-        if (!this.getDataFolder().exists())
-            this.getDataFolder().mkdirs();
-        this.configFile = new File(this.getDataFolder(), "config.yml");
-        if (!this.configFile.exists())
-            try {
-                this.configFile.createNewFile();
-            } catch (IOException e) {
-                this.getLogger().info("Unable to create config.yml!");
-                e.printStackTrace();
-            }
-        return YamlConfiguration.loadConfiguration(this.configFile);
     }
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
