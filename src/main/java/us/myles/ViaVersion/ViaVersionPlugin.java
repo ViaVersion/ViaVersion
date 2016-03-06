@@ -55,10 +55,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
-        if (getConfig().getBoolean("checkforupdates")) {
-            Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
+        if (getConfig().getBoolean("checkforupdates")) 
             UpdateUtil.sendUpdateMessage(this);
-        }
 
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
@@ -69,6 +67,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
         Bukkit.getPluginManager().registerEvents(new ArmorListener(this), this);
         Bukkit.getPluginManager().registerEvents(new CommandBlockListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
     }
