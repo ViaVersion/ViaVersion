@@ -1,12 +1,13 @@
 package us.myles.ViaVersion.update;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import us.myles.ViaVersion.api.ViaVersion;
 
 import java.io.BufferedReader;
@@ -106,9 +107,15 @@ public class UpdateUtil {
                 content = content + input;
             }
             br.close();
-            JsonParser parser = new JsonParser();
-            JsonObject statistics = (JsonObject) parser.parse(content);
-            return statistics.get("version").getAsString();
+            JSONParser parser = new JSONParser();
+            JSONObject statistics;
+            try {
+                statistics = (JSONObject) parser.parse(content);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return (String) statistics.get("version");
         } catch (MalformedURLException e) {
             return null;
         } catch (IOException e) {
