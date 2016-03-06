@@ -1,4 +1,5 @@
-# ViaVersion 0.5.5
+# ViaVersion 0.5.5 
+[![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 **Allows the connection of 1.9 clients to 1.8**
 
 This plugin modifies netty to allow connection of 1.9 clients to 1.8,
@@ -48,5 +49,4 @@ You may modify this work, all rights are still owned by myself excluding any fil
 
 
 Thanks!
-
 
