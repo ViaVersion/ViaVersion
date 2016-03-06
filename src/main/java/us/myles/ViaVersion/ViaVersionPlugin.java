@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
@@ -158,15 +159,18 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         }
     }
 
-    public void run(final Runnable runnable) {
+    public void run(final Runnable runnable, boolean wait) {
         try {
-            Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
+            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     runnable.run();
                     return true;
                 }
-            }).get(10, TimeUnit.SECONDS);
+            });
+            if(wait){
+                f.get(10, TimeUnit.SECONDS);
+            }
         } catch (Exception e) {
             System.out.println("Failed to run task.");
             e.printStackTrace();
