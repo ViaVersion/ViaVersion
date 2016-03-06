@@ -15,7 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
+import us.myles.ViaVersion.api.boss.BossBar;
+import us.myles.ViaVersion.api.boss.BossColor;
+import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.armor.ArmorListener;
+import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.listeners.CommandBlockListener;
@@ -110,7 +114,12 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     @Override
     public boolean isPorted(Player player) {
-        return portedPlayers.containsKey(player.getUniqueId());
+        return isPorted(player.getUniqueId());
+    }
+
+    @Override
+    public boolean isPorted(UUID playerUUID) {
+        return portedPlayers.containsKey(playerUUID);
     }
 
     @Override
@@ -119,9 +128,24 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     }
 
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
-        if (!isPorted(player)) throw new IllegalArgumentException("This player is not on 1.9");
-        ConnectionInfo ci = portedPlayers.get(player.getUniqueId());
+        sendRawPacket(player.getUniqueId(), packet);
+    }
+
+    @Override
+    public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
+        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not on 1.9");
+        ConnectionInfo ci = portedPlayers.get(uuid);
         ci.sendRawPacket(packet);
+    }
+
+    @Override
+    public BossBar createBossBar(String title, BossColor color, BossStyle style) {
+        return new ViaBossBar(title, 1F, color, style);
+    }
+
+    @Override
+    public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
+        return new ViaBossBar(title, health, color, style);
     }
 
     @Override
