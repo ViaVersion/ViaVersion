@@ -125,31 +125,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return this.debug;
     }
 
-    @Override
-    public Map<UUID, ConnectionInfo> getPortedPlayers() {
-        return Collections.unmodifiableMap(portedPlayers);
-    }
-
-    @Override
-    public List<UUID> getNonPortedPlayers() {
-        List<UUID> nonPortedPlayers = new ArrayList<UUID>();
-        for(Player p : Bukkit.getOnlinePlayers()){
-            if(!isPorted(p)){
-                nonPortedPlayers.add(p.getUniqueId());
-            }
-        }
-        return Collections.unmodifiableList(nonPortedPlayers);
-    }
-
-    @Override
-    public List<UUID> getPortedPlayersList() {
-        List<UUID> players = new ArrayList<UUID>();
-        for(UUID uuid : portedPlayers.keySet()){
-            players.add(uuid);
-        }
-        return Collections.unmodifiableList(players);
-    }
-
     public void setDebug(boolean value) {
         this.debug = value;
     }
