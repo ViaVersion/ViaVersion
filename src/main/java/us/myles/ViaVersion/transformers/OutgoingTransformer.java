@@ -629,7 +629,6 @@ public class OutgoingTransformer {
                     CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
                     if(tag != null && tag.contains("EntityId")) {
                     	String entity = (String) tag.get("EntityId").getValue();
-                    	System.out.println("EntityID: " + entity);
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", entity));
                         tag.put(spawn);
