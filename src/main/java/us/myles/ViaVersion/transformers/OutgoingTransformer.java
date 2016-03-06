@@ -411,13 +411,22 @@ public class OutgoingTransformer {
         if (packet == PacketType.PLAY_OPEN_WINDOW) {
             int windowId = input.readUnsignedByte();
             String type = readString(input);
+            info.setOpenWindow(type);
             String windowTitle = readString(input);
 
             output.writeByte(windowId);
             writeString(type, output);
             writeString(fixJson(windowTitle), output);
+            int slots = input.readUnsignedByte();
+            if(type.equals("minecraft:brewing_stand")){
+                slots = slots + 1; // new slot
+            }
+            output.writeByte(slots);
             output.writeBytes(input);
             return;
+        }
+        if (packet == PacketType.PLAY_CLOSE_WINDOW) {
+            info.closeWindow();
         }
         if (packet == PacketType.PLAY_SET_SLOT) {
             int windowId = input.readUnsignedByte();

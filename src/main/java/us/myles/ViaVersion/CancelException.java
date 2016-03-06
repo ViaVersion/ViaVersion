@@ -1,4 +1,4 @@
 package us.myles.ViaVersion;
 
-public class CancelException extends Exception{
+public class CancelException extends Exception {
 }

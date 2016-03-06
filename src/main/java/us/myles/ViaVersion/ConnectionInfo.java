@@ -14,6 +14,7 @@ public class ConnectionInfo {
     private Object lastPacket;
     private java.util.UUID UUID;
     private State state = State.HANDSHAKE;
+    private String openWindow;
     private int protocol = 0;
     private int compression = 0;
     private boolean active = true;
@@ -86,5 +87,17 @@ public class ConnectionInfo {
                 channel.pipeline().context(handler).writeAndFlush(packet);
             }
         });
+    }
+
+    public String getOpenWindow() {
+        return openWindow;
+    }
+
+    public void setOpenWindow(String openWindow) {
+        this.openWindow = openWindow;
+    }
+
+    public void closeWindow() {
+        this.openWindow = null;
     }
 }

@@ -136,6 +136,9 @@ public class IncomingTransformer {
             ItemSlotRewriter.rewrite1_9To1_8(input, output);
             return;
         }
+        if (packet == PacketType.PLAY_CLOSE_WINDOW_REQUEST) {
+            info.closeWindow();
+        }
         if (packet == PacketType.PLAY_CLIENT_SETTINGS) {
             String locale = PacketUtil.readString(input);
             PacketUtil.writeString(locale, output);
