@@ -12,11 +12,8 @@ import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class IncomingTransformer {
     private final ConnectionInfo info;
@@ -105,28 +102,32 @@ public class IncomingTransformer {
 
             byte button = input.readByte();
             short action = input.readShort();
-            byte mode = input.readByte();
-            // if the action is on an elytra armour slot
-            if (slot == 45 && windowID == 0) {
-                try {
-                    Class<?> setSlot = ReflectionUtil.nms("PacketPlayOutSetSlot");
-                    Constructor setSlotConstruct = setSlot.getDeclaredConstructor(int.class, int.class, ReflectionUtil.nms("ItemStack"));
-                    // properly construct
-                    Object setSlotPacket = setSlotConstruct.newInstance(windowID, slot, null);
-                    info.getChannel().pipeline().writeAndFlush(setSlotPacket); // slot is empty
-                    slot = -999; // we're evil, they'll throw item on the ground
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
+            int mode = input.readByte();
 
+            // if the action is on an elytra armour slot
+            boolean throwItem = (slot == 45 && windowID == 0);
+
+            if (info.getOpenWindow() != null && windowID > 0) {
+                if (info.getOpenWindow().equals("minecraft:brewing_stand")) {
+                    if (slot == 4) {
+                        // throw
+                        throwItem = true;
+                    }
+                    if (slot > 4)
+                        slot = (short) (slot - 1);
+                }
+            }
+            if (throwItem) {
+                ByteBuf buf = info.getChannel().alloc().buffer();
+                PacketUtil.writeVarInt(PacketType.PLAY_SET_SLOT.getNewPacketID(), buf);
+                buf.writeByte(windowID);
+                buf.writeShort(slot);
+                buf.writeShort(-1); // empty
+                info.sendRawPacket(buf);
+                // Continue the packet simulating throw
+                mode = 0;
+                button = 0;
+                slot = -999;
             }
             output.writeByte(windowID);
             output.writeShort(slot);

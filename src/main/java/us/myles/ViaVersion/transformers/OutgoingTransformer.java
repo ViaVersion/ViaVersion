@@ -418,7 +418,7 @@ public class OutgoingTransformer {
             writeString(type, output);
             writeString(fixJson(windowTitle), output);
             int slots = input.readUnsignedByte();
-            if(type.equals("minecraft:brewing_stand")){
+            if (type.equals("minecraft:brewing_stand")) {
                 slots = slots + 1; // new slot
             }
             output.writeByte(slots);
@@ -433,6 +433,12 @@ public class OutgoingTransformer {
             output.writeByte(windowId);
 
             short slot = input.readShort();
+            if (info.getOpenWindow() != null) {
+                if (info.getOpenWindow().equals("minecraft:brewing_stand")) {
+                    if (slot >= 4)
+                        slot = (short) (slot + 1);
+                }
+            }
             output.writeShort(slot);
             ItemSlotRewriter.rewrite1_8To1_9(input, output);
             return;
@@ -442,10 +448,22 @@ public class OutgoingTransformer {
             output.writeByte(windowId);
 
             short count = input.readShort();
-            output.writeShort(count);
+            boolean brewing = false;
+            if (info.getOpenWindow() != null && windowId > 0) {
+                if (info.getOpenWindow().equals("minecraft:brewing_stand")) {
+                    brewing = true;
+                }
+            }
+            output.writeShort(brewing ? (count + 1) : count);
 
             for (int i = 0; i < count; i++) {
+
                 ItemSlotRewriter.rewrite1_8To1_9(input, output);
+                
+                // write "fuel" slot
+                if(brewing && i == 3){
+                    output.writeShort(-1); // empty slot
+                }
             }
             return;
         }
