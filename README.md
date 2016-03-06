@@ -37,7 +37,7 @@ Contributors:
 
 **fillefilip8**
 
-**Chat: ** https://gitter.im/MylesIsCool/ViaVersion
+**Chat:** https://gitter.im/MylesIsCool/ViaVersion
 
 We use it to collaborate and solve errors, sign in with github.
 
