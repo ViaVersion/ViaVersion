@@ -624,11 +624,11 @@ public class OutgoingTransformer {
             output.writeByte(action);
             if (action == 1) { // update spawner
                 try {
-                	int index = input.readerIndex();
+                    int index = input.readerIndex();
                     DataInputStream stream = new DataInputStream(new ByteBufInputStream(input));
                     CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
                     if(tag != null && tag.contains("EntityId")) {
-                    	String entity = (String) tag.get("EntityId").getValue();
+                        String entity = (String) tag.get("EntityId").getValue();
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", entity));
                         tag.put(spawn);
