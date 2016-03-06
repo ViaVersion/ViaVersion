@@ -727,9 +727,8 @@ public class OutgoingTransformer {
         } else {
             if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{")|| !line.endsWith("}"))) {
                 JSONObject obj = new JSONObject();
-
                 obj.put("text", line);
-                line = obj.toJSONString();
+                return obj.toJSONString();
             }
             if (line.startsWith("\"") && line.endsWith("\"")) {
                 line = "{\"text\":" + line + "}";

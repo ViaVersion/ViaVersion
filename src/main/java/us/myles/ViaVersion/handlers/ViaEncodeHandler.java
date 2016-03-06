@@ -67,11 +67,11 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                     }
                 };
                 // Synced allows timings to work properly.
-                if (ViaVersion.getInstance().isSyncedChunks()) {
-                    ((ViaVersionPlugin) ViaVersion.getInstance()).run(chunks, false);
-                } else {
+//                if (ViaVersion.getInstance().isSyncedChunks()) {
+//                    ((ViaVersionPlugin) ViaVersion.getInstance()).run(chunks, false);
+//                } else {
                     chunks.run();
-                }
+//                }
                 bytebuf.readBytes(bytebuf.readableBytes());
                 throw new CancelException();
             }
