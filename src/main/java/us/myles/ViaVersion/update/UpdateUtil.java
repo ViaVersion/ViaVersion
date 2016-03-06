@@ -87,7 +87,7 @@ public class UpdateUtil {
         Version newest = new Version(newestString);
         if (current.compareTo(newest) < 0)
             return "There is a newer version available: " + newest.toString();
-        else if (console) {
+        else if (console && current.compareTo(newest) != 0) {
             return "You are running a newer version than is released!";
         }
         return null;
