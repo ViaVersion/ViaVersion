@@ -643,8 +643,8 @@ public class OutgoingTransformer {
                         NBTIO.writeTag(out, tag);
                     }
                     else { //There doesn't exist any NBT tag
-                    	input.readerIndex(index);
-                    	output.writeBytes(input, input.readableBytes());
+                        input.readerIndex(index);
+                        output.writeBytes(input, input.readableBytes());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
