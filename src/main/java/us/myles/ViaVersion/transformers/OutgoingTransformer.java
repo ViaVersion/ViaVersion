@@ -408,6 +408,34 @@ public class OutgoingTransformer {
 
             return;
         }
+        if (packet == PacketType.PLAY_WINDOW_PROPERTY) {
+            int windowId = input.readUnsignedByte();
+            output.writeByte(windowId);
+            short property = input.readShort();
+            short value = input.readShort();
+
+            if (info.getOpenWindow() != null) {
+                if (info.getOpenWindow().equalsIgnoreCase("minecraft:enchanting_table")) {
+                    if (property > 3 && property < 7) {
+                        short level = (short) (value >> 8);
+                        short enchantID = (short) (value & 0xFF);
+                        // Property 1
+                        ByteBuf buf1 = info.getChannel().alloc().buffer();
+                        PacketUtil.writeVarInt(PacketType.PLAY_WINDOW_PROPERTY.getNewPacketID(), buf1);
+                        buf1.writeByte(windowId);
+                        buf1.writeShort(property);
+                        buf1.writeShort(enchantID);
+
+                        info.sendRawPacket(buf1);
+
+                        property = (short) (property + 3);
+                        value = level;
+                    }
+                }
+            }
+            output.writeShort(property);
+            output.writeShort(value);
+        }
         if (packet == PacketType.PLAY_OPEN_WINDOW) {
             int windowId = input.readUnsignedByte();
             String type = readString(input);
@@ -459,9 +487,9 @@ public class OutgoingTransformer {
             for (int i = 0; i < count; i++) {
 
                 ItemSlotRewriter.rewrite1_8To1_9(input, output);
-                
+
                 // write "fuel" slot
-                if(brewing && i == 3){
+                if (brewing && i == 3) {
                     output.writeShort(-1); // empty slot
                 }
             }
