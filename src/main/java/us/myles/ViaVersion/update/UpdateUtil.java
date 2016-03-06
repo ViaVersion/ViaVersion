@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public class UpdateUtil {
 
-    private final static String URL = "https://api.spiget.org/v1/resources/";
+    private final static String URL = "http://api.spiget.org/v1/resources/";
     private final static int PLUGIN = 19254;
 
     public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
@@ -69,9 +69,17 @@ public class UpdateUtil {
         if (ViaVersion.getInstance().getVersion().equals("${project.version}")) {
             return "You are using a debug/custom version, consider updating.";
         }
+        String newestString = getNewestVersion();
+        if (newestString == null) {
+            if (console) {
+                return "Could not check for updates, check your connection.";
+            } else {
+                return null;
+            }
+        }
 
         Version current = new Version(ViaVersion.getInstance().getVersion());
-        Version newest = new Version(getNewestVersion());
+        Version newest = new Version(newestString);
         if (current.compareTo(newest) < 0)
             return "There is a newer version available: " + newest.toString();
         else if (console) {
@@ -81,7 +89,6 @@ public class UpdateUtil {
     }
 
     private static String getNewestVersion() {
-        String result = "";
         try {
             URL url = new URL(URL + PLUGIN + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -97,12 +104,11 @@ public class UpdateUtil {
             br.close();
             JsonParser parser = new JsonParser();
             JsonObject statistics = (JsonObject) parser.parse(content);
-            result = statistics.get("version").getAsString();
+            return statistics.get("version").getAsString();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-        return result;
     }
 }
