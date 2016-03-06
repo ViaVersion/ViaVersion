@@ -55,7 +55,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
         }
-        if (getConfig().getBoolean("checkforupdates")) 
+        if (getConfig().getBoolean("checkforupdates"))
             UpdateUtil.sendUpdateMessage(this);
 
         Bukkit.getPluginManager().registerEvents(new Listener() {
@@ -87,9 +87,15 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                         ChannelFuture future = (ChannelFuture) o;
                         ChannelPipeline pipeline = future.channel().pipeline();
                         ChannelHandler bootstrapAcceptor = pipeline.first();
-                        ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                        ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
-                        ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+                        try {
+                            ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                            ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
+
+                            ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+                        } catch (NoSuchFieldException e) {
+                            // field not found
+                            throw new Exception("Unable to find childHandler, blame " + bootstrapAcceptor.getClass().getName());
+                        }
                         injected = true;
                     } else {
                         break; // not the right list.
@@ -167,7 +173,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                     return true;
                 }
             });
-            if(wait){
+            if (wait) {
                 f.get(10, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
