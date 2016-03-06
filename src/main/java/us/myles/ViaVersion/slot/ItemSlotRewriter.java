@@ -178,6 +178,7 @@ public class ItemSlotRewriter {
         public CompoundTag tag;
 
         public static ItemStack fromBukkit(org.bukkit.inventory.ItemStack stack) {
+            if(stack == null) return null;
             ItemStack item = new ItemStack();
             item.id = (short) stack.getTypeId();
             item.amount = (byte) stack.getAmount();
