@@ -53,11 +53,11 @@ public class OutgoingTransformer {
 
         PacketType packet = PacketType.getOutgoingPacket(info.getState(), packetID);
         int original = packetID;
-        if (packet.getPacketID() != -1) {
-            packetID = packet.getNewPacketID();
-        }
         if (packet == null) {
             throw new RuntimeException("Outgoing Packet not found? " + packetID + " State: " + info.getState() + " Version: " + info.getProtocol());
+        }
+        if (packet.getPacketID() != -1) {
+            packetID = packet.getNewPacketID();
         }
         if (ViaVersion.getInstance().isDebug()) {
             if (packet != PacketType.PLAY_CHUNK_DATA && packet != PacketType.PLAY_KEEP_ALIVE && packet != PacketType.PLAY_TIME_UPDATE && (!packet.name().toLowerCase().contains("move") && !packet.name().toLowerCase().contains("look"))) {
