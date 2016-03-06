@@ -1,19 +1,18 @@
 package us.myles.ViaVersion.metadata;
 
+import io.netty.buffer.ByteBuf;
+import org.bukkit.entity.EntityType;
+import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
+import us.myles.ViaVersion.slot.ItemSlotRewriter;
+import us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack;
+import us.myles.ViaVersion.transformers.OutgoingTransformer;
+import us.myles.ViaVersion.util.PacketUtil;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
-import org.bukkit.entity.EntityType;
-import org.bukkit.util.EulerAngle;
-import org.bukkit.util.Vector;
-
-import io.netty.buffer.ByteBuf;
-
-import us.myles.ViaVersion.slot.ItemSlotRewriter;
-import us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack;
-import us.myles.ViaVersion.util.PacketUtil;
 
 public class MetadataRewriter {
 
@@ -88,7 +87,7 @@ public class MetadataRewriter {
                             PacketUtil.writeString((String) value, output);
                             break;
                         case Boolean:
-                            if(metaIndex == MetaIndex.AGEABLE_AGE)
+                            if (metaIndex == MetaIndex.AGEABLE_AGE)
                                 output.writeBoolean(((Byte) value).byteValue() < 0);
                             else
                                 output.writeBoolean(((Byte) value).byteValue() != 0);
@@ -109,6 +108,9 @@ public class MetadataRewriter {
                             output.writeFloat((float) angle.getX());
                             output.writeFloat((float) angle.getY());
                             output.writeFloat((float) angle.getZ());
+                            break;
+                        case Chat:
+                            PacketUtil.writeString(OutgoingTransformer.fixJson((String) value), output);
                             break;
                         default:
                             System.out.println("[Out] Unhandled MetaDataType: " + metaIndex.getNewType());
@@ -159,7 +161,7 @@ public class MetadataRewriter {
                         e.printStackTrace();
                     }
                 }
-                    break;
+                break;
                 case Position: {
                     int x = buf.readInt();
                     int y = buf.readInt();
