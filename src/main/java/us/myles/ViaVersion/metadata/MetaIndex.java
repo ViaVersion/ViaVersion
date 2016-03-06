@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.metadata;
 
 import org.bukkit.entity.*;
-import org.bukkit.entity.minecart.CommandMinecart;
 
 public enum MetaIndex {
 
@@ -107,8 +106,8 @@ public enum MetaIndex {
     MINECART_BLOCK_Y(Minecart.class, 21, Type.Int, 9, NewType.VarInt),
     MINECART_SHOWBLOCK(Minecart.class, 22, Type.Byte, 10, NewType.Boolean),
     // Command minecart (they are still broken)
-    MINECART_COMMANDBLOCK_COMMAND(CommandMinecart.class,23,Type.String,11,NewType.String),
-    MINECART_COMMANDBLOCK_OUTPUT(CommandMinecart.class,24,Type.String,12,NewType.Chat),
+    MINECART_COMMANDBLOCK_COMMAND(Minecart.class, 23, Type.String, 11, NewType.String),
+    MINECART_COMMANDBLOCK_OUTPUT(Minecart.class, 24, Type.String, 12, NewType.Chat),
     // furnace cart
     FURNACECART_ISPOWERED(org.bukkit.entity.minecart.PoweredMinecart.class, 16, Type.Byte, 11, NewType.Boolean),
     // item drop
@@ -167,14 +166,14 @@ public enum MetaIndex {
 
     public static MetaIndex getIndex(EntityType type, int index) {
         Class<? extends org.bukkit.entity.Entity> entityClass = type.getEntityClass();
-        if(entityClass == null){
+        if (entityClass == null) {
             System.out.println("Could not get entity class for " + type);
             return null;
         }
         for (MetaIndex mi : MetaIndex.values()) {
             if (mi.getIndex() == index) {
                 // To fix issue with armour stands colliding with new values
-                if(mi.getApplicableClass().equals(LivingEntity.class)) continue;
+                if (mi.getApplicableClass().equals(LivingEntity.class)) continue;
 
                 if ((mi.getApplicableClass().isAssignableFrom(entityClass) ||
                         mi.getApplicableClass().equals(entityClass))) {

@@ -216,6 +216,11 @@ public class IncomingTransformer {
                 PacketUtil.writeString(command, output);
                 output.writeBoolean(flag);
                 return;
+            } else if (name.equals("MC|AdvCmd")) {
+                output.clear();
+                PacketUtil.writeVarInt(PacketType.PLAY_PLUGIN_MESSAGE_REQUEST.getPacketID(), output);
+                PacketUtil.writeString("MC|AdvCdm", output);
+                output.writeBytes(b);
             }
             output.writeBytes(b);
         }
