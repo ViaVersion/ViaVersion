@@ -5,11 +5,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
     private final ConnectionInfo info;
@@ -24,25 +27,50 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object o, ByteBuf bytebuf) throws Exception {
+    protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
         // handle the packet type
         if (!(o instanceof ByteBuf)) {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
             if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
-                int[] locX = ReflectionUtil.get(o, "a", int[].class);
-                int[] locZ = ReflectionUtil.get(o, "b", int[].class);
+                final int[] locX = ReflectionUtil.get(o, "a", int[].class);
+                final int[] locZ = ReflectionUtil.get(o, "b", int[].class);
 
-                Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
+                final Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
                 Class<?> mapChunk = ReflectionUtil.nms("PacketPlayOutMapChunk");
-                Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
-                for (int i = 0; i < locX.length; i++) {
-                    int x = locX[i];
-                    int z = locZ[i];
-                    // world invoke function
-                    Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
-                    Object packet = constructor.newInstance(chunk, true, 65535);
-                    ctx.pipeline().writeAndFlush(packet);
+                final Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
+                Runnable chunks = new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        for (int i = 0; i < locX.length; i++) {
+                            int x = locX[i];
+                            int z = locZ[i];
+                            // world invoke function
+                            try {
+                                Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
+                                Object packet = constructor.newInstance(chunk, true, 65535);
+                                ctx.pipeline().writeAndFlush(packet);
+                            } catch (InstantiationException e) {
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchMethodException e) {
+                                e.printStackTrace();
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                };
+                // Synced allows timings to work properly.
+                if (ViaVersion.getInstance().isSyncedChunks()) {
+                    ((ViaVersionPlugin) ViaVersion.getInstance()).run(chunks);
+                } else {
+                    chunks.run();
                 }
                 bytebuf.readBytes(bytebuf.readableBytes());
                 throw new CancelException();

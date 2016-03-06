@@ -1,2 +1,4 @@
-#Should ViaVersion check for updates?
+# Should ViaVersion check for updates?
 checkforupdates: true
+# Should we send any bulk chunks, in sync (may be slower but fixes timings)
+sync-chunks: true

@@ -7,8 +7,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,10 +23,10 @@ import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -125,6 +123,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return this.debug;
     }
 
+    @Override
+    public boolean isSyncedChunks() {
+        return getConfig().getBoolean("sync-chunks", true);
+    }
+
     public void setDebug(boolean value) {
         this.debug = value;
     }
@@ -152,6 +155,21 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             System.out.println("Error fetching hand item ");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public void run(final Runnable runnable) {
+        try {
+            Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    runnable.run();
+                    return true;
+                }
+            }).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            System.out.println("Failed to run task.");
+            e.printStackTrace();
         }
     }
 }

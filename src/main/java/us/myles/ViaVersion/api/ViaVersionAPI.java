@@ -30,4 +30,10 @@ public interface ViaVersionAPI {
      * @return true if debug is enabled
      */
     boolean isDebug();
+
+    /**
+     * Obtains if syncing chunks is on
+     * @return true if it is
+     */
+    boolean isSyncedChunks();
 }
