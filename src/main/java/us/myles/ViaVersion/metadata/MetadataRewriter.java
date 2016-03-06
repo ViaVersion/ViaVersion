@@ -118,11 +118,11 @@ public class MetadataRewriter {
                     }
                 }
             } catch (Exception e) {
-            	System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
+                System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
                 if (type != null)
                     System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.oldID);
                 else
-                	System.out.println("An error occurred with entity meta data for UNKOWN_ENTITY OldID: " + entry.oldID);
+                    System.out.println("An error occurred with entity meta data for UNKOWN_ENTITY OldID: " + entry.oldID);
                 if (metaIndex != null) {
                     System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
                     System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
