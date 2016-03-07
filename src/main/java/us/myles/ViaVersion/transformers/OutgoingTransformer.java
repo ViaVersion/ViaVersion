@@ -42,7 +42,6 @@ public class OutgoingTransformer {
     private final Map<Integer, UUID> uuidMap = new HashMap<>();
     private final Map<Integer, EntityType> clientEntityTypes = new HashMap<>();
     private final Map<Integer, Integer> vehicleMap = new HashMap<>();
-    private boolean cancel = false;
     private boolean autoTeam = false;
 
     public OutgoingTransformer(ConnectionInfo info) {
@@ -72,10 +71,6 @@ public class OutgoingTransformer {
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
-        if (cancel) {
-            throw new CancelException();
-        }
-
         PacketType packet = PacketType.getOutgoingPacket(info.getState(), packetID);
         int original = packetID;
         if (packet == null) {

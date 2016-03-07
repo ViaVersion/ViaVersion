@@ -48,7 +48,13 @@ public class PacketUtil {
             return null;
         } else {
             input.readerIndex(readerIndex);
-            return (CompoundTag) NBTIO.readTag(new DataInputStream(new ByteBufInputStream(input)));
+            ByteBufInputStream bytebufStream = new ByteBufInputStream(input);
+            DataInputStream dataInputStream = new DataInputStream(bytebufStream);
+            try {
+                return (CompoundTag) NBTIO.readTag(dataInputStream);
+            } finally {
+                dataInputStream.close();
+            }
         }
     }
 
@@ -56,7 +62,12 @@ public class PacketUtil {
         if (tag == null) {
             output.writeByte(0);
         } else {
-            NBTIO.writeTag(new DataOutputStream(new ByteBufOutputStream(output)), tag);
+            ByteBufOutputStream bytebufStream = new ByteBufOutputStream(output);
+            DataOutputStream dataOutputStream = new DataOutputStream(bytebufStream);
+
+            NBTIO.writeTag(dataOutputStream, tag);
+
+            dataOutputStream.close();
         }
     }
 

@@ -193,7 +193,8 @@ public class IncomingTransformer {
                     ByteBuf in = Unpooled.wrappedBuffer(b);
                     try {
                         ItemSlotRewriter.ItemStack stack = ItemSlotRewriter.readItemStack(in);
-                        stack.id = (short) Material.WRITTEN_BOOK.getId();
+                        if (stack != null)
+                            stack.id = (short) Material.WRITTEN_BOOK.getId();
                         // write
                         ItemSlotRewriter.writeItemStack(stack, output);
                     } catch (IOException e) {
@@ -234,7 +235,7 @@ public class IncomingTransformer {
             output.writeLong(position);
             int face = PacketUtil.readVarInt(input);
             output.writeByte(face);
-            int hand = PacketUtil.readVarInt(input);
+            PacketUtil.readVarInt(input);
 
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
             try {

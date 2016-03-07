@@ -24,7 +24,6 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
     }
 
 
-
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
         // handle the packet type
@@ -57,13 +56,8 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                         }
                     }
                 };
-                // Synced allows timings to work properly.
-//                if (ViaVersion.getInstance().isSyncedChunks()) {
-//                    ((ViaVersionPlugin) ViaVersion.getInstance()).run(chunks, false);
-//                } else {
                 chunks.run();
-//                }
-                bytebuf.readBytes(bytebuf.readableBytes());
+                bytebuf.clear();
                 throw new CancelException();
             }
             // call minecraft encoder
@@ -80,7 +74,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             try {
                 outgoingTransformer.transform(id, oldPacket, bytebuf);
             } catch (CancelException e) {
-                bytebuf.readBytes(bytebuf.readableBytes());
+                bytebuf.clear();
                 throw e;
             } finally {
                 oldPacket.release();
