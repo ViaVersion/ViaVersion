@@ -677,21 +677,18 @@ public class OutgoingTransformer {
             if (action == 1) { // update spawner
                 try {
                     int index = input.readerIndex();
-                    DataInputStream stream = new DataInputStream(new ByteBufInputStream(input));
-                    CompoundTag tag = (CompoundTag) NBTIO.readTag(stream);
+                    CompoundTag tag = PacketUtil.readNBT(input);
                     if (tag != null && tag.contains("EntityId")) {
                         String entity = (String) tag.get("EntityId").getValue();
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", entity));
                         tag.put(spawn);
-                        DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
-                        NBTIO.writeTag(out, tag);
+                        PacketUtil.writeNBT(output,tag);
                     } else if (tag != null) { // EntityID does not exist
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
                         tag.put(spawn);
-                        DataOutputStream out = new DataOutputStream(new ByteBufOutputStream(output));
-                        NBTIO.writeTag(out, tag);
+                        PacketUtil.writeNBT(output,spawn);
                     } else { //There doesn't exist any NBT tag
                         input.readerIndex(index);
                         output.writeBytes(input, input.readableBytes());
