@@ -28,6 +28,7 @@ public class ViaVersionCommand implements CommandExecutor {
                 sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion()));
                 sender.sendMessage(color("&6Commands:"));
                 sender.sendMessage(color("&2/viaversion list &7- &6Shows lists of all 1.9 clients and 1.8 clients."));
+                sender.sendMessage(color("&2/viaversion autoteam &7- &6Toggle automatically teaming to prevent colliding."));
                 sender.sendMessage(color("&2/viaversion dontbugme &7- &6Toggle checking for updates."));
             } else if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("list")) {
@@ -53,6 +54,14 @@ public class ViaVersionCommand implements CommandExecutor {
                     plugin.getConfig().set("checkforupdates", newValue);
                     plugin.saveConfig();
                     sender.sendMessage(color("&6We will " + (newValue ? "&anotify you about updates." : "&cnot tell you about updates.")));
+                }
+                if (args[0].equalsIgnoreCase("autoteam")) {
+                    boolean newValue = !plugin.getConfig().getBoolean("auto-team", true);
+                    plugin.getConfig().set("auto-team", newValue);
+                    plugin.saveConfig();
+                    sender.sendMessage(color("&6We will " + (newValue ? "&aautomatically team players" : "&cno longer auto team players")));
+                    sender.sendMessage(color("&6All players will need to re-login for the change to take place."));
+
                 }
             }
 

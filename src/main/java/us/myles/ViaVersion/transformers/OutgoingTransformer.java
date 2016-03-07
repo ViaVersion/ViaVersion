@@ -37,6 +37,7 @@ public class OutgoingTransformer {
     private final ConnectionInfo info;
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private boolean cancel = false;
+    private boolean autoTeam = false;
 
     private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
     private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
@@ -550,6 +551,7 @@ public class OutgoingTransformer {
             output.writeBytes(input);
             // send fake team
             if (plugin.isAutoTeam()) {
+                autoTeam = true;
                 sendTeamPacket(true);
             }
             return;
@@ -627,7 +629,7 @@ public class OutgoingTransformer {
 
                 for (int i = 0; i < count; i++) {
                     String name = PacketUtil.readString(input);
-                    if (plugin.isAutoTeam() && name.equalsIgnoreCase(info.getUsername())) {
+                    if (autoTeam && name.equalsIgnoreCase(info.getUsername())) {
                         if (mode == 4) {
                             // since removing add to auto team
                             plugin.run(new Runnable() {
@@ -748,21 +750,7 @@ public class OutgoingTransformer {
         }
         output.writeBytes(input);
     }
-    private void sendCreateTeam() {
-        ByteBuf buf = info.getChannel().alloc().buffer();
-        PacketUtil.writeVarInt(PacketType.PLAY_TEAM.getNewPacketID(), buf);
-        PacketUtil.writeString("viaversion", buf);
-        buf.writeByte(0); // make team
-        PacketUtil.writeString("viaversion", buf);
-        PacketUtil.writeString("", buf); // prefix
-        PacketUtil.writeString("", buf); // suffix
-        buf.writeByte(0); // friendly fire
-        PacketUtil.writeString("", buf); // nametags
-        PacketUtil.writeString("never", buf); // collision rule :)
-        buf.writeByte(0); // color
-        PacketUtil.writeVarInt(0, buf); // player count
-        info.sendRawPacket(buf);
-    }
+
     private void sendTeamPacket(boolean b) {
         ByteBuf buf = info.getChannel().alloc().buffer();
         PacketUtil.writeVarInt(PacketType.PLAY_TEAM.getNewPacketID(), buf);
