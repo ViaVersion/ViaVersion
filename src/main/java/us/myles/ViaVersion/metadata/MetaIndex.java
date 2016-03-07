@@ -109,7 +109,7 @@ public enum MetaIndex {
     MINECART_COMMANDBLOCK_COMMAND(Minecart.class, 23, Type.String, 11, NewType.String),
     MINECART_COMMANDBLOCK_OUTPUT(Minecart.class, 24, Type.String, 12, NewType.Chat),
     // furnace cart
-    FURNACECART_ISPOWERED(org.bukkit.entity.minecart.PoweredMinecart.class, 16, Type.Byte, 11, NewType.Boolean),
+    FURNACECART_ISPOWERED(Minecart.class, 16, Type.Byte, 11, NewType.Boolean),
     // item drop
     ITEM_ITEM(Item.class, 10, Type.Slot, 5, NewType.Slot),
     // arrow
