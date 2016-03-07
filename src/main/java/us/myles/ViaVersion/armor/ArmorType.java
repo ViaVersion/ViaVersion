@@ -1,8 +1,12 @@
 package us.myles.ViaVersion.armor;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+@RequiredArgsConstructor
+@Getter
 public enum ArmorType {
 
     LEATHER_HELMET(1, 298, Material.LEATHER_HELMET),
@@ -27,27 +31,9 @@ public enum ArmorType {
     GOLD_BOOTS(1, 317, Material.GOLD_BOOTS),
     NONE(0, 0, Material.AIR);
 
-    private int armorpoints;
-    private int id;
-    private Material type;
-
-    ArmorType(int armor, int id, Material type) {
-        this.armorpoints = armor;
-        this.id = id;
-        this.type = type;
-    }
-
-    public int getArmorPoints() {
-        return this.armorpoints;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public Material getType() {
-        return this.type;
-    }
+    private final int armorPoints;
+    private final int id;
+    private final Material type;
 
     public static ArmorType findByType(Material type) {
         for(ArmorType a : ArmorType.values())
@@ -58,9 +44,9 @@ public enum ArmorType {
 
     public static int calculateArmorPoints(ItemStack[] armor) {
         int total = 0;
-        for(int i = 0; i < armor.length; i++) {
-            if(armor[i] != null)
-                total += findByType(armor[i].getType()).getArmorPoints();
+        for (ItemStack anArmor : armor) {
+            if (anArmor != null)
+                total += findByType(anArmor.getType()).getArmorPoints();
         }
         return total;
     }
@@ -81,11 +67,15 @@ public enum ArmorType {
 
     public static int calculateArmorPoints(int[] armor) {
         int total = 0;
-        for(int i = 0; i < armor.length; i++) {
-            if(armor[i] != -1)
-                total += findById(armor[i]).getArmorPoints();
+        for (int anArmor : armor) {
+            if (anArmor != -1)
+                total += findById(anArmor).getArmorPoints();
         }
         return total;
+    }
+
+    public Material getType() {
+        return this.type;
     }
 
 }

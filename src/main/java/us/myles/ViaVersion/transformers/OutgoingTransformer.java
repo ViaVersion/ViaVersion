@@ -3,6 +3,7 @@ package us.myles.ViaVersion.transformers;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,18 +34,38 @@ import java.util.*;
 
 import static us.myles.ViaVersion.util.PacketUtil.*;
 
+@RequiredArgsConstructor
 public class OutgoingTransformer {
-    private final ConnectionInfo info;
+
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
+
+    private final ConnectionInfo info;
+    private final Map<Integer, UUID> uuidMap = new HashMap<>();
+    private final Map<Integer, EntityType> clientEntityTypes = new HashMap<>();
+    private final Map<Integer, Integer> vehicleMap = new HashMap<>();
     private boolean cancel = false;
     private boolean autoTeam = false;
 
-    private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
-    private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
-    private Map<Integer, Integer> vehicleMap = new HashMap<>();
-
-    public OutgoingTransformer(ConnectionInfo info) {
-        this.info = info;
+    public static String fixJson(String line) {
+        if (line == null || line.equalsIgnoreCase("null")) {
+            line = "{\"text\":\"\"}";
+        } else {
+            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
+                JSONObject obj = new JSONObject();
+                obj.put("text", line);
+                return obj.toJSONString();
+            }
+            if (line.startsWith("\"") && line.endsWith("\"")) {
+                line = "{\"text\":" + line + "}";
+            }
+        }
+        try {
+            new JSONParser().parse(line);
+        } catch (Exception e) {
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+            return "{\"text\":\"\"}";
+        }
+        return line;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
@@ -75,7 +96,7 @@ public class OutgoingTransformer {
             int catid = 0;
             String newname = name;
             if (effect != null) {
-                if (effect.isBreakPlaceSound()) {
+                if (effect.isBreaksound()) {
                     throw new CancelException();
                 }
                 catid = effect.getCategory().getId();
@@ -633,12 +654,7 @@ public class OutgoingTransformer {
                     if (autoTeam && name.equalsIgnoreCase(info.getUsername())) {
                         if (mode == 4) {
                             // since removing add to auto team
-                            plugin.run(new Runnable() {
-                                @Override
-                                public void run() {
-                                    sendTeamPacket(true);
-                                }
-                            }, false);
+                            plugin.run(() -> sendTeamPacket(true), false);
                         } else {
                             // since adding remove from auto team
                             sendTeamPacket(false);
@@ -730,9 +746,7 @@ public class OutgoingTransformer {
             if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
                 try {
                     sk = ReflectionUtil.get(info.getLastPacket(), "d", boolean.class);
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                } catch (NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -772,28 +786,6 @@ public class OutgoingTransformer {
             buf.writeByte(1); // remove team
         }
         info.sendRawPacket(buf);
-    }
-
-    public static String fixJson(String line) {
-        if (line == null || line.equalsIgnoreCase("null")) {
-            line = "{\"text\":\"\"}";
-        } else {
-            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                JSONObject obj = new JSONObject();
-                obj.put("text", line);
-                return obj.toJSONString();
-            }
-            if (line.startsWith("\"") && line.endsWith("\"")) {
-                line = "{\"text\":" + line + "}";
-            }
-        }
-        try {
-            new JSONParser().parse(line);
-        } catch (Exception e) {
-            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
-            return "{\"text\":\"\"}";
-        }
-        return line;
     }
 
     private void transformMetadata(int entityID, ByteBuf input, ByteBuf output) throws CancelException {

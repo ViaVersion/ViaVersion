@@ -1,19 +1,14 @@
 package us.myles.ViaVersion.chunks;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
 public class PacketChunk {
+
     private PacketChunkData[] chunkData;
     private byte[] biomeData;
-
-    public PacketChunk(PacketChunkData[] chunkData, byte[] biomeData) {
-        this.chunkData = chunkData;
-        this.biomeData = biomeData;
-    }
-
-    public PacketChunkData[] getChunkData() {
-        return chunkData;
-    }
-
-    public byte[] getBiomeData() {
-        return biomeData;
-    }
 }

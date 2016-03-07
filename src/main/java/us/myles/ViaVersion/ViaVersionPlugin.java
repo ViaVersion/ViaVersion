@@ -28,19 +28,32 @@ import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
-    private final Map<UUID, ConnectionInfo> portedPlayers = new ConcurrentHashMap<UUID, ConnectionInfo>();
+    private final Map<UUID, ConnectionInfo> portedPlayers = new ConcurrentHashMap<>();
     private boolean debug = false;
+
+    public static ItemStack getHandItem(final ConnectionInfo info) {
+        try {
+            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
+                if (info.getPlayer() != null) {
+                    return info.getPlayer().getItemInHand();
+                }
+                return null;
+            }).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            System.out.println("Error fetching hand item ");
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -154,6 +167,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return this.debug;
     }
 
+    public void setDebug(boolean value) {
+        this.debug = value;
+    }
+
     @Override
     public boolean isSyncedChunks() {
         return getConfig().getBoolean("sync-chunks", true);
@@ -169,10 +186,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("auto-team", true);
     }
 
-    public void setDebug(boolean value) {
-        this.debug = value;
-    }
-
     public void addPortedClient(ConnectionInfo info) {
         portedPlayers.put(info.getUUID(), info);
     }
@@ -181,32 +194,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         portedPlayers.remove(clientID);
     }
 
-    public static ItemStack getHandItem(final ConnectionInfo info) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<ItemStack>() {
-                @Override
-                public ItemStack call() throws Exception {
-                    if (info.getPlayer() != null) {
-                        return info.getPlayer().getItemInHand();
-                    }
-                    return null;
-                }
-            }).get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            System.out.println("Error fetching hand item ");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public void run(final Runnable runnable, boolean wait) {
         try {
-            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    runnable.run();
-                    return true;
-                }
+            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
+                runnable.run();
+                return true;
             });
             if (wait) {
                 f.get(10, TimeUnit.SECONDS);

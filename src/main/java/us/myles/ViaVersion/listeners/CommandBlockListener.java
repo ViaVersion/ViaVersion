@@ -2,6 +2,7 @@ package us.myles.ViaVersion.listeners;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.block.Block;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.entity.Player;
@@ -19,12 +20,10 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+@RequiredArgsConstructor
 public class CommandBlockListener implements Listener {
-    private final ViaVersionPlugin plugin;
 
-    public CommandBlockListener(ViaVersionPlugin plugin) {
-        this.plugin = plugin;
-    }
+    private final ViaVersionPlugin plugin;
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onJoin(final PlayerJoinEvent e) {

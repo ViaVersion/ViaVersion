@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.metadata;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum Type {
     Byte(0),
     Short(1),
@@ -10,14 +15,6 @@ public enum Type {
     Position(6),
     Rotation(7);
     private final int typeID;
-
-    Type(int typeID){
-        this.typeID = typeID;
-    }
-
-    public int getTypeID() {
-        return typeID;
-    }
 
     public static Type byId(int id) {
         return values()[id];

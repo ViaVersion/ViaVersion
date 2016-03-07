@@ -17,7 +17,7 @@ public class BlockStorage {
     public BlockStorage() {
         this.bitsPerEntry = 4;
 
-        this.states = new ArrayList<Integer>();
+        this.states = new ArrayList<>();
         this.states.add(0);
 
         this.storage = new FlexibleStorage(this.bitsPerEntry, 4096);
@@ -26,13 +26,17 @@ public class BlockStorage {
     public BlockStorage(ByteBuf in) throws IOException {
         this.bitsPerEntry = in.readUnsignedByte();
 
-        this.states = new ArrayList<Integer>();
+        this.states = new ArrayList<>();
         int stateCount = PacketUtil.readVarInt(in);
         for (int i = 0; i < stateCount; i++) {
             this.states.add(PacketUtil.readVarInt(in));
         }
 
         this.storage = new FlexibleStorage(this.bitsPerEntry, PacketUtil.readLongs(PacketUtil.readVarInt(in), in));
+    }
+
+    private static int index(int x, int y, int z) {
+        return y << 8 | z << 4 | x;
     }
 
     public void write(ByteBuf out) throws IOException {
@@ -78,7 +82,7 @@ public class BlockStorage {
 
                 List<Integer> oldStates = this.states;
                 if (this.bitsPerEntry > 8) {
-                    oldStates = new ArrayList<Integer>(this.states);
+                    oldStates = new ArrayList<>(this.states);
                     this.states.clear();
                     this.bitsPerEntry = 13;
                 }
@@ -105,10 +109,6 @@ public class BlockStorage {
         }
 
         return true;
-    }
-
-    private static int index(int x, int y, int z) {
-        return y << 8 | z << 4 | x;
     }
 
     @Override

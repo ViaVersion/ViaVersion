@@ -188,40 +188,44 @@ public class IncomingTransformer {
             byte[] b = new byte[input.readableBytes()];
             input.readBytes(b);
             // patch books
-            if (name.equals("MC|BSign")) {
-                ByteBuf in = Unpooled.wrappedBuffer(b);
-                try {
-                    ItemSlotRewriter.ItemStack stack = ItemSlotRewriter.readItemStack(in);
-                    stack.id = (short) Material.WRITTEN_BOOK.getId();
-                    // write
-                    ItemSlotRewriter.writeItemStack(stack, output);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            switch (name) {
+                case "MC|BSign": {
+                    ByteBuf in = Unpooled.wrappedBuffer(b);
+                    try {
+                        ItemSlotRewriter.ItemStack stack = ItemSlotRewriter.readItemStack(in);
+                        stack.id = (short) Material.WRITTEN_BOOK.getId();
+                        // write
+                        ItemSlotRewriter.writeItemStack(stack, output);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
                 }
-                return;
-            } else if (name.equals("MC|AutoCmd")) {
-                ByteBuf in = Unpooled.wrappedBuffer(b);
-                int x = in.readInt();
-                int y = in.readInt();
-                int z = in.readInt();
-                String command = PacketUtil.readString(in);
-                boolean flag = in.readBoolean();
+                case "MC|AutoCmd": {
+                    ByteBuf in = Unpooled.wrappedBuffer(b);
+                    int x = in.readInt();
+                    int y = in.readInt();
+                    int z = in.readInt();
+                    String command = PacketUtil.readString(in);
+                    boolean flag = in.readBoolean();
 
-                output.clear();
-                PacketUtil.writeVarInt(PacketType.PLAY_PLUGIN_MESSAGE_REQUEST.getPacketID(), output);
-                PacketUtil.writeString("MC|AdvCdm", output);
-                output.writeByte(0);
-                output.writeInt(x);
-                output.writeInt(y);
-                output.writeInt(z);
-                PacketUtil.writeString(command, output);
-                output.writeBoolean(flag);
-                return;
-            } else if (name.equals("MC|AdvCmd")) {
-                output.clear();
-                PacketUtil.writeVarInt(PacketType.PLAY_PLUGIN_MESSAGE_REQUEST.getPacketID(), output);
-                PacketUtil.writeString("MC|AdvCdm", output);
-                output.writeBytes(b);
+                    output.clear();
+                    PacketUtil.writeVarInt(PacketType.PLAY_PLUGIN_MESSAGE_REQUEST.getPacketID(), output);
+                    PacketUtil.writeString("MC|AdvCdm", output);
+                    output.writeByte(0);
+                    output.writeInt(x);
+                    output.writeInt(y);
+                    output.writeInt(z);
+                    PacketUtil.writeString(command, output);
+                    output.writeBoolean(flag);
+                    return;
+                }
+                case "MC|AdvCmd":
+                    output.clear();
+                    PacketUtil.writeVarInt(PacketType.PLAY_PLUGIN_MESSAGE_REQUEST.getPacketID(), output);
+                    PacketUtil.writeString("MC|AdvCdm", output);
+                    output.writeBytes(b);
+                    break;
             }
             output.writeBytes(b);
         }

@@ -69,12 +69,10 @@ public class PacketUtil {
     }
 
     public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) {
-        List<Object> output = new ArrayList<Object>();
+        List<Object> output = new ArrayList<>();
         try {
             PacketUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return output;
@@ -83,9 +81,7 @@ public class PacketUtil {
     public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) {
         try {
             PacketUtil.ENCODE_METHOD.invoke(encoder, ctx, msg, output);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
@@ -169,7 +165,7 @@ public class PacketUtil {
 
     public static List<String> readStringArray(ByteBuf buf) {
         int len = readVarInt(buf);
-        List<String> ret = new ArrayList<String>(len);
+        List<String> ret = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             ret.add(readString(buf));
         }
@@ -258,8 +254,8 @@ public class PacketUtil {
     }
 
     public static void writeLongs(long[] data, ByteBuf output) {
-        for (int index = 0; index < data.length; index++) {
-            output.writeLong(data[index]);
+        for (long aData : data) {
+            output.writeLong(aData);
         }
     }
 

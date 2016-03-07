@@ -2,6 +2,8 @@ package us.myles.ViaVersion.boss;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.ViaVersion;
@@ -18,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public class ViaBossBar implements BossBar {
     private UUID uuid;
     private String title;
@@ -49,11 +52,6 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public String getTitle() {
-        return title;
-    }
-
-    @Override
     public void setHealth(float health) {
         Validate.isTrue((health >= 0 && health <= 1), "Health must be between 0 and 1");
         this.health = health;
@@ -61,8 +59,8 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public float getHealth() {
-        return health;
+    public BossColor getColor() {
+        return color;
     }
 
     @Override
@@ -73,20 +71,10 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public BossColor getColor() {
-        return color;
-    }
-
-    @Override
     public void setStyle(BossStyle style) {
         Validate.notNull(style, "Style cannot be null");
         this.style = style;
         sendPacket(UpdateAction.UPDATE_STYLE);
-    }
-
-    @Override
-    public BossStyle getStyle() {
-        return style;
     }
 
     @Override
@@ -210,6 +198,8 @@ public class ViaBossBar implements BossBar {
         return OutgoingTransformer.fixJson(text);
     }
 
+    @RequiredArgsConstructor
+    @Getter
     private enum UpdateAction {
         ADD(0),
         REMOVE(1),
@@ -219,13 +209,5 @@ public class ViaBossBar implements BossBar {
         UPDATE_FLAGS(5);
 
         private final int id;
-
-        UpdateAction(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
     }
 }

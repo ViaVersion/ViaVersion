@@ -1,7 +1,11 @@
 package us.myles.ViaVersion.metadata;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.entity.*;
 
+@AllArgsConstructor
+@Getter
 public enum MetaIndex {
 
     // entity
@@ -136,34 +140,6 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    MetaIndex(Class<?> type, int index, Type oldType, int newIndex, NewType newType) {
-        this.clazz = type;
-        this.index = index;
-        this.oldType = oldType;
-        this.newIndex = newIndex;
-        this.newType = newType;
-    }
-
-    public int getNewIndex() {
-        return newIndex;
-    }
-
-    public NewType getNewType() {
-        return newType;
-    }
-
-    public Type getOldType() {
-        return oldType;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public Class<?> getApplicableClass() {
-        return this.clazz;
-    }
-
     public static MetaIndex getIndex(EntityType type, int index) {
         Class<? extends org.bukkit.entity.Entity> entityClass = type.getEntityClass();
         if (entityClass == null) {
@@ -191,6 +167,10 @@ public enum MetaIndex {
             }
         }
         return null;
+    }
+
+    public Class<?> getApplicableClass() {
+        return this.clazz;
     }
 }
 

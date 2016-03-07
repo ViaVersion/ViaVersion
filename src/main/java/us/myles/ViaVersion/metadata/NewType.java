@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.metadata;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum NewType {
     Byte(0),
     VarInt(1),
@@ -15,13 +20,7 @@ public enum NewType {
     OptUUID(11),
     BlockID(12),
     Discontinued(99);
+
     private final int typeID;
 
-    NewType(int typeID){
-        this.typeID = typeID;
-    }
-
-    public int getTypeID() {
-        return typeID;
-    }
 }

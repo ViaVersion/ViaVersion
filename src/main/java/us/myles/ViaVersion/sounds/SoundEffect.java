@@ -1,5 +1,8 @@
 package us.myles.ViaVersion.sounds;
 
+import lombok.Getter;
+
+@Getter
 public enum SoundEffect {
 
     MOB_HORSE_ZOMBIE_IDLE("mob.horse.zombie.idle", "entity.zombie_horse.ambient", SoundCategory.NEUTRAL),
@@ -249,21 +252,21 @@ public enum SoundEffect {
     MUSIC_GAME_END_CREDITS("music.game.end.credits", "music.credits", SoundCategory.MUSIC),
     MUSIC_GAME_CREATIVE("music.game.creative", "music.creative", SoundCategory.MUSIC);
 
-    private String name;
-    private String newname;
-    private SoundCategory cat;
-    private boolean breaksound;
+    private final String name;
+    private final String newName;
+    private final SoundCategory category;
+    private final boolean breaksound;
 
     SoundEffect(String name, String newname, SoundCategory cat) {
-        this.cat = cat;
-        this.newname = newname;
+        this.category = cat;
+        this.newName = newname;
         this.name = name;
         this.breaksound = name.startsWith("dig.");
     }
     
     SoundEffect(String name, String newname, SoundCategory cat, boolean shouldIgnore) {
-        this.cat = cat;
-        this.newname = newname;
+        this.category = cat;
+        this.newName = newname;
         this.name = name;
         this.breaksound = name.startsWith("dig.") || shouldIgnore;
     }
@@ -275,22 +278,6 @@ public enum SoundEffect {
                 return e;
         }
         return null;
-    }
-
-    public String getNewName() {
-        return newname;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public SoundCategory getCategory() {
-        return cat;
-    }
-    
-    public boolean isBreakPlaceSound() {
-    	return breaksound;
     }
 
 }

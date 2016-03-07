@@ -10,6 +10,7 @@ import us.myles.ViaVersion.ConnectionInfo;
 import java.lang.reflect.Method;
 
 public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
+
     private final ChannelInitializer<SocketChannel> oldInit;
     private Method method;
 

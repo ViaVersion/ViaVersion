@@ -1,17 +1,15 @@
 package us.myles.ViaVersion.update;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
+@RequiredArgsConstructor
 public class UpdateListener implements Listener {
-	
-	private Plugin plugin;
-	
-	public UpdateListener(Plugin plugin) {
-		this.plugin = plugin;
-	}
+
+	private final Plugin plugin;
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {

@@ -5,8 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
@@ -39,30 +37,18 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                 final Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
                 Class<?> mapChunk = ReflectionUtil.nms("PacketPlayOutMapChunk");
                 final Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
-                Runnable chunks = new Runnable() {
+                Runnable chunks = () -> {
 
-                    @Override
-                    public void run() {
-
-                        for (int i = 0; i < locX.length; i++) {
-                            int x = locX[i];
-                            int z = locZ[i];
-                            // world invoke function
-                            try {
-                                Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
-                                Object packet = constructor.newInstance(chunk, true, 65535);
-                                ctx.pipeline().writeAndFlush(packet);
-                            } catch (InstantiationException e) {
-                                e.printStackTrace();
-                            } catch (InvocationTargetException e) {
-                                e.printStackTrace();
-                            } catch (NoSuchMethodException e) {
-                                e.printStackTrace();
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            } catch (ClassNotFoundException e) {
-                                e.printStackTrace();
-                            }
+                    for (int i = 0; i < locX.length; i++) {
+                        int x = locX[i];
+                        int z = locZ[i];
+                        // world invoke function
+                        try {
+                            Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
+                            Object packet = constructor.newInstance(chunk, true, 65535);
+                            ctx.pipeline().writeAndFlush(packet);
+                        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
+                            e.printStackTrace();
                         }
                     }
                 };

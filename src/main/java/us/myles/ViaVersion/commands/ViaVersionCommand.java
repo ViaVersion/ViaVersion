@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.commands;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,12 +15,11 @@ import java.util.List;
 /**
  * Created by fillefilip8 on 2016-03-03.
  */
+@RequiredArgsConstructor
 public class ViaVersionCommand implements CommandExecutor {
+
     private final ViaVersionPlugin plugin;
 
-    public ViaVersionCommand(ViaVersionPlugin plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -32,8 +32,8 @@ public class ViaVersionCommand implements CommandExecutor {
                 sender.sendMessage(color("&2/viaversion dontbugme &7- &6Toggle checking for updates."));
             } else if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("list")) {
-                    List<String> portedPlayers = new ArrayList<String>();
-                    List<String> normalPlayers = new ArrayList<String>();
+                    List<String> portedPlayers = new ArrayList<>();
+                    List<String> normalPlayers = new ArrayList<>();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         if (ViaVersion.getInstance().isPorted(p)) {
                             portedPlayers.add(p.getName());

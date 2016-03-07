@@ -3,6 +3,7 @@ package us.myles.ViaVersion.util;
 import org.bukkit.entity.EntityType;
 
 public class EntityUtil {
+
     public static EntityType getTypeFromID(int typeID, boolean isObject) {
         if (isObject) {
             return getObjectFromID(typeID);

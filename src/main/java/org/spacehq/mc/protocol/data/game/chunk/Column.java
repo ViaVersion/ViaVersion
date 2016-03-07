@@ -23,9 +23,9 @@ public class Column {
 
         this.skylight = false;
         boolean noSkylight = false;
-        for(int index = 0; index < chunks.length; index++) {
-            if(chunks[index] != null) {
-                if(chunks[index].getSkyLight() == null) {
+        for (Chunk chunk : chunks) {
+            if (chunk != null) {
+                if (chunk.getSkyLight() == null) {
                     noSkylight = true;
                 } else {
                     this.skylight = true;
