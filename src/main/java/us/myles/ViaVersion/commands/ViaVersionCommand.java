@@ -44,24 +44,26 @@ public class ViaVersionCommand implements CommandExecutor {
 
                     sender.sendMessage(color("&8[&61.9&8]: &b" + portedPlayers.toString()));
                     sender.sendMessage(color("&8[&61.8&8]: &b" + normalPlayers.toString()));
-                }
-                if (args[0].equalsIgnoreCase("debug")) {
+                } else if (args[0].equalsIgnoreCase("debug")) {
                     plugin.setDebug(!plugin.isDebug());
                     sender.sendMessage(color("&6Debug mode is now " + (plugin.isDebug() ? "&aenabled" : "&cdisabled")));
-                }
-                if (args[0].equalsIgnoreCase("dontbugme")) {
+                } else if (args[0].equalsIgnoreCase("dontbugme")) {
                     boolean newValue = !plugin.getConfig().getBoolean("checkforupdates", true);
                     plugin.getConfig().set("checkforupdates", newValue);
                     plugin.saveConfig();
                     sender.sendMessage(color("&6We will " + (newValue ? "&anotify you about updates." : "&cnot tell you about updates.")));
-                }
-                if (args[0].equalsIgnoreCase("autoteam")) {
+                } else if (args[0].equalsIgnoreCase("autoteam")) {
                     boolean newValue = !plugin.getConfig().getBoolean("auto-team", true);
                     plugin.getConfig().set("auto-team", newValue);
                     plugin.saveConfig();
                     sender.sendMessage(color("&6We will " + (newValue ? "&aautomatically team players" : "&cno longer auto team players")));
                     sender.sendMessage(color("&6All players will need to re-login for the change to take place."));
-
+                } else {
+                    sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion()));
+                    sender.sendMessage(color("&6Commands:"));
+                    sender.sendMessage(color("&2/viaversion list &7- &6Shows lists of all 1.9 clients and 1.8 clients."));
+                    sender.sendMessage(color("&2/viaversion autoteam &7- &6Toggle automatically teaming to prevent colliding."));
+                    sender.sendMessage(color("&2/viaversion dontbugme &7- &6Toggle checking for updates."));
                 }
             }
 
