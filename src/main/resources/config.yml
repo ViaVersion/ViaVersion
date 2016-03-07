@@ -8,3 +8,5 @@ sync-chunks: true
 prevent-collision: true
 # If the above is true, should we automatically team players until you do?
 auto-team: true
+# When enabled if certain metadata can't be read we won't tell you about it
+suppress-metadata-errors: false

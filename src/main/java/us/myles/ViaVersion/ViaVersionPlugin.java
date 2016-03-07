@@ -184,6 +184,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("prevent-collision", true);
     }
 
+    public boolean isSuppressMetadataErrors() {
+        return getConfig().getBoolean("suppress-metadata-errors", false);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         if (!isPreventCollision()) return false;

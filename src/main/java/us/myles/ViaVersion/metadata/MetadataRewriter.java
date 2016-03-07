@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.slot.ItemSlotRewriter.ItemStack;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
@@ -117,16 +119,18 @@ public class MetadataRewriter {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
-                if (type != null)
-                    System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.oldID);
-                else
-                    System.out.println("An error occurred with entity meta data for UNKOWN_ENTITY OldID: " + entry.oldID);
-                if (metaIndex != null) {
-                    System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
-                    System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
+                if (!((ViaVersionPlugin) ViaVersion.getInstance()).isSuppressMetadataErrors()) {
+                    System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
+                    if (type != null)
+                        System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.oldID);
+                    else
+                        System.out.println("An error occurred with entity meta data for UNKNOWN_ENTITY OldID: " + entry.oldID);
+                    if (metaIndex != null) {
+                        System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
+                        System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
+                    }
+                    e.printStackTrace();
                 }
-                e.printStackTrace();
             }
         }
         output.writeByte(255);
