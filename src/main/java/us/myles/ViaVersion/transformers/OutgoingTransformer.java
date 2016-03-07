@@ -3,6 +3,7 @@ package us.myles.ViaVersion.transformers;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -106,8 +107,11 @@ public class OutgoingTransformer {
         }
         if (packet == PacketType.PLAY_EFFECT) {
             int effectid = input.readInt();
-            if (effectid >= 1000 && effectid < 2000) //Sound effect
+
+            if (effectid >= 1000 && effectid < 2000 && effectid != 1005) //Sound effect
                 throw new CancelException();
+            if (effectid == 1005)
+                effectid = 1010;
             output.writeInt(effectid);
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
