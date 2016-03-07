@@ -98,7 +98,11 @@ public class IncomingTransformer {
             }
             output.writeByte(status);
             // write remaining bytes
-            output.writeBytes(input);
+            Long position = input.readLong();
+            output.writeLong(position);
+
+            int face = input.readUnsignedByte();
+            output.writeByte(face);
             return;
         }
         if (packet == PacketType.PLAY_HELD_ITEM_CHANGE_REQUEST) {
