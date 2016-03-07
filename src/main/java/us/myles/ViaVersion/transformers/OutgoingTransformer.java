@@ -1,15 +1,12 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
@@ -26,8 +23,6 @@ import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -106,8 +101,10 @@ public class OutgoingTransformer {
         }
         if (packet == PacketType.PLAY_EFFECT) {
             int effectid = input.readInt();
-            if (effectid >= 1000 && effectid < 2000) //Sound effect
+            if (effectid >= 1000 && effectid < 2000 && effectid != 1005) //Sound effect
                 throw new CancelException();
+            if (effectid == 1005) //Fix jukebox
+                effectid = 1010;
             output.writeInt(effectid);
         }
         if (packet == PacketType.PLAY_ATTACH_ENTITY) {
@@ -683,12 +680,12 @@ public class OutgoingTransformer {
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", entity));
                         tag.put(spawn);
-                        PacketUtil.writeNBT(output,tag);
+                        PacketUtil.writeNBT(output, tag);
                     } else if (tag != null) { // EntityID does not exist
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
                         tag.put(spawn);
-                        PacketUtil.writeNBT(output,spawn);
+                        PacketUtil.writeNBT(output, spawn);
                     } else { //There doesn't exist any NBT tag
                         input.readerIndex(index);
                         output.writeBytes(input, input.readableBytes());
