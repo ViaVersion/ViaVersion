@@ -9,6 +9,8 @@ This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
 This took hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
 
+**Contributor Chat:** https://gitter.im/MylesIsCool/ViaVersion
+
 
 Sources:
 --------
@@ -38,9 +40,20 @@ Contributors:
 
 **fillefilip8**
 
-**Chat:** https://gitter.im/MylesIsCool/ViaVersion
 
-We use it to collaborate and solve errors, sign in with github.
+
+Releases / Dev Builds:
+--------
+You can find official releases here:
+
+https://www.spigotmc.org/resources/viaversion.19254/history
+
+
+----------
+
+You can find unofficial dev builds here:
+
+**fillefilip8's Build Server:** http://build.fillecraft.com:8080/job/ViaVersion
 
 License:
 --------
