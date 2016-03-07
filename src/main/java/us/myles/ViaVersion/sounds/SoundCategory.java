@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.sounds;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum SoundCategory {
 
 
@@ -14,20 +19,7 @@ public enum SoundCategory {
     AMBIENT("ambient", 8),
     VOICE("voice", 9);
 
-    private String name;
-    private int id;
-
-    SoundCategory(String name, int id) {
-        this.name = name;
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getId() {
-        return id;
-    }
+    private final String name;
+    private final int id;
 
 }

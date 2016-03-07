@@ -1,6 +1,8 @@
 package us.myles.ViaVersion.metadata;
 
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
@@ -10,7 +12,6 @@ import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,9 +20,7 @@ public class MetadataRewriter {
     public static void writeMetadata1_9(EntityType type, List<Entry> list, ByteBuf output) {
         short id = -1;
         int data = -1;
-        Iterator<Entry> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            Entry entry = iterator.next(); //
+        for (Entry entry : list) {
             MetaIndex metaIndex = entry.index;
             try {
                 if (metaIndex.getNewType() != NewType.Discontinued) {
@@ -34,7 +33,7 @@ public class MetadataRewriter {
                         case Byte:
                             // convert from int, byte
                             if (metaIndex.getOldType() == Type.Byte) {
-                                output.writeByte(((Byte) value).byteValue());
+                                output.writeByte((Byte) value);
                             }
                             if (metaIndex.getOldType() == Type.Int) {
                                 output.writeByte(((Integer) value).byteValue());
@@ -51,15 +50,15 @@ public class MetadataRewriter {
                             }
                             output.writeBoolean(toWrite != null);
                             if (toWrite != null)
-                                PacketUtil.writeUUID((UUID) toWrite, output);
+                                PacketUtil.writeUUID(toWrite, output);
                             break;
                         case BlockID:
                             // if we have both sources :))
                             if (metaIndex.getOldType() == Type.Byte) {
-                                data = ((Byte) value).byteValue();
+                                data = (Byte) value;
                             }
                             if (metaIndex.getOldType() == Type.Short) {
-                                id = ((Short) value).shortValue();
+                                id = (Short) value;
                             }
                             if (id != -1 && data != -1) {
                                 int combined = id << 4 | data;
@@ -77,20 +76,20 @@ public class MetadataRewriter {
                                 PacketUtil.writeVarInt(((Short) value).intValue(), output);
                             }
                             if (metaIndex.getOldType() == Type.Int) {
-                                PacketUtil.writeVarInt(((Integer) value).intValue(), output);
+                                PacketUtil.writeVarInt((Integer) value, output);
                             }
                             break;
                         case Float:
-                            output.writeFloat(((Float) value).floatValue());
+                            output.writeFloat((Float) value);
                             break;
                         case String:
                             PacketUtil.writeString((String) value, output);
                             break;
                         case Boolean:
                             if (metaIndex == MetaIndex.AGEABLE_AGE)
-                                output.writeBoolean(((Byte) value).byteValue() < 0);
+                                output.writeBoolean((Byte) value < 0);
                             else
-                                output.writeBoolean(((Byte) value).byteValue() != 0);
+                                output.writeBoolean((Byte) value != 0);
                             break;
                         case Slot:
                             ItemStack item = (ItemStack) value;
@@ -186,7 +185,9 @@ public class MetadataRewriter {
         return entries;
     }
 
-    public static class Entry {
+    @Getter
+    @Setter
+    public static final class Entry {
 
         private final int oldID;
         private MetaIndex index;

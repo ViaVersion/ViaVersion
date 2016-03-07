@@ -1,5 +1,10 @@
 package org.spacehq.mc.protocol.data.game.chunk;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Column {
     private int x;
     private int z;
@@ -23,9 +28,9 @@ public class Column {
 
         this.skylight = false;
         boolean noSkylight = false;
-        for(int index = 0; index < chunks.length; index++) {
-            if(chunks[index] != null) {
-                if(chunks[index].getSkyLight() == null) {
+        for (Chunk chunk : chunks) {
+            if (chunk != null) {
+                if (chunk.getSkyLight() == null) {
                     noSkylight = true;
                 } else {
                     this.skylight = true;
@@ -43,24 +48,9 @@ public class Column {
         this.biomeData = biomeData;
     }
 
-    public int getX() {
-        return this.x;
-    }
-
-    public int getZ() {
-        return this.z;
-    }
-
-    public Chunk[] getChunks() {
-        return this.chunks;
-    }
 
     public boolean hasBiomeData() {
         return this.biomeData != null;
-    }
-
-    public byte[] getBiomeData() {
-        return this.biomeData;
     }
 
     public boolean hasSkylight() {

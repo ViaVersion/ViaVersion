@@ -11,6 +11,7 @@ import us.myles.ViaVersion.util.PacketUtil;
 import java.util.List;
 
 public class ViaDecodeHandler extends ByteToMessageDecoder {
+
     private final IncomingTransformer incomingTransformer;
     private final ByteToMessageDecoder minecraftDecoder;
     private final ConnectionInfo info;

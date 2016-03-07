@@ -40,28 +40,28 @@ public class ConnectionInfo {
         this.state = state;
     }
 
-    public void setCompression(int compression) {
-        this.compression = compression;
-    }
-
     public int getCompression() {
         return compression;
     }
 
-    public void setLastPacket(Object lastPacket) {
-        this.lastPacket = lastPacket;
+    public void setCompression(int compression) {
+        this.compression = compression;
     }
 
     public Object getLastPacket() {
         return lastPacket;
     }
 
-    public void setUUID(UUID UUID) {
-        this.UUID = UUID;
+    public void setLastPacket(Object lastPacket) {
+        this.lastPacket = lastPacket;
     }
 
     public java.util.UUID getUUID() {
         return UUID;
+    }
+
+    public void setUUID(UUID UUID) {
+        this.UUID = UUID;
     }
 
     public Player getPlayer() {
@@ -102,11 +102,11 @@ public class ConnectionInfo {
         this.openWindow = null;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

@@ -17,182 +17,10 @@ import java.util.Map;
 
 public class ItemSlotRewriter {
 
-    public static void rewrite1_9To1_8(ByteBuf input, ByteBuf output) throws CancelException {
-        try {
-            ItemStack item = readItemStack(input);
-            fixIdsFrom1_9To1_8(item);
-            writeItemStack(item, output);
-        } catch (Exception e) {
-            System.out.println("Error while rewriting an item slot.");
-            e.printStackTrace();
-            throw new CancelException();
-        }
-    }
-
-    public static void rewrite1_8To1_9(ByteBuf input, ByteBuf output) throws CancelException {
-        try {
-            ItemStack item = readItemStack(input);
-            fixIdsFrom1_8To1_9(item);
-            writeItemStack(item, output);
-        } catch (Exception e) {
-            System.out.println("Error while rewriting an item slot.");
-            e.printStackTrace();
-            throw new CancelException();
-        }
-    }
-
-    public static void fixIdsFrom1_9To1_8(ItemStack item) {
-        if (item != null) {
-            if (item.id == Material.MONSTER_EGG.getId() && item.data == 0) {
-                CompoundTag tag = item.tag;
-                int data = 0;
-                if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
-                    CompoundTag entityTag = tag.get("EntityTag");
-                    if (entityTag.get("id") instanceof StringTag) {
-                        StringTag id = entityTag.get("id");
-                        if (ENTTIY_NAME_TO_ID.containsKey(id.getValue()))
-                            data = ENTTIY_NAME_TO_ID.get(id.getValue());
-                    }
-                }
-                item.tag = null;
-                item.data = (short) data;
-            }
-            if (item.id == Material.POTION.getId()) {
-                CompoundTag tag = item.tag;
-                int data = 0;
-                if (tag != null && tag.get("Potion") instanceof StringTag) {
-                    StringTag potion = tag.get("Potion");
-                    String potionName = potion.getValue().replace("minecraft:", "");
-                    if (POTION_NAME_TO_ID.containsKey(potionName)) {
-                        data = POTION_NAME_TO_ID.get(potionName);
-                    }
-                }
-                item.tag = null;
-                item.data = (short) data;
-            }
-            if (item.id == 438) {
-                CompoundTag tag = item.tag;
-                int data = 0;
-                item.id = (short) Material.POTION.getId();
-                if (tag != null && tag.get("Potion") instanceof StringTag) {
-                    StringTag potion = tag.get("Potion");
-                    String potionName = potion.getValue().replace("minecraft:", "");
-                    if (POTION_NAME_TO_ID.containsKey(potionName)) {
-                        data = POTION_NAME_TO_ID.get(potionName) + 8192;
-                    }
-                }
-                item.tag = null;
-                item.data = (short) data;
-            }
-        }
-    }
-
-    public static void fixIdsFrom1_8To1_9(ItemStack item) {
-        if (item != null) {
-            if (item.id == Material.MONSTER_EGG.getId() && item.data != 0) {
-                CompoundTag tag = item.tag;
-                if (tag == null) {
-                    tag = new CompoundTag("tag");
-                }
-                CompoundTag entityTag = new CompoundTag("EntityTag");
-                if (ENTTIY_ID_TO_NAME.containsKey(Integer.valueOf(item.data))) {
-                    StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get(Integer.valueOf(item.data)));
-                    entityTag.put(id);
-                    tag.put(entityTag);
-                }
-                item.tag = tag;
-                item.data = 0;
-            }
-            if (item.id == Material.POTION.getId()) {
-                CompoundTag tag = item.tag;
-                if (tag == null) {
-                    tag = new CompoundTag("tag");
-                }
-                if (item.data >= 16384) {
-                    item.id = 438; // splash id
-                    item.data = (short) (item.data - 8192);
-                }
-                if (POTION_ID_TO_NAME.containsKey(Integer.valueOf(item.data))) {
-                    String name = POTION_ID_TO_NAME.get(Integer.valueOf(item.data));
-                    StringTag potion = new StringTag("Potion", "minecraft:" + name);
-                    tag.put(potion);
-                }
-                item.tag = tag;
-                item.data = 0;
-            }
-            if (item.id == Material.WRITTEN_BOOK.getId()) {
-                CompoundTag tag = item.tag;
-                if (tag == null) {
-                    tag = new CompoundTag("tag");
-                }
-                ListTag pages = tag.get("pages");
-                if (pages == null) {
-                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(OutgoingTransformer.fixJson(""))));
-                    tag.put(pages);
-                    item.tag = tag;
-                    return;
-                }
-
-                for (int i = 0; i < pages.size(); i++) {
-                    if (!(pages.get(i) instanceof StringTag))
-                        continue;
-                    StringTag page = pages.get(i);
-                    page.setValue(OutgoingTransformer.fixJson(page.getValue()));
-                }
-                item.tag = tag;
-            }
-        }
-    }
-
-    public static ItemStack readItemStack(ByteBuf input) throws IOException {
-        short id = input.readShort();
-        if (id < 0) {
-
-            return null;
-        } else {
-            ItemStack item = new ItemStack();
-            item.id = id;
-            item.amount = input.readByte();
-            item.data = input.readShort();
-            item.tag = PacketUtil.readNBT(input);
-            return item;
-        }
-    }
-
-    public static void writeItemStack(ItemStack item, ByteBuf output) throws IOException {
-        if (item == null) {
-            output.writeShort(-1);
-        } else {
-            output.writeShort(item.id);
-            output.writeByte(item.amount);
-            output.writeShort(item.data);
-            PacketUtil.writeNBT(output, item.tag);
-        }
-    }
-
-    public static class ItemStack {
-
-        public short id;
-        public byte amount;
-        public short data;
-        public CompoundTag tag;
-
-        public static ItemStack fromBukkit(org.bukkit.inventory.ItemStack stack) {
-            if(stack == null) return null;
-            ItemStack item = new ItemStack();
-            item.id = (short) stack.getTypeId();
-            item.amount = (byte) stack.getAmount();
-            item.data = stack.getData().getData();
-            // TODO: nbt
-            return item;
-        }
-    }
-
-    private static Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
-    private static Map<Integer, String> ENTTIY_ID_TO_NAME = new HashMap<>();
-
-    private static Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
-    private static Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
+    private static final Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
+    private static final Map<Integer, String> ENTTIY_ID_TO_NAME = new HashMap<>();
+    private static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
+    private static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
     static {
         /* Entities */
@@ -311,6 +139,159 @@ public class ItemSlotRewriter {
 
     }
 
+    public static void rewrite1_9To1_8(ByteBuf input, ByteBuf output) throws CancelException {
+        try {
+            ItemStack item = readItemStack(input);
+            fixIdsFrom1_9To1_8(item);
+            writeItemStack(item, output);
+        } catch (Exception e) {
+            System.out.println("Error while rewriting an item slot.");
+            e.printStackTrace();
+            throw new CancelException();
+        }
+    }
+
+    public static void rewrite1_8To1_9(ByteBuf input, ByteBuf output) throws CancelException {
+        try {
+            ItemStack item = readItemStack(input);
+            fixIdsFrom1_8To1_9(item);
+            writeItemStack(item, output);
+        } catch (Exception e) {
+            System.out.println("Error while rewriting an item slot.");
+            e.printStackTrace();
+            throw new CancelException();
+        }
+    }
+
+    public static void fixIdsFrom1_9To1_8(ItemStack item) {
+        if (item != null) {
+            if (item.id == Material.MONSTER_EGG.getId() && item.data == 0) {
+                CompoundTag tag = item.tag;
+                int data = 0;
+                if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
+                    CompoundTag entityTag = tag.get("EntityTag");
+                    if (entityTag.get("id") instanceof StringTag) {
+                        StringTag id = entityTag.get("id");
+                        if (ENTTIY_NAME_TO_ID.containsKey(id.getValue()))
+                            data = ENTTIY_NAME_TO_ID.get(id.getValue());
+                    }
+                }
+                item.tag = null;
+                item.data = (short) data;
+            }
+            if (item.id == Material.POTION.getId()) {
+                CompoundTag tag = item.tag;
+                int data = 0;
+                if (tag != null && tag.get("Potion") instanceof StringTag) {
+                    StringTag potion = tag.get("Potion");
+                    String potionName = potion.getValue().replace("minecraft:", "");
+                    if (POTION_NAME_TO_ID.containsKey(potionName)) {
+                        data = POTION_NAME_TO_ID.get(potionName);
+                    }
+                }
+                item.tag = null;
+                item.data = (short) data;
+            }
+            if (item.id == 438) {
+                CompoundTag tag = item.tag;
+                int data = 0;
+                item.id = (short) Material.POTION.getId();
+                if (tag != null && tag.get("Potion") instanceof StringTag) {
+                    StringTag potion = tag.get("Potion");
+                    String potionName = potion.getValue().replace("minecraft:", "");
+                    if (POTION_NAME_TO_ID.containsKey(potionName)) {
+                        data = POTION_NAME_TO_ID.get(potionName) + 8192;
+                    }
+                }
+                item.tag = null;
+                item.data = (short) data;
+            }
+        }
+    }
+
+    public static void fixIdsFrom1_8To1_9(ItemStack item) {
+        if (item != null) {
+            if (item.id == Material.MONSTER_EGG.getId() && item.data != 0) {
+                CompoundTag tag = item.tag;
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                CompoundTag entityTag = new CompoundTag("EntityTag");
+                if (ENTTIY_ID_TO_NAME.containsKey((int) item.data)) {
+                    StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get((int) item.data));
+                    entityTag.put(id);
+                    tag.put(entityTag);
+                }
+                item.tag = tag;
+                item.data = 0;
+            }
+            if (item.id == Material.POTION.getId()) {
+                CompoundTag tag = item.tag;
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                if (item.data >= 16384) {
+                    item.id = 438; // splash id
+                    item.data = (short) (item.data - 8192);
+                }
+                if (POTION_ID_TO_NAME.containsKey((int) item.data)) {
+                    String name = POTION_ID_TO_NAME.get((int) item.data);
+                    StringTag potion = new StringTag("Potion", "minecraft:" + name);
+                    tag.put(potion);
+                }
+                item.tag = tag;
+                item.data = 0;
+            }
+            if (item.id == Material.WRITTEN_BOOK.getId()) {
+                CompoundTag tag = item.tag;
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                ListTag pages = tag.get("pages");
+                if (pages == null) {
+                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(OutgoingTransformer.fixJson(""))));
+                    tag.put(pages);
+                    item.tag = tag;
+                    return;
+                }
+
+                for (int i = 0; i < pages.size(); i++) {
+                    if (!(pages.get(i) instanceof StringTag))
+                        continue;
+                    StringTag page = pages.get(i);
+                    page.setValue(OutgoingTransformer.fixJson(page.getValue()));
+                }
+                item.tag = tag;
+            }
+        }
+    }
+
+    public static ItemStack readItemStack(ByteBuf input) throws IOException {
+        short id = input.readShort();
+        if (id < 0) {
+
+            return null;
+        } else {
+            ItemStack item = new ItemStack();
+            item.id = id;
+            item.amount = input.readByte();
+            item.data = input.readShort();
+            item.tag = PacketUtil.readNBT(input);
+            return item;
+        }
+    }
+
+    public static void writeItemStack(ItemStack item, ByteBuf output) throws IOException {
+        if (item == null) {
+            output.writeShort(-1);
+        } else {
+            output.writeShort(item.id);
+            output.writeByte(item.amount);
+            output.writeShort(item.data);
+            PacketUtil.writeNBT(output, item.tag);
+        }
+    }
+
     private static void registerEntity(Integer id, String name) {
         ENTTIY_ID_TO_NAME.put(id, name);
         ENTTIY_NAME_TO_ID.put(name, id);
@@ -319,5 +300,23 @@ public class ItemSlotRewriter {
     private static void registerPotion(Integer id, String name) {
         POTION_ID_TO_NAME.put(id, name);
         POTION_NAME_TO_ID.put(name, id);
+    }
+
+    public static class ItemStack {
+
+        public short id;
+        public byte amount;
+        public short data;
+        public CompoundTag tag;
+
+        public static ItemStack fromBukkit(org.bukkit.inventory.ItemStack stack) {
+            if(stack == null) return null;
+            ItemStack item = new ItemStack();
+            item.id = (short) stack.getTypeId();
+            item.amount = (byte) stack.getAmount();
+            item.data = stack.getData().getData();
+            // TODO: nbt
+            return item;
+        }
     }
 }

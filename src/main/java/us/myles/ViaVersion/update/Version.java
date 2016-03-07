@@ -9,7 +9,7 @@ public class Version implements Comparable<Version> {
         if (value == null)
             throw new IllegalArgumentException("Version can not be null");
 
-        if (value.matches("^[0-9]+(\\.[0-9]+)*$") == false)
+        if (!value.matches("^[0-9]+(\\.[0-9]+)*$"))
             throw new IllegalArgumentException("Invalid version format");
 
         String[] split = value.split("\\.");
@@ -17,16 +17,6 @@ public class Version implements Comparable<Version> {
 
         for (int i = 0; i < split.length; i += 1)
             parts[i] = Integer.parseInt(split[i]);
-    }
-
-    @Override
-    public String toString() {
-        String[] split = new String[parts.length];
-
-        for (int i = 0; i < parts.length; i += 1)
-            split[i] = String.valueOf(parts[i]);
-
-        return StringUtils.join(split, ".");
     }
 
     public static int compare(Version verA, Version verB) {
@@ -46,16 +36,23 @@ public class Version implements Comparable<Version> {
         return 0;
     }
 
+    public static boolean equals(Version verA, Version verB) {
+        return verA == verB || verA != null && verB != null && compare(verA, verB) == 0;
+    }
+
+    @Override
+    public String toString() {
+        String[] split = new String[parts.length];
+
+        for (int i = 0; i < parts.length; i += 1)
+            split[i] = String.valueOf(parts[i]);
+
+        return StringUtils.join(split, ".");
+    }
+
     @Override
     public int compareTo(Version that) {
         return compare(this, that);
-    }
-
-    public static boolean equals(Version verA, Version verB) {
-        if (verA == verB) return true;
-        if (verA == null) return false;
-        if (verB == null) return false;
-        return compare(verA, verB) == 0;
     }
 
     @Override

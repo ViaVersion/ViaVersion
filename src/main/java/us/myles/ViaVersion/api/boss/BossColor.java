@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.api.boss;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum BossColor {
     PINK(0),
     BLUE(1),
@@ -10,12 +15,4 @@ public enum BossColor {
     WHITE(6);
 
     private final int id;
-
-    BossColor(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
 }

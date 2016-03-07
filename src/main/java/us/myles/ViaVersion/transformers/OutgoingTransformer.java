@@ -33,18 +33,42 @@ import java.util.*;
 
 import static us.myles.ViaVersion.util.PacketUtil.*;
 
+
 public class OutgoingTransformer {
-    private final ConnectionInfo info;
+
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
+
+    private final ConnectionInfo info;
+    private final Map<Integer, UUID> uuidMap = new HashMap<>();
+    private final Map<Integer, EntityType> clientEntityTypes = new HashMap<>();
+    private final Map<Integer, Integer> vehicleMap = new HashMap<>();
     private boolean cancel = false;
     private boolean autoTeam = false;
 
-    private Map<Integer, UUID> uuidMap = new HashMap<Integer, UUID>();
-    private Map<Integer, EntityType> clientEntityTypes = new HashMap<Integer, EntityType>();
-    private Map<Integer, Integer> vehicleMap = new HashMap<>();
-
     public OutgoingTransformer(ConnectionInfo info) {
         this.info = info;
+    }
+
+    public static String fixJson(String line) {
+        if (line == null || line.equalsIgnoreCase("null")) {
+            line = "{\"text\":\"\"}";
+        } else {
+            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
+                JSONObject obj = new JSONObject();
+                obj.put("text", line);
+                return obj.toJSONString();
+            }
+            if (line.startsWith("\"") && line.endsWith("\"")) {
+                line = "{\"text\":" + line + "}";
+            }
+        }
+        try {
+            new JSONParser().parse(line);
+        } catch (Exception e) {
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+            return "{\"text\":\"\"}";
+        }
+        return line;
     }
 
     public void transform(int packetID, ByteBuf input, ByteBuf output) throws CancelException {
@@ -75,7 +99,7 @@ public class OutgoingTransformer {
             int catid = 0;
             String newname = name;
             if (effect != null) {
-                if (effect.isBreakPlaceSound()) {
+                if (effect.isBreaksound()) {
                     throw new CancelException();
                 }
                 catid = effect.getCategory().getId();
@@ -772,28 +796,6 @@ public class OutgoingTransformer {
             buf.writeByte(1); // remove team
         }
         info.sendRawPacket(buf);
-    }
-
-    public static String fixJson(String line) {
-        if (line == null || line.equalsIgnoreCase("null")) {
-            line = "{\"text\":\"\"}";
-        } else {
-            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                JSONObject obj = new JSONObject();
-                obj.put("text", line);
-                return obj.toJSONString();
-            }
-            if (line.startsWith("\"") && line.endsWith("\"")) {
-                line = "{\"text\":" + line + "}";
-            }
-        }
-        try {
-            new JSONParser().parse(line);
-        } catch (Exception e) {
-            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
-            return "{\"text\":\"\"}";
-        }
-        return line;
     }
 
     private void transformMetadata(int entityID, ByteBuf input, ByteBuf output) throws CancelException {
