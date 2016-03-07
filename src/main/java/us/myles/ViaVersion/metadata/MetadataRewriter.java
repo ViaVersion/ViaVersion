@@ -50,7 +50,7 @@ public class MetadataRewriter {
                             }
                             output.writeBoolean(toWrite != null);
                             if (toWrite != null)
-                                PacketUtil.writeUUID((UUID) toWrite, output);
+                                PacketUtil.writeUUID(toWrite, output);
                             break;
                         case BlockID:
                             // if we have both sources :))

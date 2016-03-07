@@ -332,7 +332,7 @@ public class PacketUtil {
 
         // Data Array Length
         byte[] blockData = convertBlockArray(chunk.getBlocks());
-        writeVarInt(blockData.length / 8, buffer); // Notchian is divide by 8
+        writeVarInt((blockData != null ? blockData.length : 0) / 8, buffer); // Notchian is divide by 8
 
         buffer.writeBytes(blockData);
         // Block Light
@@ -356,9 +356,8 @@ public class PacketUtil {
     }
 
     private static BitSet append(BitSet base, int index, MagicBitSet toAdd) {
-        int length = index;
         for (int i = 0; i < toAdd.getTrueLength(); i++) {
-            base.set(length + i, toAdd.get(i));
+            base.set(index + i, toAdd.get(i));
         }
         return base;
     }

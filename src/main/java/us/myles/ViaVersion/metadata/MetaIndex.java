@@ -1,10 +1,8 @@
 package us.myles.ViaVersion.metadata;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.entity.*;
 
-@AllArgsConstructor
 @Getter
 public enum MetaIndex {
 
@@ -137,6 +135,14 @@ public enum MetaIndex {
         this.index = index;
         this.newIndex = index;
         this.oldType = oldType;
+        this.newType = newType;
+    }
+
+    MetaIndex(Class<?> type, int index, Type oldType, int newIndex, NewType newType) {
+        this.clazz = type;
+        this.index = index;
+        this.oldType = oldType;
+        this.newIndex = newIndex;
         this.newType = newType;
     }
 

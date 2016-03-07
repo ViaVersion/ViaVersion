@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -42,11 +43,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
         try {
-            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
-                if (info.getPlayer() != null) {
-                    return info.getPlayer().getItemInHand();
+            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<ItemStack>() {
+                @Override
+                public ItemStack call() throws Exception {
+                    if (info.getPlayer() != null) {
+                        return info.getPlayer().getItemInHand();
+                    }
+                    return null;
                 }
-                return null;
             }).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.out.println("Error fetching hand item ");
@@ -182,7 +186,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public boolean isAutoTeam() {
         // Collision has to be enabled first
-        if(!isPreventCollision()) return false;
+        if (!isPreventCollision()) return false;
         return getConfig().getBoolean("auto-team", true);
     }
 
@@ -196,9 +200,12 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public void run(final Runnable runnable, boolean wait) {
         try {
-            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
-                runnable.run();
-                return true;
+            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    runnable.run();
+                    return true;
+                }
             });
             if (wait) {
                 f.get(10, TimeUnit.SECONDS);

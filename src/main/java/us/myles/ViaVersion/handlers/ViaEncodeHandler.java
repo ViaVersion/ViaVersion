@@ -24,6 +24,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
     }
 
 
+
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
         // handle the packet type
@@ -37,18 +38,22 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                 final Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
                 Class<?> mapChunk = ReflectionUtil.nms("PacketPlayOutMapChunk");
                 final Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
-                Runnable chunks = () -> {
+                Runnable chunks = new Runnable() {
 
-                    for (int i = 0; i < locX.length; i++) {
-                        int x = locX[i];
-                        int z = locZ[i];
-                        // world invoke function
-                        try {
-                            Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
-                            Object packet = constructor.newInstance(chunk, true, 65535);
-                            ctx.pipeline().writeAndFlush(packet);
-                        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
-                            e.printStackTrace();
+                    @Override
+                    public void run() {
+
+                        for (int i = 0; i < locX.length; i++) {
+                            int x = locX[i];
+                            int z = locZ[i];
+                            // world invoke function
+                            try {
+                                Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
+                                Object packet = constructor.newInstance(chunk, true, 65535);
+                                ctx.pipeline().writeAndFlush(packet);
+                            } catch (InstantiationException | InvocationTargetException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 };
@@ -56,7 +61,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 //                if (ViaVersion.getInstance().isSyncedChunks()) {
 //                    ((ViaVersionPlugin) ViaVersion.getInstance()).run(chunks, false);
 //                } else {
-                    chunks.run();
+                chunks.run();
 //                }
                 bytebuf.readBytes(bytebuf.readableBytes());
                 throw new CancelException();

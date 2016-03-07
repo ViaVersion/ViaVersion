@@ -3,7 +3,6 @@ package us.myles.ViaVersion.transformers;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,7 +33,7 @@ import java.util.*;
 
 import static us.myles.ViaVersion.util.PacketUtil.*;
 
-@RequiredArgsConstructor
+
 public class OutgoingTransformer {
 
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
@@ -45,6 +44,10 @@ public class OutgoingTransformer {
     private final Map<Integer, Integer> vehicleMap = new HashMap<>();
     private boolean cancel = false;
     private boolean autoTeam = false;
+
+    public OutgoingTransformer(ConnectionInfo info) {
+        this.info = info;
+    }
 
     public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {
@@ -654,7 +657,12 @@ public class OutgoingTransformer {
                     if (autoTeam && name.equalsIgnoreCase(info.getUsername())) {
                         if (mode == 4) {
                             // since removing add to auto team
-                            plugin.run(() -> sendTeamPacket(true), false);
+                            plugin.run(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sendTeamPacket(true);
+                                }
+                            }, false);
                         } else {
                             // since adding remove from auto team
                             sendTeamPacket(false);
@@ -746,7 +754,9 @@ public class OutgoingTransformer {
             if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
                 try {
                     sk = ReflectionUtil.get(info.getLastPacket(), "d", boolean.class);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }

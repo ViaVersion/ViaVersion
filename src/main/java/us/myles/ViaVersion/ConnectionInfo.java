@@ -82,7 +82,12 @@ public class ConnectionInfo {
 
     public void sendRawPacket(final ByteBuf packet) {
         final ChannelHandler handler = channel.pipeline().get("encoder");
-        channel.eventLoop().submit((Runnable) () -> channel.pipeline().context(handler).writeAndFlush(packet));
+        channel.eventLoop().submit(new Runnable() {
+            @Override
+            public void run() {
+                channel.pipeline().context(handler).writeAndFlush(packet);
+            }
+        });
     }
 
     public String getOpenWindow() {

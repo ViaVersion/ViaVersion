@@ -71,9 +71,12 @@ public class ArmorListener implements Listener {
                 if (ArmorType.isArmor(e.getMaterial())) {
                     final Player player = e.getPlayer();
                     // Due to odd bugs it's 3 ticks later
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                        if (ViaVersion.getInstance().isPorted(player)) {
-                            sendArmorUpdate(player);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            if (ViaVersion.getInstance().isPorted(player)) {
+                                sendArmorUpdate(player);
+                            }
                         }
                     }, 3L);
                 }
@@ -87,12 +90,13 @@ public class ArmorListener implements Listener {
     }
 
     public void sendDelayedArmorUpdate(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
                 if (ViaVersion.getInstance().isPorted(player)) {
                     sendArmorUpdate(player);
                 }
-
+            }
         });
     }
 }
