@@ -549,12 +549,13 @@ public class OutgoingTransformer {
             clientEntityTypes.put(id, EntityType.PLAYER);
             output.writeInt(id);
             output.writeBytes(input);
-            // send fake team
+            return;
+        }
+        if (packet == PacketType.PLAY_SERVER_DIFFICULTY) {
             if (plugin.isAutoTeam()) {
                 autoTeam = true;
                 sendTeamPacket(true);
             }
-            return;
         }
         if (packet == PacketType.PLAY_SPAWN_PLAYER) {
             int id = PacketUtil.readVarInt(input);
