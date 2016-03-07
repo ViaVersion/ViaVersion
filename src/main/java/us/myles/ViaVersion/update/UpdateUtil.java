@@ -98,7 +98,7 @@ public class UpdateUtil {
             URL url = new URL(URL + PLUGIN + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
-            connection.addRequestProperty("User-Agent", "Mozilla/4.76");
+            connection.addRequestProperty("User-Agent", "ViaVersion " + ViaVersion.getInstance().getVersion());
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;
