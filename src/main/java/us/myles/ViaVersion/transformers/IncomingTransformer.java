@@ -163,6 +163,19 @@ public class IncomingTransformer {
             PacketUtil.readVarInt(input);
             return;
         }
+        if (packet == PacketType.PLAY_ENTITY_ACTION) {
+            int playerId = PacketUtil.readVarInt(input);
+            int action = PacketUtil.readVarInt(input);
+            int jump = PacketUtil.readVarInt(input);
+            if (action == 6 || action == 8) //Ignore stop jumping / start elytra flying
+                throw new CancelException();
+            if (action == 7) //Change open horse inventory to the 1.8 value
+                action = 6;
+            PacketUtil.writeVarInt(playerId, output);
+            PacketUtil.writeVarInt(action, output);
+            PacketUtil.writeVarInt(jump, output);
+            return;
+        }
         if (packet == PacketType.PLAY_USE_ENTITY) {
             int target = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(target, output);
