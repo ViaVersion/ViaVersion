@@ -103,7 +103,7 @@ public class OutgoingTransformer {
             int effectid = input.readInt();
             if (effectid >= 1000 && effectid < 2000 && effectid != 1005) //Sound effect
                 throw new CancelException();
-            if (effectid == 1005)
+            if (effectid == 1005) //Fix jukebox
                 effectid = 1010;
             output.writeInt(effectid);
         }
