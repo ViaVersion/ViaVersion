@@ -17,6 +17,7 @@ import java.io.IOException;
 
 public class IncomingTransformer {
     private final ConnectionInfo info;
+    private boolean startedBlocking = false;
 
     public IncomingTransformer(ConnectionInfo info) {
         this.info = info;
@@ -87,6 +88,11 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_PLAYER_DIGGING) {
             int status = input.readByte() & 0xFF; // unsign
+            if (status == 5 && startedBlocking) {
+                // stopped blocking
+                startedBlocking = false;
+                sendSecondHandItem(null);
+            }
             if (status == 6) { // item swap
                 throw new CancelException();
             }
@@ -94,6 +100,13 @@ public class IncomingTransformer {
             // write remaining bytes
             output.writeBytes(input);
             return;
+        }
+        if (packet == PacketType.PLAY_HELD_ITEM_CHANGE_REQUEST) {
+            if (startedBlocking) {
+                // stopped blocking
+                startedBlocking = false;
+                sendSecondHandItem(null);
+            }
         }
         if (packet == PacketType.PLAY_CLICK_WINDOW) {
             // if placed in new slot, reject :)
@@ -268,6 +281,7 @@ public class IncomingTransformer {
             return;
         }
         if (packet == PacketType.PLAY_USE_ITEM) {
+            int hand = PacketUtil.readVarInt(input);
             output.clear();
             PacketUtil.writeVarInt(PacketType.PLAY_PLAYER_BLOCK_PLACEMENT.getPacketID(), output);
             // Simulate using item :)
@@ -275,6 +289,22 @@ public class IncomingTransformer {
             output.writeByte(255);
             // write item in hand
             ItemStack inHand = ViaVersionPlugin.getHandItem(info);
+            if (inHand != null) {
+                if (inHand.getType().name().endsWith("SWORD")) {
+                    // blocking?
+                    if (hand == 0) {
+                        if (!startedBlocking) {
+                            startedBlocking = true;
+                            ItemSlotRewriter.ItemStack shield = new ItemSlotRewriter.ItemStack();
+                            shield.id = 442;
+                            shield.amount = 1;
+                            shield.data = 0;
+                            sendSecondHandItem(shield);
+                        }
+                        throw new CancelException();
+                    }
+                }
+            }
             try {
                 ItemSlotRewriter.ItemStack item = ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
@@ -295,5 +325,19 @@ public class IncomingTransformer {
             ItemSlotRewriter.rewrite1_9To1_8(input, output);
         }
         output.writeBytes(input);
+    }
+
+    private void sendSecondHandItem(ItemSlotRewriter.ItemStack o) {
+        ByteBuf buf = info.getChannel().alloc().buffer();
+        PacketUtil.writeVarInt(PacketType.PLAY_ENTITY_EQUIPMENT.getNewPacketID(), buf);
+        PacketUtil.writeVarInt(info.getEntityID(), buf);
+        PacketUtil.writeVarInt(1, buf); // slot
+        // write shield
+        try {
+            ItemSlotRewriter.writeItemStack(o, buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        info.sendRawPacket(buf);
     }
 }

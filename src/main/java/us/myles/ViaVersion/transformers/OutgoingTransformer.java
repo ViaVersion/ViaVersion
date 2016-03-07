@@ -1,15 +1,12 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
 import org.spacehq.mc.protocol.util.NetUtil;
-import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
@@ -26,8 +23,6 @@ import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -566,6 +561,7 @@ public class OutgoingTransformer {
         if (packet == PacketType.PLAY_JOIN_GAME) {
             int id = input.readInt();
             clientEntityTypes.put(id, EntityType.PLAYER);
+            info.setEntityID(id);
             output.writeInt(id);
             output.writeBytes(input);
             return;
@@ -683,12 +679,12 @@ public class OutgoingTransformer {
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", entity));
                         tag.put(spawn);
-                        PacketUtil.writeNBT(output,tag);
+                        PacketUtil.writeNBT(output, tag);
                     } else if (tag != null) { // EntityID does not exist
                         CompoundTag spawn = new CompoundTag("SpawnData");
                         spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
                         tag.put(spawn);
-                        PacketUtil.writeNBT(output,spawn);
+                        PacketUtil.writeNBT(output, spawn);
                     } else { //There doesn't exist any NBT tag
                         input.readerIndex(index);
                         output.writeBytes(input, input.readableBytes());
@@ -798,7 +794,29 @@ public class OutgoingTransformer {
             return;
         }
         List<MetadataRewriter.Entry> list = MetadataRewriter.readMetadata1_8(type, input);
+        for (MetadataRewriter.Entry entry : list) {
+            handleMetadata(entityID, entry, type);
+        }
         MetadataRewriter.writeMetadata1_9(type, list, output);
+    }
+
+    private void handleMetadata(int entityID, MetadataRewriter.Entry entry, EntityType type) {
+        // This handles old IDs
+        if (type == EntityType.PLAYER) {
+            if (entry.getOldID() == 0) {
+                // Byte
+                byte data = (byte) entry.getValue();
+                if ((data & 0x10) == 0x10) {
+                    ItemSlotRewriter.ItemStack shield = new ItemSlotRewriter.ItemStack();
+                    shield.id = 442;
+                    shield.amount = 1;
+                    shield.data = 0;
+                    sendSecondHandItem(entityID, shield);
+                } else {
+                    sendSecondHandItem(entityID, null);
+                }
+            }
+        }
     }
 
 
@@ -812,4 +830,18 @@ public class OutgoingTransformer {
         }
     }
 
+    private void sendSecondHandItem(int entityID, ItemSlotRewriter.ItemStack o) {
+
+        ByteBuf buf = info.getChannel().alloc().buffer();
+        PacketUtil.writeVarInt(PacketType.PLAY_ENTITY_EQUIPMENT.getNewPacketID(), buf);
+        PacketUtil.writeVarInt(entityID, buf);
+        PacketUtil.writeVarInt(1, buf); // slot
+        // write shield
+        try {
+            ItemSlotRewriter.writeItemStack(o, buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        info.sendRawPacket(buf, true);
+    }
 }

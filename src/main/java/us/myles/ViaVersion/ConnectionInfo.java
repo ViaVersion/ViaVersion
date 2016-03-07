@@ -1,14 +1,16 @@
 package us.myles.ViaVersion;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.packets.State;
 
-import java.util.UUID;
-
+@Getter
+@Setter
 public class ConnectionInfo {
     private final SocketChannel channel;
     private Object lastPacket;
@@ -17,6 +19,7 @@ public class ConnectionInfo {
     private String openWindow;
     private int protocol = 0;
     private int compression = 0;
+    private int entityID;
     private boolean active = true;
     private String username;
 
@@ -24,89 +27,33 @@ public class ConnectionInfo {
         this.channel = socketChannel;
     }
 
-    public int getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(int protocol) {
-        this.protocol = protocol;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public int getCompression() {
-        return compression;
-    }
-
-    public void setCompression(int compression) {
-        this.compression = compression;
-    }
-
-    public Object getLastPacket() {
-        return lastPacket;
-    }
-
-    public void setLastPacket(Object lastPacket) {
-        this.lastPacket = lastPacket;
-    }
-
-    public java.util.UUID getUUID() {
-        return UUID;
-    }
-
-    public void setUUID(UUID UUID) {
-        this.UUID = UUID;
-    }
-
     public Player getPlayer() {
         return UUID == null ? null : Bukkit.getPlayer(UUID);
-    }
-
-    public SocketChannel getChannel() {
-        return channel;
-    }
-
-    public boolean isActive() {
-        return active;
     }
 
     public void setActive(boolean active) {
         this.active = active;
     }
 
-    public void sendRawPacket(final ByteBuf packet) {
+    public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
         final ChannelHandler handler = channel.pipeline().get("encoder");
-        channel.eventLoop().submit(new Runnable() {
-            @Override
-            public void run() {
-                channel.pipeline().context(handler).writeAndFlush(packet);
-            }
-        });
+        if (currentThread) {
+            channel.pipeline().context(handler).writeAndFlush(packet);
+        } else {
+            channel.eventLoop().submit(new Runnable() {
+                @Override
+                public void run() {
+                    channel.pipeline().context(handler).writeAndFlush(packet);
+                }
+            });
+        }
     }
 
-    public String getOpenWindow() {
-        return openWindow;
-    }
-
-    public void setOpenWindow(String openWindow) {
-        this.openWindow = openWindow;
+    public void sendRawPacket(final ByteBuf packet) {
+        sendRawPacket(packet, false);
     }
 
     public void closeWindow() {
         this.openWindow = null;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 }
