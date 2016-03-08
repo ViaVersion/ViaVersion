@@ -40,14 +40,16 @@ public class MetadataRewriter {
                             if (metaIndex.getOldType() == Type.Int) {
                                 output.writeByte(((Integer) value).byteValue());
                             }
-                        	if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityType.PLAYER) {
-                        		output.writeByte(MetaIndex.PLAYER_HAND.getNewIndex());
-                    			output.writeByte(MetaIndex.PLAYER_HAND.getNewType().getTypeID());
-                        		if((((Byte)value) & 0x10) == 0x10) //Player eating/aiming/drinking
-                        			output.writeByte(1); //Using main hand
-                        		else
-                        			output.writeByte(0); //Not using any hand to stop animation
-                        	}
+                            // After writing the last one
+                            if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityType.PLAYER) {
+                                output.writeByte(MetaIndex.PLAYER_HAND.getNewIndex());
+                                output.writeByte(MetaIndex.PLAYER_HAND.getNewType().getTypeID());
+                                if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
+                                    output.writeByte(1); // Using main hand
+                                } else {
+                                    output.writeByte(0); // Not using any hand to stop animation
+                                }
+                            }
                             break;
                         case OptUUID:
                             String owner = (String) value;
