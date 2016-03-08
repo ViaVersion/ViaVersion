@@ -34,7 +34,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                     incomingTransformer.transform(id, bytebuf, newPacket);
                     bytebuf.clear();
                     bytebuf = newPacket;
-                } catch (CancelException e) {
+                } catch (Exception e) {
                     bytebuf.clear();
                     throw e;
                 }

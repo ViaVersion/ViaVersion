@@ -73,7 +73,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             bytebuf.clear();
             try {
                 outgoingTransformer.transform(id, oldPacket, bytebuf);
-            } catch (CancelException e) {
+            } catch (Exception e) {
                 bytebuf.clear();
                 throw e;
             } finally {
