@@ -14,6 +14,13 @@ public interface BossBar {
     void setTitle(String title);
 
     /**
+     * Get the current title
+     *
+     * @return the title
+     */
+    String getTitle();
+
+    /**
      * Change the health
      *
      * @param health this float has to be between 0F - 1F
@@ -21,11 +28,11 @@ public interface BossBar {
     void setHealth(float health);
 
     /**
-     * Get the bossbar color
+     * Get the health
      *
-     * @return
+     * @return float between 0F - 1F
      */
-    BossColor getColor();
+    float getHealth();
 
     /**
      * Yay colors!
@@ -35,11 +42,25 @@ public interface BossBar {
     void setColor(BossColor color);
 
     /**
+     * Get the bossbar color
+     *
+     * @return
+     */
+    BossColor getColor();
+
+    /**
      * Change the bosbar style
      *
      * @param style BossStyle
      */
     void setStyle(BossStyle style);
+
+    /**
+     * Get the bosbar style
+     *
+     * @return BossStyle
+     */
+    BossStyle getStyle();
 
     /**
      * Show the bossbar to a player.
