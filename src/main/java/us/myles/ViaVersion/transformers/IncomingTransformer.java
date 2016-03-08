@@ -275,14 +275,13 @@ public class IncomingTransformer {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            short curX = input.readUnsignedByte();
-            output.writeByte(curX);
-            short curY = input.readUnsignedByte();
-            output.writeByte(curY);
-            short curZ = input.readUnsignedByte();
-            output.writeByte(curZ);
-            return;
+	        short curX = input.readUnsignedByte();
+	        output.writeByte(curX);
+	        short curY = input.readUnsignedByte();
+	        output.writeByte(curY);
+	        short curZ = input.readUnsignedByte();
+	        output.writeByte(curZ);
+	        return;
         }
         if (packet == PacketType.PLAY_USE_ITEM) {
             int hand = PacketUtil.readVarInt(input);
@@ -317,9 +316,9 @@ public class IncomingTransformer {
                 e.printStackTrace();
             }
 
-            output.writeByte(-1);
-            output.writeByte(-1);
-            output.writeByte(-1);
+            output.writeByte(0); //Is zero in 1.8, not -1
+            output.writeByte(0);
+            output.writeByte(0);
             return;
         }
         if (packet == PacketType.PLAY_CREATIVE_INVENTORY_ACTION) {

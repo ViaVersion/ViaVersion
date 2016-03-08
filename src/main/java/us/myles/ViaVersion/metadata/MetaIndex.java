@@ -33,6 +33,7 @@ public enum MetaIndex {
     PLAYER_HUMAN_BYTE(HumanEntity.class, 16, Type.Byte, NewType.Discontinued), // unused on 1.8
     PLAYER_ADDITIONAL_HEARTS(HumanEntity.class, 17, Type.Float, 10, NewType.Float),
     PLAYER_SCORE(HumanEntity.class, 18, Type.Int, 11, NewType.VarInt),
+    PLAYER_HAND(HumanEntity.class, -1, Type.NonExistent, 5, NewType.Byte), // new in 1.9
     // horse
     HORSE_INFO(Horse.class, 16, Type.Int, 12, NewType.Byte),
     HORSE_TYPE(Horse.class, 19, Type.Byte, 13, NewType.VarInt),

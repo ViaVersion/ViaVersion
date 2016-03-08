@@ -13,7 +13,8 @@ public enum Type {
     String(4),
     Slot(5),
     Position(6),
-    Rotation(7);
+    Rotation(7),
+    NonExistent(-1);
     private final int typeID;
 
     public static Type byId(int id) {
