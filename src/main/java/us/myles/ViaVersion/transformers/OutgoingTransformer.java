@@ -770,6 +770,9 @@ public class OutgoingTransformer {
                 }
             }
             Column read = NetUtil.readOldChunkData(chunkX, chunkZ, groundUp, bitMask, data, true, sk);
+            if (read == null) {
+                throw new CancelException();
+            }
             // Write chunk section array :((
             ByteBuf temp = output.alloc().buffer();
             try {

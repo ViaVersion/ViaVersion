@@ -47,18 +47,21 @@ public class NetUtil {
         // 2 = Get block light.
         // 3 = Get sky light.
         Chunk[] chunks = new Chunk[16];
-
+        int chunkCount = 0;
         for (int pass = 0; pass < 4; pass++) {
+            if(pass == 1){
+                if(chunkCount == 0) return null;
+            }
             for (int ind = 0; ind < 16; ind++) {
                 if ((bitmask & 1 << ind) != 0) {
                     if (pass == 0) {
+                        chunkCount++;
                         // Block length + Blocklight length
                         expected += (4096 * 2) + 2048;
                     }
 
                     if (pass == 1) {
                         chunks[ind] = new Chunk(sky || hasSkyLight);
-
                         buf.position(pos / 2);
                         int buffPos = buf.position();
                         // convert short array to new one
@@ -109,6 +112,7 @@ public class NetUtil {
         }
 
         Column column = new Column(x, z, chunks, biomeData);
+        System.out.println("Chunk " + x + " " + z + " count: " + chunkCount);
         return column;
     }
 }
