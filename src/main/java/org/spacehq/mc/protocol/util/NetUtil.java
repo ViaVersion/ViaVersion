@@ -112,7 +112,6 @@ public class NetUtil {
         }
 
         Column column = new Column(x, z, chunks, biomeData);
-        System.out.println("Chunk " + x + " " + z + " count: " + chunkCount);
         return column;
     }
 }
