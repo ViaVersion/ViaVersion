@@ -53,8 +53,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 }
             }).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            System.out.println("Error fetching hand item ");
-            e.printStackTrace();
+            System.out.println("Error fetching hand item: " + e.getClass().getName());
             return null;
         }
     }
