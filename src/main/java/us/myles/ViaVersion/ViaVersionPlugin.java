@@ -53,8 +53,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 }
             }).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            System.out.println("Error fetching hand item ");
-            e.printStackTrace();
+            System.out.println("Error fetching hand item: " + e.getClass().getName());
+            if(ViaVersion.getInstance().isDebug())
+            	e.printStackTrace();
             return null;
         }
     }
@@ -215,8 +216,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 f.get(10, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
-            System.out.println("Failed to run task.");
-            e.printStackTrace();
+            System.out.println("Failed to run task: " + e.getClass().getName());
+            if(ViaVersion.getInstance().isDebug())
+            	e.printStackTrace();
         }
     }
 }
