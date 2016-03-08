@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.transformers;
 
 import io.netty.buffer.ByteBuf;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,6 +38,7 @@ public class OutgoingTransformer {
     private final Map<Integer, UUID> uuidMap = new HashMap<>();
     private final Map<Integer, EntityType> clientEntityTypes = new HashMap<>();
     private final Map<Integer, Integer> vehicleMap = new HashMap<>();
+    private final Set<Integer> validBlocking = new HashSet<>();
     private boolean autoTeam = false;
 
     public OutgoingTransformer(ConnectionInfo info) {
@@ -317,7 +319,24 @@ public class OutgoingTransformer {
                 slot += 1; // add 1 so it's now 2-5
             }
             PacketUtil.writeVarInt(slot, output);
-
+            if (slot == 0) {
+                // Read aheat for sword
+                input.markReaderIndex();
+                short itemID = input.readShort();
+                if (itemID != -1) {
+                    Material m = Material.getMaterial(itemID);
+                    if (m != null) {
+                        if (m.name().endsWith("SWORD")) {
+                            validBlocking.add(id);
+                        } else {
+                            validBlocking.remove(id);
+                        }
+                    }
+                } else {
+                    validBlocking.remove(id);
+                }
+                input.resetReaderIndex();
+            }
             ItemSlotRewriter.rewrite1_8To1_9(input, output);
             return;
         }
@@ -808,12 +827,15 @@ public class OutgoingTransformer {
             if (entry.getOldID() == 0) {
                 // Byte
                 byte data = (byte) entry.getValue();
+
                 if ((data & 0x10) == 0x10) {
-                    ItemSlotRewriter.ItemStack shield = new ItemSlotRewriter.ItemStack();
-                    shield.id = 442;
-                    shield.amount = 1;
-                    shield.data = 0;
-                    sendSecondHandItem(entityID, shield);
+                    if (validBlocking.contains(entityID)) {
+                        ItemSlotRewriter.ItemStack shield = new ItemSlotRewriter.ItemStack();
+                        shield.id = 442;
+                        shield.amount = 1;
+                        shield.data = 0;
+                        sendSecondHandItem(entityID, shield);
+                    }
                 } else {
                     sendSecondHandItem(entityID, null);
                 }
