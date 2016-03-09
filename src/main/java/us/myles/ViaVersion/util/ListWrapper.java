@@ -15,43 +15,43 @@ public abstract class ListWrapper implements List {
     public abstract void handleAdd(Object o);
 
     @Override
-    public int size() {
+    public synchronized int size() {
         return this.list.size();
     }
 
     @Override
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return this.list.isEmpty();
     }
 
     @Override
-    public boolean contains(Object o) {
+    public synchronized boolean contains(Object o) {
         return this.list.contains(o);
     }
 
     @Override
-    public Iterator iterator() {
+    public synchronized Iterator iterator() {
         return this.list.iterator();
     }
 
     @Override
-    public Object[] toArray() {
+    public synchronized Object[] toArray() {
         return this.list.toArray();
     }
 
     @Override
-    public boolean add(Object o) {
+    public synchronized boolean add(Object o) {
         handleAdd(o);
         return this.list.add(o);
     }
 
     @Override
-    public boolean remove(Object o) {
+    public synchronized boolean remove(Object o) {
         return this.list.remove(o);
     }
 
     @Override
-    public boolean addAll(Collection c) {
+    public synchronized boolean addAll(Collection c) {
         for (Object o : c) {
             handleAdd(o);
         }
@@ -59,7 +59,7 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public boolean addAll(int index, Collection c) {
+    public synchronized boolean addAll(int index, Collection c) {
         for (Object o : c) {
             handleAdd(o);
         }
@@ -67,72 +67,72 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         this.list.clear();
     }
 
     @Override
-    public Object get(int index) {
+    public synchronized Object get(int index) {
         return this.list.get(index);
     }
 
     @Override
-    public Object set(int index, Object element) {
+    public synchronized Object set(int index, Object element) {
         return this.list.set(index, element);
     }
 
     @Override
-    public void add(int index, Object element) {
+    public synchronized void add(int index, Object element) {
         this.list.add(index, element);
     }
 
     @Override
-    public Object remove(int index) {
+    public synchronized Object remove(int index) {
         return this.list.remove(index);
     }
 
     @Override
-    public int indexOf(Object o) {
+    public synchronized int indexOf(Object o) {
         return this.list.indexOf(o);
     }
 
     @Override
-    public int lastIndexOf(Object o) {
+    public synchronized int lastIndexOf(Object o) {
         return this.list.lastIndexOf(o);
     }
 
     @Override
-    public ListIterator listIterator() {
+    public synchronized ListIterator listIterator() {
         return this.list.listIterator();
     }
 
     @Override
-    public ListIterator listIterator(int index) {
-        return this.listIterator(index);
+    public synchronized ListIterator listIterator(int index) {
+        return this.list.listIterator(index);
     }
 
     @Override
-    public List subList(int fromIndex, int toIndex) {
+    public synchronized List subList(int fromIndex, int toIndex) {
         return this.list.subList(fromIndex, toIndex);
     }
 
     @Override
-    public boolean retainAll(Collection c) {
+    public synchronized boolean retainAll(Collection c) {
         return this.list.retainAll(c);
     }
 
     @Override
-    public boolean removeAll(Collection c) {
+    public synchronized boolean removeAll(Collection c) {
         return this.list.removeAll(c);
     }
 
     @Override
-    public boolean containsAll(Collection c) {
+    public synchronized boolean containsAll(Collection c) {
         return this.list.containsAll(c);
     }
 
     @Override
-    public Object[] toArray(Object[] a) {
+    public synchronized Object[] toArray(Object[] a) {
         return this.list.toArray(a);
     }
 }

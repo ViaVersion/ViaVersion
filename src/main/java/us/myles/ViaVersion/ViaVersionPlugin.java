@@ -119,18 +119,19 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                     final Object value = field.get(connection);
                     if (value instanceof List) {
                         // Inject the list
-                        field.set(connection, new ListWrapper((List) value) {
+                        List wrapper = new ListWrapper((List) value) {
                             @Override
-                            public void handleAdd(Object o) {
-                                synchronized (value) {
+                            public synchronized void handleAdd(Object o) {
+                                synchronized (this) {
                                     if (o instanceof ChannelFuture) {
                                         inject((ChannelFuture) o);
                                     }
                                 }
                             }
-                        });
+                        };
+                        field.set(connection, wrapper);
                         // Iterate through current list
-                        synchronized (value) {
+                        synchronized (wrapper) {
                             for (Object o : (List) value) {
                                 if (o instanceof ChannelFuture) {
                                     inject((ChannelFuture) o);
