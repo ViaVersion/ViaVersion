@@ -43,6 +43,11 @@ public class IncomingTransformer {
         if (packet == PacketType.PLAY_TP_CONFIRM || packet == PacketType.PLAY_VEHICLE_MOVE_REQUEST) { //TODO handle client-sided horse riding
             throw new CancelException();
         }
+        // Handle movement increment
+        // Update idle status (player, position, look, positionandlook)
+        if(packet == PacketType.PLAY_PLAYER || packet == PacketType.PLAY_PLAYER_POSITION_REQUEST || packet == PacketType.PLAY_PLAYER_LOOK_REQUEST || packet == PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST) {
+            info.incrementIdlePacket();
+        }
         PacketUtil.writeVarInt(packetID, output);
         if (packet == PacketType.HANDSHAKE) {
             int protVer = PacketUtil.readVarInt(input);
