@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,9 +24,11 @@ import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.listeners.CommandBlockListener;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
+import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,8 +55,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             }).get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.out.println("Error fetching hand item: " + e.getClass().getName());
-            if(ViaVersion.getInstance().isDebug())
-            	e.printStackTrace();
+            if (ViaVersion.getInstance().isDebug())
+                e.printStackTrace();
             return null;
         }
     }
@@ -71,13 +72,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         }
 
         getLogger().info("ViaVersion " + getDescription().getVersion() + " is now enabled, injecting. (Allows 1.8 to be accessed via 1.9)");
-        try {
-            injectPacketHandler();
-            System.setProperty("ViaVersion", getDescription().getVersion());
-        } catch (Exception e) {
-            getLogger().severe("Unable to inject handlers, are you on 1.8? ");
-            e.printStackTrace();
-        }
+        injectPacketHandler();
+
         if (getConfig().getBoolean("checkforupdates"))
             UpdateUtil.sendUpdateMessage(this);
 
@@ -95,39 +91,75 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
     }
 
-    public void injectPacketHandler() throws Exception {
-        Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
-        Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-        Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
-        // loop through all fields checking if list
-        boolean injected = false;
-        for (Field field : connection.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = field.get(connection);
-            if (value instanceof List) {
-                for (Object o : (List) value) {
-                    if (o instanceof ChannelFuture) {
-                        ChannelFuture future = (ChannelFuture) o;
-                        ChannelPipeline pipeline = future.channel().pipeline();
-                        ChannelHandler bootstrapAcceptor = pipeline.first();
-                        try {
-                            ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                            ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
-
-                            ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
-                        } catch (NoSuchFieldException e) {
-                            // field not found
-                            throw new Exception("Unable to find childHandler, blame " + bootstrapAcceptor.getClass().getName());
+    public void injectPacketHandler() {
+        try {
+            Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
+            Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
+            Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
+            if (connection == null) {
+                System.out.println("connection is null!!");
+                //try others
+                for (Method m : serverClazz.getDeclaredMethods()) {
+                    if (m.getReturnType() != null && !m.getName().equals("getServerConnection")) {
+                        if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
+                            if (m.getParameterTypes().length == 0) {
+                                connection = m.invoke(server);
+                            }
                         }
-                        injected = true;
-                    } else {
-                        break; // not the right list.
+                    }
+                }
+                if (connection == null) {
+                    getLogger().warning("We failed to find the ServerConnection? :(");
+                    return;
+                }
+            }
+            if (connection != null) {
+                for (Field field : connection.getClass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    Object value = field.get(connection);
+                    if (value instanceof List) {
+                        // Inject the list
+                        field.set(connection, new ListWrapper((List) value) {
+                            @Override
+                            public void handleAdd(Object o) {
+                                if (o instanceof ChannelFuture) {
+                                    inject((ChannelFuture) o);
+                                }
+                            }
+                        });
+                        // Iterate through current list
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                inject((ChannelFuture) o);
+                            } else {
+                                break; // not the right list.
+                            }
+                        }
                     }
                 }
             }
+            System.setProperty("ViaVersion", getDescription().getVersion());
+        } catch (Exception e) {
+            getLogger().severe("Unable to inject handlers, are you on 1.8? ");
+            e.printStackTrace();
         }
-        if (!injected) {
-            throw new Exception("Could not find server to inject (Please ensure late-bind in your spigot.yml is false)");
+    }
+
+    private void inject(ChannelFuture future) {
+        try {
+            ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
+            try {
+                ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
+
+                ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+            } catch (NoSuchFieldException e) {
+                // field not found
+                throw new Exception("Unable to find childHandler, blame " + bootstrapAcceptor.getClass().getName());
+            }
+        } catch (Exception e) {
+            getLogger().severe("Have you got late-bind enabled with something else? (ProtocolLib?)");
+            e.printStackTrace();
         }
     }
 
@@ -217,8 +249,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             }
         } catch (Exception e) {
             System.out.println("Failed to run task: " + e.getClass().getName());
-            if(ViaVersion.getInstance().isDebug())
-            	e.printStackTrace();
+            if (ViaVersion.getInstance().isDebug())
+                e.printStackTrace();
         }
     }
 }
