@@ -73,6 +73,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
         getLogger().info("ViaVersion " + getDescription().getVersion() + " is now enabled, injecting. (Allows 1.8 to be accessed via 1.9)");
         injectPacketHandler();
+        new ViaIdleThread(portedPlayers).runTaskTimerAsynchronously(this, 1L, 1L); // Updates player's idle status
 
         if (getConfig().getBoolean("checkforupdates"))
             UpdateUtil.sendUpdateMessage(this);

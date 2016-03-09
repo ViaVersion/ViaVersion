@@ -38,6 +38,11 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                     bytebuf.clear();
                     throw e;
                 }
+
+                // Update idle status (player, position, look, positionandlook)
+                if(id == 0x0F || id == 0x0E || id == 0x0D || id == 0x0C) {
+                    info.incrementIdlePacket();
+                }
             }
             // call minecraft decoder
             list.addAll(PacketUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
