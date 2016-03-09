@@ -16,6 +16,7 @@ import us.myles.ViaVersion.util.PacketUtil;
 import java.io.IOException;
 
 public class IncomingTransformer {
+    private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
     private final ConnectionInfo info;
     private boolean startedBlocking = false;
 
@@ -34,7 +35,7 @@ public class IncomingTransformer {
         if (packet.getPacketID() != -1) {
             packetID = packet.getPacketID();
         }
-        if (ViaVersion.getInstance().isDebug()) {
+        if (plugin.isDebug()) {
             if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
                 System.out.println("Direction " + packet.getDirection().name() + " Packet Type: " + packet + " New ID: " + packetID + " Original: " + original + " Size: " + input.readableBytes());
             }
@@ -267,7 +268,7 @@ public class IncomingTransformer {
             output.writeByte(face);
             PacketUtil.readVarInt(input);
 
-            ItemStack inHand = ViaVersionPlugin.getHandItem(info);
+            ItemStack inHand = plugin.getHandItem(info);
             try {
                 ItemSlotRewriter.ItemStack item = ItemSlotRewriter.ItemStack.fromBukkit(inHand);
                 ItemSlotRewriter.fixIdsFrom1_9To1_8(item);
@@ -291,8 +292,8 @@ public class IncomingTransformer {
             output.writeLong(-1L);
             output.writeByte(255);
             // write item in hand
-            ItemStack inHand = ViaVersionPlugin.getHandItem(info);
-            if (inHand != null) {
+            ItemStack inHand = plugin.getHandItem(info);
+            if (inHand != null && plugin.isShieldBlocking()) {
                 if (inHand.getType().name().endsWith("SWORD")) {
                     // blocking?
                     if (hand == 0) {

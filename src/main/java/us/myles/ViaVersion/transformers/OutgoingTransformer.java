@@ -830,17 +830,18 @@ public class OutgoingTransformer {
             if (entry.getOldID() == 0) {
                 // Byte
                 byte data = (byte) entry.getValue();
-
-                if ((data & 0x10) == 0x10) {
-                    if (validBlocking.contains(entityID)) {
-                        ItemSlotRewriter.ItemStack shield = new ItemSlotRewriter.ItemStack();
-                        shield.id = 442;
-                        shield.amount = 1;
-                        shield.data = 0;
-                        sendSecondHandItem(entityID, shield);
+                if (entityID != info.getEntityID() && plugin.isShieldBlocking()) {
+                    if ((data & 0x10) == 0x10) {
+                        if (validBlocking.contains(entityID)) {
+                            ItemSlotRewriter.ItemStack shield = new ItemSlotRewriter.ItemStack();
+                            shield.id = 442;
+                            shield.amount = 1;
+                            shield.data = 0;
+                            sendSecondHandItem(entityID, shield);
+                        }
+                    } else {
+                        sendSecondHandItem(entityID, null);
                     }
-                } else {
-                    sendSecondHandItem(entityID, null);
                 }
             }
         }

@@ -116,23 +116,27 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             if (connection != null) {
                 for (Field field : connection.getClass().getDeclaredFields()) {
                     field.setAccessible(true);
-                    Object value = field.get(connection);
+                    final Object value = field.get(connection);
                     if (value instanceof List) {
                         // Inject the list
                         field.set(connection, new ListWrapper((List) value) {
                             @Override
                             public void handleAdd(Object o) {
-                                if (o instanceof ChannelFuture) {
-                                    inject((ChannelFuture) o);
+                                synchronized (value) {
+                                    if (o instanceof ChannelFuture) {
+                                        inject((ChannelFuture) o);
+                                    }
                                 }
                             }
                         });
                         // Iterate through current list
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                inject((ChannelFuture) o);
-                            } else {
-                                break; // not the right list.
+                        synchronized (value) {
+                            for (Object o : (List) value) {
+                                if (o instanceof ChannelFuture) {
+                                    inject((ChannelFuture) o);
+                                } else {
+                                    break; // not the right list.
+                                }
                             }
                         }
                     }
@@ -219,6 +223,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public boolean isSuppressMetadataErrors() {
         return getConfig().getBoolean("suppress-metadata-errors", false);
+    }
+
+    public boolean isShieldBlocking() {
+        return getConfig().getBoolean("shield-blocking", true);
     }
 
     public boolean isAutoTeam() {
