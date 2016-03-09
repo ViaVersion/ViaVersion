@@ -12,3 +12,8 @@ auto-team: true
 suppress-metadata-errors: false
 # When enabled 1.9 will be able to block by using shields
 shield-blocking: true
+# Should we enable our hologram patch?
+# If they're in the wrong place enable this
+hologram-patch: false
+# This is the offset, should work as default when enabled.
+hologram-y: -1

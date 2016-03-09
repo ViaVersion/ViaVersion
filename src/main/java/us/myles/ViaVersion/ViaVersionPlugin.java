@@ -230,6 +230,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("shield-blocking", true);
     }
 
+    public boolean isHologramPatch() {
+        return getConfig().getBoolean("hologram-patch", false);
+    }
+
+    public double getHologramYOffset() {
+        return getConfig().getDouble("hologram-y", -1D);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         if (!isPreventCollision()) return false;

@@ -39,6 +39,7 @@ public class OutgoingTransformer {
     private final Map<Integer, EntityType> clientEntityTypes = new HashMap<>();
     private final Map<Integer, Integer> vehicleMap = new HashMap<>();
     private final Set<Integer> validBlocking = new HashSet<>();
+    private final Set<Integer> knownHolograms = new HashSet<>();
     private boolean autoTeam = false;
 
     public OutgoingTransformer(ConnectionInfo info) {
@@ -216,13 +217,15 @@ public class OutgoingTransformer {
             return;
         }
         if (packet == PacketType.PLAY_ENTITY_TELEPORT) {
-            // Port this so that it relative moves :P
             int id = PacketUtil.readVarInt(input);
             PacketUtil.writeVarInt(id, output);
 
             int x = input.readInt();
             output.writeDouble(x / 32D);
             int y = input.readInt();
+            if(plugin.isHologramPatch() & knownHolograms.contains(id)){
+                y = (int) ((y) + (plugin.getHologramYOffset() * 32D));
+            }
             output.writeDouble(y / 32D);
             int z = input.readInt();
             output.writeDouble(z / 32D);
@@ -243,6 +246,9 @@ public class OutgoingTransformer {
             int x = input.readByte();
             output.writeShort(x * 128);
             int y = input.readByte();
+            if(plugin.isHologramPatch() & knownHolograms.contains(id)){
+                y = (int) ((y) + plugin.getHologramYOffset());
+            }
             output.writeShort(y * 128);
             int z = input.readByte();
             output.writeShort(z * 128);
@@ -263,12 +269,16 @@ public class OutgoingTransformer {
             short x = (short) (input.readByte());
             output.writeShort(x * 128);
             short y = (short) (input.readByte());
+            if(plugin.isHologramPatch() & knownHolograms.contains(id)){
+                y = (short) (y - 1);
+            }
             output.writeShort(y * 128);
             short z = (short) (input.readByte());
             output.writeShort(z * 128);
 
             boolean onGround = input.readBoolean();
             output.writeBoolean(onGround);
+
             return;
 
         }
@@ -372,6 +382,7 @@ public class OutgoingTransformer {
             int[] toDestroy = PacketUtil.readVarInts(count, input);
             for (int entityID : toDestroy) {
                 clientEntityTypes.remove(entityID);
+                knownHolograms.remove(entityID);
                 PacketUtil.writeVarInt(entityID, output);
             }
             return;
@@ -841,6 +852,25 @@ public class OutgoingTransformer {
                         }
                     } else {
                         sendSecondHandItem(entityID, null);
+                    }
+                }
+            }
+        }
+        if(type == EntityType.ARMOR_STAND && plugin.isHologramPatch()){
+            if(entry.getOldID() == 0){
+                byte data = (byte) entry.getValue();
+                if((data & 0x20) == 0x20){
+                    if(!knownHolograms.contains(entityID)) {
+                        knownHolograms.add(entityID);
+                        // Send movement
+                        ByteBuf buf = info.getChannel().alloc().buffer();
+                        PacketUtil.writeVarInt(PacketType.PLAY_ENTITY_RELATIVE_MOVE.getNewPacketID(), buf);
+                        PacketUtil.writeVarInt(entityID, buf);
+                        buf.writeShort(0);
+                        buf.writeShort((short) (128D * (plugin.getHologramYOffset() * 32D)));
+                        buf.writeShort(0);
+                        buf.writeBoolean(true);
+                        info.sendRawPacket(buf, false);
                     }
                 }
             }
