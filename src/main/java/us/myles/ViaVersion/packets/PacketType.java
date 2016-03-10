@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.packets;
 
+import java.util.HashMap;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
 public enum PacketType {
     /* Handshake serverbound */
     HANDSHAKE(State.HANDSHAKE, Direction.INCOMING, 0x00),
@@ -167,27 +172,11 @@ public enum PacketType {
     }
 
     public static PacketType findNewPacket(State state, Direction direction, int id) {
-    	if(id == -1)
-    		return null;
-        for (PacketType pt : values()) {
-            if (pt.getNewPacketID() == id
-                    && pt.getState() == state
-                    && pt.getDirection() == direction)
-                return pt;
-        }
-        return null;
+    	return newids.get(toLong((short)direction.ordinal(), (short) state.ordinal(), id));
     }
 
     public static PacketType findOldPacket(State state, Direction direction, int id) {
-    	if(id == -1)
-    		return null;
-        for (PacketType pt : values()) {
-            if (pt.getPacketID() == id
-                    && pt.getState() == state
-                    && pt.getDirection() == direction)
-                return pt;
-        }
-        return null;
+    	return oldids.get(toLong((short)direction.ordinal(), (short) state.ordinal(), id));
     }
 
     public static PacketType getIncomingPacket(State state, int id) {
@@ -197,4 +186,19 @@ public enum PacketType {
     public static PacketType getOutgoingPacket(State state, int id) {
         return findOldPacket(state, Direction.OUTGOING, id);
     }
+	
+	private static long toLong(short a, short b, int c) {
+		int d =  (a << 16) | (b & 0xFFFF);
+		return (long) c << 32 | d & 0xFFFFFFFFL;
+	}
+    
+    private static HashMap<Long, PacketType> oldids = new HashMap<Long, PacketType>();
+    private static HashMap<Long, PacketType> newids = new HashMap<Long, PacketType>();
+    static {
+    	for(PacketType pt : PacketType.values()) {
+    		oldids.put(toLong((short)pt.getDirection().ordinal(), (short)pt.getState().ordinal(), pt.getPacketID()), pt);
+    		newids.put(toLong((short)pt.getDirection().ordinal(), (short)pt.getState().ordinal(), pt.getNewPacketID()), pt);
+    	}
+    }
+    
 }
