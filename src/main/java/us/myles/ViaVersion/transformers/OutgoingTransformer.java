@@ -47,6 +47,7 @@ public class OutgoingTransformer {
     private final Set<Integer> knownHolograms = new HashSet<>();
     private final Map<Integer, BossBar> bossBarMap = new HashMap<>();
     private boolean autoTeam = false;
+    private boolean teamExists = false;
 
     public OutgoingTransformer(ConnectionInfo info) {
         this.info = info;
@@ -817,19 +818,23 @@ public class OutgoingTransformer {
         PacketUtil.writeString("viaversion", buf); // Use viaversion as name
         if (b) {
             // add
-            buf.writeByte(0); // make team
-            PacketUtil.writeString("viaversion", buf);
-            PacketUtil.writeString("", buf); // prefix
-            PacketUtil.writeString("", buf); // suffix
-            buf.writeByte(0); // friendly fire
-            PacketUtil.writeString("", buf); // nametags
-            PacketUtil.writeString("never", buf); // collision rule :)
-            buf.writeByte(0); // color
+            if (!teamExists) {
+                buf.writeByte(0); // make team
+                PacketUtil.writeString("viaversion", buf);
+                PacketUtil.writeString("", buf); // prefix
+                PacketUtil.writeString("", buf); // suffix
+                buf.writeByte(0); // friendly fire
+                PacketUtil.writeString("", buf); // nametags
+                PacketUtil.writeString("never", buf); // collision rule :)
+                buf.writeByte(0); // color
+            } else
+                buf.writeByte(3);
             PacketUtil.writeVarInt(1, buf); // player count
             PacketUtil.writeString(info.getUsername(), buf); // us
         } else {
             buf.writeByte(1); // remove team
         }
+        teamExists = b;
         info.sendRawPacket(buf);
     }
 
