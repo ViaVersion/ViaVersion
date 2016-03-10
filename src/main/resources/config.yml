@@ -1,8 +1,5 @@
 # Should ViaVersion check for updates?
 checkforupdates: true
-# Should we send any bulk chunks, in sync (may be slower but fixes timings)
-# Currently broken due to sign updates, possibly will return
-sync-chunks: true
 # No collide options, these allow you to configure how collision works.
 # Do you want us to prevent collision?
 prevent-collision: true

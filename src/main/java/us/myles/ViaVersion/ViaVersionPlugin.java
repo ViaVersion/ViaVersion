@@ -215,11 +215,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         this.debug = value;
     }
 
-    @Override
-    public boolean isSyncedChunks() {
-        return getConfig().getBoolean("sync-chunks", true);
-    }
-
     public boolean isPreventCollision() {
         return getConfig().getBoolean("prevent-collision", true);
     }
