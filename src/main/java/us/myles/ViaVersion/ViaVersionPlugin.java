@@ -24,9 +24,12 @@ import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.listeners.CommandBlockListener;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
+import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
@@ -64,7 +68,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public void onEnable() {
         ViaVersion.setInstance(this);
-        saveDefaultConfig();
+        generateConfig();
         if (System.getProperty("ViaVersion") != null) {
             getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
             getLogger().severe("Some features may not work.");
@@ -91,6 +95,28 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
+    }
+
+    public void generateConfig() {
+        File file = new File(getDataFolder(), "config.yml");
+        if(file.exists()) {
+            // Update config options
+            Configuration oldConfig = new Configuration(file);
+            oldConfig.reload(false); // Load current options from config
+            file.delete(); // Delete old config
+            saveDefaultConfig(); // Generate new config
+            Configuration newConfig = new Configuration(file);
+            newConfig.reload(true); // Load default options
+            for(String key : oldConfig.getKeys(false)) {
+                // Set option in new config if exists
+                if(newConfig.contains(key)) {
+                    newConfig.set(key, oldConfig.get(key));
+                }
+            }
+            newConfig.save();
+        } else {
+            saveDefaultConfig();
+        }
     }
 
     public void injectPacketHandler() {
