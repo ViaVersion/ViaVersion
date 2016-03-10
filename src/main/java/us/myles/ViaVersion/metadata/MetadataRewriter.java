@@ -207,7 +207,7 @@ public class MetadataRewriter {
         private MetaIndex index;
         private Object value;
 
-        private Entry(MetaIndex index, Object value, int id) {
+        public Entry(MetaIndex index, Object value, int id) {
             this.index = index;
             this.value = value;
             this.oldID = id;

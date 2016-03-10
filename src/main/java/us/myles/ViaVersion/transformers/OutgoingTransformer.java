@@ -15,7 +15,12 @@ import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.boss.BossBar;
+import us.myles.ViaVersion.api.boss.BossColor;
+import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
+import us.myles.ViaVersion.metadata.MetadataRewriter.Entry;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.slot.ItemSlotRewriter;
@@ -40,6 +45,7 @@ public class OutgoingTransformer {
     private final Map<Integer, Integer> vehicleMap = new HashMap<>();
     private final Set<Integer> validBlocking = new HashSet<>();
     private final Set<Integer> knownHolograms = new HashSet<>();
+    private final Map<Integer, BossBar> bossBarMap = new HashMap<>();
     private boolean autoTeam = false;
 
     public OutgoingTransformer(ConnectionInfo info) {
@@ -384,6 +390,12 @@ public class OutgoingTransformer {
                 clientEntityTypes.remove(entityID);
                 knownHolograms.remove(entityID);
                 PacketUtil.writeVarInt(entityID, output);
+
+                // Remvoe boss bar
+                BossBar bar = bossBarMap.remove(entityID);
+                if(bar != null) {
+                    bar.hide();
+                }
             }
             return;
         }
@@ -832,6 +844,14 @@ public class OutgoingTransformer {
         for (MetadataRewriter.Entry entry : list) {
             handleMetadata(entityID, entry, type);
         }
+        // Fix: wither (crash fix)
+        if(type == EntityType.WITHER) {
+            list.add(new Entry(MetaIndex.WITHER_PROPERTIES, (byte) 0, 10));
+        }
+        // Fix: Dragon (crash fix)
+        if(type == EntityType.ENDER_DRAGON) {
+            list.add(new Entry(MetaIndex.ENDERDRAGON_PHASE, 0, 11));
+        }
         MetadataRewriter.writeMetadata1_9(type, list, output);
     }
 
@@ -872,6 +892,39 @@ public class OutgoingTransformer {
                         buf.writeBoolean(true);
                         info.sendRawPacket(buf, false);
                     }
+                }
+            }
+        }
+
+        // TODO: Add config option
+        // Boss bar
+        if(type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
+            if(entry.getOldID() == 2) {
+                BossBar bar = bossBarMap.get(entityID);
+                String title = (String) entry.getValue();
+                title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
+                if(bar == null) {
+                    bar = ViaVersion.getInstance().createBossBar(title, BossColor.PURPLE, BossStyle.SOLID);
+                    bossBarMap.put(entityID, bar);
+                    bar.addPlayer(info.getPlayer());
+                    bar.show();
+                } else {
+                    bar.setTitle((String) entry.getValue());
+                }
+            } else if(entry.getOldID() == 6) {
+                BossBar bar = bossBarMap.get(entityID);
+                // Make health range between 0 and 1
+                float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
+                float health = Math.max(0.0f, Math.min(((float) entry.getValue()) / maxHealth, 1.0f));
+                System.out.println(health + " " + entry.getValue());
+                if(bar == null) {
+                    String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
+                    bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PURPLE, BossStyle.SOLID);
+                    bossBarMap.put(entityID, bar);
+                    bar.addPlayer(info.getPlayer());
+                    bar.show();
+                } else {
+                    bar.setHealth(health);
                 }
             }
         }
