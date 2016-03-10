@@ -28,38 +28,6 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
         // handle the packet type
         if (!(o instanceof ByteBuf)) {
-            info.setLastPacket(o);
-            /* This transformer is more for fixing issues which we find hard at packet level :) */
-            if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
-                final int[] locX = ReflectionUtil.get(o, "a", int[].class);
-                final int[] locZ = ReflectionUtil.get(o, "b", int[].class);
-
-                final Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
-                Class<?> mapChunk = ReflectionUtil.nms("PacketPlayOutMapChunk");
-                final Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
-                Runnable chunks = new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        for (int i = 0; i < locX.length; i++) {
-                            int x = locX[i];
-                            int z = locZ[i];
-                            // world invoke function
-                            try {
-                                Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
-                                Object packet = constructor.newInstance(chunk, true, 65535);
-                                ctx.pipeline().writeAndFlush(packet);
-                            } catch (InstantiationException | InvocationTargetException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                };
-                chunks.run();
-                bytebuf.clear();
-                throw new CancelException();
-            }
             // call minecraft encoder
             PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
         }
