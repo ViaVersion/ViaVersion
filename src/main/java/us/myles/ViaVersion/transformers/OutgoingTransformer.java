@@ -909,7 +909,7 @@ public class OutgoingTransformer {
                         bar.addPlayer(info.getPlayer());
                         bar.show();
                     } else {
-                        bar.setTitle((String) entry.getValue());
+                        bar.setTitle(title);
                     }
                 } else if (entry.getOldID() == 6) {
                     BossBar bar = bossBarMap.get(entityID);
