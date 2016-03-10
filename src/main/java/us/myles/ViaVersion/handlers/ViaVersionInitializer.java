@@ -32,8 +32,10 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         // Add our transformers
         ViaEncodeHandler encoder = new ViaEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
         ViaDecodeHandler decoder = new ViaDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
+        ViaChunkHandler chunkHandler = new ViaChunkHandler(info);
 
         socketChannel.pipeline().replace("encoder", "encoder", encoder);
         socketChannel.pipeline().replace("decoder", "decoder", decoder);
+        socketChannel.pipeline().addAfter("packet_handler", "viaversion_chunk_handler", chunkHandler);
     }
 }
