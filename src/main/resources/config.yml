@@ -18,3 +18,5 @@ hologram-y: -1
 simulate-pt: true
 # Should we patch boss bars so they work? (Default: true, disable if you're having issues)
 bossbar-patch: true
+# If your boss bar flickers on 1.9, set this to 'true'. It will keep all boss bars on 100% (not recommended)
+bossbar-anti-flicker: false

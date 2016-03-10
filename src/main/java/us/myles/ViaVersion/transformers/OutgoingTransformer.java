@@ -846,10 +846,28 @@ public class OutgoingTransformer {
         }
         // Fix: wither (crash fix)
         if(type == EntityType.WITHER) {
+            // Remove custom value if already exist
+            Iterator<Entry> it = list.iterator();
+            while(it.hasNext()) {
+                Entry e = it.next();
+                if(e.getOldID() == 10) {
+                    it.remove();
+                }
+            }
+
             list.add(new Entry(MetaIndex.WITHER_PROPERTIES, (byte) 0, 10));
         }
         // Fix: Dragon (crash fix)
         if(type == EntityType.ENDER_DRAGON) {
+            // Remove custom value if already exist
+            Iterator<Entry> it = list.iterator();
+            while(it.hasNext()) {
+                Entry e = it.next();
+                if(e.getOldID() == 11) {
+                    it.remove();
+                }
+            }
+
             list.add(new Entry(MetaIndex.ENDERDRAGON_PHASE, (byte) 0, 11));
         }
         MetadataRewriter.writeMetadata1_9(type, list, output);
@@ -911,7 +929,7 @@ public class OutgoingTransformer {
                     } else {
                         bar.setTitle(title);
                     }
-                } else if (entry.getOldID() == 6) {
+                } else if (entry.getOldID() == 6 && !plugin.isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
                     BossBar bar = bossBarMap.get(entityID);
                     // Make health range between 0 and 1
                     float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
