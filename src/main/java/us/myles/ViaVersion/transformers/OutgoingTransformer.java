@@ -896,35 +896,36 @@ public class OutgoingTransformer {
             }
         }
 
-        // TODO: Add config option
         // Boss bar
-        if(type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
-            if(entry.getOldID() == 2) {
-                BossBar bar = bossBarMap.get(entityID);
-                String title = (String) entry.getValue();
-                title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
-                if(bar == null) {
-                    bar = ViaVersion.getInstance().createBossBar(title, BossColor.PURPLE, BossStyle.SOLID);
-                    bossBarMap.put(entityID, bar);
-                    bar.addPlayer(info.getPlayer());
-                    bar.show();
-                } else {
-                    bar.setTitle((String) entry.getValue());
-                }
-            } else if(entry.getOldID() == 6) {
-                BossBar bar = bossBarMap.get(entityID);
-                // Make health range between 0 and 1
-                float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
-                float health = Math.max(0.0f, Math.min(((float) entry.getValue()) / maxHealth, 1.0f));
-                System.out.println(health + " " + entry.getValue());
-                if(bar == null) {
-                    String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
-                    bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PURPLE, BossStyle.SOLID);
-                    bossBarMap.put(entityID, bar);
-                    bar.addPlayer(info.getPlayer());
-                    bar.show();
-                } else {
-                    bar.setHealth(health);
+        if(plugin.isBossbarPatch()) {
+            if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
+                if (entry.getOldID() == 2) {
+                    BossBar bar = bossBarMap.get(entityID);
+                    String title = (String) entry.getValue();
+                    title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
+                    if (bar == null) {
+                        bar = ViaVersion.getInstance().createBossBar(title, BossColor.PURPLE, BossStyle.SOLID);
+                        bossBarMap.put(entityID, bar);
+                        bar.addPlayer(info.getPlayer());
+                        bar.show();
+                    } else {
+                        bar.setTitle((String) entry.getValue());
+                    }
+                } else if (entry.getOldID() == 6) {
+                    BossBar bar = bossBarMap.get(entityID);
+                    // Make health range between 0 and 1
+                    float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
+                    float health = Math.max(0.0f, Math.min(((float) entry.getValue()) / maxHealth, 1.0f));
+                    System.out.println(health + " " + entry.getValue());
+                    if (bar == null) {
+                        String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
+                        bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PURPLE, BossStyle.SOLID);
+                        bossBarMap.put(entityID, bar);
+                        bar.addPlayer(info.getPlayer());
+                        bar.show();
+                    } else {
+                        bar.setHealth(health);
+                    }
                 }
             }
         }

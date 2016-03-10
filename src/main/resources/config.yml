@@ -19,3 +19,5 @@ hologram-patch: false
 hologram-y: -1
 # Enable player tick simulation, this fixes eating, drinking, nether portals.
 simulate-pt: true
+# Should we patch boss bars so they work? (Default: true, disable if you're having issues)
+bossbar-patch: true

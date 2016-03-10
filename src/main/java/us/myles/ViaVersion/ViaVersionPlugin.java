@@ -236,6 +236,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("hologram-patch", false);
     }
 
+    public boolean isBossbarPatch() {
+        return getConfig().getBoolean("bossbar-patch", true);
+    }
+
     public double getHologramYOffset() {
         return getConfig().getDouble("hologram-y", -1D);
     }
