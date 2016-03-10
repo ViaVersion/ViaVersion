@@ -850,7 +850,7 @@ public class OutgoingTransformer {
         }
         // Fix: Dragon (crash fix)
         if(type == EntityType.ENDER_DRAGON) {
-            list.add(new Entry(MetaIndex.ENDERDRAGON_PHASE, 0, 11));
+            list.add(new Entry(MetaIndex.ENDERDRAGON_PHASE, (byte) 0, 11));
         }
         MetadataRewriter.writeMetadata1_9(type, list, output);
     }
@@ -904,7 +904,7 @@ public class OutgoingTransformer {
                     String title = (String) entry.getValue();
                     title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
                     if (bar == null) {
-                        bar = ViaVersion.getInstance().createBossBar(title, BossColor.PURPLE, BossStyle.SOLID);
+                        bar = ViaVersion.getInstance().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
                         bossBarMap.put(entityID, bar);
                         bar.addPlayer(info.getPlayer());
                         bar.show();
@@ -916,10 +916,9 @@ public class OutgoingTransformer {
                     // Make health range between 0 and 1
                     float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
                     float health = Math.max(0.0f, Math.min(((float) entry.getValue()) / maxHealth, 1.0f));
-                    System.out.println(health + " " + entry.getValue());
                     if (bar == null) {
                         String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
-                        bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PURPLE, BossStyle.SOLID);
+                        bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                         bossBarMap.put(entityID, bar);
                         bar.addPlayer(info.getPlayer());
                         bar.show();

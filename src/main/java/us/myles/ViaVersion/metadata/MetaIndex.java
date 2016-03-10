@@ -92,6 +92,7 @@ public enum MetaIndex {
     WITHER_TARGET3(Wither.class, 19, Type.Int, 13, NewType.VarInt),
     WITHER_INVULN_TIME(Wither.class, 20, Type.Int, 14, NewType.VarInt),
     WITHER_PROPERTIES(Wither.class, 10, Type.Byte, NewType.Byte),
+    WITHER_UNKNOWN(Wither.class, 11, Type.Byte, NewType.Discontinued),
     // wither skull
     WITHERSKULL_INVULN(WitherSkull.class, 10, Type.Byte, 5, NewType.Boolean),
     // guardian
@@ -125,9 +126,12 @@ public enum MetaIndex {
     ITEMFRAME_ROTATION(ItemFrame.class, 9, Type.Byte, 6, NewType.VarInt),
     // ender crystal
     ENDERCRYSTAL_HEALTH(EnderCrystal.class, 8, Type.Int, NewType.Discontinued),
-    // Ender dragon
+    // Ender dragon boss bar issues
+    ENDERDRAGON_UNKNOWN(EnderDragon.class, 5, Type.Byte, NewType.Discontinued),
+    ENDERDRAGON_NAME(EnderDragon.class, 10, Type.String, NewType.Discontinued),
+    // Normal Ender dragon
     ENDERDRAGON_FLAG(EnderDragon.class, 15, Type.Byte, NewType.Discontinued),
-    ENDERDRAGON_PHASE(EnderDragon.class, 11, Type.Int, NewType.VarInt);
+    ENDERDRAGON_PHASE(EnderDragon.class, 11, Type.Byte, NewType.VarInt);
 
     private Class<?> clazz;
     private int newIndex;
