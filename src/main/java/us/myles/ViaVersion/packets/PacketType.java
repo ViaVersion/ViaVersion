@@ -60,6 +60,7 @@ public enum PacketType {
     PLAY_SPAWN_MOB(State.PLAY, Direction.OUTGOING, 0x0F, 0x03),
     PLAY_SPAWN_PAINTING(State.PLAY, Direction.OUTGOING, 0x10, 0x04),
     PLAY_SPAWN_PLAYER(State.PLAY, Direction.OUTGOING, 0x0C, 0x05),
+
     PLAY_ANIMATION(State.PLAY, Direction.OUTGOING, 0x0B, 0x06),
     PLAY_STATS(State.PLAY, Direction.OUTGOING, 0x37, 0x07),
     PLAY_BLOCK_BREAK_ANIMATION(State.PLAY, Direction.OUTGOING, 0x25, 0x08),
