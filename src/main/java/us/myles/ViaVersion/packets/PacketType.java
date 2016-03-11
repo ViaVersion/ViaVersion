@@ -172,11 +172,11 @@ public enum PacketType {
     }
 
     public static PacketType findNewPacket(State state, Direction direction, int id) {
-    	return newids.get(toLong((short)direction.ordinal(), (short) state.ordinal(), id));
+    	return newids.get(toShort((short) id, (short)direction.ordinal(), (short) state.ordinal()));
     }
 
     public static PacketType findOldPacket(State state, Direction direction, int id) {
-    	return oldids.get(toLong((short)direction.ordinal(), (short) state.ordinal(), id));
+    	return oldids.get(toShort((short) id, (short)direction.ordinal(), (short) state.ordinal()));
     }
 
     public static PacketType getIncomingPacket(State state, int id) {
@@ -187,17 +187,16 @@ public enum PacketType {
         return findOldPacket(state, Direction.OUTGOING, id);
     }
 	
-	private static long toLong(short a, short b, int c) {
-		int d =  (a << 16) | (b & 0xFFFF);
-		return (long) c << 32 | d & 0xFFFFFFFFL;
+	private static short toShort(short id, short direction, short state) {
+		return (short) ((id & 0x00FF) | (direction<<8) & 0x0F00 | (state << 12) & 0xF000);
 	}
-    
-    private static HashMap<Long, PacketType> oldids = new HashMap<Long, PacketType>();
-    private static HashMap<Long, PacketType> newids = new HashMap<Long, PacketType>();
+
+    private static HashMap<Short, PacketType> oldids = new HashMap<Short, PacketType>();
+    private static HashMap<Short, PacketType> newids = new HashMap<Short, PacketType>();
     static {
     	for(PacketType pt : PacketType.values()) {
-    		oldids.put(toLong((short)pt.getDirection().ordinal(), (short)pt.getState().ordinal(), pt.getPacketID()), pt);
-    		newids.put(toLong((short)pt.getDirection().ordinal(), (short)pt.getState().ordinal(), pt.getNewPacketID()), pt);
+    		oldids.put(toShort((short) pt.getPacketID(), (short)pt.getDirection().ordinal(), (short)pt.getState().ordinal()), pt);
+    		newids.put(toShort((short) pt.getNewPacketID(), (short)pt.getDirection().ordinal(), (short)pt.getState().ordinal()), pt);
     	}
     }
     
