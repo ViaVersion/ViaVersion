@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.packets;
 
+import java.util.HashMap;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
 public enum PacketType {
     /* Handshake serverbound */
     HANDSHAKE(State.HANDSHAKE, Direction.INCOMING, 0x00),
@@ -167,27 +172,11 @@ public enum PacketType {
     }
 
     public static PacketType findNewPacket(State state, Direction direction, int id) {
-    	if(id == -1)
-    		return null;
-        for (PacketType pt : values()) {
-            if (pt.getNewPacketID() == id
-                    && pt.getState() == state
-                    && pt.getDirection() == direction)
-                return pt;
-        }
-        return null;
+    	return newids.get(toShort((short) id, (short)direction.ordinal(), (short) state.ordinal()));
     }
 
     public static PacketType findOldPacket(State state, Direction direction, int id) {
-    	if(id == -1)
-    		return null;
-        for (PacketType pt : values()) {
-            if (pt.getPacketID() == id
-                    && pt.getState() == state
-                    && pt.getDirection() == direction)
-                return pt;
-        }
-        return null;
+    	return oldids.get(toShort((short) id, (short)direction.ordinal(), (short) state.ordinal()));
     }
 
     public static PacketType getIncomingPacket(State state, int id) {
@@ -197,4 +186,18 @@ public enum PacketType {
     public static PacketType getOutgoingPacket(State state, int id) {
         return findOldPacket(state, Direction.OUTGOING, id);
     }
+	
+	private static short toShort(short id, short direction, short state) {
+		return (short) ((id & 0x00FF) | (direction<<8) & 0x0F00 | (state << 12) & 0xF000);
+	}
+
+    private static HashMap<Short, PacketType> oldids = new HashMap<Short, PacketType>();
+    private static HashMap<Short, PacketType> newids = new HashMap<Short, PacketType>();
+    static {
+    	for(PacketType pt : PacketType.values()) {
+    		oldids.put(toShort((short) pt.getPacketID(), (short)pt.getDirection().ordinal(), (short)pt.getState().ordinal()), pt);
+    		newids.put(toShort((short) pt.getNewPacketID(), (short)pt.getDirection().ordinal(), (short)pt.getState().ordinal()), pt);
+    	}
+    }
+    
 }
