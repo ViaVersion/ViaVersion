@@ -1,64 +1,13 @@
-# ViaVersion 0.6.3
-[![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
-**Allows the connection of 1.9 clients to 1.8**
-
-This plugin modifies netty to allow connection of 1.9 clients to 1.8,
-
-###*Don't use late bind*
+# ViaVersion API Dev
 
 
-This took hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
+This is an experimental branch working on a Protocol API,
 
-**Contributor Chat:** https://gitter.im/MylesIsCool/ViaVersion
+Nothing is final and is expected to change,
 
+This is not functional mainly because to start with it's API design.
 
-Sources:
---------
-
-**wiki.vg** (Protocol info, though I did have to find a lot myself)
-
-**MCProtocolLib** (used for chunk reading & some of writing.)
-
-**OpenNBT** (used for slot rewriting)
-
-
-
-Contributors:
---------
-
-**Myself** (harhar)
-
-**Matsv/StamBoom**
-
-**HugoDaBosss**
-
-**SanderGielisse**
-
-**Paulomart**
-
-**gigosaurus**
-
-**fillefilip8**
-
-**lenis0012**
-
-
-
-Releases / Dev Builds:
---------
-You can find official releases here:
-
-https://www.spigotmc.org/resources/viaversion.19254/history
-
-
-----------
-
-You can find unofficial dev builds here:
-
-**fillefilip8's Build Server:** http://build.fillecraft.com:8080/job/ViaVersion
-
-**sgdc3's Build Server:** http://ci.xephi.fr/job/ViaVersion/
-**sgdc3's Maven:** http://ci.xephi.fr/plugin/repository/everything/
+I'm publishing this just to prove i'm actually active and not doing nothing harhar.
 
 License:
 --------
