@@ -230,7 +230,7 @@ public class OutgoingTransformer {
             int x = input.readInt();
             output.writeDouble(x / 32D);
             int y = input.readInt();
-            if(plugin.isHologramPatch() & knownHolograms.contains(id)){
+            if (plugin.isHologramPatch() & knownHolograms.contains(id)) {
                 y = (int) ((y) + (plugin.getHologramYOffset() * 32D));
             }
             output.writeDouble(y / 32D);
@@ -253,7 +253,7 @@ public class OutgoingTransformer {
             int x = input.readByte();
             output.writeShort(x * 128);
             int y = input.readByte();
-            if(plugin.isHologramPatch() & knownHolograms.contains(id)){
+            if (plugin.isHologramPatch() & knownHolograms.contains(id)) {
                 y = (int) ((y) + plugin.getHologramYOffset());
             }
             output.writeShort(y * 128);
@@ -276,7 +276,7 @@ public class OutgoingTransformer {
             short x = (short) (input.readByte());
             output.writeShort(x * 128);
             short y = (short) (input.readByte());
-            if(plugin.isHologramPatch() & knownHolograms.contains(id)){
+            if (plugin.isHologramPatch() & knownHolograms.contains(id)) {
                 y = (short) (y - 1);
             }
             output.writeShort(y * 128);
@@ -394,7 +394,7 @@ public class OutgoingTransformer {
 
                 // Remvoe boss bar
                 BossBar bar = bossBarMap.remove(entityID);
-                if(bar != null) {
+                if (bar != null) {
                     bar.hide();
                 }
             }
@@ -608,7 +608,24 @@ public class OutgoingTransformer {
             clientEntityTypes.put(id, EntityType.PLAYER);
             info.setEntityID(id);
             output.writeInt(id);
-            output.writeBytes(input);
+
+            int gamemode = input.readUnsignedByte();
+            output.writeByte(gamemode);
+            int dimension = input.readByte();
+            output.writeByte(dimension);
+            int difficulty = input.readUnsignedByte();
+            if (info.getProtocol() >= 108) {
+                // 1.8.1 Pre 2
+                output.writeInt(difficulty);
+            } else {
+                output.writeByte(difficulty);
+            }
+            int maxPlayers = input.readUnsignedByte();
+            output.writeByte(maxPlayers);
+            String level = PacketUtil.readString(input);
+            PacketUtil.writeString(level, output);
+            boolean reducedDebug = input.readBoolean();
+            output.writeBoolean(reducedDebug);
             return;
         }
         if (packet == PacketType.PLAY_SERVER_DIFFICULTY) {
@@ -850,12 +867,12 @@ public class OutgoingTransformer {
             handleMetadata(entityID, entry, type);
         }
         // Fix: wither (crash fix)
-        if(type == EntityType.WITHER) {
+        if (type == EntityType.WITHER) {
             // Remove custom value if already exist
             Iterator<Entry> it = list.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Entry e = it.next();
-                if(e.getOldID() == 10) {
+                if (e.getOldID() == 10) {
                     it.remove();
                 }
             }
@@ -863,12 +880,12 @@ public class OutgoingTransformer {
             list.add(new Entry(MetaIndex.WITHER_PROPERTIES, (byte) 0, 10));
         }
         // Fix: Dragon (crash fix)
-        if(type == EntityType.ENDER_DRAGON) {
+        if (type == EntityType.ENDER_DRAGON) {
             // Remove custom value if already exist
             Iterator<Entry> it = list.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Entry e = it.next();
-                if(e.getOldID() == 11) {
+                if (e.getOldID() == 11) {
                     it.remove();
                 }
             }
@@ -899,11 +916,11 @@ public class OutgoingTransformer {
                 }
             }
         }
-        if(type == EntityType.ARMOR_STAND && plugin.isHologramPatch()){
-            if(entry.getOldID() == 0){
+        if (type == EntityType.ARMOR_STAND && plugin.isHologramPatch()) {
+            if (entry.getOldID() == 0) {
                 byte data = (byte) entry.getValue();
-                if((data & 0x20) == 0x20){
-                    if(!knownHolograms.contains(entityID)) {
+                if ((data & 0x20) == 0x20) {
+                    if (!knownHolograms.contains(entityID)) {
                         knownHolograms.add(entityID);
                         // Send movement
                         ByteBuf buf = info.getChannel().alloc().buffer();
@@ -920,7 +937,7 @@ public class OutgoingTransformer {
         }
 
         // Boss bar
-        if(plugin.isBossbarPatch()) {
+        if (plugin.isBossbarPatch()) {
             if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
                 if (entry.getOldID() == 2) {
                     BossBar bar = bossBarMap.get(entityID);
