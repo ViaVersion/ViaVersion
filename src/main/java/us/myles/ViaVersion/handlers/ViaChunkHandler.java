@@ -26,24 +26,7 @@ public class ViaChunkHandler extends MessageToMessageEncoder {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
             if(o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
-                final int[] locX = ReflectionUtil.get(o, "a", int[].class);
-                final int[] locZ = ReflectionUtil.get(o, "b", int[].class);
-                final Object world = ReflectionUtil.get(o, "world", ReflectionUtil.nms("World"));
-                Class<?> mapChunk = ReflectionUtil.nms("PacketPlayOutMapChunk");
-                final Constructor constructor = mapChunk.getDeclaredConstructor(ReflectionUtil.nms("Chunk"), boolean.class, int.class);
-                for(int i = 0; i < locX.length; i++) {
-                    int x = locX[i];
-                    int z = locZ[i];
-                    // world invoke function
-                    try {
-                        Object chunk = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class).invoke(world, x, z);
-                        Object packet = constructor.newInstance(chunk, true, 65535);
-                        list.add(packet);
-                    } catch(InstantiationException | InvocationTargetException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                list.addAll(info.getChunkManager().transformMapChunkBulk(o));
                 return;
             }
         }

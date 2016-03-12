@@ -18,6 +18,8 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.chunks.Chunk;
+import us.myles.ViaVersion.chunks.ChunkManager;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.metadata.MetadataRewriter.Entry;
@@ -776,54 +778,15 @@ public class OutgoingTransformer {
             return;
         }
         if (packet == PacketType.PLAY_CHUNK_DATA) {
-            // We need to catch unloading chunk packets as defined by wiki.vg
-            // To unload chunks, send this packet with Ground-Up Continuous=true and no 16^3 chunks (eg. Primary Bit Mask=0)
-            int chunkX = input.readInt();
-            int chunkZ = input.readInt();
-            output.writeInt(chunkX);
-            output.writeInt(chunkZ);
-
-
-            boolean groundUp = input.readBoolean();
-            output.writeBoolean(groundUp);
-
-            int bitMask = input.readUnsignedShort();
-            int size = PacketUtil.readVarInt(input);
-            byte[] data = new byte[size];
-            input.readBytes(data);
-//            if (bitMask == 0 && groundUp) {
-//                // if 256
-//                output.clear();
-//                PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
-//                output.writeInt(chunkX);
-//                output.writeInt(chunkZ);
-//                System.out.println("Sending unload chunk " + chunkX + " " + chunkZ + " - " + size + " bulk: " + bulk);
-//                return;
-//            }
-            boolean sk = false;
-            if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
-                try {
-                    sk = ReflectionUtil.get(info.getLastPacket(), "d", boolean.class);
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            Column read = NetUtil.readOldChunkData(chunkX, chunkZ, groundUp, bitMask, data, true, sk);
-            if (read == null) {
+            // Read chunk
+            ChunkManager chunkManager = info.getChunkManager();
+            Chunk chunk = chunkManager.readChunk(input);
+            if(chunk == null) {
                 throw new CancelException();
             }
-            // Write chunk section array :((
-            ByteBuf temp = output.alloc().buffer();
-            try {
-                int bitmask = NetUtil.writeNewColumn(temp, read, groundUp, sk);
-                PacketUtil.writeVarInt(bitmask, output);
-                PacketUtil.writeVarInt(temp.readableBytes(), output);
-                output.writeBytes(temp);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+            // Write chunk
+            chunkManager.writeChunk(chunk, output);
             return;
         }
         output.writeBytes(input);
