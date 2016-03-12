@@ -1,14 +1,14 @@
 package us.myles.ViaVersion2.api.remapper;
 
 import us.myles.ViaVersion2.api.PacketWrapper;
-import us.myles.ViaVersion2.api.util.Pair;
 import us.myles.ViaVersion2.api.type.Type;
+import us.myles.ViaVersion2.api.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PacketRemapper {
-    private List<Pair<ValueReader, ValueTransformer>> valueRemappers = new ArrayList<>();
+    private List<Pair<ValueReader, ValueWriter>> valueRemappers = new ArrayList<>();
 
     public PacketRemapper() {
         registerMap();
@@ -23,8 +23,12 @@ public abstract class PacketRemapper {
         map(new TypeRemapper(oldType), new TypeRemapper(newType));
     }
 
-    public <T> void map(ValueReader<T> inputRemapper, ValueTransformer<T> outputRemapper) {
-        valueRemappers.add(new Pair<ValueReader, ValueTransformer>(inputRemapper, outputRemapper));
+    public <T1, T2> void map(Type<T1> oldType, ValueTransformer<T1, T2> transformer) {
+        map(new TypeRemapper(oldType), transformer);
+    }
+
+    public <T> void map(ValueReader<T> inputReader, ValueWriter<T> outputWriter) {
+        valueRemappers.add(new Pair<ValueReader, ValueWriter>(inputReader, outputWriter));
     }
 
     public void create(ValueCreator transformer) {
@@ -35,7 +39,7 @@ public abstract class PacketRemapper {
 
     public void remap(PacketWrapper packetWrapper) {
         // Read all the current values
-        for(Pair<ValueReader, ValueTransformer> valueRemapper : valueRemappers){
+        for (Pair<ValueReader, ValueWriter> valueRemapper : valueRemappers) {
             Object object = valueRemapper.getKey().read(packetWrapper);
             // Convert object to write type :O!!!
             // TODO: Data converter lol

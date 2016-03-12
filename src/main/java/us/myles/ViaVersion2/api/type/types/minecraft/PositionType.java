@@ -1,4 +1,4 @@
-package us.myles.ViaVersion2.api.type.types;
+package us.myles.ViaVersion2.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion2.api.type.Type;

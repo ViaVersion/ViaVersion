@@ -1,9 +1,13 @@
 package us.myles.ViaVersion2.api.type;
 
 
-import javafx.geometry.Pos;
 import lombok.Getter;
+import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
 import us.myles.ViaVersion2.api.type.types.*;
+import us.myles.ViaVersion2.api.type.types.minecraft.EulerAngleType;
+import us.myles.ViaVersion2.api.type.types.minecraft.PositionType;
+import us.myles.ViaVersion2.api.type.types.minecraft.VectorType;
 import us.myles.ViaVersion2.api.util.Position;
 
 import java.util.UUID;
@@ -46,17 +50,21 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Special Types */
     public static final Type<Void> NOTHING = new VoidType(); // This is purely used for remapping.
     /* MC Types */
-    public static final Type<Position> POSITION = new PositionType(); // This is purely used for remapping.
+    public static final Type<Position> POSITION = new PositionType();
+    public static final Type<EulerAngle> ROTATION = new EulerAngleType();
+    public static final Type<Vector> VECTOR = new VectorType();
+
+    public static final Type<Object> ITEM = null; // TODO
     /* Actual Class */
 
-    private final Class<T> outputClass;
+    private final Class<? super T> outputClass;
     private final String typeName;
 
-    public Type(Class<T> outputClass) {
+    public Type(Class<? super T> outputClass) {
         this(outputClass.getSimpleName(), outputClass);
     }
 
-    public Type(String typeName, Class<T> outputClass) {
+    public Type(String typeName, Class<? super T> outputClass) {
         this.outputClass = outputClass;
         this.typeName = typeName;
     }

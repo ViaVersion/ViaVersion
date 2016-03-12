@@ -3,7 +3,7 @@ package us.myles.ViaVersion2.api.remapper;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.type.Type;
 
-public class TypeRemapper<T> implements ValueReader<T>, ValueTransformer<T> {
+public class TypeRemapper<T> implements ValueReader<T>, ValueWriter<T> {
     private final Type<T> type;
 
     public TypeRemapper(Type<T> type) {
