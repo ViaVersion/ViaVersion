@@ -42,6 +42,9 @@ public class PacketUtil {
     }
 
     public static CompoundTag readNBT(ByteBuf input) throws IOException {
+        // Default client is limited to 2097152 bytes. (2.09mb)
+        Preconditions.checkArgument(input.readableBytes() <= 2097152, "Cannot read NBT (got %s bytes)", input.readableBytes());
+
         int readerIndex = input.readerIndex();
         byte b = input.readByte();
         if (b == 0) {
