@@ -42,7 +42,6 @@ public class OutgoingTransformer {
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
     private final ConnectionInfo info;
-    private final ChunkManager chunkManager;
     private final Map<Integer, UUID> uuidMap = new HashMap<>();
     private final Map<Integer, EntityType> clientEntityTypes = new HashMap<>();
     private final Map<Integer, Integer> vehicleMap = new HashMap<>();
@@ -54,7 +53,6 @@ public class OutgoingTransformer {
 
     public OutgoingTransformer(ConnectionInfo info) {
         this.info = info;
-        this.chunkManager = new ChunkManager(info);
     }
 
     public static String fixJson(String line) {
@@ -781,6 +779,7 @@ public class OutgoingTransformer {
         }
         if (packet == PacketType.PLAY_CHUNK_DATA) {
             // Read chunk
+            ChunkManager chunkManager = info.getChunkManager();
             Chunk chunk = chunkManager.readChunk(input);
             if(chunk == null) {
                 throw new CancelException();

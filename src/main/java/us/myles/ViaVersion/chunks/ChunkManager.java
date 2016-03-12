@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.chunks;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -7,13 +8,13 @@ import org.bukkit.Bukkit;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
+import us.myles.ViaVersion.util.ReflectionUtil.ClassReflection;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -33,21 +34,54 @@ public class ChunkManager {
 
     private final ConnectionInfo info;
     private final Set<Long> loadedChunks = Sets.newConcurrentHashSet();
-    private Method getWorldHandle;
-    private Method getChunkAt;
-    private Field getSections;
+    private final Set<Long> bulkChunks = Sets.newConcurrentHashSet();
+
+    // Reflection
+    private static ClassReflection mapChunkBulkRef;
+    private static ClassReflection mapChunkRef;
+
+    static {
+        try {
+            mapChunkBulkRef = new ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
+            mapChunkRef = new ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
+        } catch(Exception e) {
+            Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunk reflection", e);
+        }
+    }
 
     public ChunkManager(ConnectionInfo info) {
         this.info = info;
+    }
 
+    /**
+     * Transform a map chunk bulk in to separate map chunk packets.
+     * These packets are registered  so that they will never be seen as unload packets.
+     *
+     * @param packet to transform
+     * @return List of chunk data packets
+     */
+    public List<Object> transformMapChunkBulk(Object packet) {
+        List<Object> list = Lists.newArrayList();
         try {
-            this.getWorldHandle = ReflectionUtil.obc("CraftWorld").getDeclaredMethod("getHandle");
-            this.getChunkAt = ReflectionUtil.nms("World").getDeclaredMethod("getChunkAt", int.class, int.class);
-            this.getSections = ReflectionUtil.nms("Chunk").getDeclaredField("sections");
-            getSections.setAccessible(true);
+            int[] xcoords = mapChunkBulkRef.getFieldValue("a", packet, int[].class);
+            int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
+            Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
+            for(int i = 0; i < chunkMaps.length; i++) {
+                int x = xcoords[i];
+                int z = zcoords[i];
+                Object chunkMap = chunkMaps[i];
+                Object chunkPacket = mapChunkRef.newInstance();
+                mapChunkRef.setFieldValue("a", chunkPacket, x);
+                mapChunkRef.setFieldValue("b", chunkPacket, z);
+                mapChunkRef.setFieldValue("c", chunkPacket, chunkMap);
+                mapChunkRef.setFieldValue("d", chunkPacket, true); // Chunk bulk chunks are always ground-up
+                bulkChunks.add(toLong(x, z)); // Store for later
+                list.add(chunkPacket);
+            }
         } catch(Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunk verification", e);
+            Bukkit.getLogger().log(Level.WARNING, "Failed to transform chunk bulk", e);
         }
+        return list;
     }
 
     /**
@@ -76,35 +110,15 @@ public class ChunkManager {
                 usedSections.set(i);
             }
         }
-
-        // Unloading & empty chunks
         int sectionCount = usedSections.cardinality(); // the amount of sections set
-        if(sectionCount == 0 && groundUp) {
-            if(loadedChunks.contains(chunkHash)) {
-                // This is a chunk unload packet
-                loadedChunks.remove(chunkHash);
-                return new Chunk(chunkX, chunkZ);
-            } else {
-                // Check if chunk data is invalid
-                try {
-                    Object nmsWorld = getWorldHandle.invoke(info.getPlayer().getWorld());
-                    Object nmsChunk = getChunkAt.invoke(info.getPlayer().getWorld());
-                    Object[] nmsSections = (Object[]) getSections.get(nmsChunk);
 
-                    // Check if chunk is actually empty
-                    boolean isEmpty = false;
-                    int i = 0;
-                    while(i < nmsSections.length) {
-                        if(!(isEmpty = nmsSections[i++] == null)) break;
-                    }
-                    if(isEmpty) {
-                        // not empty, LOL
-                        return null;
-                    }
-                } catch(Exception e) {
-                    Bukkit.getLogger().log(Level.WARNING, "Failed to verify chunk", e);
-                }
-            }
+        // If the chunk is from a chunk bulk, it is never an unload packet
+        // Other wise, if it has no data, it is :)
+        boolean isBulkPacket = bulkChunks.remove(chunkHash);
+        if(sectionCount == 0 && groundUp && !isBulkPacket && loadedChunks.contains(chunkHash)) {
+            // This is a chunk unload packet
+            loadedChunks.remove(chunkHash);
+            return new Chunk(chunkX, chunkZ);
         }
 
         int startIndex = input.readerIndex();
