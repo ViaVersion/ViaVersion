@@ -37,6 +37,12 @@ public class ReflectionUtil {
         return (T) field.get(null);
     }
 
+    public static <T> T getSuper(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+        Field field = o.getClass().getSuperclass().getDeclaredField(f);
+        field.setAccessible(true);
+        return (T) field.get(o);
+    }
+
     public static <T> T get(Object instance, Class<?> clazz, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
         Field field = clazz.getDeclaredField(f);
         field.setAccessible(true);
