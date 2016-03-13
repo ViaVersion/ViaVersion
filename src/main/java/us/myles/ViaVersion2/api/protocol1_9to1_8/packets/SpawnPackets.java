@@ -14,7 +14,7 @@ import us.myles.ViaVersion2.api.remapper.ValueTransformer;
 import us.myles.ViaVersion2.api.type.Type;
 
 public class SpawnPackets {
-    private static ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
+    public static ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
         @Override
         public Double transform(PacketWrapper wrapper, Integer inputValue) {
             return inputValue / 32D;
@@ -222,6 +222,27 @@ public class SpawnPackets {
 
                 // TODO Rewrite Metadata
                 map(Protocol1_9TO1_8.METADATA_LIST);
+            }
+        });
+
+        // Entity Destroy Packet
+        protocol.registerOutgoing(State.PLAY, 0x13, 0x30, new PacketRemapper() {
+
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT_ARRAY); // 0 - Entities to destroy
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        Integer[] entities = wrapper.get(Type.VAR_INT_ARRAY, 0);
+                        for (Integer entity : entities) {
+                            // EntityTracker
+                            wrapper.user().get(EntityTracker.class).removeEntity(entity);
+                            // TODO: When holograms added and bossbars, remove too
+                        }
+                    }
+                });
             }
         });
     }

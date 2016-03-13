@@ -3,6 +3,7 @@ package us.myles.ViaVersion2.api.protocol1_9to1_8.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion2.api.metadata.Metadata;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.MetadataTypes;
 import us.myles.ViaVersion2.api.type.Type;
 
 public class MetadataType extends Type<Metadata> {

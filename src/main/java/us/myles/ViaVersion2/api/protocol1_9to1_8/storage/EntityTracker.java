@@ -23,4 +23,8 @@ public class EntityTracker extends StoredObject{
             return uuid;
         }
     }
+
+    public void removeEntity(Integer entityID) {
+        clientEntityTypes.remove(entityID);
+    }
 }

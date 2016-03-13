@@ -4,10 +4,9 @@ package us.myles.ViaVersion2.api.type;
 import lombok.Getter;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.type.types.*;
-import us.myles.ViaVersion2.api.type.types.minecraft.EulerAngleType;
-import us.myles.ViaVersion2.api.type.types.minecraft.PositionType;
-import us.myles.ViaVersion2.api.type.types.minecraft.VectorType;
+import us.myles.ViaVersion2.api.type.types.minecraft.*;
 import us.myles.ViaVersion2.api.util.Position;
 
 import java.util.UUID;
@@ -17,6 +16,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Defined Types */
     public static final Type<Byte> BYTE = new ByteType();
     public static final Type<Byte[]> BYTE_ARRAY = new ArrayType<>(Type.BYTE);
+
+    public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 
     public static final Type<Short> UNSIGNED_BYTE = new UnsignedByteType();
     public static final Type<Short[]> UNSIGNED_BYTE_ARRAY = new ArrayType<>(Type.UNSIGNED_BYTE);
@@ -53,8 +54,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Position> POSITION = new PositionType();
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
-
-    public static final Type<Object> ITEM = null; // TODO
+    public static final Type<Item> ITEM = new ItemType(); // TODO
+    public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
     /* Actual Class */
 
     private final Class<? super T> outputClass;

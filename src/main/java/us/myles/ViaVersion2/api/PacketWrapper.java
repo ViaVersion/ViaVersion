@@ -43,6 +43,12 @@ public class PacketWrapper {
         packetValues.add(new Pair<Type, Object>(type, value));
     }
 
+    public <T> T passthrough(Type<T> type) {
+        T value = read(type);
+        write(type, value);
+        return value;
+    }
+
     public void writeToBuffer(ByteBuf buffer) {
         for (Pair<Type, Object> packetValue : packetValues) {
             packetValue.getKey().write(buffer, packetValue.getValue());
@@ -50,6 +56,7 @@ public class PacketWrapper {
     }
 
     public void writeRemaining(ByteBuf output) {
+        System.out.println("Writing remaining: " + output.readableBytes());
         output.writeBytes(inputBuffer);
     }
 

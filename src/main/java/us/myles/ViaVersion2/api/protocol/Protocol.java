@@ -65,10 +65,9 @@ public abstract class Protocol {
             protocolPacket.getRemapper().remap(packetWrapper);
             // write to output
             packetWrapper.writeToBuffer(output);
-        } else {
-            // pass through
-            packetWrapper.writeRemaining(output);
         }
+        // pass through
+        packetWrapper.writeRemaining(output);
     }
 
     @AllArgsConstructor
