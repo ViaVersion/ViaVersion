@@ -32,12 +32,14 @@ public class PacketWrapper {
     }
 
     public <T> T read(Type<T> type) {
+        System.out.println("Reading: " + type.getTypeName());
         // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
         return type.read(inputBuffer);
     }
 
 
     public <T> void write(Type<T> type, T value) {
+        System.out.println("Writing " + type.getTypeName() + " - " + value);
         packetValues.add(new Pair<Type, Object>(type, value));
     }
 

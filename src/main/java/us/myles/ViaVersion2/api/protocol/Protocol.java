@@ -6,21 +6,25 @@ import lombok.Getter;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
-import us.myles.ViaVersion2.api.util.Pair;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.type.Type;
+import us.myles.ViaVersion2.api.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Protocol {
-    public abstract void registerPackets();
+    private Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
+    private Map<Pair<State, Integer>, ProtocolPacket> outgoing = new HashMap<>();
+
+    public Protocol() {
+        registerPackets();
+    }
+
+    protected abstract void registerPackets();
 
     public abstract void init(UserConnection userConnection);
-
-    public Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
-    public Map<Pair<State, Integer>, ProtocolPacket> outgoing = new HashMap<>();
 
     public void registerIncoming(State state, int oldPacketID, int newPacketID) {
         registerIncoming(state, oldPacketID, newPacketID, null);

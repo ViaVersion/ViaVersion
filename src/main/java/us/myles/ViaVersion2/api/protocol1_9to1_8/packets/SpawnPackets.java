@@ -1,10 +1,13 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueCreator;
 import us.myles.ViaVersion2.api.remapper.ValueTransformer;
@@ -24,16 +27,27 @@ public class SpawnPackets {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
-                // 1 - UUID
+
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker tracker = wrapper.user().object(EntityTracker.class);
-                        wrapper.write(Type.UUID, tracker.getEntityUUID(entityID));
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                     }
                 });
                 map(Type.BYTE); // 2 - Type
+
+                // Parse this info
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        int typeID = wrapper.get(Type.BYTE, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.getClientEntityTypes().put(entityID, EntityUtil.getTypeFromID(typeID, true));
+                    }
+                });
 
                 map(Type.INT, toNewDouble); // 3 - X - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 4 - Y - Needs to be divide by 32
@@ -62,7 +76,6 @@ public class SpawnPackets {
                         wrapper.write(Type.SHORT, vZ);
                     }
                 });
-
             }
         });
 
@@ -71,6 +84,16 @@ public class SpawnPackets {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
+
+                // Parse this info
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.getClientEntityTypes().put(entityID, EntityType.EXPERIENCE_ORB);
+                    }
+                });
 
                 map(Type.INT, toNewDouble); // 1 - X - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 2 - Y - Needs to be divide by 32
@@ -86,6 +109,16 @@ public class SpawnPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.BYTE); // 1 - Type
+                // Parse this info
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        // Currently only lightning uses this
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.getClientEntityTypes().put(entityID, EntityType.LIGHTNING);
+                    }
+                });
 
                 map(Type.INT, toNewDouble); // 2 - X - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 3 - Y - Needs to be divide by 32
@@ -98,16 +131,27 @@ public class SpawnPackets {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
-                // 1 - UUID
+
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker tracker = wrapper.user().object(EntityTracker.class);
-                        wrapper.write(Type.UUID, tracker.getEntityUUID(entityID));
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                     }
                 });
                 map(Type.UNSIGNED_BYTE); // 2 - Type
+
+                // Parse this info
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        int typeID = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.getClientEntityTypes().put(entityID, EntityUtil.getTypeFromID(typeID, false));
+                    }
+                });
 
                 map(Type.INT, toNewDouble); // 3 - X - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 4 - Y - Needs to be divide by 32
@@ -131,15 +175,27 @@ public class SpawnPackets {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
-                // 1 - UUID
+
+                // Parse this info
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.getClientEntityTypes().put(entityID, EntityType.PAINTING);
+                    }
+                });
+
+
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker tracker = wrapper.user().object(EntityTracker.class);
-                        wrapper.write(Type.UUID, tracker.getEntityUUID(entityID));
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                     }
                 });
+
                 map(Type.STRING); // 2 - Title
 
                 map(Type.POSITION); // 3 - Position

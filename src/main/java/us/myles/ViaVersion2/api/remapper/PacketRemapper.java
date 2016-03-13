@@ -31,8 +31,12 @@ public abstract class PacketRemapper {
         valueRemappers.add(new Pair<ValueReader, ValueWriter>(inputReader, outputWriter));
     }
 
-    public void create(ValueCreator transformer) {
-        map(new TypeRemapper(Type.NOTHING), transformer);
+    public void create(ValueCreator creator) {
+        map(new TypeRemapper(Type.NOTHING), creator);
+    }
+
+    public void handler(PacketHandler handler) {
+        map(new TypeRemapper(Type.NOTHING), handler);
     }
 
     public abstract void registerMap();

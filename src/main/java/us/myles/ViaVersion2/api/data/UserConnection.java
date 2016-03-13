@@ -6,7 +6,7 @@ import java.util.List;
 public class UserConnection {
     List<StoredObject> storedObjects = new ArrayList<>();
 
-    public <T extends StoredObject> T object(Class<T> objectClass) {
+    public <T extends StoredObject> T get(Class<T> objectClass) {
         for (StoredObject o : storedObjects) {
             if (o.getClass().equals(objectClass))
                 return (T) o;
@@ -22,7 +22,7 @@ public class UserConnection {
         return false;
     }
 
-    public void add(StoredObject object) {
+    public void put(StoredObject object) {
         storedObjects.add(object);
     }
 }

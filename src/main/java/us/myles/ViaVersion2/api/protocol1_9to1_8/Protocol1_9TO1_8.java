@@ -17,7 +17,7 @@ public class Protocol1_9TO1_8 extends Protocol {
     public static Type<Metadata> METADATA = new MetadataType();
 
     @Override
-    public void registerPackets() {
+    protected void registerPackets() {
         // Example PLAY_SPAWN_OBJECT(State.PLAY, Direction.OUTGOING, 0x0E, 0x00),
         SpawnPackets.register(this);
     }
@@ -25,6 +25,6 @@ public class Protocol1_9TO1_8 extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         // Entity tracker
-        userConnection.add(new EntityTracker());
+        userConnection.put(new EntityTracker());
     }
 }
