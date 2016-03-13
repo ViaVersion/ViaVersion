@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.entity.Player;
@@ -11,8 +12,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -30,14 +33,23 @@ public class CommandBlockListener implements Listener {
     private final ViaVersionPlugin plugin;
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onJoin(final PlayerJoinEvent e) {
-        if (e.getPlayer().isOp() && plugin.isPorted(e.getPlayer())) {
-            ByteBuf buf = Unpooled.buffer();
-            PacketUtil.writeVarInt(PacketType.PLAY_ENTITY_STATUS.getNewPacketID(), buf);
-            buf.writeInt(e.getPlayer().getEntityId());
-            buf.writeByte(26);
-            plugin.sendRawPacket(e.getPlayer(), buf);
-        }
+    public void onJoin(PlayerJoinEvent e) {
+        sendOp(e.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRespawn(final PlayerRespawnEvent e) {
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+            @Override
+            public void run() {
+                sendOp(e.getPlayer());
+            }
+        }, 1L);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldChange(PlayerChangedWorldEvent e) {
+        sendOp(e.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -48,6 +60,16 @@ public class CommandBlockListener implements Listener {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    private void sendOp(Player p) {
+        if (p.isOp() && plugin.isPorted(p)) {
+            ByteBuf buf = Unpooled.buffer();
+            PacketUtil.writeVarInt(PacketType.PLAY_ENTITY_STATUS.getNewPacketID(), buf);
+            buf.writeInt(p.getEntityId());
+            buf.writeByte(26);
+            plugin.sendRawPacket(p, buf);
         }
     }
 
