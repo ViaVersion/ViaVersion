@@ -93,12 +93,14 @@ public class ArmorListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRespawn(PlayerRespawnEvent e) {
-        sendDelayedArmorUpdate(e.getPlayer());
+        if (ViaVersion.getInstance().isPorted(e.getPlayer()))
+            sendDelayedArmorUpdate(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWorldChange(PlayerChangedWorldEvent e){
-        sendArmorUpdate(e.getPlayer());
+    public void onWorldChange(PlayerChangedWorldEvent e) {
+        if (ViaVersion.getInstance().isPorted(e.getPlayer()))
+            sendArmorUpdate(e.getPlayer());
     }
 
     public void sendDelayedArmorUpdate(final Player player) {
