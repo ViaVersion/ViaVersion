@@ -6,9 +6,6 @@ import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.spacehq.mc.protocol.data.game.chunk.Column;
-import org.spacehq.mc.protocol.util.NetUtil;
-import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.CancelException;
@@ -29,7 +26,6 @@ import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.util.*;
@@ -768,7 +764,7 @@ public class OutgoingTransformer {
             // Read chunk
             ChunkManager chunkManager = info.getChunkManager();
             Chunk chunk = chunkManager.readChunk(input);
-            if(chunk == null) {
+            if (chunk == null) {
                 throw new CancelException();
             }
 
