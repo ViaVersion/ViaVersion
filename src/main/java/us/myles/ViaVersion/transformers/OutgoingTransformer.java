@@ -759,20 +759,7 @@ public class OutgoingTransformer {
                 return;
             }
             if (action == 2) { //Update commandblock
-                try {
-                    CompoundTag nbt = readNBT(input);
-                    if (nbt == null)
-                        throw new CancelException();
-                    //Thanks http://www.minecraftforum.net/forums/minecraft-discussion/redstone-discussion-and/command-blocks/2488148-1-9-nbt-changes-and-additions#TileAllCommandBlocks
-                    nbt.put(new ByteTag("powered", (byte) 0));
-                    nbt.put(new ByteTag("auto", (byte) 0));
-                    nbt.put(new ByteTag("conditionMet", (byte) 0));
-                    writeNBT(output, nbt);
-                    return;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new CancelException();
-                }
+                throw new CancelException(); //Only update if player interact with commandblock (The commandblock window will update every time this packet is sent, this would prevent you from change things that update every tick)
             }
             output.writeBytes(input, input.readableBytes());
             return;
