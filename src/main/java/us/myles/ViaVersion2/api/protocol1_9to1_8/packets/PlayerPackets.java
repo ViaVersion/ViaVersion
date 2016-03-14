@@ -270,5 +270,7 @@ public class PlayerPackets {
         protocol.registerIncoming(State.PLAY, 0x06, 0x0D); // Player Move & Look Packet
         protocol.registerIncoming(State.PLAY, 0x05, 0x0E); // Player Look Packet
         protocol.registerIncoming(State.PLAY, 0x03, 0x0F); // Player Packet
+
+        // TODO Plugin Channels :(
     }
 }
