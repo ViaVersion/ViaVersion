@@ -136,7 +136,7 @@ public class PlayerPackets {
                 map(Type.UNSIGNED_BYTE); // 4 - Max Players (Tab)
                 map(Type.STRING); // 5 - Level Type
                 map(Type.BOOLEAN); // 6 - Reduced Debug info
-                
+
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -228,9 +228,7 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x3F, 0x18); // Plugin Message
 
         // TODO:
-        // Login Success - Save UUID and Username
         // Server Difficulty - Activate Auto-Team
-        // TODO: Status Response, implement? (Might be implemented by a base protocol?)
 
         /* Incoming Packets */
 

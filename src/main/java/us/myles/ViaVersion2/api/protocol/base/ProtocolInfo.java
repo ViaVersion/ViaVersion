@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.data.StoredObject;
+import us.myles.ViaVersion2.api.protocol.ProtocolPipeline;
 
 import java.util.UUID;
 
@@ -14,4 +15,5 @@ public class ProtocolInfo extends StoredObject{
     private int protocolVersion = -1;
     private String username;
     private UUID uuid;
+    private ProtocolPipeline pipeline;
 }

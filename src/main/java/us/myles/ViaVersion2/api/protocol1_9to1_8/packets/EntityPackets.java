@@ -40,8 +40,7 @@ public class EntityPackets {
 
                             wrapper.cancel(); // Don't send current packet
 
-                            PacketWrapper passengerPacket = wrapper.create();
-                            passengerPacket.write(Type.VAR_INT, 0x40); // Passenger Packet ID
+                            PacketWrapper passengerPacket = wrapper.create(0x40); // Passenger Packet ID
                             if (vehicle == -1) {
                                 if (!tracker.getVehicleMap().containsKey(passenger))
                                     return null; // Cancel

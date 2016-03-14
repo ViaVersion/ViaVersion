@@ -107,6 +107,6 @@ public class BaseProtocol extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new ProtocolInfo());
+        // Nothing gets added, ProtocolPipeline handles ProtocolInfo
     }
 }

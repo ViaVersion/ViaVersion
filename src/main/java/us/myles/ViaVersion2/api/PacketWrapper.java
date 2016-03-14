@@ -2,21 +2,30 @@ package us.myles.ViaVersion2.api;
 
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
+import lombok.Setter;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.remapper.ValueCreator;
 import us.myles.ViaVersion2.api.type.Type;
 import us.myles.ViaVersion2.api.util.Pair;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PacketWrapper {
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
+    @Setter
+    @Getter
+    private int id = -1;
+    private LinkedList<Pair<Type, Object>> readableObjects = new LinkedList<>();
     private List<Pair<Type, Object>> packetValues = new ArrayList<>();
 
-    public PacketWrapper(ByteBuf inputBuffer, UserConnection userConnection) {
+    public PacketWrapper(int packetID, ByteBuf inputBuffer, UserConnection userConnection) {
+        this.id = packetID;
         this.inputBuffer = inputBuffer;
         this.userConnection = userConnection;
     }
@@ -49,10 +58,19 @@ public class PacketWrapper {
     }
 
     public <T> T read(Type<T> type) throws Exception {
-        Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
-        System.out.println("Reading: " + type.getTypeName());
-        // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
-        return type.read(inputBuffer);
+        if (readableObjects.isEmpty()) {
+            Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
+            System.out.println("Reading: " + type.getTypeName());
+            // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
+            return type.read(inputBuffer);
+        } else {
+            Pair<Type, Object> read = readableObjects.poll();
+            if (read.getKey().equals(type)) {
+                return (T) read.getValue();
+            } else {
+                throw new IOException("Unable to read type " + type.getTypeName() + ", found " + type.getTypeName());
+            }
+        }
     }
 
 
@@ -68,12 +86,17 @@ public class PacketWrapper {
     }
 
     public void writeToBuffer(ByteBuf buffer) throws Exception {
+        if (id != -1) {
+            Type.VAR_INT.write(buffer, id);
+        }
+
         for (Pair<Type, Object> packetValue : packetValues) {
             packetValue.getKey().write(buffer, packetValue.getValue());
         }
+        writeRemaining(buffer);
     }
 
-    public void writeRemaining(ByteBuf output) {
+    private void writeRemaining(ByteBuf output) {
         if (inputBuffer != null) {
             System.out.println("Writing remaining: " + output.readableBytes());
             output.writeBytes(inputBuffer);
@@ -83,17 +106,15 @@ public class PacketWrapper {
     public void send() throws Exception {
         ByteBuf output = inputBuffer.alloc().buffer();
         writeToBuffer(output);
-        writeRemaining(output);
-
         user().sendRawPacket(output);
     }
 
-    public PacketWrapper create() throws Exception {
-        return new PacketWrapper(null, user());
+    public PacketWrapper create(int packetID) throws Exception {
+        return new PacketWrapper(packetID, null, user());
     }
 
-    public PacketWrapper create(ValueCreator init) throws Exception {
-        PacketWrapper wrapper = create();
+    public PacketWrapper create(int packetID, ValueCreator init) throws Exception {
+        PacketWrapper wrapper = create(packetID);
         init.write(wrapper);
         return wrapper;
     }
@@ -108,5 +129,9 @@ public class PacketWrapper {
 
     public UserConnection user() {
         return this.userConnection;
+    }
+
+    public void resetReader() {
+        this.readableObjects.addAll(packetValues);
     }
 }
