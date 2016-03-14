@@ -11,7 +11,7 @@ public class TypeRemapper<T> implements ValueReader<T>, ValueWriter<T> {
     }
 
     @Override
-    public T read(PacketWrapper wrapper) {
+    public T read(PacketWrapper wrapper) throws Exception {
         return wrapper.read(type);
     }
 

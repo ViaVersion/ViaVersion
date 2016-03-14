@@ -41,7 +41,7 @@ public abstract class PacketRemapper {
 
     public abstract void registerMap();
 
-    public void remap(PacketWrapper packetWrapper) {
+    public void remap(PacketWrapper packetWrapper) throws Exception{
         // Read all the current values
         for (Pair<ValueReader, ValueWriter> valueRemapper : valueRemappers) {
             Object object = valueRemapper.getKey().read(packetWrapper);

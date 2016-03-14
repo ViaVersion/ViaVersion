@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.chunks;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 @Getter
 public class Chunk {
     private final int x;
@@ -21,7 +20,7 @@ public class Chunk {
      * @param x coord
      * @param z coord
      */
-    protected Chunk(int x, int z) {
+    public Chunk(int x, int z) {
         this(x, z, true, 0, new ChunkSection[16], null);
         this.unloadPacket = true;
     }

@@ -1,8 +1,12 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.types.ChunkType;
+import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.type.Type;
 
@@ -43,6 +47,20 @@ public class WorldPackets {
             }
         });
 
+        // Chunk Packet
+        protocol.registerOutgoing(State.PLAY, 0x21, 0x20, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception{
+                        ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+                        wrapper.passthrough(new ChunkType(clientChunks));
+                    }
+                });
+            }
+        });
+
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
@@ -57,8 +75,6 @@ public class WorldPackets {
         protocol.registerOutgoing(State.PLAY, 0x41, 0x0D); // Server Difficulty Packet
         protocol.registerOutgoing(State.PLAY, 0x03, 0x44); // Update Time Packet
         protocol.registerOutgoing(State.PLAY, 0x44, 0x35); // World Border Packet
-
-        // TODO: Chunk Data, Bulk Chunk :)
 
         /* Incoming Packets */
 

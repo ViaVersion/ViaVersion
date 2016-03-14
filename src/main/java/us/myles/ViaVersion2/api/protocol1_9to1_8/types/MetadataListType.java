@@ -14,7 +14,7 @@ public class MetadataListType extends Type<List<Metadata>> {
     }
 
     @Override
-    public List<Metadata> read(ByteBuf buffer) {
+    public List<Metadata> read(ByteBuf buffer) throws Exception {
         List<Metadata> list = new ArrayList<>();
         Metadata m;
         do {
@@ -28,8 +28,8 @@ public class MetadataListType extends Type<List<Metadata>> {
     }
 
     @Override
-    public void write(ByteBuf buffer, List<Metadata> object) {
-        for(Metadata m:object){
+    public void write(ByteBuf buffer, List<Metadata> object) throws Exception {
+        for (Metadata m : object) {
             Protocol1_9TO1_8.METADATA.write(buffer, m);
         }
         // Write end of list

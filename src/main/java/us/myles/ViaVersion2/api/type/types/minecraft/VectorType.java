@@ -10,7 +10,7 @@ public class VectorType extends Type<Vector> {
     }
 
     @Override
-    public Vector read(ByteBuf buffer) {
+    public Vector read(ByteBuf buffer) throws Exception {
         int x = Type.INT.read(buffer);
         int y = Type.INT.read(buffer);
         int z = Type.INT.read(buffer);
@@ -19,7 +19,7 @@ public class VectorType extends Type<Vector> {
     }
 
     @Override
-    public void write(ByteBuf buffer, Vector object) {
+    public void write(ByteBuf buffer, Vector object) throws Exception {
         Type.INT.write(buffer, object.getBlockX());
         Type.INT.write(buffer, object.getBlockY());
         Type.INT.write(buffer, object.getBlockZ());

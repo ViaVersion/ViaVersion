@@ -174,7 +174,7 @@ public class EntityPackets {
                 map(Type.VAR_INT); // 1 - Action Type
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int type = wrapper.get(Type.VAR_INT, 1);
                         if (type == 2) {
                             wrapper.passthrough(Type.FLOAT); // 2 - X

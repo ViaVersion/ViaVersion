@@ -49,7 +49,7 @@ public class PlayerPackets {
                 // We only handle if the title or subtitle is set then just write through.
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action == 0 || action == 1) {
                             Protocol1_9TO1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
@@ -90,7 +90,7 @@ public class PlayerPackets {
                 map(Type.BYTE);
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         byte mode = wrapper.get(Type.BYTE, 1);
                         if (mode == 0 || mode == 2) {
                             wrapper.passthrough(Type.STRING);
@@ -152,7 +152,7 @@ public class PlayerPackets {
                 handler(new PacketHandler() {
 
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         int count = wrapper.get(Type.VAR_INT, 1);
 

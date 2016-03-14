@@ -45,7 +45,7 @@ public class PacketWrapper {
         throw new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
     }
 
-    public <T> T read(Type<T> type) {
+    public <T> T read(Type<T> type) throws Exception {
         System.out.println("Reading: " + type.getTypeName());
         // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
         return type.read(inputBuffer);
@@ -57,13 +57,13 @@ public class PacketWrapper {
         packetValues.add(new Pair<Type, Object>(type, value));
     }
 
-    public <T> T passthrough(Type<T> type) {
+    public <T> T passthrough(Type<T> type) throws Exception {
         T value = read(type);
         write(type, value);
         return value;
     }
 
-    public void writeToBuffer(ByteBuf buffer) {
+    public void writeToBuffer(ByteBuf buffer) throws Exception {
         for (Pair<Type, Object> packetValue : packetValues) {
             packetValue.getKey().write(buffer, packetValue.getValue());
         }

@@ -11,7 +11,7 @@ public class EulerAngleType extends Type<EulerAngle> {
     }
 
     @Override
-    public EulerAngle read(ByteBuf buffer) {
+    public EulerAngle read(ByteBuf buffer) throws Exception {
         float x = Type.FLOAT.read(buffer);
         float y = Type.FLOAT.read(buffer);
         float z = Type.FLOAT.read(buffer);
@@ -20,7 +20,7 @@ public class EulerAngleType extends Type<EulerAngle> {
     }
 
     @Override
-    public void write(ByteBuf buffer, EulerAngle object) {
+    public void write(ByteBuf buffer, EulerAngle object) throws Exception {
         Type.FLOAT.write(buffer, (float) object.getX());
         Type.FLOAT.write(buffer, (float) object.getY());
         Type.FLOAT.write(buffer, (float) object.getZ());

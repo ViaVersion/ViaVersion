@@ -92,7 +92,7 @@ public enum PacketType {
     PLAY_UNLOAD_CHUNK(State.PLAY, Direction.OUTGOING, -1, 0x1D),
     PLAY_CHANGE_GAME_STATE(State.PLAY, Direction.OUTGOING, 0x2B, 0x1E),
     PLAY_KEEP_ALIVE(State.PLAY, Direction.OUTGOING, 0x00, 0x1F), // Mapped
-    PLAY_CHUNK_DATA(State.PLAY, Direction.OUTGOING, 0x21, 0x20), // TODO
+    PLAY_CHUNK_DATA(State.PLAY, Direction.OUTGOING, 0x21, 0x20), // Mapped
     PLAY_EFFECT(State.PLAY, Direction.OUTGOING, 0x28, 0x21), // Mapped
     PLAY_PARTICLE(State.PLAY, Direction.OUTGOING, 0x2A, 0x22), // Mapped
     PLAY_JOIN_GAME(State.PLAY, Direction.OUTGOING, 0x01, 0x23), // Mapped

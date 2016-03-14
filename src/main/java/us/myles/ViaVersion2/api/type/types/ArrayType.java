@@ -12,7 +12,7 @@ public class ArrayType<T> extends Type<T[]> {
     }
 
     @Override
-    public T[] read(ByteBuf buffer) {
+    public T[] read(ByteBuf buffer) throws Exception{
         int amount = Type.VAR_INT.read(buffer);
         Object[] array = new Object[amount];
         for (int i = 0; i < amount; i++) {
@@ -22,7 +22,7 @@ public class ArrayType<T> extends Type<T[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, T[] object) {
+    public void write(ByteBuf buffer, T[] object) throws Exception{
         Type.VAR_INT.write(buffer, object.length);
         for (T o : object) {
             elementType.write(buffer, o);

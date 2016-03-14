@@ -13,7 +13,7 @@ public class MetadataType extends Type<Metadata> {
     }
 
     @Override
-    public Metadata read(ByteBuf buffer) {
+    public Metadata read(ByteBuf buffer) throws Exception {
         byte item = buffer.readByte();
         if (item == 127) return null; // end of metadata
         MetadataTypes type = MetadataTypes.byId((item & 0xE0) >> 5);
@@ -22,7 +22,7 @@ public class MetadataType extends Type<Metadata> {
     }
 
     @Override
-    public void write(ByteBuf buffer, Metadata object) {
+    public void write(ByteBuf buffer, Metadata object) throws Exception {
         if (object == null) {
             buffer.writeByte(127);
         } else {

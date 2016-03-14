@@ -61,7 +61,7 @@ public class SpawnPackets {
                 // Create last 3 shorts
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         int data = wrapper.get(Type.INT, 3); // Data (4th Integer)
 
                         short vX = 0, vY = 0, vZ = 0;

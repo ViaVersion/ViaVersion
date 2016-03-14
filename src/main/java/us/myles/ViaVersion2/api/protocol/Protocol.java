@@ -47,7 +47,7 @@ public abstract class Protocol {
         outgoing.put(new Pair<>(state, oldPacketID), protocolPacket);
     }
 
-    public void transform(Direction direction, State state, int packetID, PacketWrapper packetWrapper, ByteBuf output) {
+    public void transform(Direction direction, State state, int packetID, PacketWrapper packetWrapper, ByteBuf output) throws Exception {
         Pair<State, Integer> statePacket = new Pair<>(state, packetID);
         Map<Pair<State, Integer>, ProtocolPacket> packetMap = (direction == Direction.OUTGOING ? outgoing : incoming);
         ProtocolPacket protocolPacket;
