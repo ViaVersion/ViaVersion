@@ -1,6 +1,10 @@
 package us.myles.ViaVersion2.api.protocol.base;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.protocol.Protocol;
@@ -15,7 +19,29 @@ public class BaseProtocol extends Protocol {
     @Override
     protected void registerPackets() {
         /* Outgoing Packets */
-        registerOutgoing(State.STATUS, 0x00, 0x00); // Status Response Packet
+        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        // TODO: Actually make this show compatible versions
+                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
+                        String originalStatus = wrapper.get(Type.STRING, 0);
+                        try {
+                            JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
+                            JSONObject version = (JSONObject) json.get("version");
+                            version.put("protocol", info.getProtocolVersion());
+
+                            wrapper.set(Type.STRING, 0, json.toJSONString()); // Update value
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }); // Status Response Packet
         registerOutgoing(State.STATUS, 0x01, 0x01); // Status Pong Packet
 
         registerOutgoing(State.LOGIN, 0x00, 0x00); // Login Disconnect Packet
