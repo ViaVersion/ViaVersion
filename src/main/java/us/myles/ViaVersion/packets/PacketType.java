@@ -7,52 +7,55 @@ import com.google.common.collect.Table;
 
 public enum PacketType {
     /* Handshake serverbound */
-    HANDSHAKE(State.HANDSHAKE, Direction.INCOMING, 0x00),
+    HANDSHAKE(State.HANDSHAKE, Direction.INCOMING, 0x00), // Mapped
     /* Login serverbound */
-    LOGIN_START(State.LOGIN, Direction.INCOMING, 0x00),
-    LOGIN_ENCRYPTION_RESPONSE(State.LOGIN, Direction.INCOMING, 0x01),
+    LOGIN_START(State.LOGIN, Direction.INCOMING, 0x00), // Mapped
+    LOGIN_ENCRYPTION_RESPONSE(State.LOGIN, Direction.INCOMING, 0x01), // Mapped
     /* Login clientbound */
-    LOGIN_DISCONNECT(State.LOGIN, Direction.OUTGOING, 0x00),
-    LOGIN_ENCRYPTION_REQUEST(State.LOGIN, Direction.OUTGOING, 0x01),
-    LOGIN_SUCCESS(State.LOGIN, Direction.OUTGOING, 0x02),
-    LOGIN_SETCOMPRESSION(State.LOGIN, Direction.OUTGOING, 0x03),
+    LOGIN_DISCONNECT(State.LOGIN, Direction.OUTGOING, 0x00), // Mapped
+    LOGIN_ENCRYPTION_REQUEST(State.LOGIN, Direction.OUTGOING, 0x01), // Mapped
+    LOGIN_SUCCESS(State.LOGIN, Direction.OUTGOING, 0x02), // Mapped
+    LOGIN_SETCOMPRESSION(State.LOGIN, Direction.OUTGOING, 0x03), // Mapped
+
     /* Status serverbound */
-    STATUS_REQUEST(State.STATUS, Direction.INCOMING, 0x00),
-    STATUS_PING(State.STATUS, Direction.INCOMING, 0x01),
+    STATUS_REQUEST(State.STATUS, Direction.INCOMING, 0x00), // Mapped
+    STATUS_PING(State.STATUS, Direction.INCOMING, 0x01), // Mapped
     /* Status clientbound */
     STATUS_RESPONSE(State.STATUS, Direction.OUTGOING, 0x00),
     STATUS_PONG(State.STATUS, Direction.OUTGOING, 0x01),
     /* Play serverbound */
-    PLAY_TP_CONFIRM(State.PLAY, Direction.INCOMING, -1, 0x00),
-    PLAY_TAB_COMPLETE_REQUEST(State.PLAY, Direction.INCOMING, 0x14, 0x01),
-    PLAY_CHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02),
-    PLAY_CLIENT_STATUS(State.PLAY, Direction.INCOMING, 0x16, 0x03),
-    PLAY_CLIENT_SETTINGS(State.PLAY, Direction.INCOMING, 0x15, 0x04),
-    PLAY_CONFIRM_TRANS(State.PLAY, Direction.INCOMING, 0x0F, 0x05),
-    PLAY_ENCHANT_ITEM(State.PLAY, Direction.INCOMING, 0x11, 0x06),
-    PLAY_CLICK_WINDOW(State.PLAY, Direction.INCOMING, 0x0E, 0x07),
-    PLAY_CLOSE_WINDOW_REQUEST(State.PLAY, Direction.INCOMING, 0x0D, 0x08),
+    PLAY_TP_CONFIRM(State.PLAY, Direction.INCOMING, -1, 0x00), // TODO
+    PLAY_TAB_COMPLETE_REQUEST(State.PLAY, Direction.INCOMING, 0x14, 0x01), // Mapped
+    PLAY_CHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02), // Mapped
+    PLAY_CLIENT_STATUS(State.PLAY, Direction.INCOMING, 0x16, 0x03), // Mapped
+    PLAY_CLIENT_SETTINGS(State.PLAY, Direction.INCOMING, 0x15, 0x04), // Mapped
+    PLAY_CONFIRM_TRANS(State.PLAY, Direction.INCOMING, 0x0F, 0x05), // Mapped
+    PLAY_ENCHANT_ITEM(State.PLAY, Direction.INCOMING, 0x11, 0x06), // Mapped
+    PLAY_CLICK_WINDOW(State.PLAY, Direction.INCOMING, 0x0E, 0x07), // Mapped
+    PLAY_CLOSE_WINDOW_REQUEST(State.PLAY, Direction.INCOMING, 0x0D, 0x08), // Mapped
     PLAY_PLUGIN_MESSAGE_REQUEST(State.PLAY, Direction.INCOMING, 0x17, 0x09),
-    PLAY_USE_ENTITY(State.PLAY, Direction.INCOMING, 0x02, 0x0A),
-    PLAY_KEEP_ALIVE_REQUEST(State.PLAY, Direction.INCOMING, 0x00, 0x0B),
-    PLAY_PLAYER_POSITION_REQUEST(State.PLAY, Direction.INCOMING, 0x04, 0x0C),
-    PLAY_PLAYER_POSITION_LOOK_REQUEST(State.PLAY, Direction.INCOMING, 0x06, 0x0D),
-    PLAY_PLAYER_LOOK_REQUEST(State.PLAY, Direction.INCOMING, 0x05, 0x0E),
-    PLAY_PLAYER(State.PLAY, Direction.INCOMING, 0x03, 0x0F),
-    PLAY_VEHICLE_MOVE_REQUEST(State.PLAY, Direction.INCOMING, -1, 0x10),
-    PLAY_STEER_BOAT(State.PLAY, Direction.INCOMING, -1, 0x11),
-    PLAY_PLAYER_ABILITIES_REQUEST(State.PLAY, Direction.INCOMING, 0x13, 0x12),
-    PLAY_PLAYER_DIGGING(State.PLAY, Direction.INCOMING, 0x07, 0x13),
-    PLAY_ENTITY_ACTION(State.PLAY, Direction.INCOMING, 0x0B, 0x14),
-    PLAY_STEER_VEHICLE(State.PLAY, Direction.INCOMING, 0x0C, 0x15),
-    PLAY_RESOURCE_PACK_STATUS(State.PLAY, Direction.INCOMING, 0x19, 0x16),
-    PLAY_HELD_ITEM_CHANGE_REQUEST(State.PLAY, Direction.INCOMING, 0x09, 0x17),
-    PLAY_CREATIVE_INVENTORY_ACTION(State.PLAY, Direction.INCOMING, 0x10, 0x18),
-    PLAY_UPDATE_SIGN_REQUEST(State.PLAY, Direction.INCOMING, 0x12, 0x19),
-    PLAY_ANIMATION_REQUEST(State.PLAY, Direction.INCOMING, 0x0A, 0x1A),
-    PLAY_SPECTATE(State.PLAY, Direction.INCOMING, 0x18, 0x1B),
-    PLAY_PLAYER_BLOCK_PLACEMENT(State.PLAY, Direction.INCOMING, 0x08, 0x1C),
-    PLAY_USE_ITEM(State.PLAY, Direction.INCOMING, -1, 0x1D),
+    PLAY_USE_ENTITY(State.PLAY, Direction.INCOMING, 0x02, 0x0A), // Mapped
+    PLAY_KEEP_ALIVE_REQUEST(State.PLAY, Direction.INCOMING, 0x00, 0x0B), // Mapped
+    PLAY_PLAYER_POSITION_REQUEST(State.PLAY, Direction.INCOMING, 0x04, 0x0C), // Mapped
+    PLAY_PLAYER_POSITION_LOOK_REQUEST(State.PLAY, Direction.INCOMING, 0x06, 0x0D), // Mapped
+    PLAY_PLAYER_LOOK_REQUEST(State.PLAY, Direction.INCOMING, 0x05, 0x0E), // Mapped
+    PLAY_PLAYER(State.PLAY, Direction.INCOMING, 0x03, 0x0F), // Mapped
+    PLAY_VEHICLE_MOVE_REQUEST(State.PLAY, Direction.INCOMING, -1, 0x10), // TODO
+    PLAY_STEER_BOAT(State.PLAY, Direction.INCOMING, -1, 0x11), // TODO
+    PLAY_PLAYER_ABILITIES_REQUEST(State.PLAY, Direction.INCOMING, 0x13, 0x12), // Mapped
+    PLAY_PLAYER_DIGGING(State.PLAY, Direction.INCOMING, 0x07, 0x13), // Mapped
+    PLAY_ENTITY_ACTION(State.PLAY, Direction.INCOMING, 0x0B, 0x14), // Mapped
+    PLAY_STEER_VEHICLE(State.PLAY, Direction.INCOMING, 0x0C, 0x15), // Mapped
+
+    PLAY_RESOURCE_PACK_STATUS(State.PLAY, Direction.INCOMING, 0x19, 0x16), // Mapped
+    PLAY_HELD_ITEM_CHANGE_REQUEST(State.PLAY, Direction.INCOMING, 0x09, 0x17), // Mapped
+
+    PLAY_CREATIVE_INVENTORY_ACTION(State.PLAY, Direction.INCOMING, 0x10, 0x18), // Mapped
+    PLAY_UPDATE_SIGN_REQUEST(State.PLAY, Direction.INCOMING, 0x12, 0x19), // Mapped
+    PLAY_ANIMATION_REQUEST(State.PLAY, Direction.INCOMING, 0x0A, 0x1A), // Mapped
+    PLAY_SPECTATE(State.PLAY, Direction.INCOMING, 0x18, 0x1B), // Mapped
+    PLAY_PLAYER_BLOCK_PLACEMENT(State.PLAY, Direction.INCOMING, 0x08, 0x1C), // Mapped
+    PLAY_USE_ITEM(State.PLAY, Direction.INCOMING, -1, 0x1D), // TODO
     /* Play clientbound */
     PLAY_SPAWN_OBJECT(State.PLAY, Direction.OUTGOING, 0x0E, 0x00), // Mapped
     PLAY_SPAWN_XP_ORB(State.PLAY, Direction.OUTGOING, 0x11, 0x01), // Mapped

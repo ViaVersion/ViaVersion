@@ -4,6 +4,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueTransformer;
 import us.myles.ViaVersion2.api.type.Type;
@@ -29,7 +30,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN, new ValueTransformer<Boolean, Void>(Type.NOTHING) {
                     @Override
                     public Void transform(PacketWrapper wrapper, Boolean inputValue) {
-                        if(!inputValue){
+                        if (!inputValue) {
                             // TODO: Write Set Passengers packet
                         }
                         return null;
@@ -146,5 +147,52 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x1E, 0x31); // Remove Entity Effect Packet
         protocol.registerOutgoing(State.PLAY, 0x19, 0x34); // Entity Head Look Packet
         protocol.registerOutgoing(State.PLAY, 0x12, 0x3B); // Entity Velocity Packet
+
+        /* Incoming Packets */
+
+        // Entity Action Packet
+        protocol.registerIncoming(State.PLAY, 0x0B, 0x14, new PacketRemapper() {
+
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Player ID
+                map(Type.VAR_INT); // 1 - Action
+                map(Type.VAR_INT); // 2 - Jump
+
+                // TODO: If action is 6 or 8 cancel
+                // If action is 7 change to 6
+            }
+        });
+
+
+        // Use Entity Packet
+        protocol.registerIncoming(State.PLAY, 0x02, 0x0A, new PacketRemapper() {
+
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID (Target)
+                map(Type.VAR_INT); // 1 - Action Type
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) {
+                        int type = wrapper.get(Type.VAR_INT, 1);
+                        if (type == 2) {
+                            wrapper.passthrough(Type.FLOAT); // 2 - X
+                            wrapper.passthrough(Type.FLOAT); // 3 - Y
+                            wrapper.passthrough(Type.FLOAT); // 4 - Z
+                        }
+                        if (type == 0 || type == 2) {
+                            wrapper.read(Type.VAR_INT); // 2/5 - Hand
+                        }
+                    }
+                });
+            }
+        });
+
+        /* Packets which do not have any field remapping or handlers */
+
+        protocol.registerIncoming(State.PLAY, 0x0C, 0x15); // Steer Vehicle Packet
+        protocol.registerIncoming(State.PLAY, 0x18, 0x1B); // Spectate Packet
+
     }
 }

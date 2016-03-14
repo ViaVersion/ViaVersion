@@ -224,5 +224,51 @@ public class PlayerPackets {
         // Login Success - Save UUID and Username
         // Server Difficulty - Activate Auto-Team
         // TODO: Status Response, implement? (Might be implemented by a base protocol?)
+
+        /* Incoming Packets */
+
+        // Tab Complete Request Packet
+        protocol.registerIncoming(State.PLAY, 0x14, 0x01, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - Requested Command
+                map(Type.BOOLEAN, Type.NOTHING); // 1 - Is Command Block
+            }
+        });
+
+        // Client Settings Packet
+        protocol.registerIncoming(State.PLAY, 0x15, 0x04, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - locale
+                map(Type.BYTE); // 1 - View Distance
+                map(Type.VAR_INT, Type.BYTE); // 2 - Chat Mode
+                map(Type.BOOLEAN); // 3 - If Chat Colours on
+                map(Type.UNSIGNED_BYTE); // 4 - Skin Parts
+                map(Type.VAR_INT, Type.NOTHING); // 5 - Main Hand
+            }
+        });
+
+        // Animation Request Packet
+        protocol.registerIncoming(State.PLAY, 0x0A, 0x1A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT, Type.NOTHING); // 0 - Hand
+            }
+        });
+
+        /* Packets which do not have any field remapping or handlers */
+
+        protocol.registerIncoming(State.PLAY, 0x01, 0x02); // Chat Message Packet
+        protocol.registerIncoming(State.PLAY, 0x16, 0x03); // Client Status Packet
+        protocol.registerIncoming(State.PLAY, 0x13, 0x12); // Player Abilities Request Packet
+        protocol.registerIncoming(State.PLAY, 0x19, 0x16); // Resource Pack Status Packet
+
+        protocol.registerIncoming(State.PLAY, 0x00, 0x0B); // Keep Alive Request Packet
+
+        protocol.registerIncoming(State.PLAY, 0x04, 0x0C); // Player Position Packet
+        protocol.registerIncoming(State.PLAY, 0x06, 0x0D); // Player Move & Look Packet
+        protocol.registerIncoming(State.PLAY, 0x05, 0x0E); // Player Look Packet
+        protocol.registerIncoming(State.PLAY, 0x03, 0x0F); // Player Packet
     }
 }

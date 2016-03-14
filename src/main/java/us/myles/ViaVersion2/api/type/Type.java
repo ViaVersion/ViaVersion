@@ -39,6 +39,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<Short> SHORT = new ShortType();
     public static final Type<Short[]> SHORT_ARRAY = new ArrayType<>(Type.SHORT);
+
+    public static final Type<Integer> UNSIGNED_SHORT = new UnsignedShortType();
+    public static final Type<Integer[]> UNSIGNED_SHORT_ARRAY = new ArrayType<>(Type.UNSIGNED_SHORT);
     /* Other Types */
     public static final Type<String> STRING = new StringType();
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);

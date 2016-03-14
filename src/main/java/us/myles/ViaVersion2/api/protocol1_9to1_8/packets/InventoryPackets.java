@@ -90,5 +90,56 @@ public class InventoryPackets {
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x32, 0x11); // Confirm Transaction Packet
+
+        /* Incoming Packets */
+
+        // Creative Inventory Slot Action Packet
+        protocol.registerIncoming(State.PLAY, 0x10, 0x18, new PacketRemapper() {
+
+            @Override
+            public void registerMap() {
+                map(Type.SHORT);
+                map(Type.ITEM);
+                // TODO: Transform Item Patch
+            }
+        });
+
+        // Player Click Window Packet
+        protocol.registerIncoming(State.PLAY, 0x0E, 0x07, new PacketRemapper() {
+
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE);
+                map(Type.SHORT);
+                map(Type.BYTE);
+                map(Type.SHORT);
+                map(Type.BYTE);
+                map(Type.ITEM);
+
+                // TODO: Transform Item Patch
+                // TODO: Throw elytra and brewing patch
+            }
+        });
+
+        // Close Window Incoming Packet
+        protocol.registerIncoming(State.PLAY, 0x0D, 0x08, new PacketRemapper() {
+
+            @Override
+            public void registerMap() {
+                // TODO Close Inventory patch
+            }
+        });
+
+
+
+        // TODO Use Item
+
+        /* Packets which do not have any field remapping or handlers */
+
+        protocol.registerIncoming(State.PLAY, 0x0F, 0x05); // Confirm Transaction Packet
+        protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
+
+        // TODO Held Item change blocking patch
+        protocol.registerIncoming(State.PLAY, 0x09, 0x17); // Held Item Change Packet
     }
 }
