@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import us.myles.ViaVersion.chunks.ChunkManager;
 import us.myles.ViaVersion.packets.State;
 
 @Getter
@@ -16,6 +17,7 @@ public class ConnectionInfo {
     private static final long IDLE_PACKET_LIMIT = 20; // Max 20 ticks behind
 
     private final SocketChannel channel;
+    private final ChunkManager chunkManager;
     private Object lastPacket;
     private java.util.UUID UUID;
     private State state = State.HANDSHAKE;
@@ -29,6 +31,7 @@ public class ConnectionInfo {
 
     public ConnectionInfo(SocketChannel socketChannel) {
         this.channel = socketChannel;
+        this.chunkManager = new ChunkManager(this);
     }
 
     public Player getPlayer() {

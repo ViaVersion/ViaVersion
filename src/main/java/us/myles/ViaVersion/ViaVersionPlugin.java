@@ -29,7 +29,6 @@ import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -39,7 +38,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
@@ -99,7 +97,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public void generateConfig() {
         File file = new File(getDataFolder(), "config.yml");
-        if(file.exists()) {
+        if (file.exists()) {
             // Update config options
             Configuration oldConfig = new Configuration(file);
             oldConfig.reload(false); // Load current options from config
@@ -107,9 +105,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             saveDefaultConfig(); // Generate new config
             Configuration newConfig = new Configuration(file);
             newConfig.reload(true); // Load default options
-            for(String key : oldConfig.getKeys(false)) {
+            for (String key : oldConfig.getKeys(false)) {
                 // Set option in new config if exists
-                if(newConfig.contains(key)) {
+                if (newConfig.contains(key)) {
                     newConfig.set(key, oldConfig.get(key));
                 }
             }
@@ -123,23 +121,19 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         try {
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
-            if (connection == null) {
-                System.out.println("connection is null!!");
-                //try others
-                for (Method m : serverClazz.getDeclaredMethods()) {
-                    if (m.getReturnType() != null && !m.getName().equals("getServerConnection")) {
-                        if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
-                            if (m.getParameterTypes().length == 0) {
-                                connection = m.invoke(server);
-                            }
+            Object connection = null;
+            for (Method m : serverClazz.getDeclaredMethods()) {
+                if (m.getReturnType() != null) {
+                    if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
+                        if (m.getParameterTypes().length == 0) {
+                            connection = m.invoke(server);
                         }
                     }
                 }
-                if (connection == null) {
-                    getLogger().warning("We failed to find the ServerConnection? :(");
-                    return;
-                }
+            }
+            if (connection == null) {
+                getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
+                return;
             }
             if (connection != null) {
                 for (Field field : connection.getClass().getDeclaredFields()) {
