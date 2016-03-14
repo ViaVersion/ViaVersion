@@ -10,10 +10,10 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
         this.outputType = outputType;
     }
 
-    public abstract T2 transform(PacketWrapper wrapper, T1 inputValue);
+    public abstract T2 transform(PacketWrapper wrapper, T1 inputValue) throws Exception;
 
     @Override
-    public void write(PacketWrapper writer, T1 inputValue) {
+    public void write(PacketWrapper writer, T1 inputValue) throws Exception {
         writer.write(outputType, transform(writer, inputValue));
     }
 }

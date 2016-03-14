@@ -1,9 +1,12 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueTransformer;
@@ -29,9 +32,26 @@ public class EntityPackets {
                 // Leash boolean is removed in new versions
                 map(Type.BOOLEAN, new ValueTransformer<Boolean, Void>(Type.NOTHING) {
                     @Override
-                    public Void transform(PacketWrapper wrapper, Boolean inputValue) {
+                    public Void transform(PacketWrapper wrapper, Boolean inputValue) throws Exception {
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (!inputValue) {
-                            // TODO: Write Set Passengers packet
+                            int passenger = wrapper.get(Type.VAR_INT, 0);
+                            int vehicle = wrapper.get(Type.VAR_INT, 1);
+
+                            wrapper.cancel(); // Don't send current packet
+
+                            PacketWrapper passengerPacket = wrapper.create();
+                            passengerPacket.write(Type.VAR_INT, 0x40); // Passenger Packet ID
+                            if (vehicle == -1) {
+                                if (!tracker.getVehicleMap().containsKey(passenger))
+                                    return null; // Cancel
+                                passengerPacket.write(Type.VAR_INT, tracker.getVehicleMap().remove(passenger));
+                                passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{});
+                            } else {
+                                passengerPacket.write(Type.VAR_INT, vehicle);
+                                passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{passenger});
+                            }
+                            passengerPacket.send(); // Send the packet
                         }
                         return null;
                     }
@@ -53,7 +73,20 @@ public class EntityPackets {
 
                 map(Type.BOOLEAN); // 6 - On Ground
 
-                // TODO: Move holograms up on Y by offset (*32)
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            if (tracker.getKnownHolograms().contains(entityID)) {
+                                Double newValue = wrapper.get(Type.DOUBLE, 1);
+                                newValue += (32D * ((ViaVersionPlugin) ViaVersion.getInstance()).getHologramYOffset());
+                                wrapper.set(Type.DOUBLE, 1, newValue);
+                            }
+                        }
+                    }
+                });
             }
         });
         // Entity Look Move Packet
@@ -71,7 +104,20 @@ public class EntityPackets {
 
                 map(Type.BOOLEAN); // 6 - On Ground
 
-                // TODO: Hologram patch moves down by 1 in Y
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            if (tracker.getKnownHolograms().contains(entityID)) {
+                                Short newValue = wrapper.get(Type.SHORT, 1);
+                                newValue = (short) (newValue + (((ViaVersionPlugin) ViaVersion.getInstance()).getHologramYOffset()));
+                                wrapper.set(Type.SHORT, 1, newValue);
+                            }
+                        }
+                    }
+                });
             }
         });
         // Entity Relative Move Packet
@@ -86,7 +132,20 @@ public class EntityPackets {
 
                 map(Type.BOOLEAN); // 4 - On Ground
 
-                // TODO: Hologram patch moves down by 1 in Y
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            if (tracker.getKnownHolograms().contains(entityID)) {
+                                Short newValue = wrapper.get(Type.SHORT, 1);
+                                newValue = (short) (newValue + (((ViaVersionPlugin) ViaVersion.getInstance()).getHologramYOffset()));
+                                wrapper.set(Type.SHORT, 1, newValue);
+                            }
+                        }
+                    }
+                });
             }
         });
         // Entity Equipment Packet
@@ -158,9 +217,17 @@ public class EntityPackets {
                 map(Type.VAR_INT); // 0 - Player ID
                 map(Type.VAR_INT); // 1 - Action
                 map(Type.VAR_INT); // 2 - Jump
-
-                // TODO: If action is 6 or 8 cancel
-                // If action is 7 change to 6
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int action = wrapper.get(Type.VAR_INT, 1);
+                        if (action == 6 || action == 8)
+                            wrapper.cancel();
+                        if (action == 7) {
+                            wrapper.set(Type.VAR_INT, 1, 6);
+                        }
+                    }
+                });
             }
         });
 

@@ -3,6 +3,7 @@ package us.myles.ViaVersion2.api.protocol;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
@@ -66,6 +67,8 @@ public abstract class Protocol {
         // remap
         if (protocolPacket.getRemapper() != null) {
             protocolPacket.getRemapper().remap(packetWrapper);
+            if(packetWrapper.isCancelled())
+                throw new CancelException();
             // write to output
             packetWrapper.writeToBuffer(output);
         }

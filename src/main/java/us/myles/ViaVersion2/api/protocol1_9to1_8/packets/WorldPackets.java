@@ -97,8 +97,14 @@ public class WorldPackets {
                 map(Type.UNSIGNED_BYTE); // 0 - Status
                 map(Type.POSITION); // 1 - Position
                 map(Type.UNSIGNED_BYTE); // 2 - Face
-
-                // TODO: Cancel if status == 6
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        if(status == 6)
+                            wrapper.cancel();
+                    }
+                });
                 // TODO: Blocking patch stopped if blocking and 5
             }
         });

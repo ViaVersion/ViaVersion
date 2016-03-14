@@ -136,8 +136,15 @@ public class PlayerPackets {
                 map(Type.UNSIGNED_BYTE); // 4 - Max Players (Tab)
                 map(Type.STRING); // 5 - Level Type
                 map(Type.BOOLEAN); // 6 - Reduced Debug info
-
-                // TODO Register player ID as self ID
+                
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int myID = wrapper.get(Type.INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.setEntityID(myID);
+                    }
+                });
             }
         });
 
