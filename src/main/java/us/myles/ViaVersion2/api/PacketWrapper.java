@@ -2,11 +2,13 @@ package us.myles.ViaVersion2.api;
 
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.remapper.ValueCreator;
 import us.myles.ViaVersion2.api.type.Type;
+import us.myles.ViaVersion2.api.type.TypeConverter;
 import us.myles.ViaVersion2.api.util.Pair;
 
 import java.io.IOException;
@@ -60,7 +62,6 @@ public class PacketWrapper {
     public <T> T read(Type<T> type) throws Exception {
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
-            System.out.println("Reading: " + type.getTypeName());
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
             return type.read(inputBuffer);
         } else {
@@ -75,7 +76,6 @@ public class PacketWrapper {
 
 
     public <T> void write(Type<T> type, T value) {
-        System.out.println("Writing " + type.getTypeName() + " - " + value);
         packetValues.add(new Pair<Type, Object>(type, value));
     }
 
@@ -89,22 +89,44 @@ public class PacketWrapper {
         if (id != -1) {
             Type.VAR_INT.write(buffer, id);
         }
-
+        int index = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            packetValue.getKey().write(buffer, packetValue.getValue());
+            System.out.println("writing: " + packetValue.getKey().getTypeName() + " value: " + packetValue.getValue() + " ID: " + getId());
+            try {
+                Object value = packetValue.getValue();
+                if(value != null) {
+                    if (!value.getClass().equals(packetValue.getKey().getOutputClass())) {
+                        // attempt conversion
+                        if (packetValue.getKey() instanceof TypeConverter) {
+                            value = ((TypeConverter) packetValue.getKey()).from(value);
+                        } else {
+                            System.out.println("Possible type mismatch: " + value.getClass().getName() + " -> " + packetValue.getKey().getTypeName());
+                        }
+                    }
+                }
+                packetValue.getKey().write(buffer, value);
+            }catch (Exception e){
+                System.out.println(getId() + " Index: " + index + " Type: " + packetValue.getKey().getTypeName());
+                throw e;
+            }
+            index++;
+        }
+        if(packetValues.size() != 0){
+            if(inputBuffer != null){
+                System.out.println(">> Writing remaining: " + inputBuffer.readableBytes() + " ID: " + getId());
+            }
         }
         writeRemaining(buffer);
     }
 
     private void writeRemaining(ByteBuf output) {
         if (inputBuffer != null) {
-            System.out.println("Writing remaining: " + output.readableBytes());
             output.writeBytes(inputBuffer);
         }
     }
 
     public void send() throws Exception {
-        ByteBuf output = inputBuffer.alloc().buffer();
+        ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
         writeToBuffer(output);
         user().sendRawPacket(output);
     }

@@ -24,7 +24,7 @@ public enum PacketType {
     STATUS_RESPONSE(State.STATUS, Direction.OUTGOING, 0x00),
     STATUS_PONG(State.STATUS, Direction.OUTGOING, 0x01),
     /* Play serverbound */
-    PLAY_TP_CONFIRM(State.PLAY, Direction.INCOMING, -1, 0x00), // TODO
+    PLAY_TP_CONFIRM(State.PLAY, Direction.INCOMING, -1, 0x00), // Mapped
     PLAY_TAB_COMPLETE_REQUEST(State.PLAY, Direction.INCOMING, 0x14, 0x01), // Mapped
     PLAY_CHAT_MESSAGE_CLIENT(State.PLAY, Direction.INCOMING, 0x01, 0x02), // Mapped
     PLAY_CLIENT_STATUS(State.PLAY, Direction.INCOMING, 0x16, 0x03), // Mapped
@@ -40,8 +40,8 @@ public enum PacketType {
     PLAY_PLAYER_POSITION_LOOK_REQUEST(State.PLAY, Direction.INCOMING, 0x06, 0x0D), // Mapped
     PLAY_PLAYER_LOOK_REQUEST(State.PLAY, Direction.INCOMING, 0x05, 0x0E), // Mapped
     PLAY_PLAYER(State.PLAY, Direction.INCOMING, 0x03, 0x0F), // Mapped
-    PLAY_VEHICLE_MOVE_REQUEST(State.PLAY, Direction.INCOMING, -1, 0x10), // TODO
-    PLAY_STEER_BOAT(State.PLAY, Direction.INCOMING, -1, 0x11), // TODO
+    PLAY_VEHICLE_MOVE_REQUEST(State.PLAY, Direction.INCOMING, -1, 0x10), // Mapped
+    PLAY_STEER_BOAT(State.PLAY, Direction.INCOMING, -1, 0x11), // Mapped
     PLAY_PLAYER_ABILITIES_REQUEST(State.PLAY, Direction.INCOMING, 0x13, 0x12), // Mapped
     PLAY_PLAYER_DIGGING(State.PLAY, Direction.INCOMING, 0x07, 0x13), // Mapped
     PLAY_ENTITY_ACTION(State.PLAY, Direction.INCOMING, 0x0B, 0x14), // Mapped
@@ -55,7 +55,7 @@ public enum PacketType {
     PLAY_ANIMATION_REQUEST(State.PLAY, Direction.INCOMING, 0x0A, 0x1A), // Mapped
     PLAY_SPECTATE(State.PLAY, Direction.INCOMING, 0x18, 0x1B), // Mapped
     PLAY_PLAYER_BLOCK_PLACEMENT(State.PLAY, Direction.INCOMING, 0x08, 0x1C), // Mapped
-    PLAY_USE_ITEM(State.PLAY, Direction.INCOMING, -1, 0x1D), // TODO
+    PLAY_USE_ITEM(State.PLAY, Direction.INCOMING, -1, 0x1D), // Mapped
     /* Play clientbound */
     PLAY_SPAWN_OBJECT(State.PLAY, Direction.OUTGOING, 0x0E, 0x00), // Mapped
     PLAY_SPAWN_XP_ORB(State.PLAY, Direction.OUTGOING, 0x11, 0x01), // Mapped

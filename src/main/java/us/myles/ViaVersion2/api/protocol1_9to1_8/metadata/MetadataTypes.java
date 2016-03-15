@@ -1,4 +1,4 @@
-package us.myles.ViaVersion2.api.protocol1_9to1_8;
+package us.myles.ViaVersion2.api.protocol1_9to1_8.metadata;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

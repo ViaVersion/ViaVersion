@@ -5,7 +5,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion2.api.data.UserConnection;
+import us.myles.ViaVersion2.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
@@ -26,7 +27,10 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        ConnectionInfo info = new ConnectionInfo(socketChannel);
+        UserConnection info = new UserConnection(socketChannel);
+        // init protocol
+        System.out.println("init pipeline");
+        new ProtocolPipeline(info);
         // Add originals
         this.method.invoke(this.oldInit, socketChannel);
         // Add our transformers

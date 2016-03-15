@@ -47,6 +47,7 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     @Override
     protected void registerPackets() {
+        System.out.println("Registering packets for 1.9 to 1.8");
         SpawnPackets.register(this);
         InventoryPackets.register(this);
         EntityPackets.register(this);

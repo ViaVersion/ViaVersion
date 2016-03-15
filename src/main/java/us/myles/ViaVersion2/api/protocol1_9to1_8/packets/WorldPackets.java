@@ -1,5 +1,6 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import us.myles.ViaVersion.chunks.Chunk;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
@@ -32,6 +33,12 @@ public class WorldPackets {
                 // Everything else get's written through
 
                 // TODO: Effect canceller patch
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
             }
         });
 
@@ -44,6 +51,12 @@ public class WorldPackets {
                 // Everything else get's written through
 
                 // TODO: Sound Effect translator patch
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
             }
         });
 
@@ -53,9 +66,16 @@ public class WorldPackets {
             public void registerMap() {
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception{
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        wrapper.passthrough(new ChunkType(clientChunks));
+                        Chunk chunk = wrapper.passthrough(new ChunkType(clientChunks));
+                        if (chunk.isUnloadPacket()) {
+                            PacketWrapper unload = wrapper.create(0x1D);
+                            unload.write(Type.INT, chunk.getX());
+                            unload.write(Type.INT, chunk.getZ());
+                            unload.send();
+                            wrapper.cancel();
+                        }
                     }
                 });
             }
@@ -101,7 +121,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if(status == 6)
+                        if (status == 6)
                             wrapper.cancel();
                     }
                 });

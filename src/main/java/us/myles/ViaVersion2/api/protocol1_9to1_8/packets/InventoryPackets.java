@@ -4,6 +4,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueCreator;
 import us.myles.ViaVersion2.api.type.Type;
@@ -41,7 +42,8 @@ public class InventoryPackets {
 
             @Override
             public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+
+                map(Type.BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM); // 2 - Slot Value
                 // TODO Brewing patch
@@ -55,6 +57,7 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.ITEM_ARRAY); // 1 - Window Values
+
                 // TODO Brewing patch
                 // TODO - ItemStack rewriter
             }
@@ -115,7 +118,6 @@ public class InventoryPackets {
                 map(Type.SHORT);
                 map(Type.BYTE);
                 map(Type.ITEM);
-
                 // TODO: Transform Item Patch
                 // TODO: Throw elytra and brewing patch
             }
@@ -140,6 +142,16 @@ public class InventoryPackets {
         protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
 
         // TODO Held Item change blocking patch
-        protocol.registerIncoming(State.PLAY, 0x09, 0x17); // Held Item Change Packet
+        protocol.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        System.out.println("held item");
+                    }
+                });
+            }
+        }); // Held Item Change Packet
     }
 }

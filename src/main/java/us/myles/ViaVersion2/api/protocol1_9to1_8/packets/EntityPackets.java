@@ -4,13 +4,17 @@ import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.metadata.Metadata;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueTransformer;
 import us.myles.ViaVersion2.api.type.Type;
+
+import java.util.List;
 
 public class EntityPackets {
     public static ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
@@ -75,6 +79,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        System.out.println("handling holo for tp");
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -86,6 +91,8 @@ public class EntityPackets {
                         }
                     }
                 });
+
+
             }
         });
         // Entity Look Move Packet
@@ -106,6 +113,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        System.out.println("look move");
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -174,7 +182,19 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Protocol1_9TO1_8.METADATA_LIST); // 1 - Metadata List
-                // TODO Transform metadata
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        if(tracker.getClientEntityTypes().containsKey(entityID)) {
+                            MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+                        }else{
+                            System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
+                        }
+                    }
+                });
             }
         });
 

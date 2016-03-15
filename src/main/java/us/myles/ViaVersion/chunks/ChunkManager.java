@@ -60,29 +60,7 @@ public class ChunkManager {
      * @param packet to transform
      * @return List of chunk data packets
      */
-    public List<Object> transformMapChunkBulk(Object packet) {
-        List<Object> list = Lists.newArrayList();
-        try {
-            int[] xcoords = mapChunkBulkRef.getFieldValue("a", packet, int[].class);
-            int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
-            Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
-            for(int i = 0; i < chunkMaps.length; i++) {
-                int x = xcoords[i];
-                int z = zcoords[i];
-                Object chunkMap = chunkMaps[i];
-                Object chunkPacket = mapChunkRef.newInstance();
-                mapChunkRef.setFieldValue("a", chunkPacket, x);
-                mapChunkRef.setFieldValue("b", chunkPacket, z);
-                mapChunkRef.setFieldValue("c", chunkPacket, chunkMap);
-                mapChunkRef.setFieldValue("d", chunkPacket, true); // Chunk bulk chunks are always ground-up
-                bulkChunks.add(toLong(x, z)); // Store for later
-                list.add(chunkPacket);
-            }
-        } catch(Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to transform chunk bulk", e);
-        }
-        return list;
-    }
+
 
     /**
      * Read chunk from 1.8 chunk data.

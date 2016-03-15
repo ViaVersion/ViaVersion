@@ -5,22 +5,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
+import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
+import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.data.UserConnection;
+import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
-    private final ConnectionInfo info;
+    private final UserConnection info;
     private final MessageToByteEncoder minecraftEncoder;
-    private final OutgoingTransformer outgoingTransformer;
 
-    public ViaEncodeHandler(ConnectionInfo info, MessageToByteEncoder minecraftEncoder) {
+    public ViaEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
         this.info = info;
         this.minecraftEncoder = minecraftEncoder;
-        this.outgoingTransformer = new OutgoingTransformer(info);
     }
 
 
@@ -40,7 +42,10 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             ByteBuf oldPacket = bytebuf.copy();
             bytebuf.clear();
             try {
-                outgoingTransformer.transform(id, oldPacket, bytebuf);
+                PacketWrapper wrapper = new PacketWrapper(id, oldPacket, info);
+                ProtocolInfo protInfo = info.get(ProtocolInfo.class);
+                protInfo.getPipeline().transform(Direction.OUTGOING, protInfo.getState(), wrapper);
+                wrapper.writeToBuffer(bytebuf);
             } catch (Exception e) {
                 bytebuf.clear();
                 throw e;

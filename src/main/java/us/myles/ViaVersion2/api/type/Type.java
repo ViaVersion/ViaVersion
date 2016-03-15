@@ -60,6 +60,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<CompoundTag> NBT = new NBTType();
 
+    public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
+
     public static final Type<Item> ITEM = new ItemType();
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
     /* Actual Class */

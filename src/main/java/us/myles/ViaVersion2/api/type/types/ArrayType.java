@@ -3,6 +3,8 @@ package us.myles.ViaVersion2.api.type.types;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion2.api.type.Type;
 
+import java.lang.reflect.Array;
+
 public class ArrayType<T> extends Type<T[]> {
     private final Type<T> elementType;
 
@@ -14,11 +16,13 @@ public class ArrayType<T> extends Type<T[]> {
     @Override
     public T[] read(ByteBuf buffer) throws Exception{
         int amount = Type.VAR_INT.read(buffer);
-        Object[] array = new Object[amount];
+        T[] array = (T[]) Array.newInstance(elementType.getOutputClass(), amount);
+
+        System.out.println("READING ARRAY " + array.length);
         for (int i = 0; i < amount; i++) {
             array[i] = elementType.read(buffer);
         }
-        return (T[]) array;
+        return array;
     }
 
     @Override

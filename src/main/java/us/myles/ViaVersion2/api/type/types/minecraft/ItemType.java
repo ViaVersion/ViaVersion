@@ -13,6 +13,7 @@ public class ItemType extends Type<Item> {
     public Item read(ByteBuf buffer) throws Exception {
         short id = buffer.readShort();
         if (id < 0) {
+            System.out.println("null item");
             return null;
         } else {
             Item item = new Item();
@@ -20,6 +21,7 @@ public class ItemType extends Type<Item> {
             item.setAmount(buffer.readByte());
             item.setData(buffer.readShort());
             item.setTag(Type.NBT.read(buffer));
+            System.out.println("item tag: " + item.getTag());
             return item;
         }
     }
@@ -28,6 +30,7 @@ public class ItemType extends Type<Item> {
     public void write(ByteBuf buffer, Item object) throws Exception {
         if (object == null) {
             buffer.writeShort(-1);
+            System.out.println("writing -1");
         } else {
             buffer.writeShort(object.getId());
             buffer.writeByte(object.getAmount());

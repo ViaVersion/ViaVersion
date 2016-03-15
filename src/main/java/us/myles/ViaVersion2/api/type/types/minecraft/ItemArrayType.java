@@ -22,7 +22,7 @@ public class ItemArrayType extends Type<Item[]> {
 
     @Override
     public void write(ByteBuf buffer, Item[] object) throws Exception {
-        Type.VAR_INT.write(buffer, object.length);
+        Type.SHORT.write(buffer, (short) object.length);
         for (Item o : object) {
             Type.ITEM.write(buffer, o);
         }

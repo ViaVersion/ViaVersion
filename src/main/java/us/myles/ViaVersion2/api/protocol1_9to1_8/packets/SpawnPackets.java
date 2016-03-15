@@ -4,14 +4,18 @@ import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.metadata.Metadata;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueCreator;
 import us.myles.ViaVersion2.api.remapper.ValueTransformer;
 import us.myles.ViaVersion2.api.type.Type;
+
+import java.util.List;
 
 public class SpawnPackets {
     public static ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
@@ -62,7 +66,7 @@ public class SpawnPackets {
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
-                        int data = wrapper.get(Type.INT, 3); // Data (4th Integer)
+                        int data = wrapper.get(Type.INT, 0); // Data (1st Integer)
 
                         short vX = 0, vY = 0, vZ = 0;
                         if (data > 0) {
@@ -165,8 +169,21 @@ public class SpawnPackets {
                 map(Type.SHORT); // 10 - Velocity Y
                 map(Type.SHORT); // 11 - Velocity Z
 
-                // TODO Rewrite Metadata
                 map(Protocol1_9TO1_8.METADATA_LIST);
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        if(tracker.getClientEntityTypes().containsKey(entityID)) {
+                            MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+                        }else{
+                            System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
+                        }
+                    }
+                });
             }
         });
 
@@ -218,8 +235,21 @@ public class SpawnPackets {
 
                 map(Type.SHORT, Type.NOTHING); // Current Item is discontinued
 
-                // TODO Rewrite Metadata
                 map(Protocol1_9TO1_8.METADATA_LIST);
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        if(tracker.getClientEntityTypes().containsKey(entityID)) {
+                            MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+                        }else{
+                            System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
+                        }
+                    }
+                });
             }
         });
 

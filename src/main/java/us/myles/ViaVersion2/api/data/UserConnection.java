@@ -3,13 +3,22 @@ package us.myles.ViaVersion2.api.data;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserConnection {
-    private final SocketChannel channel;
     List<StoredObject> storedObjects = new ArrayList<>();
+    @Getter
+    @Setter
+    private boolean active = true;
+    private final SocketChannel channel;
+    @Getter
+    @Setter
+    private Object lastPacket;
+
 
     public UserConnection(SocketChannel socketChannel) {
         this.channel = socketChannel;

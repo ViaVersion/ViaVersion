@@ -162,7 +162,6 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         int count = wrapper.get(Type.VAR_INT, 1);
-
                         for (int i = 0; i < count; i++) {
                             wrapper.passthrough(Type.UUID); // Player UUID
                             if (action == 0) { // add player
@@ -213,6 +212,7 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x48, 0x32); // Resource Pack Send Packet
         protocol.registerOutgoing(State.PLAY, 0x07, 0x33); // Respawn Packet
         protocol.registerOutgoing(State.PLAY, 0x43, 0x36); // Camera Packet
+        protocol.registerOutgoing(State.PLAY, 0x2B, 0x1E); // Change Game State Packet
 
         protocol.registerOutgoing(State.PLAY, 0x09, 0x37); // Held Item Change Packet
 
@@ -262,6 +262,58 @@ public class PlayerPackets {
             }
         });
 
+        // TP Confirm
+        protocol.registerIncoming(State.PLAY, -1, 0x00, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
+        // Vehicle Move
+        protocol.registerIncoming(State.PLAY, -1, 0x10, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
+        // Steer Boat
+        protocol.registerIncoming(State.PLAY, -1, 0x11, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
+        // Use Item TODO
+        protocol.registerIncoming(State.PLAY, -1, 0x1D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerIncoming(State.PLAY, 0x01, 0x02); // Chat Message Packet
@@ -277,5 +329,7 @@ public class PlayerPackets {
         protocol.registerIncoming(State.PLAY, 0x03, 0x0F); // Player Packet
 
         // TODO Plugin Channels :(
+        protocol.registerIncoming(State.PLAY, 0x17, 0x09); // plugin message incoming
+        protocol.registerOutgoing(State.PLAY, 0x3F, 0x18); // plugin message outgoing
     }
 }

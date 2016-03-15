@@ -1,7 +1,5 @@
 package us.myles.ViaVersion2.api.protocol;
 
-import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
@@ -13,16 +11,25 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class ProtocolPipeline extends Protocol {
-    LinkedList<Protocol> protocolList = new LinkedList<>();
+    LinkedList<Protocol> protocolList;
+    private UserConnection userConnection;
+
+    public ProtocolPipeline(UserConnection userConnection) {
+        super();
+        init(userConnection);
+    }
 
     @Override
     protected void registerPackets() {
+        protocolList = new LinkedList<>();
         // This is a pipeline so we register basic pipes
         protocolList.addLast(new BaseProtocol());
     }
 
     @Override
     public void init(UserConnection userConnection) {
+        this.userConnection = userConnection;
+
         ProtocolInfo protocolInfo = new ProtocolInfo();
         protocolInfo.setPipeline(this);
 
@@ -34,14 +41,25 @@ public class ProtocolPipeline extends Protocol {
         }
     }
 
+    public void add(Protocol protocol) {
+        if (protocolList != null) {
+            System.out.println("Adding protocol to list!!");
+            protocolList.addLast(protocol);
+            protocol.init(userConnection);
+        } else {
+            throw new NullPointerException("Tried to add protocol to early");
+        }
+    }
+
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-
+//        System.out.println("--> Packet ID incoming: " + packetWrapper.getId() + " - " + state);
         for (Protocol protocol : new ArrayList<>(protocolList)) { // Copy to prevent from removal.
             protocol.transform(direction, state, packetWrapper);
             // Reset the reader for the packetWrapper (So it can be recycled across packets)
             packetWrapper.resetReader();
         }
         super.transform(direction, state, packetWrapper);
+        System.out.println("--> Sending Packet ID: " + packetWrapper.getId() + " " + state + " " + direction);
     }
 }

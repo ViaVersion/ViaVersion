@@ -9,7 +9,8 @@ import us.myles.ViaVersion2.api.type.Type;
 @Getter
 @Setter
 public class Metadata {
-    private final int id;
+    private int id;
+    private int typeID;
     private Type type;
     private Object value;
 }

@@ -8,6 +8,7 @@ import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.protocol.Protocol;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.type.Type;
@@ -56,6 +57,7 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) {
+                        System.out.println("play state");
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setState(State.PLAY);
                         UUID uuid = UUID.fromString(wrapper.get(Type.STRING, 0));
@@ -85,7 +87,10 @@ public class BaseProtocol extends Protocol {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setProtocolVersion(protVer);
                         // TODO: Choose the right pipe
-
+                        // We'll just cheat lol
+                        wrapper.user().get(ProtocolInfo.class).getPipeline().add(new Protocol1_9TO1_8());
+                        System.out.println("I should decide on a protocol for " + protVer);
+                        wrapper.set(Type.VAR_INT, 0, 47); // TODO remove hard code
                         // Change state
                         int state = wrapper.get(Type.VAR_INT, 1);
                         if (state == 1) {

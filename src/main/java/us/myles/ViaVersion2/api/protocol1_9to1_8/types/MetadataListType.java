@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MetadataListType extends Type<List<Metadata>> {
     public MetadataListType() {
-        super(List.class);
+        super("Metadata List", List.class);
     }
 
     @Override
@@ -31,6 +31,7 @@ public class MetadataListType extends Type<List<Metadata>> {
     public void write(ByteBuf buffer, List<Metadata> object) throws Exception {
         for (Metadata m : object) {
             Protocol1_9TO1_8.METADATA.write(buffer, m);
+            System.out.println("Writing meta data: " + m.getType().getTypeName() + " - " + m.getId() + " - " + m.getTypeID());
         }
         // Write end of list
         Protocol1_9TO1_8.METADATA.write(buffer, null);

@@ -4,22 +4,22 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import us.myles.ViaVersion.CancelException;
-import us.myles.ViaVersion.ConnectionInfo;
-import us.myles.ViaVersion.transformers.IncomingTransformer;
+import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.util.PacketUtil;
+import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.data.UserConnection;
+import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
 import java.util.List;
 
 public class ViaDecodeHandler extends ByteToMessageDecoder {
 
-    private final IncomingTransformer incomingTransformer;
     private final ByteToMessageDecoder minecraftDecoder;
-    private final ConnectionInfo info;
+    private final UserConnection info;
 
-    public ViaDecodeHandler(ConnectionInfo info, ByteToMessageDecoder minecraftDecoder) {
+    public ViaDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
         this.info = info;
         this.minecraftDecoder = minecraftDecoder;
-        this.incomingTransformer = new IncomingTransformer(info);
     }
 
     @Override
@@ -29,9 +29,14 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
             if (info.isActive()) {
                 int id = PacketUtil.readVarInt(bytebuf);
                 // Transform
-                ByteBuf newPacket = ctx.alloc().buffer();
                 try {
-                    incomingTransformer.transform(id, bytebuf, newPacket);
+
+                    PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);
+                    ProtocolInfo protInfo = info.get(ProtocolInfo.class);
+                    protInfo.getPipeline().transform(Direction.INCOMING, protInfo.getState(), wrapper);
+                    ByteBuf newPacket = ctx.alloc().buffer();
+                    wrapper.writeToBuffer(newPacket);
+
                     bytebuf.clear();
                     bytebuf = newPacket;
                 } catch (Exception e) {
