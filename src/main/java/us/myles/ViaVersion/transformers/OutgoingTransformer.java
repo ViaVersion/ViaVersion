@@ -299,7 +299,8 @@ public class OutgoingTransformer {
             try {
                 JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
                 JSONObject version = (JSONObject) json.get("version");
-                version.put("protocol", info.getProtocol());
+                if ((long) version.get("protocol") != 9999) //Fix ServerListPlus custom outdated message
+                    version.put("protocol", info.getProtocol());
                 PacketUtil.writeString(json.toJSONString(), output);
             } catch (ParseException e) {
                 e.printStackTrace();
