@@ -34,6 +34,7 @@ public enum MetaIndex {
     PLAYER_ADDITIONAL_HEARTS(HumanEntity.class, 17, Type.Float, 10, NewType.Float),
     PLAYER_SCORE(HumanEntity.class, 18, Type.Int, 11, NewType.VarInt),
     PLAYER_HAND(HumanEntity.class, -1, Type.NonExistent, 5, NewType.Byte), // new in 1.9
+    SOMETHING_ANTICHEAT_PLUGINS_FOR_SOME_REASON_USE(HumanEntity.class, 11, Type.Byte, NewType.Discontinued), //For what we know, This doesn't exists. If you think it exists and knows what it does. Please tell us.
     // horse
     HORSE_INFO(Horse.class, 16, Type.Int, 12, NewType.Byte),
     HORSE_TYPE(Horse.class, 19, Type.Byte, 13, NewType.VarInt),
