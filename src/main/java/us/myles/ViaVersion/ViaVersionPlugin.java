@@ -239,6 +239,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("prevent-collision", true);
     }
 
+    public boolean isNewEffectIndicator(){
+        return getConfig().getBoolean("use-new-effect-indicator",true);
+    }
+
     public boolean isSuppressMetadataErrors() {
         return getConfig().getBoolean("suppress-metadata-errors", false);
     }

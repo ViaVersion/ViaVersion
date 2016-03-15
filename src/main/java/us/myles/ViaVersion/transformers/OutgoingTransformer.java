@@ -679,7 +679,7 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(duration, output);
             // we need to write as a byte instead of boolean
             boolean hideParticles = input.readBoolean();
-            output.writeByte(hideParticles ? 1 : 0);
+            output.writeByte(hideParticles ? plugin.isNewEffectIndicator() ? 2 : 1 : 0);
             return;
         }
         if (packet == PacketType.PLAY_TEAM) {
