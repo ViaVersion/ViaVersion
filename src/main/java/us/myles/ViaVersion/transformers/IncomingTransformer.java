@@ -329,7 +329,6 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_CREATIVE_INVENTORY_ACTION) {
             short slot = input.readShort();
-            System.out.println(slot);
             if (slot == 45) {
                 ByteBuf buf = info.getChannel().alloc().buffer();
                 PacketUtil.writeVarInt(PacketType.PLAY_SET_SLOT.getNewPacketID(), buf);
