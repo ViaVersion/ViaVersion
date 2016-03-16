@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
@@ -225,8 +226,6 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x06, 0x3E); // Update Health Packet
         protocol.registerOutgoing(State.PLAY, 0x0D, 0x49); // Collect Item Packet
 
-        protocol.registerOutgoing(State.PLAY, 0x3F, 0x18); // Plugin Message
-
         // TODO:
         // Server Difficulty - Activate Auto-Team
 
@@ -301,16 +300,28 @@ public class PlayerPackets {
             }
         });
 
-        // Use Item TODO
+        // Use Item Packet
         protocol.registerIncoming(State.PLAY, -1, 0x1D, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
+                        // Wipe the input buffer
+                        wrapper.clearInputBuffer();
+                        // First set this packet ID to Block placement
+                        wrapper.setId(0x08);
+                        wrapper.write(Type.LONG, -1L);
+                        wrapper.write(Type.BYTE, (byte) 255);
+                        // Write item in hand
+                        wrapper.write(Type.SHORT, (short) -1); // TODO
+
+                        wrapper.write(Type.BYTE, (byte) 0);
+                        wrapper.write(Type.BYTE, (byte) 0);
+                        wrapper.write(Type.BYTE, (byte) 0);
                     }
                 });
+
             }
         });
 
@@ -323,10 +334,10 @@ public class PlayerPackets {
 
         protocol.registerIncoming(State.PLAY, 0x00, 0x0B); // Keep Alive Request Packet
 
-        protocol.registerIncoming(State.PLAY, 0x04, 0x0C); // Player Position Packet
-        protocol.registerIncoming(State.PLAY, 0x06, 0x0D); // Player Move & Look Packet
-        protocol.registerIncoming(State.PLAY, 0x05, 0x0E); // Player Look Packet
-        protocol.registerIncoming(State.PLAY, 0x03, 0x0F); // Player Packet
+        protocol.registerIncoming(State.PLAY, 0x04, 0x0C, new PlayerMovementMapper()); // Player Position Packet
+        protocol.registerIncoming(State.PLAY, 0x06, 0x0D, new PlayerMovementMapper()); // Player Move & Look Packet
+        protocol.registerIncoming(State.PLAY, 0x05, 0x0E, new PlayerMovementMapper()); // Player Look Packet
+        protocol.registerIncoming(State.PLAY, 0x03, 0x0F, new PlayerMovementMapper()); // Player Packet
 
         // TODO Plugin Channels :(
         protocol.registerIncoming(State.PLAY, 0x17, 0x09); // plugin message incoming

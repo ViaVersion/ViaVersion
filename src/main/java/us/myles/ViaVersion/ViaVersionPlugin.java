@@ -27,6 +27,8 @@ import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
+import us.myles.ViaVersion2.api.data.UserConnection;
+import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -41,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
-    private final Map<UUID, ConnectionInfo> portedPlayers = new ConcurrentHashMap<>();
+    private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
     private boolean debug = false;
 
     public static ItemStack getHandItem(final ConnectionInfo info) {
@@ -212,7 +214,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
         if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not on 1.9");
-        ConnectionInfo ci = portedPlayers.get(uuid);
+        UserConnection ci = portedPlayers.get(uuid);
         ci.sendRawPacket(packet);
     }
 
@@ -269,8 +271,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("auto-team", true);
     }
 
-    public void addPortedClient(ConnectionInfo info) {
-        portedPlayers.put(info.getUUID(), info);
+    public void addPortedClient(UserConnection info) {
+        portedPlayers.put(info.get(ProtocolInfo.class).getUuid(), info);
     }
 
     public void removePortedClient(UUID clientID) {

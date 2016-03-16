@@ -313,7 +313,7 @@ public class OutgoingTransformer {
             PacketUtil.writeString(uuid, output);
             UUID uniqueId = UUID.fromString(uuid);
             info.setUUID(uniqueId);
-            plugin.addPortedClient(info);
+           // plugin.addPortedClient(info);
             String username = PacketUtil.readString(input);
             info.setUsername(username);
             PacketUtil.writeString(username, output);

@@ -3,6 +3,8 @@ package us.myles.ViaVersion2.api.protocol.base;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
@@ -57,12 +59,14 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) {
-                        System.out.println("play state");
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setState(State.PLAY);
+                        // Save other info
                         UUID uuid = UUID.fromString(wrapper.get(Type.STRING, 0));
                         info.setUuid(uuid);
                         info.setUsername(wrapper.get(Type.STRING, 1));
+                        // Add to ported clients
+                        ((ViaVersionPlugin) ViaVersion.getInstance()).addPortedClient(wrapper.user());
                     }
                 });
             }

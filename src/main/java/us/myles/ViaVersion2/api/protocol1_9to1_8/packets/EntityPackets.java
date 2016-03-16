@@ -4,8 +4,10 @@ import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.metadata.Metadata;
 import us.myles.ViaVersion2.api.protocol.Protocol;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
@@ -172,7 +174,13 @@ public class EntityPackets {
 
                 // TODO - Blocking patch
 
-                // TODO - ItemStack rewriter
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item stack = wrapper.get(Type.ITEM, 0);
+                        ItemRewriter.toClient(stack);
+                    }
+                });
             }
         });
         // Entity Metadata Packet

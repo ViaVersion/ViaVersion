@@ -62,4 +62,11 @@ public class ProtocolPipeline extends Protocol {
         super.transform(direction, state, packetWrapper);
         System.out.println("--> Sending Packet ID: " + packetWrapper.getId() + " " + state + " " + direction);
     }
+
+    public boolean contains(Class<? extends Protocol> pipeClass){
+        for(Protocol protocol:protocolList){
+            if(protocol.getClass().equals(pipeClass)) return true;
+        }
+        return false;
+    }
 }

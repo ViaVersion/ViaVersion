@@ -14,6 +14,7 @@ public class UserConnection {
     @Getter
     @Setter
     private boolean active = true;
+    @Getter
     private final SocketChannel channel;
     @Getter
     @Setter

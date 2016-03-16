@@ -9,6 +9,7 @@ import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.MovementTracker;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.types.MetadataListType;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.types.MetadataType;
 import us.myles.ViaVersion2.api.remapper.ValueTransformer;
@@ -61,5 +62,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new EntityTracker());
         // Chunk tracker
         userConnection.put(new ClientChunks());
+        // Movement tracker
+        userConnection.put(new MovementTracker());
     }
 }

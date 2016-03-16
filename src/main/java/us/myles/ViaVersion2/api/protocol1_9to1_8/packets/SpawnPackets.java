@@ -170,7 +170,7 @@ public class SpawnPackets {
                 map(Type.SHORT); // 11 - Velocity Z
 
                 map(Protocol1_9TO1_8.METADATA_LIST);
-
+                // TODO: Metadata detector for bossbars, wither stuff.
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -267,7 +267,6 @@ public class SpawnPackets {
                         for (Integer entity : entities) {
                             // EntityTracker
                             wrapper.user().get(EntityTracker.class).removeEntity(entity);
-                            // TODO: When holograms added and bossbars, remove too
                         }
                     }
                 });

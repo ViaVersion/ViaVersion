@@ -2,7 +2,9 @@ package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.protocol.Protocol;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
@@ -47,7 +49,13 @@ public class InventoryPackets {
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM); // 2 - Slot Value
                 // TODO Brewing patch
-                // TODO - ItemStack rewriter
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item stack = wrapper.get(Type.ITEM, 0);
+                        ItemRewriter.toClient(stack);
+                    }
+                });
             }
         });
         // Window Set Slots Packet
@@ -59,7 +67,14 @@ public class InventoryPackets {
                 map(Type.ITEM_ARRAY); // 1 - Window Values
 
                 // TODO Brewing patch
-                // TODO - ItemStack rewriter
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item[] stacks = wrapper.get(Type.ITEM_ARRAY, 0);
+                        for (Item stack : stacks)
+                            ItemRewriter.toClient(stack);
+                    }
+                });
             }
         });
         // Close Window Packet
@@ -103,7 +118,13 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.SHORT);
                 map(Type.ITEM);
-                // TODO: Transform Item Patch
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item stack = wrapper.get(Type.ITEM, 0);
+                        ItemRewriter.toServer(stack);
+                    }
+                });
             }
         });
 
@@ -118,7 +139,13 @@ public class InventoryPackets {
                 map(Type.SHORT);
                 map(Type.BYTE);
                 map(Type.ITEM);
-                // TODO: Transform Item Patch
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item stack = wrapper.get(Type.ITEM, 0);
+                        ItemRewriter.toServer(stack);
+                    }
+                });
                 // TODO: Throw elytra and brewing patch
             }
         });
@@ -131,10 +158,6 @@ public class InventoryPackets {
                 // TODO Close Inventory patch
             }
         });
-
-
-
-        // TODO Use Item
 
         /* Packets which do not have any field remapping or handlers */
 

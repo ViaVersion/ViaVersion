@@ -94,7 +94,7 @@ public class PacketWrapper {
             System.out.println("writing: " + packetValue.getKey().getTypeName() + " value: " + packetValue.getValue() + " ID: " + getId());
             try {
                 Object value = packetValue.getValue();
-                if(value != null) {
+                if (value != null) {
                     if (!value.getClass().equals(packetValue.getKey().getOutputClass())) {
                         // attempt conversion
                         if (packetValue.getKey() instanceof TypeConverter) {
@@ -105,18 +105,23 @@ public class PacketWrapper {
                     }
                 }
                 packetValue.getKey().write(buffer, value);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println(getId() + " Index: " + index + " Type: " + packetValue.getKey().getTypeName());
                 throw e;
             }
             index++;
         }
-        if(packetValues.size() != 0){
-            if(inputBuffer != null){
+        if (packetValues.size() != 0) {
+            if (inputBuffer != null) {
                 System.out.println(">> Writing remaining: " + inputBuffer.readableBytes() + " ID: " + getId());
             }
         }
         writeRemaining(buffer);
+    }
+
+    public void clearInputBuffer() {
+        if (inputBuffer != null)
+            inputBuffer.clear();
     }
 
     private void writeRemaining(ByteBuf output) {
