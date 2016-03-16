@@ -8,6 +8,7 @@ import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.transformers.IncomingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class ViaDecodeHandler extends ByteToMessageDecoder {
@@ -40,7 +41,13 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 }
             }
             // call minecraft decoder
-            list.addAll(PacketUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+            try {
+                list.addAll(PacketUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof Exception) {
+                    throw (Exception) e.getCause();
+                }
+            }
         }
     }
 
