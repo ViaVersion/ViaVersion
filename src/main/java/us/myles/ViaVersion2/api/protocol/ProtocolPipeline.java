@@ -60,12 +60,13 @@ public class ProtocolPipeline extends Protocol {
             packetWrapper.resetReader();
         }
         super.transform(direction, state, packetWrapper);
-        System.out.println("--> Sending Packet ID: " + packetWrapper.getId() + " " + state + " " + direction);
+        if (packetWrapper.getId() != 37 && packetWrapper.getId() != 32 && packetWrapper.getId() != 52 && packetWrapper.getId() != 21 && packetWrapper.getId() != 59)
+            System.out.println("--> Sending Packet ID: " + packetWrapper.getId() + " " + state + " " + direction);
     }
 
-    public boolean contains(Class<? extends Protocol> pipeClass){
-        for(Protocol protocol:protocolList){
-            if(protocol.getClass().equals(pipeClass)) return true;
+    public boolean contains(Class<? extends Protocol> pipeClass) {
+        for (Protocol protocol : protocolList) {
+            if (protocol.getClass().equals(pipeClass)) return true;
         }
         return false;
     }

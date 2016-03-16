@@ -46,7 +46,6 @@ public abstract class PacketRemapper {
         for (Pair<ValueReader, ValueWriter> valueRemapper : valueRemappers) {
             Object object = valueRemapper.getKey().read(packetWrapper);
             // Convert object to write type :O!!!
-            // TODO: Data converter lol
             valueRemapper.getValue().write(packetWrapper, object);
         }
         // If we had handlers we'd put them here

@@ -13,6 +13,7 @@ import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.InventoryTracker;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.MovementTracker;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.types.MetadataListType;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.types.MetadataType;
@@ -71,6 +72,8 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new ClientChunks(userConnection));
         // Movement tracker
         userConnection.put(new MovementTracker(userConnection));
+        // Inventory tracker
+        userConnection.put(new InventoryTracker(userConnection));
     }
 
 

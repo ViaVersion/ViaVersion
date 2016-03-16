@@ -91,8 +91,7 @@ public class PacketWrapper {
         }
         int index = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            System.out.println("writing: " + packetValue.getKey().getTypeName() + " value: " + packetValue.getValue() + " ID: " + getId());
-            try {
+           try {
                 Object value = packetValue.getValue();
                 if (value != null) {
                     if (!value.getClass().equals(packetValue.getKey().getOutputClass())) {
@@ -110,11 +109,6 @@ public class PacketWrapper {
                 throw e;
             }
             index++;
-        }
-        if (packetValues.size() != 0) {
-            if (inputBuffer != null) {
-                System.out.println(">> Writing remaining: " + inputBuffer.readableBytes() + " ID: " + getId());
-            }
         }
         writeRemaining(buffer);
     }

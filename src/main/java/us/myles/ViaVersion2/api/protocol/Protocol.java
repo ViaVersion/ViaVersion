@@ -58,7 +58,6 @@ public abstract class Protocol {
         packetWrapper.setId(newID);
         // remap
         if (protocolPacket.getRemapper() != null) {
-            System.out.println("Remapping for " + getClass().getName() + " - " + newID + "<- " + direction + " " + state);
             protocolPacket.getRemapper().remap(packetWrapper);
             if(packetWrapper.isCancelled())
                 throw new CancelException();

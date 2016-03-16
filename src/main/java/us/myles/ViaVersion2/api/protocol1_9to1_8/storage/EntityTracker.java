@@ -11,7 +11,6 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.metadata.NewType;
 import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.StoredObject;
@@ -31,11 +30,13 @@ public class EntityTracker extends StoredObject {
     private final Map<Integer, BossBar> bossBarMap = new HashMap<>();
     private final Set<Integer> validBlocking = new HashSet<>();
     private final Set<Integer> knownHolograms = new HashSet<>();
-    @Getter
     @Setter
     private boolean blocking = false;
     @Setter
+    private boolean autoTeam = false;
+    @Setter
     private int entityID;
+    private boolean teamExists = false;
 
     public EntityTracker(UserConnection user) {
         super(user);
@@ -51,8 +52,8 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void setSecondHand(UserConnection connection, Item item) {
-        PacketWrapper wrapper = new PacketWrapper(0x3C, null, connection);
+    public void setSecondHand(Item item) {
+        PacketWrapper wrapper = new PacketWrapper(0x3C, null, getUser());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, item);
@@ -92,7 +93,7 @@ public class EntityTracker extends StoredObject {
             if (type == EntityType.ENDER_DRAGON) {
                 if (metadata.getId() == 11) {
                     metadataList.remove(metadata);
-                 //   metadataList.add(new Metadata(11, NewType.Byte.getTypeID(), Type.VAR_INT, 0));
+                    //   metadataList.add(new Metadata(11, NewType.Byte.getTypeID(), Type.VAR_INT, 0));
                 }
             }
 
@@ -104,10 +105,10 @@ public class EntityTracker extends StoredObject {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityID)) {
                                 Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                setSecondHand(getUser(), shield);
+                                setSecondHand(shield);
                             }
                         } else {
-                            setSecondHand(getUser(), null);
+                            setSecondHand(null);
                         }
                     }
                 }
@@ -164,6 +165,36 @@ public class EntityTracker extends StoredObject {
                     }
                 }
             }
+        }
+    }
+
+    public void sendTeamPacket(boolean b) {
+        PacketWrapper wrapper = new PacketWrapper(0x41, null, getUser());
+        wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
+        if (b) {
+            // add
+            if (!teamExists) {
+                wrapper.write(Type.BYTE, (byte) 0); // make team
+                wrapper.write(Type.STRING, "viaversion");
+                wrapper.write(Type.STRING, ""); // prefix
+                wrapper.write(Type.STRING, ""); // suffix
+                wrapper.write(Type.BYTE, (byte) 0); // friendly fire
+                wrapper.write(Type.STRING, ""); // nametags
+                wrapper.write(Type.STRING, "never"); // collision rule :)
+                wrapper.write(Type.BYTE, (byte) 0); // color
+            } else {
+                wrapper.write(Type.BYTE, (byte) 3);
+            }
+            wrapper.write(Type.VAR_INT, 1); // player count
+            wrapper.write(Type.STRING, getUser().get(ProtocolInfo.class).getUsername());
+        } else {
+            wrapper.write(Type.BYTE, (byte) 1); // remove team
+        }
+        teamExists = b;
+        try {
+            wrapper.send();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

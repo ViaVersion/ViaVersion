@@ -1,8 +1,11 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.chunks.Chunk;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.ClientChunks;
@@ -94,7 +97,21 @@ public class WorldPackets {
         protocol.registerOutgoing(State.PLAY, 0x27, 0x1C); // Explosion Packet
         protocol.registerOutgoing(State.PLAY, 0x2A, 0x22); // Particle Packet
 
-        protocol.registerOutgoing(State.PLAY, 0x41, 0x0D); // Server Difficulty Packet
+        protocol.registerOutgoing(State.PLAY, 0x41, 0x0D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isAutoTeam()) {
+                            EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                            entityTracker.setAutoTeam(true);
+                            entityTracker.sendTeamPacket(true);
+                        }
+                    }
+                });
+            }
+        }); // Server Difficulty Packet
         protocol.registerOutgoing(State.PLAY, 0x03, 0x44); // Update Time Packet
         protocol.registerOutgoing(State.PLAY, 0x44, 0x35); // World Border Packet
 
@@ -134,9 +151,9 @@ public class WorldPackets {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         if (status == 5) {
                             EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                            if(entityTracker.isBlocking()){
+                            if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
-                                entityTracker.setSecondHand(wrapper.user(), null);
+                                entityTracker.setSecondHand(null);
                             }
                         }
                     }
@@ -151,14 +168,13 @@ public class WorldPackets {
                 map(Type.POSITION); // 0 - Position
                 map(Type.VAR_INT, Type.BYTE); // 1 - Block Face
                 map(Type.VAR_INT, Type.NOTHING); // 2 - Hand
-                // TODO: Actual hand item
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.SHORT, (short) -1);
+                        Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
+                        wrapper.write(Type.ITEM, item);
                     }
                 });
-                // Did have item rewriter but its not needed
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y
                 map(Type.UNSIGNED_BYTE); // 6 - Z

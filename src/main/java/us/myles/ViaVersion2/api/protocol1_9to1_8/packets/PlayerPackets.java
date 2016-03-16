@@ -8,6 +8,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.protocol.Protocol;
+import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
@@ -111,7 +112,24 @@ public class PlayerPackets {
 
                         if (mode == 0 || mode == 2) {
                             String[] players = wrapper.read(Type.STRING_ARRAY);
-                            // TODO Handler for sending autoteam
+                            final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                            String myName = wrapper.user().get(ProtocolInfo.class).getUsername();
+                            for (String player : players) {
+                                if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {
+                                    if (mode == 4) {
+                                        // since removing add to auto team
+                                        ((ViaVersionPlugin) ViaVersion.getInstance()).run(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                entityTracker.sendTeamPacket(true);
+                                            }
+                                        }, false);
+                                    } else {
+                                        // since adding remove from auto team
+                                        entityTracker.sendTeamPacket(false);
+                                    }
+                                }
+                            }
                             wrapper.write(Type.STRING_ARRAY, players);
                         }
                     }
@@ -228,9 +246,6 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x06, 0x3E); // Update Health Packet
         protocol.registerOutgoing(State.PLAY, 0x0D, 0x49); // Collect Item Packet
 
-        // TODO:
-        // Server Difficulty - Activate Auto-Team
-
         /* Incoming Packets */
 
         // Tab Complete Request Packet
@@ -326,7 +341,7 @@ public class PlayerPackets {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
                                         Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                        tracker.setSecondHand(wrapper.user(), shield);
+                                        tracker.setSecondHand(shield);
                                     }
                                     wrapper.cancel();
                                 }

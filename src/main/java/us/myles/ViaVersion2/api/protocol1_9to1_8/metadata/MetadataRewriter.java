@@ -9,7 +9,9 @@ import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
 import us.myles.ViaVersion.metadata.Type;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
+import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.metadata.Metadata;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.ItemRewriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,10 +113,7 @@ public class MetadataRewriter {
                         case Slot:
                             entry.setType(us.myles.ViaVersion2.api.type.Type.ITEM);
                             entry.setValue(value);
-//                            ItemSlotRewriter.ItemStack item = (ItemSlotRewriter.ItemStack) value;
-//                            ItemSlotRewriter.fixIdsFrom1_8To1_9(item);
-//                            ItemSlotRewriter.writeItemStack(item, output);
-                            // TODO
+                            ItemRewriter.toClient((Item) entry.getValue());
                             break;
                         case Position:
                             entry.setType(us.myles.ViaVersion2.api.type.Type.VECTOR);
@@ -156,7 +155,6 @@ public class MetadataRewriter {
                 }
             }
         }
-        // TODO: Holo patch and bossbar patch
     }
 
 }
