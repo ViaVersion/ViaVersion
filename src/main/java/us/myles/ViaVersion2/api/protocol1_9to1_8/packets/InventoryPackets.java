@@ -6,6 +6,7 @@ import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.remapper.ValueCreator;
@@ -164,14 +165,18 @@ public class InventoryPackets {
         protocol.registerIncoming(State.PLAY, 0x0F, 0x05); // Confirm Transaction Packet
         protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
 
-        // TODO Held Item change blocking patch
         protocol.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
             @Override
             public void registerMap() {
+                // Blocking patch
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        System.out.println("held item");
+                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        if (entityTracker.isBlocking()) {
+                            entityTracker.setBlocking(false);
+                            entityTracker.setSecondHand(wrapper.user(), null);
+                        }
                     }
                 });
             }

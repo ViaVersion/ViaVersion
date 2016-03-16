@@ -30,7 +30,7 @@ public class ProtocolPipeline extends Protocol {
     public void init(UserConnection userConnection) {
         this.userConnection = userConnection;
 
-        ProtocolInfo protocolInfo = new ProtocolInfo();
+        ProtocolInfo protocolInfo = new ProtocolInfo(userConnection);
         protocolInfo.setPipeline(this);
 
         userConnection.put(protocolInfo);

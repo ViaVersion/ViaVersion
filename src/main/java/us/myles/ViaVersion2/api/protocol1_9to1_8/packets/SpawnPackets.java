@@ -170,7 +170,6 @@ public class SpawnPackets {
                 map(Type.SHORT); // 11 - Velocity Z
 
                 map(Protocol1_9TO1_8.METADATA_LIST);
-                // TODO: Metadata detector for bossbars, wither stuff.
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -182,6 +181,16 @@ public class SpawnPackets {
                         }else{
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
                         }
+                    }
+                });
+                // Handler for meta data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.handleMetadata(entityID, metadataList);
                     }
                 });
             }
@@ -248,6 +257,17 @@ public class SpawnPackets {
                         }else{
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
                         }
+                    }
+                });
+
+                // Handler for meta data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.handleMetadata(entityID, metadataList);
                     }
                 });
             }

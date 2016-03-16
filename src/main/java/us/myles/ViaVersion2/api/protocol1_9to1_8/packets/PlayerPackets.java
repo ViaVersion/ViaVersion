@@ -1,10 +1,12 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
+import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
@@ -307,6 +309,7 @@ public class PlayerPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        int hand = wrapper.read(Type.VAR_INT);
                         // Wipe the input buffer
                         wrapper.clearInputBuffer();
                         // First set this packet ID to Block placement
@@ -314,7 +317,23 @@ public class PlayerPackets {
                         wrapper.write(Type.LONG, -1L);
                         wrapper.write(Type.BYTE, (byte) 255);
                         // Write item in hand
-                        wrapper.write(Type.SHORT, (short) -1); // TODO
+                        Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
+                        // Blocking patch
+                        if (item != null) {
+                            if (Material.getMaterial(item.getId()).name().endsWith("SWORD")) {
+                                if (hand == 0) {
+                                    EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                                    if (!tracker.isBlocking()) {
+                                        tracker.setBlocking(true);
+                                        Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                        tracker.setSecondHand(wrapper.user(), shield);
+                                    }
+                                    wrapper.cancel();
+                                }
+
+                            }
+                        }
+                        wrapper.write(Type.ITEM, item);
 
                         wrapper.write(Type.BYTE, (byte) 0);
                         wrapper.write(Type.BYTE, (byte) 0);

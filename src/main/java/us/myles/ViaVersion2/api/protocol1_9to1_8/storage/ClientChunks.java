@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion2.api.data.StoredObject;
+import us.myles.ViaVersion2.api.data.UserConnection;
 
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,10 @@ public class ClientChunks extends StoredObject {
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunk reflection", e);
         }
+    }
+
+    public ClientChunks(UserConnection user) {
+        super(user);
     }
 
     public List<Object> transformMapChunkBulk(Object packet) {

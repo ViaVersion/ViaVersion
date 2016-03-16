@@ -6,9 +6,11 @@ import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.protocol.Protocol;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.types.ChunkType;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
+import us.myles.ViaVersion2.api.remapper.ValueCreator;
 import us.myles.ViaVersion2.api.type.Type;
 
 public class WorldPackets {
@@ -125,7 +127,20 @@ public class WorldPackets {
                             wrapper.cancel();
                     }
                 });
-                // TODO: Blocking patch stopped if blocking and 5
+                // Blocking
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        if (status == 5) {
+                            EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                            if(entityTracker.isBlocking()){
+                                entityTracker.setBlocking(false);
+                                entityTracker.setSecondHand(wrapper.user(), null);
+                            }
+                        }
+                    }
+                });
             }
         });
 
@@ -136,7 +151,13 @@ public class WorldPackets {
                 map(Type.POSITION); // 0 - Position
                 map(Type.VAR_INT, Type.BYTE); // 1 - Block Face
                 map(Type.VAR_INT, Type.NOTHING); // 2 - Hand
-                // TODO: Insert hand item here
+                // TODO: Actual hand item
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.SHORT, (short) -1);
+                    }
+                });
                 // Did have item rewriter but its not needed
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y

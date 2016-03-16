@@ -1,5 +1,6 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import org.bukkit.Material;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
@@ -171,14 +172,29 @@ public class EntityPackets {
                     }
                 });
                 map(Type.ITEM); // 2 - Item
-
-                // TODO - Blocking patch
-
+                // Item Rewriter
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
                         ItemRewriter.toClient(stack);
+                    }
+                });
+                // Blocking
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        Item stack = wrapper.get(Type.ITEM, 0);
+
+                        if(stack != null){
+                            if(Material.getMaterial(stack.getId()).name().endsWith("SWORD")){
+                                entityTracker.getValidBlocking().add(entityID);
+                                return;
+                            }
+                        }
+                        entityTracker.getValidBlocking().remove(entityID);
                     }
                 });
             }
@@ -203,6 +219,17 @@ public class EntityPackets {
                         }
                     }
                 });
+
+                // Handler for meta data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.handleMetadata(entityID, metadataList);
+                    }
+                });
             }
         });
 
@@ -216,7 +243,6 @@ public class EntityPackets {
                 map(Type.BYTE); // 2 - Amplifier
                 map(Type.VAR_INT); // 3 - Duration
                 map(Type.BOOLEAN, Type.BYTE);  // 4 - Hide particles
-                // TODO: Test particles as conversion might not work
             }
         });
 

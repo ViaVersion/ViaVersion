@@ -47,7 +47,7 @@ public class MetadataRewriter {
                                 int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
                                 int typeID = MetaIndex.PLAYER_HAND.getNewType().getTypeID();
                                 Metadata metadata = new Metadata(newIndex, typeID, us.myles.ViaVersion2.api.type.Type.BYTE, val);
-//                                list.add(metadata);
+                                list.add(metadata);
                             }
                             break;
                         case OptUUID:
