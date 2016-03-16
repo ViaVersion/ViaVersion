@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -193,6 +194,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public boolean isPorted(Player player) {
         return isPorted(player.getUniqueId());
+    }
+
+    @Override
+    public int getPlayerVersion(@NonNull Player player) {
+        if (!isPorted(player))
+            return 47;
+        return portedPlayers.get(player.getUniqueId()).getProtocol();
     }
 
     @Override
