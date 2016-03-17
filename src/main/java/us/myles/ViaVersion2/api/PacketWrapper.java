@@ -94,12 +94,12 @@ public class PacketWrapper {
            try {
                 Object value = packetValue.getValue();
                 if (value != null) {
-                    if (!value.getClass().equals(packetValue.getKey().getOutputClass())) {
+                    if (!packetValue.getKey().getOutputClass().isAssignableFrom(value.getClass())) {
                         // attempt conversion
                         if (packetValue.getKey() instanceof TypeConverter) {
                             value = ((TypeConverter) packetValue.getKey()).from(value);
                         } else {
-                            System.out.println("Possible type mismatch: " + value.getClass().getName() + " -> " + packetValue.getKey().getTypeName());
+                            System.out.println("Possible type mismatch: " + value.getClass().getName() + " -> " + packetValue.getKey().getOutputClass());
                         }
                     }
                 }

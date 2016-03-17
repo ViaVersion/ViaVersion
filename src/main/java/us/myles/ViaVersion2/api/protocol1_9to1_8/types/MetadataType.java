@@ -26,7 +26,6 @@ public class MetadataType extends Type<Metadata> {
     public void write(ByteBuf buffer, Metadata object) throws Exception {
         if (object == null) {
             buffer.writeByte(255);
-            System.out.println("writing null :)");
         } else {
             buffer.writeByte(object.getId());
             buffer.writeByte(object.getTypeID());

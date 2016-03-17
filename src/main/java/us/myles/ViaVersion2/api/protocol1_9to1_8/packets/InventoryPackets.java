@@ -291,11 +291,6 @@ public class InventoryPackets {
             }
         });
 
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerIncoming(State.PLAY, 0x0F, 0x05); // Confirm Transaction Packet
-        protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
-
         // Held Item Change Packet
         protocol.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
             @Override
@@ -313,5 +308,12 @@ public class InventoryPackets {
                 });
             }
         });
+
+        /* Packets which do not have any field remapping or handlers */
+
+        protocol.registerIncoming(State.PLAY, 0x0F, 0x05); // Confirm Transaction Packet
+        protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
+
+
     }
 }

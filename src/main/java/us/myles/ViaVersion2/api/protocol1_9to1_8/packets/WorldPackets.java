@@ -1,9 +1,14 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8.packets;
 
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
+import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.chunks.Chunk;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.sounds.SoundEffect;
+import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.protocol.Protocol;
@@ -37,11 +42,17 @@ public class WorldPackets {
                 map(Type.INT); // 0 - Effect ID
                 // Everything else get's written through
 
-                // TODO: Effect canceller patch
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
+                        int id = wrapper.get(Type.INT, 0);
+                        if (id >= 1000 && id < 2000 && id != 1005) { // Sound Effect
+                            wrapper.cancel();
+                        }
+                        if (id == 1005) { // Fix jukebox
+                            id = 1010;
+                        }
+                        wrapper.set(Type.INT, 0, id);
                     }
                 });
             }
@@ -55,11 +66,24 @@ public class WorldPackets {
                 // 1 - Sound Category ID
                 // Everything else get's written through
 
-                // TODO: Sound Effect translator patch
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
+                        String name = wrapper.get(Type.STRING, 0);
+
+                        SoundEffect effect = SoundEffect.getByName(name);
+                        int catid = 0;
+                        String newname = name;
+                        if (effect != null) {
+                            if (effect.isBreaksound()) {
+                                wrapper.cancel();
+                                return;
+                            }
+                            catid = effect.getCategory().getId();
+                            newname = effect.getNewName();
+                        }
+                        wrapper.set(Type.STRING, 0, newname);
+                        wrapper.write(Type.VAR_INT, catid); // Write Category ID
                     }
                 });
             }
@@ -86,11 +110,44 @@ public class WorldPackets {
             }
         });
 
+        // Update Block Entity Packet
+        protocol.registerOutgoing(State.PLAY, 0x35, 0x09, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // 0 - Block Position
+                map(Type.UNSIGNED_BYTE); // 1 - Action
+                map(Type.NBT); // 2 - NBT (Might not be present)
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int action = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        if (action == 1) { // Update Spawner
+                            CompoundTag tag = wrapper.get(Type.NBT, 0);
+                            if (tag != null) {
+                                if (tag.contains("EntityId")) {
+                                    String entity = (String) tag.get("EntityId").getValue();
+                                    CompoundTag spawn = new CompoundTag("SpawnData");
+                                    spawn.put(new StringTag("id", entity));
+                                    tag.put(spawn);
+                                } else { // EntityID does not exist
+                                    CompoundTag spawn = new CompoundTag("SpawnData");
+                                    spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
+                                    tag.put(spawn);
+                                }
+                            }
+                        }
+                        if (action == 2) { // Update Command Block
+                            // To prevent window issues don't send updates
+                            wrapper.cancel();
+                        }
+                    }
+                });
+            }
+        });
+
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
-        protocol.registerOutgoing(State.PLAY, 0x35, 0x09); // Update Block Entity Packet
-        // TODO: Update_Block_Entity actually implement
         protocol.registerOutgoing(State.PLAY, 0x24, 0x0A); // Block Action Packet
         protocol.registerOutgoing(State.PLAY, 0x23, 0x0B); // Block Change Packet
         protocol.registerOutgoing(State.PLAY, 0x22, 0x10); // Multi Block Change Packet

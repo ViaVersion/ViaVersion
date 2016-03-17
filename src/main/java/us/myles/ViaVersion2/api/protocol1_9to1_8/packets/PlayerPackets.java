@@ -221,6 +221,23 @@ public class PlayerPackets {
                 });
             }
         });
+        // Packet Plugin Message Outgoing
+        protocol.registerOutgoing(State.PLAY, 0x3F, 0x18, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - Channel Name
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String name = wrapper.get(Type.STRING, 0);
+                        if(name.equalsIgnoreCase("MC|BOpen")){
+                            wrapper.passthrough(Type.REMAINING_BYTES); // This is so ugly, :(
+                            wrapper.write(Type.VAR_INT, 0);
+                        }
+                    }
+                });
+            }
+        });
 
         /* Packets which do not have any field remapping or handlers */
 
@@ -359,6 +376,39 @@ public class PlayerPackets {
             }
         });
 
+        // Packet Plugin Message Incoming
+        protocol.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - Channel Name
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String name = wrapper.get(Type.STRING, 0);
+                        if(name.equalsIgnoreCase("MC|BSign")){
+                            Item item = wrapper.passthrough(Type.ITEM);
+                            if(item != null){
+                                item.setId((short) Material.WRITTEN_BOOK.getId());
+                            }
+                        }
+                        if(name.equalsIgnoreCase("MC|AutoCmd")){
+                            wrapper.set(Type.STRING, 0, "MC|AdvCdm");
+                            wrapper.write(Type.BYTE, (byte) 0);
+                            wrapper.passthrough(Type.INT); // X
+                            wrapper.passthrough(Type.INT); // Y
+                            wrapper.passthrough(Type.INT); // Z
+                            wrapper.passthrough(Type.STRING); // Command
+                            wrapper.passthrough(Type.BOOLEAN); // Flag
+                            wrapper.clearInputBuffer();
+                        }
+                        if(name.equalsIgnoreCase("MC|AdvCmd")){
+                            wrapper.set(Type.STRING, 0, "MC|AdvCdm");
+                        }
+                    }
+                });
+            }
+        });
+
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerIncoming(State.PLAY, 0x01, 0x02); // Chat Message Packet
@@ -373,8 +423,5 @@ public class PlayerPackets {
         protocol.registerIncoming(State.PLAY, 0x05, 0x0E, new PlayerMovementMapper()); // Player Look Packet
         protocol.registerIncoming(State.PLAY, 0x03, 0x0F, new PlayerMovementMapper()); // Player Packet
 
-        // TODO Plugin Channels :(
-        protocol.registerIncoming(State.PLAY, 0x17, 0x09); // plugin message incoming
-        protocol.registerOutgoing(State.PLAY, 0x3F, 0x18); // plugin message outgoing
     }
 }

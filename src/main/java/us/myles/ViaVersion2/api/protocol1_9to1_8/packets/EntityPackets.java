@@ -82,7 +82,6 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        System.out.println("handling holo for tp");
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -116,7 +115,6 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        System.out.println("look move");
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);

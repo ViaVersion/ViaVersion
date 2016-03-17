@@ -135,7 +135,6 @@ public class MetadataRewriter {
                             list.remove(entry);
                             break;
                     }
-                    System.out.println("List Item: " + entry.getType().getTypeName() + " - " + entry.getValue() + " New Type: " + metaIndex.getNewType());
                 } else {
                     list.remove(entry);
                 }

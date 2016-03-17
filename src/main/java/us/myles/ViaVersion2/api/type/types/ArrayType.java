@@ -18,7 +18,6 @@ public class ArrayType<T> extends Type<T[]> {
         int amount = Type.VAR_INT.read(buffer);
         T[] array = (T[]) Array.newInstance(elementType.getOutputClass(), amount);
 
-        System.out.println("READING ARRAY " + array.length);
         for (int i = 0; i < amount; i++) {
             array[i] = elementType.read(buffer);
         }
