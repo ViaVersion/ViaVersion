@@ -2,8 +2,9 @@ package us.myles.ViaVersion2.api.type.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion2.api.type.Type;
+import us.myles.ViaVersion2.api.type.TypeConverter;
 
-public class VarIntType extends Type<Integer>{
+public class VarIntType extends Type<Integer> implements TypeConverter<Integer> {
 
     public VarIntType() {
         super("VarInt", Integer.class);
@@ -48,5 +49,17 @@ public class VarIntType extends Type<Integer>{
         }
 
         return out;
+    }
+
+
+    @Override
+    public Integer from(Object o) {
+        if (o instanceof Number) {
+            return ((Number) o).intValue();
+        }
+        if (o instanceof Boolean) {
+            return ((Boolean) o) == true ? 1 : 0;
+        }
+        return (Integer) o;
     }
 }

@@ -8,7 +8,9 @@ import us.myles.ViaVersion2.api.protocol.base.BaseProtocol;
 import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ProtocolPipeline extends Protocol {
     LinkedList<Protocol> protocolList;
@@ -54,7 +56,13 @@ public class ProtocolPipeline extends Protocol {
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
 //        System.out.println("--> Packet ID incoming: " + packetWrapper.getId() + " - " + state);
-        for (Protocol protocol : new ArrayList<>(protocolList)) { // Copy to prevent from removal.
+        List<Protocol> protocols = new ArrayList<>(protocolList);
+        // Other way if outgoing
+        if (direction == Direction.OUTGOING)
+            Collections.reverse(protocols);
+
+        for (Protocol protocol : protocols) { // Copy to prevent from removal.
+            System.out.println("Calling " + protocol.getClass().getSimpleName() + " " + direction);
             protocol.transform(direction, state, packetWrapper);
             // Reset the reader for the packetWrapper (So it can be recycled across packets)
             packetWrapper.resetReader();

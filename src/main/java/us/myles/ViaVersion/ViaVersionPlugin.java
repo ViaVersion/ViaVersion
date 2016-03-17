@@ -28,6 +28,7 @@ import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion2.api.data.UserConnection;
+import us.myles.ViaVersion2.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
 import java.io.File;
@@ -75,7 +76,22 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             return;
         }
 
-        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now enabled, injecting. (Allows 1.8 to be accessed via 1.9)");
+        // Gather version :)
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                gatherProtocolVersion();
+                // Check if there are any pipes to this version
+                if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
+                    getLogger().info("ViaVersion detected protocol version: " + ProtocolRegistry.SERVER_PROTOCOL);
+                    if (!ProtocolRegistry.isWorkingPipe()) {
+                        getLogger().warning("ViaVersion will not function on the current protocol.");
+                    }
+                }
+            }
+        });
+
+        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now enabled, injecting.");
         injectPacketHandler();
         if (getConfig().getBoolean("simulate-pt", true))
             new ViaIdleThread(portedPlayers).runTaskTimerAsynchronously(this, 1L, 1L); // Updates player's idle status
@@ -95,6 +111,53 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
+    }
+
+    public void gatherProtocolVersion() {
+        try {
+            Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
+            Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
+            Class<?> pingClazz = ReflectionUtil.nms("ServerPing");
+            Object ping = null;
+            // Search for ping method
+            for (Field f : serverClazz.getDeclaredFields()) {
+                if (f.getType() != null) {
+                    if (f.getType().getSimpleName().equals("ServerPing")) {
+                        f.setAccessible(true);
+                        ping = f.get(server);
+                    }
+                }
+            }
+            if (ping != null) {
+                Object serverData = null;
+                for (Field f : pingClazz.getDeclaredFields()) {
+                    if (f.getType() != null) {
+                        if (f.getType().getSimpleName().endsWith("ServerData")) {
+                            f.setAccessible(true);
+                            serverData = f.get(ping);
+                        }
+                    }
+                }
+                if (serverData != null) {
+                    int protocolVersion = -1;
+                    for (Field f : serverData.getClass().getDeclaredFields()) {
+                        if (f.getType() != null) {
+                            if (f.getType() == int.class) {
+                                f.setAccessible(true);
+                                protocolVersion = (int) f.get(serverData);
+                            }
+                        }
+                    }
+                    if (protocolVersion != -1) {
+                        ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // We couldn't work it out... We'll just use ping and hope for the best...
+        }
     }
 
     public void generateConfig() {

@@ -19,14 +19,14 @@ public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
         buffer.writeByte(object);
     }
 
+
     @Override
     public Byte from(Object o) {
         if (o instanceof Number) {
             return ((Number) o).byteValue();
         }
         if(o instanceof Boolean){
-            if(o == true) return 1;
-            if(o == false) return 0;
+            return ((Boolean)o) == true ? (byte) 1 : 0;
         }
         return (Byte) o;
     }

@@ -6,15 +6,17 @@ import org.json.simple.parser.ParseException;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.util.PacketUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.protocol.Protocol;
-import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion2.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion2.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion2.api.remapper.PacketHandler;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.type.Type;
+import us.myles.ViaVersion2.api.util.Pair;
 
+import java.util.List;
 import java.util.UUID;
 
 public class BaseProtocol extends Protocol {
@@ -29,14 +31,25 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) {
-                        // TODO: Actually make this show compatible versions
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
                             JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
                             JSONObject version = (JSONObject) json.get("version");
-                            version.put("protocol", info.getProtocolVersion());
 
+                            System.out.println("Calculating " + info.getProtocolVersion());
+                            // TODO: Make it so the detection doesn't base off just ping :)
+                            if (ProtocolRegistry.SERVER_PROTOCOL == -1) {
+                                Long original = (Long) version.get("protocol");
+                                ProtocolRegistry.SERVER_PROTOCOL = original.intValue();
+                            }
+                            List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
+                            if (protocols != null) {
+                                version.put("protocol", info.getProtocolVersion());
+                            } else {
+                                // not compatible :(, *plays very sad violin*
+                                wrapper.user().setActive(false);
+                            }
                             wrapper.set(Type.STRING, 0, json.toJSONString()); // Update value
                         } catch (ParseException e) {
                             e.printStackTrace();
@@ -88,15 +101,27 @@ public class BaseProtocol extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) {
                         int protVer = wrapper.get(Type.VAR_INT, 0);
+                        int state = wrapper.get(Type.VAR_INT, 1);
+
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setProtocolVersion(protVer);
-                        // TODO: Choose the right pipe
-                        // We'll just cheat lol
-                        wrapper.user().get(ProtocolInfo.class).getPipeline().add(new Protocol1_9TO1_8());
-                        System.out.println("I should decide on a protocol for " + protVer);
-                        wrapper.set(Type.VAR_INT, 0, 47); // TODO remove hard code
+                        // Choose the pipe
+                        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
+                        ProtocolPipeline pipeline = wrapper.user().get(ProtocolInfo.class).getPipeline();
+                        if (protocols != null) {
+                            for (Pair<Integer, Protocol> prot : protocols) {
+                                pipeline.add(prot.getValue());
+                                System.out.println("adding pipe");
+                            }
+                            wrapper.set(Type.VAR_INT, 0, ProtocolRegistry.SERVER_PROTOCOL);
+                        } else {
+                            if (state == 2) {
+                                // not compatible :(, *plays very sad violin*
+                                wrapper.user().setActive(false);
+                            }
+                        }
+
                         // Change state
-                        int state = wrapper.get(Type.VAR_INT, 1);
                         if (state == 1) {
                             info.setState(State.STATUS);
                         }

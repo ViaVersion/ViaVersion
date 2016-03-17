@@ -7,7 +7,6 @@ import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.UserConnection;
-import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion2.api.remapper.PacketRemapper;
 import us.myles.ViaVersion2.api.util.Pair;
 
@@ -59,9 +58,14 @@ public abstract class Protocol {
         // remap
         if (protocolPacket.getRemapper() != null) {
             protocolPacket.getRemapper().remap(packetWrapper);
-            if(packetWrapper.isCancelled())
+            if (packetWrapper.isCancelled())
                 throw new CancelException();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Protocol:" + getClass().getSimpleName();
     }
 
     @AllArgsConstructor

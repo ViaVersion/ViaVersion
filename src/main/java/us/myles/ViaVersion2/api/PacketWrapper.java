@@ -60,6 +60,7 @@ public class PacketWrapper {
     }
 
     public <T> T read(Type<T> type) throws Exception {
+        if(type == Type.NOTHING) return null;
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
@@ -69,7 +70,11 @@ public class PacketWrapper {
             if (read.getKey().equals(type)) {
                 return (T) read.getValue();
             } else {
-                throw new IOException("Unable to read type " + type.getTypeName() + ", found " + type.getTypeName());
+                if (type == Type.NOTHING) {
+                    return read(type); // retry
+                } else {
+                    throw new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
+                }
             }
         }
     }
@@ -89,9 +94,13 @@ public class PacketWrapper {
         if (id != -1) {
             Type.VAR_INT.write(buffer, id);
         }
+        if (readableObjects.size() > 0) {
+            packetValues.addAll(readableObjects);
+        }
+
         int index = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-           try {
+            try {
                 Object value = packetValue.getValue();
                 if (value != null) {
                     if (!packetValue.getKey().getOutputClass().isAssignableFrom(value.getClass())) {
@@ -116,6 +125,7 @@ public class PacketWrapper {
     public void clearInputBuffer() {
         if (inputBuffer != null)
             inputBuffer.clear();
+        readableObjects.clear(); // :(
     }
 
     private void writeRemaining(ByteBuf output) {
@@ -154,5 +164,6 @@ public class PacketWrapper {
 
     public void resetReader() {
         this.readableObjects.addAll(packetValues);
+        this.packetValues.clear();
     }
 }
