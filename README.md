@@ -15,6 +15,12 @@ and eventually we'll add a way to add things the way chunk handler works!!
 
 and then javadocs.
 
+and maybe check for memory leaks.
+
+
+It would be nice to have a Pipeline cache so it doesn't have to figure it out all the time.
+(and to ensure it uses the shortest pipeline)
+
 License:
 --------
 
