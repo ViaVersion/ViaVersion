@@ -17,19 +17,19 @@ import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.armor.ArmorListener;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
-import us.myles.ViaVersion.listeners.CommandBlockListener;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.ArmorListener;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.CommandBlockListener;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
-import us.myles.ViaVersion2.api.data.UserConnection;
-import us.myles.ViaVersion2.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -244,7 +244,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public int getPlayerVersion(@NonNull Player player) {
         if (!isPorted(player))
-            return 47;
+            return ProtocolRegistry.SERVER_PROTOCOL;
         return portedPlayers.get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
@@ -256,6 +256,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public String getVersion() {
         return getDescription().getVersion();
+    }
+
+    public UserConnection getConnection(UUID playerUUID){
+        return portedPlayers.get(playerUUID);
+    }
+
+    public UserConnection getConnection(Player player){
+        return portedPlayers.get(player.getUniqueId());
     }
 
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
@@ -292,8 +300,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         return getConfig().getBoolean("prevent-collision", true);
     }
 
-    public boolean isNewEffectIndicator(){
-        return getConfig().getBoolean("use-new-effect-indicator",true);
+    public boolean isNewEffectIndicator() {
+        return getConfig().getBoolean("use-new-effect-indicator", true);
     }
 
     public boolean isSuppressMetadataErrors() {
@@ -322,8 +330,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public boolean isAutoTeam() {
         // Collision has to be enabled first
-        if (!isPreventCollision()) return false;
-        return getConfig().getBoolean("auto-team", true);
+        return isPreventCollision() && getConfig().getBoolean("auto-team", true);
     }
 
     public void addPortedClient(UserConnection info) {

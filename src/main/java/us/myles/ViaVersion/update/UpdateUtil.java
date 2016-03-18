@@ -20,10 +20,9 @@ import java.util.UUID;
 
 public class UpdateUtil {
 
+    public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
     private final static String URL = "http://api.spiget.org/v1/resources/";
     private final static int PLUGIN = 19254;
-
-    public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
 
     public static void sendUpdateMessage(final UUID uuid, final Plugin plugin) {
         new BukkitRunnable() {

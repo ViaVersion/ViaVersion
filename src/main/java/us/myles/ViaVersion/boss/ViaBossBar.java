@@ -11,9 +11,9 @@ import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.PacketType;
-import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.*;
 
@@ -152,36 +152,41 @@ public class ViaBossBar implements BossBar {
     }
 
     private ByteBuf getPacket(UpdateAction action) {
-        ByteBuf buf = Unpooled.buffer();
-        PacketUtil.writeVarInt(PacketType.PLAY_BOSS_BAR.getNewPacketID(), buf);
-        PacketUtil.writeUUID(uuid, buf);
-        PacketUtil.writeVarInt(action.getId(), buf);
-        switch (action) {
-            case ADD:
-                PacketUtil.writeString(fixJson(title), buf);
-                buf.writeFloat(health);
-                PacketUtil.writeVarInt(color.getId(), buf);
-                PacketUtil.writeVarInt(style.getId(), buf);
-                buf.writeByte(flagToBytes());
-                break;
-            case REMOVE:
-                break;
-            case UPDATE_HEALTH:
-                buf.writeFloat(health);
-                break;
-            case UPDATE_TITLE:
-                PacketUtil.writeString(fixJson(title), buf);
-                break;
-            case UPDATE_STYLE:
-                PacketUtil.writeVarInt(color.getId(), buf);
-                PacketUtil.writeVarInt(style.getId(), buf);
-                break;
-            case UPDATE_FLAGS:
-                buf.writeByte(flagToBytes());
-                break;
-        }
+        try {
+            ByteBuf buf = Unpooled.buffer();
+            Type.VAR_INT.write(buf, 0x0C); // Boss bar packet
+            Type.UUID.write(buf, uuid);
+            Type.VAR_INT.write(buf, action.getId());
+            switch (action) {
+                case ADD:
+                    Type.STRING.write(buf, fixJson(title));
+                    buf.writeFloat(health);
+                    Type.VAR_INT.write(buf, color.getId());
+                    Type.VAR_INT.write(buf, style.getId());
+                    buf.writeByte(flagToBytes());
+                    break;
+                case REMOVE:
+                    break;
+                case UPDATE_HEALTH:
+                    buf.writeFloat(health);
+                    break;
+                case UPDATE_TITLE:
+                    Type.STRING.write(buf, fixJson(title));
+                    break;
+                case UPDATE_STYLE:
+                    Type.VAR_INT.write(buf, color.getId());
+                    Type.VAR_INT.write(buf, style.getId());
+                    break;
+                case UPDATE_FLAGS:
+                    buf.writeByte(flagToBytes());
+                    break;
+            }
 
-        return buf;
+            return buf;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private int flagToBytes() {

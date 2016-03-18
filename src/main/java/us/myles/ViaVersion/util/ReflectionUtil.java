@@ -17,6 +17,7 @@ public class ReflectionUtil {
     public static Class<?> nms(String className) throws ClassNotFoundException {
         return Class.forName(NMS + "." + className);
     }
+
     public static Class<?> obc(String className) throws ClassNotFoundException {
         return Class.forName(BASE + "." + className);
     }
@@ -77,22 +78,22 @@ public class ReflectionUtil {
         }
 
         private void scanFields(Class<?> host, boolean recursive) {
-            if(host.getSuperclass() != null && recursive) {
+            if (host.getSuperclass() != null && recursive) {
                 scanFields(host.getSuperclass(), true);
             }
 
-            for(Field field : host.getDeclaredFields()) {
+            for (Field field : host.getDeclaredFields()) {
                 field.setAccessible(true);
                 fields.put(field.getName(), field);
             }
         }
 
         private void scanMethods(Class<?> host, boolean recursive) {
-            if(host.getSuperclass() != null && recursive) {
+            if (host.getSuperclass() != null && recursive) {
                 scanMethods(host.getSuperclass(), true);
             }
 
-            for(Method method : host.getDeclaredMethods()) {
+            for (Method method : host.getDeclaredMethods()) {
                 method.setAccessible(true);
                 methods.put(method.getName(), method);
             }

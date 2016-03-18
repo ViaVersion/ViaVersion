@@ -7,13 +7,6 @@ import java.util.UUID;
 
 public interface BossBar {
     /**
-     * Change the title
-     *
-     * @param title Title can be in either JSON or just text
-     */
-    void setTitle(String title);
-
-    /**
      * Get the current title
      *
      * @return the title
@@ -21,11 +14,11 @@ public interface BossBar {
     String getTitle();
 
     /**
-     * Change the health
+     * Change the title
      *
-     * @param health this float has to be between 0F - 1F
+     * @param title Title can be in either JSON or just text
      */
-    void setHealth(float health);
+    void setTitle(String title);
 
     /**
      * Get the health
@@ -35,11 +28,11 @@ public interface BossBar {
     float getHealth();
 
     /**
-     * Yay colors!
+     * Change the health
      *
-     * @param color Whatever color you want!
+     * @param health this float has to be between 0F - 1F
      */
-    void setColor(BossColor color);
+    void setHealth(float health);
 
     /**
      * Get the bossbar color
@@ -49,11 +42,11 @@ public interface BossBar {
     BossColor getColor();
 
     /**
-     * Change the bosbar style
+     * Yay colors!
      *
-     * @param style BossStyle
+     * @param color Whatever color you want!
      */
-    void setStyle(BossStyle style);
+    void setColor(BossColor color);
 
     /**
      * Get the bosbar style
@@ -61,6 +54,13 @@ public interface BossBar {
      * @return BossStyle
      */
     BossStyle getStyle();
+
+    /**
+     * Change the bosbar style
+     *
+     * @param style BossStyle
+     */
+    void setStyle(BossStyle style);
 
     /**
      * Show the bossbar to a player.

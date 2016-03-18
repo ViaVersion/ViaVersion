@@ -3,8 +3,8 @@ package us.myles.ViaVersion.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import us.myles.ViaVersion2.api.data.UserConnection;
-import us.myles.ViaVersion2.api.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class ViaChunkHandler extends MessageToMessageEncoder {
         if (!(o instanceof ByteBuf)) {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
-            if(o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
+            if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
                 list.addAll(info.get(ClientChunks.class).transformMapChunkBulk(o));
                 return;
             }

@@ -5,8 +5,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion2.api.data.UserConnection;
-import us.myles.ViaVersion2.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 

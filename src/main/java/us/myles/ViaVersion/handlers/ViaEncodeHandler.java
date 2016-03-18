@@ -4,11 +4,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion2.api.PacketWrapper;
-import us.myles.ViaVersion2.api.data.UserConnection;
-import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
+import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -28,7 +29,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder
             try {
-                PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+                PipelineUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
@@ -39,7 +40,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             throw new CancelException();
         }
         if (info.isActive()) {
-            int id = PacketUtil.readVarInt(bytebuf);
+            int id = Type.VAR_INT.read(bytebuf);
             // Transform
             ByteBuf oldPacket = bytebuf.copy();
             bytebuf.clear();
@@ -59,7 +60,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PacketUtil.containsCause(cause, CancelException.class)) return;
+        if (PipelineUtil.containsCause(cause, CancelException.class)) return;
         super.exceptionCaught(ctx, cause);
     }
 }

@@ -2,9 +2,7 @@ package us.myles.ViaVersion.packets;
 
 import java.util.HashMap;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-
+@Deprecated
 public enum PacketType {
     /* Handshake serverbound */
     HANDSHAKE(State.HANDSHAKE, Direction.INCOMING, 0x00), // Mapped
@@ -138,9 +136,19 @@ public enum PacketType {
     PLAY_ENTITY_PROPERTIES(State.PLAY, Direction.OUTGOING, 0x20, 0x4B), // Mapped
     PLAY_ENTITY_EFFECT(State.PLAY, Direction.OUTGOING, 0x1D, 0x4C), // Mapped
 
-    PLAY_MAP_CHUNK_BULK(State.PLAY, Direction.OUTGOING, 0x26, -1), // TODO?
-    PLAY_SET_COMPRESSION(State.PLAY, Direction.OUTGOING, 0x46, -1), // TODO?
-    PLAY_UPDATE_ENTITY_NBT(State.PLAY, Direction.OUTGOING, 0x49, -1),; // TODO?
+    PLAY_MAP_CHUNK_BULK(State.PLAY, Direction.OUTGOING, 0x26, -1),
+    PLAY_SET_COMPRESSION(State.PLAY, Direction.OUTGOING, 0x46, -1),
+    PLAY_UPDATE_ENTITY_NBT(State.PLAY, Direction.OUTGOING, 0x49, -1);
+
+    private static HashMap<Short, PacketType> oldids = new HashMap<>();
+    private static HashMap<Short, PacketType> newids = new HashMap<>();
+
+    static {
+        for (PacketType pt : PacketType.values()) {
+            oldids.put(toShort((short) pt.getPacketID(), (short) pt.getDirection().ordinal(), (short) pt.getState().ordinal()), pt);
+            newids.put(toShort((short) pt.getNewPacketID(), (short) pt.getDirection().ordinal(), (short) pt.getState().ordinal()), pt);
+        }
+    }
 
     private State state;
     private Direction direction;
@@ -161,6 +169,26 @@ public enum PacketType {
         this.newPacketID = newPacketID;
     }
 
+    public static PacketType findNewPacket(State state, Direction direction, int id) {
+        return newids.get(toShort((short) id, (short) direction.ordinal(), (short) state.ordinal()));
+    }
+
+    public static PacketType findOldPacket(State state, Direction direction, int id) {
+        return oldids.get(toShort((short) id, (short) direction.ordinal(), (short) state.ordinal()));
+    }
+
+    public static PacketType getIncomingPacket(State state, int id) {
+        return findNewPacket(state, Direction.INCOMING, id);
+    }
+
+    public static PacketType getOutgoingPacket(State state, int id) {
+        return findOldPacket(state, Direction.OUTGOING, id);
+    }
+
+    private static short toShort(short id, short direction, short state) {
+        return (short) ((id & 0x00FF) | (direction << 8) & 0x0F00 | (state << 12) & 0xF000);
+    }
+
     public State getState() {
         return state;
     }
@@ -177,33 +205,4 @@ public enum PacketType {
         return newPacketID;
     }
 
-    public static PacketType findNewPacket(State state, Direction direction, int id) {
-    	return newids.get(toShort((short) id, (short)direction.ordinal(), (short) state.ordinal()));
-    }
-
-    public static PacketType findOldPacket(State state, Direction direction, int id) {
-    	return oldids.get(toShort((short) id, (short)direction.ordinal(), (short) state.ordinal()));
-    }
-
-    public static PacketType getIncomingPacket(State state, int id) {
-        return findNewPacket(state, Direction.INCOMING, id);
-    }
-
-    public static PacketType getOutgoingPacket(State state, int id) {
-        return findOldPacket(state, Direction.OUTGOING, id);
-    }
-	
-	private static short toShort(short id, short direction, short state) {
-		return (short) ((id & 0x00FF) | (direction<<8) & 0x0F00 | (state << 12) & 0xF000);
-	}
-
-    private static HashMap<Short, PacketType> oldids = new HashMap<Short, PacketType>();
-    private static HashMap<Short, PacketType> newids = new HashMap<Short, PacketType>();
-    static {
-    	for(PacketType pt : PacketType.values()) {
-    		oldids.put(toShort((short) pt.getPacketID(), (short)pt.getDirection().ordinal(), (short)pt.getState().ordinal()), pt);
-    		newids.put(toShort((short) pt.getNewPacketID(), (short)pt.getDirection().ordinal(), (short)pt.getState().ordinal()), pt);
-    	}
-    }
-    
 }

@@ -9,14 +9,14 @@ import org.bukkit.plugin.Plugin;
 @RequiredArgsConstructor
 public class UpdateListener implements Listener {
 
-	private final Plugin plugin;
-	
-	@EventHandler
-	public void onJoin(PlayerJoinEvent e) {
-		if(e.getPlayer().hasPermission("viaversion.update")
-				&& plugin.getConfig().getBoolean("checkforupdates", true)) {
-			UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId(), plugin);
-		}
-	}
+    private final Plugin plugin;
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        if (e.getPlayer().hasPermission("viaversion.update")
+                && plugin.getConfig().getBoolean("checkforupdates", true)) {
+            UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId(), plugin);
+        }
+    }
 
 }

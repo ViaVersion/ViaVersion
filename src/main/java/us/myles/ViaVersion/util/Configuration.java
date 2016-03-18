@@ -17,9 +17,9 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class Configuration extends YamlConfiguration {
-    private List<String> mainHeader = Lists.newArrayList();
     private final Map<String, List<String>> headers = Maps.newConcurrentMap();
     private final File file;
+    private List<String> mainHeader = Lists.newArrayList();
     private boolean loadHeaders;
 
     public Configuration(File file) {
@@ -47,7 +47,7 @@ public class Configuration extends YamlConfiguration {
     /**
      * Set option header.
      *
-     * @param key of option (or section)
+     * @param key    of option (or section)
      * @param header of option (or section)
      */
     public void header(String key, String... header) {
@@ -85,14 +85,14 @@ public class Configuration extends YamlConfiguration {
         this.loadHeaders = loadHeaders;
         try {
             load(file);
-        } catch(Exception e) {
+        } catch (Exception e) {
             Bukkit.getLogger().log(Level.WARNING, "failed to reload file", e);
         }
     }
 
     @Override
     public void loadFromString(String contents) throws InvalidConfigurationException {
-        if(!loadHeaders) {
+        if (!loadHeaders) {
             super.loadFromString(contents);
             return;
         }
@@ -105,12 +105,12 @@ public class Configuration extends YamlConfiguration {
         int currentIndents = 0;
         String key = "";
         List<String> headers = Lists.newArrayList();
-        for(String line : contents.split("\n")) {
-            if(line.isEmpty()) continue; // Skip empty lines
+        for (String line : contents.split("\n")) {
+            if (line.isEmpty()) continue; // Skip empty lines
             int indent = getSuccessiveCharCount(line, ' ');
             String subline = indent > 0 ? line.substring(indent) : line;
-            if(subline.startsWith("#")) {
-                if(subline.startsWith("#>")) {
+            if (subline.startsWith("#")) {
+                if (subline.startsWith("#>")) {
                     String txt = subline.startsWith("#> ") ? subline.substring(3) : subline.substring(2);
                     mainHeader.add(txt);
                     continue; // Main header, handled by bukkit
@@ -123,7 +123,7 @@ public class Configuration extends YamlConfiguration {
             }
 
             int indents = indent / indentLength;
-            if(indents <= currentIndents) {
+            if (indents <= currentIndents) {
                 // Remove last section of key
                 String[] array = key.split(Pattern.quote(pathSeparator));
                 int backspace = currentIndents - indents + 1;
@@ -138,7 +138,7 @@ public class Configuration extends YamlConfiguration {
             currentIndents = indents;
 
             memoryData.append(line).append('\n');
-            if(!headers.isEmpty()) {
+            if (!headers.isEmpty()) {
                 this.headers.put(key, headers);
                 headers = Lists.newArrayList();
             }
@@ -155,10 +155,10 @@ public class Configuration extends YamlConfiguration {
      * Save config to file
      */
     public void save() {
-        if(headers.isEmpty() && mainHeader.isEmpty()) {
+        if (headers.isEmpty() && mainHeader.isEmpty()) {
             try {
                 super.save(file);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 Bukkit.getLogger().log(Level.WARNING, "Failed to save file", e);
             }
             return;
@@ -171,17 +171,17 @@ public class Configuration extends YamlConfiguration {
         StringBuilder fileData = new StringBuilder(buildHeader());
         int currentIndents = 0;
         String key = "";
-        for(String h : mainHeader) {
+        for (String h : mainHeader) {
             // Append main header to top of file
             fileData.append("#> ").append(h).append('\n');
         }
 
-        for(String line : content.split("\n")) {
-            if(line.isEmpty()) continue; // Skip empty lines
+        for (String line : content.split("\n")) {
+            if (line.isEmpty()) continue; // Skip empty lines
             int indent = getSuccessiveCharCount(line, ' ');
             int indents = indent / indentLength;
             String indentText = indent > 0 ? line.substring(0, indent) : "";
-            if(indents <= currentIndents) {
+            if (indents <= currentIndents) {
                 // Remove last section of key
                 String[] array = key.split(Pattern.quote(pathSeparator));
                 int backspace = currentIndents - indents + 1;
@@ -206,13 +206,13 @@ public class Configuration extends YamlConfiguration {
             writer = new FileWriter(file);
             writer.write(fileData.toString());
             writer.flush();
-        } catch(IOException e) {
+        } catch (IOException e) {
             Bukkit.getLogger().log(Level.WARNING, "Failed to save file", e);
         } finally {
-            if(writer != null) {
+            if (writer != null) {
                 try {
                     writer.close();
-                } catch(IOException e) {
+                } catch (IOException ignored) {
                 }
             }
         }
@@ -220,7 +220,7 @@ public class Configuration extends YamlConfiguration {
 
     private String addHeaderTags(List<String> header, String indent) {
         StringBuilder builder = new StringBuilder();
-        for(String line : header) {
+        for (String line : header) {
             builder.append(indent).append("# ").append(line).append('\n');
         }
         return builder.toString();
@@ -234,8 +234,8 @@ public class Configuration extends YamlConfiguration {
 
     private int getSuccessiveCharCount(String text, char key) {
         int count = 0;
-        for(int i = 0; i < text.length(); i++) {
-            if(text.charAt(i) == key) {
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == key) {
                 count += 1;
             } else {
                 break;

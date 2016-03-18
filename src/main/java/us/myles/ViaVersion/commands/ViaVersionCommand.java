@@ -12,9 +12,6 @@ import us.myles.ViaVersion.api.ViaVersion;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by fillefilip8 on 2016-03-03.
- */
 @RequiredArgsConstructor
 public class ViaVersionCommand implements CommandExecutor {
 
@@ -62,7 +59,7 @@ public class ViaVersionCommand implements CommandExecutor {
         return false;
     }
 
-    public void sendHelp(CommandSender sender){
+    public void sendHelp(CommandSender sender) {
         sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion()));
         sender.sendMessage(color("&6Commands:"));
         sender.sendMessage(color("&2/viaversion list &7- &6Shows lists of all 1.9 clients and 1.8 clients."));

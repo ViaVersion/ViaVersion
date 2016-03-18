@@ -19,6 +19,7 @@ public interface ViaVersionAPI {
 
     /**
      * Get protocol number from a player
+     *
      * @param player Bukkit player object
      * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
      */
