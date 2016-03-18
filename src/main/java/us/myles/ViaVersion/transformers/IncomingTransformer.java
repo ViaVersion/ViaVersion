@@ -329,8 +329,17 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_CREATIVE_INVENTORY_ACTION) {
             short slot = input.readShort();
+            if (slot == 45) {
+                ByteBuf buf = info.getChannel().alloc().buffer();
+                PacketUtil.writeVarInt(PacketType.PLAY_SET_SLOT.getNewPacketID(), buf);
+                buf.writeByte(0);
+                buf.writeShort(slot);
+                buf.writeShort(-1); // empty
+                info.sendRawPacket(buf);
+                // Continue the packet simulating throw
+                slot = -999;
+            }
             output.writeShort(slot);
-
             ItemSlotRewriter.rewrite1_9To1_8(input, output);
         }
         output.writeBytes(input);

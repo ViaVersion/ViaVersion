@@ -4,16 +4,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.CancelException;
-import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
@@ -31,7 +27,13 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
         // handle the packet type
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder
-            PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+            try {
+                PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof Exception) {
+                    throw (Exception) e.getCause();
+                }
+            }
         }
         if (bytebuf.readableBytes() == 0) {
             throw new CancelException();

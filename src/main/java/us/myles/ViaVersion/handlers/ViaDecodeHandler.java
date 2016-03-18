@@ -10,6 +10,7 @@ import us.myles.ViaVersion2.api.PacketWrapper;
 import us.myles.ViaVersion2.api.data.UserConnection;
 import us.myles.ViaVersion2.api.protocol.base.ProtocolInfo;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class ViaDecodeHandler extends ByteToMessageDecoder {
@@ -45,7 +46,13 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 }
             }
             // call minecraft decoder
-            list.addAll(PacketUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+            try {
+                list.addAll(PacketUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof Exception) {
+                    throw (Exception) e.getCause();
+                }
+            }
         }
     }
 
