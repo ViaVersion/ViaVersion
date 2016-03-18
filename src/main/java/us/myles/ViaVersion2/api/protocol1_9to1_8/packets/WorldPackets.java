@@ -145,15 +145,7 @@ public class WorldPackets {
             }
         });
 
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
-        protocol.registerOutgoing(State.PLAY, 0x24, 0x0A); // Block Action Packet
-        protocol.registerOutgoing(State.PLAY, 0x23, 0x0B); // Block Change Packet
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x10); // Multi Block Change Packet
-        protocol.registerOutgoing(State.PLAY, 0x27, 0x1C); // Explosion Packet
-        protocol.registerOutgoing(State.PLAY, 0x2A, 0x22); // Particle Packet
-
+        // Server Difficulty Packet
         protocol.registerOutgoing(State.PLAY, 0x41, 0x0D, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -168,7 +160,15 @@ public class WorldPackets {
                     }
                 });
             }
-        }); // Server Difficulty Packet
+        });
+        /* Packets which do not have any field remapping or handlers */
+
+        protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
+        protocol.registerOutgoing(State.PLAY, 0x24, 0x0A); // Block Action Packet
+        protocol.registerOutgoing(State.PLAY, 0x23, 0x0B); // Block Change Packet
+        protocol.registerOutgoing(State.PLAY, 0x22, 0x10); // Multi Block Change Packet
+        protocol.registerOutgoing(State.PLAY, 0x27, 0x1C); // Explosion Packet
+        protocol.registerOutgoing(State.PLAY, 0x2A, 0x22); // Particle Packet
         protocol.registerOutgoing(State.PLAY, 0x03, 0x44); // Update Time Packet
         protocol.registerOutgoing(State.PLAY, 0x44, 0x35); // World Border Packet
 

@@ -5,7 +5,6 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.ListTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion2.api.item.Item;
 
 import java.util.Collections;
@@ -222,7 +221,7 @@ public class ItemRewriter {
                 }
                 ListTag pages = tag.get("pages");
                 if (pages == null) {
-                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(OutgoingTransformer.fixJson(""))));
+                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(Protocol1_9TO1_8.fixJson(""))));
                     tag.put(pages);
                     item.setTag(tag);
                     return;
@@ -232,7 +231,7 @@ public class ItemRewriter {
                     if (!(pages.get(i) instanceof StringTag))
                         continue;
                     StringTag page = pages.get(i);
-                    page.setValue(OutgoingTransformer.fixJson(page.getValue()));
+                    page.setValue(Protocol1_9TO1_8.fixJson(page.getValue()));
                 }
                 item.setTag(tag);
             }

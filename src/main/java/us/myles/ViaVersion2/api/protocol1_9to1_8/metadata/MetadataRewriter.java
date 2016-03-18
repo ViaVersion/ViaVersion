@@ -8,10 +8,10 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.NewType;
 import us.myles.ViaVersion.metadata.Type;
-import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion2.api.item.Item;
 import us.myles.ViaVersion2.api.metadata.Metadata;
 import us.myles.ViaVersion2.api.protocol1_9to1_8.ItemRewriter;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public class MetadataRewriter {
                             break;
                         case Chat:
                             entry.setType(us.myles.ViaVersion2.api.type.Type.STRING);
-                            value = OutgoingTransformer.fixJson((String) value);
+                            value = Protocol1_9TO1_8.fixJson((String) value);
                             entry.setValue(value);
                             break;
                         default:

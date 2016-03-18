@@ -252,8 +252,6 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x43, 0x36); // Camera Packet
         protocol.registerOutgoing(State.PLAY, 0x2B, 0x1E); // Change Game State Packet
 
-        protocol.registerOutgoing(State.PLAY, 0x09, 0x37); // Held Item Change Packet
-
         protocol.registerOutgoing(State.PLAY, 0x3D, 0x38); // Display Scoreboard Packet
         protocol.registerOutgoing(State.PLAY, 0x3B, 0x3F); // Scoreboard Objective Packet
         protocol.registerOutgoing(State.PLAY, 0x3C, 0x42); // Update Score Packet

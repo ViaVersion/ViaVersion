@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
@@ -47,25 +46,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
     private boolean debug = false;
-
-    public static ItemStack getHandItem(final ConnectionInfo info) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<ItemStack>() {
-                @Override
-                public ItemStack call() throws Exception {
-                    if (info.getPlayer() != null) {
-                        return info.getPlayer().getItemInHand();
-                    }
-                    return null;
-                }
-            }).get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            System.out.println("Error fetching hand item: " + e.getClass().getName());
-            if (ViaVersion.getInstance().isDebug())
-                e.printStackTrace();
-            return null;
-        }
-    }
 
     @Override
     public void onEnable() {
@@ -265,7 +245,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     public int getPlayerVersion(@NonNull Player player) {
         if (!isPorted(player))
             return 47;
-        return portedPlayers.get(player.getUniqueId()).getProtocol();
+        return portedPlayers.get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override

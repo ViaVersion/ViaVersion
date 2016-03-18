@@ -12,8 +12,8 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.packets.PacketType;
-import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
+import us.myles.ViaVersion2.api.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.*;
 
@@ -192,7 +192,7 @@ public class ViaBossBar implements BossBar {
     }
 
     private String fixJson(String text) {
-        return OutgoingTransformer.fixJson(text);
+        return Protocol1_9TO1_8.fixJson(text);
     }
 
     @RequiredArgsConstructor

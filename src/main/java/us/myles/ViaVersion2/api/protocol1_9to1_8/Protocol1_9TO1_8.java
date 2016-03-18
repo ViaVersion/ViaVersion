@@ -1,5 +1,8 @@
 package us.myles.ViaVersion2.api.protocol1_9to1_8;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONObject;
@@ -26,31 +29,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class Protocol1_9TO1_8 extends Protocol {
+    private static Gson gson = new GsonBuilder().create();
+
     public static Type<List<Metadata>> METADATA_LIST = new MetadataListType();
     public static Type<Metadata> METADATA = new MetadataType();
 
     public static ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
         public String transform(PacketWrapper wrapper, String line) {
-            if (line == null || line.equalsIgnoreCase("null")) {
-                line = "{\"text\":\"\"}";
-            } else {
-                if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                    JSONObject obj = new JSONObject();
-                    obj.put("text", line);
-                    return obj.toJSONString();
-                }
-                if (line.startsWith("\"") && line.endsWith("\"")) {
-                    line = "{\"text\":" + line + "}";
-                }
-            }
-            try {
-                new JSONParser().parse(line);
-            } catch (Exception e) {
-                System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
-                return "{\"text\":\"\"}";
-            }
-            return line;
+            return fixJson(line);
         }
     };
 
@@ -75,6 +62,27 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new InventoryTracker(userConnection));
     }
 
+    public static String fixJson(String line) {
+        if (line == null || line.equalsIgnoreCase("null")) {
+            line = "{\"text\":\"\"}";
+        } else {
+            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("text", line);
+                return gson.toJson(jsonObject);
+            }
+            if (line.startsWith("\"") && line.endsWith("\"")) {
+                line = "{\"text\":" + line + "}";
+            }
+        }
+        try {
+            gson.fromJson(line, JsonObject.class);
+        } catch (Exception e) {
+            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+            return "{\"text\":\"\"}";
+        }
+        return line;
+    }
 
     public static ItemStack getHandItem(final UserConnection info) {
         try {

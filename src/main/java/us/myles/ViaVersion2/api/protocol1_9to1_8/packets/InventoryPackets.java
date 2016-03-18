@@ -196,7 +196,7 @@ public class InventoryPackets {
         });
 
         /* Packets which do not have any field remapping or handlers */
-
+        protocol.registerOutgoing(State.PLAY, 0x09, 0x37); // Held Item Change Packet
         protocol.registerOutgoing(State.PLAY, 0x32, 0x11); // Confirm Transaction Packet
 
         /* Incoming Packets */
@@ -213,6 +213,27 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
                         ItemRewriter.toServer(stack);
+                    }
+                });
+                // Elytra throw patch
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        final short slot = wrapper.get(Type.SHORT, 0);
+                        boolean throwItem = (slot == 45);
+                        if (throwItem) {
+                            // Send a packet wiping the slot
+                            wrapper.create(0x16, new ValueCreator() {
+                                @Override
+                                public void write(PacketWrapper wrapper) throws Exception {
+                                    wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+                                    wrapper.write(Type.SHORT, slot);
+                                    wrapper.write(Type.SHORT, (short) -1);
+                                }
+                            }).send();
+                            // Finally reset to simulate throwing item
+                            wrapper.set(Type.SHORT, 0, (short) -999); // Set slot to -999
+                        }
                     }
                 });
             }

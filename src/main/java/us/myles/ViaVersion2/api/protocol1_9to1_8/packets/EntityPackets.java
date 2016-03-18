@@ -56,6 +56,7 @@ public class EntityPackets {
                             } else {
                                 passengerPacket.write(Type.VAR_INT, vehicle);
                                 passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{passenger});
+                                tracker.getVehicleMap().put(passenger, vehicle);
                             }
                             passengerPacket.send(); // Send the packet
                         }
