@@ -1,11 +1,11 @@
 package us.myles.ViaVersion.transformers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.CancelException;
@@ -34,6 +34,7 @@ import static us.myles.ViaVersion.util.PacketUtil.*;
 
 
 public class OutgoingTransformer {
+    private static Gson gson = new GsonBuilder().create();
 
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
@@ -56,16 +57,16 @@ public class OutgoingTransformer {
             line = "{\"text\":\"\"}";
         } else {
             if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                JSONObject obj = new JSONObject();
-                obj.put("text", line);
-                return obj.toJSONString();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("text", line);
+                return gson.toJson(jsonObject);
             }
             if (line.startsWith("\"") && line.endsWith("\"")) {
                 line = "{\"text\":" + line + "}";
             }
         }
         try {
-            new JSONParser().parse(line);
+            gson.fromJson(line, JsonObject.class);
         } catch (Exception e) {
             System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
             return "{\"text\":\"\"}";
@@ -297,12 +298,12 @@ public class OutgoingTransformer {
         if (packet == PacketType.STATUS_RESPONSE) {
             String originalStatus = PacketUtil.readString(input);
             try {
-                JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
-                JSONObject version = (JSONObject) json.get("version");
-                if ((long) version.get("protocol") != 9999) //Fix ServerListPlus custom outdated message
-                    version.put("protocol", info.getProtocol());
-                PacketUtil.writeString(json.toJSONString(), output);
-            } catch (ParseException e) {
+                JsonObject jsonObject = gson.fromJson(originalStatus, JsonObject.class);
+                JsonObject version = jsonObject.get("version").getAsJsonObject();
+                if (version.get("protocol").getAsInt() != 9999) //Fix ServerListPlus custom outdated message
+                    version.addProperty("protocol", info.getProtocol());
+                PacketUtil.writeString(gson.toJson(jsonObject), output);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return;

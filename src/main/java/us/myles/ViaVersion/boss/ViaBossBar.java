@@ -15,10 +15,7 @@ import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class ViaBossBar implements BossBar {
@@ -142,7 +139,7 @@ public class ViaBossBar implements BossBar {
 
     private void sendPacket(UpdateAction action) {
         ByteBuf buf = getPacket(action);
-        for (UUID uuid : players)
+        for (UUID uuid : new ArrayList<>(players))
             sendPacket(uuid, buf);
     }
 
