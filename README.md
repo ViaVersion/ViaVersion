@@ -1,13 +1,19 @@
 # ViaVersion API Dev
 
 
-This is an experimental branch working on a Protocol API,
+This is an experimental branch, but soon to be live.
 
-Nothing is final and is expected to change,
 
-This is not functional mainly because to start with it's API design.
+The things which stop this from going live:
 
-I'm publishing this just to prove i'm actually active and not doing nothing harhar.
+Need to implement debug mode using deprecated PacketType for english
+
+Need to implement a way for mappers to register listeners <--
+
+
+and eventually we'll add a way to add things the way chunk handler works!!
+
+and then javadocs.
 
 License:
 --------
