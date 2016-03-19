@@ -31,18 +31,20 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
             if (info.isActive()) {
                 int id = Type.VAR_INT.read(bytebuf);
                 // Transform
+                ByteBuf newPacket = ctx.alloc().buffer();
                 try {
-
                     PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);
                     ProtocolInfo protInfo = info.get(ProtocolInfo.class);
                     protInfo.getPipeline().transform(Direction.INCOMING, protInfo.getState(), wrapper);
-                    ByteBuf newPacket = ctx.alloc().buffer();
                     wrapper.writeToBuffer(newPacket);
 
                     bytebuf.clear();
                     bytebuf = newPacket;
                 } catch (Exception e) {
+                    // Clear Buffer
                     bytebuf.clear();
+                    // Release Packet, be free!
+                    newPacket.release();
                     throw e;
                 }
             }
