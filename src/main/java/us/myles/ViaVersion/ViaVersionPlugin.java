@@ -136,31 +136,29 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
                 return;
             }
-            if (connection != null) {
-                for (Field field : connection.getClass().getDeclaredFields()) {
-                    field.setAccessible(true);
-                    final Object value = field.get(connection);
-                    if (value instanceof List) {
-                        // Inject the list
-                        List wrapper = new ListWrapper((List) value) {
-                            @Override
-                            public synchronized void handleAdd(Object o) {
-                                synchronized (this) {
-                                    if (o instanceof ChannelFuture) {
-                                        inject((ChannelFuture) o);
-                                    }
-                                }
-                            }
-                        };
-                        field.set(connection, wrapper);
-                        // Iterate through current list
-                        synchronized (wrapper) {
-                            for (Object o : (List) value) {
+            for (Field field : connection.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                final Object value = field.get(connection);
+                if (value instanceof List) {
+                    // Inject the list
+                    List wrapper = new ListWrapper((List) value) {
+                        @Override
+                        public synchronized void handleAdd(Object o) {
+                            synchronized (this) {
                                 if (o instanceof ChannelFuture) {
                                     inject((ChannelFuture) o);
-                                } else {
-                                    break; // not the right list.
                                 }
+                            }
+                        }
+                    };
+                    field.set(connection, wrapper);
+                    // Iterate through current list
+                    synchronized (wrapper) {
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                inject((ChannelFuture) o);
+                            } else {
+                                break; // not the right list.
                             }
                         }
                     }
