@@ -33,10 +33,12 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 ByteBuf newPacket = ctx.alloc().buffer();
                 try {
                     incomingTransformer.transform(id, bytebuf, newPacket);
-                    bytebuf.clear();
                     bytebuf = newPacket;
                 } catch (Exception e) {
+                    // Clear Buffer
                     bytebuf.clear();
+                    // Release Packet, be free!
+                    newPacket.release();
                     throw e;
                 }
             }
