@@ -4,6 +4,8 @@ import org.bukkit.entity.EntityType;
 
 public class EntityUtil {
 
+    public static boolean logFailures = true;
+
     public static EntityType getTypeFromID(int typeID, boolean isObject) {
         if (isObject) {
             return getObjectFromID(typeID);
@@ -81,7 +83,7 @@ public class EntityUtil {
                 break;
             default:
                 type = EntityType.fromId(objectID);
-                if (type == null) {
+                if (type == null && logFailures) {
                     System.out.println("Unable to find entity type for " + objectID);
                     type = EntityType.UNKNOWN;
                 }
