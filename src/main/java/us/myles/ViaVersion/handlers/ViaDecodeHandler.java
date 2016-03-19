@@ -53,6 +53,8 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
                 }
+            } finally {
+                bytebuf.release();
             }
         }
     }

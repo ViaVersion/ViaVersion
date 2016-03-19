@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.commands;
 
+import io.netty.util.ResourceLeakDetector;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -39,6 +40,13 @@ public class ViaVersionCommand implements CommandExecutor {
                 } else if (args[0].equalsIgnoreCase("debug")) {
                     plugin.setDebug(!plugin.isDebug());
                     sender.sendMessage(color("&6Debug mode is now " + (plugin.isDebug() ? "&aenabled" : "&cdisabled")));
+                } else if (args[0].equalsIgnoreCase("displayleaks")) {
+                    if (ResourceLeakDetector.getLevel() != ResourceLeakDetector.Level.ADVANCED) {
+                        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
+                    } else {
+                        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
+                    }
+                    sender.sendMessage(color("&6Leak detector is now " + (ResourceLeakDetector.getLevel() == ResourceLeakDetector.Level.ADVANCED ? "&aenabled" : "&cdisabled")));
                 } else if (args[0].equalsIgnoreCase("dontbugme")) {
                     boolean newValue = !plugin.getConfig().getBoolean("checkforupdates", true);
                     plugin.getConfig().set("checkforupdates", newValue);
