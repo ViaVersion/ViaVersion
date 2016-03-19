@@ -3,6 +3,8 @@ package us.myles.ViaVersion.util;
 import org.bukkit.entity.EntityType;
 
 public class EntityUtil {
+    
+    public static boolean logErrors = true;
 
     public static EntityType getTypeFromID(int typeID, boolean isObject) {
         if (isObject) {
@@ -82,7 +84,8 @@ public class EntityUtil {
             default:
                 type = EntityType.fromId(objectID);
                 if (type == null) {
-                    System.out.println("Unable to find entity type for " + objectID);
+                    if (logErrors)
+                        System.out.println("Unable to find entity type for " + objectID);
                     type = EntityType.UNKNOWN;
                 }
                 break;
