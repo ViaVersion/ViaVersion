@@ -1,4 +1,4 @@
-# ViaVersion 0.6.6
+# ViaVersion 0.6.7
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 **Allows the connection of 1.9 clients to 1.8**
 
