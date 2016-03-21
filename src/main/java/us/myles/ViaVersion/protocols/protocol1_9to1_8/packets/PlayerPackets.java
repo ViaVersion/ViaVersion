@@ -7,12 +7,12 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
@@ -448,10 +448,31 @@ public class PlayerPackets {
             }
         });
 
+        // Client Status Packet
+        protocol.registerIncoming(State.PLAY, 0x16, 0x03, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Action ID
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int action = wrapper.get(Type.VAR_INT, 0);
+                        if (action == 2) {
+                            // cancel any blocking >.>
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            if (tracker.isBlocking()) {
+                                tracker.setSecondHand(null);
+                                tracker.setBlocking(false);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerIncoming(State.PLAY, 0x01, 0x02); // Chat Message Packet
-        protocol.registerIncoming(State.PLAY, 0x16, 0x03); // Client Status Packet
         protocol.registerIncoming(State.PLAY, 0x13, 0x12); // Player Abilities Request Packet
         protocol.registerIncoming(State.PLAY, 0x19, 0x16); // Resource Pack Status Packet
 
