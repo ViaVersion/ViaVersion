@@ -42,8 +42,8 @@ public class EntityPackets {
                     public Void transform(PacketWrapper wrapper, Boolean inputValue) throws Exception {
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (!inputValue) {
-                            int passenger = wrapper.get(Type.VAR_INT, 0);
-                            int vehicle = wrapper.get(Type.VAR_INT, 1);
+                            int passenger = wrapper.get(Type.INT, 0);
+                            int vehicle = wrapper.get(Type.INT, 1);
 
                             wrapper.cancel(); // Don't send current packet
 
