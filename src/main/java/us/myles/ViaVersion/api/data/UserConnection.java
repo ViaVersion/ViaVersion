@@ -8,11 +8,13 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UserConnection {
     @Getter
     private final SocketChannel channel;
-    List<StoredObject> storedObjects = new ArrayList<>();
+    Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
     @Getter
     @Setter
     private boolean active = true;
@@ -26,23 +28,15 @@ public class UserConnection {
     }
 
     public <T extends StoredObject> T get(Class<T> objectClass) {
-        for (StoredObject o : storedObjects) {
-            if (o.getClass().equals(objectClass))
-                return (T) o;
-        }
-        return null;
+        return (T) storedObjects.get(objectClass);
     }
 
     public <T extends StoredObject> boolean has(Class<T> objectClass) {
-        for (StoredObject o : storedObjects) {
-            if (o.getClass().equals(objectClass))
-                return true;
-        }
-        return false;
+        return storedObjects.containsKey(objectClass);
     }
 
     public void put(StoredObject object) {
-        storedObjects.add(object);
+        storedObjects.put(object.getClass(), object);
     }
 
     public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
