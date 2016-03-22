@@ -252,9 +252,6 @@ public class OutgoingTransformer {
             int x = input.readByte();
             output.writeShort(x * 128);
             int y = input.readByte();
-            if (plugin.isHologramPatch() & knownHolograms.contains(id)) {
-                y = (int) ((y) + plugin.getHologramYOffset());
-            }
             output.writeShort(y * 128);
             int z = input.readByte();
             output.writeShort(z * 128);
@@ -275,9 +272,6 @@ public class OutgoingTransformer {
             short x = (short) (input.readByte());
             output.writeShort(x * 128);
             short y = (short) (input.readByte());
-            if (plugin.isHologramPatch() & knownHolograms.contains(id)) {
-                y = (short) (y - 1);
-            }
             output.writeShort(y * 128);
             short z = (short) (input.readByte());
             output.writeShort(z * 128);
