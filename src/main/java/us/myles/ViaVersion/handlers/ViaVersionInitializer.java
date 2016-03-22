@@ -29,7 +29,6 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         UserConnection info = new UserConnection(socketChannel);
         // init protocol
-        System.out.println("init pipeline");
         new ProtocolPipeline(info);
         // Add originals
         this.method.invoke(this.oldInit, socketChannel);

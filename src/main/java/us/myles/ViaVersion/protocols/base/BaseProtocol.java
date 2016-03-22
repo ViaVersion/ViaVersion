@@ -113,7 +113,6 @@ public class BaseProtocol extends Protocol {
                         if (protocols != null) {
                             for (Pair<Integer, Protocol> prot : protocols) {
                                 pipeline.add(prot.getValue());
-                                System.out.println("adding pipe");
                             }
                             wrapper.set(Type.VAR_INT, 0, ProtocolRegistry.SERVER_PROTOCOL);
                         } else {
