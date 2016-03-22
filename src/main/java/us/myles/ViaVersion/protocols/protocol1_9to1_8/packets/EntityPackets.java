@@ -112,21 +112,6 @@ public class EntityPackets {
                 map(Type.BYTE); // 5 - Pitch
 
                 map(Type.BOOLEAN); // 6 - On Ground
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
-                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                            if (tracker.getKnownHolograms().contains(entityID)) {
-                                Short newValue = wrapper.get(Type.SHORT, 1);
-                                newValue = (short) (newValue + (((ViaVersionPlugin) ViaVersion.getInstance()).getHologramYOffset()));
-                                wrapper.set(Type.SHORT, 1, newValue);
-                            }
-                        }
-                    }
-                });
             }
         });
         // Entity Relative Move Packet
@@ -140,21 +125,6 @@ public class EntityPackets {
                 map(Type.BYTE, toNewShort); // 3 - Z
 
                 map(Type.BOOLEAN); // 4 - On Ground
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
-                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                            if (tracker.getKnownHolograms().contains(entityID)) {
-                                Short newValue = wrapper.get(Type.SHORT, 1);
-                                newValue = (short) (newValue + (((ViaVersionPlugin) ViaVersion.getInstance()).getHologramYOffset()));
-                                wrapper.set(Type.SHORT, 1, newValue);
-                            }
-                        }
-                    }
-                });
             }
         });
         // Entity Equipment Packet
