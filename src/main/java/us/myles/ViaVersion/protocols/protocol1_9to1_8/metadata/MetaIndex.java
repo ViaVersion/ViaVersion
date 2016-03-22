@@ -59,7 +59,7 @@ public enum MetaIndex {
     // sheep
     SHEEP_COLOR(Sheep.class, 16, Type.Byte, 12, NewType.Byte),
     // villager
-    VILLAGER_PROFESSION(Villager.class, 16, Type.Int, 12, NewType.VarInt), // TODO write this to wiki.vg
+    VILLAGER_PROFESSION(Villager.class, 16, Type.Int, 12, NewType.VarInt),
     // enderman
     ENDERMAN_BLOCK(Enderman.class, 16, Type.Short, 11, NewType.BlockID), // special case
     ENDERMAN_BLOCKDATA(Enderman.class, 17, Type.Byte, 11, NewType.BlockID), // special case
