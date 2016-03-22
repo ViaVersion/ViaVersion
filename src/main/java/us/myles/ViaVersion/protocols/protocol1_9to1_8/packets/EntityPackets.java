@@ -84,11 +84,11 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
+                        if (ViaVersion.getConfig().isHologramPatch()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                             if (tracker.getKnownHolograms().contains(entityID)) {
                                 Double newValue = wrapper.get(Type.DOUBLE, 1);
-                                newValue += (32D * ((ViaVersionPlugin) ViaVersion.getInstance()).getHologramYOffset());
+                                newValue += (32D * ViaVersion.getConfig().getHologramYOffset());
                                 wrapper.set(Type.DOUBLE, 1, newValue);
                             }
                         }

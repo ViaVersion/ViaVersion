@@ -1,8 +1,11 @@
 package us.myles.ViaVersion.api.protocol;
 
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.packets.Direction;
+import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -11,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class ProtocolPipeline extends Protocol {
     LinkedList<Protocol> protocolList;
@@ -45,7 +49,6 @@ public class ProtocolPipeline extends Protocol {
 
     public void add(Protocol protocol) {
         if (protocolList != null) {
-            System.out.println("Adding protocol to list!!");
             protocolList.addLast(protocol);
             protocol.init(userConnection);
         } else {
@@ -55,21 +58,67 @@ public class ProtocolPipeline extends Protocol {
 
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-//        System.out.println("--> Packet ID incoming: " + packetWrapper.getId() + " - " + state);
+        int originalID = packetWrapper.getId();
         List<Protocol> protocols = new ArrayList<>(protocolList);
         // Other way if outgoing
         if (direction == Direction.OUTGOING)
             Collections.reverse(protocols);
 
         for (Protocol protocol : protocols) { // Copy to prevent from removal.
-            System.out.println("Calling " + protocol.getClass().getSimpleName() + " " + direction);
             protocol.transform(direction, state, packetWrapper);
             // Reset the reader for the packetWrapper (So it can be recycled across packets)
             packetWrapper.resetReader();
         }
         super.transform(direction, state, packetWrapper);
-        if (packetWrapper.getId() != 37 && packetWrapper.getId() != 32 && packetWrapper.getId() != 52 && packetWrapper.getId() != 21 && packetWrapper.getId() != 59)
-            System.out.println("--> Sending Packet ID: " + packetWrapper.getId() + " " + state + " " + direction);
+
+        if (ViaVersion.getInstance().isDebug()) {
+            // Debug packet
+            String packet = "UNKNOWN";
+
+            // For 1.8/1.9 server version, eventually we'll probably get an API for this...
+            if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.V1_8 &&
+                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.V1_9_1_PRE2) {
+
+                PacketType type;
+                if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.V1_8) {
+                    if (direction == Direction.INCOMING) {
+                        type = PacketType.findNewPacket(state, direction, originalID);
+                    } else {
+                        type = PacketType.findOldPacket(state, direction, originalID);
+                    }
+                } else {
+                    if (direction == Direction.INCOMING) {
+                        type = PacketType.findOldPacket(state, direction, originalID);
+                    } else {
+                        type = PacketType.findNewPacket(state, direction, originalID);
+                    }
+                }
+
+                // Filter :) This would be not hard coded too, sorry :(
+                if(type == PacketType.PLAY_CHUNK_DATA) return;
+                if(type == PacketType.PLAY_TIME_UPDATE) return;
+                if(type == PacketType.PLAY_KEEP_ALIVE) return;
+                if(type == PacketType.PLAY_KEEP_ALIVE_REQUEST) return;
+                if(type == PacketType.PLAY_ENTITY_LOOK_MOVE) return;
+                if(type == PacketType.PLAY_ENTITY_LOOK) return;
+                if(type == PacketType.PLAY_ENTITY_RELATIVE_MOVE) return;
+                if(type == PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST) return;
+                if(type == PacketType.PLAY_PLAYER_LOOK_REQUEST) return;
+                if(type == PacketType.PLAY_PLAYER_POSITION_REQUEST) return;
+
+                packet = type.name();
+            }
+            String name = packet + "[" + userConnection.get(ProtocolInfo.class).getProtocolVersion() + "]";
+            ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
+            plugin.getLogger().log(Level.INFO, "{0}: {1} {2} -> {3} [{4}]",
+                    new Object[]{
+                            direction,
+                            state,
+                            originalID,
+                            packetWrapper.getId(),
+                            name
+                    });
+        }
     }
 
     public boolean contains(Class<? extends Protocol> pipeClass) {

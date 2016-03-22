@@ -150,7 +150,7 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        if (((ViaVersionPlugin) ViaVersion.getInstance()).isAutoTeam()) {
+                        if (ViaVersion.getConfig().isAutoTeam()) {
                             EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             entityTracker.setAutoTeam(true);
                             entityTracker.sendTeamPacket(true);

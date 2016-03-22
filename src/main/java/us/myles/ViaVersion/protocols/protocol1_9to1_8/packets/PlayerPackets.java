@@ -105,7 +105,7 @@ public class PlayerPackets {
 
                             wrapper.passthrough(Type.STRING);
 
-                            wrapper.write(Type.STRING, ((ViaVersionPlugin) ViaVersion.getInstance()).isPreventCollision() ? "never" : "");
+                            wrapper.write(Type.STRING, ViaVersion.getConfig().isPreventCollision() ? "never" : "");
 
                             wrapper.passthrough(Type.BYTE);
                         }
