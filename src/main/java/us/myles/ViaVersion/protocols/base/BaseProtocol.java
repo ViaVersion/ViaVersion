@@ -28,7 +28,7 @@ public class BaseProtocol extends Protocol {
     @Override
     protected void registerPackets() {
         /* Outgoing Packets */
-        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() {
+        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() { // Status Response Packet
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -59,7 +59,8 @@ public class BaseProtocol extends Protocol {
                     }
                 });
             }
-        }); // Status Response Packet
+        });
+
         registerOutgoing(State.STATUS, 0x01, 0x01); // Status Pong Packet
 
         registerOutgoing(State.LOGIN, 0x00, 0x00); // Login Disconnect Packet
