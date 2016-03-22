@@ -1,14 +1,11 @@
 package us.myles.ViaVersion.transformers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.spacehq.mc.protocol.data.game.chunk.Column;
-import org.spacehq.mc.protocol.util.NetUtil;
-import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.CancelException;
@@ -18,6 +15,8 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.chunks.Chunk;
+import us.myles.ViaVersion.chunks.ChunkManager;
 import us.myles.ViaVersion.metadata.MetaIndex;
 import us.myles.ViaVersion.metadata.MetadataRewriter;
 import us.myles.ViaVersion.metadata.MetadataRewriter.Entry;
@@ -27,7 +26,6 @@ import us.myles.ViaVersion.slot.ItemSlotRewriter;
 import us.myles.ViaVersion.sounds.SoundEffect;
 import us.myles.ViaVersion.util.EntityUtil;
 import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,6 +34,7 @@ import static us.myles.ViaVersion.util.PacketUtil.*;
 
 
 public class OutgoingTransformer {
+    private static Gson gson = new GsonBuilder().create();
 
     private final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
@@ -58,16 +57,16 @@ public class OutgoingTransformer {
             line = "{\"text\":\"\"}";
         } else {
             if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                JSONObject obj = new JSONObject();
-                obj.put("text", line);
-                return obj.toJSONString();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("text", line);
+                return gson.toJson(jsonObject);
             }
             if (line.startsWith("\"") && line.endsWith("\"")) {
                 line = "{\"text\":" + line + "}";
             }
         }
         try {
-            new JSONParser().parse(line);
+            gson.fromJson(line, JsonObject.class);
         } catch (Exception e) {
             System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
             return "{\"text\":\"\"}";
@@ -299,11 +298,12 @@ public class OutgoingTransformer {
         if (packet == PacketType.STATUS_RESPONSE) {
             String originalStatus = PacketUtil.readString(input);
             try {
-                JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
-                JSONObject version = (JSONObject) json.get("version");
-                version.put("protocol", info.getProtocol());
-                PacketUtil.writeString(json.toJSONString(), output);
-            } catch (ParseException e) {
+                JsonObject jsonObject = gson.fromJson(originalStatus, JsonObject.class);
+                JsonObject version = jsonObject.get("version").getAsJsonObject();
+                if (version.get("protocol").getAsInt() != 9999) //Fix ServerListPlus custom outdated message
+                    version.addProperty("protocol", info.getProtocol());
+                PacketUtil.writeString(gson.toJson(jsonObject), output);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return;
@@ -680,7 +680,7 @@ public class OutgoingTransformer {
             PacketUtil.writeVarInt(duration, output);
             // we need to write as a byte instead of boolean
             boolean hideParticles = input.readBoolean();
-            output.writeByte(hideParticles ? 1 : 0);
+            output.writeByte(hideParticles ? plugin.isNewEffectIndicator() ? 2 : 1 : 0);
             return;
         }
         if (packet == PacketType.PLAY_TEAM) {
@@ -757,73 +757,21 @@ public class OutgoingTransformer {
                 return;
             }
             if (action == 2) { //Update commandblock
-                try {
-                    CompoundTag nbt = readNBT(input);
-                    if (nbt == null)
-                        throw new CancelException();
-                    //Thanks http://www.minecraftforum.net/forums/minecraft-discussion/redstone-discussion-and/command-blocks/2488148-1-9-nbt-changes-and-additions#TileAllCommandBlocks
-                    nbt.put(new ByteTag("powered", (byte) 0));
-                    nbt.put(new ByteTag("auto", (byte) 0));
-                    nbt.put(new ByteTag("conditionMet", (byte) 0));
-                    writeNBT(output, nbt);
-                    return;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new CancelException();
-                }
+                throw new CancelException(); //Only update if player interact with commandblock (The commandblock window will update every time this packet is sent, this would prevent you from change things that update every tick)
             }
             output.writeBytes(input, input.readableBytes());
             return;
         }
         if (packet == PacketType.PLAY_CHUNK_DATA) {
-            // We need to catch unloading chunk packets as defined by wiki.vg
-            // To unload chunks, send this packet with Ground-Up Continuous=true and no 16^3 chunks (eg. Primary Bit Mask=0)
-            int chunkX = input.readInt();
-            int chunkZ = input.readInt();
-            output.writeInt(chunkX);
-            output.writeInt(chunkZ);
-
-
-            boolean groundUp = input.readBoolean();
-            output.writeBoolean(groundUp);
-
-            int bitMask = input.readUnsignedShort();
-            int size = PacketUtil.readVarInt(input);
-            byte[] data = new byte[size];
-            input.readBytes(data);
-//            if (bitMask == 0 && groundUp) {
-//                // if 256
-//                output.clear();
-//                PacketUtil.writeVarInt(PacketType.PLAY_UNLOAD_CHUNK.getNewPacketID(), output);
-//                output.writeInt(chunkX);
-//                output.writeInt(chunkZ);
-//                System.out.println("Sending unload chunk " + chunkX + " " + chunkZ + " - " + size + " bulk: " + bulk);
-//                return;
-//            }
-            boolean sk = false;
-            if (info.getLastPacket().getClass().getName().endsWith("PacketPlayOutMapChunkBulk")) {
-                try {
-                    sk = ReflectionUtil.get(info.getLastPacket(), "d", boolean.class);
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            Column read = NetUtil.readOldChunkData(chunkX, chunkZ, groundUp, bitMask, data, true, sk);
-            if (read == null) {
+            // Read chunk
+            ChunkManager chunkManager = info.getChunkManager();
+            Chunk chunk = chunkManager.readChunk(input);
+            if (chunk == null) {
                 throw new CancelException();
             }
-            // Write chunk section array :((
-            ByteBuf temp = output.alloc().buffer();
-            try {
-                int bitmask = NetUtil.writeNewColumn(temp, read, groundUp, sk);
-                PacketUtil.writeVarInt(bitmask, output);
-                PacketUtil.writeVarInt(temp.readableBytes(), output);
-                output.writeBytes(temp);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+            // Write chunk
+            chunkManager.writeChunk(chunk, output);
             return;
         }
         output.writeBytes(input);

@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion</artifactId>
-    <version>0.6.4-SNAPSHOT</version>
+    <version>0.6.8-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>ViaVersion</name>
@@ -101,6 +101,10 @@
                             <pattern>org.spacehq.opennbt</pattern>
                             <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>com.google.gson</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.gson</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -162,6 +166,15 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- GSON (JSON Library) -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.6.2</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Netty (Network Library) -->
         <dependency>
             <groupId>io.netty</groupId>
@@ -170,6 +183,7 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

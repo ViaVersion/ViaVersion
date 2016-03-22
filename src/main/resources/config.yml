@@ -20,3 +20,5 @@ simulate-pt: true
 bossbar-patch: true
 # If your boss bar flickers on 1.9, set this to 'true'. It will keep all boss bars on 100% (not recommended)
 bossbar-anti-flicker: false
+# This will show the new effect indicator in the top-right corner for 1.9 players.
+use-new-effect-indicator: true

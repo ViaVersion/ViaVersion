@@ -42,6 +42,9 @@ public class PacketUtil {
     }
 
     public static CompoundTag readNBT(ByteBuf input) throws IOException {
+        // Default client is limited to 2097152 bytes. (2.09mb)
+        Preconditions.checkArgument(input.readableBytes() <= 2097152, "Cannot read NBT (got %s bytes)", input.readableBytes());
+
         int readerIndex = input.readerIndex();
         byte b = input.readByte();
         if (b == 0) {
@@ -71,35 +74,22 @@ public class PacketUtil {
         }
     }
 
-    public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) {
+    public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
             PacketUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return output;
     }
 
-    public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) {
+    public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) throws InvocationTargetException {
         try {
             PacketUtil.ENCODE_METHOD.invoke(encoder, ctx, msg, output);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-    }
-
-    public static ByteBuf decompress(ChannelHandlerContext ctx, ByteBuf msg) {
-        ByteToMessageDecoder x = (ByteToMessageDecoder) ctx.pipeline().get("decompress");
-        List<Object> output = callDecode(x, ctx, msg);
-        return output.size() == 0 ? null : (ByteBuf) output.get(0);
-    }
-
-    public static ByteBuf compress(ChannelHandlerContext ctx, ByteBuf msg) {
-        MessageToByteEncoder x = (MessageToByteEncoder) ctx.pipeline().get("compress");
-        ByteBuf output = ctx.alloc().buffer();
-        callEncode(x, ctx, msg, output);
-        return output;
     }
 
     /* I take no credit, these are taken from BungeeCord */

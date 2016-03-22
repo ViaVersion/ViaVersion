@@ -7,9 +7,7 @@ import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.ConnectionInfo;
 import us.myles.ViaVersion.transformers.OutgoingTransformer;
 import us.myles.ViaVersion.util.PacketUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
@@ -29,7 +27,13 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
         // handle the packet type
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder
-            PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+            try {
+                PacketUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof Exception) {
+                    throw (Exception) e.getCause();
+                }
+            }
         }
         if (bytebuf.readableBytes() == 0) {
             throw new CancelException();

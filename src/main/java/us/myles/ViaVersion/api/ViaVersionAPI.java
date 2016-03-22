@@ -10,12 +10,19 @@ import java.util.UUID;
 
 public interface ViaVersionAPI {
     /**
-     * Is player using 1.9?
+     * Is the player connection modified by ViaVersion?
      *
-     * @param player
-     * @return True if the client is on 1.9
+     * @param player Bukkit player object
+     * @return True if the client is modified (At the moment it also means version 1.9 and higher)
      */
     boolean isPorted(Player player);
+
+    /**
+     * Get protocol number from a player
+     * @param player Bukkit player object
+     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
+     */
+    int getPlayerVersion(Player player);
 
     /**
      * Is player using 1.9?

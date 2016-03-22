@@ -45,7 +45,7 @@ public class IncomingTransformer {
         }
         // Handle movement increment
         // Update idle status (player, position, look, positionandlook)
-        if(packet == PacketType.PLAY_PLAYER || packet == PacketType.PLAY_PLAYER_POSITION_REQUEST || packet == PacketType.PLAY_PLAYER_LOOK_REQUEST || packet == PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST) {
+        if (packet == PacketType.PLAY_PLAYER || packet == PacketType.PLAY_PLAYER_POSITION_REQUEST || packet == PacketType.PLAY_PLAYER_LOOK_REQUEST || packet == PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST) {
             info.incrementIdlePacket();
         }
         PacketUtil.writeVarInt(packetID, output);
@@ -162,6 +162,18 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_CLOSE_WINDOW_REQUEST) {
             info.closeWindow();
+        }
+        if (packet == PacketType.PLAY_CLIENT_STATUS) {
+            int action = PacketUtil.readVarInt(input);
+            PacketUtil.writeVarInt(action, input);
+
+            if (action == 2) {
+                // cancel any blocking >.>
+                if (startedBlocking) {
+                    sendSecondHandItem(null);
+                    startedBlocking = false;
+                }
+            }
         }
         if (packet == PacketType.PLAY_CLIENT_SETTINGS) {
             String locale = PacketUtil.readString(input);
@@ -281,13 +293,13 @@ public class IncomingTransformer {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-	        short curX = input.readUnsignedByte();
-	        output.writeByte(curX);
-	        short curY = input.readUnsignedByte();
-	        output.writeByte(curY);
-	        short curZ = input.readUnsignedByte();
-	        output.writeByte(curZ);
-	        return;
+            short curX = input.readUnsignedByte();
+            output.writeByte(curX);
+            short curY = input.readUnsignedByte();
+            output.writeByte(curY);
+            short curZ = input.readUnsignedByte();
+            output.writeByte(curZ);
+            return;
         }
         if (packet == PacketType.PLAY_USE_ITEM) {
             int hand = PacketUtil.readVarInt(input);
@@ -329,8 +341,17 @@ public class IncomingTransformer {
         }
         if (packet == PacketType.PLAY_CREATIVE_INVENTORY_ACTION) {
             short slot = input.readShort();
+            if (slot == 45) {
+                ByteBuf buf = info.getChannel().alloc().buffer();
+                PacketUtil.writeVarInt(PacketType.PLAY_SET_SLOT.getNewPacketID(), buf);
+                buf.writeByte(0);
+                buf.writeShort(slot);
+                buf.writeShort(-1); // empty
+                info.sendRawPacket(buf);
+                // Continue the packet simulating throw
+                slot = -999;
+            }
             output.writeShort(slot);
-
             ItemSlotRewriter.rewrite1_9To1_8(input, output);
         }
         output.writeBytes(input);

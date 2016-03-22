@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,7 +30,6 @@ import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -39,7 +39,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
@@ -99,7 +98,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public void generateConfig() {
         File file = new File(getDataFolder(), "config.yml");
-        if(file.exists()) {
+        if (file.exists()) {
             // Update config options
             Configuration oldConfig = new Configuration(file);
             oldConfig.reload(false); // Load current options from config
@@ -107,9 +106,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             saveDefaultConfig(); // Generate new config
             Configuration newConfig = new Configuration(file);
             newConfig.reload(true); // Load default options
-            for(String key : oldConfig.getKeys(false)) {
+            for (String key : oldConfig.getKeys(false)) {
                 // Set option in new config if exists
-                if(newConfig.contains(key)) {
+                if (newConfig.contains(key)) {
                     newConfig.set(key, oldConfig.get(key));
                 }
             }
@@ -123,49 +122,43 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         try {
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
-            if (connection == null) {
-                System.out.println("connection is null!!");
-                //try others
-                for (Method m : serverClazz.getDeclaredMethods()) {
-                    if (m.getReturnType() != null && !m.getName().equals("getServerConnection")) {
-                        if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
-                            if (m.getParameterTypes().length == 0) {
-                                connection = m.invoke(server);
-                            }
+            Object connection = null;
+            for (Method m : serverClazz.getDeclaredMethods()) {
+                if (m.getReturnType() != null) {
+                    if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
+                        if (m.getParameterTypes().length == 0) {
+                            connection = m.invoke(server);
                         }
                     }
                 }
-                if (connection == null) {
-                    getLogger().warning("We failed to find the ServerConnection? :(");
-                    return;
-                }
             }
-            if (connection != null) {
-                for (Field field : connection.getClass().getDeclaredFields()) {
-                    field.setAccessible(true);
-                    final Object value = field.get(connection);
-                    if (value instanceof List) {
-                        // Inject the list
-                        List wrapper = new ListWrapper((List) value) {
-                            @Override
-                            public synchronized void handleAdd(Object o) {
-                                synchronized (this) {
-                                    if (o instanceof ChannelFuture) {
-                                        inject((ChannelFuture) o);
-                                    }
-                                }
-                            }
-                        };
-                        field.set(connection, wrapper);
-                        // Iterate through current list
-                        synchronized (wrapper) {
-                            for (Object o : (List) value) {
+            if (connection == null) {
+                getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
+                return;
+            }
+            for (Field field : connection.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                final Object value = field.get(connection);
+                if (value instanceof List) {
+                    // Inject the list
+                    List wrapper = new ListWrapper((List) value) {
+                        @Override
+                        public synchronized void handleAdd(Object o) {
+                            synchronized (this) {
                                 if (o instanceof ChannelFuture) {
                                     inject((ChannelFuture) o);
-                                } else {
-                                    break; // not the right list.
                                 }
+                            }
+                        }
+                    };
+                    field.set(connection, wrapper);
+                    // Iterate through current list
+                    synchronized (wrapper) {
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                inject((ChannelFuture) o);
+                            } else {
+                                break; // not the right list.
                             }
                         }
                     }
@@ -199,6 +192,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public boolean isPorted(Player player) {
         return isPorted(player.getUniqueId());
+    }
+
+    @Override
+    public int getPlayerVersion(@NonNull Player player) {
+        if (!isPorted(player))
+            return 47;
+        return portedPlayers.get(player.getUniqueId()).getProtocol();
     }
 
     @Override
@@ -243,6 +243,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public boolean isPreventCollision() {
         return getConfig().getBoolean("prevent-collision", true);
+    }
+
+    public boolean isNewEffectIndicator(){
+        return getConfig().getBoolean("use-new-effect-indicator",true);
     }
 
     public boolean isSuppressMetadataErrors() {
