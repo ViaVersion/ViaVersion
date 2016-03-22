@@ -10,6 +10,13 @@ public interface ViaVersionConfig {
     boolean isDebug();
 
     /**
+     * Get if the plugin should check for updates
+     *
+     * @return true if update checking is enabled
+     */
+    boolean isCheckForUpdates();
+
+    /**
      * Get if collision preventing for players is enabled
      *
      * @return true if collision preventing is enabled
