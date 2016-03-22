@@ -80,15 +80,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         if (getConfig().getBoolean("checkforupdates"))
             UpdateUtil.sendUpdateMessage(this);
 
-        Bukkit.getPluginManager().registerEvents(new Listener() {
-            @EventHandler
-            public void onPlayerQuit(PlayerQuitEvent e) {
-                removePortedClient(e.getPlayer().getUniqueId());
-            }
-        }, this);
-
-        Bukkit.getPluginManager().registerEvents(new ArmorListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new CommandBlockListener(this), this);
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(new ViaVersionCommand(this));

@@ -1,10 +1,15 @@
 package us.myles.ViaVersion.protocols.base;
 
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -14,7 +19,6 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.api.Pair;
 
 import java.util.List;
 import java.util.UUID;
@@ -142,5 +146,16 @@ public class BaseProtocol extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         // Nothing gets added, ProtocolPipeline handles ProtocolInfo
+    }
+
+    @Override
+    protected void registerListeners() {
+        final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
+        Bukkit.getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void onPlayerQuit(PlayerQuitEvent e) {
+                plugin.removePortedClient(e.getPlayer().getUniqueId());
+            }
+        }, plugin);
     }
 }

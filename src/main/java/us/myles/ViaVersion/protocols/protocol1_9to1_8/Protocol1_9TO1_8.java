@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -13,6 +15,8 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.ArmorListener;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.CommandBlockListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
@@ -86,6 +90,13 @@ public class Protocol1_9TO1_8 extends Protocol {
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);
+    }
+
+    @Override
+    protected void registerListeners() {
+        ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
+        Bukkit.getPluginManager().registerEvents(new ArmorListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new CommandBlockListener(plugin), plugin);
     }
 
     @Override
