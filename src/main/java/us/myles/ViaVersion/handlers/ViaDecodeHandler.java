@@ -6,9 +6,9 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import us.myles.ViaVersion.CancelException;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.Direction;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;

@@ -21,7 +21,6 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
@@ -35,9 +34,9 @@ public class ArmorListener implements Listener {
 
     public static void sendArmorUpdate(Player player) {
         // Ensure that the player is on our pipe
-        UserConnection userConnection = ((ViaVersionPlugin)ViaVersion.getInstance()).getConnection(player);
-        if(userConnection == null) return;
-        if(!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
+        UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(player);
+        if (userConnection == null) return;
+        if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
 
         int armor = ArmorType.calculateArmorPoints(player.getInventory().getArmorContents());
         try {

@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import org.bukkit.Material;
-import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -183,7 +182,7 @@ public class EntityPackets {
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (tracker.getClientEntityTypes().containsKey(entityID)) {
                             MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
-                        } else if(!ViaVersion.getConfig().isUnknownEntitiesSuppressed()){
+                        } else if (!ViaVersion.getConfig().isUnknownEntitiesSuppressed()) {
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
                         }
                     }

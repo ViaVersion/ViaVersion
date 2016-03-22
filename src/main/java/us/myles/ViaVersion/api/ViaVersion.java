@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.api;
 
 import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.ViaVersionPlugin;
 
 public class ViaVersion {

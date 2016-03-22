@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.api.protocol;
 
+import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
-import us.myles.ViaVersion.api.Pair;
 
 import java.util.*;
 
@@ -17,6 +17,13 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_9_1TO1_9(), Collections.singletonList(ProtocolVersion.V1_9_1_PRE2), ProtocolVersion.V1_9);
     }
 
+    /**
+     * Register a protocol
+     *
+     * @param protocol  The protocol to register.
+     * @param supported Supported client versions.
+     * @param output    The output server version it converts to.
+     */
     public static void registerProtocol(Protocol protocol, List<Integer> supported, Integer output) {
         for (Integer version : supported) {
             if (!registryMap.containsKey(version)) {
@@ -27,6 +34,11 @@ public class ProtocolRegistry {
         }
     }
 
+    /**
+     * Check if this plugin is useful to the server.
+     *
+     * @return True if there is a useful pipe
+     */
     public static boolean isWorkingPipe() {
         for (Map<Integer, Protocol> maps : registryMap.values()) {
             if (maps.containsKey(SERVER_PROTOCOL)) return true;
@@ -34,6 +46,14 @@ public class ProtocolRegistry {
         return false; // No destination for protocol
     }
 
+    /**
+     * Calculate a path to get from an input protocol to the servers protocol.
+     *
+     * @param current       The current items in the path
+     * @param clientVersion The current input version
+     * @param serverVersion The desired output version
+     * @return The path which has been generated, null if failed.
+     */
     private static List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
@@ -69,7 +89,15 @@ public class ProtocolRegistry {
         return null;
     }
 
+    /**
+     * Calculate a path from a client version to server version
+     *
+     * @param clientVersion The input client version
+     * @param serverVersion The desired output server version
+     * @return The path it generated, null if it failed.
+     */
     public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
+        // TODO: Cache
         return getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);
     }
 }

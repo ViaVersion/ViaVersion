@@ -25,6 +25,11 @@ public class Chunk {
         this.unloadPacket = true;
     }
 
+    /**
+     * Does this chunk have biome data
+     *
+     * @return True if the chunk has biome data
+     */
     public boolean hasBiomeData() {
         return biomeData != null && groundUp;
     }

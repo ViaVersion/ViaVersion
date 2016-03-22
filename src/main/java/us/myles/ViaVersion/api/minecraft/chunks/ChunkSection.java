@@ -31,10 +31,26 @@ public class ChunkSection {
         palette.add(0); // AIR
     }
 
+    /**
+     * Set a block in the chunk
+     *
+     * @param x    Block X
+     * @param y    Block Y
+     * @param z    Block Z
+     * @param type The type of the block
+     * @param data The data value of the block
+     */
     public void setBlock(int x, int y, int z, int type, int data) {
         setBlock(index(x, y, z), type, data);
     }
 
+    /**
+     * Set a block in the chunk based on the index
+     *
+     * @param idx  Index
+     * @param type The type of the block
+     * @param data The data value of the block
+     */
     public void setBlock(int idx, int type, int data) {
         int hash = type << 4 | (data & 0xF);
         int index = palette.indexOf(hash);
@@ -46,10 +62,20 @@ public class ChunkSection {
         blocks[idx] = index;
     }
 
+    /**
+     * Set the block light array
+     *
+     * @param data The value to set the block light to
+     */
     public void setBlockLight(byte[] data) {
         blockLight.setHandle(data);
     }
 
+    /**
+     * Set the sky light array
+     *
+     * @param data The value to set the sky light to
+     */
     public void setSkyLight(byte[] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         this.skyLight = new NibbleArray(data);
@@ -59,6 +85,12 @@ public class ChunkSection {
         return z << 8 | y << 4 | x;
     }
 
+    /**
+     * Write the blocks to a buffer.
+     *
+     * @param output The buffer to write to.
+     * @throws Exception Throws if it failed to write.
+     */
     public void writeBlocks(ByteBuf output) throws Exception {
         // Write bits per block
         int bitsPerBlock = 4;
@@ -94,14 +126,29 @@ public class ChunkSection {
         }
     }
 
+    /**
+     * Write the block light to a buffer
+     *
+     * @param output The buffer to write to
+     */
     public void writeBlockLight(ByteBuf output) {
         output.writeBytes(blockLight.getHandle());
     }
 
+    /**
+     * Write the sky light to a buffer
+     *
+     * @param output The buffer to write to
+     */
     public void writeSkyLight(ByteBuf output) {
         output.writeBytes(skyLight.getHandle());
     }
 
+    /**
+     * Check if sky light is present
+     *
+     * @return True if skylight is present
+     */
     public boolean hasSkyLight() {
         return skyLight != null;
     }

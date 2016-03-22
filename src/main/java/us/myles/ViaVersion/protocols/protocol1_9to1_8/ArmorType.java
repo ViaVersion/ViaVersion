@@ -1,12 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
-import java.util.HashMap;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
 
 @RequiredArgsConstructor
 @Getter
@@ -34,21 +33,22 @@ public enum ArmorType {
     GOLD_BOOTS(1, 317, Material.GOLD_BOOTS),
     NONE(0, 0, Material.AIR);
 
+    private static HashMap<Material, ArmorType> armor;
+
+    static {
+        armor = new HashMap<Material, ArmorType>();
+        for (ArmorType a : ArmorType.values()) {
+            armor.put(a.getType(), a);
+        }
+    }
+
     private final int armorPoints;
     private final int id;
     private final Material type;
-    
-    private static HashMap<Material, ArmorType> armor;
-    static {
-    	armor = new HashMap<Material, ArmorType>();
-    	for(ArmorType a : ArmorType.values()) {
-    		armor.put(a.getType(), a);
-    	}
-    }
 
     public static ArmorType findByType(Material type) {
-    	ArmorType t = armor.get(type);
-    	return t == null ? ArmorType.NONE : t;
+        ArmorType t = armor.get(type);
+        return t == null ? ArmorType.NONE : t;
     }
 
     public static int calculateArmorPoints(ItemStack[] armor) {

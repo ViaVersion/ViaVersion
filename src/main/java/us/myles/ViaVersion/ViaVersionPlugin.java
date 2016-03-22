@@ -8,9 +8,6 @@ import io.netty.channel.socket.SocketChannel;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
@@ -20,12 +17,10 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.commands.ViaVersionCommand;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.ArmorListener;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.CommandBlockListener;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.Configuration;
@@ -248,11 +243,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getDescription().getVersion();
     }
 
-    public UserConnection getConnection(UUID playerUUID){
+    public UserConnection getConnection(UUID playerUUID) {
         return portedPlayers.get(playerUUID);
     }
 
-    public UserConnection getConnection(Player player){
+    public UserConnection getConnection(Player player) {
         return portedPlayers.get(player.getUniqueId());
     }
 

@@ -10,6 +10,14 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
         this.outputType = outputType;
     }
 
+    /**
+     * Transform a value from one type to another
+     *
+     * @param wrapper    The current packet
+     * @param inputValue The input value
+     * @return The value to write to the wrapper
+     * @throws Exception Throws exception if it fails to transform a value
+     */
     public abstract T2 transform(PacketWrapper wrapper, T1 inputValue) throws Exception;
 
     @Override

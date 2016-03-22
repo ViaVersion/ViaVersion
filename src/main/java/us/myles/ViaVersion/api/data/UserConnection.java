@@ -6,8 +6,6 @@ import io.netty.channel.socket.SocketChannel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,18 +25,41 @@ public class UserConnection {
         this.channel = socketChannel;
     }
 
+    /**
+     * Get an object from the storage
+     *
+     * @param objectClass The class of the object to get
+     * @return The requested object
+     */
     public <T extends StoredObject> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
-    public <T extends StoredObject> boolean has(Class<T> objectClass) {
+    /**
+     * Check if the storage has an object
+     *
+     * @param objectClass The object class to check
+     * @return True if the object is in the storage
+     */
+    public boolean has(Class<? extends StoredObject> objectClass) {
         return storedObjects.containsKey(objectClass);
     }
 
+    /**
+     * Put an object into the stored objects based on class
+     *
+     * @param object The object to store.
+     */
     public void put(StoredObject object) {
         storedObjects.put(object.getClass(), object);
     }
 
+    /**
+     * Send a raw packet to the player
+     *
+     * @param packet        The raw packet to send
+     * @param currentThread Should it run in the same thread
+     */
     public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
         final ChannelHandler handler = channel.pipeline().get("encoder");
         if (currentThread) {
@@ -53,6 +74,11 @@ public class UserConnection {
         }
     }
 
+    /**
+     * Send a raw packet to the player (netty thread)
+     *
+     * @param packet The packet to send
+     */
     public void sendRawPacket(final ByteBuf packet) {
         sendRawPacket(packet, false);
     }

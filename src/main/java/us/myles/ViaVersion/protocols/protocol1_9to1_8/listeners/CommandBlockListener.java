@@ -24,7 +24,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
@@ -61,9 +60,9 @@ public class CommandBlockListener implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK && plugin.isPorted(e.getPlayer()) && e.getPlayer().isOp()) {
             // Ensure that the player is on our pipe
-            UserConnection userConnection = ((ViaVersionPlugin)ViaVersion.getInstance()).getConnection(e.getPlayer());
-            if(userConnection == null) return;
-            if(!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
+            UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(e.getPlayer());
+            if (userConnection == null) return;
+            if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
 
             try {
                 sendCommandBlockPacket(e.getClickedBlock(), e.getPlayer());
@@ -77,8 +76,8 @@ public class CommandBlockListener implements Listener {
         if (p.isOp() && plugin.isPorted(p)) {
             // Ensure that the player is on our pipe
             UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(p);
-            if(userConnection == null) return;
-            if(!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
+            if (userConnection == null) return;
+            if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
 
             try {
                 ByteBuf buf = Unpooled.buffer();

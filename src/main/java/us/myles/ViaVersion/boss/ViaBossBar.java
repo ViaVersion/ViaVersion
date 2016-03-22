@@ -12,7 +12,6 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.*;
