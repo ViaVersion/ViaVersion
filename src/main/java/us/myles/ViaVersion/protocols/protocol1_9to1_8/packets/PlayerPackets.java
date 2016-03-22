@@ -145,7 +145,7 @@ public class PlayerPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception{
                         int entityID = wrapper.get(Type.INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.getClientEntityTypes().put(entityID, EntityType.PLAYER);

@@ -34,7 +34,7 @@ public class BaseProtocol extends Protocol {
                 map(Type.STRING);
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
@@ -73,7 +73,7 @@ public class BaseProtocol extends Protocol {
                 map(Type.STRING); // 1 - Player Username
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setState(State.PLAY);
                         // Save other info
@@ -101,7 +101,7 @@ public class BaseProtocol extends Protocol {
                 map(Type.VAR_INT); // 3 - Next State
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int protVer = wrapper.get(Type.VAR_INT, 0);
                         int state = wrapper.get(Type.VAR_INT, 1);
 

@@ -34,7 +34,7 @@ public class SpawnPackets {
 
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
@@ -45,7 +45,7 @@ public class SpawnPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         int typeID = wrapper.get(Type.BYTE, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -92,7 +92,7 @@ public class SpawnPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.getClientEntityTypes().put(entityID, EntityType.EXPERIENCE_ORB);
@@ -116,7 +116,7 @@ public class SpawnPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         // Currently only lightning uses this
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -138,7 +138,7 @@ public class SpawnPackets {
 
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
@@ -149,7 +149,7 @@ public class SpawnPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         int typeID = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -205,7 +205,7 @@ public class SpawnPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.getClientEntityTypes().put(entityID, EntityType.PAINTING);
@@ -215,7 +215,7 @@ public class SpawnPackets {
 
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
@@ -282,7 +282,7 @@ public class SpawnPackets {
 
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         Integer[] entities = wrapper.get(Type.VAR_INT_ARRAY, 0);
                         for (Integer entity : entities) {
                             // EntityTracker

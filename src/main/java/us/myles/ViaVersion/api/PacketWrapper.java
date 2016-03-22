@@ -39,7 +39,7 @@ public class PacketWrapper {
      * @param index The index of the part (relative to the type)
      * @return The requested type or throws ArrayIndexOutOfBounds
      */
-    public <T> T get(Type<T> type, int index) {
+    public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
             if (packetValue.getKey() == type) { // Ref check
@@ -49,7 +49,9 @@ public class PacketWrapper {
                 currentIndex++;
             }
         }
-        throw new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
+
+        Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
+        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId());
     }
 
     /**
@@ -59,7 +61,7 @@ public class PacketWrapper {
      * @param index The index of the part (relative to the type)
      * @param value The value of the part you wish to set it to.
      */
-    public <T> void set(Type<T> type, int index, T value) {
+    public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
             if (packetValue.getKey() == type) { // Ref check
@@ -70,7 +72,8 @@ public class PacketWrapper {
                 currentIndex++;
             }
         }
-        throw new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
+        Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
+        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId());
     }
 
     /**
@@ -98,7 +101,8 @@ public class PacketWrapper {
                 if (type == Type.NOTHING) {
                     return read(type); // retry
                 } else {
-                    throw new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
+                    Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
+                    throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId());
                 }
             }
         }
