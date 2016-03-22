@@ -2,7 +2,7 @@ package us.myles.ViaVersion.api.protocol;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import us.myles.ViaVersion.CancelException;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;

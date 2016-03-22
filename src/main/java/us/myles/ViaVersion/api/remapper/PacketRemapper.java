@@ -3,6 +3,7 @@ package us.myles.ViaVersion.api.remapper;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.InformativeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,12 +85,17 @@ public abstract class PacketRemapper {
      * @throws Exception Throws if it fails to write / read to the packet.
      */
     public void remap(PacketWrapper packetWrapper) throws Exception {
-        // Read all the current values
-        for (Pair<ValueReader, ValueWriter> valueRemapper : valueRemappers) {
-            Object object = valueRemapper.getKey().read(packetWrapper);
-            // Convert object to write type :O!!!
-            valueRemapper.getValue().write(packetWrapper, object);
+        try {
+            // Read all the current values
+            for (Pair<ValueReader, ValueWriter> valueRemapper : valueRemappers) {
+                Object object = valueRemapper.getKey().read(packetWrapper);
+                // Convert object to write type :O!!!
+                valueRemapper.getValue().write(packetWrapper, object);
+            }
+            // If we had handlers we'd put them here
+        } catch (InformativeException e) {
+            e.addSource(this.getClass());
+            throw e;
         }
-        // If we had handlers we'd put them here
     }
 }

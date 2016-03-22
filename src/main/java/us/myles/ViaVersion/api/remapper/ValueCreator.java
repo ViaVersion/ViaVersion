@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.remapper;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.exception.InformativeException;
 
 public abstract class ValueCreator implements ValueWriter {
     /**
@@ -13,6 +14,11 @@ public abstract class ValueCreator implements ValueWriter {
 
     @Override
     public void write(PacketWrapper writer, Object inputValue) throws Exception {
-        write(writer);
+        try {
+            write(writer);
+        } catch (InformativeException e) {
+            e.addSource(this.getClass());
+            throw e;
+        }
     }
 }

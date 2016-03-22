@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.TypeConverter;
+import us.myles.ViaVersion.exception.InformativeException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,7 +85,11 @@ public class PacketWrapper {
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
-            return type.read(inputBuffer);
+            try {
+                return type.read(inputBuffer);
+            } catch (Exception e) {
+                throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId());
+            }
         } else {
             Pair<Type, Object> read = readableObjects.poll();
             if (read.getKey().equals(type)) {
@@ -152,8 +157,7 @@ public class PacketWrapper {
                 }
                 packetValue.getKey().write(buffer, value);
             } catch (Exception e) {
-                System.out.println(getId() + " Index: " + index + " Type: " + packetValue.getKey().getTypeName());
-                throw e;
+                throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId());
             }
             index++;
         }

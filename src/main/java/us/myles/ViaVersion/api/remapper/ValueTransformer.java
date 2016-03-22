@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.remapper;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.InformativeException;
 
 public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
     private final Type<T2> outputType;
@@ -22,6 +23,11 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
 
     @Override
     public void write(PacketWrapper writer, T1 inputValue) throws Exception {
-        writer.write(outputType, transform(writer, inputValue));
+        try {
+            writer.write(outputType, transform(writer, inputValue));
+        } catch (InformativeException e) {
+            e.addSource(this.getClass());
+            throw e;
+        }
     }
 }
