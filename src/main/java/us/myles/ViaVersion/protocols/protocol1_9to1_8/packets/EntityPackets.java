@@ -183,7 +183,7 @@ public class EntityPackets {
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (tracker.getClientEntityTypes().containsKey(entityID)) {
                             MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
-                        } else {
+                        } else if(!((ViaVersionPlugin)ViaVersion.getInstance()).getConfig().getBoolean("suppress-entityid-errors")){
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
                         }
                     }
