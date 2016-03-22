@@ -800,7 +800,8 @@ public class OutgoingTransformer {
     private void transformMetadata(int entityID, ByteBuf input, ByteBuf output) throws CancelException {
         EntityType type = clientEntityTypes.get(entityID);
         if (type == null) {
-            System.out.println("Unable to get entity for ID: " + entityID);
+            if(!((ViaVersionPlugin)ViaVersion.getInstance()).getConfig().getBoolean("suppress-entityid-errors"))
+                System.out.println("Unable to get entity for ID: " + entityID);
             output.writeByte(255);
             return;
         }
