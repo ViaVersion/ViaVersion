@@ -12,23 +12,23 @@ public interface ViaVersionConfig {
      */
     boolean isDebug();
 
-    public boolean isPreventCollision();
+    boolean isPreventCollision();
 
-    public boolean isNewEffectIndicator();
+    boolean isNewEffectIndicator();
 
-    public boolean isSuppressMetadataErrors();
+    boolean isSuppressMetadataErrors();
 
-    public boolean isShieldBlocking();
+    boolean isShieldBlocking();
 
-    public boolean isHologramPatch();
+    boolean isHologramPatch();
 
-    public boolean isBossbarPatch();
+    boolean isBossbarPatch();
 
-    public boolean isBossbarAntiflicker();
+    boolean isBossbarAntiflicker();
 
-    public boolean isUnkownEntitiesSuppressed();
+    boolean isUnkownEntitiesSuppressed();
 
-    public double getHologramYOffset();
+    double getHologramYOffset();
 
-    public boolean isAutoTeam();
+    boolean isAutoTeam();
 }
