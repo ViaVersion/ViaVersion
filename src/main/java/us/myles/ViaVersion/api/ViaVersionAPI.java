@@ -80,7 +80,7 @@ public interface ViaVersionAPI {
     BossBar createBossBar(String title, float health, BossColor color, BossStyle style);
 
     /**
-     * Obtain if global debug is enabled
+     * Get if global debug is enabled
      *
      * @return true if debug is enabled
      */
