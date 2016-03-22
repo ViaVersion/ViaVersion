@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
+import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
@@ -42,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
+public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVersionConfig {
 
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
     private boolean debug = false;
@@ -311,6 +312,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     public boolean isBossbarAntiflicker() {
         return getConfig().getBoolean("bossbar-anti-flicker", false);
+    }
+
+    public boolean isUnknownEntitiesSuppressed() {
+        return getConfig().getBoolean("suppress-entityid-errors", false);
     }
 
     public double getHologramYOffset() {
