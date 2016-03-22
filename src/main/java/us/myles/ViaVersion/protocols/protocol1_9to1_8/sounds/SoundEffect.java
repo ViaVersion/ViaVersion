@@ -1,6 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
 import lombok.Getter;
+import org.bukkit.Sound;
+
+import java.util.HashMap;
 
 @Getter
 public enum SoundEffect {
@@ -257,6 +260,14 @@ public enum SoundEffect {
     private final SoundCategory category;
     private final boolean breaksound;
 
+    private static HashMap<String, SoundEffect> effects;
+    static {
+        effects = new HashMap<String, SoundEffect>();
+        for(SoundEffect e : SoundEffect.values()) {
+            effects.put(e.getName(), e);
+        }
+    }
+
     SoundEffect(String name, String newname, SoundCategory cat) {
         this.category = cat;
         this.newName = newname;
@@ -273,10 +284,8 @@ public enum SoundEffect {
 
     public static SoundEffect getByName(String name) {
         name = name.toLowerCase();
-        for (SoundEffect e : SoundEffect.values()) {
-            if (e.getName().equals(name))
-                return e;
-        }
+        if(effects.containsKey(name))
+            return effects.get(name);
         return null;
     }
 
