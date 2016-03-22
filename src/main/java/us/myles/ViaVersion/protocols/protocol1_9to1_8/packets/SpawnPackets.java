@@ -103,7 +103,7 @@ public class SpawnPackets {
                 map(Type.INT, toNewDouble); // 2 - Y - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 3 - Z - Needs to be divide by 32
 
-                map(Type.INT); // 4 - Data
+                map(Type.SHORT); // 4 - Amount to spawn
             }
         });
 
