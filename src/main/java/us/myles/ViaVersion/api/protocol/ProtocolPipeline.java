@@ -2,10 +2,10 @@ package us.myles.ViaVersion.api.protocol;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.BaseProtocol;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.base.BaseProtocol;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +76,17 @@ public class ProtocolPipeline extends Protocol {
         for (Protocol protocol : protocolList) {
             if (protocol.getClass().equals(pipeClass)) return true;
         }
+        return false;
+    }
+
+    public boolean filter(Object o, List list) throws Exception {
+        for (Protocol protocol : protocolList) {
+            if (protocol.isFiltered(o.getClass())) {
+                protocol.filterPacket(userConnection, o, list);
+                return true;
+            }
+        }
+
         return false;
     }
 }

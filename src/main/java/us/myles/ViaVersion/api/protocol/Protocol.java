@@ -11,6 +11,7 @@ import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Protocol {
@@ -20,6 +21,14 @@ public abstract class Protocol {
     public Protocol() {
         registerPackets();
         registerListeners();
+    }
+
+    public boolean isFiltered(Class packetClass) {
+        return false;
+    }
+
+    protected void filterPacket(UserConnection info, Object packet, List output) throws Exception {
+        output.add(packet);
     }
 
     protected void registerListeners() {

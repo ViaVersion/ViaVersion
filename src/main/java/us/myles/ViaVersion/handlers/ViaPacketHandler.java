@@ -5,15 +5,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 
 import java.util.List;
 
-public class ViaChunkHandler extends MessageToMessageEncoder {
+public class ViaPacketHandler extends MessageToMessageEncoder {
     private final UserConnection info;
 
-    public ViaChunkHandler(UserConnection info) {
+    public ViaPacketHandler(UserConnection info) {
         this.info = info;
     }
 
@@ -25,9 +23,8 @@ public class ViaChunkHandler extends MessageToMessageEncoder {
         if (!(o instanceof ByteBuf)) {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
-            if (o.getClass().getName().endsWith("PacketPlayOutMapChunkBulk") && info.isActive()) {
-                if (info.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) {
-                    list.addAll(info.get(ClientChunks.class).transformMapChunkBulk(o));
+            if (info.isActive()) {
+                if (info.get(ProtocolInfo.class).getPipeline().filter(o, list)) {
                     return;
                 }
             }

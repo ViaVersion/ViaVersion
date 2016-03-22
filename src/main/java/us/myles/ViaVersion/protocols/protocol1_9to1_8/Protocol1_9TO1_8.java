@@ -100,6 +100,16 @@ public class Protocol1_9TO1_8 extends Protocol {
     }
 
     @Override
+    public boolean isFiltered(Class packetClass) {
+        return packetClass.getName().endsWith("PacketPlayOutMapChunkBulk");
+    }
+
+    @Override
+    protected void filterPacket(UserConnection info, Object packet, List output) throws Exception {
+        output.addAll(info.get(ClientChunks.class).transformMapChunkBulk(packet));
+    }
+
+    @Override
     public void init(UserConnection userConnection) {
         // Entity tracker
         userConnection.put(new EntityTracker(userConnection));
