@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
 import lombok.Getter;
-import org.bukkit.Sound;
 
 import java.util.HashMap;
 
