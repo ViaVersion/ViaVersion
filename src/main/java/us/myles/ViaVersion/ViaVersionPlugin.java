@@ -73,7 +73,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         if (getConfig().getBoolean("simulate-pt", true))
             new ViaIdleThread(portedPlayers).runTaskTimerAsynchronously(this, 1L, 1L); // Updates player's idle status
 
-        if (getConfig().getBoolean("checkforupdates"))
+        if (isCheckForUpdates())
             UpdateUtil.sendUpdateMessage(this);
 
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
@@ -279,6 +279,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
     public void setDebug(boolean value) {
         this.debug = value;
+    }
+
+    public boolean isCheckForUpdates() {
+        return getConfig().getBoolean("checkforupdates", true);
     }
 
     public boolean isPreventCollision() {
