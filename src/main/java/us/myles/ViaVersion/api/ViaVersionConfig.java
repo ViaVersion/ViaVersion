@@ -12,6 +12,11 @@ public interface ViaVersionConfig {
      */
     boolean isDebug();
 
+    /**
+     * Obtain if collision preventing for players is enabled
+     *
+     * @return true if collision preventing is enabled
+     */
     boolean isPreventCollision();
 
     boolean isNewEffectIndicator();
@@ -26,7 +31,7 @@ public interface ViaVersionConfig {
 
     boolean isBossbarAntiflicker();
 
-    boolean isUnkownEntitiesSuppressed();
+    boolean isUnknownEntitiesSuppressed();
 
     double getHologramYOffset();
 

@@ -325,7 +325,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getConfig().getBoolean("bossbar-anti-flicker", false);
     }
 
-    public boolean isUnkownEntitiesSuppressed() {
+    public boolean isUnknownEntitiesSuppressed() {
         return getConfig().getBoolean("suppress-entityid-errors", false);
     }
 
