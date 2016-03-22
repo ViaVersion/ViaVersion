@@ -22,3 +22,6 @@ bossbar-patch: true
 bossbar-anti-flicker: false
 # This will show the new effect indicator in the top-right corner for 1.9 players.
 use-new-effect-indicator: true
+# This will suppress the following error: 'Unable to get entity for ID: xxxx'
+# This error message means one of you plugins is sending bad packets!
+suppress-entityid-errors: false
