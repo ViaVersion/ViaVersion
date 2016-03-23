@@ -110,7 +110,7 @@ public class PlayerPackets {
                             wrapper.passthrough(Type.BYTE);
                         }
 
-                        if (mode == 0 || mode == 2) {
+                        if (mode == 0 || mode == 3 || mode == 4) {
                             String[] players = wrapper.read(Type.STRING_ARRAY);
                             final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             String myName = wrapper.user().get(ProtocolInfo.class).getUsername();
