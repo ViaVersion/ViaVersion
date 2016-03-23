@@ -184,6 +184,7 @@ public class EntityPackets {
                             MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
                         } else if (!ViaVersion.getConfig().isUnknownEntitiesSuppressed()) {
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
+                            metadataList.clear();
                         }
                     }
                 });

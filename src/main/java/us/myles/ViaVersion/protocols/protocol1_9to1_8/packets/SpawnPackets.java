@@ -180,6 +180,7 @@ public class SpawnPackets {
                             MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
                         } else {
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
+                            metadataList.clear();
                         }
                     }
                 });
@@ -235,6 +236,16 @@ public class SpawnPackets {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Player UUID
 
+                // Parse this info
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.getClientEntityTypes().put(entityID, EntityType.PLAYER);
+                    }
+                });
+
                 map(Type.INT, toNewDouble); // 2 - X - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 3 - Y - Needs to be divide by 32
                 map(Type.INT, toNewDouble); // 4 - Z - Needs to be divide by 32
@@ -256,6 +267,7 @@ public class SpawnPackets {
                             MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
                         } else {
                             System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
+                            metadataList.clear();
                         }
                     }
                 });
