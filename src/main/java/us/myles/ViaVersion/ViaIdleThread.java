@@ -1,7 +1,6 @@
 package us.myles.ViaVersion;
 
 import org.bukkit.scheduler.BukkitRunnable;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.Map;
@@ -9,33 +8,25 @@ import java.util.UUID;
 
 public class ViaIdleThread extends BukkitRunnable {
     private final Map<UUID, ConnectionInfo> portedPlayers;
-    private final Class<?> idlePacketClass;
+    private final Object idlePacket;
 
     public ViaIdleThread(Map<UUID, ConnectionInfo> portedPlayers) {
         this.portedPlayers = portedPlayers;
         try {
-            this.idlePacketClass = ReflectionUtil.nms("PacketPlayInFlying");
-        } catch(ClassNotFoundException e) {
-            throw new RuntimeException("Couldn't find player idle packet, help!", e);
+            Class<?> idlePacketClass = ReflectionUtil.nms("PacketPlayInFlying");
+            idlePacket = idlePacketClass.newInstance();
+        } catch (InstantiationException | IllegalArgumentException | IllegalAccessException | ClassNotFoundException e) {
+            throw new RuntimeException("Couldn't find/make player idle packet, help!", e);
         }
     }
 
     @Override
     public void run() {
-        for(ConnectionInfo info : portedPlayers.values()) {
+        for (ConnectionInfo info : portedPlayers.values()) {
             long nextIdleUpdate = info.getNextIdlePacket();
-            if(nextIdleUpdate <= System.currentTimeMillis()) {
-                try {
-                    Object packet = idlePacketClass.newInstance();
-                    info.getChannel().pipeline().fireChannelRead(packet);
-                } catch(InstantiationException | IllegalAccessException e) {
-                    System.out.println("Failed to create idle packet.");
-                    if(ViaVersion.getInstance().isDebug()) {
-                        e.printStackTrace();
-                    }
-                } finally {
-                    info.incrementIdlePacket();
-                }
+            if (nextIdleUpdate <= System.currentTimeMillis()) {
+                info.getChannel().pipeline().fireChannelRead(idlePacket);
+                info.incrementIdlePacket();
             }
         }
     }
