@@ -10,6 +10,7 @@ public class ProtocolRegistry {
     public static int SERVER_PROTOCOL = -1;
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private static Map<Integer, Map<Integer, Protocol>> registryMap = new HashMap<>();
+    private static Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new HashMap<>();
 
     static {
         // Register built in protocols
@@ -25,6 +26,10 @@ public class ProtocolRegistry {
      * @param output    The output server version it converts to.
      */
     public static void registerProtocol(Protocol protocol, List<Integer> supported, Integer output) {
+        // Clear cache as this may make new routes.
+        if (pathCache.size() > 0)
+            pathCache.clear();
+
         for (Integer version : supported) {
             if (!registryMap.containsKey(version)) {
                 registryMap.put(version, new HashMap<Integer, Protocol>());
@@ -97,7 +102,17 @@ public class ProtocolRegistry {
      * @return The path it generated, null if it failed.
      */
     public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
-        // TODO: Cache
-        return getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);
+        Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
+        // Check cache
+        if (pathCache.containsKey(protocolKey)) {
+            return pathCache.get(protocolKey);
+        }
+        // Generate path
+        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);
+        // If it found a path, cache it.
+        if (outputPath != null) {
+            pathCache.put(protocolKey, outputPath);
+        }
+        return outputPath;
     }
 }

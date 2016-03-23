@@ -3,16 +3,8 @@
 
 This is an experimental branch, but soon to be live.
 
-
-The things which stop this from going live:
-
-Need to implement debug mode using deprecated PacketType for english
-
-and then javadocs.
-
-
-It would be nice to have a Pipeline cache so it doesn't have to figure it out all the time.
-(and to ensure it uses the shortest pipeline)
+(The only issues would be really really complex protocol pipelines...) 
+(But I don't see them happening any time soon)
 
 License:
 --------
