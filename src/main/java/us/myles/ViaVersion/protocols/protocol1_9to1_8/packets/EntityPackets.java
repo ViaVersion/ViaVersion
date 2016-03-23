@@ -210,7 +210,15 @@ public class EntityPackets {
                 map(Type.BYTE); // 1 - Effect ID
                 map(Type.BYTE); // 2 - Amplifier
                 map(Type.VAR_INT); // 3 - Duration
-                map(Type.BOOLEAN, Type.BYTE);  // 4 - Hide particles
+                handler(new PacketHandler() { //Handle effect indicator
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        boolean showParticles = wrapper.read(Type.BOOLEAN); //In 1.8 = true->Show particles : false->Hide particles
+                        boolean newEffect = ViaVersion.getConfig().isNewEffectIndicator();
+                        //0: hide, 1: shown without indictator, 2: shown with indicator, 3: hide with beacon indicator but we don't use it.
+                        wrapper.write(Type.BYTE, (byte) (showParticles ? newEffect ? 2 : 1 : 0));
+                    }
+                });
             }
         });
 
