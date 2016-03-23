@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
+import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -226,12 +227,28 @@ public class WorldPackets {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
                         Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
-                        wrapper.write(Type.ITEM, item);
+                        wrapper.write(Type.ITEM, item); // 3 - Item
                     }
                 });
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y
                 map(Type.UNSIGNED_BYTE); // 6 - Z
+
+                // Cancel if item as 1.9 uses Use_Item packet
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item item = wrapper.get(Type.ITEM, 0);
+                        if (item != null) {
+                            Material m = Material.getMaterial(item.getId());
+                            if (m != null) {
+                                if (!m.isBlock()) {
+                                    wrapper.cancel();
+                                }
+                            }
+                        }
+                    }
+                });
 
             }
         });
