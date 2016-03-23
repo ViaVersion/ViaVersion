@@ -35,6 +35,7 @@ public class IncomingTransformer {
         if (packet.getPacketID() != -1) {
             packetID = packet.getPacketID();
         }
+
         if (plugin.isDebug()) {
             if (packet != PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST && packet != PacketType.PLAY_KEEP_ALIVE_REQUEST && packet != PacketType.PLAY_PLAYER_POSITION_REQUEST && packet != PacketType.PLAY_PLAYER_LOOK_REQUEST) {
                 System.out.println("Direction " + packet.getDirection().name() + " Packet Type: " + packet + " New ID: " + packetID + " Original: " + original + " Size: " + input.readableBytes());
@@ -292,6 +293,12 @@ public class IncomingTransformer {
                 ItemSlotRewriter.writeItemStack(item, output);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            // Check item
+            if (inHand != null) {
+                if (!inHand.getType().isBlock()) {
+                    throw new CancelException();
+                }
             }
             short curX = input.readUnsignedByte();
             output.writeByte(curX);
