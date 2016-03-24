@@ -5,6 +5,7 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -216,6 +217,61 @@ public class WorldPackets {
             }
         });
 
+        // Use Item Packet
+        protocol.registerIncoming(State.PLAY, -1, 0x1D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        Long last = tracker.getLastPlaceBlock();
+                        if(last != -1){
+                            if((wrapper.user().getReceivedPackets() - last) < 5) {
+                                wrapper.cancel();
+                            }
+                            tracker.setLastPlaceBlock(-1L);
+                        }
+                    }
+                });
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int hand = wrapper.read(Type.VAR_INT);
+                        // Wipe the input buffer
+                        wrapper.clearInputBuffer();
+                        // First set this packet ID to Block placement
+                        wrapper.setId(0x08);
+                        wrapper.write(Type.LONG, -1L);
+                        wrapper.write(Type.BYTE, (byte) 255);
+                        // Write item in hand
+                        Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
+                        // Blocking patch
+                        if (item != null) {
+                            if (Material.getMaterial(item.getId()).name().endsWith("SWORD")) {
+                                if (hand == 0) {
+                                    EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                                    if (!tracker.isBlocking()) {
+                                        tracker.setBlocking(true);
+                                        Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                        tracker.setSecondHand(shield);
+                                    }
+                                    wrapper.cancel();
+                                }
+
+                            }
+                        }
+                        wrapper.write(Type.ITEM, item);
+
+                        wrapper.write(Type.BYTE, (byte) 0);
+                        wrapper.write(Type.BYTE, (byte) 0);
+                        wrapper.write(Type.BYTE, (byte) 0);
+                    }
+                });
+
+            }
+        });
+
         // Block Placement Packet
         protocol.registerIncoming(State.PLAY, 0x08, 0x1C, new PacketRemapper() {
             @Override
@@ -242,9 +298,25 @@ public class WorldPackets {
                         if (item != null) {
                             Material m = Material.getMaterial(item.getId());
                             if (m != null) {
-                                if (!m.isBlock()) {
-                                    wrapper.cancel();
+                                // Prevent special items from sending certain info
+                                // Books
+                                boolean special = m == Material.WRITTEN_BOOK;
+                                // Buckets
+                                special = special || m == Material.WATER_BUCKET || m == Material.LAVA_BUCKET || m == Material.BUCKET;
+                                // Food
+                                special = special || m.isEdible();
+                                // Potions
+                                special = special || m == Material.POTION || m == Material.GLASS_BOTTLE;
+                                // Projectiles
+                                special = special || m == Material.BOW;
+                                special = special || m == Material.SNOW_BALL || m == Material.EGG || m == Material.EXP_BOTTLE || m == Material.ENDER_PEARL || m == Material.EYE_OF_ENDER;
+                                // Don't send data if special
+                                if (special) {
+                                    wrapper.set(Type.POSITION, 0, new Position(-1L, 255L, -1L));
+                                    wrapper.set(Type.BYTE, 0, (byte) -1);
                                 }
+                                EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                                tracker.setLastPlaceBlock(wrapper.user().getReceivedPackets());
                             }
                         }
                     }

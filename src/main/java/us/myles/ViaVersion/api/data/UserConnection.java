@@ -19,6 +19,10 @@ public class UserConnection {
     @Getter
     @Setter
     private Object lastPacket;
+    @Getter
+    private long sentPackets = 0L;
+    @Getter
+    private long receivedPackets = 0L;
 
 
     public UserConnection(SocketChannel socketChannel) {
@@ -81,5 +85,19 @@ public class UserConnection {
      */
     public void sendRawPacket(final ByteBuf packet) {
         sendRawPacket(packet, false);
+    }
+
+    /**
+     * Used for incrementing the number of packets sent to the client
+     */
+    public void incrementSent() {
+        this.sentPackets++;
+    }
+
+    /**
+     * Used for incrementing the number of packets received from the client
+     */
+    public void incrementReceived() {
+        this.receivedPackets++;
     }
 }

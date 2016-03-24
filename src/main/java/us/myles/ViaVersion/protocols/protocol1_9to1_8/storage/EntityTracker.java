@@ -34,6 +34,8 @@ public class EntityTracker extends StoredObject {
     @Setter
     private boolean autoTeam = false;
     @Setter
+    private Long lastPlaceBlock = -1L;
+    @Setter
     private int entityID;
     private boolean teamExists = false;
 

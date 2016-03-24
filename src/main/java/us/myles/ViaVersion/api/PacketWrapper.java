@@ -115,6 +115,16 @@ public class PacketWrapper {
      * @param value The value of the type to write.
      */
     public <T> void write(Type<T> type, T value) {
+        if (value != null) {
+            if (!type.getOutputClass().isAssignableFrom(value.getClass())) {
+                // attempt conversion
+                if (type instanceof TypeConverter) {
+                    value = (T) ((TypeConverter) type).from(value);
+                } else {
+                    System.out.println("Possible type mismatch: " + value.getClass().getName() + " -> " + type.getOutputClass());
+                }
+            }
+        }
         packetValues.add(new Pair<Type, Object>(type, value));
     }
 

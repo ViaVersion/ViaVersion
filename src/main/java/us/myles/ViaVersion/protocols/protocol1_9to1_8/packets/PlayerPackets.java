@@ -373,48 +373,6 @@ public class PlayerPackets {
             }
         });
 
-        // Use Item Packet
-        protocol.registerIncoming(State.PLAY, -1, 0x1D, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int hand = wrapper.read(Type.VAR_INT);
-                        // Wipe the input buffer
-                        wrapper.clearInputBuffer();
-                        // First set this packet ID to Block placement
-                        wrapper.setId(0x08);
-                        wrapper.write(Type.LONG, -1L);
-                        wrapper.write(Type.BYTE, (byte) 255);
-                        // Write item in hand
-                        Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
-                        // Blocking patch
-                        if (item != null) {
-                            if (Material.getMaterial(item.getId()).name().endsWith("SWORD")) {
-                                if (hand == 0) {
-                                    EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                                    if (!tracker.isBlocking()) {
-                                        tracker.setBlocking(true);
-                                        Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                        tracker.setSecondHand(shield);
-                                    }
-                                    wrapper.cancel();
-                                }
-
-                            }
-                        }
-                        wrapper.write(Type.ITEM, item);
-
-                        wrapper.write(Type.BYTE, (byte) 0);
-                        wrapper.write(Type.BYTE, (byte) 0);
-                        wrapper.write(Type.BYTE, (byte) 0);
-                    }
-                });
-
-            }
-        });
-
         // Packet Plugin Message Incoming
         protocol.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {
             @Override

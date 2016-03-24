@@ -41,6 +41,9 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             throw new CancelException();
         }
         if (info.isActive()) {
+            // Increment sent
+            info.incrementSent();
+            // Handle ID
             int id = Type.VAR_INT.read(bytebuf);
             // Transform
             ByteBuf oldPacket = bytebuf.copy();

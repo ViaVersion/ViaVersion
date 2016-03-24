@@ -30,6 +30,9 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
         // use transformers
         if (bytebuf.readableBytes() > 0) {
             if (info.isActive()) {
+                // Increment received
+                info.incrementReceived();
+                // Handle ID
                 int id = Type.VAR_INT.read(bytebuf);
                 // Transform
                 ByteBuf newPacket = ctx.alloc().buffer();
