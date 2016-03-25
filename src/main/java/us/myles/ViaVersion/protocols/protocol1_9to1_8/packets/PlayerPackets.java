@@ -90,28 +90,28 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x3E, 0x41, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
-                map(Type.BYTE);
+                map(Type.STRING); // 0 - Team Name
+                map(Type.BYTE); // 1 - Mode
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        byte mode = wrapper.get(Type.BYTE, 1);
+                        byte mode = wrapper.get(Type.BYTE, 0); // Mode
                         if (mode == 0 || mode == 2) {
-                            wrapper.passthrough(Type.STRING);
-                            wrapper.passthrough(Type.STRING);
-                            wrapper.passthrough(Type.STRING);
+                            wrapper.passthrough(Type.STRING); // Display Name
+                            wrapper.passthrough(Type.STRING); // Prefix
+                            wrapper.passthrough(Type.STRING); // Suffix
 
-                            wrapper.passthrough(Type.BYTE);
+                            wrapper.passthrough(Type.BYTE); // Friendly Fire
 
-                            wrapper.passthrough(Type.STRING);
+                            wrapper.passthrough(Type.STRING); // Name tag visibility
 
                             wrapper.write(Type.STRING, ViaVersion.getConfig().isPreventCollision() ? "never" : "");
 
-                            wrapper.passthrough(Type.BYTE);
+                            wrapper.passthrough(Type.BYTE); // Colour
                         }
 
                         if (mode == 0 || mode == 3 || mode == 4) {
-                            String[] players = wrapper.read(Type.STRING_ARRAY);
+                            String[] players = wrapper.read(Type.STRING_ARRAY); // Players
                             final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             String myName = wrapper.user().get(ProtocolInfo.class).getUsername();
                             for (String player : players) {
