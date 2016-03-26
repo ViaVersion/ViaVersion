@@ -54,6 +54,10 @@ public class EntityTracker extends StoredObject {
     }
 
     public void setSecondHand(Item item) {
+        setSecondHand(entityID, item);
+    }
+
+    public void setSecondHand(int entityID, Item item) {
         PacketWrapper wrapper = new PacketWrapper(0x3C, null, getUser());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
@@ -106,10 +110,10 @@ public class EntityTracker extends StoredObject {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityID)) {
                                 Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                setSecondHand(shield);
+                                setSecondHand(entityID, shield);
                             }
                         } else {
-                            setSecondHand(null);
+                            setSecondHand(entityID, null);
                         }
                     }
                 }
