@@ -29,7 +29,7 @@ public class PaperPatch implements Listener {
             if (e.getPlayer().getLocation().getBlock().equals(e.getBlock())) {
                 e.setCancelled(true);
             } else {
-                if (e.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN).equals(e.getBlock())) {
+                if (e.getPlayer().getLocation().getBlock().getRelative(BlockFace.UP).equals(e.getBlock())) {
                     e.setCancelled(true);
                 }
             }
