@@ -17,6 +17,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.ArmorListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.BlockListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.CommandBlockListener;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.PaperPatch;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
@@ -98,6 +99,10 @@ public class Protocol1_9TO1_8 extends Protocol {
         Bukkit.getPluginManager().registerEvents(new ArmorListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new CommandBlockListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new BlockListener(plugin), plugin);
+        if(Bukkit.getVersion().toLowerCase().contains("paper")){
+            plugin.getLogger().info("Enabling PaperSpigot patch: Fixes block placement.");
+            Bukkit.getPluginManager().registerEvents(new PaperPatch(), plugin);
+        }
     }
 
     @Override
