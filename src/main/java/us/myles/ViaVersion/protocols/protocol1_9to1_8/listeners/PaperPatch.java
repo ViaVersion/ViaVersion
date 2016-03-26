@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
 
+import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,11 +27,21 @@ public class PaperPatch implements Listener {
             if (userConnection == null) return;
             if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
 
+            Location diff = e.getPlayer().getLocation().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
+
             if (e.getPlayer().getLocation().getBlock().equals(e.getBlock())) {
                 e.setCancelled(true);
             } else {
                 if (e.getPlayer().getLocation().getBlock().getRelative(BlockFace.UP).equals(e.getBlock())) {
                     e.setCancelled(true);
+                }else{
+                    // Within radius of block
+                    if(Math.abs(diff.getX()) <= 0.8 && Math.abs(diff.getZ()) <= 0.8D){
+                        // Are they on the edge / shifting ish
+                        if(diff.getY() <= 0.1D && diff.getY() >= -0.1D){
+                            e.setCancelled(true);
+                        }
+                    }
                 }
             }
         }
