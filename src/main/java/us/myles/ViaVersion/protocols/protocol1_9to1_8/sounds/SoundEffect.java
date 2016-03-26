@@ -155,7 +155,7 @@ public enum SoundEffect {
     MOB_CAT_HISS("mob.cat.hiss", "entity.cat.hiss", SoundCategory.NEUTRAL),
     NOTE_BD("note.bd", "block.note.basedrum", SoundCategory.RECORD),
     MOB_SPIDER_SAY("mob.spider.say", "entity.spider.hurt", SoundCategory.HOSTILE),
-    STEP_STONE("step.stone", "block.anvil.hit", SoundCategory.NEUTRAL),
+    STEP_STONE("step.stone", "block.anvil.hit", SoundCategory.NEUTRAL, true), //Is used for glass placement sound
     RANDOM_LEVELUP("random.levelup", "entity.player.levelup", SoundCategory.PLAYER),
     LIQUID_LAVAPOP("liquid.lavapop", "block.lava.pop", SoundCategory.BLOCK),
     MOB_SHEEP_SAY("mob.sheep.say", "entity.sheep.ambient", SoundCategory.NEUTRAL),

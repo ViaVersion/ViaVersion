@@ -1,9 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -14,12 +17,14 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class EntityTracker extends StoredObject {
@@ -29,6 +34,7 @@ public class EntityTracker extends StoredObject {
     private final Map<Integer, BossBar> bossBarMap = new HashMap<>();
     private final Set<Integer> validBlocking = new HashSet<>();
     private final Set<Integer> knownHolograms = new HashSet<>();
+    private final Cache<Position, Material> blockInteractions = CacheBuilder.newBuilder().maximumSize(10).expireAfterAccess(250, TimeUnit.MILLISECONDS).build();
     @Setter
     private boolean blocking = false;
     @Setter
@@ -76,6 +82,24 @@ public class EntityTracker extends StoredObject {
         if (bar != null) {
             bar.hide();
         }
+    }
+
+    public boolean interactedBlockRecently(int x, int y, int z) {
+        if(blockInteractions.size() == 0)
+            return false;
+        Iterator<Position> it = blockInteractions.asMap().keySet().iterator();
+        while(it.hasNext()) {
+            Position p = it.next();
+            if(p.getX() == x)
+                if(p.getY() == y)
+                    if(p.getZ() == z)
+                        return true;
+        }
+        return false;
+    }
+
+    public void addBlockInteraction(Position p) {
+        blockInteractions.put(p,Material.AIR);
     }
 
     public void handleMetadata(int entityID, List<Metadata> metadataList) {

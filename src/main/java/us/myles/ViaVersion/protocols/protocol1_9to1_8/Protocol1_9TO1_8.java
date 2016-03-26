@@ -15,6 +15,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.ArmorListener;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.BlockListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.CommandBlockListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -96,6 +97,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
         Bukkit.getPluginManager().registerEvents(new ArmorListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new CommandBlockListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new BlockListener(plugin), plugin);
     }
 
     @Override
