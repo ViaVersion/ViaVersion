@@ -157,9 +157,11 @@ public class EntityPackets {
                         Item stack = wrapper.get(Type.ITEM, 0);
 
                         if (stack != null) {
-                            if (Material.getMaterial(stack.getId()).name().endsWith("SWORD")) {
-                                entityTracker.getValidBlocking().add(entityID);
-                                return;
+                            if(Material.getMaterial(stack.getId()) != null) {
+                                if (Material.getMaterial(stack.getId()).name().endsWith("SWORD")) {
+                                    entityTracker.getValidBlocking().add(entityID);
+                                    return;
+                                }
                             }
                         }
                         entityTracker.getValidBlocking().remove(entityID);
