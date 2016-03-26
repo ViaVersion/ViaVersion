@@ -87,7 +87,7 @@ public class EntityPackets {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                             if (tracker.getKnownHolograms().contains(entityID)) {
                                 Double newValue = wrapper.get(Type.DOUBLE, 1);
-                                newValue += (32D * ViaVersion.getConfig().getHologramYOffset());
+                                newValue += (ViaVersion.getConfig().getHologramYOffset());
                                 wrapper.set(Type.DOUBLE, 1, newValue);
                             }
                         }
