@@ -74,15 +74,21 @@ public class WorldPackets {
                         int catid = 0;
                         String newname = name;
                         if (effect != null) {
-                            if (effect.isBreaksound()) {
-                                wrapper.cancel();
-                                return;
-                            }
                             catid = effect.getCategory().getId();
                             newname = effect.getNewName();
                         }
                         wrapper.set(Type.STRING, 0, newname);
                         wrapper.write(Type.VAR_INT, catid); // Write Category ID
+                        if(effect != null && effect.isBreaksound()) {
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            int x = wrapper.passthrough(Type.INT); //Position X
+                            int y = wrapper.passthrough(Type.INT); //Position Y
+                            int z = wrapper.passthrough(Type.INT); //Position Z
+                            if(tracker.interactedBlockRecently((int)Math.floor(x/8.0),(int)Math.floor(y/8.0),(int)Math.floor(z/8.0))) {
+                                wrapper.cancel();
+                                return;
+                            }
+                        }
                     }
                 });
             }
@@ -320,6 +326,28 @@ public class WorldPackets {
                                 tracker.setLastPlaceBlock(wrapper.user().getReceivedPackets());
                             }
                         }
+                    }
+                });
+
+                //Register block place to fix sounds
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int face = wrapper.get(Type.BYTE,0);
+                        if(face == 255)
+                            return;
+                        Position p = wrapper.get(Type.POSITION, 0);
+                        long x = p.getX(); long y = p.getY(); long z = p.getZ();
+                        switch(face) {
+                            case 0: y--; break;
+                            case 1: y++; break;
+                            case 2: z--; break;
+                            case 3: z++; break;
+                            case 4: x--; break;
+                            case 5: x++; break;
+                        }
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.addBlockInteraction(new Position(x,y,z));
                     }
                 });
 
