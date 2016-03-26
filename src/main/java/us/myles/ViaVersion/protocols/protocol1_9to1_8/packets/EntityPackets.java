@@ -146,7 +146,6 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
                         ItemRewriter.toClient(stack);
-                        wrapper.set(Type.ITEM, 0, stack);
                     }
                 });
                 // Blocking
