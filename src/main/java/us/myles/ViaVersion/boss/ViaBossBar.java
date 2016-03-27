@@ -144,7 +144,7 @@ public class ViaBossBar implements BossBar {
     }
 
     private void sendPacket(UUID uuid, ByteBuf buf) {
-        if (ViaVersion.getInstance().getPlayerVersion(uuid) > ProtocolVersion.V1_9) {
+        if (!ViaVersion.getInstance().isPorted(uuid) || !(ViaVersion.getInstance().getPlayerVersion(uuid) >= ProtocolVersion.V1_9)) {
             players.remove(uuid);
             return;
         }
