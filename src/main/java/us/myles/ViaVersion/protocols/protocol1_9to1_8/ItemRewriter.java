@@ -112,7 +112,7 @@ public class ItemRewriter {
         registerPotion(8205, "water_breathing");
         registerPotion(8269, "long_water_breathing");
 
-        registerPotion(8197, "healing");
+        registerPotion(8261, "healing");
         registerPotion(8229, "strong_healing");
 
         registerPotion(8204, "harming");
