@@ -43,7 +43,7 @@ public class PaperPatch implements Listener {
                         BlockFace relative = e.getBlockAgainst().getFace(e.getBlock());
                         // Are they towering up, (handles some latency)
                         if(relative == BlockFace.UP){
-                            if(diff.getY() <= 1.1D && diff.getY() >= 0D){
+                            if(diff.getY() < 1D && diff.getY() >= 0D){
                                 e.setCancelled(true);
                             }
                         }
