@@ -18,7 +18,7 @@ public interface BossBar {
      *
      * @param title Title can be in either JSON or just text
      */
-    void setTitle(String title);
+    BossBar setTitle(String title);
 
     /**
      * Get the health
@@ -32,7 +32,7 @@ public interface BossBar {
      *
      * @param health this float has to be between 0F - 1F
      */
-    void setHealth(float health);
+    BossBar setHealth(float health);
 
     /**
      * Get the bossbar color
@@ -46,7 +46,7 @@ public interface BossBar {
      *
      * @param color Whatever color you want!
      */
-    void setColor(BossColor color);
+    BossBar setColor(BossColor color);
 
     /**
      * Get the bosbar style
@@ -60,35 +60,35 @@ public interface BossBar {
      *
      * @param style BossStyle
      */
-    void setStyle(BossStyle style);
+    BossBar setStyle(BossStyle style);
 
     /**
      * Show the bossbar to a player.
      *
      * @param player
      */
-    void addPlayer(Player player);
+    BossBar addPlayer(Player player);
 
     /**
      * Remove the bossbar from a player
      *
      * @param player
      */
-    void removePlayer(Player player);
+    BossBar removePlayer(Player player);
 
     /**
      * Add flags
      *
      * @param flag
      */
-    void addFlag(BossFlag flag);
+    BossBar addFlag(BossFlag flag);
 
     /**
      * Remove flags.
      *
      * @param flag
      */
-    void removeFlag(BossFlag flag);
+    BossBar removeFlag(BossFlag flag);
 
     /**
      * @param flag
@@ -106,12 +106,12 @@ public interface BossBar {
     /**
      * Show the bossbar to everyone (In the getPlayer set)
      */
-    void show();
+    BossBar show();
 
     /**
      * Hide the bossbar from everyone (In the getPlayer set)
      */
-    void hide();
+    BossBar hide();
 
     /**
      * Is it visible?
