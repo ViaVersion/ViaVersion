@@ -26,9 +26,7 @@ public class PaperPatch implements Listener {
             UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(e.getPlayer());
             if (userConnection == null) return;
             if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
-
             Location diff = e.getPlayer().getLocation().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
-
             if (e.getPlayer().getLocation().getBlock().equals(e.getBlock())) {
                 e.setCancelled(true);
             } else {
@@ -40,6 +38,14 @@ public class PaperPatch implements Listener {
                         // Are they on the edge / shifting ish
                         if(diff.getY() <= 0.1D && diff.getY() >= -0.1D){
                             e.setCancelled(true);
+                            return;
+                        }
+                        BlockFace relative = e.getBlockAgainst().getFace(e.getBlock());
+                        // Are they towering up, (handles some latency)
+                        if(relative == BlockFace.UP){
+                            if(diff.getY() <= 1.1D && diff.getY() >= 0D){
+                                e.setCancelled(true);
+                            }
                         }
                     }
                 }
