@@ -80,12 +80,12 @@ public class WorldPackets {
                         }
                         wrapper.set(Type.STRING, 0, newname);
                         wrapper.write(Type.VAR_INT, catid); // Write Category ID
-                        if(effect != null && effect.isBreaksound()) {
+                        if (effect != null && effect.isBreaksound()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                             int x = wrapper.passthrough(Type.INT); //Position X
                             int y = wrapper.passthrough(Type.INT); //Position Y
                             int z = wrapper.passthrough(Type.INT); //Position Z
-                            if(tracker.interactedBlockRecently((int)Math.floor(x/8.0),(int)Math.floor(y/8.0),(int)Math.floor(z/8.0))) {
+                            if (tracker.interactedBlockRecently((int) Math.floor(x / 8.0), (int) Math.floor(y / 8.0), (int) Math.floor(z / 8.0))) {
                                 wrapper.cancel();
                                 return;
                             }
@@ -231,19 +231,6 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        Long last = tracker.getLastPlaceBlock();
-                        if (last != -1) {
-                            if ((wrapper.user().getReceivedPackets() - last) < 5) {
-                                wrapper.cancel();
-                            }
-                            tracker.setLastPlaceBlock(-1L);
-                        }
-                    }
-                });
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
                         int hand = wrapper.read(Type.VAR_INT);
                         // Wipe the input buffer
                         wrapper.clearInputBuffer();
@@ -276,6 +263,46 @@ public class WorldPackets {
                         wrapper.write(Type.BYTE, (byte) 0);
                     }
                 });
+                /*
+
+                The thing i've discovered is when using an item in air, it needs to send 2 packets.
+                I believe the issue is that this needs to be flipped with the packet above while still
+                sending block info.
+
+                Otherwise no idea, the disadvantage: Interact does not get fired if you right click
+                special items. (there's quite a few...)
+
+                 */
+//                handler(new PacketHandler() {
+//                    @Override
+//                    public void handle(PacketWrapper wrapper) throws Exception {
+//                        if(wrapper.isCancelled()) return;
+//                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+//                        if(tracker.isBlocking()) return;
+//
+//                        Long last = tracker.getLastPlaceBlock();
+//                        if (last != -1) {
+//                            if ((wrapper.user().getReceivedPackets() - last) < 3) {
+//                                tracker.setLastPlaceBlock(-1L);
+//                                return;
+//                            }
+//                            tracker.setLastPlaceBlock(-1L);
+//                        }
+//                        final Item item = wrapper.get(Type.ITEM, 0);
+//                        wrapper.create(0x08, new ValueCreator() {
+//                            @Override
+//                            public void write(PacketWrapper wrapper) throws Exception {
+//                                wrapper.write(Type.POSITION, new Position(1L, 1L, 1L));
+//                                wrapper.write(Type.BYTE, (byte) 2);
+//                                wrapper.write(Type.ITEM, item); // hand
+//
+//                                wrapper.write(Type.UNSIGNED_BYTE, (short) 1);
+//                                wrapper.write(Type.UNSIGNED_BYTE, (short) 1);
+//                                wrapper.write(Type.UNSIGNED_BYTE, (short) 1);
+//                            }
+//                        }).sendToServer();
+//                    }
+//                });
 
             }
         });
@@ -322,11 +349,10 @@ public class WorldPackets {
                                 special = special || ArmorType.isArmor(m);
                                 // Don't send data if special
                                 if (special && m != Material.AIR) {
-                                    wrapper.set(Type.POSITION, 0, new Position(-1L, -1L, -1L));
-                                    wrapper.set(Type.BYTE, 0, (byte) 255);
+                                    EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                                    tracker.setLastPlaceBlock(wrapper.user().getReceivedPackets());
                                 }
-                                EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                                tracker.setLastPlaceBlock(wrapper.user().getReceivedPackets());
+
                             }
                         }
                     }
@@ -336,21 +362,35 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int face = wrapper.get(Type.BYTE,0);
-                        if(face == 255)
+                        int face = wrapper.get(Type.BYTE, 0);
+                        if (face == 255)
                             return;
                         Position p = wrapper.get(Type.POSITION, 0);
-                        long x = p.getX(); long y = p.getY(); long z = p.getZ();
-                        switch(face) {
-                            case 0: y--; break;
-                            case 1: y++; break;
-                            case 2: z--; break;
-                            case 3: z++; break;
-                            case 4: x--; break;
-                            case 5: x++; break;
+                        long x = p.getX();
+                        long y = p.getY();
+                        long z = p.getZ();
+                        switch (face) {
+                            case 0:
+                                y--;
+                                break;
+                            case 1:
+                                y++;
+                                break;
+                            case 2:
+                                z--;
+                                break;
+                            case 3:
+                                z++;
+                                break;
+                            case 4:
+                                x--;
+                                break;
+                            case 5:
+                                x++;
+                                break;
                         }
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.addBlockInteraction(new Position(x,y,z));
+                        tracker.addBlockInteraction(new Position(x, y, z));
                     }
                 });
 

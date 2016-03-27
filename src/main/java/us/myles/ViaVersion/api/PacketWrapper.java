@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.TypeConverter;
 import us.myles.ViaVersion.exception.InformativeException;
+import us.myles.ViaVersion.handlers.ViaDecodeHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -262,5 +263,24 @@ public class PacketWrapper {
     public void resetReader() {
         this.readableObjects.addAll(packetValues);
         this.packetValues.clear();
+    }
+
+    public void sendToServer() throws Exception {
+        if (!isCancelled()) {
+            ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+            Type.VAR_INT.write(output, ViaDecodeHandler.PASSTHROUGH_ID); // Pass through
+
+            writeToBuffer(output);
+
+            boolean mark = false;
+            for (String s : user().getChannel().pipeline().names()) {
+                if (mark) {
+                    user().getChannel().pipeline().context(user().getChannel().pipeline().get(s)).fireChannelRead(output);
+                    return;
+                }
+                if (s.equalsIgnoreCase("decompress"))
+                    mark = true;
+            }
+        }
     }
 }

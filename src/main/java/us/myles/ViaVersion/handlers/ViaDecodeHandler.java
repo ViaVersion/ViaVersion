@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
@@ -19,6 +18,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
 
     private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
+    public static int PASSTHROUGH_ID = 1000;
 
     public ViaDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
         this.info = info;
@@ -37,10 +37,14 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 // Transform
                 ByteBuf newPacket = ctx.alloc().buffer();
                 try {
-                    PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);
-                    ProtocolInfo protInfo = info.get(ProtocolInfo.class);
-                    protInfo.getPipeline().transform(Direction.INCOMING, protInfo.getState(), wrapper);
-                    wrapper.writeToBuffer(newPacket);
+                    if (id == ViaDecodeHandler.PASSTHROUGH_ID) {
+                        newPacket.writeBytes(bytebuf);
+                    } else {
+                        PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);
+                        ProtocolInfo protInfo = info.get(ProtocolInfo.class);
+                        protInfo.getPipeline().transform(Direction.INCOMING, protInfo.getState(), wrapper);
+                        wrapper.writeToBuffer(newPacket);
+                    }
 
                     bytebuf.clear();
                     bytebuf = newPacket;

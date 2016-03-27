@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
@@ -48,11 +47,12 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
             // Transform
             ByteBuf oldPacket = bytebuf.copy();
             bytebuf.clear();
+
             try {
-                PacketWrapper wrapper = new PacketWrapper(id, oldPacket, info);
-                ProtocolInfo protInfo = info.get(ProtocolInfo.class);
-                protInfo.getPipeline().transform(Direction.OUTGOING, protInfo.getState(), wrapper);
-                wrapper.writeToBuffer(bytebuf);
+                    PacketWrapper wrapper = new PacketWrapper(id, oldPacket, info);
+                    ProtocolInfo protInfo = info.get(ProtocolInfo.class);
+                    protInfo.getPipeline().transform(Direction.OUTGOING, protInfo.getState(), wrapper);
+                    wrapper.writeToBuffer(bytebuf);
             } catch (Exception e) {
                 bytebuf.clear();
                 throw e;
