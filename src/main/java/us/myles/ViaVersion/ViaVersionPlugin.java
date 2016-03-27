@@ -234,6 +234,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     }
 
     @Override
+    public int getPlayerVersion(@NonNull UUID uuid) {
+        if (!isPorted(uuid))
+            return ProtocolRegistry.SERVER_PROTOCOL;
+        return portedPlayers.get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+    }
+
+    @Override
     public boolean isPorted(UUID playerUUID) {
         return portedPlayers.containsKey(playerUUID);
     }
@@ -257,7 +264,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
     @Override
     public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
-        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not on 1.9");
+        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
         UserConnection ci = portedPlayers.get(uuid);
         ci.sendRawPacket(packet);
     }
