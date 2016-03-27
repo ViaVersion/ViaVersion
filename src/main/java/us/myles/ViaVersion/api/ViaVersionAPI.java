@@ -26,6 +26,14 @@ public interface ViaVersionAPI {
     int getPlayerVersion(Player player);
 
     /**
+     * Get protocol number from a player
+     *
+     * @param uuid UUID of a player
+     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
+     */
+    int getPlayerVersion(UUID uuid);
+
+    /**
      * Is player using 1.9?
      *
      * @param playerUUID

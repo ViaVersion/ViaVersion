@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
@@ -143,7 +144,7 @@ public class ViaBossBar implements BossBar {
     }
 
     private void sendPacket(UUID uuid, ByteBuf buf) {
-        if (!ViaVersion.getInstance().isPorted(uuid)) {
+        if (ViaVersion.getInstance().getPlayerVersion(uuid) > ProtocolVersion.V1_9) {
             players.remove(uuid);
             return;
         }
