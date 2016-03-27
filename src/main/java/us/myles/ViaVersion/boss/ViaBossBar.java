@@ -42,17 +42,19 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public void setTitle(String title) {
+    public BossBar setTitle(String title) {
         Validate.notNull(title, "Title cannot be null");
         this.title = title;
         sendPacket(UpdateAction.UPDATE_TITLE);
+        return this;
     }
 
     @Override
-    public void setHealth(float health) {
+    public BossBar setHealth(float health) {
         Validate.isTrue((health >= 0 && health <= 1), "Health must be between 0 and 1");
         this.health = health;
         sendPacket(UpdateAction.UPDATE_HEALTH);
+        return this;
     }
 
     @Override
@@ -61,48 +63,54 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public void setColor(BossColor color) {
+    public BossBar setColor(BossColor color) {
         Validate.notNull(color, "Color cannot be null");
         this.color = color;
         sendPacket(UpdateAction.UPDATE_STYLE);
+        return this;
     }
 
     @Override
-    public void setStyle(BossStyle style) {
+    public BossBar setStyle(BossStyle style) {
         Validate.notNull(style, "Style cannot be null");
         this.style = style;
         sendPacket(UpdateAction.UPDATE_STYLE);
+        return this;
     }
 
     @Override
-    public void addPlayer(Player player) {
+    public BossBar addPlayer(Player player) {
         if (player != null && !players.contains(player.getUniqueId())) {
             players.add(player.getUniqueId());
             if (visible)
                 sendPacket(player.getUniqueId(), getPacket(UpdateAction.ADD));
         }
+        return this;
     }
 
     @Override
-    public void removePlayer(Player player) {
+    public BossBar removePlayer(Player player) {
         if (player != null && players.contains(player.getUniqueId())) {
             players.remove(player.getUniqueId());
             sendPacket(player.getUniqueId(), getPacket(UpdateAction.REMOVE));
         }
+        return this;
     }
 
     @Override
-    public void addFlag(BossFlag flag) {
+    public BossBar addFlag(BossFlag flag) {
         if (!hasFlag(flag))
             flags.add(flag);
         sendPacket(UpdateAction.UPDATE_FLAGS);
+        return this;
     }
 
     @Override
-    public void removeFlag(BossFlag flag) {
+    public BossBar removeFlag(BossFlag flag) {
         if (hasFlag(flag))
             flags.remove(flag);
         sendPacket(UpdateAction.UPDATE_FLAGS);
+        return this;
     }
 
     @Override
@@ -116,13 +124,15 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public void show() {
+    public BossBar show() {
         setVisible(true);
+        return this;
     }
 
     @Override
-    public void hide() {
+    public BossBar hide() {
         setVisible(false);
+        return this;
     }
 
     @Override
