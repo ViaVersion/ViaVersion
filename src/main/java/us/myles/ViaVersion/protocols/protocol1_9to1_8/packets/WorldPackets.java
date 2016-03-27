@@ -241,17 +241,19 @@ public class WorldPackets {
                         // Write item in hand
                         Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
                         // Blocking patch
-                        if (item != null) {
-                            if (Material.getMaterial(item.getId()) != null) {
-                                if (Material.getMaterial(item.getId()).name().endsWith("SWORD")) {
-                                    if (hand == 0) {
-                                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                                        if (!tracker.isBlocking()) {
-                                            tracker.setBlocking(true);
-                                            Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                            tracker.setSecondHand(shield);
+                        if (ViaVersion.getConfig().isShieldBlocking()) {
+                            if (item != null) {
+                                if (Material.getMaterial(item.getId()) != null) {
+                                    if (Material.getMaterial(item.getId()).name().endsWith("SWORD")) {
+                                        if (hand == 0) {
+                                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                                            if (!tracker.isBlocking()) {
+                                                tracker.setBlocking(true);
+                                                Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                                tracker.setSecondHand(shield);
+                                            }
+                                            wrapper.cancel();
                                         }
-                                        wrapper.cancel();
                                     }
                                 }
                             }
