@@ -323,7 +323,7 @@ public class WorldPackets {
                                 // Don't send data if special
                                 if (special && m != Material.AIR) {
                                     wrapper.set(Type.POSITION, 0, new Position(-1L, -1L, -1L));
-                                    wrapper.set(Type.BYTE, 0, (byte) -1);
+                                    wrapper.set(Type.BYTE, 0, (byte) 255);
                                 }
                                 EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                                 tracker.setLastPlaceBlock(wrapper.user().getReceivedPackets());
