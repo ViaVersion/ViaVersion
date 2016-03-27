@@ -265,6 +265,12 @@ public class PacketWrapper {
         this.packetValues.clear();
     }
 
+    /**
+     * Send the current packet to the server.
+     * (Ensure the ID is suitable for the server version)
+     *
+     * @throws Exception If it failed to write
+     */
     public void sendToServer() throws Exception {
         if (!isCancelled()) {
             ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
