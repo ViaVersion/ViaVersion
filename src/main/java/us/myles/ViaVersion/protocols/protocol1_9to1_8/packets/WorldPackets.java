@@ -14,6 +14,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -317,9 +318,11 @@ public class WorldPackets {
                                 // Projectiles
                                 special = special || m == Material.BOW;
                                 special = special || m == Material.SNOW_BALL || m == Material.EGG || m == Material.EXP_BOTTLE || m == Material.ENDER_PEARL || m == Material.EYE_OF_ENDER;
+                                // Armour
+                                special = special || ArmorType.isArmor(m);
                                 // Don't send data if special
-                                if (special) {
-                                    wrapper.set(Type.POSITION, 0, new Position(-1L, 255L, -1L));
+                                if (special && m != Material.AIR) {
+                                    wrapper.set(Type.POSITION, 0, new Position(-1L, -1L, -1L));
                                     wrapper.set(Type.BYTE, 0, (byte) -1);
                                 }
                                 EntityTracker tracker = wrapper.user().get(EntityTracker.class);

@@ -79,18 +79,16 @@ public class ArmorListener implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         if (e.getItem() != null) {
             if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                if (ArmorType.isArmor(e.getMaterial())) {
-                    final Player player = e.getPlayer();
-                    // Due to odd bugs it's 3 ticks later
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                        @Override
-                        public void run() {
-                            if (ViaVersion.getInstance().isPorted(player)) {
-                                sendArmorUpdate(player);
-                            }
+                final Player player = e.getPlayer();
+                // Due to odd bugs it's 3 ticks later
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ViaVersion.getInstance().isPorted(player)) {
+                            sendArmorUpdate(player);
                         }
-                    }, 3L);
-                }
+                    }
+                }, 3L);
             }
         }
     }
