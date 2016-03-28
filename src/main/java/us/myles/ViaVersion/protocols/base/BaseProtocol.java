@@ -40,14 +40,14 @@ public class BaseProtocol extends Protocol {
                         try {
                             JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
                             JSONObject version = (JSONObject) json.get("version");
-
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) {
                                 Long original = (Long) version.get("protocol");
                                 ProtocolRegistry.SERVER_PROTOCOL = original.intValue();
                             }
                             List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
                             if (protocols != null) {
-                                version.put("protocol", info.getProtocolVersion());
+                                if ((long) version.get("protocol") != 9999) //Fix serverlistplus
+                                    version.put("protocol", info.getProtocolVersion());
                             } else {
                                 // not compatible :(, *plays very sad violin*
                                 wrapper.user().setActive(false);
