@@ -15,6 +15,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 public class PlayerPackets {
@@ -145,7 +146,7 @@ public class PlayerPackets {
                 // Parse this info
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception{
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.getClientEntityTypes().put(entityID, EntityType.PLAYER);
@@ -243,19 +244,6 @@ public class PlayerPackets {
 
         // Map Bulk
         protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
-
-        // Update Entity NBT
-        protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -415,6 +403,12 @@ public class PlayerPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
+                        if (action == 0) {
+                            // Client unloads chunks on respawn, take note
+                            ClientChunks cc = wrapper.user().get(ClientChunks.class);
+                            cc.getBulkChunks().clear();
+                            cc.getLoadedChunks().clear();
+                        }
                         if (action == 2) {
                             // cancel any blocking >.>
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);

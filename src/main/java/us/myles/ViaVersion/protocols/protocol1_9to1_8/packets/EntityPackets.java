@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import org.bukkit.Material;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -157,7 +158,7 @@ public class EntityPackets {
                         Item stack = wrapper.get(Type.ITEM, 0);
 
                         if (stack != null) {
-                            if(Material.getMaterial(stack.getId()) != null) {
+                            if (Material.getMaterial(stack.getId()) != null) {
                                 if (Material.getMaterial(stack.getId()).name().endsWith("SWORD")) {
                                     entityTracker.getValidBlocking().add(entityID);
                                     return;
@@ -224,6 +225,24 @@ public class EntityPackets {
                 });
             }
         });
+
+
+        // Update Entity NBT
+        protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+//                        int id = wrapper.read(Type.VAR_INT);
+//                        CompoundTag tag = wrapper.read(Type.NBT);
+//                        System.out.println(id + " - " + tag);
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
 
         /* Packets which do not have any field remapping or handlers */
 
