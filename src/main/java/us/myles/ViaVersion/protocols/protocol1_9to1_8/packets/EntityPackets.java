@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import org.bukkit.Material;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -247,6 +246,7 @@ public class EntityPackets {
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x20, 0x4B); // Entity Properties Packet
+
         protocol.registerOutgoing(State.PLAY, 0x1A, 0x1B); // Entity Status Packet
         protocol.registerOutgoing(State.PLAY, 0x16, 0x27); // Entity Look Packet
         protocol.registerOutgoing(State.PLAY, 0x14, 0x28); // Entity Packet

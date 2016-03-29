@@ -222,6 +222,7 @@ public class PlayerPackets {
                 });
             }
         });
+
         // Packet Plugin Message Outgoing
         protocol.registerOutgoing(State.PLAY, 0x3F, 0x18, new PacketRemapper() {
             @Override
@@ -234,6 +235,26 @@ public class PlayerPackets {
                         if (name.equalsIgnoreCase("MC|BOpen")) {
                             wrapper.passthrough(Type.REMAINING_BYTES); // This is so ugly, :(
                             wrapper.write(Type.VAR_INT, 0);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Update Health Packet
+        protocol.registerOutgoing(State.PLAY, 0x06, 0x3E, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.FLOAT); // 0 - Health
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        float health = wrapper.get(Type.FLOAT, 0);
+                        if (health <= 0) {
+                            // Client unloads chunks on respawn, take note
+                            ClientChunks cc = wrapper.user().get(ClientChunks.class);
+                            cc.getBulkChunks().clear();
+                            cc.getLoadedChunks().clear();
                         }
                     }
                 });
@@ -287,7 +308,6 @@ public class PlayerPackets {
 
         protocol.registerOutgoing(State.PLAY, 0x05, 0x43); // Spawn Position Packet
         protocol.registerOutgoing(State.PLAY, 0x1F, 0x3D); // Set XP Packet
-        protocol.registerOutgoing(State.PLAY, 0x06, 0x3E); // Update Health Packet
         protocol.registerOutgoing(State.PLAY, 0x0D, 0x49); // Collect Item Packet
 
         /* Incoming Packets */
@@ -403,12 +423,6 @@ public class PlayerPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
-                        if (action == 0) {
-                            // Client unloads chunks on respawn, take note
-                            ClientChunks cc = wrapper.user().get(ClientChunks.class);
-                            cc.getBulkChunks().clear();
-                            cc.getLoadedChunks().clear();
-                        }
                         if (action == 2) {
                             // cancel any blocking >.>
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
