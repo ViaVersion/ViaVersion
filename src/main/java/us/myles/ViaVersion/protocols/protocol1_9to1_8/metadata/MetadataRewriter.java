@@ -141,7 +141,7 @@ public class MetadataRewriter {
                 }
             } catch (Exception e) {
                 list.remove(entry);
-                if (!((ViaVersionPlugin) ViaVersion.getInstance()).isSuppressMetadataErrors()) {
+                if (!ViaVersion.getConfig().isSuppressMetadataErrors() || ViaVersion.getInstance().isDebug()) {
                     System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
                     if (type != null)
                         System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.getId());
