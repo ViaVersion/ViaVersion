@@ -61,6 +61,8 @@ You can find unofficial dev builds here:
 **sgdc3's Build Server:** http://ci.xephi.fr/job/ViaVersion/
 **sgdc3's Maven:** http://ci.xephi.fr/plugin/repository/everything/
 
+**JavaDocs:** https://jd.matsv.nl/
+
 License:
 --------
 
