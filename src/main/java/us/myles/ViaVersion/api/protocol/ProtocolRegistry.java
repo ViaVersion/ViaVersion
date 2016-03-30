@@ -15,7 +15,7 @@ public class ProtocolRegistry {
     static {
         // Register built in protocols
         registerProtocol(new Protocol1_9TO1_8(), Collections.singletonList(ProtocolVersion.V1_9), ProtocolVersion.V1_8);
-        registerProtocol(new Protocol1_9_1TO1_9(), Collections.singletonList(ProtocolVersion.V1_9_1_PRE2), ProtocolVersion.V1_9);
+        registerProtocol(new Protocol1_9_1TO1_9(), Arrays.asList(ProtocolVersion.V1_9_1_PRE2, ProtocolVersion.V1_9_2), ProtocolVersion.V1_9);
     }
 
     /**
