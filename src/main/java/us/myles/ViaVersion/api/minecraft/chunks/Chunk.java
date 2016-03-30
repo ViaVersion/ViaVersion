@@ -2,9 +2,11 @@ package us.myles.ViaVersion.api.minecraft.chunks;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @RequiredArgsConstructor
 @Getter
+@ToString
 public class Chunk {
     private final int x;
     private final int z;

@@ -1,9 +1,6 @@
 package us.myles.ViaVersion.api.minecraft.item;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.bukkit.inventory.ItemStack;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
@@ -11,6 +8,7 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Item {
     private short id;
     private byte amount;

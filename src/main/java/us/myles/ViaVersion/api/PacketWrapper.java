@@ -52,7 +52,7 @@ public class PacketWrapper {
         }
 
         Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
-        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId());
+        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId()).set("Data", packetValues);
     }
 
     /**
@@ -92,7 +92,7 @@ public class PacketWrapper {
             try {
                 return type.read(inputBuffer);
             } catch (Exception e) {
-                throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId());
+                throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
             }
         } else {
             Pair<Type, Object> read = readableObjects.poll();
@@ -103,7 +103,7 @@ public class PacketWrapper {
                     return read(type); // retry
                 } else {
                     Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
-                    throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId());
+                    throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
                 }
             }
         }
@@ -172,7 +172,7 @@ public class PacketWrapper {
                 }
                 packetValue.getKey().write(buffer, value);
             } catch (Exception e) {
-                throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId());
+                throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
             }
             index++;
         }

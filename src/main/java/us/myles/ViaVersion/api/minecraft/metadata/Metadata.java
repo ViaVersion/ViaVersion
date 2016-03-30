@@ -13,4 +13,14 @@ public class Metadata {
     private int typeID;
     private Type type;
     private Object value;
+
+    @Override
+    public String toString() {
+        return "Metadata{" +
+                "id=" + id +
+                ", typeID=" + typeID +
+                ", type=" + type +
+                ", value=" + value +
+                '}';
+    }
 }

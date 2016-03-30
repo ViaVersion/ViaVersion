@@ -77,4 +77,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
         this.outputClass = outputClass;
         this.typeName = typeName;
     }
+
+    @Override
+    public String toString() {
+        return "Type|" + getTypeName();
+    }
 }
