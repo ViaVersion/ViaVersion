@@ -1,7 +1,9 @@
 package us.myles.ViaVersion.util;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -56,5 +58,17 @@ public class PipelineUtil {
                 if (c.isAssignableFrom(t.getClass())) return true;
         }
         return false;
+    }
+
+    public static ChannelHandlerContext getContextBefore(String name, ChannelPipeline pipeline) {
+        boolean mark = false;
+        for (String s : pipeline.names()) {
+            if (mark) {
+                return pipeline.context(pipeline.get(s));
+            }
+            if (s.equalsIgnoreCase(name))
+                mark = true;
+        }
+        return null;
     }
 }

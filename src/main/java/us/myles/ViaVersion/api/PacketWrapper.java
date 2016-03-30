@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.TypeConverter;
 import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.handlers.ViaDecodeHandler;
+import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -278,15 +279,7 @@ public class PacketWrapper {
 
             writeToBuffer(output);
 
-            boolean mark = false;
-            for (String s : user().getChannel().pipeline().names()) {
-                if (mark) {
-                    user().getChannel().pipeline().context(user().getChannel().pipeline().get(s)).fireChannelRead(output);
-                    return;
-                }
-                if (s.equalsIgnoreCase("decompress"))
-                    mark = true;
-            }
+            PipelineUtil.getContextBefore("decompress", user().getChannel().pipeline()).fireChannelRead(output);
         }
     }
 }

@@ -70,8 +70,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
         getLogger().info("ViaVersion " + getDescription().getVersion() + " is now enabled, injecting.");
         injectPacketHandler();
-        if (getConfig().getBoolean("simulate-pt", true))
-            new ViaIdleThread(portedPlayers).runTaskTimerAsynchronously(this, 1L, 1L); // Updates player's idle status
+
 
         if (isCheckForUpdates())
             UpdateUtil.sendUpdateMessage(this);
@@ -358,5 +357,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
             if (ViaVersion.getInstance().isDebug())
                 e.printStackTrace();
         }
+    }
+
+    public Map<UUID, UserConnection> getPortedPlayers() {
+        return portedPlayers;
     }
 }
