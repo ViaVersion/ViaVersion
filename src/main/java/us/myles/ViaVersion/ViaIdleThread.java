@@ -34,9 +34,13 @@ public class ViaIdleThread extends BukkitRunnable {
                 long nextIdleUpdate = info.get(MovementTracker.class).getNextIdlePacket();
                 if (nextIdleUpdate <= System.currentTimeMillis()) {
                     ChannelHandlerContext context = PipelineUtil.getContextBefore("decoder", info.getChannel().pipeline());
-                    context.fireChannelRead(idlePacket);
+                    if(info.getChannel().isOpen()) {
+                        if (context != null) {
+                            context.fireChannelRead(idlePacket);
 
-                    info.get(MovementTracker.class).incrementIdlePacket();
+                            info.get(MovementTracker.class).incrementIdlePacket();
+                        }
+                    }
                 }
             }
         }
