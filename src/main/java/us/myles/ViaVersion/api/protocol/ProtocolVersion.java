@@ -8,6 +8,6 @@ public class ProtocolVersion {
     public static final int V1_8 = 47;
 
     public static final int V1_9 = 107;
-    public static final int V1_9_1_PRE2 = 108; // used for 1.9.1
+    public static final int V1_9_1 = 108; // used for 1.9.1
     public static final int V1_9_2 = 109;
 }
