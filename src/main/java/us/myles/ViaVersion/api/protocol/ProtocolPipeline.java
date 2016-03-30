@@ -83,7 +83,7 @@ public class ProtocolPipeline extends Protocol {
 
             // For 1.8/1.9 server version, eventually we'll probably get an API for this...
             if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.V1_8 &&
-                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.V1_9_1_PRE2) {
+                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.V1_9_1) {
 
                 PacketType type;
                 if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.V1_8) {
