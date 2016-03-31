@@ -22,7 +22,7 @@ public class ProtocolVersion {
     static {
         register(v1_7_1 = new ProtocolVersion(4, "1.7-1.7.5"));
         register(v1_7_6 = new ProtocolVersion(5, "1.7.6-1.7.10"));
-        register(v1_8 = new ProtocolVersion(4, "1.8.x"));
+        register(v1_8 = new ProtocolVersion(47, "1.8.x"));
         register(v1_9 = new ProtocolVersion(107, "1.9"));
         register(v1_9_1 = new ProtocolVersion(108, "1.9.1"));
         register(v1_9_2 = new ProtocolVersion(109, "1.9.2"));
