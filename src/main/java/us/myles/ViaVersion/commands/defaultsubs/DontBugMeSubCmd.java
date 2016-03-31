@@ -13,7 +13,7 @@ public class DontBugMeSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return null;
+        return "Toggle checking for updates";
     }
 
     @Override

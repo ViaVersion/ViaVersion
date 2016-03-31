@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.commands;
 
 import lombok.NonNull;
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,6 +26,7 @@ public class ViaCommandHandler implements us.myles.ViaVersion.api.command.ViaVer
 
     @Override
     public void registerSubCommand(@NonNull ViaSubCommand command) throws Exception {
+        Validate.isTrue(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid subcommand name");
         if (hasSubCommand(command.name()))
             throw new Exception("ViaSubCommand " + command.name() + " does already exists!"); //Maybe another exception later.
         commandMap.put(command.name().toLowerCase(), command);
@@ -52,8 +54,13 @@ public class ViaCommandHandler implements us.myles.ViaVersion.api.command.ViaVer
             showHelp(sender);
             return false;
         }
-
         ViaSubCommand handler = getSubCommand(args[0]);
+
+        if (!hasPermission(sender, handler.permission())){
+            sender.sendMessage(color("&cYou are not allowed to use this command!"));
+            return false;
+        }
+
         String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
         boolean result = handler.execute(sender, subArgs);
         if (!result)
@@ -64,7 +71,7 @@ public class ViaCommandHandler implements us.myles.ViaVersion.api.command.ViaVer
     public void showHelp(CommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
         if (allowed.size() == 0){
-            sender.sendMessage("&cYou are not allowed to use this command!");
+            sender.sendMessage(color("&cYou are not allowed to use this command!"));
             return;
         }
         sender.sendMessage(color("&aViaVersion &c" + ViaVersion.getInstance().getVersion()));
@@ -77,9 +84,13 @@ public class ViaCommandHandler implements us.myles.ViaVersion.api.command.ViaVer
     private Set<ViaSubCommand> calculateAllowedCommands(CommandSender sender) {
         Set<ViaSubCommand> cmds = new HashSet<>();
         for (ViaSubCommand sub : commandMap.values())
-            if (sub.permission() == null || sender.hasPermission(sub.permission()))
+            if (hasPermission(sender, sub.permission()))
                 cmds.add(sub);
         return cmds;
+    }
+
+    private boolean hasPermission(CommandSender sender, String permission){
+        return permission == null || sender.hasPermission(permission);
     }
 
 

@@ -7,5 +7,4 @@ loadbefore: [ProtocolLib, ProxyPipe]
 commands:
   viaversion:
     description: Shows ViaVersion Version and more.
-    permission: viaversion.admin
     aliases: [viaver]
