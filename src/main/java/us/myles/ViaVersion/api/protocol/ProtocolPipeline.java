@@ -82,11 +82,11 @@ public class ProtocolPipeline extends Protocol {
             String packet = "UNKNOWN";
 
             // For 1.8/1.9 server version, eventually we'll probably get an API for this...
-            if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.V1_8 &&
-                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.V1_9_2) {
+            if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_8.getId() &&
+                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_9_2.getId()) {
 
                 PacketType type;
-                if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.V1_8) {
+                if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.v1_8.getId()) {
                     if (direction == Direction.INCOMING) {
                         type = PacketType.findNewPacket(state, direction, originalID);
                     } else {
