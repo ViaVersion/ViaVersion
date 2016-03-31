@@ -12,11 +12,11 @@ import java.lang.reflect.Method;
 
 public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final ChannelInitializer<SocketChannel> oldInit;
+    private final ChannelInitializer<SocketChannel> original;
     private Method method;
 
     public ViaVersionInitializer(ChannelInitializer<SocketChannel> oldInit) {
-        this.oldInit = oldInit;
+        this.original = oldInit;
         try {
             this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
             this.method.setAccessible(true);
@@ -25,13 +25,17 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         }
     }
 
+    public ChannelInitializer<SocketChannel> getOriginal() {
+        return original;
+    }
+
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         UserConnection info = new UserConnection(socketChannel);
         // init protocol
         new ProtocolPipeline(info);
         // Add originals
-        this.method.invoke(this.oldInit, socketChannel);
+        this.method.invoke(this.original, socketChannel);
         // Add our transformers
         ViaEncodeHandler encoder = new ViaEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
         ViaDecodeHandler decoder = new ViaDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));

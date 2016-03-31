@@ -9,6 +9,7 @@ import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
@@ -31,6 +32,7 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -42,19 +44,36 @@ import java.util.concurrent.TimeUnit;
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVersionConfig {
 
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
+    private List<ChannelFuture> injectedFutures = new ArrayList<>();
+    private List<Pair<Field, Object>> injectedLists = new ArrayList<>();
     private ViaCommandHandler commandHandler;
     private boolean debug = false;
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         ViaVersion.setInstance(this);
         generateConfig();
         if (System.getProperty("ViaVersion") != null) {
-            getLogger().severe("ViaVersion is already loaded, we don't support reloads. Please reboot if you wish to update.");
-            getLogger().severe("Some features may not work.");
-            return;
+            if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
+                getLogger().severe("ViaVersion is already loaded, we're going to kick all the players... because otherwise we'll crash because of ProtocolLib.");
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.kickPlayer("Server reload, please rejoin!");
+                }
+
+            } else {
+                getLogger().severe("ViaVersion is already loaded, this should work fine... Otherwise reboot the server!!!");
+
+            }
         }
 
+        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded, injecting.");
+        injectPacketHandler();
+    }
+
+    @Override
+    public void onEnable() {
+        if (isCheckForUpdates())
+            UpdateUtil.sendUpdateMessage(this);
         // Gather version :)
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             @Override
@@ -70,17 +89,17 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
             }
         });
 
-        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now enabled, injecting.");
-        injectPacketHandler();
-
-
-        if (isCheckForUpdates())
-            UpdateUtil.sendUpdateMessage(this);
 
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(commandHandler = new ViaCommandHandler());
         getCommand("viaversion").setTabCompleter(commandHandler);
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("ViaVersion is disabling, if this is a reload it may not work.");
+        uninject();
     }
 
     public void gatherProtocolVersion() {
@@ -185,6 +204,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                             }
                         }
                     };
+                    injectedLists.add(new Pair<>(field, connection));
                     field.set(connection, wrapper);
                     // Iterate through current list
                     synchronized (wrapper) {
@@ -213,6 +233,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                 ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
 
                 ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+                injectedFutures.add(future);
             } catch (NoSuchFieldException e) {
                 // field not found
                 throw new Exception("Unable to find childHandler, blame " + bootstrapAcceptor.getClass().getName());
@@ -221,6 +242,35 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
             getLogger().severe("Have you got late-bind enabled with something else? (ProtocolLib?)");
             e.printStackTrace();
         }
+    }
+
+    private void uninject() {
+        // TODO: Uninject from players currently online to prevent protocol lib issues.
+        for (ChannelFuture future : injectedFutures) {
+            ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
+            try {
+                ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                if (oldInit instanceof ViaVersionInitializer) {
+                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((ViaVersionInitializer) oldInit).getOriginal());
+                }
+            } catch (Exception e) {
+                System.out.println("Failed to remove injection... reload won't work with connections sorry");
+            }
+        }
+        injectedFutures.clear();
+
+        for (Pair<Field, Object> pair : injectedLists) {
+            try {
+                Object o = pair.getKey().get(pair.getValue());
+                if (o instanceof ListWrapper) {
+                    pair.getKey().set(pair.getValue(), ((ListWrapper) o).getOriginalList());
+                }
+            } catch (IllegalAccessException e) {
+                System.out.println("Failed to remove injection... reload might not work with connections sorry");
+            }
+        }
+
+        injectedLists.clear();
     }
 
     @Override

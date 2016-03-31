@@ -56,6 +56,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                     throw e;
                 }
             }
+
             // call minecraft decoder
             try {
                 list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));

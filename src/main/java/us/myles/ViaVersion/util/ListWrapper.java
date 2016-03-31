@@ -14,6 +14,10 @@ public abstract class ListWrapper implements List {
 
     public abstract void handleAdd(Object o);
 
+    public List getOriginalList() {
+        return list;
+    }
+
     @Override
     public synchronized int size() {
         return this.list.size();
