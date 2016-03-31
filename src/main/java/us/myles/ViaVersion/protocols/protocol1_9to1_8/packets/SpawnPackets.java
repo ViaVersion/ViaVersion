@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -253,7 +254,24 @@ public class SpawnPackets {
                 map(Type.BYTE); // 5 - Yaw
                 map(Type.BYTE); // 6 - Pitch
 
-                map(Type.SHORT, Type.NOTHING); // Current Item is discontinued
+                handler(new PacketHandler() { //Handle discontinued player hand item
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        short item = wrapper.read(Type.SHORT);
+                        System.out.println(item);
+                        if (item != 0) {
+                            PacketWrapper packet = new PacketWrapper(0x3C, null, wrapper.user());
+                            packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
+                            packet.write(Type.VAR_INT, 1);
+                            packet.write(Type.ITEM, new Item(item, (byte) 1, (short) 0, null));
+                            try {
+                                packet.send();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
 
                 map(Protocol1_9TO1_8.METADATA_LIST);
 
