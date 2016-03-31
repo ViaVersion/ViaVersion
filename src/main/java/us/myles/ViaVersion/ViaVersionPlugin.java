@@ -5,7 +5,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -81,6 +80,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(commandHandler = new ViaCommandHandler());
+        getCommand("viaversion").setTabCompleter(new ViaCommandHandler());
     }
 
     public void gatherProtocolVersion() {
@@ -286,13 +286,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return this.debug;
     }
 
+    public void setDebug(boolean value) {
+        this.debug = value;
+    }
+
     @Override
     public ViaVersionCommand getCommandHandler() {
         return commandHandler;
-    }
-
-    public void setDebug(boolean value) {
-        this.debug = value;
     }
 
     public boolean isCheckForUpdates() {

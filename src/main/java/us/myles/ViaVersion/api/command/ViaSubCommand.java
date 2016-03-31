@@ -1,8 +1,10 @@
 package us.myles.ViaVersion.api.command;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class ViaSubCommand {
     /**
@@ -25,15 +27,16 @@ public abstract class ViaSubCommand {
      *
      * @return your input
      */
-    public String usage(){
+    public String usage() {
         return name();
     }
 
     /**
      * Permission, null for everyone
+     *
      * @return
      */
-    public String permission(){
+    public String permission() {
         return "viaversion.admin";
     }
 
@@ -41,12 +44,23 @@ public abstract class ViaSubCommand {
      * Gets triggered on execution
      *
      * @param sender Command sender
-     * @param args Arguments
+     * @param args   Arguments
      * @return command executed succesfully if false, show usage
      */
     public abstract boolean execute(CommandSender sender, String[] args);
 
-    public String color(String s){
+    /**
+     * Yay, possibility to implement tab-completion
+     *
+     * @param sender Command sender
+     * @param args   args
+     * @return tab complete possibilities
+     */
+    public List<String> onTabComplete(CommandSender sender, String[] args) {
+        return Collections.emptyList();
+    }
+
+    public String color(String s) {
         return ViaCommandHandler.color(s);
     }
 }

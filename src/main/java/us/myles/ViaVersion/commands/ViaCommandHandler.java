@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.command.ViaVersionCommand;
@@ -13,7 +14,7 @@ import us.myles.ViaVersion.commands.defaultsubs.*;
 
 import java.util.*;
 
-public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
+public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, TabCompleter {
     private Map<String, ViaSubCommand> commandMap;
 
     public ViaCommandHandler() {
@@ -23,6 +24,14 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
         } catch (Exception e) {
             //ignore never throws exception because it doesn't exists
         }
+    }
+
+    public static String color(String string) {
+        try {
+            string = ChatColor.translateAlternateColorCodes('&', string); //Dont replace all & with $ like we did before.
+        } catch (Exception ignored) {
+        }
+        return string;
     }
 
     @Override
@@ -50,14 +59,14 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
             return false;
         }
 
-        if (!hasSubCommand(args[0])){
+        if (!hasSubCommand(args[0])) {
             sender.sendMessage(color("&cThis command is not found"));
             showHelp(sender);
             return false;
         }
         ViaSubCommand handler = getSubCommand(args[0]);
 
-        if (!hasPermission(sender, handler.permission())){
+        if (!hasPermission(sender, handler.permission())) {
             sender.sendMessage(color("&cYou are not allowed to use this command!"));
             return false;
         }
@@ -69,9 +78,42 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
         return result;
     }
 
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String arg, String[] args) {
+        Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
+        List<String> output = new ArrayList<>();
+
+        //SubCommands tabcomplete
+        if (args.length == 1) {
+            if (!args[0].equals("")) {
+                for (ViaSubCommand sub : allowed)
+                    if (sub.name().toLowerCase().startsWith(args[0].toLowerCase()))
+                        output.add(sub.name());
+            } else {
+                for (ViaSubCommand sub : allowed)
+                    output.add(sub.name());
+            }
+        }
+        //Let the SubCommand handle it
+        else if (args.length >= 2) {
+            if (getSubCommand(args[0]) != null) {
+                ViaSubCommand sub = getSubCommand(args[0]);
+                if (!allowed.contains(sub))
+                    return output;
+
+                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+
+                List<String> tab = sub.onTabComplete(sender, subArgs);
+                Collections.sort(tab);
+                return tab;
+            }
+        }
+        return output;
+    }
+
     public void showHelp(CommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
-        if (allowed.size() == 0){
+        if (allowed.size() == 0) {
             sender.sendMessage(color("&cYou are not allowed to use this command!"));
             return;
         }
@@ -90,17 +132,8 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
         return cmds;
     }
 
-    private boolean hasPermission(CommandSender sender, String permission){
+    private boolean hasPermission(CommandSender sender, String permission) {
         return permission == null || sender.hasPermission(permission);
-    }
-
-
-    public static String color(String string) {
-        try {
-            string = ChatColor.translateAlternateColorCodes('&', string); //Dont replace all & with $ like we did before.
-        } catch (Exception ignored) {
-        }
-        return string;
     }
 
     private void registerDefaults() throws Exception {
@@ -109,5 +142,6 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
         registerSubCommand(new DisplayLeaksSubCmd());
         registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
+        registerSubCommand(new HelpSubCmd());
     }
 }
