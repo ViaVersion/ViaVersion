@@ -150,6 +150,7 @@ public class PlayerPackets {
                         int entityID = wrapper.get(Type.INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.getClientEntityTypes().put(entityID, EntityType.PLAYER);
+                        tracker.setEntityID(entityID);
                     }
                 });
                 map(Type.UNSIGNED_BYTE); // 1 - Player Gamemode
@@ -158,15 +159,6 @@ public class PlayerPackets {
                 map(Type.UNSIGNED_BYTE); // 4 - Max Players (Tab)
                 map(Type.STRING); // 5 - Level Type
                 map(Type.BOOLEAN); // 6 - Reduced Debug info
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int myID = wrapper.get(Type.INT, 0);
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.setEntityID(myID);
-                    }
-                });
             }
         });
 
