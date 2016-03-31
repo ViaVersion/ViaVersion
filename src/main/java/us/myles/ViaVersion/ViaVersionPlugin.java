@@ -80,7 +80,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
         getCommand("viaversion").setExecutor(commandHandler = new ViaCommandHandler());
-        getCommand("viaversion").setTabCompleter(new ViaCommandHandler());
+        getCommand("viaversion").setTabCompleter(commandHandler);
     }
 
     public void gatherProtocolVersion() {
