@@ -38,7 +38,7 @@ public abstract class ViaSubCommand {
     }
 
     /**
-     * Events get triggered on execution
+     * Gets triggered on execution
      *
      * @param sender Command sender
      * @param args Arguments
