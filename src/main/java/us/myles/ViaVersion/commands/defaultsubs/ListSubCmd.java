@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 
 import java.util.*;
 
@@ -38,7 +39,7 @@ public class ListSubCmd extends ViaSubCommand {
         Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
 
         for (Map.Entry<Integer, Set<String>> entry : sorted.entrySet())
-            sender.sendMessage(String.format(color("&8[&6%s&8]: &b%s"), entry.getKey(), entry.getValue())); //TODO: Make versions like [1.8,1.9,1.9.1,1.9.2,etc] instead of protocol id
+            sender.sendMessage(String.format(color("&8[&6%s&8]: &b%s"), ProtocolVersion.getProtocol(entry.getKey()).getName(), entry.getValue()));
 
         sorted.clear();
         return true;
