@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.command.ViaVersionCommand;
 
 import java.util.UUID;
 
@@ -93,4 +94,11 @@ public interface ViaVersionAPI {
      * @return true if debug is enabled
      */
     boolean isDebug();
+
+    /**
+     * Get ViaVersions command handler
+     *
+     * @return command handler
+     */
+    ViaVersionCommand getCommandHandler();
 }

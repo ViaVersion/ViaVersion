@@ -1,0 +1,46 @@
+package us.myles.ViaVersion.commands.defaultsubs;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.command.ViaSubCommand;
+
+import java.util.*;
+
+public class ListSubCmd extends ViaSubCommand {
+    @Override
+    public String name() {
+        return "list";
+    }
+
+    @Override
+    public String description() {
+        return "Shows lists of the versions from logged in players";
+    }
+
+    @Override
+    public String usage() {
+        return "list";
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String[] args) {
+        Map<Integer, Set<String>> playerVersions = new HashMap<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            int playerVersion = ViaVersion.getInstance().getPlayerVersion(p);
+            if (playerVersions.containsKey(playerVersion)) {
+                playerVersions.get(playerVersion).add(p.getName());
+                continue;
+            }
+            playerVersions.put(playerVersion, Collections.singleton(p.getName()));
+        }
+        Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
+
+        for (Map.Entry<Integer, Set<String>> entry : sorted.entrySet())
+            sender.sendMessage(String.format(color("&8[&6%s&8]: &b%s"), entry.getKey(), entry.getValue())); //TODO: Make versions like [1.8,1.9,1.9.1,1.9.2,etc] instead of protocol id
+
+        sorted.clear();
+        return true;
+    }
+}

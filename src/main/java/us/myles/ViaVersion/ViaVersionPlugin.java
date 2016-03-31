@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,10 +16,11 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.boss.ViaBossBar;
-import us.myles.ViaVersion.commands.ViaVersionCommand;
+import us.myles.ViaVersion.commands.ViaCommandHandler;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateListener;
@@ -41,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVersionConfig {
 
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
+    private ViaCommandHandler commandHandler;
     private boolean debug = false;
 
     @Override
@@ -77,7 +80,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
         Bukkit.getPluginManager().registerEvents(new UpdateListener(this), this);
 
-        getCommand("viaversion").setExecutor(new ViaVersionCommand(this));
+        getCommand("viaversion").setExecutor(commandHandler = new ViaCommandHandler());
     }
 
     public void gatherProtocolVersion() {
@@ -281,6 +284,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     @Override
     public boolean isDebug() {
         return this.debug;
+    }
+
+    @Override
+    public ViaVersionCommand getCommandHandler() {
+        return commandHandler;
     }
 
     public void setDebug(boolean value) {
