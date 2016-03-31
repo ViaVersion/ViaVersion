@@ -13,7 +13,7 @@ public class DebugSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "toggle debug mode";
+        return "Toggle debug mode";
     }
 
     @Override

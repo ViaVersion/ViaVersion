@@ -8,11 +8,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
+import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.commands.defaultsubs.*;
 
 import java.util.*;
 
-public class ViaCommandHandler implements us.myles.ViaVersion.api.command.ViaVersionCommand, CommandExecutor {
+public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor {
     private Map<String, ViaSubCommand> commandMap;
 
     public ViaCommandHandler() {
