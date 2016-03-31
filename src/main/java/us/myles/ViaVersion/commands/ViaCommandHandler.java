@@ -26,14 +26,6 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, Ta
         }
     }
 
-    public static String color(String string) {
-        try {
-            string = ChatColor.translateAlternateColorCodes('&', string); //Dont replace all & with $ like we did before.
-        } catch (Exception ignored) {
-        }
-        return string;
-    }
-
     @Override
     public void registerSubCommand(@NonNull ViaSubCommand command) throws Exception {
         Validate.isTrue(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid subcommand name");
@@ -143,5 +135,13 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, Ta
         registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
         registerSubCommand(new HelpSubCmd());
+    }
+
+    public static String color(String string) {
+        try {
+            string = ChatColor.translateAlternateColorCodes('&', string); //Dont replace all & with $ like we did before.
+        } catch (Exception ignored) {
+        }
+        return string;
     }
 }
