@@ -37,6 +37,13 @@ public abstract class ViaSubCommand {
         return "viaversion.admin";
     }
 
+    /**
+     * Events get triggered on execution
+     *
+     * @param sender Command sender
+     * @param args Arguments
+     * @return command executed succesfully if false, show usage
+     */
     public abstract boolean execute(CommandSender sender, String[] args);
 
     public String color(String s){
