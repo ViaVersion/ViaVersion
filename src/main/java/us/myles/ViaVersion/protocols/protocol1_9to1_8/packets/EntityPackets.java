@@ -201,6 +201,16 @@ public class EntityPackets {
                         tracker.handleMetadata(entityID, metadataList);
                     }
                 });
+
+                // Cancel packet if list empty
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        if(metadataList.size() == 0)
+                            wrapper.cancel();
+                    }
+                });
             }
         });
 
