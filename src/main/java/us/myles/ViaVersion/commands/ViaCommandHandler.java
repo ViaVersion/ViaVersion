@@ -135,6 +135,7 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, Ta
         registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
         registerSubCommand(new HelpSubCmd());
+        registerSubCommand(new ReloadSubCmd());
     }
 
     public static String color(String string) {
