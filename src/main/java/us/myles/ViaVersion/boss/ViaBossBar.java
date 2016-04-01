@@ -3,6 +3,7 @@ package us.myles.ViaVersion.boss;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
@@ -42,8 +43,7 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public BossBar setTitle(String title) {
-        Validate.notNull(title, "Title cannot be null");
+    public BossBar setTitle(@NonNull String title) {
         this.title = title;
         sendPacket(UpdateAction.UPDATE_TITLE);
         return this;
@@ -63,24 +63,22 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public BossBar setColor(BossColor color) {
-        Validate.notNull(color, "Color cannot be null");
+    public BossBar setColor(@NonNull BossColor color) {
         this.color = color;
         sendPacket(UpdateAction.UPDATE_STYLE);
         return this;
     }
 
     @Override
-    public BossBar setStyle(BossStyle style) {
-        Validate.notNull(style, "Style cannot be null");
+    public BossBar setStyle(@NonNull BossStyle style) {
         this.style = style;
         sendPacket(UpdateAction.UPDATE_STYLE);
         return this;
     }
 
     @Override
-    public BossBar addPlayer(Player player) {
-        if (player != null && !players.contains(player.getUniqueId())) {
+    public BossBar addPlayer(@NonNull Player player) {
+        if (!players.contains(player.getUniqueId())) {
             players.add(player.getUniqueId());
             if (visible)
                 sendPacket(player.getUniqueId(), getPacket(UpdateAction.ADD));
@@ -89,8 +87,8 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public BossBar removePlayer(Player player) {
-        if (player != null && players.contains(player.getUniqueId())) {
+    public BossBar removePlayer(@NonNull Player player) {
+        if (players.contains(player.getUniqueId())) {
             players.remove(player.getUniqueId());
             sendPacket(player.getUniqueId(), getPacket(UpdateAction.REMOVE));
         }
@@ -98,7 +96,14 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public BossBar addFlag(BossFlag flag) {
+    public BossBar addPlayers(@NonNull Player... players) {
+        for (Player p : players)
+            addPlayer(p);
+        return this;
+    }
+
+    @Override
+    public BossBar addFlag(@NonNull BossFlag flag) {
         if (!hasFlag(flag))
             flags.add(flag);
         sendPacket(UpdateAction.UPDATE_FLAGS);
@@ -106,7 +111,7 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public BossBar removeFlag(BossFlag flag) {
+    public BossBar removeFlag(@NonNull BossFlag flag) {
         if (hasFlag(flag))
             flags.remove(flag);
         sendPacket(UpdateAction.UPDATE_FLAGS);
@@ -114,7 +119,7 @@ public class ViaBossBar implements BossBar {
     }
 
     @Override
-    public boolean hasFlag(BossFlag flag) {
+    public boolean hasFlag(@NonNull BossFlag flag) {
         return flags.contains(flag);
     }
 
