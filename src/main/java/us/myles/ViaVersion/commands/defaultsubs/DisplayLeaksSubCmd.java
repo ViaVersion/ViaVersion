@@ -17,12 +17,12 @@ public class DisplayLeaksSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        if (ResourceLeakDetector.getLevel() != ResourceLeakDetector.Level.ADVANCED) {
+        if (ResourceLeakDetector.getLevel() != ResourceLeakDetector.Level.ADVANCED)
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
-        } else {
+        else
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
-        }
-        sender.sendMessage(color("&6Leak detector is now " + (ResourceLeakDetector.getLevel() == ResourceLeakDetector.Level.ADVANCED ? "&aenabled" : "&cdisabled")));
+
+        sendMessage(sender, "&6Leak detector is now %s", (ResourceLeakDetector.getLevel() == ResourceLeakDetector.Level.ADVANCED ? "&aenabled" : "&cdisabled"));
         return true;
     }
 }

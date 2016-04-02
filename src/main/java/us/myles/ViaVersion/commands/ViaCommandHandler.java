@@ -145,4 +145,8 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, Ta
         }
         return string;
     }
+
+    public static void sendMessage(@NonNull CommandSender sender, String message, Object... args) {
+        sender.sendMessage(color(String.format(message, args)));
+    }
 }

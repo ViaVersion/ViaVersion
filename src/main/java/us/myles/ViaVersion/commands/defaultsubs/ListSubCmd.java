@@ -39,7 +39,7 @@ public class ListSubCmd extends ViaSubCommand {
         Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
 
         for (Map.Entry<Integer, Set<String>> entry : sorted.entrySet())
-            sender.sendMessage(String.format(color("&8[&6%s&8]: &b%s"), ProtocolVersion.getProtocol(entry.getKey()).getName(), entry.getValue()));
+            sendMessage(sender, "&8[&6%s&8]: &b%s", ProtocolVersion.getProtocol(entry.getKey()).getName(), entry.getValue());
 
         sorted.clear();
         return true;
