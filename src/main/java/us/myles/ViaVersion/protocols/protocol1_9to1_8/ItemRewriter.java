@@ -136,6 +136,7 @@ public class ItemRewriter {
     }
 
     public static void toServer(Item item) {
+        System.out.println(item);
         if (item != null) {
             if (item.getId() == Material.MONSTER_EGG.getId() && item.getData() == 0) {
                 CompoundTag tag = item.getTag();
@@ -147,8 +148,9 @@ public class ItemRewriter {
                         if (ENTTIY_NAME_TO_ID.containsKey(id.getValue()))
                             data = ENTTIY_NAME_TO_ID.get(id.getValue());
                     }
+                    tag.remove("EntityTag");
                 }
-                item.setTag(null);
+                item.setTag(tag);
                 item.setData((short) data);
             }
             if (item.getId() == Material.POTION.getId()) {
