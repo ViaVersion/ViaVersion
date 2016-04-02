@@ -290,7 +290,7 @@ public class SpawnPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short item = wrapper.read(Type.SHORT);
-                        System.out.println(item);
+//                        System.out.println(item);
                         if (item != 0) {
                             PacketWrapper packet = new PacketWrapper(0x3C, null, wrapper.user());
                             packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
