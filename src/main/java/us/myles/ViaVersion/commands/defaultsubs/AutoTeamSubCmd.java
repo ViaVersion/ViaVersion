@@ -23,8 +23,8 @@ public class AutoTeamSubCmd extends ViaSubCommand {
         boolean newValue = !plugin.isAutoTeam();
         plugin.getConfig().set("auto-team", newValue);
         plugin.saveConfig();
-        sender.sendMessage(color("&6We will " + (newValue ? "&aautomatically team players" : "&cno longer auto team players")));
-        sender.sendMessage(color("&6All players will need to re-login for the change to take place."));
+        sendMessage(sender, "&6We will %s", (newValue ? "&aautomatically team players" : "&cno longer auto team players"));
+        sendMessage(sender, "&6All players will need to re-login for the change to take place.");
 
         return true;
     }

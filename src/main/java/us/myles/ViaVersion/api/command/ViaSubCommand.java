@@ -63,4 +63,15 @@ public abstract class ViaSubCommand {
     public String color(String s) {
         return ViaCommandHandler.color(s);
     }
+
+    /**
+     * Send message formatted / colored
+     *
+     * @param sender command sender
+     * @param message string message
+     * @param args optional objects
+     */
+    public void sendMessage(CommandSender sender, String message, Object... args){
+        ViaCommandHandler.sendMessage(sender, message, args);
+    }
 }

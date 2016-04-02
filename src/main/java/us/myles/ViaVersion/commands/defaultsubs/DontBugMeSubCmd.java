@@ -23,7 +23,7 @@ public class DontBugMeSubCmd extends ViaSubCommand {
         boolean newValue = !plugin.isCheckForUpdates();
         plugin.getConfig().set("checkforupdates", newValue);
         plugin.saveConfig();
-        sender.sendMessage(color("&6We will " + (newValue ? "&anotify you about updates." : "&cnot tell you about updates.")));
+        sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));
 
         return true;
     }
