@@ -147,8 +147,9 @@ public class ItemRewriter {
                         if (ENTTIY_NAME_TO_ID.containsKey(id.getValue()))
                             data = ENTTIY_NAME_TO_ID.get(id.getValue());
                     }
+                    tag.remove("EntityTag");
                 }
-                item.setTag(null);
+                item.setTag(tag);
                 item.setData((short) data);
             }
             if (item.getId() == Material.POTION.getId()) {
@@ -160,10 +161,12 @@ public class ItemRewriter {
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName);
                     }
+                    tag.remove("Potion");
                 }
-                item.setTag(null);
+                item.setTag(tag);
                 item.setData((short) data);
             }
+            //Splash potion
             if (item.getId() == 438) {
                 CompoundTag tag = item.getTag();
                 int data = 0;
@@ -174,8 +177,9 @@ public class ItemRewriter {
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName) + 8192;
                     }
+                    tag.remove("Potion");
                 }
-                item.setTag(null);
+                item.setTag(tag);
                 item.setData((short) data);
             }
         }
