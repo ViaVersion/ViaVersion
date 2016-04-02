@@ -15,6 +15,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -40,7 +41,9 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Effect ID
-                // Everything else get's written through
+                map(Type.POSITION); // 1 - Position
+                map(Type.INT); // 2 - Data
+                map(Type.BOOLEAN); // 3 - Disable relative volume
 
                 handler(new PacketHandler() {
                     @Override
@@ -53,6 +56,18 @@ public class WorldPackets {
                             id = 1010;
                         }
                         wrapper.set(Type.INT, 0, id);
+                    }
+                });
+                // Rewrite potion effect as it changed to use a dynamic registry
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.INT, 0);
+                        if (id == 2002) {
+                            int data = wrapper.get(Type.INT, 1);
+                            int newData = ItemRewriter.getNewEffectID(data);
+                            wrapper.set(Type.INT, 1, newData);
+                        }
                     }
                 });
             }

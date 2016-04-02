@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -11,11 +12,14 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.util.EntityUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpawnPackets {
@@ -79,6 +83,34 @@ public class SpawnPackets {
                         wrapper.write(Type.SHORT, vX);
                         wrapper.write(Type.SHORT, vY);
                         wrapper.write(Type.SHORT, vZ);
+                    }
+                });
+
+                // Handle potions
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        final int entityID = wrapper.get(Type.VAR_INT, 0);
+                        final int data = wrapper.get(Type.INT, 0); // Data
+
+                        int typeID = wrapper.get(Type.BYTE, 0);
+                        if (EntityUtil.getTypeFromID(typeID, true) == EntityType.SPLASH_POTION) {
+                            // Convert this to meta data, woo!
+                            PacketWrapper metaPacket = wrapper.create(0x39, new ValueCreator() {
+                                @Override
+                                public void write(PacketWrapper wrapper) throws Exception {
+                                    wrapper.write(Type.VAR_INT, entityID);
+                                    List<Metadata> meta = new ArrayList<>();
+                                    Item item = new Item((short) Material.POTION.getId(), (byte) 1, (short) data, null);
+                                    ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
+
+                                    Metadata potion = new Metadata(5, NewType.Slot.getTypeID(), Type.ITEM, item);
+                                    meta.add(potion);
+                                    wrapper.write(Protocol1_9TO1_8.METADATA_LIST, meta);
+                                }
+                            });
+                            metaPacket.send();
+                        }
                     }
                 });
             }

@@ -18,6 +18,8 @@ public class ItemRewriter {
     private static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     private static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
+    private static final Map<Integer, Integer> POTION_INDEX = new HashMap<>();
+
     static {
         /* Entities */
         registerEntity(1, "Item");
@@ -84,6 +86,7 @@ public class ItemRewriter {
         registerEntity(200, "EnderCrystal");
 
         /* Potions */
+        registerPotion(-1, "empty");
         registerPotion(0, "water");
         registerPotion(64, "mundane");
         registerPotion(32, "thick");
@@ -242,12 +245,20 @@ public class ItemRewriter {
         }
     }
 
+    public static int getNewEffectID(int oldID) {
+        if (oldID >= 16384) {
+            oldID -= 8192;
+        }
+        return POTION_INDEX.containsKey(oldID) ? POTION_INDEX.get(oldID) : 0;
+    }
+
     private static void registerEntity(Integer id, String name) {
         ENTTIY_ID_TO_NAME.put(id, name);
         ENTTIY_NAME_TO_ID.put(name, id);
     }
 
     private static void registerPotion(Integer id, String name) {
+        POTION_INDEX.put(id, POTION_ID_TO_NAME.size());
         POTION_ID_TO_NAME.put(id, name);
         POTION_NAME_TO_ID.put(name, id);
     }

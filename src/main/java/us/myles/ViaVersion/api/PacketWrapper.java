@@ -198,6 +198,7 @@ public class PacketWrapper {
     /**
      * Send this packet to the associated user.
      * Be careful not to send packets twice.
+     * (Sends it after current)
      *
      * @throws Exception if it fails to write
      */
