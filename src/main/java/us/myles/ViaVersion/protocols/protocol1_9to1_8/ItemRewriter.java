@@ -136,7 +136,6 @@ public class ItemRewriter {
     }
 
     public static void toServer(Item item) {
-        System.out.println(item);
         if (item != null) {
             if (item.getId() == Material.MONSTER_EGG.getId() && item.getData() == 0) {
                 CompoundTag tag = item.getTag();
@@ -162,10 +161,12 @@ public class ItemRewriter {
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName);
                     }
+                    tag.remove("Potion");
                 }
-                item.setTag(null);
+                item.setTag(tag);
                 item.setData((short) data);
             }
+            //Splash potion
             if (item.getId() == 438) {
                 CompoundTag tag = item.getTag();
                 int data = 0;
@@ -176,8 +177,9 @@ public class ItemRewriter {
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName) + 8192;
                     }
+                    tag.remove("Potion");
                 }
-                item.setTag(null);
+                item.setTag(tag);
                 item.setData((short) data);
             }
         }
