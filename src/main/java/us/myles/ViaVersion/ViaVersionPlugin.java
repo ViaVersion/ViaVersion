@@ -133,7 +133,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                 public void iterate(Field match) throws Exception {
 
                 }
-            }.noMatch(getLogger(), "Can't find ServerData!").find(ping, pingClazz, ElementType.FIELD);
+            }.noMatch(getLogger(), "Unable to locate serverData, this version may be incompatible with ViaVersion!").find(ping, pingClazz, ElementType.FIELD);
             if (serverData == null) return;
 
             int protocolVersion;
