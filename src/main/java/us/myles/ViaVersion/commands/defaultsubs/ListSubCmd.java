@@ -30,12 +30,9 @@ public class ListSubCmd extends ViaSubCommand {
         Map<Integer, Set<String>> playerVersions = new HashMap<>();
         for (Player p : Bukkit.getOnlinePlayers()) {
             int playerVersion = ViaVersion.getInstance().getPlayerVersion(p);
-            if (playerVersions.containsKey(playerVersion)) {
-                playerVersions.get(playerVersion).add(p.getName());
-                continue;
-            }
-            playerVersions.put(playerVersion, new HashSet<String>()).add(p.getName());
-
+            if (!playerVersions.containsKey(playerVersion))
+                playerVersions.put(playerVersion, new HashSet<String>());
+            playerVersions.get(playerVersion).add(p.getName());
         }
         Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
 
