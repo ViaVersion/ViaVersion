@@ -188,18 +188,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 		            }
 				}
 				
-				
-			Field[] iter = null;
-		    try {
-		        iter = new Field[]{
+            for (Field field : new Field[]{
 	                connection.getClass().getDeclaredField("f"),
 	                connection.getClass().getDeclaredField("g"),
-	        	};
-		    } catch (NoSuchFieldException e) {
-		        e.printStackTrace();
-		    }
-			
-            for (Field field : iter) {
+	        	}) {
                 field.setAccessible(true);
                 final Object value = field.get(connection);
                 // Inject the list
