@@ -148,7 +148,7 @@ public class BaseProtocol extends Protocol {
 
     @Override
     protected void registerListeners() {
-        final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
+        final ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
