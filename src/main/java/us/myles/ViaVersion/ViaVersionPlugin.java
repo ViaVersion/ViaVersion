@@ -6,7 +6,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.NonNull;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -120,25 +119,24 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                 @Override
                 public void iterate(Field match) {}
 
-            }.noMatch("[ViaVersion] Can't find ServerPing!").find(server, serverClazz, ElementType.FIELD);
+            }.noMatch(getLogger(), "Can't find ServerPing!").find(server, serverClazz, ElementType.FIELD);
             if (ping == null) return;
 
 
             Object serverData = new ReflectionFinder<Field>() {
                 @Override
-                public boolean filter(Field f) {
-                    return f.getType() != null && f.getType() == int.class;
+                public boolean filter(Field f) throws Exception {
+                    return f.getType() != null && f.getType().getSimpleName().equalsIgnoreCase("ServerPingServerData");
                 }
 
                 @Override
                 public void iterate(Field match) throws Exception {
 
                 }
-            }.noMatch("[ViaVersion] Can't find serverData").find(ping, pingClazz, ElementType.FIELD);
+            }.noMatch(getLogger(), "Can't find ServerData!").find(ping, pingClazz, ElementType.FIELD);
             if (serverData == null) return;
 
             int protocolVersion;
-
             protocolVersion = new ReflectionFinder<Field>() {
                 @Override
                 public boolean filter(Field f) throws Exception {

@@ -5,12 +5,14 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 /**
  * Created by Florian on 03.04.16 in us.myles.ViaVersion.util
  */
 public abstract class ReflectionFinder<T> {
 
+    Logger logger = null;
     String nomatch = null;
 
     public <R> R find(Object in, Class<?> c, ElementType et) throws Exception {
@@ -22,12 +24,13 @@ public abstract class ReflectionFinder<T> {
             iterate((T)ao);
             r = (R) (et == ElementType.METHOD ? ((Method)ao).invoke(in) : ((Field)ao).get(in));
         }
-        if (nomatch != null && r == null) System.out.println(nomatch);
+        if (nomatch != null && r == null && logger != null) logger.warning(nomatch);
         return r;
     }
 
-    public ReflectionFinder noMatch(String s) {
-        nomatch = s;
+    public ReflectionFinder noMatch(Logger logger, String s) {
+        this.nomatch = s;
+        this.logger = logger;
         return this;
     }
 
