@@ -176,47 +176,56 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
             Object connection = null;
-            for (Method m : serverClazz.getDeclaredMethods()) {
-                if (m.getReturnType() != null) {
-                    if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
-                        if (m.getParameterTypes().length == 0) {
-                            connection = m.invoke(server);
-                        }
-                    }
-                }
-            }
-            if (connection == null) {
-                getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
-                return;
-            }
-            for (Field field : connection.getClass().getDeclaredFields()) {
+			
+			
+			try {
+				connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
+			} catch (Exception ignored) {}
+				finally {
+		            if (connection == null) {
+		                getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
+		                return;
+		            }
+				}
+				
+				
+			Field[] iter = null;
+		    try {
+		        iter = new Field[]{
+	                connection.getClass().getDeclaredField("f"),
+	                connection.getClass().getDeclaredField("g"),
+	        	};
+		    } catch (NoSuchFieldException e) {
+		        e.printStackTrace();
+		    }
+			
+            for (Field field : iter) {
                 field.setAccessible(true);
                 final Object value = field.get(connection);
-                if (value instanceof List) {
-                    // Inject the list
-                    List wrapper = new ListWrapper((List) value) {
-                        @Override
-                        public synchronized void handleAdd(Object o) {
-                            synchronized (this) {
-                                if (o instanceof ChannelFuture) {
-                                    inject((ChannelFuture) o);
-                                }
-                            }
-                        }
-                    };
-                    injectedLists.add(new Pair<>(field, connection));
-                    field.set(connection, wrapper);
-                    // Iterate through current list
-                    synchronized (wrapper) {
-                        for (Object o : (List) value) {
+                // Inject the list
+                List wrapper = new ListWrapper((List) value) {
+                    @Override
+                    public synchronized void handleAdd(Object o) {
+                        synchronized (this) {
                             if (o instanceof ChannelFuture) {
-                                inject((ChannelFuture) o);
-                            } else {
-                                break; // not the right list.
+                               inject((ChannelFuture) o);
                             }
                         }
                     }
+                };
+                injectedLists.add(new Pair<>(field, connection));
+                field.set(connection, wrapper);
+                // Iterate through current list
+                synchronized (wrapper) {
+                    for (Object o : (List) value) {
+                        if (o instanceof ChannelFuture) {
+                            inject((ChannelFuture) o);
+                        } else {
+                            break; // not the right list.
+                        }
+                   }
                 }
+                
             }
             System.setProperty("ViaVersion", getDescription().getVersion());
         } catch (Exception e) {
