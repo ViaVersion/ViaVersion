@@ -240,7 +240,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
             }.find(connection, connection.getClass(), ElementType.FIELD);
 
-            getLogger().info("Successfully injected!");
             System.setProperty("ViaVersion", getDescription().getVersion());
         } catch (Exception e) {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
