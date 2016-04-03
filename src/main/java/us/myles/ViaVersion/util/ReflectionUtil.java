@@ -63,16 +63,6 @@ public class ReflectionUtil {
         field.set(o, value);
     }
 
-    public static Field[] getFields(Object o, String... fieldnames) throws NoSuchFieldException {
-        Field[] f = new Field[fieldnames.length];
-        for (int i = 0; i < fieldnames.length; i++) {
-            Field fi = o.getClass().getDeclaredField(fieldnames[i]);
-            fi.setAccessible(true);
-            f[i] = fi;
-        }
-        return f;
-    }
-
     public static final class ClassReflection {
         private final Class<?> handle;
         private final Map<String, Field> fields = Maps.newConcurrentMap();

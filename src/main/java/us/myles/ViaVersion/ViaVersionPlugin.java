@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.NonNull;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,9 +28,11 @@ import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
+import us.myles.ViaVersion.util.ReflectionFinder;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.File;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -107,42 +110,49 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
             Class<?> pingClazz = ReflectionUtil.nms("ServerPing");
-            Object ping = null;
-            // Search for ping method
-            for (Field f : serverClazz.getDeclaredFields()) {
-                if (f.getType() != null) {
-                    if (f.getType().getSimpleName().equals("ServerPing")) {
-                        f.setAccessible(true);
-                        ping = f.get(server);
-                    }
+
+            Object ping = new ReflectionFinder<Field>() {
+                @Override
+                public boolean filter(Field obj) throws Exception {
+                    return obj.getType() != null && obj.getType().getSimpleName().equals("ServerPing");
                 }
-            }
-            if (ping != null) {
-                Object serverData = null;
-                for (Field f : pingClazz.getDeclaredFields()) {
-                    if (f.getType() != null) {
-                        if (f.getType().getSimpleName().endsWith("ServerData")) {
-                            f.setAccessible(true);
-                            serverData = f.get(ping);
-                        }
-                    }
+
+                @Override
+                public void iterate(Field match) {}
+
+            }.noMatch("[ViaVersion] Can't find ServerPing!").find(server, serverClazz, ElementType.FIELD);
+            if (ping == null) return;
+
+
+            Object serverData = new ReflectionFinder<Field>() {
+                @Override
+                public boolean filter(Field f) {
+                    return f.getType() != null && f.getType() == int.class;
                 }
-                if (serverData != null) {
-                    int protocolVersion = -1;
-                    for (Field f : serverData.getClass().getDeclaredFields()) {
-                        if (f.getType() != null) {
-                            if (f.getType() == int.class) {
-                                f.setAccessible(true);
-                                protocolVersion = (int) f.get(serverData);
-                            }
-                        }
-                    }
-                    if (protocolVersion != -1) {
-                        ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
-                        return;
-                    }
+
+                @Override
+                public void iterate(Field match) throws Exception {
+
                 }
-            }
+            }.noMatch("[ViaVersion] Can't find serverData").find(ping, pingClazz, ElementType.FIELD);
+            if (serverData == null) return;
+
+            int protocolVersion;
+
+            protocolVersion = new ReflectionFinder<Field>() {
+                @Override
+                public boolean filter(Field f) throws Exception {
+                    return f.getType() != null && f.getType() == int.class;
+                }
+
+                @Override
+                public void iterate(Field match) throws Exception {
+
+                }
+            }.find(serverData, serverData.getClass(), ElementType.FIELD);
+
+            ProtocolRegistry.SERVER_PROTOCOL = (protocolVersion == -1 ? ProtocolRegistry.SERVER_PROTOCOL : protocolVersion);
+
         } catch (Exception e) {
             e.printStackTrace();
             // We couldn't work it out... We'll just use ping and hope for the best...
@@ -175,51 +185,68 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         try {
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
+
+            final Object connection = new ReflectionFinder<Method>() {
+
+                @Override
+                public boolean filter(Method m) {
+                    return m.getReturnType() != null && m.getReturnType().getSimpleName().equals("ServerConnection") && m.getParameterTypes().length == 0;
+                }
+
+                @Override
+                public void iterate(Method match) {}
+
+            }.find(server, serverClazz, ElementType.METHOD);
 
             if (connection == null) {
                 getLogger().severe("We failed to find the ServerConnection? :( What server are you running?");
                 return;
             }
-				
-            for (Field field : ReflectionUtil.getFields(connection, "f", "g")) {
 
-                field.setAccessible(true);
-                final Object value = field.get(connection);
+            new ReflectionFinder<Field>() {
 
-                // Inject the list
-                List wrapper = new ListWrapper((List) value) {
-                    @Override
-                    public synchronized void handleAdd(Object o) {
-                        synchronized (this) {
+                @Override
+                public boolean filter(Field f) throws Exception {
+                    return f.get(connection) instanceof List;
+                }
+
+                @Override
+                public void iterate(Field match) throws IllegalAccessException {
+                    final Object value = match.get(connection);
+                    // Inject the list
+                    List wrapper = new ListWrapper((List) value) {
+                        @Override
+                        public synchronized void handleAdd(Object o) {
+                            synchronized (this) {
+                                if (o instanceof ChannelFuture) {
+                                    inject((ChannelFuture) o);
+                                }
+                            }
+                        }
+                    };
+
+                    injectedLists.add(new Pair<>(match, connection));
+                    match.set(connection, wrapper);
+
+                    // Iterate through current list
+                    synchronized (wrapper) {
+                        for (Object o : (List) value) {
                             if (o instanceof ChannelFuture) {
-                               inject((ChannelFuture) o);
+                                inject((ChannelFuture) o);
+                            } else {
+                                break; // not the right list.
                             }
                         }
                     }
-                };
-
-                injectedLists.add(new Pair<>(field, connection));
-                field.set(connection, wrapper);
-
-                // Iterate through current list
-                synchronized (wrapper) {
-                    for (Object o : (List) value) {
-                        if (o instanceof ChannelFuture) {
-                            inject((ChannelFuture) o);
-                        } else {
-                            break; // not the right list.
-                        }
-                   }
                 }
-                
-            }
+
+            }.find(connection, connection.getClass(), ElementType.FIELD);
+
+            getLogger().info("Successfully injected!");
             System.setProperty("ViaVersion", getDescription().getVersion());
         } catch (Exception e) {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
-        } finally {
-            getLogger().info("Successfully injected!");
         }
     }
 
