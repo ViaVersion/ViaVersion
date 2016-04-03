@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -60,6 +61,16 @@ public class ReflectionUtil {
         Field field = o.getClass().getDeclaredField(f);
         field.setAccessible(true);
         field.set(o, value);
+    }
+
+    public static Field[] getFields(Object o, String... fieldnames) throws NoSuchFieldException {
+        Field[] f = new Field[fieldnames.length];
+        for (int i = 0; i < fieldnames.length; i++) {
+            Field fi = o.getClass().getDeclaredField(fieldnames[i]);
+            fi.setAccessible(true);
+            f[i] = fi;
+        }
+        return f;
     }
 
     public static final class ClassReflection {

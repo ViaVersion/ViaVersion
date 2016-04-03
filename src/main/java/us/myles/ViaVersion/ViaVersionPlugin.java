@@ -175,25 +175,18 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         try {
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Object connection = null;
-			
-			
-			try {
-				connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
-			} catch (Exception ignored) {}
-				finally {
-		            if (connection == null) {
-		                getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
-		                return;
-		            }
-				}
+            Object connection = serverClazz.getDeclaredMethod("getServerConnection").invoke(server);
+
+            if (connection == null) {
+                getLogger().severe("We failed to find the ServerConnection? :( What server are you running?");
+                return;
+            }
 				
-            for (Field field : new Field[]{
-	                connection.getClass().getDeclaredField("f"),
-	                connection.getClass().getDeclaredField("g"),
-	        	}) {
+            for (Field field : ReflectionUtil.getFields(connection, "f", "g")) {
+
                 field.setAccessible(true);
                 final Object value = field.get(connection);
+
                 // Inject the list
                 List wrapper = new ListWrapper((List) value) {
                     @Override
@@ -205,8 +198,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                         }
                     }
                 };
+
                 injectedLists.add(new Pair<>(field, connection));
                 field.set(connection, wrapper);
+
                 // Iterate through current list
                 synchronized (wrapper) {
                     for (Object o : (List) value) {
@@ -223,6 +218,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         } catch (Exception e) {
             getLogger().severe("Unable to inject handlers, are you on 1.8? ");
             e.printStackTrace();
+        } finally {
+            getLogger().info("Successfully injected!");
         }
     }
 
