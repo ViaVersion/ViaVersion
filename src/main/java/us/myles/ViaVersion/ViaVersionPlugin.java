@@ -400,7 +400,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
     public void run(final Runnable runnable, boolean wait) {
         try {
-            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
+            Future f = Bukkit.getScheduler().callSyncMethod((ViaVersionPlugin) ViaVersion.getInstance(), new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     runnable.run();

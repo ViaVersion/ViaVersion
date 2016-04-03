@@ -67,7 +67,7 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     public static ItemStack getHandItem(final UserConnection info) {
         try {
-            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<ItemStack>() {
+            return Bukkit.getScheduler().callSyncMethod((ViaVersionPlugin) ViaVersion.getInstance(), new Callable<ItemStack>() {
                 @Override
                 public ItemStack call() throws Exception {
                     UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
@@ -96,7 +96,7 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     @Override
     protected void registerListeners() {
-        ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
+        ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
         Bukkit.getPluginManager().registerEvents(new ArmorListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new CommandBlockListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new BlockListener(plugin), plugin);
