@@ -20,7 +20,6 @@ public abstract class Protocol {
 
     public Protocol() {
         registerPackets();
-        registerListeners();
     }
 
     /**

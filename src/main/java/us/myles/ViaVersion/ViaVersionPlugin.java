@@ -94,6 +94,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
         getCommand("viaversion").setExecutor(commandHandler = new ViaCommandHandler());
         getCommand("viaversion").setTabCompleter(commandHandler);
+
+        // Register Protocol Listeners
+        ProtocolRegistry.registerListeners();
     }
 
     @Override

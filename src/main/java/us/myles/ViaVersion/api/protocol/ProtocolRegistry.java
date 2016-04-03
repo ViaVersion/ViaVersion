@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.protocol;
 
+import org.bukkit.Bukkit;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
@@ -11,6 +12,7 @@ public class ProtocolRegistry {
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private static Map<Integer, Map<Integer, Protocol>> registryMap = new HashMap<>();
     private static Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new HashMap<>();
+    private static List<Protocol> registerList = new ArrayList<>();
 
     static {
         // Register built in protocols
@@ -37,6 +39,12 @@ public class ProtocolRegistry {
 
             registryMap.get(version).put(output, protocol);
         }
+
+        if (Bukkit.getPluginManager().getPlugin("ViaVersion").isEnabled()) {
+            protocol.registerListeners();
+        } else {
+            registerList.add(protocol);
+        }
     }
 
     /**
@@ -49,6 +57,16 @@ public class ProtocolRegistry {
             if (maps.containsKey(SERVER_PROTOCOL)) return true;
         }
         return false; // No destination for protocol
+    }
+
+    /**
+     * Called when the server is enabled, to register any non registered listeners.
+     */
+    public static void registerListeners() {
+        for (Protocol protocol : registerList) {
+            protocol.registerListeners();
+        }
+        registerList.clear();
     }
 
     /**
