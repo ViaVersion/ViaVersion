@@ -34,7 +34,8 @@ public class ListSubCmd extends ViaSubCommand {
                 playerVersions.get(playerVersion).add(p.getName());
                 continue;
             }
-            playerVersions.put(playerVersion, Collections.singleton(p.getName()));
+            playerVersions.put(playerVersion, new HashSet<String>()).add(p.getName());
+
         }
         Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
 
