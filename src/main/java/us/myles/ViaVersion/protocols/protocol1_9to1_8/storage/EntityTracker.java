@@ -89,21 +89,21 @@ public class EntityTracker extends StoredObject {
     }
 
     public boolean interactedBlockRecently(int x, int y, int z) {
-        if(blockInteractions.size() == 0)
+        if (blockInteractions.size() == 0)
             return false;
         Iterator<Position> it = blockInteractions.asMap().keySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Position p = it.next();
-            if(p.getX() == x)
-                if(p.getY() == y)
-                    if(p.getZ() == z)
+            if (p.getX() == x)
+                if (p.getY() == y)
+                    if (p.getZ() == z)
                         return true;
         }
         return false;
     }
 
     public void addBlockInteraction(Position p) {
-        blockInteractions.put(p,Material.AIR);
+        blockInteractions.put(p, Material.AIR);
     }
 
     public void handleMetadata(int entityID, List<Metadata> metadataList) {
@@ -143,9 +143,10 @@ public class EntityTracker extends StoredObject {
                 }
             }
             if (type == EntityType.ARMOR_STAND && ((ViaVersionPlugin) ViaVersion.getInstance()).isHologramPatch()) {
-                if (metadata.getId() == 0) {
+                if (metadata.getId() == 0 && getMetaByIndex(metadataList, 10) != null) {
+                    Metadata meta = getMetaByIndex(metadataList, 10); //Only happens if the armorstand is small
                     byte data = (byte) metadata.getValue();
-                    if ((data & 0x20) == 0x20) {
+                    if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01) {
                         if (!knownHolograms.contains(entityID)) {
                             knownHolograms.add(entityID);
                             try {
@@ -198,6 +199,13 @@ public class EntityTracker extends StoredObject {
                 }
             }
         }
+    }
+
+    public Metadata getMetaByIndex(List<Metadata> list, int index) {
+        for (Metadata meta : list)
+            if (index == meta.getId())
+                return meta;
+        return null;
     }
 
     public void sendTeamPacket(boolean b) {
