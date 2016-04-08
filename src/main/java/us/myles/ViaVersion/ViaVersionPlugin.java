@@ -27,11 +27,13 @@ import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
-import us.myles.ViaVersion.util.ReflectionFinder;
 import us.myles.ViaVersion.util.ReflectionUtil;
+import us.myles.ViaVersion.util.filter.FieldFilter;
+import us.myles.ViaVersion.util.filter.MethodFilter;
+import us.myles.ViaVersion.util.filter.ResultIterator;
+import us.myles.ViaVersion.util.filter.Searcher;
 
 import java.io.File;
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -108,46 +110,40 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         try {
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Class<?> pingClazz = ReflectionUtil.nms("ServerPing");
 
-            Object ping = new ReflectionFinder<Field>() {
-                @Override
-                public boolean filter(Field obj) throws Exception {
-                    return obj.getType() != null && obj.getType().getSimpleName().equals("ServerPing");
-                }
+            Searcher searcher = new Searcher(serverClazz, server)
+                    .search(new FieldFilter() {
+                        @Override
+                        public boolean filter(Field field, Object in) throws Exception {
+                            return field.getType() != null && field.getType().getSimpleName().equals("ServerPing");
+                        }
+                    });
 
-                @Override
-                public void iterate(Field match) {}
+            if (searcher.checkNull()) {
+                getLogger().warning("Unable to locate ServerPing D:");
+                return;
+            }
 
-            }.noMatch(getLogger(), "Can't find ServerPing!").find(server, serverClazz, ElementType.FIELD);
-            if (ping == null) return;
+            searcher = searcher.nextSearcher(ReflectionUtil.nms("ServerPing"))
+                    .search(new FieldFilter() {
+                        @Override
+                        public boolean filter(Field field, Object in) throws Exception {
+                            return field.getType() != null && field.getType().getSimpleName().equalsIgnoreCase("ServerPingServerData");
+                        }
+                    });
 
-
-            Object serverData = new ReflectionFinder<Field>() {
-                @Override
-                public boolean filter(Field f) throws Exception {
-                    return f.getType() != null && f.getType().getSimpleName().equalsIgnoreCase("ServerPingServerData");
-                }
-
-                @Override
-                public void iterate(Field match) throws Exception {
-
-                }
-            }.noMatch(getLogger(), "Unable to locate serverData, this version may be incompatible with ViaVersion!").find(ping, pingClazz, ElementType.FIELD);
-            if (serverData == null) return;
+            if (searcher.checkNull()){
+                getLogger().warning("Unable to locate serverData, this version may be incompatible with ViaVersion!");
+                return;
+            }
 
             int protocolVersion;
-            protocolVersion = new ReflectionFinder<Field>() {
+            protocolVersion = (Integer) searcher.nextSearcher().search(new FieldFilter() {
                 @Override
-                public boolean filter(Field f) throws Exception {
+                public boolean filter(Field f, Object in) throws Exception {
                     return f.getType() != null && f.getType() == int.class;
                 }
-
-                @Override
-                public void iterate(Field match) throws Exception {
-
-                }
-            }.find(serverData, serverData.getClass(), ElementType.FIELD);
+            }).finalResult();
 
             ProtocolRegistry.SERVER_PROTOCOL = (protocolVersion == -1 ? ProtocolRegistry.SERVER_PROTOCOL : protocolVersion);
 
@@ -184,41 +180,34 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
 
-            final Object connection = new ReflectionFinder<Method>() {
+            Searcher searcher = new Searcher(serverClazz, server);
 
+            searcher.search(new MethodFilter() {
                 @Override
-                public boolean filter(Method m) {
+                public boolean filter(Method m, Object in) {
                     return m.getReturnType() != null && m.getReturnType().getSimpleName().equals("ServerConnection") && m.getParameterTypes().length == 0;
                 }
+            });
 
-                @Override
-                public void iterate(Method match) {}
-
-            }.find(server, serverClazz, ElementType.METHOD);
-
-            if (connection == null) {
+            if (searcher.checkNull()) {
                 getLogger().severe("We failed to find the ServerConnection? :( What server are you running?");
                 return;
             }
 
-            new ReflectionFinder<Field>() {
 
-                @Override
-                public boolean filter(Field f) throws Exception {
-                    return f.get(connection) instanceof List;
-                }
+            final Object connection = searcher.finalResult();
+            searcher = searcher.nextSearcher();
 
+            searcher.iterator(new ResultIterator<Field>() {
                 @Override
-                public void iterate(Field match) throws IllegalAccessException {
+                public void iterate(Field match) throws Exception{
                     final Object value = match.get(connection);
-                    // Inject the list
+
                     List wrapper = new ListWrapper((List) value) {
                         @Override
                         public synchronized void handleAdd(Object o) {
                             synchronized (this) {
-                                if (o instanceof ChannelFuture) {
-                                    inject((ChannelFuture) o);
-                                }
+                                inject((ChannelFuture) o);
                             }
                         }
                     };
@@ -226,25 +215,27 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                     injectedLists.add(new Pair<>(match, connection));
                     match.set(connection, wrapper);
 
-                    // Iterate through current list
                     synchronized (wrapper) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                inject((ChannelFuture) o);
-                            } else {
-                                break; // not the right list.
-                            }
+                        for (ChannelFuture o : (List<ChannelFuture>) value) {
+                            inject(o);
                         }
                     }
                 }
+            });
 
-            }.find(connection, connection.getClass(), ElementType.FIELD);
+            searcher.search(new FieldFilter() {
+                @Override
+                public boolean filter(Field field, Object in) throws Exception {
+                    return field.getType().getSimpleName().equals("List") && !((List) field.get(in)).isEmpty() && ((List) field.get(in)).get(0) instanceof ChannelFuture;
+                }
+            });
 
             System.setProperty("ViaVersion", getDescription().getVersion());
         } catch (Exception e) {
-            getLogger().severe("Unable to inject handlers, are you on 1.8? ");
+            getLogger().severe("Unable to inject handlers, are you on 1.8?");
             e.printStackTrace();
         }
+        
     }
 
     private void inject(ChannelFuture future) {
