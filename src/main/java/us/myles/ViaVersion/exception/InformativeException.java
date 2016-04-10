@@ -21,9 +21,9 @@ public class InformativeException extends Exception {
     }
 
     private String getSource(Class<?> sourceClazz) {
-        if(sourceClazz.isAnonymousClass()){
+        if (sourceClazz.isAnonymousClass()) {
             return sourceClazz.getName() + " (Anonymous)";
-        }else{
+        } else {
             return sourceClazz.getName();
         }
     }

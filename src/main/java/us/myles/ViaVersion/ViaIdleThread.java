@@ -1,6 +1,5 @@
 package us.myles.ViaVersion;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.bukkit.scheduler.BukkitRunnable;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -34,7 +33,7 @@ public class ViaIdleThread extends BukkitRunnable {
                 long nextIdleUpdate = info.get(MovementTracker.class).getNextIdlePacket();
                 if (nextIdleUpdate <= System.currentTimeMillis()) {
                     ChannelHandlerContext context = PipelineUtil.getContextBefore("decoder", info.getChannel().pipeline());
-                    if(info.getChannel().isOpen()) {
+                    if (info.getChannel().isOpen()) {
                         if (context != null) {
                             context.fireChannelRead(idlePacket);
 

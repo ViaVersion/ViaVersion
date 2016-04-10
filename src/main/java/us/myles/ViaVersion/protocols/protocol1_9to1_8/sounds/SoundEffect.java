@@ -260,9 +260,10 @@ public enum SoundEffect {
     private final boolean breaksound;
 
     private static HashMap<String, SoundEffect> effects;
+
     static {
-        effects = new HashMap<String, SoundEffect>();
-        for(SoundEffect e : SoundEffect.values()) {
+        effects = new HashMap<>();
+        for (SoundEffect e : SoundEffect.values()) {
             effects.put(e.getName(), e);
         }
     }
@@ -283,7 +284,7 @@ public enum SoundEffect {
 
     public static SoundEffect getByName(String name) {
         name = name.toLowerCase();
-        if(effects.containsKey(name))
+        if (effects.containsKey(name))
             return effects.get(name);
         return null;
     }
