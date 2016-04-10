@@ -17,6 +17,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
@@ -49,12 +50,8 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.INT, 0);
-                        if (id >= 1000 && id < 2000 && id != 1005) { // Sound Effect
-                            wrapper.cancel();
-                        }
-                        if (id == 1005) { // Fix jukebox
-                            id = 1010;
-                        }
+                        if (Effect.contains(id) && wrapper.get(Type.INT, 1) != -1)
+                            id = Effect.getNewId(id);
                         wrapper.set(Type.INT, 0, id);
                     }
                 });
