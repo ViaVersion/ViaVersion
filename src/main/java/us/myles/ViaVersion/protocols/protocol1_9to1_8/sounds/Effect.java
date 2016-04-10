@@ -33,7 +33,7 @@ public class Effect {
 
     public static int getNewId(int id) {
         if (!contains(id))
-            return -1;
+            return id;
         return effects.get(id);
     }
 
