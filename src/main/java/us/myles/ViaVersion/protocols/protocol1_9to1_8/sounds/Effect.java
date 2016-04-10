@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 
-@RequiredArgsConstructor
 public class Effect {
 
     private static HashMap<Integer, Integer> effects;
