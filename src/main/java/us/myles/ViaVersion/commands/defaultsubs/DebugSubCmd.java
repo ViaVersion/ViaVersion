@@ -21,7 +21,7 @@ public class DebugSubCmd extends ViaSubCommand {
         ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
         plugin.setDebug(!plugin.isDebug());
-        sendMessage(sender, "&6Debug mode is now %s" , (plugin.isDebug() ? "&aenabled" : "&cdisabled"));
+        sendMessage(sender, "&6Debug mode is now %s", (plugin.isDebug() ? "&aenabled" : "&cdisabled"));
         return true;
     }
 }

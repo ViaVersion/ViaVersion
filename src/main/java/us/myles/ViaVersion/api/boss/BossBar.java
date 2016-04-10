@@ -75,7 +75,7 @@ public interface BossBar {
      * @param players list of players
      * @return the bossbar instance
      */
-    BossBar addPlayers(Player...players);
+    BossBar addPlayers(Player... players);
 
     /**
      * Remove the bossbar from a player

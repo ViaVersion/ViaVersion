@@ -20,7 +20,7 @@ public class BlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void placeBlock(BlockPlaceEvent e) {
-        if(plugin.isPorted(e.getPlayer())) {
+        if (plugin.isPorted(e.getPlayer())) {
             UserConnection c = plugin.getConnection(e.getPlayer());
             if (!c.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
             Block b = e.getBlockPlaced();

@@ -1,8 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.HashMap;
 
 public class Effect {
@@ -37,11 +34,11 @@ public class Effect {
         return effects.get(id);
     }
 
-    public static boolean contains(int oldId){
+    public static boolean contains(int oldId) {
         return effects.containsKey(oldId);
     }
 
-    private static void addRewrite(int oldId, int newId){
+    private static void addRewrite(int oldId, int newId) {
         effects.put(oldId, newId);
     }
 }

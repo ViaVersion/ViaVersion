@@ -32,18 +32,18 @@ public class PaperPatch implements Listener {
             } else {
                 if (e.getPlayer().getLocation().getBlock().getRelative(BlockFace.UP).equals(e.getBlock())) {
                     e.setCancelled(true);
-                }else{
+                } else {
                     // Within radius of block
-                    if(Math.abs(diff.getX()) <= 0.8 && Math.abs(diff.getZ()) <= 0.8D){
+                    if (Math.abs(diff.getX()) <= 0.8 && Math.abs(diff.getZ()) <= 0.8D) {
                         // Are they on the edge / shifting ish
-                        if(diff.getY() <= 0.1D && diff.getY() >= -0.1D){
+                        if (diff.getY() <= 0.1D && diff.getY() >= -0.1D) {
                             e.setCancelled(true);
                             return;
                         }
                         BlockFace relative = e.getBlockAgainst().getFace(e.getBlock());
                         // Are they towering up, (handles some latency)
-                        if(relative == BlockFace.UP){
-                            if(diff.getY() < 1D && diff.getY() >= 0D){
+                        if (relative == BlockFace.UP) {
+                            if (diff.getY() < 1D && diff.getY() >= 0D) {
                                 e.setCancelled(true);
                             }
                         }
