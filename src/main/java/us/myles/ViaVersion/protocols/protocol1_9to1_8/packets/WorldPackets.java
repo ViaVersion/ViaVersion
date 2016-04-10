@@ -50,7 +50,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.INT, 0);
-                        if (Effect.contains(id) && wrapper.get(Type.INT, 1) != -1)
+                        if (Effect.contains(id))
                             id = Effect.getNewId(id);
                         wrapper.set(Type.INT, 0, id);
                     }
