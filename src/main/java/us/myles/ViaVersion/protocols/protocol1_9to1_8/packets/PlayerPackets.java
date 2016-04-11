@@ -253,6 +253,22 @@ public class PlayerPackets {
             }
         });
 
+        // Respawn Packet
+        protocol.registerOutgoing(State.PLAY, 0x07, 0x33, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // Client unloads chunks on respawn, take note
+                        ClientChunks cc = wrapper.user().get(ClientChunks.class);
+                        cc.getBulkChunks().clear();
+                        cc.getLoadedChunks().clear();
+                    }
+                });
+            }
+        });
+
         /* Removed packets */
 
         // Map Bulk
@@ -290,7 +306,6 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x39, 0x2B); // Player Abilities Packet
         protocol.registerOutgoing(State.PLAY, 0x00, 0x1F); // Keep Alive Packet
         protocol.registerOutgoing(State.PLAY, 0x48, 0x32); // Resource Pack Send Packet
-        protocol.registerOutgoing(State.PLAY, 0x07, 0x33); // Respawn Packet
         protocol.registerOutgoing(State.PLAY, 0x43, 0x36); // Camera Packet
         protocol.registerOutgoing(State.PLAY, 0x2B, 0x1E); // Change Game State Packet
 
