@@ -252,6 +252,24 @@ public class EntityPackets {
             }
         });
 
+        // Combat Event Packet
+        protocol.registerOutgoing(State.PLAY, 0x42, 0x2C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); //Event id
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (wrapper.get(Type.VAR_INT, 0) == 2) { // entity dead
+                            wrapper.passthrough(Type.VAR_INT); //Player id
+                            wrapper.passthrough(Type.INT); //Entity id
+                            Protocol1_9TO1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
+                        }
+                    }
+                });
+            }
+        });
 
         /* Packets which do not have any field remapping or handlers */
 
@@ -261,7 +279,6 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x16, 0x27); // Entity Look Packet
         protocol.registerOutgoing(State.PLAY, 0x14, 0x28); // Entity Packet
 
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x2C); // Combat Event Packet
         protocol.registerOutgoing(State.PLAY, 0x0A, 0x2F); // Use Bed Packet
 
         protocol.registerOutgoing(State.PLAY, 0x1E, 0x31); // Remove Entity Effect Packet
