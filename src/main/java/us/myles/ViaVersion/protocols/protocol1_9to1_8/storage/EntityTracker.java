@@ -22,6 +22,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -123,6 +124,12 @@ public class EntityTracker extends StoredObject {
                 if (metadata.getId() == 11) {
                     metadataList.remove(metadata);
                     //   metadataList.add(new Metadata(11, NewType.Byte.getTypeID(), Type.VAR_INT, 0));
+                }
+            }
+
+            if (type == EntityType.SKELETON) {
+                if ((getMetaByIndex(metadataList, 12)) == null) {
+                    metadataList.add(new Metadata(12, NewType.Boolean.getTypeID(), Type.BOOLEAN, true));
                 }
             }
 
