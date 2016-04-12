@@ -20,8 +20,6 @@ Sources:
 
 **wiki.vg** (Protocol info, though I did have to find a lot myself)
 
-**MCProtocolLib** (used for chunk reading & some of writing.)
-
 **OpenNBT** (used for slot rewriting)
 
 
