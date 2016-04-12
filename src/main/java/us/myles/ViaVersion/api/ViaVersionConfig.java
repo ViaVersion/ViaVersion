@@ -31,6 +31,13 @@ public interface ViaVersionConfig {
     boolean isNewEffectIndicator();
 
     /**
+     * Get if 1.9 clients are shown the new death message on the death screen
+     *
+     * @return true if enabled
+     */
+    boolean isShowNewDeathMessages();
+
+    /**
      * Get if metadata errors will be suppressed
      *
      * @return true if metadata errors suppression is enabled

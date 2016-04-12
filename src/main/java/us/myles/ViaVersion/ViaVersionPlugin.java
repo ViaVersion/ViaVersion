@@ -360,6 +360,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getConfig().getBoolean("use-new-effect-indicator", true);
     }
 
+    @Override
+    public boolean isShowNewDeathMessages() {
+        return getConfig().getBoolean("use-new-deathmessages", false);
+    }
+
     public boolean isSuppressMetadataErrors() {
         return getConfig().getBoolean("suppress-metadata-errors", false);
     }
