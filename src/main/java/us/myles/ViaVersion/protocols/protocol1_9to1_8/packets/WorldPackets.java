@@ -115,14 +115,9 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        Chunk chunk = wrapper.passthrough(new ChunkType(clientChunks));
-                        if (chunk.isUnloadPacket()) {
-                            PacketWrapper unload = wrapper.create(0x1D);
-                            unload.write(Type.INT, chunk.getX());
-                            unload.write(Type.INT, chunk.getZ());
-                            unload.send();
-                            wrapper.cancel();
-                        }
+                        wrapper.passthrough(new ChunkType(clientChunks));
+                        // eat any other data (Usually happens with unload packets)
+                        wrapper.read(Type.REMAINING_BYTES);
                     }
                 });
             }
