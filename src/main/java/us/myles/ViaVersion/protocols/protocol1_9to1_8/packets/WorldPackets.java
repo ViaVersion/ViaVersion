@@ -255,7 +255,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if(!ViaVersion.getConfig().isBlockBreakPatch()) return;
-                        
+
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         final Position block = wrapper.get(Type.POSITION, 0);
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
