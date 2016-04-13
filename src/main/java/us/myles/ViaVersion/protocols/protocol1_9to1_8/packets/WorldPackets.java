@@ -6,7 +6,6 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -174,11 +173,34 @@ public class WorldPackets {
                 });
             }
         });
+
+        // Block Change Packet
+        protocol.registerOutgoing(State.PLAY, 0x23, 0x0B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION);
+                map(Type.VAR_INT);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Position pos = wrapper.user().get(EntityTracker.class).getCurrentlyDigging();
+                        if (pos != null) {
+                            if (wrapper.get(Type.POSITION, 0).equals(pos)) {
+                                // cancel this one
+                                if (wrapper.get(Type.VAR_INT, 0) != 0) {
+                                    wrapper.cancel();
+                                    wrapper.user().get(EntityTracker.class).setCurrentlyDigging(null);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
         protocol.registerOutgoing(State.PLAY, 0x24, 0x0A); // Block Action Packet
-        protocol.registerOutgoing(State.PLAY, 0x23, 0x0B); // Block Change Packet
         protocol.registerOutgoing(State.PLAY, 0x22, 0x10); // Multi Block Change Packet
         protocol.registerOutgoing(State.PLAY, 0x27, 0x1C); // Explosion Packet
         protocol.registerOutgoing(State.PLAY, 0x2A, 0x22); // Particle Packet
@@ -225,6 +247,26 @@ public class WorldPackets {
                                 entityTracker.setBlocking(false);
                                 entityTracker.setSecondHand(null);
                             }
+                        }
+                    }
+                });
+                // Digging patch (prevents it glitching)
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if(!ViaVersion.getConfig().isBlockBreakPatch()) return;
+                        
+                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        final Position block = wrapper.get(Type.POSITION, 0);
+                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        if (status == 0) {
+                            entityTracker.setCurrentlyDigging(null);
+                        }
+                        if (status == 1) {
+                            entityTracker.setCurrentlyDigging(null);
+                        }
+                        if (status == 2) {
+                            entityTracker.setCurrentlyDigging(block);
                         }
                     }
                 });

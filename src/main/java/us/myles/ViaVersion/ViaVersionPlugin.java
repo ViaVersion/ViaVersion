@@ -393,6 +393,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getConfig().getDouble("hologram-y", -1D);
     }
 
+    public boolean isBlockBreakPatch() {
+        return getConfig().getBoolean("block-break-patch", true);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return isPreventCollision() && getConfig().getBoolean("auto-team", true);

@@ -44,6 +44,8 @@ public class EntityTracker extends StoredObject {
     private Long lastPlaceBlock = -1L;
     @Setter
     private int entityID;
+    @Setter
+    private Position currentlyDigging = null;
     private boolean teamExists = false;
 
     public EntityTracker(UserConnection user) {
