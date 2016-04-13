@@ -128,15 +128,11 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
     @Override
     public void write(ByteBuf output, ClientChunks param, Chunk chunk) throws Exception {
-        if (chunk.isUnloadPacket()) {
-            output.clear();
-            Type.VAR_INT.write(output, 0x1D); // Unload packet ID
-        }
+        if (chunk.isUnloadPacket()) return;
 
         // Write primary info
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
-        if (chunk.isUnloadPacket()) return;
         output.writeByte(chunk.isGroundUp() ? 0x01 : 0x00);
         Type.VAR_INT.write(output, chunk.getPrimaryBitmask());
 
