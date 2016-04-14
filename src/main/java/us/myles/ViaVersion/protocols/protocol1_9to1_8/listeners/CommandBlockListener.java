@@ -122,9 +122,13 @@ public class CommandBlockListener implements Listener {
     private long[] getPosition(Object obj) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         return new long[]{
                 (long) ReflectionUtil.getSuper(obj, "a", int.class), //X
-                (long) ReflectionUtil.getSuper(obj, "c", int.class), //Y
-                (long) ReflectionUtil.getSuper(obj, "d", int.class)  //Z
+                (long) ReflectionUtil.getSuper(obj, isR1() ? "b" : "c", int.class), //Y
+                (long) ReflectionUtil.getSuper(obj, isR1() ? "c" : "d", int.class)  //Z
         };
+    }
+
+    private boolean isR1() {
+        return ReflectionUtil.getVersion().equals("v1_8_R1");
     }
 
     private CompoundTag getNBT(Object obj) throws Exception {

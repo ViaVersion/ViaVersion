@@ -22,6 +22,10 @@ public class ReflectionUtil {
         return Class.forName(BASE + "." + className);
     }
 
+    public static String getVersion() {
+        return BASE.substring(BASE.lastIndexOf('.') + 1);
+    }
+
     public static Object invokeStatic(Class<?> clazz, String method) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method m = clazz.getDeclaredMethod(method);
         return m.invoke(null);
