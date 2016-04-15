@@ -146,10 +146,10 @@ public class InventoryPackets {
                                 Item[] oldStack = wrapper.get(Type.ITEM_ARRAY, 0);
                                 Item[] newStack = new Item[oldStack.length + 1];
                                 for (int i = 0; i < newStack.length; i++) {
-                                    if (i > 3) {
+                                    if (i > 4) {
                                         newStack[i] = oldStack[i - 1];
                                     } else {
-                                        if (i != 3) { // Leave index 3 blank
+                                        if (i != 4) { // Leave index 3 blank
                                             newStack[i] = oldStack[i];
                                         }
                                     }
