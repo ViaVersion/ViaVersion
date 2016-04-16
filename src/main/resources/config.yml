@@ -29,3 +29,5 @@ use-new-deathmessages: false
 suppress-entityid-errors: false
 # Our patch for block breaking issue, if you have issues with block updates then disable this.
 block-break-patch: true
+# Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
+item-cache: true

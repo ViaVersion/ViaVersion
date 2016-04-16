@@ -10,6 +10,7 @@ import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
@@ -62,23 +63,27 @@ public class Protocol1_9TO1_8 extends Protocol {
         return line;
     }
 
-    public static ItemStack getHandItem(final UserConnection info) {
-        try {
-            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<ItemStack>() {
-                @Override
-                public ItemStack call() throws Exception {
-                    UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
-                    if (Bukkit.getPlayer(playerUUID) != null) {
-                        return Bukkit.getPlayer(playerUUID).getItemInHand();
+    public static Item getHandItem(final UserConnection info) {
+        if(HandItemCache.CACHE){
+            return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
+        }else {
+            try {
+                return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Item>() {
+                    @Override
+                    public Item call() throws Exception {
+                        UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
+                        if (Bukkit.getPlayer(playerUUID) != null) {
+                            return Item.getItem(Bukkit.getPlayer(playerUUID).getItemInHand());
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            }).get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            System.out.println("Error fetching hand item: " + e.getClass().getName());
-            if (ViaVersion.getInstance().isDebug())
-                e.printStackTrace();
-            return null;
+                }).get(10, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                System.out.println("Error fetching hand item: " + e.getClass().getName());
+                if (ViaVersion.getInstance().isDebug())
+                    e.printStackTrace();
+                return null;
+            }
         }
     }
 
@@ -104,6 +109,10 @@ public class Protocol1_9TO1_8 extends Protocol {
         }
         if (plugin.getConfig().getBoolean("simulate-pt", true))
             new ViaIdleThread(plugin.getPortedPlayers()).runTaskTimerAsynchronously(plugin, 1L, 1L); // Updates player's idle status
+        if (plugin.getConfig().getBoolean("item-cache", true)) {
+            new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
+            HandItemCache.CACHE = true;
+        }
     }
 
     @Override

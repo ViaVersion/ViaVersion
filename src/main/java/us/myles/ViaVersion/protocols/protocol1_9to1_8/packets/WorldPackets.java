@@ -288,7 +288,7 @@ public class WorldPackets {
                         wrapper.write(Type.LONG, -1L);
                         wrapper.write(Type.BYTE, (byte) 255);
                         // Write item in hand
-                        Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
+                        Item item = Protocol1_9TO1_8.getHandItem(wrapper.user());
                         // Blocking patch
                         if (ViaVersion.getConfig().isShieldBlocking()) {
                             if (item != null) {
@@ -368,7 +368,7 @@ public class WorldPackets {
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
-                        Item item = Item.getItem(Protocol1_9TO1_8.getHandItem(wrapper.user()));
+                        Item item = Protocol1_9TO1_8.getHandItem(wrapper.user());
                         wrapper.write(Type.ITEM, item); // 3 - Item
                     }
                 });
