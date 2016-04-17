@@ -483,10 +483,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                 if (info.getPacketsPerSecond() >= getWarningPPS()) {
                     info.setWarnings(info.getWarnings() + 1);
                 }
-            }
-            if (info.getWarnings() >= getMaxWarnings()) {
-                info.disconnect(getMaxWarningsKickMessage());
-                return true; // don't send current packet
+
+                if (info.getWarnings() >= getMaxWarnings()) {
+                    info.disconnect(getMaxWarningsKickMessage());
+                    return true; // don't send current packet
+                }
             }
         }
         return false;
