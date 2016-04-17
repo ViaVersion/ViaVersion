@@ -39,9 +39,9 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
         if (bytebuf.readableBytes() == 0) {
             throw new CancelException();
         }
+        // Increment sent
+        info.incrementSent();
         if (info.isActive()) {
-            // Increment sent
-            info.incrementSent();
             // Handle ID
             int id = Type.VAR_INT.read(bytebuf);
             // Transform

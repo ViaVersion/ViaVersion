@@ -397,6 +397,36 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getConfig().getBoolean("block-break-patch", true);
     }
 
+    @Override
+    public int getMaxPPS() {
+        return getConfig().getInt("max-pps", 140);
+    }
+
+    @Override
+    public String getMaxPPSKickMessage() {
+        return getConfig().getString("max-pps-kick-msg", "Sending packets too fast? lag?");
+    }
+
+    @Override
+    public int getTrackingPeriod() {
+        return getConfig().getInt("tracking-period", 5);
+    }
+
+    @Override
+    public int getWarningPPS() {
+        return getConfig().getInt("tracking-warning-pps", 120);
+    }
+
+    @Override
+    public int getMaxWarnings() {
+        return getConfig().getInt("tracking-max-warnings", 3);
+    }
+
+    @Override
+    public String getMaxWarningsKickMessage() {
+        return getConfig().getString("tracking-max-kick-msg", "You are sending too many packets, :(");
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return isPreventCollision() && getConfig().getBoolean("auto-team", true);
@@ -431,5 +461,34 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
     public Map<UUID, UserConnection> getPortedPlayers() {
         return portedPlayers;
+    }
+
+    public boolean handlePPS(UserConnection info) {
+        // Max PPS Checker
+        if (getMaxPPS() > 0) {
+            if (info.getPacketsPerSecond() >= getMaxPPS()) {
+                info.disconnect(getMaxPPSKickMessage());
+                return true; // don't send current packet
+            }
+        }
+
+        // Tracking PPS Checker
+        if (getMaxWarnings() > 0 && getTrackingPeriod() > 0) {
+            if (info.getSecondsObserved() > getTrackingPeriod()) {
+                // Reset
+                info.setWarnings(0);
+                info.setSecondsObserved(1);
+            } else {
+                info.setSecondsObserved(info.getSecondsObserved() + 1);
+                if (info.getPacketsPerSecond() >= getWarningPPS()) {
+                    info.setWarnings(info.getWarnings() + 1);
+                }
+            }
+            if (info.getWarnings() >= getMaxWarnings()) {
+                info.disconnect(getMaxWarningsKickMessage());
+                return true; // don't send current packet
+            }
+        }
+        return false;
     }
 }

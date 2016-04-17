@@ -1,28 +1,37 @@
 package us.myles.ViaVersion.api.data;
 
+import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Data
 public class UserConnection {
-    @Getter
     private final SocketChannel channel;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
-    @Getter
-    @Setter
     private boolean active = true;
-    @Getter
-    @Setter
+    private boolean pendingDisconnect = false;
     private Object lastPacket;
-    @Getter
     private long sentPackets = 0L;
-    @Getter
     private long receivedPackets = 0L;
+    // Used for tracking pps
+    private long startTime = 0L;
+    private long intervalPackets = 0L;
+    private long packetsPerSecond = -1L;
+    // Used for handling warnings (over time)
+    private int secondsObserved = 0;
+    private int warnings = 0;
 
 
     public UserConnection(SocketChannel socketChannel) {
@@ -97,7 +106,45 @@ public class UserConnection {
     /**
      * Used for incrementing the number of packets received from the client
      */
-    public void incrementReceived() {
+    public boolean incrementReceived() {
+        // handle stats
+        Long diff = System.currentTimeMillis() - startTime;
+        if (diff >= 1000) {
+            packetsPerSecond = intervalPackets;
+            startTime = System.currentTimeMillis();
+            intervalPackets = 1;
+            return true;
+        } else {
+            intervalPackets++;
+        }
+        // increase total
         this.receivedPackets++;
+        return false;
+    }
+
+    /**
+     * Disconnect a connection
+     *
+     * @param reason The reason to use, not used if player is not active.
+     */
+    public void disconnect(final String reason) {
+        if(!getChannel().isOpen()) return;
+        if(pendingDisconnect) return;
+        pendingDisconnect = true;
+        if (get(ProtocolInfo.class).getUuid() != null) {
+            final UUID uuid = get(ProtocolInfo.class).getUuid();
+            if (Bukkit.getPlayer(uuid) != null) {
+                Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Runnable() {
+                    @Override
+                    public void run() {
+                        Player player = Bukkit.getPlayer(uuid);
+                        if (player != null)
+                            player.kickPlayer(ChatColor.translateAlternateColorCodes('&', reason));
+                    }
+                });
+                return;
+            }
+        }
+        getChannel().close(); // =)
     }
 }

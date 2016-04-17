@@ -3,7 +3,10 @@ package us.myles.ViaVersion.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
@@ -29,9 +32,19 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
         // use transformers
         if (bytebuf.readableBytes() > 0) {
+            // Ignore if pending disconnect
+            if (info.isPendingDisconnect()) {
+                return;
+            }
+            // Increment received
+            boolean second = info.incrementReceived();
+            // Check PPS
+            if(second) {
+                if (((ViaVersionPlugin) ViaVersion.getConfig()).handlePPS(info))
+                    return;
+            }
+
             if (info.isActive()) {
-                // Increment received
-                info.incrementReceived();
                 // Handle ID
                 int id = Type.VAR_INT.read(bytebuf);
                 // Transform

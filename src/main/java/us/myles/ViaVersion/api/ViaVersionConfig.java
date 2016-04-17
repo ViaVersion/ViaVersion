@@ -100,4 +100,46 @@ public interface ViaVersionConfig {
      * @return true if it is enabled.
      */
     boolean isBlockBreakPatch();
+
+    /**
+     * Get the maximum number of packets a client can send per second.
+     *
+     * @return The number of packets a client can send per second.
+     */
+    int getMaxPPS();
+
+    /**
+     * Get the kick message sent if the user hits the max packets per second.
+     *
+     * @return Kick message, with colour codes using '&'
+     */
+    String getMaxPPSKickMessage();
+
+    /**
+     * The time in seconds that should be tracked for warnings
+     *
+     * @return Time in seconds that should be tracked for warnings
+     */
+    int getTrackingPeriod();
+
+    /**
+     * The number of packets per second to count as a warning
+     *
+     * @return The number of packets per second to count as a warning.
+     */
+    int getWarningPPS();
+
+    /**
+     * Get the maximum number of warnings the client can have in the interval
+     *
+     * @return The number of packets a client can send per second.
+     */
+    int getMaxWarnings();
+
+    /**
+     * Get the kick message sent if the user goes over the warnings in the interval
+     *
+     * @return Kick message, with colour codes using '&'
+     */
+    String getMaxWarningsKickMessage();
 }

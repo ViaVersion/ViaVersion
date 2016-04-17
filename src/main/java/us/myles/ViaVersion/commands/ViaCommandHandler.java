@@ -130,6 +130,7 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, Ta
 
     private void registerDefaults() throws Exception {
         registerSubCommand(new ListSubCmd());
+        registerSubCommand(new PPSSubCmd());
         registerSubCommand(new DebugSubCmd());
         registerSubCommand(new DisplayLeaksSubCmd());
         registerSubCommand(new DontBugMeSubCmd());

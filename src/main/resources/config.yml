@@ -31,3 +31,22 @@ suppress-entityid-errors: false
 block-break-patch: true
 # Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
 item-cache: true
+# Anti-Cheat, Packets Per Second (PPS) limiter
+# Clients by default send around 20-90 packets per second.
+
+# What is the maximum per second a client can send
+# Use -1 to disable.
+max-pps: 400
+max-pps-kick-msg: "You are sending too many packets!"
+
+# We can also kick them if over a period they send over a threshold a certain amount of times.
+
+# Period to track (in seconds)
+# Use -1 to disable.
+tracking-period: 6
+# How many packets per second counts as a warning
+tracking-warning-pps: 120
+# How many warnings over the interval can we have
+# This can never be higher than "tracking-interval"
+tracking-max-warnings: 4
+tracking-max-kick-msg: "You are sending too many packets, :("
