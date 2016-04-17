@@ -409,7 +409,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
     @Override
     public int getTrackingPeriod() {
-        return getConfig().getInt("tracking-period", 5);
+        return getConfig().getInt("tracking-period", 6);
     }
 
     @Override
