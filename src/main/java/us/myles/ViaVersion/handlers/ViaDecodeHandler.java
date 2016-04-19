@@ -6,7 +6,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;

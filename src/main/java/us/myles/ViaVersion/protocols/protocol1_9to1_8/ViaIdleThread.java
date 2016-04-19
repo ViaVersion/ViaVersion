@@ -1,4 +1,4 @@
-package us.myles.ViaVersion;
+package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.bukkit.scheduler.BukkitRunnable;

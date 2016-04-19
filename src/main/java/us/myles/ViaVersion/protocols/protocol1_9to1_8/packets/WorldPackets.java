@@ -232,8 +232,12 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (status == 6)
+                        if (status == 5)
                             wrapper.cancel();
+                        if(status > 5){
+                            wrapper.set(Type.UNSIGNED_BYTE, 0, (short) (status - 1));
+                        }
+                        System.out.println("SENDING ID: " + wrapper.get(Type.UNSIGNED_BYTE, 0));
                     }
                 });
                 // Blocking
@@ -251,25 +255,25 @@ public class WorldPackets {
                     }
                 });
                 // Digging patch (prevents it glitching)
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if(!ViaVersion.getConfig().isBlockBreakPatch()) return;
-
-                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                        final Position block = wrapper.get(Type.POSITION, 0);
-                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (status == 0) {
-                            entityTracker.setCurrentlyDigging(null);
-                        }
-                        if (status == 1) {
-                            entityTracker.setCurrentlyDigging(null);
-                        }
-                        if (status == 2) {
-                            entityTracker.setCurrentlyDigging(block);
-                        }
-                    }
-                });
+//                handler(new PacketHandler() {
+//                    @Override
+//                    public void handle(PacketWrapper wrapper) throws Exception {
+//                        if(!ViaVersion.getConfig().isBlockBreakPatch()) return;
+//
+//                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+//                        final Position block = wrapper.get(Type.POSITION, 0);
+//                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+//                        if (status == 0) {
+//                            entityTracker.setCurrentlyDigging(null);
+//                        }
+//                        if (status == 1) {
+//                            entityTracker.setCurrentlyDigging(null);
+//                        }
+//                        if (status == 2) {
+//                            entityTracker.setCurrentlyDigging(block);
+//                        }
+//                    }
+//                });
             }
         });
 
