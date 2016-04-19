@@ -153,14 +153,16 @@ public class ViaBossBar implements BossBar {
     }
 
     private void sendPacket(UpdateAction action) {
-        ByteBuf buf = getPacket(action);
-        for (UUID uuid : new ArrayList<>(players))
+        for (UUID uuid : new ArrayList<>(players)) {
+            ByteBuf buf = getPacket(action);
             sendPacket(uuid, buf);
+        }
     }
 
     private void sendPacket(UUID uuid, ByteBuf buf) {
         if (!ViaVersion.getInstance().isPorted(uuid) || !(ViaVersion.getInstance().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
             players.remove(uuid);
+            buf.release();
             return;
         }
         ViaVersion.getInstance().sendRawPacket(uuid, buf);
