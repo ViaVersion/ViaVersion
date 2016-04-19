@@ -294,7 +294,7 @@ public class SpawnPackets {
                         if (item != 0) {
                             PacketWrapper packet = new PacketWrapper(0x3C, null, wrapper.user());
                             packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
-                            packet.write(Type.VAR_INT, 1);
+                            packet.write(Type.VAR_INT, 0);
                             packet.write(Type.ITEM, new Item(item, (byte) 1, (short) 0, null));
                             try {
                                 packet.send();
