@@ -180,21 +180,6 @@ public class WorldPackets {
             public void registerMap() {
                 map(Type.POSITION);
                 map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Position pos = wrapper.user().get(EntityTracker.class).getCurrentlyDigging();
-                        if (pos != null) {
-                            if (wrapper.get(Type.POSITION, 0).equals(pos)) {
-                                // cancel this one
-                                if (wrapper.get(Type.VAR_INT, 0) != 0) {
-                                    wrapper.cancel();
-                                    wrapper.user().get(EntityTracker.class).setCurrentlyDigging(null);
-                                }
-                            }
-                        }
-                    }
-                });
             }
         });
         /* Packets which do not have any field remapping or handlers */
@@ -250,26 +235,6 @@ public class WorldPackets {
                         }
                     }
                 });
-                // Digging patch (prevents it glitching)
-//                handler(new PacketHandler() {
-//                    @Override
-//                    public void handle(PacketWrapper wrapper) throws Exception {
-//                        if(!ViaVersion.getConfig().isBlockBreakPatch()) return;
-//
-//                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-//                        final Position block = wrapper.get(Type.POSITION, 0);
-//                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-//                        if (status == 0) {
-//                            entityTracker.setCurrentlyDigging(null);
-//                        }
-//                        if (status == 1) {
-//                            entityTracker.setCurrentlyDigging(null);
-//                        }
-//                        if (status == 2) {
-//                            entityTracker.setCurrentlyDigging(block);
-//                        }
-//                    }
-//                });
             }
         });
 
