@@ -232,12 +232,8 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (status == 5)
+                        if (status == 4)
                             wrapper.cancel();
-                        if(status > 5){
-                            wrapper.set(Type.UNSIGNED_BYTE, 0, (short) (status - 1));
-                        }
-                        System.out.println("SENDING ID: " + wrapper.get(Type.UNSIGNED_BYTE, 0));
                     }
                 });
                 // Blocking
@@ -245,7 +241,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (status == 5) {
+                        if (status == 4) {
                             EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
