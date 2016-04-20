@@ -57,6 +57,26 @@ public class PacketWrapper {
     }
 
     /**
+     * Check if a type is at an index
+     *
+     * @param type  The type of the part you wish to get.
+     * @param index The index of the part (relative to the type)
+     * @return True if the type is at the index
+     */
+    public boolean is(Type type, int index) {
+        int currentIndex = 0;
+        for (Pair<Type, Object> packetValue : packetValues) {
+            if (packetValue.getKey() == type) { // Ref check
+                if (currentIndex == index) {
+                    return true;
+                }
+                currentIndex++;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Set a currently existing part in the output
      *
      * @param type  The type of the part you wish to set.
