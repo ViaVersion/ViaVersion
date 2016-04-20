@@ -443,6 +443,52 @@ public class PlayerPackets {
             }
         });
 
+        // Player Position Packet
+        protocol.registerIncoming(State.PLAY, 0x04, 0x0C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.DOUBLE); // 0 - X
+                map(Type.DOUBLE); // 1 - Y
+                map(Type.DOUBLE); // 2 - Z
+                map(Type.BOOLEAN); // 3 - Ground
+                handler(new PlayerMovementMapper());
+            }
+        });
+
+        // Player Move & Look Packet
+        protocol.registerIncoming(State.PLAY, 0x06, 0x0D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.DOUBLE); // 0 - X
+                map(Type.DOUBLE); // 1 - Y
+                map(Type.DOUBLE); // 2 - Z
+                map(Type.FLOAT); // 3 - Yaw
+                map(Type.FLOAT); // 4 - Pitch
+                map(Type.BOOLEAN); // 5 - Ground
+                handler(new PlayerMovementMapper());
+            }
+        });
+
+        // Player Look Packet
+        protocol.registerIncoming(State.PLAY, 0x05, 0x0E, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.FLOAT); // 0 - Yaw
+                map(Type.FLOAT); // 1 - Pitch
+                map(Type.BOOLEAN); // 2 - Ground
+                handler(new PlayerMovementMapper());
+            }
+        });
+
+        // Player Packet
+        protocol.registerIncoming(State.PLAY, 0x03, 0x0F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.BOOLEAN); // 0 - Ground
+                handler(new PlayerMovementMapper());
+            }
+        });
+
         /* Packets which do not have any field remapping or handlers */
 
         protocol.registerIncoming(State.PLAY, 0x01, 0x02); // Chat Message Packet
@@ -451,9 +497,6 @@ public class PlayerPackets {
 
         protocol.registerIncoming(State.PLAY, 0x00, 0x0B); // Keep Alive Request Packet
 
-        protocol.registerIncoming(State.PLAY, 0x04, 0x0C, new PlayerMovementMapper()); // Player Position Packet
-        protocol.registerIncoming(State.PLAY, 0x06, 0x0D, new PlayerMovementMapper()); // Player Move & Look Packet
-        protocol.registerIncoming(State.PLAY, 0x05, 0x0E, new PlayerMovementMapper()); // Player Look Packet
-        protocol.registerIncoming(State.PLAY, 0x03, 0x0F, new PlayerMovementMapper()); // Player Packet
+
     }
 }
