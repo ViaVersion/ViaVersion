@@ -16,6 +16,8 @@ hologram-patch: false
 hologram-y: -1
 # Enable player tick simulation, this fixes eating, drinking, nether portals.
 simulate-pt: true
+# Should we use nms player to simulate packets, (may fix anti-cheat issues)
+nms-player-ticking: true
 # Should we patch boss bars so they work? (Default: true, disable if you're having issues)
 bossbar-patch: true
 # If your boss bar flickers on 1.9, set this to 'true'. It will keep all boss bars on 100% (not recommended)

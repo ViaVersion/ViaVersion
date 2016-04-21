@@ -106,7 +106,7 @@ public class Protocol1_9TO1_8 extends Protocol {
             Bukkit.getPluginManager().registerEvents(new PaperPatch(), plugin);
         }
         if (plugin.getConfig().getBoolean("simulate-pt", true))
-            new ViaIdleThread(plugin.getPortedPlayers()).runTaskTimerAsynchronously(plugin, 1L, 1L); // Updates player's idle status
+            new ViaIdleThread(plugin.getPortedPlayers()).runTaskTimer(plugin, 1L, 1L); // Updates player's idle status
         if (plugin.getConfig().getBoolean("item-cache", true)) {
             new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
             HandItemCache.CACHE = true;
