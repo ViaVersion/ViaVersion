@@ -226,7 +226,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (status == 4) {
+                        if (status == 5 || status == 4 || status == 3) {
                             EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
