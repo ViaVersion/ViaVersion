@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.protocol;
 
 import org.bukkit.Bukkit;
 import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
@@ -13,8 +14,11 @@ public class ProtocolRegistry {
     private static Map<Integer, Map<Integer, Protocol>> registryMap = new HashMap<>();
     private static Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new HashMap<>();
     private static List<Protocol> registerList = new ArrayList<>();
+    public static final Protocol BASE_PROTOCOL = new BaseProtocol();
 
     static {
+        // Base Protocol
+        registerProtocol(BASE_PROTOCOL, Arrays.<Integer>asList(), -1);
         // Register built in protocols
         registerProtocol(new Protocol1_9TO1_8(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_8.getId());
         registerProtocol(new Protocol1_9_1TO1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9.getId());

@@ -29,7 +29,7 @@ public class ProtocolPipeline extends Protocol {
     protected void registerPackets() {
         protocolList = new LinkedList<>();
         // This is a pipeline so we register basic pipes
-        protocolList.addLast(new BaseProtocol());
+        protocolList.addLast(ProtocolRegistry.BASE_PROTOCOL);
     }
 
     @Override
