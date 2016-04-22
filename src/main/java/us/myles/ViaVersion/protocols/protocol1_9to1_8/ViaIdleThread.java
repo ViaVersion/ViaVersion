@@ -50,7 +50,7 @@ public class ViaIdleThread extends BukkitRunnable {
         } catch (NoSuchFieldException | InstantiationException | IllegalArgumentException | IllegalAccessException e) {
             throw new RuntimeException("Couldn't make player idle packet, help!", e);
         }
-        if(USE_NMS) {
+        if (USE_NMS) {
             try {
                 getHandle = ReflectionUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
             } catch (NoSuchMethodException | ClassNotFoundException e) {
@@ -70,6 +70,7 @@ public class ViaIdleThread extends BukkitRunnable {
             }
         }
     }
+
     @Override
     public void run() {
         for (UserConnection info : portedPlayers.values()) {
@@ -79,15 +80,19 @@ public class ViaIdleThread extends BukkitRunnable {
                     if (info.getChannel().isOpen()) {
                         if (USE_NMS) {
                             Player player = Bukkit.getPlayer(info.get(ProtocolInfo.class).getUuid());
-                            try {
-                                // Tick player
-                                Object entityPlayer = getHandle.invoke(player);
-                                Object pc = connection.get(entityPlayer);
-                                handleFlying.invoke(pc, (info.get(MovementTracker.class).isGround() ? idlePacket2 : idlePacket));
-                                // Tick world
-                                info.get(MovementTracker.class).incrementIdlePacket();
-                            } catch (IllegalAccessException | InvocationTargetException e) {
-                                e.printStackTrace();
+                            if (player != null) {
+                                try {
+                                    // Tick player
+                                    Object entityPlayer = getHandle.invoke(player);
+                                    Object pc = connection.get(entityPlayer);
+                                    if (pc != null) {
+                                        handleFlying.invoke(pc, (info.get(MovementTracker.class).isGround() ? idlePacket2 : idlePacket));
+                                        // Tick world
+                                        info.get(MovementTracker.class).incrementIdlePacket();
+                                    }
+                                } catch (IllegalAccessException | InvocationTargetException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         } else {
                             // Old method using packets.
