@@ -37,7 +37,11 @@ public class ProtocolVersion {
     }
 
     public static ProtocolVersion getProtocol(int id) {
-        return versions.get(id);
+        if (versions.containsKey(id)) {
+            return versions.get(id);
+        } else {
+            return new ProtocolVersion(id, "Unknown (" + id + ")");
+        }
     }
 
     public static List<ProtocolVersion> getProtocols() {
