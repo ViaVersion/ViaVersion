@@ -35,6 +35,8 @@ public class PPSSubCmd extends ViaSubCommand {
         long max = 0;
 
         for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!ViaVersion.getInstance().isPorted(p))
+                continue;
             int playerVersion = ViaVersion.getInstance().getPlayerVersion(p);
             if (!playerVersions.containsKey(playerVersion))
                 playerVersions.put(playerVersion, new HashSet<String>());
