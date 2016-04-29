@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -227,6 +228,31 @@ public class PlayerPackets {
                         if (name.equalsIgnoreCase("MC|BOpen")) {
                             wrapper.passthrough(Type.REMAINING_BYTES); // This is so ugly, :(
                             wrapper.write(Type.VAR_INT, 0);
+                        }
+                        if (name.equalsIgnoreCase("MC|TrList")) {
+                            wrapper.passthrough(Type.INT); // ID
+
+                            Short size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+
+                            for (int i = 0; i < size; ++i) {
+                                Item item1 = wrapper.passthrough(Type.ITEM);
+                                ItemRewriter.toClient(item1);
+
+                                Item item2 = wrapper.passthrough(Type.ITEM);
+                                ItemRewriter.toClient(item2);
+
+                                boolean present = wrapper.passthrough(Type.BOOLEAN);
+
+                                if (present) {
+                                    Item item3 = wrapper.passthrough(Type.ITEM);
+                                    ItemRewriter.toClient(item3);
+                                }
+
+                                wrapper.passthrough(Type.BOOLEAN);
+
+                                wrapper.passthrough(Type.INT);
+                                wrapper.passthrough(Type.INT);
+                            }
                         }
                     }
                 });
