@@ -157,7 +157,7 @@ public enum MetaIndex {
     }
 
     public static MetaIndex getIndex(EntityType type, int index) {
-        Class<? extends org.bukkit.entity.Entity> entityClass = type.getEntityClass();
+        Class<? extends org.bukkit.entity.Entity> entityClass = type == null ? LivingEntity.class : type.getEntityClass();
         if (entityClass == null) {
             System.out.println("Could not get entity class for " + type);
             return null;
