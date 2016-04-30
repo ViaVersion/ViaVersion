@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public class ProtocolPipeline extends Protocol {
 
             // For 1.8/1.9 server version, eventually we'll probably get an API for this...
             if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_8.getId() &&
-                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_9_2.getId()) {
+                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_9_3.getId()) {
 
                 PacketType type;
                 if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.v1_8.getId()) {

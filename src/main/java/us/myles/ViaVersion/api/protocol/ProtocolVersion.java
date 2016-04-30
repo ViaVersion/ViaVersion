@@ -15,6 +15,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_9;
     public static final ProtocolVersion v1_9_1;
     public static final ProtocolVersion v1_9_2;
+    public static final ProtocolVersion v1_9_3;
 
     private final int id;
     private final String name;
@@ -26,6 +27,7 @@ public class ProtocolVersion {
         register(v1_9 = new ProtocolVersion(107, "1.9"));
         register(v1_9_1 = new ProtocolVersion(108, "1.9.1"));
         register(v1_9_2 = new ProtocolVersion(109, "1.9.2"));
+        register(v1_9_3 = new ProtocolVersion(110, "1.9.3"));
     }
 
     public static void register(@NonNull ProtocolVersion protocol) {
