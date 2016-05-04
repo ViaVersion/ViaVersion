@@ -38,7 +38,7 @@ public class DeathListener implements Listener {
 
     public boolean checkGamerule(World w) {
         try {
-            return Boolean.parseBoolean(w.getGameRuleValue("showDeathMessage"));
+            return Boolean.parseBoolean(w.getGameRuleValue("showDeathMessages"));
         } catch (Exception e) {
             return false;
         }
