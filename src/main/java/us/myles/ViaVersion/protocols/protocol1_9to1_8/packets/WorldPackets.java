@@ -6,6 +6,7 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -114,7 +115,10 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        wrapper.passthrough(new ChunkType(clientChunks));
+                        Chunk chunk = wrapper.passthrough(new ChunkType(clientChunks));
+                        if (chunk.isUnloadPacket())
+                            wrapper.setId(0x1D);
+
                         // eat any other data (Usually happens with unload packets)
                         wrapper.read(Type.REMAINING_BYTES);
                     }

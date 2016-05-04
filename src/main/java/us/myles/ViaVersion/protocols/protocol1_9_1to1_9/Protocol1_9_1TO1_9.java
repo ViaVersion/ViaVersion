@@ -9,7 +9,7 @@ import us.myles.ViaVersion.packets.State;
 public class Protocol1_9_1TO1_9 extends Protocol {
     @Override
     protected void registerPackets() {
-        // Currently supports 1.9.1 PRE 2
+        // Currently supports 1.9.1 and 1.9.2
         // Join Game Packet
         registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
             @Override

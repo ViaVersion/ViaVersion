@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3TO1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.*;
@@ -22,6 +23,7 @@ public class ProtocolRegistry {
         // Register built in protocols
         registerProtocol(new Protocol1_9TO1_8(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_8.getId());
         registerProtocol(new Protocol1_9_1TO1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9.getId());
+        registerProtocol(new Protocol1_9_3TO1_9_1_2(), Arrays.asList(ProtocolVersion.v1_9_3.getId()), ProtocolVersion.v1_9_2.getId());
     }
 
     /**
