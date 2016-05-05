@@ -22,6 +22,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 import java.util.*;
@@ -47,6 +48,8 @@ public class EntityTracker extends StoredObject {
     @Setter
     private Position currentlyDigging = null;
     private boolean teamExists = false;
+    @Setter
+    private GameMode gameMode;
 
     public EntityTracker(UserConnection user) {
         super(user);
