@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -16,6 +18,8 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.ChatRewriter;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -27,6 +31,19 @@ public class PlayerPackets {
             public void registerMap() {
                 map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Chat Message (json)
                 map(Type.BYTE); // 1 - Chat Positon
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        try {
+                            JsonObject obj = (JsonObject) new JsonParser().parse(wrapper.get(Type.STRING, 0));
+                            ChatRewriter.toClient(obj, wrapper.user());
+                            wrapper.set(Type.STRING, 0, obj.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 
@@ -160,6 +177,14 @@ public class PlayerPackets {
                 map(Type.UNSIGNED_BYTE); // 4 - Max Players (Tab)
                 map(Type.STRING); // 5 - Level Type
                 map(Type.BOOLEAN); // 6 - Reduced Debug info
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.setGameMode(GameMode.getById(wrapper.get(Type.UNSIGNED_BYTE, 0))); //Set player gamemode
+                    }
+                });
             }
         });
 
@@ -283,6 +308,11 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x07, 0x33, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.INT); // 0 - Dimension
+                map(Type.UNSIGNED_BYTE); // 1 - Difficulty
+                map(Type.UNSIGNED_BYTE); // 2 - GameMode
+                map(Type.STRING); // 3 - Level Type
+
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -290,6 +320,28 @@ public class PlayerPackets {
                         ClientChunks cc = wrapper.user().get(ClientChunks.class);
                         cc.getBulkChunks().clear();
                         cc.getLoadedChunks().clear();
+
+                        int gamemode = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        wrapper.user().get(EntityTracker.class).setGameMode(GameMode.getById(gamemode));
+                    }
+                });
+            }
+        });
+
+        // Change Game State Packet
+        protocol.registerOutgoing(State.PLAY, 0x2B, 0x1E, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); //0 - Reason
+                map(Type.FLOAT); //1 - Value
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) { //Change gamemode
+                            int gamemode = wrapper.get(Type.FLOAT, 0).intValue();
+                            wrapper.user().get(EntityTracker.class).setGameMode(GameMode.getById(gamemode));
+                        }
                     }
                 });
             }
@@ -333,7 +385,6 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x00, 0x1F); // Keep Alive Packet
         protocol.registerOutgoing(State.PLAY, 0x48, 0x32); // Resource Pack Send Packet
         protocol.registerOutgoing(State.PLAY, 0x43, 0x36); // Camera Packet
-        protocol.registerOutgoing(State.PLAY, 0x2B, 0x1E); // Change Game State Packet
 
         protocol.registerOutgoing(State.PLAY, 0x3D, 0x38); // Display Scoreboard Packet
         protocol.registerOutgoing(State.PLAY, 0x3B, 0x3F); // Scoreboard Objective Packet
