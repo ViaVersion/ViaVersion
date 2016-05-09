@@ -70,6 +70,14 @@ public interface BossBar {
     BossBar addPlayer(Player player);
 
     /**
+     * Show the bossbar to a player (uuid)
+     *
+     * @param player uuid of the player
+     * @return the BossBar instance
+     */
+    BossBar addPlayer(UUID player);
+
+    /**
      * add multiple players
      *
      * @param players list of players
