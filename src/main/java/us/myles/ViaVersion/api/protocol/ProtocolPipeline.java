@@ -11,12 +11,12 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 public class ProtocolPipeline extends Protocol {
-    LinkedList<Protocol> protocolList;
+    List<Protocol> protocolList;
     private UserConnection userConnection;
 
     public ProtocolPipeline(UserConnection userConnection) {
@@ -26,9 +26,9 @@ public class ProtocolPipeline extends Protocol {
 
     @Override
     protected void registerPackets() {
-        protocolList = new LinkedList<>();
+        protocolList = new CopyOnWriteArrayList<>();
         // This is a pipeline so we register basic pipes
-        protocolList.addLast(ProtocolRegistry.BASE_PROTOCOL);
+        protocolList.add(ProtocolRegistry.BASE_PROTOCOL);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ProtocolPipeline extends Protocol {
      */
     public void add(Protocol protocol) {
         if (protocolList != null) {
-            protocolList.addLast(protocol);
+            protocolList.add(protocol);
             protocol.init(userConnection);
         } else {
             throw new NullPointerException("Tried to add protocol to early");
