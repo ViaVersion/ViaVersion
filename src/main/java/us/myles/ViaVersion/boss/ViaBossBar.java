@@ -78,10 +78,15 @@ public class ViaBossBar implements BossBar {
 
     @Override
     public BossBar addPlayer(@NonNull Player player) {
-        if (!players.contains(player.getUniqueId())) {
-            players.add(player.getUniqueId());
+        return addPlayer(player.getUniqueId());
+    }
+
+    @Override
+    public BossBar addPlayer(UUID player) {
+        if (!players.contains(player)) {
+            players.add(player);
             if (visible)
-                sendPacket(player.getUniqueId(), getPacket(UpdateAction.ADD));
+                sendPacket(player, getPacket(UpdateAction.ADD));
         }
         return this;
     }

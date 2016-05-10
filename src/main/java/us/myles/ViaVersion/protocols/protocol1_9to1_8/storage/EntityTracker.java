@@ -6,10 +6,8 @@ import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
@@ -181,7 +179,7 @@ public class EntityTracker extends StoredObject {
                     }
                 }
             }
-            Player player = Bukkit.getPlayer(getUser().get(ProtocolInfo.class).getUuid());
+            UUID uuid = getUser().get(ProtocolInfo.class).getUuid();
             // Boss bar
             if (((ViaVersionPlugin) ViaVersion.getInstance()).isBossbarPatch()) {
                 if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
@@ -192,7 +190,7 @@ public class EntityTracker extends StoredObject {
                         if (bar == null) {
                             bar = ViaVersion.getInstance().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityID, bar);
-                            bar.addPlayer(player);
+                            bar.addPlayer(uuid);
                             bar.show();
                         } else {
                             bar.setTitle(title);
@@ -206,7 +204,7 @@ public class EntityTracker extends StoredObject {
                             String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
                             bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityID, bar);
-                            bar.addPlayer(player);
+                            bar.addPlayer(uuid);
                             bar.show();
                         } else {
                             bar.setHealth(health);
