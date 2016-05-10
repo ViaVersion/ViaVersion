@@ -20,6 +20,7 @@ import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.boss.ViaBossBar;
+import us.myles.ViaVersion.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -48,6 +49,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     private List<Pair<Field, Object>> injectedLists = new ArrayList<>();
     private ViaCommandHandler commandHandler;
     private boolean debug = false;
+    private boolean compatSpigotBuild = false;
 
     @Override
     public void onLoad() {
@@ -65,8 +67,16 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
             }
         }
+        // Check if it's a spigot build with a protocol mod
+        try {
+            compatSpigotBuild = ReflectionUtil.nms("PacketEncoder").getDeclaredField("version") != null;
+        } catch (Exception e){
+            compatSpigotBuild = false;
+        }
+        // Generate classes needed (only works if it's compat)
+        ClassGenerator.generate();
 
-        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded, injecting.");
+        getLogger().info("ViaVersion " + getDescription().getVersion() + (compatSpigotBuild ? "compat" : "") + " is now loaded, injecting.");
         injectPacketHandler();
     }
 
@@ -346,6 +356,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     @Override
     public ViaVersionCommand getCommandHandler() {
         return commandHandler;
+    }
+
+    @Override
+    public boolean isCompatSpigotBuild() {
+        return compatSpigotBuild;
     }
 
     public boolean isCheckForUpdates() {

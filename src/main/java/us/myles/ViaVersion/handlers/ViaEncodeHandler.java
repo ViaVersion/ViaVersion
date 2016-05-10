@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
@@ -11,6 +12,7 @@ import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class ViaEncodeHandler extends MessageToByteEncoder {
@@ -25,6 +27,11 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
+        if (ViaVersion.getInstance().isCompatSpigotBuild()) {
+            Field ver = minecraftEncoder.getClass().getDeclaredField("version");
+            ver.setAccessible(true);
+            ver.set(minecraftEncoder, ver.get(this));
+        }
         // handle the packet type
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder

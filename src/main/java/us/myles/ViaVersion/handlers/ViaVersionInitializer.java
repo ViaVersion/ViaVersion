@@ -7,6 +7,8 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion.classgenerator.ClassGenerator;
+import us.myles.ViaVersion.classgenerator.HandlerConstructor;
 
 import java.lang.reflect.Method;
 
@@ -36,9 +38,11 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         new ProtocolPipeline(info);
         // Add originals
         this.method.invoke(this.original, socketChannel);
+
+        HandlerConstructor constructor = ClassGenerator.getConstructor();
         // Add our transformers
-        ViaEncodeHandler encoder = new ViaEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
-        ViaDecodeHandler decoder = new ViaDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
+        MessageToByteEncoder encoder = constructor.newEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
+        ByteToMessageDecoder decoder = constructor.newDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
         ViaPacketHandler chunkHandler = new ViaPacketHandler(info);
 
         socketChannel.pipeline().replace("encoder", "encoder", encoder);

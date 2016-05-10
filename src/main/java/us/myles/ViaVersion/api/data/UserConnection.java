@@ -1,12 +1,9 @@
 package us.myles.ViaVersion.api.data;
 
-import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

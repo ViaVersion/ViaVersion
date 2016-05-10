@@ -101,4 +101,12 @@ public interface ViaVersionAPI {
      * @return command handler
      */
     ViaVersionCommand getCommandHandler();
+
+    /**
+     * Get if this version is a compatibility build for spigot.
+     * Eg. 1.9.1 / 1.9.2 allow certain versions to connect
+     *
+     * @return True if it is
+     */
+    boolean isCompatSpigotBuild();
 }

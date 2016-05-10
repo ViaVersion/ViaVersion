@@ -174,7 +174,7 @@ public class PacketWrapper {
         readableObjects.clear();
         // If the buffer has readable bytes, copy them.
         if(inputBuffer.readableBytes() > 0){
-            read(Type.REMAINING_BYTES);
+            passthrough(Type.REMAINING_BYTES);
         }
     }
 
@@ -317,5 +317,14 @@ public class PacketWrapper {
 
             PipelineUtil.getContextBefore("decompress", user().getChannel().pipeline()).fireChannelRead(output);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "PacketWrapper{" +
+                "packetValues=" + packetValues +
+                ", readableObjects=" + readableObjects +
+                ", id=" + id +
+                '}';
     }
 }
