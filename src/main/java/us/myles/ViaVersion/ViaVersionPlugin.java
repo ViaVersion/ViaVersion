@@ -442,6 +442,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getConfig().getString("tracking-max-kick-msg", "You are sending too many packets, :(");
     }
 
+    @Override
+    public boolean isAntiXRay() {
+        return getConfig().getBoolean("anti-xray-patch", true);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return isPreventCollision() && getConfig().getBoolean("auto-team", true);

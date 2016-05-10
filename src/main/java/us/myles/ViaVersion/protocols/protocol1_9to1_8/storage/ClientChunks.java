@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -17,11 +19,15 @@ public class ClientChunks extends StoredObject {
     // Reflection
     private static ReflectionUtil.ClassReflection mapChunkBulkRef;
     private static ReflectionUtil.ClassReflection mapChunkRef;
+    private static Method obfuscateRef;
+    private static Class<?> worldRef;
 
     static {
         try {
             mapChunkBulkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
             mapChunkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
+            obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
+            worldRef = ReflectionUtil.nms("World");
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunk reflection", e);
         }
@@ -44,6 +50,20 @@ public class ClientChunks extends StoredObject {
             int[] xcoords = mapChunkBulkRef.getFieldValue("a", packet, int[].class);
             int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
             Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
+
+            if (ViaVersion.getConfig().isAntiXRay()) { //Spigot anti-xray patch
+                Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
+
+                for (int i = 0; i < xcoords.length; ++i) {
+                    Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
+                    Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
+
+                    Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
+                    Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
+
+                    obfuscateRef.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
+                }
+            }
             for (int i = 0; i < chunkMaps.length; i++) {
                 int x = xcoords[i];
                 int z = zcoords[i];
