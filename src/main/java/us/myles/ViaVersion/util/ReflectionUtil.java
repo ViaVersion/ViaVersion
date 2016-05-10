@@ -60,6 +60,13 @@ public class ReflectionUtil {
         return (T) field.get(o);
     }
 
+    public static <T> T getPublic(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+        Field field = o.getClass().getField(f);
+        field.setAccessible(true);
+        return (T) field.get(o);
+    }
+
+
     public static void set(Object o, String f, Object value) throws NoSuchFieldException, IllegalAccessException {
         Field field = o.getClass().getDeclaredField(f);
         field.setAccessible(true);
