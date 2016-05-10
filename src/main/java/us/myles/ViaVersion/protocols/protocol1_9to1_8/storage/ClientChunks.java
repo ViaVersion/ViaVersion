@@ -18,11 +18,15 @@ public class ClientChunks extends StoredObject {
     // Reflection
     private static ReflectionUtil.ClassReflection mapChunkBulkRef;
     private static ReflectionUtil.ClassReflection mapChunkRef;
+    private static Method obfuscateRef;
+    private static Class<?> worldRef;
 
     static {
         try {
             mapChunkBulkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
             mapChunkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
+            obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
+            worldRef = ReflectionUtil.nms("World");
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunk reflection", e);
         }
@@ -45,7 +49,7 @@ public class ClientChunks extends StoredObject {
             int[] xcoords = mapChunkBulkRef.getFieldValue("a", packet, int[].class);
             int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
             Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
-            Object world = mapChunkBulkRef.getFieldValue("world", packet, ReflectionUtil.nms("World"));
+            Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
 
 
             for (int i = 0; i < xcoords.length; ++i) { //Spigot anti-xray
@@ -55,8 +59,7 @@ public class ClientChunks extends StoredObject {
                 Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
                 Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
 
-                Method obfuscate = antiXrayInstance.getClass().getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
-                obfuscate.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
+                obfuscateRef.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
             }
             for (int i = 0; i < chunkMaps.length; i++) {
                 int x = xcoords[i];
