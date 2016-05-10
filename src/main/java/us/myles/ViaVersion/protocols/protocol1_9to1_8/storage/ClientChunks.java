@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.util.ReflectionUtil;
@@ -49,17 +50,19 @@ public class ClientChunks extends StoredObject {
             int[] xcoords = mapChunkBulkRef.getFieldValue("a", packet, int[].class);
             int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
             Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
-            Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
 
+            if (ViaVersion.getConfig().isAntiXRay()) { //Spigot anti-xray patch
+                Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
 
-            for (int i = 0; i < xcoords.length; ++i) { //Spigot anti-xray
-                Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
-                Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
+                for (int i = 0; i < xcoords.length; ++i) {
+                    Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
+                    Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
 
-                Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
-                Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
+                    Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
+                    Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
 
-                obfuscateRef.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
+                    obfuscateRef.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
+                }
             }
             for (int i = 0; i < chunkMaps.length; i++) {
                 int x = xcoords[i];

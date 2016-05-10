@@ -142,4 +142,11 @@ public interface ViaVersionConfig {
      * @return Kick message, with colour codes using '&'
      */
     String getMaxWarningsKickMessage();
+
+    /**
+     * Is anti-xray enabled?
+     *
+     * @return A boolean
+     */
+    boolean isAntiXRay();
 }
