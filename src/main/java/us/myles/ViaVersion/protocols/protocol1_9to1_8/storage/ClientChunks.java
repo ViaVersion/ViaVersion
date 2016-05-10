@@ -3,6 +3,8 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
+import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.Bukkit;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -43,7 +45,13 @@ public class ClientChunks extends StoredObject {
         try {
             int[] xcoords = mapChunkBulkRef.getFieldValue("a", packet, int[].class);
             int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
-            Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
+            PacketPlayOutMapChunk.ChunkMap[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, PacketPlayOutMapChunk.ChunkMap[].class);
+            World world = mapChunkBulkRef.getFieldValue("world", packet, World.class);
+
+
+            for (int i = 0; i < xcoords.length; ++i) { //Spigot anti-xray
+                world.spigotConfig.antiXrayInstance.obfuscate(xcoords[i], zcoords[i], chunkMaps[i].b, chunkMaps[i].a, world); // Spigot
+            }
             for (int i = 0; i < chunkMaps.length; i++) {
                 int x = xcoords[i];
                 int z = zcoords[i];
