@@ -8,8 +8,6 @@ This plugin modifies netty to allow connection of 1.9 clients to 1.8,
 
 ###*Don't use late bind*
 
-This uses our new API, we currently don't have javadocs yet but look at one of our protocols on how to get started then use ProtocolRegistry.registerProtocol()
-
 This took 100s hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
 
 **Contributor Chat:** https://gitter.im/MylesIsCool/ViaVersion
@@ -66,8 +64,7 @@ You can find unofficial dev builds here:
 License:
 --------
 
-You may modify this work, all rights are still owned by myself excluding any files in the spacebase package as they belong to the respected contributors. Please credit the original author (myself) when forking etc. (or if it helped you understand the new protocol or netty!)
-
+MIT License, see LICENSE for more details.
 
 Thanks!
 
