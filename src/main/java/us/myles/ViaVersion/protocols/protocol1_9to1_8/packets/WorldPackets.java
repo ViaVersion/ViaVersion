@@ -16,11 +16,13 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunk.Sign;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.SignTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.ChunkType;
 
 public class WorldPackets {
@@ -34,6 +36,25 @@ public class WorldPackets {
                 map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 2 - Sign Line (json)
                 map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 3 - Sign Line (json)
                 map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 4 - Sign Line (json)
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        SignTracker tracker = wrapper.user().get(SignTracker.class);
+                        ClientChunks chunks = wrapper.user().get(ClientChunks.class);
+                        Position blockPosition = wrapper.get(Type.POSITION, 0);
+                        long pos = tracker.positionToChunk(blockPosition);
+                        if (!chunks.getLoadedChunks().contains(pos)) {
+                            String[] lines = new String[4];
+                            for (int i = 0; i < 4; i++)
+                                lines[i] = wrapper.get(Type.STRING, i);
+
+                            tracker.add(pos, new Sign(blockPosition, lines)); //Add sign to cache
+
+                            wrapper.cancel();
+                        }
+                    }
+                });
             }
         });
 

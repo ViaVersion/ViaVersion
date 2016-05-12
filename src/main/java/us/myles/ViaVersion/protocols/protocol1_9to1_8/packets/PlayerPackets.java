@@ -22,6 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.SignTracker;
 
 public class PlayerPackets {
     public static void register(Protocol protocol) {
@@ -298,6 +299,7 @@ public class PlayerPackets {
                             ClientChunks cc = wrapper.user().get(ClientChunks.class);
                             cc.getBulkChunks().clear();
                             cc.getLoadedChunks().clear();
+                            wrapper.user().get(SignTracker.class).clear();
                         }
                     }
                 });
@@ -320,6 +322,7 @@ public class PlayerPackets {
                         ClientChunks cc = wrapper.user().get(ClientChunks.class);
                         cc.getBulkChunks().clear();
                         cc.getLoadedChunks().clear();
+                        wrapper.user().get(SignTracker.class).clear();
 
                         int gamemode = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         wrapper.user().get(EntityTracker.class).setGameMode(GameMode.getById(gamemode));

@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.SignTracker;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -33,7 +34,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         super(chunks, Chunk.class);
     }
 
-    private static long toLong(int msw, int lsw) {
+    public static long toLong(int msw, int lsw) {
         return ((long) msw << 32) + lsw - -2147483648L;
     }
 
@@ -65,11 +66,13 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         if (sectionCount == 0 && groundUp && !isBulkPacket && param.getLoadedChunks().contains(chunkHash)) {
             // This is a chunk unload packet
             param.getLoadedChunks().remove(chunkHash);
+            param.getUser().get(SignTracker.class).removeChunk(chunkHash);
             return new Chunk(chunkX, chunkZ);
         }
 
         int startIndex = input.readerIndex();
         param.getLoadedChunks().add(chunkHash); // mark chunk as loaded
+        param.getUser().get(SignTracker.class).loadChunk(chunkHash);
 
         // Read blocks
         for (int i = 0; i < SECTION_COUNT; i++) {
