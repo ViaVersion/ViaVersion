@@ -44,7 +44,7 @@ public class WorldPackets {
                         ClientChunks chunks = wrapper.user().get(ClientChunks.class);
                         Position blockPosition = wrapper.get(Type.POSITION, 0);
                         long pos = tracker.positionToChunk(blockPosition);
-                        if (!chunks.getLoadedChunks().contains(pos)) {
+                        if (!chunks.getLoadedChunks().contains(pos) && ViaVersion.getConfig().isSignPatch()) {
                             String[] lines = new String[4];
                             for (int i = 0; i < 4; i++)
                                 lines[i] = wrapper.get(Type.STRING, i);

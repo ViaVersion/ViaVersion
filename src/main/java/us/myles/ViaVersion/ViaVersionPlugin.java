@@ -447,6 +447,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return getConfig().getBoolean("anti-xray-patch", true);
     }
 
+    @Override
+    public boolean isSignPatch() {
+        return getConfig().getBoolean("sign-patch", true);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return isPreventCollision() && getConfig().getBoolean("auto-team", true);

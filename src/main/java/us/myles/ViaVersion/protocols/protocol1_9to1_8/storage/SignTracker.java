@@ -6,6 +6,7 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -66,6 +67,8 @@ public class SignTracker extends StoredObject {
     }
 
     public void loadChunk(long chunk) {
+        if (!ViaVersion.getConfig().isSignPatch())
+            return;
         if (!signs.containsKey(chunk))
             return;
 
@@ -86,6 +89,8 @@ public class SignTracker extends StoredObject {
     }
 
     public void removeChunk(long chunk) {
+        if (!ViaVersion.getConfig().isSignPatch())
+            return;
         signs.remove(chunk);
     }
 

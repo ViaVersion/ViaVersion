@@ -149,4 +149,11 @@ public interface ViaVersionConfig {
      * @return A boolean
      */
     boolean isAntiXRay();
+
+    /**
+     * Use the sign patch to fix empty signs-
+     *
+     * @return True if enabled
+     */
+    boolean isSignPatch();
 }
