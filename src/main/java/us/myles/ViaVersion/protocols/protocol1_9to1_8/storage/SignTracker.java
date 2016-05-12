@@ -70,7 +70,6 @@ public class SignTracker extends StoredObject {
             return;
 
         Set<Sign> signSet = signs.remove(chunk);
-        System.out.println("Loaded chunk " + chunk + " " + signs.size() + " left");
 
         for (Sign s : signSet) {
             try {
@@ -88,7 +87,6 @@ public class SignTracker extends StoredObject {
 
     public void removeChunk(long chunk) {
         signs.remove(chunk);
-        System.out.println("Removed chunk " + chunk + " " + signs.size() + " left");
     }
 
     public boolean is1_9_3() {
