@@ -17,19 +17,19 @@ public class Chunk1_9_3Type extends Type<Chunk1_9_3> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        boolean groundUp = input.readByte() != 0;
+        boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
         int size = Type.VAR_INT.read(input);
 
         byte[] sections = new byte[size];
-        input.readBytes(size);
+        input.readBytes(sections);
 
         int blockEntities = Type.VAR_INT.read(input);
         List<CompoundTag> nbtData = new ArrayList<>();
         for (int i = 0; i < blockEntities; i++) {
             nbtData.add(Type.NBT.read(input));
         }
-        System.out.println("block ent: " + blockEntities + " readable bytes: " + input.readableBytes() + " section: " + sections.length + " X: " + chunkX + " Z: " + chunkZ + " Bitmask: " + primaryBitmask);
+//        System.out.println("block ent: " + blockEntities + " readable bytes: " + input.readableBytes() + " section: " + sections.length + " X: " + chunkX + " Z: " + chunkZ + " Bitmask: " + primaryBitmask);
         return new Chunk1_9_3(chunkX, chunkZ, groundUp, primaryBitmask, sections, nbtData);
     }
 
@@ -38,7 +38,7 @@ public class Chunk1_9_3Type extends Type<Chunk1_9_3> {
         buffer.writeInt(chunk.getX());
         buffer.writeInt(chunk.getZ());
 
-        buffer.writeByte(chunk.isGroundUp() ? 0x01 : 0x00);
+        buffer.writeBoolean(chunk.isGroundUp());
         Type.VAR_INT.write(buffer, chunk.getBitmask());
 
         Type.VAR_INT.write(buffer, chunk.getSections().length);
