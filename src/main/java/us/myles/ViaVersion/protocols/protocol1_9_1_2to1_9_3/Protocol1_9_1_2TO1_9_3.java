@@ -19,7 +19,7 @@ public class Protocol1_9_1_2TO1_9_3 extends Protocol {
         //Unchanged packet structure
         registerOutgoing(State.PLAY, 0x46, 0x47); //Sound effect
         registerOutgoing(State.PLAY, 0x47, 0x48); //Player list header and footer
-        registerOutgoing(State.PLAY, 0x48, 0x47); //Collect item
+        registerOutgoing(State.PLAY, 0x48, 0x49); //Collect item
         registerOutgoing(State.PLAY, 0x49, 0x4A); //Entity teleport
         registerOutgoing(State.PLAY, 0x4A, 0x4B); //Entity properties
         registerOutgoing(State.PLAY, 0x4B, 0x4C); //Entity effect
@@ -56,7 +56,8 @@ public class Protocol1_9_1_2TO1_9_3 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.passthrough(CHUNK);
+                        Chunk1_9_3 chunk = wrapper.passthrough(CHUNK);
+                        BlockEntity.handle(chunk.getBlockEntities(), wrapper.user());
                     }
                 });
             }
