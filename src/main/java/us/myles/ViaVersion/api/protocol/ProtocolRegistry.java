@@ -90,6 +90,7 @@ public class ProtocolRegistry {
      * @return The path which has been generated, null if failed.
      */
     private static List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
+        if(clientVersion == serverVersion) return null; // We're already there
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
@@ -103,6 +104,8 @@ public class ProtocolRegistry {
             return current; // Easy solution
         }
         // There might be a more advanced solution... So we'll see if any of the others can get us there
+        List<Pair<Integer, Protocol>> shortest = null;
+
         for (Map.Entry<Integer, Protocol> entry : inputMap.entrySet()) {
             // Ensure it wasn't caught by the other loop
             if (!entry.getKey().equals(serverVersion)) {
@@ -115,13 +118,16 @@ public class ProtocolRegistry {
                     // Calculate the rest of the protocol using the current
                     newCurrent = getProtocolPath(newCurrent, entry.getKey(), serverVersion);
                     if (newCurrent != null) {
-                        return newCurrent;
+                        // If it's shorter then choose it
+                        if (shortest == null || shortest.size() > newCurrent.size()) {
+                            shortest = newCurrent;
+                        }
                     }
                 }
             }
         }
 
-        return null;
+        return shortest; // null if none found
     }
 
     /**
