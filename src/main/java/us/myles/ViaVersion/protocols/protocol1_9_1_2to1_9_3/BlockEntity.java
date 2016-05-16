@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3;
 import lombok.Getter;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.type.Type;
@@ -62,9 +63,9 @@ public class BlockEntity {
                     updateSign(pos, lines, connection);
                 }
             } catch (Exception e) {
-                System.out.println("Please post this error to http://github.com/MylesIsCool/ViaVersion/issues");
-                System.out.println(tag);
-                e.printStackTrace();
+                if(ViaVersion.getInstance().isDebug()) {
+                    System.out.println("Block Entity: " + e.getMessage() + ": " + tag);
+                }
             }
         }
     }
