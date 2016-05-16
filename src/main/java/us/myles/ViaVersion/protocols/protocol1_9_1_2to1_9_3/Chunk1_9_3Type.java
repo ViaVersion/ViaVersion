@@ -29,7 +29,6 @@ public class Chunk1_9_3Type extends Type<Chunk1_9_3> {
         for (int i = 0; i < blockEntities; i++) {
             nbtData.add(Type.NBT.read(input));
         }
-//        System.out.println("block ent: " + blockEntities + " readable bytes: " + input.readableBytes() + " section: " + sections.length + " X: " + chunkX + " Z: " + chunkZ + " Bitmask: " + primaryBitmask);
         return new Chunk1_9_3(chunkX, chunkZ, groundUp, primaryBitmask, sections, nbtData);
     }
 
