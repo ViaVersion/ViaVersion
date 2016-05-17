@@ -224,6 +224,14 @@ public class PacketWrapper {
         readableObjects.clear(); // :(
     }
 
+    /**
+     * Clear the packet, used if you have to change the packet completely
+     */
+    public void clearPacket() {
+        clearInputBuffer();
+        packetValues.clear();
+    }
+
     private void writeRemaining(ByteBuf output) {
         if (inputBuffer != null) {
             output.writeBytes(inputBuffer);

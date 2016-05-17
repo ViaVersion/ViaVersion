@@ -3,9 +3,11 @@ package us.myles.ViaVersion.api.protocol;
 import org.bukkit.Bukkit;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3.Protocol1_9_1_2TO1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3TO1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9TO1_9_1;
 
 import java.util.*;
 
@@ -24,6 +26,10 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_9TO1_8(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_8.getId());
         registerProtocol(new Protocol1_9_1TO1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9.getId());
         registerProtocol(new Protocol1_9_3TO1_9_1_2(), Arrays.asList(ProtocolVersion.v1_9_3.getId()), ProtocolVersion.v1_9_2.getId());
+        // Only supported for 1.9.4 server to 1.9 (nothing else)
+        registerProtocol(new Protocol1_9TO1_9_1(), Arrays.asList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_9_2.getId());
+        registerProtocol(new Protocol1_9_1_2TO1_9_3(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
+
     }
 
     /**
@@ -84,6 +90,7 @@ public class ProtocolRegistry {
      * @return The path which has been generated, null if failed.
      */
     private static List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
+        if(clientVersion == serverVersion) return null; // We're already there
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
@@ -97,6 +104,8 @@ public class ProtocolRegistry {
             return current; // Easy solution
         }
         // There might be a more advanced solution... So we'll see if any of the others can get us there
+        List<Pair<Integer, Protocol>> shortest = null;
+
         for (Map.Entry<Integer, Protocol> entry : inputMap.entrySet()) {
             // Ensure it wasn't caught by the other loop
             if (!entry.getKey().equals(serverVersion)) {
@@ -109,13 +118,16 @@ public class ProtocolRegistry {
                     // Calculate the rest of the protocol using the current
                     newCurrent = getProtocolPath(newCurrent, entry.getKey(), serverVersion);
                     if (newCurrent != null) {
-                        return newCurrent;
+                        // If it's shorter then choose it
+                        if (shortest == null || shortest.size() > newCurrent.size()) {
+                            shortest = newCurrent;
+                        }
                     }
                 }
             }
         }
 
-        return null;
+        return shortest; // null if none found
     }
 
     /**

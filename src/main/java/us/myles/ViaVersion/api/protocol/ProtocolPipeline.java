@@ -85,18 +85,14 @@ public class ProtocolPipeline extends Protocol {
                     ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_9_3.getId()) {
 
                 PacketType type;
-                if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.v1_8.getId()) {
+                if (ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_8.getId()) {
                     if (direction == Direction.INCOMING) {
                         type = PacketType.findNewPacket(state, direction, originalID);
                     } else {
                         type = PacketType.findOldPacket(state, direction, originalID);
                     }
                 } else {
-                    if (direction == Direction.INCOMING) {
-                        type = PacketType.findOldPacket(state, direction, originalID);
-                    } else {
-                        type = PacketType.findNewPacket(state, direction, originalID);
-                    }
+                    type = PacketType.findNewPacket(state, direction, originalID);
                 }
 
                 // Filter :) This would be not hard coded too, sorry :(
@@ -115,13 +111,19 @@ public class ProtocolPipeline extends Protocol {
             }
             String name = packet + "[" + userConnection.get(ProtocolInfo.class).getProtocolVersion() + "]";
             ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
-            plugin.getLogger().log(Level.INFO, "{0}: {1} {2} -> {3} [{4}]",
+
+            String actualUsername = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+            String username = actualUsername != null ? actualUsername + " " : "";
+
+            plugin.getLogger().log(Level.INFO, "{0}{1}: {2} {3} -> {4} [{5}] Value: {6}",
                     new Object[]{
+                            username,
                             direction,
                             state,
                             originalID,
                             packetWrapper.getId(),
-                            name
+                            name,
+                            packetWrapper
                     });
         }
     }
@@ -156,5 +158,9 @@ public class ProtocolPipeline extends Protocol {
         }
 
         return false;
+    }
+
+    public List<Protocol> pipes() {
+        return protocolList;
     }
 }
