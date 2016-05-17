@@ -33,6 +33,7 @@
     <build>
         <finalName>${project.name}-${project.version}</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
+        <defaultGoal>clean install</defaultGoal>
         <!-- <testSourceDirectory>src/test/java</testSourceDirectory> -->
 
         <resources>
