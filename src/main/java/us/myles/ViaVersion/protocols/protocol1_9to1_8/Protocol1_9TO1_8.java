@@ -132,5 +132,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new InventoryTracker(userConnection));
         // Place block tracker
         userConnection.put(new PlaceBlockTracker(userConnection));
+        // Sign tracker
+        userConnection.put(new SignTracker(userConnection));
     }
 }
