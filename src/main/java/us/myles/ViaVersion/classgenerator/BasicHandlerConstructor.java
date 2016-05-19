@@ -3,7 +3,6 @@ package us.myles.ViaVersion.classgenerator;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.classgenerator.HandlerConstructor;
 import us.myles.ViaVersion.handlers.ViaDecodeHandler;
 import us.myles.ViaVersion.handlers.ViaEncodeHandler;
 

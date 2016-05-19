@@ -61,6 +61,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<CompoundTag> NBT = new NBTType();
 
     public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
+    public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
 
     public static final Type<Item> ITEM = new ItemType();
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
