@@ -54,3 +54,5 @@ tracking-max-warnings: 4
 tracking-max-kick-msg: "You are sending too many packets, :("
 # Patch the Anti xray to work on 1.9 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
 anti-xray-patch: true
+# Send the supported versions with the Status response packet
+send-supported-versions: false

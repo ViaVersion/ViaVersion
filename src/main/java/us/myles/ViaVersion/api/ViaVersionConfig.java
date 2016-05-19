@@ -149,4 +149,11 @@ public interface ViaVersionConfig {
      * @return A boolean
      */
     boolean isAntiXRay();
+
+    /**
+     * Send supported versions in the status response packet
+     *
+     * @return If true, enabled
+     */
+    boolean isSendSupportedVersions();
 }

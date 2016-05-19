@@ -33,10 +33,7 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -96,6 +93,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                         getLogger().warning("ViaVersion will not function on the current protocol.");
                     }
                 }
+                ProtocolRegistry.refreshVersions();
             }
         });
 
@@ -363,6 +361,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return compatSpigotBuild;
     }
 
+    @Override
+    public SortedSet<Integer> getSupportedVersions() {
+        return ProtocolRegistry.getSupportedVersions();
+    }
+
     public boolean isCheckForUpdates() {
         return getConfig().getBoolean("checkforupdates", true);
     }
@@ -445,6 +448,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     @Override
     public boolean isAntiXRay() {
         return getConfig().getBoolean("anti-xray-patch", true);
+    }
+
+    @Override
+    public boolean isSendSupportedVersions() {
+        return getConfig().getBoolean("send-supported-versions", false);
     }
 
     public boolean isAutoTeam() {

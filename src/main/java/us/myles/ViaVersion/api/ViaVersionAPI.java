@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.command.ViaVersionCommand;
 
+import java.util.SortedSet;
 import java.util.UUID;
 
 public interface ViaVersionAPI {
@@ -109,4 +110,11 @@ public interface ViaVersionAPI {
      * @return True if it is
      */
     boolean isCompatSpigotBuild();
+
+    /**
+     * Get the supported protocol versions
+     *
+     * @return a list of protocol versions
+     */
+    SortedSet<Integer> getSupportedVersions();
 }

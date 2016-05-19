@@ -42,6 +42,8 @@ public class BaseProtocol extends Protocol {
                         try {
                             JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
                             JSONObject version = (JSONObject) json.get("version");
+                            if (ViaVersion.getConfig().isSendSupportedVersions())
+                                version.put("SupportedVersions", ViaVersion.getInstance().getSupportedVersions());
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) {
                                 Long original = (Long) version.get("protocol");
                                 ProtocolRegistry.SERVER_PROTOCOL = original.intValue();
