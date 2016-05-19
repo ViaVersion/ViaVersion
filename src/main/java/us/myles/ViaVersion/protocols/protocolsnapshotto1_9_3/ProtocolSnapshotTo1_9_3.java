@@ -1,9 +1,11 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3;
 
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
@@ -12,6 +14,13 @@ import java.util.List;
 public class ProtocolSnapshotTo1_9_3 extends Protocol {
     public static final Type<List<Metadata>> METADATA_LIST = new MetaListSnapshotType();
     public static final Type<Metadata> METADATA = new MetaSnapshotType();
+    public static ValueTransformer<Short, Float> toNewPitch = new ValueTransformer<Short, Float>(Type.FLOAT) {
+        @Override
+        public Float transform(PacketWrapper wrapper, Short inputValue) throws Exception {
+            return inputValue / 63.5F;
+
+        }
+    };
 
     @Override
     protected void registerPackets() {
@@ -25,7 +34,7 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
                 map(Type.INT); // 3 - y
                 map(Type.INT); // 4 - z
                 map(Type.FLOAT); // 5 - Volume
-                map(Type.UNSIGNED_BYTE, Type.FLOAT); // 6 - Pitch
+                map(Type.UNSIGNED_BYTE, toNewPitch); // 6 - Pitch
             }
         });
 
@@ -39,7 +48,7 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
                 map(Type.INT); // 3 - y
                 map(Type.INT); // 4 - z
                 map(Type.FLOAT); // 5 - Volume
-                map(Type.UNSIGNED_BYTE, Type.FLOAT); // 6 - Pitch
+                map(Type.UNSIGNED_BYTE, toNewPitch); // 6 - Pitch
             }
         });
 
