@@ -51,17 +51,21 @@ public class ClientChunks extends StoredObject {
             int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
             Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
 
-            if (ViaVersion.getConfig().isAntiXRay()) { //Spigot anti-xray patch
-                Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
+            if (ViaVersion.getConfig().isAntiXRay() && ViaVersion.getInstance().isSpigot()) { //Spigot anti-xray patch
+                try {
+                    Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
 
-                for (int i = 0; i < xcoords.length; ++i) {
-                    Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
-                    Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
+                    for (int i = 0; i < xcoords.length; ++i) {
+                        Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
+                        Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
 
-                    Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
-                    Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
+                        Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
+                        Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
 
-                    obfuscateRef.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
+                        obfuscateRef.invoke(antiXrayInstance, xcoords[i], zcoords[i], b, a, world);
+                    }
+                } catch (Exception e) {
+                    // not spigot, or it failed.
                 }
             }
             for (int i = 0; i < chunkMaps.length; i++) {

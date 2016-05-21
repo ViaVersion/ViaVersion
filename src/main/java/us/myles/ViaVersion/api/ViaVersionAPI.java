@@ -117,4 +117,12 @@ public interface ViaVersionAPI {
      * @return a list of protocol versions
      */
     SortedSet<Integer> getSupportedVersions();
+
+    /**
+     * Gets if the server uses spigot
+     *
+     * Note: Will only work after ViaVersion load
+     * @return True if spigot
+     */
+    boolean isSpigot();
 }
