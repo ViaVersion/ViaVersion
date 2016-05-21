@@ -3,17 +3,13 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaListSnapshotType extends Type<List<Metadata>> {
-    public MetaListSnapshotType() {
-        super(List.class);
-        addCompatibility(Protocol1_9TO1_8.METADATA_LIST);
-    }
+public class MetaListSnapshotType extends MetaListTypeTemplate {
 
     @Override
     public List<Metadata> read(ByteBuf buffer) throws Exception {

@@ -2,16 +2,13 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetadataListType extends Type<List<Metadata>> {
-    public MetadataListType() {
-        super("Metadata List", List.class);
-    }
+public class MetadataListType extends MetaListTypeTemplate {
 
     @Override
     public List<Metadata> read(ByteBuf buffer) throws Exception {

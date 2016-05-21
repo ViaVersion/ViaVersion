@@ -83,16 +83,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
         this.compatibilities = new HashSet<>();
     }
 
-    public void addCompatibility(Class<? extends Type> claz) {
-        compatibilities.add(claz);
-    }
-
-    public void addCompatibility(Type claz) {
-        addCompatibility(claz.getClass());
-    }
-
-    public boolean isCompatibleWith(Type claz) {
-        return compatibilities.contains(claz.getClass());
+    public Class<? extends Type> getBaseClass() {
+        return this.getClass();
     }
 
     @Override

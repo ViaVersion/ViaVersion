@@ -3,14 +3,10 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataTypes;
 
-public class MetadataType extends Type<Metadata> {
-
-    public MetadataType() {
-        super(Metadata.class);
-    }
+public class MetadataType extends MetaTypeTemplate {
 
     @Override
     public Metadata read(ByteBuf buffer) throws Exception {

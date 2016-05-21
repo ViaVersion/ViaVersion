@@ -117,7 +117,7 @@ public class PacketWrapper {
             }
         } else {
             Pair<Type, Object> read = readableObjects.poll();
-            if (read.getKey().equals(type) || (type.isCompatibleWith(read.getKey()) && type.getOutputClass().equals(read.getKey().getOutputClass()))) {
+            if (read.getKey().equals(type) || (type.getBaseClass().equals(read.getKey().getBaseClass()) && type.getOutputClass().equals(read.getKey().getOutputClass()))) {
                 return (T) read.getValue();
             } else {
                 if (type == Type.NOTHING) {
