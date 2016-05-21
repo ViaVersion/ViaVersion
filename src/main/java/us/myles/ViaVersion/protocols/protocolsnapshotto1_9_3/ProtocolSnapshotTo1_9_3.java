@@ -4,6 +4,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
@@ -49,6 +50,14 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
                 map(Type.INT); // 4 - z
                 map(Type.FLOAT); // 5 - Volume
                 map(Type.UNSIGNED_BYTE, toNewPitch); // 6 - Pitch
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.VAR_INT, 0);
+                        wrapper.set(Type.VAR_INT, 0, getNewSoundId(id));
+                    }
+                });
             }
         });
 
@@ -95,7 +104,14 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
                 map(METADATA_LIST); // 7 - Metadata list
             }
         });
+    }
 
+    public int getNewSoundId(int id) { //TODO organize things later
+        if (id >= 24 && id <= 295) //One EnchantTable sound makes everything move between 24 and 295, blame the enchant table.
+            return ++id;
+        else if (id >= 296 && id < 443) //Blame the polar bear
+            return id + 7;
+        return id;
     }
 
     @Override
