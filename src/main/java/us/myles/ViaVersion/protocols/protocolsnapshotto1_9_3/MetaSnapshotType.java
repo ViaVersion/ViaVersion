@@ -3,11 +3,13 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 public class MetaSnapshotType extends Type<Metadata> {
     public MetaSnapshotType() {
         super(Metadata.class);
+        addCompatibility(Protocol1_9TO1_8.METADATA);
     }
 
     @Override

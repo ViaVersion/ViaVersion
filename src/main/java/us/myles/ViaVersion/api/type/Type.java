@@ -10,6 +10,8 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
 import us.myles.ViaVersion.api.type.types.minecraft.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -68,6 +70,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Actual Class */
 
     private final Class<? super T> outputClass;
+    private final Set<Class<? extends Type>> compatibilities;
     private final String typeName;
 
     public Type(Class<? super T> outputClass) {
@@ -77,6 +80,19 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public Type(String typeName, Class<? super T> outputClass) {
         this.outputClass = outputClass;
         this.typeName = typeName;
+        this.compatibilities = new HashSet<>();
+    }
+
+    public void addCompatibility(Class<? extends Type> claz) {
+        compatibilities.add(claz);
+    }
+
+    public void addCompatibility(Type claz) {
+        addCompatibility(claz.getClass());
+    }
+
+    public boolean isCompatibleWith(Type claz) {
+        return compatibilities.contains(claz.getClass());
     }
 
     @Override

@@ -117,7 +117,7 @@ public class PacketWrapper {
             }
         } else {
             Pair<Type, Object> read = readableObjects.poll();
-            if (read.getKey().equals(type)) {
+            if (read.getKey().equals(type) || (type.isCompatibleWith(read.getKey()) && type.getOutputClass().equals(read.getKey().getOutputClass()))) {
                 return (T) read.getValue();
             } else {
                 if (type == Type.NOTHING) {
@@ -173,7 +173,7 @@ public class PacketWrapper {
         packetValues.addAll(readableObjects);
         readableObjects.clear();
         // If the buffer has readable bytes, copy them.
-        if(inputBuffer.readableBytes() > 0){
+        if (inputBuffer.readableBytes() > 0) {
             passthrough(Type.REMAINING_BYTES);
         }
     }
