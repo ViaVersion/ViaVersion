@@ -47,11 +47,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     private ViaCommandHandler commandHandler;
     private boolean debug = false;
     private boolean compatSpigotBuild = false;
+    private boolean spigot = true;
 
     @Override
     public void onLoad() {
         ViaVersion.setInstance(this);
+        // Config magic
         generateConfig();
+        // Handle reloads
         if (System.getProperty("ViaVersion") != null) {
             if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
                 getLogger().severe("ViaVersion is already loaded, we're going to kick all the players... because otherwise we'll crash because of ProtocolLib.");
@@ -63,6 +66,12 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                 getLogger().severe("ViaVersion is already loaded, this should work fine... Otherwise reboot the server!!!");
 
             }
+        }
+        // Spigot detector
+        try {
+           Class.forName("org.spigotmc.SpigotConfig");
+        } catch (ClassNotFoundException e) {
+            spigot = false;
         }
         // Check if it's a spigot build with a protocol mod
         try {
@@ -105,6 +114,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
         // Register Protocol Listeners
         ProtocolRegistry.registerListeners();
+
+        // Warn them if they have anti-xray on and they aren't using spigot
+        if(isAntiXRay() && !spigot){
+            getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
+        }
     }
 
     @Override
@@ -364,6 +378,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     @Override
     public SortedSet<Integer> getSupportedVersions() {
         return ProtocolRegistry.getSupportedVersions();
+    }
+
+    @Override
+    public boolean isSpigot() {
+        return this.spigot;
     }
 
     public boolean isCheckForUpdates() {
