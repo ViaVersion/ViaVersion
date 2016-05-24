@@ -18,6 +18,8 @@ Sources:
 
 **wiki.vg** (Protocol info, though I did have to find a lot myself)
 
+**Burger** We use this tool to get protocol and other useful information for new / undocumented Minecraft versions
+
 **OpenNBT** (used for slot rewriting)
 
 
