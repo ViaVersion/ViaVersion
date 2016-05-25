@@ -29,7 +29,7 @@ public class ProtocolVersion {
         register(v1_9_1 = new ProtocolVersion(108, "1.9.1"));
         register(v1_9_2 = new ProtocolVersion(109, "1.9.2"));
         register(v1_9_3 = new ProtocolVersion(110, "1.9.3/4"));
-        register(SNAPSHOT = new ProtocolVersion(201, "16w20a"));
+        register(SNAPSHOT = new ProtocolVersion(202, "16w21a"));
     }
 
     public static void register(@NonNull ProtocolVersion protocol) {
