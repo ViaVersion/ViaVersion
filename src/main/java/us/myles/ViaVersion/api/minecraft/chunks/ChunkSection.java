@@ -157,6 +157,7 @@ public class ChunkSection {
      * Get expected size of this chunk section.
      *
      * @return Amount of bytes sent by this section
+     * @throws Exception If it failed to calculate bits properly
      */
     public int getExpectedSize() throws Exception {
         int bitsPerBlock = palette.size() > 255 ? 16 : 8;

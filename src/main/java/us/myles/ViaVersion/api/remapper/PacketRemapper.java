@@ -39,7 +39,9 @@ public abstract class PacketRemapper {
      * Map a type from an old type to a transformed new type.
      *
      * @param oldType     The old type
+     * @param <T1>        The old return type.
      * @param transformer The transformer to use to produce the new type.
+     * @param <T2>        The new return type.
      */
     public <T1, T2> void map(Type<T1> oldType, ValueTransformer<T1, T2> transformer) {
         map(new TypeRemapper(oldType), transformer);
@@ -49,7 +51,8 @@ public abstract class PacketRemapper {
      * Map a type using a basic ValueReader to a ValueWriter
      *
      * @param inputReader  The reader to read with.
-     * @param outputWriter The writer to write with.
+     * @param outputWriter The writer to write with
+     * @param <T>          The return type
      */
     public <T> void map(ValueReader<T> inputReader, ValueWriter<T> outputWriter) {
         valueRemappers.add(new Pair<ValueReader, ValueWriter>(inputReader, outputWriter));

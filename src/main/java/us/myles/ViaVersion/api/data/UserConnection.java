@@ -39,6 +39,7 @@ public class UserConnection {
      * Get an object from the storage
      *
      * @param objectClass The class of the object to get
+     * @param <T>         The type of the class you want to get.
      * @return The requested object
      */
     public <T extends StoredObject> T get(Class<T> objectClass) {
@@ -102,6 +103,8 @@ public class UserConnection {
 
     /**
      * Used for incrementing the number of packets received from the client
+     *
+     * @return True if the interval has reset
      */
     public boolean incrementReceived() {
         // handle stats
@@ -125,8 +128,8 @@ public class UserConnection {
      * @param reason The reason to use, not used if player is not active.
      */
     public void disconnect(final String reason) {
-        if(!getChannel().isOpen()) return;
-        if(pendingDisconnect) return;
+        if (!getChannel().isOpen()) return;
+        if (pendingDisconnect) return;
         pendingDisconnect = true;
         if (get(ProtocolInfo.class).getUuid() != null) {
             final UUID uuid = get(ProtocolInfo.class).getUuid();

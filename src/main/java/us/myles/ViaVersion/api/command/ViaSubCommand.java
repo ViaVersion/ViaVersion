@@ -10,14 +10,14 @@ public abstract class ViaSubCommand {
     /**
      * Subcommand name
      *
-     * @return your input
+     * @return The command name
      */
     public abstract String name();
 
     /**
      * subcommand description, this'll show in /viaversion list
      *
-     * @return your input
+     * @return The command description
      */
     public abstract String description();
 
@@ -25,7 +25,7 @@ public abstract class ViaSubCommand {
      * Usage example:
      * "playerversion [name]"
      *
-     * @return your input
+     * @return The command usage
      */
     public String usage() {
         return name();
@@ -34,7 +34,7 @@ public abstract class ViaSubCommand {
     /**
      * Permission, null for everyone
      *
-     * @return
+     * @return The permission required to use the command
      */
     public String permission() {
         return "viaversion.admin";
@@ -59,7 +59,7 @@ public abstract class ViaSubCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         return Collections.emptyList();
     }
-
+    
     public String color(String s) {
         return ViaCommandHandler.color(s);
     }

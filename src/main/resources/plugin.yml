@@ -3,7 +3,7 @@ main: us.myles.ViaVersion.ViaVersionPlugin
 author: _MylesC
 version: ${project.version}
 load: startup
-loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, PacketListenerApi]
+loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, PacketListenerApi, SkinRestorer]
 commands:
   viaversion:
     description: Shows ViaVersion Version and more.

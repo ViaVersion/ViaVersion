@@ -38,7 +38,7 @@ public interface ViaVersionAPI {
     /**
      * Is player using 1.9?
      *
-     * @param playerUUID
+     * @param playerUUID UUID of a player
      * @return True if the client is on 1.9
      */
     boolean isPorted(UUID playerUUID);
