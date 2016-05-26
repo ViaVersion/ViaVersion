@@ -17,6 +17,7 @@ public interface BossBar {
      * Change the title
      *
      * @param title Title can be in either JSON or just text
+     * @return The BossBar object
      */
     BossBar setTitle(String title);
 
@@ -31,13 +32,14 @@ public interface BossBar {
      * Change the health
      *
      * @param health this float has to be between 0F - 1F
+     * @return The BossBar object
      */
     BossBar setHealth(float health);
 
     /**
      * Get the bossbar color
      *
-     * @return
+     * @return The colour
      */
     BossColor getColor();
 
@@ -45,6 +47,7 @@ public interface BossBar {
      * Yay colors!
      *
      * @param color Whatever color you want!
+     * @return The BossBar object
      */
     BossBar setColor(BossColor color);
 
@@ -59,13 +62,15 @@ public interface BossBar {
      * Change the bosbar style
      *
      * @param style BossStyle
+     * @return The BossBar object
      */
     BossBar setStyle(BossStyle style);
 
     /**
      * Show the bossbar to a player.
      *
-     * @param player
+     * @param player The player
+     * @return The BossBar object
      */
     BossBar addPlayer(Player player);
 
@@ -73,7 +78,7 @@ public interface BossBar {
      * Show the bossbar to a player (uuid)
      *
      * @param player uuid of the player
-     * @return the BossBar instance
+     * @return The BossBar object
      */
     BossBar addPlayer(UUID player);
 
@@ -81,34 +86,37 @@ public interface BossBar {
      * add multiple players
      *
      * @param players list of players
-     * @return the bossbar instance
+     * @return The BossBar object
      */
     BossBar addPlayers(Player... players);
 
     /**
      * Remove the bossbar from a player
      *
-     * @param player
+     * @param player The player
+     * @return The BossBar object
      */
     BossBar removePlayer(Player player);
 
     /**
      * Add flags
      *
-     * @param flag
+     * @param flag The flag to add
+     * @return The BossBar object
      */
     BossBar addFlag(BossFlag flag);
 
     /**
      * Remove flags.
      *
-     * @param flag
+     * @param flag The flag to remove
+     * @return The BossBar object
      */
     BossBar removeFlag(BossFlag flag);
 
     /**
-     * @param flag
-     * @return
+     * @param flag The flag to check against
+     * @return True if it has the flag
      */
     boolean hasFlag(BossFlag flag);
 
@@ -121,11 +129,15 @@ public interface BossBar {
 
     /**
      * Show the bossbar to everyone (In the getPlayer set)
+     *
+     * @return The BossBar object
      */
     BossBar show();
 
     /**
      * Hide the bossbar from everyone (In the getPlayer set)
+     *
+     * @return The BossBar object
      */
     BossBar hide();
 

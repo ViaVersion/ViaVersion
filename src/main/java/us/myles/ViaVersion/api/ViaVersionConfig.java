@@ -111,7 +111,7 @@ public interface ViaVersionConfig {
     /**
      * Get the kick message sent if the user hits the max packets per second.
      *
-     * @return Kick message, with colour codes using '&'
+     * @return Kick message, with colour codes using '&amp;'
      */
     String getMaxPPSKickMessage();
 
@@ -139,7 +139,7 @@ public interface ViaVersionConfig {
     /**
      * Get the kick message sent if the user goes over the warnings in the interval
      *
-     * @return Kick message, with colour codes using '&'
+     * @return Kick message, with colour codes using '&amp;'
      */
     String getMaxWarningsKickMessage();
 

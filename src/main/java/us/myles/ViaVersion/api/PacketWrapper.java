@@ -38,8 +38,10 @@ public class PacketWrapper {
      * Get a part from the output
      *
      * @param type  The type of the part you wish to get.
+     * @param <T>   The return type of the type you wish to get.
      * @param index The index of the part (relative to the type)
      * @return The requested type or throws ArrayIndexOutOfBounds
+     * @throws Exception If it fails to find it, an exception will be thrown.
      */
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
@@ -80,8 +82,10 @@ public class PacketWrapper {
      * Set a currently existing part in the output
      *
      * @param type  The type of the part you wish to set.
+     * @param <T>   The return type of the type you wish to set.
      * @param index The index of the part (relative to the type)
      * @param value The value of the part you wish to set it to.
+     * @throws Exception If it fails to set it, an exception will be thrown.
      */
     public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
@@ -102,6 +106,7 @@ public class PacketWrapper {
      * Read a type from the input.
      *
      * @param type The type you wish to read
+     * @param <T>  The return type of the type you wish to read.
      * @return The requested type
      * @throws Exception If it fails to read
      */
@@ -134,6 +139,7 @@ public class PacketWrapper {
      * Write a type to the output.
      *
      * @param type  The type to write.
+     * @param <T>   The return type of the type you wish to write.
      * @param value The value of the type to write.
      */
     public <T> void write(Type<T> type, T value) {
@@ -154,6 +160,7 @@ public class PacketWrapper {
      * Take a value from the input and write to the output.
      *
      * @param type The type to read and write.
+     * @param <T>  The return type of the type you wish to pass through.
      * @return The type which was read/written.
      * @throws Exception If it failed to read or write
      */
@@ -173,7 +180,7 @@ public class PacketWrapper {
         packetValues.addAll(readableObjects);
         readableObjects.clear();
         // If the buffer has readable bytes, copy them.
-        if(inputBuffer.readableBytes() > 0){
+        if (inputBuffer.readableBytes() > 0) {
             passthrough(Type.REMAINING_BYTES);
         }
     }
