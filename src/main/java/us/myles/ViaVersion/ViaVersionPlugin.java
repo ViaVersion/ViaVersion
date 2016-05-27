@@ -423,7 +423,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     }
 
     public boolean isUnknownEntitiesSuppressed() {
-        return getConfig().getBoolean("suppress-entityid-errors", false);
+        return false;
     }
 
     public double getHologramYOffset() {
@@ -431,7 +431,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     }
 
     public boolean isBlockBreakPatch() {
-        return getConfig().getBoolean("block-break-patch", true);
+        return false;
     }
 
     @Override

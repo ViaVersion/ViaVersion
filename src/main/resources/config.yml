@@ -67,11 +67,6 @@ bossbar-anti-flicker: false
 use-new-effect-indicator: true
 # Show the new death messages for 1.9 on the death screen
 use-new-deathmessages: false
-# This will suppress the following error: 'Unable to get entity for ID: xxxx'
-# This error message means one of you plugins is sending bad packets!
-suppress-entityid-errors: false
-# Our patch for block breaking issue, if you have issues with block updates then disable this.
-block-break-patch: true
 # Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
 item-cache: true
 # Patch the Anti xray to work on 1.9 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.

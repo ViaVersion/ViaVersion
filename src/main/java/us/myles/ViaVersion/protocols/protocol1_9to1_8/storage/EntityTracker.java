@@ -21,7 +21,9 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 import java.util.*;
@@ -32,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class EntityTracker extends StoredObject {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
     private final Map<Integer, BossBar> bossBarMap = new ConcurrentHashMap<>();
     private final Set<Integer> validBlocking = Sets.newConcurrentHashSet();
@@ -87,6 +90,7 @@ public class EntityTracker extends StoredObject {
         uuidMap.remove(entityID);
         validBlocking.remove(entityID);
         knownHolograms.remove(entityID);
+        metadataBuffer.remove(entityID);
 
         BossBar bar = bossBarMap.remove(entityID);
         if (bar != null) {
@@ -113,7 +117,9 @@ public class EntityTracker extends StoredObject {
     }
 
     public void handleMetadata(int entityID, List<Metadata> metadataList) {
-        if (!clientEntityTypes.containsKey(entityID)) return;
+        if (!clientEntityTypes.containsKey(entityID)) {
+            return;
+        }
 
         EntityType type = clientEntityTypes.get(entityID);
         for (Metadata metadata : new ArrayList<>(metadataList)) {
@@ -249,6 +255,32 @@ public class EntityTracker extends StoredObject {
             wrapper.send();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void addMetadataToBuffer(int entityID, List<Metadata> metadataList) {
+        if (metadataBuffer.containsKey(entityID)) {
+            metadataBuffer.get(entityID).addAll(metadataList);
+        } else {
+            metadataBuffer.put(entityID, metadataList);
+        }
+    }
+
+    public void sendMetadataBuffer(int entityID) {
+        if (metadataBuffer.containsKey(entityID)) {
+            PacketWrapper wrapper = new PacketWrapper(0x39, null, getUser());
+            wrapper.write(Type.VAR_INT, entityID);
+            wrapper.write(Protocol1_9TO1_8.METADATA_LIST, metadataBuffer.get(entityID));
+            MetadataRewriter.transform(getClientEntityTypes().get(entityID), metadataBuffer.get(entityID));
+            handleMetadata(entityID, metadataBuffer.get(entityID));
+            if (metadataBuffer.get(entityID).size() > 0) {
+                try {
+                    wrapper.send();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            metadataBuffer.remove(entityID);
         }
     }
 }

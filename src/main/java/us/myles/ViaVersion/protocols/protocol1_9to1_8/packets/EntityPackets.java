@@ -184,9 +184,10 @@ public class EntityPackets {
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (tracker.getClientEntityTypes().containsKey(entityID)) {
                             MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
-                        } else if (!ViaVersion.getConfig().isUnknownEntitiesSuppressed() || ViaVersion.getInstance().isDebug()) {
-                            System.out.println("Unable to find entity for metadata, entity ID: " + entityID);
-                            metadataList.clear();
+                        } else {
+                            // Buffer
+                            tracker.addMetadataToBuffer(entityID, metadataList);
+                            wrapper.cancel();
                         }
                     }
                 });
@@ -207,8 +208,9 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
-                        if (metadataList.size() == 0)
+                        if (metadataList.size() == 0) {
                             wrapper.cancel();
+                        }
                     }
                 });
             }
@@ -243,9 +245,6 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-//                        int id = wrapper.read(Type.VAR_INT);
-//                        CompoundTag tag = wrapper.read(Type.NBT);
-//                        System.out.println(id + " - " + tag);
                         wrapper.cancel();
                     }
                 });
