@@ -3,6 +3,7 @@
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 
 ## This is an experimental branch for 1.10, we do not recommend you to use this on a production server
+**Direct download link:** [Latest builds](https://ci.viaversion.com/job/ViaVersion%201.10%20DEV/)
 
 **Allows the connection of 1.9 clients to 1.8**
 
