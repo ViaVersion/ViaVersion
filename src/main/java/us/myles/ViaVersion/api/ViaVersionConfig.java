@@ -78,6 +78,7 @@ public interface ViaVersionConfig {
      *
      * @return true if boss bar patching is enabled
      */
+    @Deprecated
     boolean isUnknownEntitiesSuppressed();
 
     /**
@@ -99,6 +100,7 @@ public interface ViaVersionConfig {
      *
      * @return true if it is enabled.
      */
+    @Deprecated
     boolean isBlockBreakPatch();
 
     /**
