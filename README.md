@@ -1,4 +1,4 @@
-# ViaVersion 0.8.3
+# ViaVersion 0.8.4
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 
@@ -52,14 +52,13 @@ https://www.spigotmc.org/resources/viaversion.19254/history
 
 ----------
 
-You can find unofficial dev builds here:
+You can find official dev builds here:
 
-**Terrobility's Build Server:** https://ci.terrocidepvp.net/job/ViaVersion/
+**Jenkins:** https://ci.viaversion.com
 
-**sgdc3's Build Server:** http://ci.xephi.fr/job/ViaVersion/
-**sgdc3's Maven:** http://ci.xephi.fr/plugin/repository/everything/
+**JavaDocs:** https://jd.viaversion.com
 
-**JavaDocs:** https://jd.matsv.nl/
+**Maven Repo:** https://repo.viaversion.com
 
 License:
 --------
