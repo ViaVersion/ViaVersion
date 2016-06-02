@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3.storage.ResourcePackTracker;
 
 import java.util.List;
 
@@ -104,6 +105,38 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
                 map(METADATA_LIST); // 7 - Metadata list
             }
         });
+
+        // Packet Send ResourcePack
+        registerOutgoing(State.PLAY, 0x32, 0x32, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - URL
+                map(Type.STRING); // 1 - Hash
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
+                        tracker.setLastHash(wrapper.get(Type.STRING, 1)); // Store the hash for resourcepack status
+                    }
+                });
+            }
+        });
+
+        // Packet ResourcePack status
+        registerIncoming(State.PLAY, 0x16, 0x16, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
+                        wrapper.write(Type.STRING, tracker.getLastHash());
+                        wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT));
+                    }
+                });
+            }
+        });
     }
 
     public int getNewSoundId(int id) { //TODO organize things later
@@ -116,6 +149,6 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-
+        userConnection.put(new ResourcePackTracker(userConnection));
     }
 }
