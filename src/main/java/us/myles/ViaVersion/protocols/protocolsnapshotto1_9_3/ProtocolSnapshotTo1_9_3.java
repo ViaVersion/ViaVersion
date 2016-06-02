@@ -139,12 +139,19 @@ public class ProtocolSnapshotTo1_9_3 extends Protocol {
         });
     }
 
-    public int getNewSoundId(int id) { //TODO organize things later
-        if (id >= 24 && id <= 295) //One EnchantTable sound makes everything move between 24 and 295, blame the enchant table.
-            return ++id;
-        else if (id >= 296 && id < 443) //Blame the polar bear
-            return id + 7;
-        return id;
+    public int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
+        int newId = id;
+        if (id >= 24) //Blame the enchantment table sound
+            newId += 1;
+        else if (id >= 248) //Blame the husk
+            newId += 4;
+        else if (id >= 296) //Blame the polar bear
+            newId += 6;
+        else if (id >= 354) //Blame the stray
+            newId += 4;
+        else if (id >= 372) //Blame the wither skeleton
+            newId += 4;
+        return newId;
     }
 
     @Override
