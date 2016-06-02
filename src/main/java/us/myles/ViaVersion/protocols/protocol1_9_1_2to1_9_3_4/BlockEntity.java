@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3;
+package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
 
 import lombok.Getter;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;

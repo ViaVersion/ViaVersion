@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3;
+package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
 
 import io.netty.buffer.ByteBuf;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -7,13 +7,13 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Chunk1_9_3Type extends Type<Chunk1_9_3> {
-    public Chunk1_9_3Type() {
-        super("1.9.3 Chunk", Chunk1_9_3.class);
+public class Chunk1_9_3_4Type extends Type<Chunk1_9_3_4> {
+    public Chunk1_9_3_4Type() {
+        super("1.9.3 Chunk", Chunk1_9_3_4.class);
     }
 
     @Override
-    public Chunk1_9_3 read(ByteBuf input) throws Exception {
+    public Chunk1_9_3_4 read(ByteBuf input) throws Exception {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
@@ -29,11 +29,11 @@ public class Chunk1_9_3Type extends Type<Chunk1_9_3> {
         for (int i = 0; i < blockEntities; i++) {
             nbtData.add(Type.NBT.read(input));
         }
-        return new Chunk1_9_3(chunkX, chunkZ, groundUp, primaryBitmask, sections, nbtData);
+        return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, sections, nbtData);
     }
 
     @Override
-    public void write(ByteBuf buffer, Chunk1_9_3 chunk) throws Exception {
+    public void write(ByteBuf buffer, Chunk1_9_3_4 chunk) throws Exception {
         buffer.writeInt(chunk.getX());
         buffer.writeInt(chunk.getZ());
 
