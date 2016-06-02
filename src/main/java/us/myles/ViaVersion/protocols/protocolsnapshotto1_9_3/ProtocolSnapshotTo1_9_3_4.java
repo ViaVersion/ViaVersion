@@ -145,13 +145,13 @@ public class ProtocolSnapshotTo1_9_3_4 extends Protocol {
         int newId = id;
         if (id >= 24) //Blame the enchantment table sound
             newId += 1;
-        else if (id >= 248) //Blame the husk
+        if (id >= 248) //Blame the husk
             newId += 4;
-        else if (id >= 296) //Blame the polar bear
+        if (id >= 296) //Blame the polar bear
             newId += 6;
-        else if (id >= 354) //Blame the stray
+        if (id >= 354) //Blame the stray
             newId += 4;
-        else if (id >= 372) //Blame the wither skeleton
+        if (id >= 372) //Blame the wither skeleton
             newId += 4;
         return newId;
     }
