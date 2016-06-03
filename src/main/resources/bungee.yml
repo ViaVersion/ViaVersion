@@ -1,0 +1,4 @@
+name: ViaVersion
+main: us.myles.ViaVersion.Bungee
+author: _MylesC
+version: ${project.version}
