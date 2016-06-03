@@ -136,6 +136,12 @@
             <id>spacehq-repo</id>
             <url>https://repo.spacehq.org/content/repositories/releases/</url>
         </repository>
+
+        <!-- Bungee repo -->
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -204,6 +210,13 @@
             <artifactId>lombok</artifactId>
             <version>1.16.6</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!--Bungeecord-->
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.9-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
