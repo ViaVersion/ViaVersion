@@ -8,6 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.ViaVersion;
@@ -48,6 +49,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     private boolean debug = false;
     private boolean compatSpigotBuild = false;
     private boolean spigot = true;
+    private boolean lateBind = false;
 
     @Override
     public void onLoad() {
@@ -69,25 +71,29 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         }
         // Spigot detector
         try {
-           Class.forName("org.spigotmc.SpigotConfig");
+            Class.forName("org.spigotmc.SpigotConfig");
         } catch (ClassNotFoundException e) {
             spigot = false;
         }
         // Check if it's a spigot build with a protocol mod
         try {
             compatSpigotBuild = ReflectionUtil.nms("PacketEncoder").getDeclaredField("version") != null;
-        } catch (Exception e){
+        } catch (Exception e) {
             compatSpigotBuild = false;
         }
         // Generate classes needed (only works if it's compat)
         ClassGenerator.generate();
+        lateBind = !isBinded();
 
-        getLogger().info("ViaVersion " + getDescription().getVersion() + (compatSpigotBuild ? "compat" : "") + " is now loaded, injecting.");
-        injectPacketHandler();
+        getLogger().info("ViaVersion " + getDescription().getVersion() + (compatSpigotBuild ? "compat" : "") + " is now loaded" + (lateBind ? ", waiting for boot. (late-bind)" : ", injecting!"));
+        if (!lateBind)
+            injectPacketHandler();
     }
 
     @Override
     public void onEnable() {
+        if (lateBind)
+            injectPacketHandler();
         if (isCheckForUpdates())
             UpdateUtil.sendUpdateMessage(this);
         // Gather version :)
@@ -116,7 +122,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         ProtocolRegistry.registerListeners();
 
         // Warn them if they have anti-xray on and they aren't using spigot
-        if(isAntiXRay() && !spigot){
+        if (isAntiXRay() && !spigot) {
             getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
         }
     }
@@ -196,20 +202,25 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         }
     }
 
-    public void injectPacketHandler() {
-        try {
-            Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
-            Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Object connection = null;
-            for (Method m : serverClazz.getDeclaredMethods()) {
-                if (m.getReturnType() != null) {
-                    if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
-                        if (m.getParameterTypes().length == 0) {
-                            connection = m.invoke(server);
-                        }
+    public Object getServerConnection() throws Exception {
+        Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
+        Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
+        Object connection = null;
+        for (Method m : serverClazz.getDeclaredMethods()) {
+            if (m.getReturnType() != null) {
+                if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
+                    if (m.getParameterTypes().length == 0) {
+                        connection = m.invoke(server);
                     }
                 }
             }
+        }
+        return connection;
+    }
+
+    public void injectPacketHandler() {
+        try {
+            Object connection = getServerConnection();
             if (connection == null) {
                 getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
                 return;
@@ -250,6 +261,33 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         }
     }
 
+    public boolean isBinded() {
+        try {
+            Object connection = getServerConnection();
+            if (connection == null) {
+                return false;
+            }
+            for (Field field : connection.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                final Object value = field.get(connection);
+                if (value instanceof List) {
+                    // Inject the list
+                    synchronized (value) {
+                        for (Object o : (List) value) {
+                            if (o instanceof ChannelFuture) {
+                                return true;
+                            } else {
+                                break; // not the right list.
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
     private void inject(ChannelFuture future) {
         try {
             ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
@@ -260,11 +298,18 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
                 ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
                 injectedFutures.add(future);
             } catch (NoSuchFieldException e) {
-                // field not found
-                throw new Exception("Unable to find childHandler, blame " + bootstrapAcceptor.getClass().getName());
+                // let's find who to blame!
+                ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
+                if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
+                    PluginDescriptionFile yaml = ReflectionUtil.get(cl, "description", PluginDescriptionFile.class);
+                    throw new Exception("Unable to inject, due to " + bootstrapAcceptor.getClass().getName() + ", try without the plugin " + yaml.getName() + "?");
+                } else {
+                    throw new Exception("Unable to find childHandler, weird server version? " + bootstrapAcceptor.getClass().getName());
+                }
+
             }
         } catch (Exception e) {
-            getLogger().severe("Have you got late-bind enabled with something else? (ProtocolLib?)");
+            getLogger().severe("Have you got late-bind enabled with something else?");
             e.printStackTrace();
         }
     }
