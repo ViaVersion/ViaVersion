@@ -20,7 +20,7 @@ public class AutoTeamSubCmd extends ViaSubCommand {
     public boolean execute(CommandSender sender, String[] args) {
         ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
-        boolean newValue = !plugin.isAutoTeam();
+        boolean newValue = !ViaVersion.getConfig().isAutoTeam();
         plugin.getConfig().set("auto-team", newValue);
         plugin.saveConfig();
         sendMessage(sender, "&6We will %s", (newValue ? "&aautomatically team players" : "&cno longer auto team players"));
