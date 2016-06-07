@@ -3,13 +3,6 @@ package us.myles.ViaVersion.api;
 public interface ViaVersionConfig {
 
     /**
-     * Get if global debug is enabled
-     *
-     * @return true if debug is enabled
-     */
-    boolean isDebug();
-
-    /**
      * Get if the plugin should check for updates
      *
      * @return true if update checking is enabled

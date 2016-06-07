@@ -20,7 +20,7 @@ public class DontBugMeSubCmd extends ViaSubCommand {
     public boolean execute(CommandSender sender, String[] args) {
         ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
-        boolean newValue = !plugin.isCheckForUpdates();
+        boolean newValue = !ViaVersion.getConfig().isCheckForUpdates();
         plugin.getConfig().set("checkforupdates", newValue);
         plugin.saveConfig();
         sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));

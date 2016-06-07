@@ -20,7 +20,7 @@ public class ReloadSubCmd extends ViaSubCommand {
     public boolean execute(CommandSender sender, String[] args) {
         ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
-        plugin.generateConfig();
+        plugin.getConf().generateConfig();
         sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
         return true;
     }
