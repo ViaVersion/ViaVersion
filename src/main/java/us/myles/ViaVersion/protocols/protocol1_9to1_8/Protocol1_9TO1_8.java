@@ -102,9 +102,9 @@ public class Protocol1_9TO1_8 extends Protocol {
             plugin.getLogger().info("Enabling PaperSpigot patch: Fixes block placement.");
             Bukkit.getPluginManager().registerEvents(new PaperPatch(), plugin);
         }
-        if (plugin.getConfig().getBoolean("simulate-pt", true))
+        if (plugin.getConf().isStimulatePlayerTick())
             new ViaIdleThread(plugin.getPortedPlayers()).runTaskTimer(plugin, 1L, 1L); // Updates player's idle status
-        if (plugin.getConfig().getBoolean("item-cache", true)) {
+        if (plugin.getConf().isItemCache()) {
             new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
             HandItemCache.CACHE = true;
         }

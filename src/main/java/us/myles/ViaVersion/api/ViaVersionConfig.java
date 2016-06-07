@@ -151,4 +151,25 @@ public interface ViaVersionConfig {
      * @return If true, enabled
      */
     boolean isSendSupportedVersions();
+
+    /**
+     * Stimulate the player tick
+     *
+     * @return if true, enabled
+     */
+    boolean isStimulatePlayerTick();
+
+    /**
+     * Use the item cache to prevent high resource usage
+     *
+     * @return if true, enabled
+     */
+    boolean isItemCache();
+
+    /**
+     * Use the NMS player ticking
+     *
+     * @return if true, enabled
+     */
+    boolean isNMSPlayerTicking();
 }

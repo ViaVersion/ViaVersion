@@ -123,7 +123,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
         // Warn them if they have anti-xray on and they aren't using spigot
         if (conf.isAntiXRay() && !spigot) {
-            getLogger().info("You have anti-xray on in your conf, since you're not using spigot it won't fix xray!");
+            getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
         }
     }
 

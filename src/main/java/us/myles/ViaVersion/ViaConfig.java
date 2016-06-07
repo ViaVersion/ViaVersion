@@ -135,6 +135,21 @@ public class ViaConfig implements ViaVersionConfig {
         return plugin.getConfig().getBoolean("send-supported-versions", false);
     }
 
+    @Override
+    public boolean isStimulatePlayerTick() {
+        return plugin.getConfig().getBoolean("simulate-pt", true);
+    }
+
+    @Override
+    public boolean isItemCache() {
+        return plugin.getConfig().getBoolean("item-cache", true);
+    }
+
+    @Override
+    public boolean isNMSPlayerTicking() {
+        return plugin.getConfig().getBoolean("nms-player-ticking", true);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return isPreventCollision() && plugin.getConfig().getBoolean("auto-team", true);
