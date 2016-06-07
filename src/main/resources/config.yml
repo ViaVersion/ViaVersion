@@ -38,7 +38,7 @@ tracking-max-warnings: 4
 tracking-max-kick-msg: "You are sending too many packets, :("
 #
 #----------------------------------------------------------#
-#           1.9 CLIENTS ON 1.8 SERVERS OPTIONS              #
+#         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #
 #----------------------------------------------------------#
 #
 # No collide options, these allow you to configure how collision works.
@@ -48,7 +48,7 @@ prevent-collision: true
 auto-team: true
 # When enabled if certain metadata can't be read we won't tell you about it
 suppress-metadata-errors: false
-# When enabled 1.9 will be able to block by using shields
+# When enabled 1.9 & 1.10 will be able to block by using shields
 shield-blocking: true
 # Should we enable our hologram patch?
 # If they're in the wrong place enable this
@@ -61,13 +61,13 @@ simulate-pt: true
 nms-player-ticking: true
 # Should we patch boss bars so they work? (Default: true, disable if you're having issues)
 bossbar-patch: true
-# If your boss bar flickers on 1.9, set this to 'true'. It will keep all boss bars on 100% (not recommended)
+# If your boss bar flickers on 1.9 & 1.10, set this to 'true'. It will keep all boss bars on 100% (not recommended)
 bossbar-anti-flicker: false
-# This will show the new effect indicator in the top-right corner for 1.9 players.
+# This will show the new effect indicator in the top-right corner for 1.9 & 1.10 players.
 use-new-effect-indicator: true
-# Show the new death messages for 1.9 on the death screen
+# Show the new death messages for 1.9 & 1.10 on the death screen
 use-new-deathmessages: false
 # Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
 item-cache: true
-# Patch the Anti xray to work on 1.9 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
+# Patch the Anti xray to work on 1.9 & 1.10 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
 anti-xray-patch: true
