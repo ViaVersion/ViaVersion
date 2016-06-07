@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion</artifactId>
-    <version>1.10-pre1-DEV</version>
+    <version>1.10-pre2-DEV</version>
     <packaging>jar</packaging>
 
     <name>ViaVersion</name>
