@@ -10,14 +10,14 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetaListSnapshotType;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetaSnapshotType;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetaList1_10Type;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.Meta1_10Type;
 
 import java.util.List;
 
 public class Protocol1_10To1_9_3_4 extends Protocol {
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaListSnapshotType();
-    public static final Type<Metadata> METADATA = new MetaSnapshotType();
+    public static final Type<List<Metadata>> METADATA_LIST = new MetaList1_10Type();
+    public static final Type<Metadata> METADATA = new Meta1_10Type();
     public static ValueTransformer<Short, Float> toNewPitch = new ValueTransformer<Short, Float>(Type.FLOAT) {
         @Override
         public Float transform(PacketWrapper wrapper, Short inputValue) throws Exception {

@@ -10,7 +10,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaListSnapshotType extends MetaListTypeTemplate {
+public class MetaList1_10Type extends MetaListTypeTemplate {
 
     @Override
     public List<Metadata> read(ByteBuf buffer) throws Exception {
