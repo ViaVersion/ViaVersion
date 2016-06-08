@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.ViaVersionAPI;
-import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
@@ -27,11 +27,9 @@ import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
-import us.myles.ViaVersion.util.Configuration;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -40,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVersionConfig {
+public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
     private List<ChannelFuture> injectedFutures = new ArrayList<>();
@@ -50,12 +48,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     private boolean compatSpigotBuild = false;
     private boolean spigot = true;
     private boolean lateBind = false;
+    @Getter
+    private ViaConfig conf;
 
     @Override
     public void onLoad() {
-        ViaVersion.setInstance(this);
         // Config magic
-        generateConfig();
+        conf = new ViaConfig(this);
+        ViaVersion.setInstance(this);
         // Handle reloads
         if (System.getProperty("ViaVersion") != null) {
             if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
@@ -94,7 +94,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
     public void onEnable() {
         if (lateBind)
             injectPacketHandler();
-        if (isCheckForUpdates())
+        if (conf.isCheckForUpdates())
             UpdateUtil.sendUpdateMessage(this);
         // Gather version :)
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -122,7 +122,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         ProtocolRegistry.registerListeners();
 
         // Warn them if they have anti-xray on and they aren't using spigot
-        if (isAntiXRay() && !spigot) {
+        if (conf.isAntiXRay() && !spigot) {
             getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
         }
     }
@@ -177,28 +177,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         } catch (Exception e) {
             e.printStackTrace();
             // We couldn't work it out... We'll just use ping and hope for the best...
-        }
-    }
-
-    public void generateConfig() {
-        File file = new File(getDataFolder(), "config.yml");
-        if (file.exists()) {
-            // Update config options
-            Configuration oldConfig = new Configuration(file);
-            oldConfig.reload(false); // Load current options from config
-            file.delete(); // Delete old config
-            saveDefaultConfig(); // Generate new config
-            Configuration newConfig = new Configuration(file);
-            newConfig.reload(true); // Load default options
-            for (String key : oldConfig.getKeys(false)) {
-                // Set option in new config if exists
-                if (newConfig.contains(key)) {
-                    newConfig.set(key, oldConfig.get(key));
-                }
-            }
-            newConfig.save();
-        } else {
-            saveDefaultConfig();
         }
     }
 
@@ -430,100 +408,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
         return this.spigot;
     }
 
-    public boolean isCheckForUpdates() {
-        return getConfig().getBoolean("checkforupdates", true);
-    }
-
-    public boolean isPreventCollision() {
-        return getConfig().getBoolean("prevent-collision", true);
-    }
-
-    public boolean isNewEffectIndicator() {
-        return getConfig().getBoolean("use-new-effect-indicator", true);
-    }
-
-    @Override
-    public boolean isShowNewDeathMessages() {
-        return getConfig().getBoolean("use-new-deathmessages", false);
-    }
-
-    public boolean isSuppressMetadataErrors() {
-        return getConfig().getBoolean("suppress-metadata-errors", false);
-    }
-
-    public boolean isShieldBlocking() {
-        return getConfig().getBoolean("shield-blocking", true);
-    }
-
-    public boolean isHologramPatch() {
-        return getConfig().getBoolean("hologram-patch", false);
-    }
-
-    public boolean isBossbarPatch() {
-        return getConfig().getBoolean("bossbar-patch", true);
-    }
-
-    public boolean isBossbarAntiflicker() {
-        return getConfig().getBoolean("bossbar-anti-flicker", false);
-    }
-
-    public boolean isUnknownEntitiesSuppressed() {
-        return false;
-    }
-
-    public double getHologramYOffset() {
-        return getConfig().getDouble("hologram-y", -1D);
-    }
-
-    public boolean isBlockBreakPatch() {
-        return false;
-    }
-
-    @Override
-    public int getMaxPPS() {
-        return getConfig().getInt("max-pps", 140);
-    }
-
-    @Override
-    public String getMaxPPSKickMessage() {
-        return getConfig().getString("max-pps-kick-msg", "Sending packets too fast? lag?");
-    }
-
-    @Override
-    public int getTrackingPeriod() {
-        return getConfig().getInt("tracking-period", 6);
-    }
-
-    @Override
-    public int getWarningPPS() {
-        return getConfig().getInt("tracking-warning-pps", 120);
-    }
-
-    @Override
-    public int getMaxWarnings() {
-        return getConfig().getInt("tracking-max-warnings", 3);
-    }
-
-    @Override
-    public String getMaxWarningsKickMessage() {
-        return getConfig().getString("tracking-max-kick-msg", "You are sending too many packets, :(");
-    }
-
-    @Override
-    public boolean isAntiXRay() {
-        return getConfig().getBoolean("anti-xray-patch", true);
-    }
-
-    @Override
-    public boolean isSendSupportedVersions() {
-        return getConfig().getBoolean("send-supported-versions", false);
-    }
-
-    public boolean isAutoTeam() {
-        // Collision has to be enabled first
-        return isPreventCollision() && getConfig().getBoolean("auto-team", true);
-    }
-
     public void addPortedClient(UserConnection info) {
         portedPlayers.put(info.get(ProtocolInfo.class).getUuid(), info);
     }
@@ -557,27 +441,27 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI, ViaVe
 
     public boolean handlePPS(UserConnection info) {
         // Max PPS Checker
-        if (getMaxPPS() > 0) {
-            if (info.getPacketsPerSecond() >= getMaxPPS()) {
-                info.disconnect(getMaxPPSKickMessage());
+        if (conf.getMaxPPS() > 0) {
+            if (info.getPacketsPerSecond() >= conf.getMaxPPS()) {
+                info.disconnect(conf.getMaxPPSKickMessage());
                 return true; // don't send current packet
             }
         }
 
         // Tracking PPS Checker
-        if (getMaxWarnings() > 0 && getTrackingPeriod() > 0) {
-            if (info.getSecondsObserved() > getTrackingPeriod()) {
+        if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
+            if (info.getSecondsObserved() > conf.getTrackingPeriod()) {
                 // Reset
                 info.setWarnings(0);
                 info.setSecondsObserved(1);
             } else {
                 info.setSecondsObserved(info.getSecondsObserved() + 1);
-                if (info.getPacketsPerSecond() >= getWarningPPS()) {
+                if (info.getPacketsPerSecond() >= conf.getWarningPPS()) {
                     info.setWarnings(info.getWarnings() + 1);
                 }
 
-                if (info.getWarnings() >= getMaxWarnings()) {
-                    info.disconnect(getMaxWarningsKickMessage());
+                if (info.getWarnings() >= conf.getMaxWarnings()) {
+                    info.disconnect(conf.getMaxWarningsKickMessage());
                     return true; // don't send current packet
                 }
             }
