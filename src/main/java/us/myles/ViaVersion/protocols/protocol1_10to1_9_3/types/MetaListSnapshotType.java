@@ -1,11 +1,11 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3.types;
+package us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3.ProtocolSnapshotTo1_9_3_4;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class MetaListSnapshotType extends MetaListTypeTemplate {
         List<Metadata> list = new ArrayList<>();
         Metadata meta;
         do {
-            meta = ProtocolSnapshotTo1_9_3_4.METADATA.read(buffer);
+            meta = Protocol1_10To1_9_3_4.METADATA.read(buffer);
             if (meta != null)
                 list.add(meta);
         } while (meta != null);
@@ -31,11 +31,11 @@ public class MetaListSnapshotType extends MetaListTypeTemplate {
             if (m.getId() >= 5)
                 m.setId(m.getId() + 1);
             if (m.getId() == 4)
-                ProtocolSnapshotTo1_9_3_4.METADATA.write(buffer, new Metadata(5, NewType.Boolean.getTypeID(), Type.BOOLEAN, false)); // No gravity metadata
-            ProtocolSnapshotTo1_9_3_4.METADATA.write(buffer, m);
+                Protocol1_10To1_9_3_4.METADATA.write(buffer, new Metadata(5, NewType.Boolean.getTypeID(), Type.BOOLEAN, false)); // No gravity metadata
+            Protocol1_10To1_9_3_4.METADATA.write(buffer, m);
         }
 
         // Write end of list
-        ProtocolSnapshotTo1_9_3_4.METADATA.write(buffer, null);
+        Protocol1_10To1_9_3_4.METADATA.write(buffer, null);
     }
 }

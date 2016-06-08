@@ -5,12 +5,12 @@ import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2TO1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3TO1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9TO1_9_1;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3.ProtocolSnapshotTo1_9_3_4;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +34,7 @@ public class ProtocolRegistry {
         // Only supported for 1.9.4 server to 1.9 (nothing else)
         registerProtocol(new Protocol1_9TO1_9_1(), Arrays.asList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_9_2.getId());
         registerProtocol(new Protocol1_9_1_2TO1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
-        registerProtocol(new ProtocolSnapshotTo1_9_3_4(), Collections.singletonList(ProtocolVersion.SNAPSHOT.getId()), ProtocolVersion.v1_9_3.getId());
+        registerProtocol(new Protocol1_10To1_9_3_4(), Collections.singletonList(ProtocolVersion.SNAPSHOT.getId()), ProtocolVersion.v1_9_3.getId());
 
     }
 

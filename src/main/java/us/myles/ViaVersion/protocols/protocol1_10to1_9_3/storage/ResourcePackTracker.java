@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_9_3.storage;
+package us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage;
 
 import lombok.Getter;
 import lombok.Setter;
