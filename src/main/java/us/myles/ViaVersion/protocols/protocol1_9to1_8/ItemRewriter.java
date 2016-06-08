@@ -248,13 +248,14 @@ public class ItemRewriter {
         if(cached != null) {
             return cached;
         }
+        if(damage == 0) {
+            return "water";
+        }
 
         int effect = damage & 0xF;
         int name = damage & 0x3F;
         boolean enhanced = (damage & 0x20) > 0;
         boolean extended = (damage & 0x40) > 0;
-        boolean drinkable = (damage & 0x2000) > 0;
-        //boolean splash = (damage & 0x4000) > 0;
 
         boolean canEnhance = true;
         boolean canExtend = true;
@@ -278,16 +279,12 @@ public class ItemRewriter {
 
 
             default:
+                canEnhance = false; canExtend = false;
                 switch (name) {
+                    case 0: id="mundane"; break;
                     case 16: id="awkward"; break;
                     case 32: id="thick"; break;
-                    default:
-                        if(drinkable) {
-                            id = "mundane";
-                        }
-                        else {
-                            id = "water";
-                        }
+                    default: id="empty";
                 }
         }
 
@@ -298,9 +295,6 @@ public class ItemRewriter {
             else if(canExtend && extended) {
                 id = "long_" + id;
             }
-
-            //if(splash)
-            //    potion.splash();
         }
 
         return id;
