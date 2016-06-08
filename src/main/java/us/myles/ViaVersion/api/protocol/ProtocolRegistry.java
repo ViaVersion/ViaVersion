@@ -34,7 +34,7 @@ public class ProtocolRegistry {
         // Only supported for 1.9.4 server to 1.9 (nothing else)
         registerProtocol(new Protocol1_9TO1_9_1(), Arrays.asList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_9_2.getId());
         registerProtocol(new Protocol1_9_1_2TO1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
-        registerProtocol(new Protocol1_10To1_9_3_4(), Collections.singletonList(ProtocolVersion.SNAPSHOT.getId()), ProtocolVersion.v1_9_3.getId());
+        registerProtocol(new Protocol1_10To1_9_3_4(), Collections.singletonList(ProtocolVersion.v1_10.getId()), ProtocolVersion.v1_9_3.getId());
 
     }
 
