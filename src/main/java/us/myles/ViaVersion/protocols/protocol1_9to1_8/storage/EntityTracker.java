@@ -143,6 +143,13 @@ public class EntityTracker extends StoredObject {
                 }
             }
 
+            //ECHOPET Patch
+            if (type == EntityType.HORSE) {
+                // Wrong metadata value from EchoPet, patch since it's discontinued. (https://github.com/DSH105/EchoPet/blob/06947a8b08ce40be9a518c2982af494b3b99d140/modules/API/src/main/java/com/dsh105/echopet/compat/api/entity/HorseArmour.java#L22)
+                if (metadata.getId() == 16 && (int) metadata.getValue() == Integer.MIN_VALUE)
+                    metadata.setValue(0);
+            }
+
             if (type == EntityType.PLAYER) {
                 if (metadata.getId() == 0) {
                     // Byte
