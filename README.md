@@ -1,4 +1,4 @@
-# ViaVersion 0.8.4
+# ViaVersion 0.9.2
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 

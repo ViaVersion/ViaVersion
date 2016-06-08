@@ -12,6 +12,8 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
@@ -104,8 +106,8 @@ public class SpawnPackets {
                                     List<Metadata> meta = new ArrayList<>();
                                     Item item = new Item((short) Material.POTION.getId(), (byte) 1, (short) data, null);
                                     ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
-
-                                    Metadata potion = new Metadata(5, NewType.Slot.getTypeID(), Type.ITEM, item);
+                                    // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
+                                    Metadata potion = new Metadata(wrapper.user().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) ? 6 : 5, NewType.Slot.getTypeID(), Type.ITEM, item);
                                     meta.add(potion);
                                     wrapper.write(Protocol1_9TO1_8.METADATA_LIST, meta);
                                 }
