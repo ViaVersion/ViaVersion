@@ -6,10 +6,7 @@
 **Direct download link:** [Latest builds](https://ci.viaversion.com/job/ViaVersion%201.10%20DEV/)
 
 **Allows the connection of 1.9 clients to 1.8**
-
-This plugin modifies netty to allow connection of 1.9 clients to 1.8,
-
-###*Don't use late bind*
+**1.10 clients on 1.8 / 1.9 servers**
 
 This took 100s hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
 
