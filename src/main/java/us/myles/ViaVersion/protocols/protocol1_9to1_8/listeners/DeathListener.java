@@ -55,7 +55,7 @@ public class DeathListener implements Listener {
                     wrapper.write(Type.VAR_INT, p.getEntityId());
                     wrapper.write(Type.INT, p.getEntityId());
                     Protocol1_9TO1_8.FIX_JSON.write(wrapper, msg);
-                    wrapper.send();
+                    wrapper.send(Protocol1_9TO1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                     wrapper.clearInputBuffer();

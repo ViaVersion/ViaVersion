@@ -3,18 +3,24 @@ package us.myles.ViaVersion.api;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.TypeConverter;
 import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.handlers.ViaDecodeHandler;
+import us.myles.ViaVersion.packets.Direction;
+import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -250,10 +256,44 @@ public class PacketWrapper {
      * Be careful not to send packets twice.
      * (Sends it after current)
      *
+     * @param packetProtocol - The protocol version of the packet.
      * @throws Exception if it fails to write
      */
+    public void send(Class<? extends Protocol> packetProtocol) throws Exception {
+        if (!isCancelled()) {
+            // Apply current pipeline
+            List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
+            // Other way if outgoing
+            Collections.reverse(protocols);
+            int index = 0;
+            for (int i = 0; i < protocols.size(); i++) {
+                if (protocols.get(i).getClass().equals(packetProtocol)) {
+                    index = i + 1;
+                    break;
+                }
+            }
+            // Apply other protocols
+            apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
+            // Send
+            ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+            writeToBuffer(output);
+            user().sendRawPacket(output);
+        }
+    }
+
+    /**
+     * Send this packet to the associated user.
+     * Be careful not to send packets twice.
+     * (Sends it after current)
+     * <br />
+     * <b>This method is no longer used, it's favoured to use send(Protocol) as it will handle the pipeline properly.</b>
+     *
+     * @throws Exception if it fails to write
+     */
+    @Deprecated
     public void send() throws Exception {
         if (!isCancelled()) {
+            // Send
             ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
             writeToBuffer(output);
             user().sendRawPacket(output);
@@ -282,6 +322,26 @@ public class PacketWrapper {
         PacketWrapper wrapper = create(packetID);
         init.write(wrapper);
         return wrapper;
+    }
+
+    /**
+     * Applies a pipeline from an index to the wrapper
+     *
+     * @param direction The direction
+     * @param state     The state
+     * @param index     The index to start from
+     * @param pipeline  The pipeline
+     * @return The current packetwrapper
+     * @throws Exception
+     */
+    public PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
+        for (int i = index; i < pipeline.size(); i++) { // Copy to prevent from removal.
+            pipeline.get(i).transform(direction, state, this);
+            // Reset the reader for the packetWrapper (So it can be recycled across packets)
+            resetReader();
+        }
+
+        return this;
     }
 
     /**

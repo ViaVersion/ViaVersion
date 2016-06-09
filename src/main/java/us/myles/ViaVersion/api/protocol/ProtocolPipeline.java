@@ -69,11 +69,9 @@ public class ProtocolPipeline extends Protocol {
         if (direction == Direction.OUTGOING)
             Collections.reverse(protocols);
 
-        for (Protocol protocol : protocols) { // Copy to prevent from removal.
-            protocol.transform(direction, state, packetWrapper);
-            // Reset the reader for the packetWrapper (So it can be recycled across packets)
-            packetWrapper.resetReader();
-        }
+        // Apply protocols
+        packetWrapper.apply(direction, state, 0, protocols);
+
         super.transform(direction, state, packetWrapper);
 
         if (ViaVersion.getInstance().isDebug()) {

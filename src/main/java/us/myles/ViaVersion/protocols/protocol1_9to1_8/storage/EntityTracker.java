@@ -77,7 +77,7 @@ public class EntityTracker extends StoredObject {
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, item);
         try {
-            wrapper.send();
+            wrapper.send(Protocol1_9TO1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -258,7 +258,7 @@ public class EntityTracker extends StoredObject {
         }
         teamExists = b;
         try {
-            wrapper.send();
+            wrapper.send(Protocol1_9TO1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -281,7 +281,7 @@ public class EntityTracker extends StoredObject {
             handleMetadata(entityID, metadataBuffer.get(entityID));
             if (metadataBuffer.get(entityID).size() > 0) {
                 try {
-                    wrapper.send();
+                    wrapper.send(Protocol1_9TO1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

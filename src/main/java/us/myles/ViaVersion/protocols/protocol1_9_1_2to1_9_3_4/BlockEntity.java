@@ -75,7 +75,7 @@ public class BlockEntity {
         wrapper.write(Type.POSITION, pos);
         wrapper.write(Type.UNSIGNED_BYTE, id);
         wrapper.write(Type.NBT, tag);
-        wrapper.send();
+        wrapper.send(Protocol1_9_1_2TO1_9_3_4.class);
     }
 
     private static void updateSign(Position pos, String[] lines, UserConnection connection) throws Exception {
@@ -83,6 +83,6 @@ public class BlockEntity {
         wrapper.write(Type.POSITION, pos);
         for (String s : lines)
             wrapper.write(Type.STRING, s);
-        wrapper.send();
+        wrapper.send(Protocol1_9_1_2TO1_9_3_4.class);
     }
 }

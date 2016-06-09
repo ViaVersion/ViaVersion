@@ -57,7 +57,7 @@ public class EntityPackets {
                                 passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{passenger});
                                 tracker.getVehicleMap().put(passenger, vehicle);
                             }
-                            passengerPacket.send(); // Send the packet
+                            passengerPacket.send(Protocol1_9TO1_8.class); // Send the packet
                         }
                         return null;
                     }
