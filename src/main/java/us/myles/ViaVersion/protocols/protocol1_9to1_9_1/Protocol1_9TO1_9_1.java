@@ -38,7 +38,7 @@ public class Protocol1_9TO1_9_1 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int sound = wrapper.get(Type.VAR_INT, 0);
 
-                        if (sound == 415) // Stop the Elytra sound for 1.9 (It's introduced in 1.10)
+                        if (sound == 415) // Stop the Elytra sound for 1.9 (It's introduced in 1.9.2)
                             wrapper.cancel();
                         else if (sound >= 416) // Act like the Elytra sound never existed
                             wrapper.set(Type.VAR_INT, 0, sound - 1);
