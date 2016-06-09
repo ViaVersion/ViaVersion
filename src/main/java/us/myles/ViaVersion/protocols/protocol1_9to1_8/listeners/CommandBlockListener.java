@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -80,12 +81,12 @@ public class CommandBlockListener implements Listener {
             if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
 
             try {
-                ByteBuf buf = Unpooled.buffer();
-                Type.VAR_INT.write(buf, 0x1B); // Entity Status
-                buf.writeInt(p.getEntityId());
-                buf.writeByte(26);
-                plugin.sendRawPacket(p, buf);
-            } catch (Exception ignored) {
+                PacketWrapper wrapper = new PacketWrapper(0x1B, null, userConnection); // Entity status
+                wrapper.write(Type.INT, p.getEntityId());
+                wrapper.write(Type.BYTE, (byte) 26); //Hardcoded op permission level
+                wrapper.send(Protocol1_9TO1_8.class);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -97,26 +98,32 @@ public class CommandBlockListener implements Listener {
 
         Object tileEntityCommand = ReflectionUtil.get(cmd, "commandBlock", ReflectionUtil.nms("TileEntityCommand"));
         Object updatePacket = ReflectionUtil.invoke(tileEntityCommand, "getUpdatePacket");
-        ByteBuf buf = packetToByteBuf(updatePacket);
-        plugin.sendRawPacket(player, buf);
+
+        UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(player);
+
+        PacketWrapper wrapper = generatePacket(updatePacket, userConnection);
+        wrapper.send(Protocol1_9TO1_8.class);
     }
 
-    private ByteBuf packetToByteBuf(Object updatePacket) throws Exception {
-        ByteBuf buf = Unpooled.buffer();
-        Type.VAR_INT.write(buf, 0x09); //Block Entity Packet ID
+    private PacketWrapper generatePacket(Object updatePacket, UserConnection usr) throws Exception {
+        PacketWrapper wrapper = new PacketWrapper(0x09, null, usr); // Update block entity
+
         long[] pos = getPosition(ReflectionUtil.get(updatePacket, "a", ReflectionUtil.nms("BlockPosition")));
-        Type.POSITION.write(buf, new Position(pos[0], pos[1], pos[2])); //Block position
-        buf.writeByte(2); //Action id always 2
+
+        wrapper.write(Type.POSITION, new Position(pos[0], pos[1], pos[2])); //Block position
+        wrapper.write(Type.BYTE, (byte) 2); // Action id always 2
+
         CompoundTag nbt = getNBT(ReflectionUtil.get(updatePacket, "c", ReflectionUtil.nms("NBTTagCompound")));
         if (nbt == null) {
-            buf.writeByte(0); //If nbt is null. Use 0 as nbt
-            return buf;
+            wrapper.write(Type.BYTE, (byte) 0); //If nbt is null. Use 0 as nbt
+            return wrapper;
         }
         nbt.put(new ByteTag("powered", (byte) 0));
         nbt.put(new ByteTag("auto", (byte) 0));
         nbt.put(new ByteTag("conditionMet", (byte) 0));
-        Type.NBT.write(buf, nbt); //NBT tag
-        return buf;
+
+        wrapper.write(Type.NBT, nbt); // NBT TAG
+        return wrapper;
     }
 
     private long[] getPosition(Object obj) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
