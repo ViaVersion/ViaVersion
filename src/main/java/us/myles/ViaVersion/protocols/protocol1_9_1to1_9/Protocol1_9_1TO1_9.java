@@ -40,8 +40,6 @@ public class Protocol1_9_1TO1_9 extends Protocol {
 
                         if (sound >= 415) // Add 1 to every sound id since there is no Elytra sound on a 1.9 server
                             wrapper.set(Type.VAR_INT, 0, sound + 1);
-
-                        wrapper.passthrough(Type.REMAINING_BYTES);
                     }
                 });
             }

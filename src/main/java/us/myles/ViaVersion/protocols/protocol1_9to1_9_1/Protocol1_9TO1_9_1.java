@@ -42,8 +42,6 @@ public class Protocol1_9TO1_9_1 extends Protocol {
                             wrapper.cancel();
                         else if (sound >= 416) // Act like the Elytra sound never existed
                             wrapper.set(Type.VAR_INT, 0, sound - 1);
-
-                        wrapper.passthrough(Type.REMAINING_BYTES); // Passthrough everything else
                     }
                 });
             }
