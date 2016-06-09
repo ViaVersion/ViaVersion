@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -17,9 +15,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
@@ -40,24 +38,21 @@ public class ArmorListener implements Listener {
         if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
 
         int armor = ArmorType.calculateArmorPoints(player.getInventory().getArmorContents());
-        int protocol = userConnection.get(ProtocolInfo.class).getProtocolVersion();
-        ByteBuf buf = Unpooled.buffer();
+
+        PacketWrapper wrapper = new PacketWrapper(0x4B, null, userConnection);
         try {
+            wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
+            wrapper.write(Type.INT, 1); // only 1 property
+            wrapper.write(Type.STRING, "generic.armor");
+            wrapper.write(Type.DOUBLE, 0D); //default 0 armor
+            wrapper.write(Type.VAR_INT, 1); // 1 modifier
+            wrapper.write(Type.UUID, ARMOR_ATTRIBUTE); // armor modifier uuid
+            wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
+            wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 is add number
 
-            //TODO possibility to send packets by Protocol version, to let the transformer do the work
-            Type.VAR_INT.write(buf, (protocol >= ProtocolVersion.v1_9_3.getId()) ? 0x4A : 0x4B); // Entity Properties
-            Type.VAR_INT.write(buf, player.getEntityId());
-            buf.writeInt(1); // only 1 property
-            Type.STRING.write(buf, "generic.armor");
-            buf.writeDouble(0); //default 0 armor
-            Type.VAR_INT.write(buf, 1); // 1 modifier
-            Type.UUID.write(buf, ARMOR_ATTRIBUTE); // armor modifier uuid
-            buf.writeDouble((double) armor); // the modifier value
-            buf.writeByte(0); // the modifier operation, 0 is add number
-
-            ViaVersion.getInstance().sendRawPacket(player, buf);
-        } catch (Exception ignored) {
-            buf.release();
+            wrapper.send(Protocol1_9TO1_8.class);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
