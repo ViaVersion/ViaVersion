@@ -98,8 +98,8 @@ public class Protocol1_9TO1_8 extends Protocol {
         Bukkit.getPluginManager().registerEvents(new CommandBlockListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new DeathListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new BlockListener(plugin), plugin);
-        if (Bukkit.getVersion().toLowerCase().contains("paper")) {
-            plugin.getLogger().info("Enabling PaperSpigot patch: Fixes block placement.");
+        if (Bukkit.getVersion().toLowerCase().contains("paper") || Bukkit.getVersion().toLowerCase().contains("taco")) {
+            plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot patch: Fixes block placement.");
             Bukkit.getPluginManager().registerEvents(new PaperPatch(), plugin);
         }
         if (plugin.getConf().isStimulatePlayerTick())
