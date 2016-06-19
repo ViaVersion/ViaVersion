@@ -59,7 +59,7 @@ public abstract class ViaSubCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         return Collections.emptyList();
     }
-    
+
     public String color(String s) {
         return ViaCommandHandler.color(s);
     }

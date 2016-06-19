@@ -3,7 +3,6 @@ package us.myles.ViaVersion.api;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.data.UserConnection;

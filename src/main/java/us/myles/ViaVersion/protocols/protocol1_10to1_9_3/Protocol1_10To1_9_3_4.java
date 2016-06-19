@@ -10,8 +10,8 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetaList1_10Type;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.Meta1_10Type;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetaList1_10Type;
 
 import java.util.List;
 

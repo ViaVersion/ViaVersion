@@ -63,7 +63,7 @@ public class BlockEntity {
                     updateSign(pos, lines, connection);
                 }
             } catch (Exception e) {
-                if(ViaVersion.getInstance().isDebug()) {
+                if (ViaVersion.getInstance().isDebug()) {
                     System.out.println("Block Entity: " + e.getMessage() + ": " + tag);
                 }
             }
