@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Pair;
@@ -29,6 +28,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.ListWrapper;
+import us.myles.ViaVersion.util.ProtocolSupportUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -338,15 +338,23 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public int getPlayerVersion(@NonNull Player player) {
         if (!isPorted(player))
-            return ProtocolRegistry.SERVER_PROTOCOL;
+            return getExternalVersion(player);
         return portedPlayers.get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
     public int getPlayerVersion(@NonNull UUID uuid) {
         if (!isPorted(uuid))
-            return ProtocolRegistry.SERVER_PROTOCOL;
+            return getExternalVersion(Bukkit.getPlayer(uuid));
         return portedPlayers.get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+    }
+
+    private int getExternalVersion(Player player) {
+        if (!isProtocolSupport()) {
+            return ProtocolRegistry.SERVER_PROTOCOL;
+        } else {
+            return ProtocolSupportUtil.getProtocolVersion(player);
+        }
     }
 
     @Override
