@@ -19,6 +19,7 @@ import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 
 import java.util.List;
@@ -169,5 +170,16 @@ public class BaseProtocol extends Protocol {
                 plugin.removePortedClient(e.getPlayer().getUniqueId());
             }
         }, plugin);
+    }
+
+    @Override
+    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+        super.transform(direction, state, packetWrapper);
+        if (direction == Direction.INCOMING && state == State.HANDSHAKE) {
+            // Disable if it isn't a handshake packet.
+            if (packetWrapper.getId() > 0) {
+                packetWrapper.user().setActive(false);
+            }
+        }
     }
 }
