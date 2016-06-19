@@ -125,4 +125,11 @@ public interface ViaVersionAPI {
      * @return True if spigot
      */
     boolean isSpigot();
+
+    /**
+     * Gets if protocol support is also being used.
+     *
+     * @return True if it is being used.
+     */
+    boolean isProtocolSupport();
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Pair;
@@ -48,6 +49,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     private boolean compatSpigotBuild = false;
     private boolean spigot = true;
     private boolean lateBind = false;
+    private boolean protocolSupport = false;
     @Getter
     private ViaConfig conf;
 
@@ -56,6 +58,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         // Config magic
         conf = new ViaConfig(this);
         ViaVersion.setInstance(this);
+
         // Handle reloads
         if (System.getProperty("ViaVersion") != null) {
             if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
@@ -69,19 +72,25 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
             }
         }
+
         // Spigot detector
         try {
             Class.forName("org.spigotmc.SpigotConfig");
         } catch (ClassNotFoundException e) {
             spigot = false;
         }
+
         // Check if it's a spigot build with a protocol mod
         try {
             compatSpigotBuild = ReflectionUtil.nms("PacketEncoder").getDeclaredField("version") != null;
         } catch (Exception e) {
             compatSpigotBuild = false;
         }
-        // Generate classes needed (only works if it's compat)
+
+        // Check if we're using protocol support too
+        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+
+        // Generate classes needed (only works if it's compat or ps)
         ClassGenerator.generate();
         lateBind = !isBinded();
 
@@ -433,6 +442,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             if (ViaVersion.getInstance().isDebug())
                 e.printStackTrace();
         }
+    }
+
+    public boolean isProtocolSupport() {
+        return protocolSupport;
     }
 
     public Map<UUID, UserConnection> getPortedPlayers() {

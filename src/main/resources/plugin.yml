@@ -4,6 +4,7 @@ author: _MylesC
 version: ${project.version}
 load: postworld
 loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, PacketListenerApi, SkinRestorer]
+softdepend: [ProtocolSupport]
 commands:
   viaversion:
     description: Shows ViaVersion Version and more.
