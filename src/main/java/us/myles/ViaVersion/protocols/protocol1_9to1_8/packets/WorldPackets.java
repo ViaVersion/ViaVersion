@@ -283,46 +283,6 @@ public class WorldPackets {
                         wrapper.write(Type.BYTE, (byte) 0);
                     }
                 });
-                /*
-
-                The thing i've discovered is when using an item in air, it needs to send 2 packets.
-                I believe the issue is that this needs to be flipped with the packet above while still
-                sending block info.
-
-                Otherwise no idea, the disadvantage: Interact does not get fired if you right click
-                special items. (there's quite a few...)
-
-                 */
-//                handler(new PacketHandler() {
-//                    @Override
-//                    public void handle(PacketWrapper wrapper) throws Exception {
-//                        if(wrapper.isCancelled()) return;
-//                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-//                        if(tracker.isBlocking()) return;
-//
-//                        Long last = tracker.getLastPlaceBlock();
-//                        if (last != -1) {
-//                            if ((wrapper.user().getReceivedPackets() - last) < 3) {
-//                                tracker.setLastPlaceBlock(-1L);
-//                                return;
-//                            }
-//                            tracker.setLastPlaceBlock(-1L);
-//                        }
-//                        final Item item = wrapper.get(Type.ITEM, 0);
-//                        wrapper.create(0x08, new ValueCreator() {
-//                            @Override
-//                            public void write(PacketWrapper wrapper) throws Exception {
-//                                wrapper.write(Type.POSITION, new Position(1L, 1L, 1L));
-//                                wrapper.write(Type.BYTE, (byte) 2);
-//                                wrapper.write(Type.ITEM, item); // hand
-//
-//                                wrapper.write(Type.UNSIGNED_BYTE, (short) 1);
-//                                wrapper.write(Type.UNSIGNED_BYTE, (short) 1);
-//                                wrapper.write(Type.UNSIGNED_BYTE, (short) 1);
-//                            }
-//                        }).sendToServer();
-//                    }
-//                });
 
             }
         });

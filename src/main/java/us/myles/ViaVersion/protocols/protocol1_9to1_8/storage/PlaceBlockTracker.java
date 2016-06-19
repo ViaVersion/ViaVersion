@@ -8,7 +8,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 
 @Getter
 public class PlaceBlockTracker extends StoredObject {
-    private long lastPlaceTimestamp = System.currentTimeMillis();
+    private long lastPlaceTimestamp = 0;
     @Setter
     private Position lastPlacedPosition = null;
 
