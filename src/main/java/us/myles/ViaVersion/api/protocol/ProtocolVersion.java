@@ -1,13 +1,16 @@
 package us.myles.ViaVersion.api.protocol;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
 
-@Data
+@AllArgsConstructor
+@Getter
 public class ProtocolVersion {
     private static final Map<Integer, ProtocolVersion> versions = new HashMap<>();
+    private static final List<ProtocolVersion> versionList = new ArrayList<>();
 
     public static final ProtocolVersion v1_4_6;
     public static final ProtocolVersion v1_5_1;
@@ -52,6 +55,7 @@ public class ProtocolVersion {
 
     public static void register(@NonNull ProtocolVersion protocol) {
         versions.put(protocol.getId(), protocol);
+        versionList.add(protocol);
     }
 
     public static boolean isRegistered(int id) {
@@ -66,7 +70,25 @@ public class ProtocolVersion {
         }
     }
 
+    public static int getIndex(ProtocolVersion version) {
+        return versionList.indexOf(version);
+    }
+
     public static List<ProtocolVersion> getProtocols() {
         return Collections.unmodifiableList(new ArrayList<>(versions.values()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProtocolVersion that = (ProtocolVersion) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }
