@@ -27,7 +27,7 @@ public class FakeTileEntity {
         register(Arrays.asList(Material.SIGN_POST, Material.WALL_SIGN), "Sign");
         register(Material.MOB_SPAWNER, "MobSpawner");
         register(Material.NOTE_BLOCK, "Music");
-        register(Material.PISTON_BASE, "Piston");
+        register(Arrays.asList(Material.PISTON_BASE, Material.PISTON_EXTENSION, Material.PISTON_STICKY_BASE, Material.PISTON_MOVING_PIECE), "Piston");
         register(Arrays.asList(Material.BREWING_STAND, Material.CAULDRON), "Cauldron");
         register(Material.ENCHANTMENT_TABLE, "EnchantTable");
         register(Arrays.asList(Material.ENDER_PORTAL, Material.ENDER_PORTAL_FRAME), "Airportal");
