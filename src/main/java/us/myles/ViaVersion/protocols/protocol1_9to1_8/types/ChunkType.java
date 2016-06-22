@@ -179,7 +179,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
             output.writeBytes(chunk.getBiomeData());
         }
 
-        Type.NBT_ARRAY.write(buf, tags);
+        Type.NBT_ARRAY.write(output, tags.toArray(new CompoundTag[0]));
     }
 
 

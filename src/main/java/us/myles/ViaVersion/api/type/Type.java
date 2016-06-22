@@ -60,7 +60,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<CompoundTag> NBT = new NBTType();
-    public static final Type<List<CompoundTag>> NBT_ARRAY = new NBTArrayType();
+    public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
 
     public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
     public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
