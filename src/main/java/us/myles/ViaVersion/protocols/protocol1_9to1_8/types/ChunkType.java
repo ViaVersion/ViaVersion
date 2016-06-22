@@ -3,10 +3,13 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.bukkit.Bukkit;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -46,6 +49,9 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
     @Override
     public Chunk read(ByteBuf input, ClientChunks param) throws Exception {
+        boolean replacePistons = param.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && ViaVersion.getConfig().isReplacePistons();
+        int replacementId = ViaVersion.getConfig().getPistonReplacementId();
+
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
         long chunkHash = toLong(chunkX, chunkZ);
@@ -93,7 +99,8 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
                 int mask = blockBuf.get();
                 int type = mask >> 4;
                 int data = mask & 0xF;
-
+                if (replacePistons && type == 36)
+                    type = replacementId;
                 section.setBlock(j, type, data);
             }
         }

@@ -71,3 +71,7 @@ use-new-deathmessages: false
 item-cache: true
 # Patch the Anti xray to work on 1.9 & 1.10 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
 anti-xray-patch: true
+# Should we replace extended pistons to fix 1.10.1 (Only on chunk load)
+replace-pistons: false
+# What id should we replace with, default is air. (careful of players getting stuck standing on them)
+replacement-piston-id: 0

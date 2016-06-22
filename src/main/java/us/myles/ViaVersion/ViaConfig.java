@@ -150,6 +150,16 @@ public class ViaConfig implements ViaVersionConfig {
         return plugin.getConfig().getBoolean("nms-player-ticking", true);
     }
 
+    @Override
+    public boolean isReplacePistons() {
+        return plugin.getConfig().getBoolean("replace-pistons", false);
+    }
+
+    @Override
+    public int getPistonReplacementId() {
+        return plugin.getConfig().getInt("replacement-piston-id", 0);
+    }
+
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return isPreventCollision() && plugin.getConfig().getBoolean("auto-team", true);

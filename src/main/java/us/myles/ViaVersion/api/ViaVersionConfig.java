@@ -172,4 +172,18 @@ public interface ViaVersionConfig {
      * @return if true, enabled
      */
     boolean isNMSPlayerTicking();
+
+    /**
+     * Replace extended pistons on 1.10 chunk loading.
+     *
+     * @return True if to replace them
+     */
+    boolean isReplacePistons();
+
+    /**
+     * Get the id for replacing extended pistons.
+     *
+     * @return The integer id
+     */
+    int getPistonReplacementId();
 }
