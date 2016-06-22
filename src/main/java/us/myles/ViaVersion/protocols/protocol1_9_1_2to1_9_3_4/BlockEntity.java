@@ -45,7 +45,6 @@ public class BlockEntity {
                 if (newId == -1)
                     continue;
 
-
                 int x = (int) tag.get("x").getValue();
                 int y = (int) tag.get("y").getValue();
                 int z = (int) tag.get("z").getValue();
