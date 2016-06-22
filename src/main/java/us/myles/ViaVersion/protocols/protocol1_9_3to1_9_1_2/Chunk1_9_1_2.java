@@ -14,7 +14,8 @@ public class Chunk1_9_1_2 implements Chunk {
     private int z;
     private boolean groundUp;
     private int bitmask;
-    private byte[] sections;
+    private final ChunkSection1_9_1_2[] sections;
+    private final byte[] biomeData;
     List<CompoundTag> blockEntities;
 
 }

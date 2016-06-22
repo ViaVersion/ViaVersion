@@ -47,7 +47,7 @@ public class ChunkSection1_9to1_8 {
 
     public int getBlockId(int x, int y, int z){
         int index = blocks[index(x, y, z)];
-        return palette.indexOf(index) >> 4;
+        return palette.get(index) >> 4;
     }
 
     /**

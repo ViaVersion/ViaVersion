@@ -104,7 +104,7 @@ public class FakeTileEntity {
             tag.put(new IntTag("x", x));
             tag.put(new IntTag("y", y));
             tag.put(new IntTag("z", z));
-            System.out.println("Found tile entity " + block + " at position " + x + " " + y + " " + z);
+//            System.out.println("Found tile entity " + block + " at position " + x + " " + y + " " + z);
             return tag;
         }
         return null;

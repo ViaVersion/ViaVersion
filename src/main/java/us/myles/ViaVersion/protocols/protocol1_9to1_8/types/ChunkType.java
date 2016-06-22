@@ -97,6 +97,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
                 int mask = blockBuf.get();
                 int type = mask >> 4;
                 int data = mask & 0xF;
+
                 section.setBlock(j, type, data);
             }
         }
@@ -161,8 +162,10 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
                 for (int y = 0; y < 16; y++)
                     for (int z = 0; z < 16; z++) {
                         int block = section.getBlockId(x, y, z);
-                        if (FakeTileEntity.hasBlock(block))
-                            tags.add(FakeTileEntity.getFromBlock(x * chunk.getX(), y, z * chunk.getZ(), block));
+                        if (FakeTileEntity.hasBlock(block)) {
+                            // NOT SURE WHY Y AND Z WORK THIS WAY, TODO: WORK OUT WHY THIS IS OR FIX W/E BROKE IT
+                            tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), z + (i << 4), y + (chunk.getZ() << 4), block));
+                        }
                     }
 
             if (!section.hasSkyLight()) continue; // No sky light, we're done here.
