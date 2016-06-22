@@ -10,8 +10,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
 import us.myles.ViaVersion.api.type.types.minecraft.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -61,6 +60,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<CompoundTag> NBT = new NBTType();
+    public static final Type<List<CompoundTag>> NBT_ARRAY = new NBTArrayType();
 
     public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
     public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();

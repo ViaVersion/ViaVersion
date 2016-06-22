@@ -94,12 +94,17 @@ public class FakeTileEntity {
             register(m.getId(), name, tags);
     }
 
+    public static boolean hasBlock(int block) {
+        return tileEntities.containsKey(block);
+    }
+
     public static CompoundTag getFromBlock(int x, int y, int z, int block) {
         if (tileEntities.containsKey(block)) {
             CompoundTag tag = tileEntities.get(block).clone();
             tag.put(new IntTag("x", x));
             tag.put(new IntTag("y", y));
             tag.put(new IntTag("z", z));
+            System.out.println("Found tile entity " + block + " at position " + x + " " + y + " " + z);
             return tag;
         }
         return null;

@@ -3,10 +3,12 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.bukkit.Bukkit;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.FakeTileEntity;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -14,7 +16,9 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.logging.Level;
 
 public class ChunkType extends PartialType<Chunk, ClientChunks> {
@@ -145,14 +149,25 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         output.writeByte(chunk.isGroundUp() ? 0x01 : 0x00);
         Type.VAR_INT.write(output, chunk.getPrimaryBitmask());
 
+        List<CompoundTag> tags = new ArrayList<>();
+
         ByteBuf buf = Unpooled.buffer();
         for (int i = 0; i < SECTION_COUNT; i++) {
             ChunkSection1_9to1_8 section = chunk.getSections()[i];
             if (section == null) continue; // Section not set
             section.writeBlocks(buf);
             section.writeBlockLight(buf);
+            for (int x = 0; x < 16; x++)
+                for (int y = 0; y < 16; y++)
+                    for (int z = 0; z < 16; z++) {
+                        int block = section.getBlockId(x, y, z);
+                        if (FakeTileEntity.hasBlock(block))
+                            tags.add(FakeTileEntity.getFromBlock(x * chunk.getX(), y, z * chunk.getZ(), block));
+                    }
+
             if (!section.hasSkyLight()) continue; // No sky light, we're done here.
             section.writeSkyLight(buf);
+
         }
         buf.readerIndex(0);
         Type.VAR_INT.write(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
@@ -163,6 +178,8 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         if (chunk.hasBiomeData()) {
             output.writeBytes(chunk.getBiomeData());
         }
+
+        Type.NBT_ARRAY.write(buf, tags);
     }
 
 

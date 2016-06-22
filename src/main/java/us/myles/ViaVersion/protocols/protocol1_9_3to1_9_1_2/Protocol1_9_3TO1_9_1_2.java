@@ -60,7 +60,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
             }
         });
 
-        // Chunk packet
+  /*      // Chunk packet TODO uncomment when it's no longer hardcoded in 1.8
         registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -72,7 +72,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                     }
                 });
             }
-        });
+        });*/
     }
 
     @Override
