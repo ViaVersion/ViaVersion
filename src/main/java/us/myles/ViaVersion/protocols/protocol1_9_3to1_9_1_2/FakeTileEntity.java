@@ -45,8 +45,6 @@ public class FakeTileEntity {
     private static void register(Integer material, String name) {
         CompoundTag comp = new CompoundTag("");
         comp.put(new StringTag(name));
-//        for (Tag tag : tags)
-//            comp.put(tag);
         tileEntities.put(material, comp);
     }
 
