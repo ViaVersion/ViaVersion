@@ -28,6 +28,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
 import us.myles.ViaVersion.util.ListWrapper;
+import us.myles.ViaVersion.util.ProtocolSupportUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -48,6 +49,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     private boolean compatSpigotBuild = false;
     private boolean spigot = true;
     private boolean lateBind = false;
+    private boolean protocolSupport = false;
     @Getter
     private ViaConfig conf;
 
@@ -56,6 +58,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         // Config magic
         conf = new ViaConfig(this);
         ViaVersion.setInstance(this);
+
         // Handle reloads
         if (System.getProperty("ViaVersion") != null) {
             if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
@@ -69,19 +72,25 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
             }
         }
+
         // Spigot detector
         try {
             Class.forName("org.spigotmc.SpigotConfig");
         } catch (ClassNotFoundException e) {
             spigot = false;
         }
+
         // Check if it's a spigot build with a protocol mod
         try {
             compatSpigotBuild = ReflectionUtil.nms("PacketEncoder").getDeclaredField("version") != null;
         } catch (Exception e) {
             compatSpigotBuild = false;
         }
-        // Generate classes needed (only works if it's compat)
+
+        // Check if we're using protocol support too
+        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+
+        // Generate classes needed (only works if it's compat or ps)
         ClassGenerator.generate();
         lateBind = !isBinded();
 
@@ -329,15 +338,23 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     @Override
     public int getPlayerVersion(@NonNull Player player) {
         if (!isPorted(player))
-            return ProtocolRegistry.SERVER_PROTOCOL;
+            return getExternalVersion(player);
         return portedPlayers.get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
     public int getPlayerVersion(@NonNull UUID uuid) {
         if (!isPorted(uuid))
-            return ProtocolRegistry.SERVER_PROTOCOL;
+            return getExternalVersion(Bukkit.getPlayer(uuid));
         return portedPlayers.get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+    }
+
+    private int getExternalVersion(Player player) {
+        if (!isProtocolSupport()) {
+            return ProtocolRegistry.SERVER_PROTOCOL;
+        } else {
+            return ProtocolSupportUtil.getProtocolVersion(player);
+        }
     }
 
     @Override
@@ -433,6 +450,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             if (ViaVersion.getInstance().isDebug())
                 e.printStackTrace();
         }
+    }
+
+    public boolean isProtocolSupport() {
+        return protocolSupport;
     }
 
     public Map<UUID, UserConnection> getPortedPlayers() {

@@ -6,5 +6,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 public interface HandlerConstructor {
     public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder);
+
     public ByteToMessageDecoder newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder);
 }

@@ -27,19 +27,25 @@ public class ListSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        Map<Integer, Set<String>> playerVersions = new HashMap<>();
+        Map<ProtocolVersion, Set<String>> playerVersions = new TreeMap<>(new Comparator<ProtocolVersion>() {
+            @Override
+            public int compare(ProtocolVersion o1, ProtocolVersion o2) {
+                return ProtocolVersion.getIndex(o2) - ProtocolVersion.getIndex(o1);
+            }
+        });
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             int playerVersion = ViaVersion.getInstance().getPlayerVersion(p);
-            if (!playerVersions.containsKey(playerVersion))
-                playerVersions.put(playerVersion, new HashSet<String>());
-            playerVersions.get(playerVersion).add(p.getName());
+            ProtocolVersion key = ProtocolVersion.getProtocol(playerVersion);
+            if (!playerVersions.containsKey(key))
+                playerVersions.put(key, new HashSet<String>());
+            playerVersions.get(key).add(p.getName());
         }
-        Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
 
-        for (Map.Entry<Integer, Set<String>> entry : sorted.entrySet())
-            sendMessage(sender, "&8[&6%s&8]: &b%s", ProtocolVersion.getProtocol(entry.getKey()).getName(), entry.getValue());
+        for (Map.Entry<ProtocolVersion, Set<String>> entry : playerVersions.entrySet())
+            sendMessage(sender, "&8[&6%s&8]: &b%s", entry.getKey().getName(), entry.getValue());
 
-        sorted.clear();
+        playerVersions.clear();
         return true;
     }
 }

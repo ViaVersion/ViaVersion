@@ -87,7 +87,7 @@ public class ViaConfig implements ViaVersionConfig {
 
     @Override
     public double getHologramYOffset() {
-        return plugin.getConfig().getDouble("hologram-y", -1D);
+        return plugin.getConfig().getDouble("hologram-y", -0.96D);
     }
 
     @Override

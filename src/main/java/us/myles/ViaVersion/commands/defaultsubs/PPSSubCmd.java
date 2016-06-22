@@ -56,6 +56,9 @@ public class PPSSubCmd extends ViaSubCommand {
             sendMessage(sender, "&cAverage: &f" + (totalPackets / clients));
             sendMessage(sender, "&cHighest: &f" + max);
         }
+        if (clients == 0) {
+            sendMessage(sender, "&cNo clients to display.");
+        }
         for (Map.Entry<Integer, Set<String>> entry : sorted.entrySet())
             sendMessage(sender, "&8[&6%s&8]: &b%s", ProtocolVersion.getProtocol(entry.getKey()).getName(), entry.getValue());
         sorted.clear();

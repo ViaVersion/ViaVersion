@@ -21,6 +21,7 @@ public interface ViaVersionAPI {
 
     /**
      * Get protocol number from a player
+     * Will also retrieve version from ProtocolSupport if it's being used.
      *
      * @param player Bukkit player object
      * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
@@ -120,9 +121,17 @@ public interface ViaVersionAPI {
 
     /**
      * Gets if the server uses spigot
-     *
+     * <p>
      * Note: Will only work after ViaVersion load
+     *
      * @return True if spigot
      */
     boolean isSpigot();
+
+    /**
+     * Gets if protocol support is also being used.
+     *
+     * @return True if it is being used.
+     */
+    boolean isProtocolSupport();
 }
