@@ -24,7 +24,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4B, 0x4A); //Entity properties
         registerOutgoing(State.PLAY, 0x4C, 0x4B); //Entity effect
 
-        //Sign update
+        // Sign update packet
         registerOutgoing(State.PLAY, 0x46, -1, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -60,6 +60,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
             }
         });
 
+        // Chunk packet
         registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
