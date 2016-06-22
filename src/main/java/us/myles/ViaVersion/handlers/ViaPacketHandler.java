@@ -17,9 +17,9 @@ public class ViaPacketHandler extends MessageToMessageEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object o, List list) throws Exception {
-        // Split chunk bulk packet up in to single chunk packets before it reached the encoder.
-        // This will prevent issues with several plugins and other protocol handlers due to the chunk being sent twice.
-        // It also sends the chunk in the right order possible resolving some issues with added chunk/block/entity data.
+        // Split chunks bulk packet up in to single chunks packets before it reached the encoder.
+        // This will prevent issues with several plugins and other protocol handlers due to the chunks being sent twice.
+        // It also sends the chunks in the right order possible resolving some issues with added chunks/block/entity data.
         if (!(o instanceof ByteBuf)) {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */

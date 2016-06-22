@@ -52,8 +52,6 @@ public class BlockEntity {
 
                 Position pos = new Position((long) x, (long) y, (long) z);
 
-                //Sorry, the PacketWrapper class wil handle this in the future
-                //TODO let the packetwrapper class handle it
                 if (newId != 9) {
                     updateBlockEntity(pos, (short) newId, tag, connection);
                 } else {

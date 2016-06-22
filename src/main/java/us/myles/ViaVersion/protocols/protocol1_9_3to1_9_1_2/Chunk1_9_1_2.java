@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class Chunk1_9_3_4 implements Chunk {
+public class Chunk1_9_1_2 implements Chunk {
     private int x;
     private int z;
     private boolean groundUp;
