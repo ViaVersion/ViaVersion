@@ -96,7 +96,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                                             }
                                         }
                             }
-                            
+
                             wrapper.write(type, chunk);
                             wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
                         } else {
