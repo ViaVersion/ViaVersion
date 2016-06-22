@@ -70,7 +70,6 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Actual Class */
 
     private final Class<? super T> outputClass;
-    private final Set<Class<? extends Type>> compatibilities;
     private final String typeName;
 
     public Type(Class<? super T> outputClass) {
@@ -80,7 +79,6 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public Type(String typeName, Class<? super T> outputClass) {
         this.outputClass = outputClass;
         this.typeName = typeName;
-        this.compatibilities = new HashSet<>();
     }
 
     public Class<? extends Type> getBaseClass() {
