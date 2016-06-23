@@ -3,12 +3,14 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
 
+import java.util.Arrays;
 import java.util.List;
 
-public class ChunkSection1_9_1_2 {
+public class ChunkSection1_9_1_2 implements ChunkSection {
     /**
      * Size (dimensions) of blocks in a chunks section.
      */
@@ -89,6 +91,82 @@ public class ChunkSection1_9_1_2 {
 
     private int index(int x, int y, int z) {
         return z << 8 | y << 4 | x;
+    }
+
+    /**
+     * Read blocks from input stream.
+     * This reads all the block related data:
+     * <ul>
+     *     <li>Block length/palette type</li>
+     *     <li>Palette</li>
+     *     <li>Block hashes/palette reference</li>
+     * </ul>
+     *
+     * @param input The buffer to read from.
+     * @throws Exception
+     */
+    public void readBlocks(ByteBuf input) throws Exception {
+        // Clear current data
+//        Arrays.fill(blocks, 0);
+        palette.clear();
+
+        // Reaad bits per block
+        int bitsPerBlock = input.readByte();
+        long maxEntryValue = (1L << bitsPerBlock) - 1;
+
+        if(bitsPerBlock == 0) {
+            throw new RuntimeException("Aye me m8 its the global palette!");
+        }
+
+        // Read palette
+        int paletteLength = Type.VAR_INT.read(input);
+        for(int i = 0; i < paletteLength; i++) {
+            palette.add(Type.VAR_INT.read(input));
+        }
+
+        // Read blocks
+        int blockLength = Type.VAR_INT.read(input);
+        long[] blockData = new long[blockLength];
+        for(int i = 0; i < blocks.length; i++) {
+            int bitIndex = i * bitsPerBlock;
+            int startIndex = bitIndex / 64;
+            int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
+            int startBitSubIndex = bitIndex % 64;
+            if(startIndex == endIndex) {
+                blocks[i] = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
+            } else {
+                int endBitSubIndex = 64 - startBitSubIndex;
+                blocks[i] = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
+            }
+        }
+    }
+
+    /**
+     * Read block light from buffer.
+     *
+     * @param input The buffer to read from
+     */
+    public void readBlockLight(ByteBuf input) {
+        byte[] handle = new byte[LIGHT_LENGTH];
+        input.readBytes(handle);
+        blockLight.setHandle(handle);
+    }
+
+    /**
+     * Read sky light from buffer.
+     * Note: Only sent in overworld!
+     *
+     * @param input The buffer to read from
+     */
+    public void readSkyLight(ByteBuf input) {
+        byte[] handle = new byte[LIGHT_LENGTH];
+        input.readBytes(handle);
+        if(skyLight != null) {
+            skyLight.setHandle(handle);
+            return;
+        }
+
+        this.skyLight = new NibbleArray(handle);
     }
 
     /**
