@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.exception.CancelException;
+import us.myles.ViaVersion.handlers.*;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
@@ -15,7 +16,7 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class BukkitEncodeHandler extends MessageToByteEncoder {
+public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHandler {
     private static Field versionField = null;
 
     static {
@@ -44,13 +45,18 @@ public class BukkitEncodeHandler extends MessageToByteEncoder {
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder
             try {
-                PipelineUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+                PipelineUtil.callEncode(this.minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, bytebuf);
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
                 }
             }
         }
+
+        transform(bytebuf);
+    }
+
+    public void transform(ByteBuf bytebuf) throws Exception {
         if (bytebuf.readableBytes() == 0) {
             throw new CancelException();
         }
