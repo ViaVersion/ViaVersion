@@ -245,10 +245,10 @@ public class ItemRewriter {
 
     public static String potionNameFromDamage(short damage) {
         String cached = POTION_ID_TO_NAME.get((int) damage);
-        if(cached != null) {
+        if (cached != null) {
             return cached;
         }
-        if(damage == 0) {
+        if (damage == 0) {
             return "water";
         }
 
@@ -262,37 +262,78 @@ public class ItemRewriter {
 
         String id;
         switch (effect) {
-            case 1: id="regeneration"; break;
-            case 2: id="swiftness"; break;
-            case 3: id="fire_resistance"; canEnhance = false; break;
-            case 4: id="poison"; break;
-            case 5: id="healing"; canExtend = false; break;
-            case 6: id="night_vision"; canEnhance = false; break;
+            case 1:
+                id = "regeneration";
+                break;
+            case 2:
+                id = "swiftness";
+                break;
+            case 3:
+                id = "fire_resistance";
+                canEnhance = false;
+                break;
+            case 4:
+                id = "poison";
+                break;
+            case 5:
+                id = "healing";
+                canExtend = false;
+                break;
+            case 6:
+                id = "night_vision";
+                canEnhance = false;
+                break;
 
-            case 8: id="weakness"; canEnhance = false; break;
-            case 9: id="strength"; break;
-            case 10: id="slowness"; canEnhance = false; break;
-            case 11: id="leaping"; break;
-            case 12: id="harming"; canExtend=false; break;
-            case 13: id="water_breathing"; canEnhance = false; break;
-            case 14: id="invisibility"; canEnhance = false; break;
+            case 8:
+                id = "weakness";
+                canEnhance = false;
+                break;
+            case 9:
+                id = "strength";
+                break;
+            case 10:
+                id = "slowness";
+                canEnhance = false;
+                break;
+            case 11:
+                id = "leaping";
+                break;
+            case 12:
+                id = "harming";
+                canExtend = false;
+                break;
+            case 13:
+                id = "water_breathing";
+                canEnhance = false;
+                break;
+            case 14:
+                id = "invisibility";
+                canEnhance = false;
+                break;
 
 
             default:
-                canEnhance = false; canExtend = false;
+                canEnhance = false;
+                canExtend = false;
                 switch (name) {
-                    case 0: id="mundane"; break;
-                    case 16: id="awkward"; break;
-                    case 32: id="thick"; break;
-                    default: id="empty";
+                    case 0:
+                        id = "mundane";
+                        break;
+                    case 16:
+                        id = "awkward";
+                        break;
+                    case 32:
+                        id = "thick";
+                        break;
+                    default:
+                        id = "empty";
                 }
         }
 
-        if(effect > 0) {
-            if(canEnhance && enhanced) {
+        if (effect > 0) {
+            if (canEnhance && enhanced) {
                 id = "strong_" + id;
-            }
-            else if(canExtend && extended) {
+            } else if (canExtend && extended) {
                 id = "long_" + id;
             }
         }
@@ -304,11 +345,11 @@ public class ItemRewriter {
         if (oldID >= 16384) {
             oldID -= 8192;
         }
-        if(POTION_INDEX.containsKey(oldID)) {
+        if (POTION_INDEX.containsKey(oldID)) {
             return POTION_INDEX.get(oldID);
         }
 
-        oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short)oldID));
+        oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short) oldID));
         return POTION_INDEX.containsKey(oldID) ? POTION_INDEX.get(oldID) : 0;
     }
 
