@@ -52,8 +52,12 @@ public class Protocol1_9TO1_8 extends Protocol {
         try {
             gson.fromJson(line, JsonObject.class);
         } catch (Exception e) {
-            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
-            return "{\"text\":\"\"}";
+            if (ViaVersion.getConfig().isForceJsonTransform()) {
+                return "{\"text\":\"" + line + "\"}";
+            } else {
+                System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+                return "{\"text\":\"\"}";
+            }
         }
         return line;
     }

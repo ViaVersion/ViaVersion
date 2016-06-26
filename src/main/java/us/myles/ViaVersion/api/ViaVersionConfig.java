@@ -186,4 +186,11 @@ public interface ViaVersionConfig {
      * @return The integer id
      */
     int getPistonReplacementId();
+
+    /**
+     * Force json transform
+     *
+     * @return True if enabled
+     */
+    boolean isForceJsonTransform();
 }

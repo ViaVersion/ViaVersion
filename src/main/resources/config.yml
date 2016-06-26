@@ -75,3 +75,5 @@ anti-xray-patch: true
 replace-pistons: false
 # What id should we replace with, default is air. (careful of players getting stuck standing on them)
 replacement-piston-id: 0
+# Force the string -> json transform
+force-json-transform: true
