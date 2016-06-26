@@ -164,4 +164,9 @@ public class ViaConfig implements ViaVersionConfig {
         // Collision has to be enabled first
         return isPreventCollision() && plugin.getConfig().getBoolean("auto-team", true);
     }
+
+    @Override
+    public boolean isForceJsonTransform() {
+        return plugin.getConfig().getBoolean("force-json-transform", false);
+    }
 }

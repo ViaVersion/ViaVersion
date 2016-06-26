@@ -41,9 +41,7 @@ public class Protocol1_9TO1_8 extends Protocol {
             line = "{\"text\":\"\"}";
         } else {
             if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("text", line);
-                return gson.toJson(jsonObject);
+                return constructJson(line);
             }
             if (line.startsWith("\"") && line.endsWith("\"")) {
                 line = "{\"text\":" + line + "}";
@@ -52,10 +50,20 @@ public class Protocol1_9TO1_8 extends Protocol {
         try {
             gson.fromJson(line, JsonObject.class);
         } catch (Exception e) {
-            System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
-            return "{\"text\":\"\"}";
+            if (ViaVersion.getConfig().isForceJsonTransform()) {
+                return constructJson(line);
+            } else {
+                System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+                return "{\"text\":\"\"}";
+            }
         }
         return line;
+    }
+
+    private static String constructJson(String text) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("text", text);
+        return gson.toJson(jsonObject);
     }
 
     public static Item getHandItem(final UserConnection info) {
