@@ -294,6 +294,9 @@ public class PacketWrapper {
                 }
             }
 
+            // Reset reader before we start
+            resetReader();
+
             // Apply other protocols
             apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
             // Send

@@ -26,9 +26,6 @@ public class BlockEntity {
         types.put("UNKNOWN", 7);
         types.put("EndGateway", 8);
         types.put("Sign", 9);
-
-        //I didn't see anything that didn't work about chests
-//        types.put("Chest", -1);
     }
 
     public static void handle(List<CompoundTag> tags, UserConnection connection) {
@@ -44,7 +41,6 @@ public class BlockEntity {
                 int newId = types.get(id);
                 if (newId == -1)
                     continue;
-
 
                 int x = (int) tag.get("x").getValue();
                 int y = (int) tag.get("y").getValue();
