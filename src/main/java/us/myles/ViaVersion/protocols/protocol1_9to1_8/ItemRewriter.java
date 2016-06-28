@@ -213,11 +213,9 @@ public class ItemRewriter {
                     item.setId((short) 438); // splash id
                     item.setData((short) (item.getData() - 8192));
                 }
-                if (POTION_ID_TO_NAME.containsKey((int) item.getData())) {
-                    String name = POTION_ID_TO_NAME.get((int) item.getData());
-                    StringTag potion = new StringTag("Potion", "minecraft:" + name);
-                    tag.put(potion);
-                }
+                String name = potionNameFromDamage(item.getData());
+                StringTag potion = new StringTag("Potion", "minecraft:" + name);
+                tag.put(potion);
                 item.setTag(tag);
                 item.setData((short) 0);
             }
@@ -245,10 +243,113 @@ public class ItemRewriter {
         }
     }
 
+    public static String potionNameFromDamage(short damage) {
+        String cached = POTION_ID_TO_NAME.get((int) damage);
+        if (cached != null) {
+            return cached;
+        }
+        if (damage == 0) {
+            return "water";
+        }
+
+        int effect = damage & 0xF;
+        int name = damage & 0x3F;
+        boolean enhanced = (damage & 0x20) > 0;
+        boolean extended = (damage & 0x40) > 0;
+
+        boolean canEnhance = true;
+        boolean canExtend = true;
+
+        String id;
+        switch (effect) {
+            case 1:
+                id = "regeneration";
+                break;
+            case 2:
+                id = "swiftness";
+                break;
+            case 3:
+                id = "fire_resistance";
+                canEnhance = false;
+                break;
+            case 4:
+                id = "poison";
+                break;
+            case 5:
+                id = "healing";
+                canExtend = false;
+                break;
+            case 6:
+                id = "night_vision";
+                canEnhance = false;
+                break;
+
+            case 8:
+                id = "weakness";
+                canEnhance = false;
+                break;
+            case 9:
+                id = "strength";
+                break;
+            case 10:
+                id = "slowness";
+                canEnhance = false;
+                break;
+            case 11:
+                id = "leaping";
+                break;
+            case 12:
+                id = "harming";
+                canExtend = false;
+                break;
+            case 13:
+                id = "water_breathing";
+                canEnhance = false;
+                break;
+            case 14:
+                id = "invisibility";
+                canEnhance = false;
+                break;
+
+
+            default:
+                canEnhance = false;
+                canExtend = false;
+                switch (name) {
+                    case 0:
+                        id = "mundane";
+                        break;
+                    case 16:
+                        id = "awkward";
+                        break;
+                    case 32:
+                        id = "thick";
+                        break;
+                    default:
+                        id = "empty";
+                }
+        }
+
+        if (effect > 0) {
+            if (canEnhance && enhanced) {
+                id = "strong_" + id;
+            } else if (canExtend && extended) {
+                id = "long_" + id;
+            }
+        }
+
+        return id;
+    }
+
     public static int getNewEffectID(int oldID) {
         if (oldID >= 16384) {
             oldID -= 8192;
         }
+        if (POTION_INDEX.containsKey(oldID)) {
+            return POTION_INDEX.get(oldID);
+        }
+
+        oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short) oldID));
         return POTION_INDEX.containsKey(oldID) ? POTION_INDEX.get(oldID) : 0;
     }
 

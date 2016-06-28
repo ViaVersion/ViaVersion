@@ -3,10 +3,15 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.bukkit.Bukkit;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 
 import java.nio.ByteBuffer;
@@ -17,11 +22,11 @@ import java.util.logging.Level;
 
 public class ChunkType extends PartialType<Chunk, ClientChunks> {
     /**
-     * Amount of sections in a chunk.
+     * Amount of sections in a chunks.
      */
-    private static final int SECTION_COUNT = 16;
+    public static final int SECTION_COUNT = 16;
     /**
-     * size of each chunk section (16x16x16).
+     * size of each chunks section (16x16x16).
      */
     private static final int SECTION_SIZE = 16;
     /**
@@ -38,7 +43,15 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
     }
 
     @Override
+    public Class<? extends Type> getBaseClass() {
+        return BaseChunkType.class;
+    }
+
+    @Override
     public Chunk read(ByteBuf input, ClientChunks param) throws Exception {
+        boolean replacePistons = param.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && ViaVersion.getConfig().isReplacePistons();
+        int replacementId = ViaVersion.getConfig().getPistonReplacementId();
+
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
         long chunkHash = toLong(chunkX, chunkZ);
@@ -48,7 +61,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
         // Data to be read
         BitSet usedSections = new BitSet(16);
-        ChunkSection[] sections = new ChunkSection[16];
+        ChunkSection1_9to1_8[] sections = new ChunkSection1_9to1_8[16];
         byte[] biomeData = null;
 
         // Calculate section count from bitmask
@@ -59,33 +72,35 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         }
         int sectionCount = usedSections.cardinality(); // the amount of sections set
 
-        // If the chunk is from a chunk bulk, it is never an unload packet
+        // If the chunks is from a chunks bulk, it is never an unload packet
         // Other wise, if it has no data, it is :)
         boolean isBulkPacket = param.getBulkChunks().remove(chunkHash);
         if (sectionCount == 0 && groundUp && !isBulkPacket && param.getLoadedChunks().contains(chunkHash)) {
-            // This is a chunk unload packet
+            // This is a chunks unload packet
             param.getLoadedChunks().remove(chunkHash);
-            return new Chunk(chunkX, chunkZ);
+            return new Chunk1_9to1_8(chunkX, chunkZ);
         }
 
         int startIndex = input.readerIndex();
-        param.getLoadedChunks().add(chunkHash); // mark chunk as loaded
+        param.getLoadedChunks().add(chunkHash); // mark chunks as loaded
 
         // Read blocks
         for (int i = 0; i < SECTION_COUNT; i++) {
             if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection section = new ChunkSection();
+            ChunkSection1_9to1_8 section = new ChunkSection1_9to1_8();
             sections[i] = section;
 
             // Read block data and convert to short buffer
-            byte[] blockData = new byte[ChunkSection.SIZE * 2];
+            byte[] blockData = new byte[ChunkSection1_9to1_8.SIZE * 2];
             input.readBytes(blockData);
             ShortBuffer blockBuf = ByteBuffer.wrap(blockData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 
-            for (int j = 0; j < ChunkSection.SIZE; j++) {
+            for (int j = 0; j < ChunkSection1_9to1_8.SIZE; j++) {
                 int mask = blockBuf.get();
                 int type = mask >> 4;
                 int data = mask & 0xF;
+                if (replacePistons && type == 36)
+                    type = replacementId;
                 section.setBlock(j, type, data);
             }
         }
@@ -93,20 +108,20 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         // Read block light
         for (int i = 0; i < SECTION_COUNT; i++) {
             if (!usedSections.get(i)) continue; // Section not set, has no light
-            byte[] blockLightArray = new byte[ChunkSection.LIGHT_LENGTH];
+            byte[] blockLightArray = new byte[ChunkSection1_9to1_8.LIGHT_LENGTH];
             input.readBytes(blockLightArray);
             sections[i].setBlockLight(blockLightArray);
         }
 
         // Read sky light
         int bytesLeft = dataLength - (input.readerIndex() - startIndex);
-        if (bytesLeft >= ChunkSection.LIGHT_LENGTH) {
+        if (bytesLeft >= ChunkSection1_9to1_8.LIGHT_LENGTH) {
             for (int i = 0; i < SECTION_COUNT; i++) {
                 if (!usedSections.get(i)) continue; // Section not set, has no light
-                byte[] skyLightArray = new byte[ChunkSection.LIGHT_LENGTH];
+                byte[] skyLightArray = new byte[ChunkSection1_9to1_8.LIGHT_LENGTH];
                 input.readBytes(skyLightArray);
                 sections[i].setSkyLight(skyLightArray);
-                bytesLeft -= ChunkSection.LIGHT_LENGTH;
+                bytesLeft -= ChunkSection1_9to1_8.LIGHT_LENGTH;
             }
         }
 
@@ -119,15 +134,18 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
         // Check remaining bytes
         if (bytesLeft > 0) {
-            Bukkit.getLogger().log(Level.WARNING, bytesLeft + " Bytes left after reading chunk! (" + groundUp + ")");
+            Bukkit.getLogger().log(Level.WARNING, bytesLeft + " Bytes left after reading chunks! (" + groundUp + ")");
         }
 
-        // Return chunk
-        return new Chunk(chunkX, chunkZ, groundUp, bitmask, sections, biomeData);
+        // Return chunks
+        return new Chunk1_9to1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData);
     }
 
     @Override
-    public void write(ByteBuf output, ClientChunks param, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, ClientChunks param, Chunk input) throws Exception {
+        if (!(input instanceof Chunk1_9to1_8)) throw new Exception("Incompatible chunk, " + input.getClass());
+
+        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) input;
         // Write primary info
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
@@ -137,12 +155,14 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
         ByteBuf buf = Unpooled.buffer();
         for (int i = 0; i < SECTION_COUNT; i++) {
-            ChunkSection section = chunk.getSections()[i];
+            ChunkSection1_9to1_8 section = chunk.getSections()[i];
             if (section == null) continue; // Section not set
             section.writeBlocks(buf);
             section.writeBlockLight(buf);
+
             if (!section.hasSkyLight()) continue; // No sky light, we're done here.
             section.writeSkyLight(buf);
+
         }
         buf.readerIndex(0);
         Type.VAR_INT.write(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
@@ -153,5 +173,9 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         if (chunk.hasBiomeData()) {
             output.writeBytes(chunk.getBiomeData());
         }
+
+
     }
+
+
 }

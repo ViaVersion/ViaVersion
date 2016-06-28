@@ -1,15 +1,16 @@
-package us.myles.ViaVersion.api.minecraft.chunks;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.List;
 
-public class ChunkSection {
+public class ChunkSection1_9_1_2 {
     /**
-     * Size (dimensions) of blocks in a chunk section.
+     * Size (dimensions) of blocks in a chunks section.
      */
     public static final int SIZE = 16 * 16 * 16; // width * depth * height
     /**
@@ -25,14 +26,14 @@ public class ChunkSection {
     private final NibbleArray blockLight;
     private NibbleArray skyLight;
 
-    public ChunkSection() {
+    public ChunkSection1_9_1_2() {
         this.blocks = new int[SIZE];
         this.blockLight = new NibbleArray(SIZE);
         palette.add(0); // AIR
     }
 
     /**
-     * Set a block in the chunk
+     * Set a block in the chunks
      *
      * @param x    Block X
      * @param y    Block Y
@@ -44,8 +45,13 @@ public class ChunkSection {
         setBlock(index(x, y, z), type, data);
     }
 
+    public int getBlockId(int x, int y, int z){
+        int index = blocks[index(x, y, z)];
+        return palette.indexOf(index) >> 4;
+    }
+
     /**
-     * Set a block in the chunk based on the index
+     * Set a block in the chunks based on the index
      *
      * @param idx  Index
      * @param type The type of the block
@@ -154,7 +160,7 @@ public class ChunkSection {
     }
 
     /**
-     * Get expected size of this chunk section.
+     * Get expected size of this chunks section.
      *
      * @return Amount of bytes sent by this section
      * @throws Exception If it failed to calculate bits properly

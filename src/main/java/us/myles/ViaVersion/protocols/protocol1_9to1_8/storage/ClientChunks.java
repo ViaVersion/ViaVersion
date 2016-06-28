@@ -26,10 +26,12 @@ public class ClientChunks extends StoredObject {
         try {
             mapChunkBulkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
             mapChunkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
-            obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
-            worldRef = ReflectionUtil.nms("World");
+            if (ViaVersion.getInstance().isSpigot()) {
+                obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
+                worldRef = ReflectionUtil.nms("World");
+            }
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunk reflection", e);
+            Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunks reflection", e);
         }
     }
 
@@ -81,7 +83,7 @@ public class ClientChunks extends StoredObject {
                 list.add(chunkPacket);
             }
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to transform chunk bulk", e);
+            Bukkit.getLogger().log(Level.WARNING, "Failed to transform chunks bulk", e);
         }
         return list;
     }

@@ -1,4 +1,4 @@
-# ViaVersion 0.9.3
+# ViaVersion 0.9.4
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 
@@ -21,12 +21,12 @@ Sources:
 
 
 
-Contributors:
+All Time Contributors:
 --------
 
 **Myself** (harhar)
 
-**Matsv/StamBoom**
+**Matsv**
 
 **HugoDaBosss**
 
@@ -39,6 +39,10 @@ Contributors:
 **fillefilip8**
 
 **lenis0012**
+
+**fuzzy_bot**
+
+**joserobjr**
 
 
 

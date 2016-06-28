@@ -464,7 +464,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         // Max PPS Checker
         if (conf.getMaxPPS() > 0) {
             if (info.getPacketsPerSecond() >= conf.getMaxPPS()) {
-                info.disconnect(conf.getMaxPPSKickMessage());
+                info.disconnect(conf.getMaxPPSKickMessage().replace("%pps", ((Long) info.getPacketsPerSecond()).intValue() + ""));
                 return true; // don't send current packet
             }
         }
@@ -482,7 +482,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 }
 
                 if (info.getWarnings() >= conf.getMaxWarnings()) {
-                    info.disconnect(conf.getMaxWarningsKickMessage());
+                    info.disconnect(conf.getMaxWarningsKickMessage().replace("%pps", ((Long) info.getPacketsPerSecond()).intValue() + ""));
                     return true; // don't send current packet
                 }
             }
