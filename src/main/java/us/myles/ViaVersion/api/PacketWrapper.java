@@ -276,10 +276,11 @@ public class PacketWrapper {
      * Be careful not to send packets twice.
      * (Sends it after current)
      *
-     * @param packetProtocol - The protocol version of the packet.
+     * @param packetProtocol      - The protocol version of the packet.
+     * @param skipCurrentPipeline - Skip the current pipeline
      * @throws Exception if it fails to write
      */
-    public void send(Class<? extends Protocol> packetProtocol) throws Exception {
+    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
         if (!isCancelled()) {
             // Apply current pipeline
             List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
@@ -288,10 +289,14 @@ public class PacketWrapper {
             int index = 0;
             for (int i = 0; i < protocols.size(); i++) {
                 if (protocols.get(i).getClass().equals(packetProtocol)) {
-                    index = i + 1;
+                    index = skipCurrentPipeline ? (i + 1) : (i);
                     break;
                 }
             }
+
+            // Reset reader before we start
+            resetReader();
+
             // Apply other protocols
             apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
             // Send
@@ -299,6 +304,18 @@ public class PacketWrapper {
             writeToBuffer(output);
             user().sendRawPacket(output);
         }
+    }
+
+    /**
+     * Send this packet to the associated user.
+     * Be careful not to send packets twice.
+     * (Sends it after current)
+     *
+     * @param packetProtocol - The protocol version of the packet.
+     * @throws Exception if it fails to write
+     */
+    public void send(Class<? extends Protocol> packetProtocol) throws Exception {
+        send(packetProtocol, true);
     }
 
     /**

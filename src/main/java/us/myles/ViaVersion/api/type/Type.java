@@ -10,7 +10,6 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
 import us.myles.ViaVersion.api.type.types.minecraft.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter

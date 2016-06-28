@@ -26,9 +26,6 @@ public class BlockEntity {
         types.put("UNKNOWN", 7);
         types.put("EndGateway", 8);
         types.put("Sign", 9);
-
-        //I didn't see anything that didn't work about chests
-//        types.put("Chest", -1);
     }
 
     public static void handle(List<CompoundTag> tags, UserConnection connection) {
@@ -51,14 +48,7 @@ public class BlockEntity {
 
                 Position pos = new Position((long) x, (long) y, (long) z);
 
-                if (newId != 9) {
-                    updateBlockEntity(pos, (short) newId, tag, connection);
-                } else {
-                    String[] lines = new String[4];
-                    for (int i = 1; i < 5; i++)
-                        lines[i - 1] = (String) tag.get("Text" + i).getValue();
-                    updateSign(pos, lines, connection);
-                }
+                updateBlockEntity(pos, (short) newId, tag, connection);
             } catch (Exception e) {
                 if (ViaVersion.getInstance().isDebug()) {
                     System.out.println("Block Entity: " + e.getMessage() + ": " + tag);
@@ -72,14 +62,6 @@ public class BlockEntity {
         wrapper.write(Type.POSITION, pos);
         wrapper.write(Type.UNSIGNED_BYTE, id);
         wrapper.write(Type.NBT, tag);
-        wrapper.send(Protocol1_9_1_2TO1_9_3_4.class);
-    }
-
-    private static void updateSign(Position pos, String[] lines, UserConnection connection) throws Exception {
-        PacketWrapper wrapper = new PacketWrapper(0x46, null, connection);
-        wrapper.write(Type.POSITION, pos);
-        for (String s : lines)
-            wrapper.write(Type.STRING, s);
-        wrapper.send(Protocol1_9_1_2TO1_9_3_4.class);
+        wrapper.send(Protocol1_9_1_2TO1_9_3_4.class, false);
     }
 }
