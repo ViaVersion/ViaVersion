@@ -31,6 +31,8 @@ public class BaseProtocol extends Protocol {
     @Override
     protected void registerPackets() {
         /* Outgoing Packets */
+
+        // Status Response Packet
         registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() { // Status Response Packet
             @Override
             public void registerMap() {
@@ -51,7 +53,7 @@ public class BaseProtocol extends Protocol {
                             }
                             List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
                             if (protocols != null) {
-                                if ((long) version.get("protocol") != 9999) //Fix serverlistplus
+                                if ((long) version.get("protocol") != 9999) //Fix ServerListPlus
                                     version.put("protocol", info.getProtocolVersion());
                             } else {
                                 // not compatible :(, *plays very sad violin*
@@ -88,6 +90,10 @@ public class BaseProtocol extends Protocol {
                         info.setUsername(wrapper.get(Type.STRING, 1));
                         // Add to ported clients
                         ((ViaVersionPlugin) ViaVersion.getInstance()).addPortedClient(wrapper.user());
+
+                        if (info.getPipeline().pipes().size() == 1 && info.getPipeline().pipes().get(0).getClass() == BaseProtocol.class) // Only base protocol
+                            wrapper.user().setActive(false);
+
                         if (ViaVersion.getInstance().isDebug()) {
                             // Print out the route to console
                             ((ViaVersionPlugin) ViaVersion.getInstance()).getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
@@ -130,11 +136,6 @@ public class BaseProtocol extends Protocol {
                                 pipeline.add(prot.getValue());
                             }
                             wrapper.set(Type.VAR_INT, 0, ProtocolRegistry.SERVER_PROTOCOL);
-                        } else {
-                            if (state == 2) {
-                                // not compatible :(, *plays very sad violin*
-                                wrapper.user().setActive(false);
-                            }
                         }
 
                         // Change state
