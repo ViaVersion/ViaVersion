@@ -27,6 +27,7 @@ import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateListener;
 import us.myles.ViaVersion.update.UpdateUtil;
+import us.myles.ViaVersion.util.ConcurrentList;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ProtocolSupportUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
@@ -52,6 +53,20 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     private boolean protocolSupport = false;
     @Getter
     private ViaConfig conf;
+
+    public ViaVersionPlugin() {
+        // Check if we're using protocol support too
+        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+
+        if (protocolSupport) {
+            getLogger().info("Patching to prevent concurrency issues...");
+            try {
+                patchLists();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void onLoad() {
@@ -86,9 +101,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         } catch (Exception e) {
             compatSpigotBuild = false;
         }
-
-        // Check if we're using protocol support too
-        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
 
         // Generate classes needed (only works if it's compat or ps)
         ClassGenerator.generate();
@@ -247,6 +259,27 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             e.printStackTrace();
         }
     }
+
+
+    public void patchLists() throws Exception {
+        Object connection = getServerConnection();
+        if (connection == null) {
+            getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
+            return;
+        }
+        for (Field field : connection.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            final Object value = field.get(connection);
+            if (value instanceof List) {
+                if (!(value instanceof ConcurrentList)) {
+                    ConcurrentList list = new ConcurrentList();
+                    list.addAll((List) value);
+                    field.set(connection, list);
+                }
+            }
+        }
+    }
+
 
     public boolean isBinded() {
         try {
