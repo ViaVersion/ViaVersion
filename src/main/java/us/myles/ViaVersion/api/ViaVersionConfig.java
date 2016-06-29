@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api;
 
+import java.util.List;
+
 public interface ViaVersionConfig {
 
     /**
@@ -193,4 +195,18 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isForceJsonTransform();
+
+    /**
+     * Get the blocked protocols
+     *
+     * @return An Integer list
+     */
+    List<Integer> getBlockedProtocols();
+
+    /**
+     * Get the custom disconnect message
+     *
+     * @return Disconnect message
+     */
+    String getBlockedDisconnectMsg();
 }

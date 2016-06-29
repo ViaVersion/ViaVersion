@@ -21,6 +21,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,20 +46,26 @@ public class BaseProtocol extends Protocol {
                         try {
                             JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
                             JSONObject version = (JSONObject) json.get("version");
-                            if (ViaVersion.getConfig().isSendSupportedVersions())
+                            int protocolVersion = ((Long) version.get("protocol")).intValue();
+
+                            if (ViaVersion.getConfig().isSendSupportedVersions()) //Send supported versions
                                 version.put("supportedVersions", ViaVersion.getInstance().getSupportedVersions());
-                            if (ProtocolRegistry.SERVER_PROTOCOL == -1) {
-                                Long original = (Long) version.get("protocol");
-                                ProtocolRegistry.SERVER_PROTOCOL = original.intValue();
-                            }
+
+                            if (ProtocolRegistry.SERVER_PROTOCOL == -1) // Set the Server protocol if the detection on startup failed
+                                ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
+
                             List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
                             if (protocols != null) {
-                                if ((long) version.get("protocol") != 9999) //Fix ServerListPlus
+                                if (protocolVersion != 9999) //Fix ServerListPlus
                                     version.put("protocol", info.getProtocolVersion());
                             } else {
                                 // not compatible :(, *plays very sad violin*
                                 wrapper.user().setActive(false);
                             }
+
+                            if (ViaVersion.getConfig().getBlockedProtocols().contains(info.getProtocolVersion()))
+                                version.put("protocol", -1); // Show blocked versions as outdated
+
                             wrapper.set(Type.STRING, 0, json.toJSONString()); // Update value
                         } catch (ParseException e) {
                             e.printStackTrace();
@@ -152,7 +159,28 @@ public class BaseProtocol extends Protocol {
         registerIncoming(State.STATUS, 0x00, 0x00); // Status Request Packet
         registerIncoming(State.STATUS, 0x01, 0x01); // Status Ping Packet
 
-        registerIncoming(State.LOGIN, 0x00, 0x00); // Login Start Packet
+        // Login Start Packet
+        registerIncoming(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        if (ViaVersion.getConfig().getBlockedProtocols().contains(protocol)) {
+                            if (!wrapper.user().getChannel().isOpen()) return;
+
+                            PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
+                            Protocol1_9TO1_8.FIX_JSON.write(disconnectPacket, ViaVersion.getConfig().getBlockedDisconnectMsg());
+                            disconnectPacket.send(BaseProtocol.class);
+
+                            wrapper.cancel();
+                            wrapper.user().getChannel().closeFuture();
+                        }
+                    }
+                });
+            }
+        }); // Login Start Packet
         registerIncoming(State.LOGIN, 0x01, 0x01); // Encryption Response Packet
     }
 
