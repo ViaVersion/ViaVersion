@@ -4,6 +4,7 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Configuration;
 
 import java.io.File;
+import java.util.List;
 
 public class ViaConfig implements ViaVersionConfig {
     private final ViaVersionPlugin plugin;
@@ -168,5 +169,15 @@ public class ViaConfig implements ViaVersionConfig {
     @Override
     public boolean isForceJsonTransform() {
         return plugin.getConfig().getBoolean("force-json-transform", false);
+    }
+
+    @Override
+    public List<Integer> getBlockedProtocols() {
+        return plugin.getConfig().getIntegerList("block-protocols");
+    }
+
+    @Override
+    public String getBlockedDisconnectMsg() {
+        return plugin.getConfig().getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
     }
 }
