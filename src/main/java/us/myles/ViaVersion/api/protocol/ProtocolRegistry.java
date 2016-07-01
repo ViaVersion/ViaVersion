@@ -79,6 +79,11 @@ public class ProtocolRegistry {
         }
     }
 
+    /**
+     * Get the versions compatible with the server.
+     *
+     * @return Read-only set of the versions.
+     */
     public static SortedSet<Integer> getSupportedVersions() {
         return Collections.unmodifiableSortedSet(new TreeSet<>(supportedVersions));
     }

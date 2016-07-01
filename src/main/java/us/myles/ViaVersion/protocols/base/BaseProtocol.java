@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.base;
 
+import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -171,7 +172,7 @@ public class BaseProtocol extends Protocol {
                             if (!wrapper.user().getChannel().isOpen()) return;
 
                             PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
-                            Protocol1_9TO1_8.FIX_JSON.write(disconnectPacket, ViaVersion.getConfig().getBlockedDisconnectMsg());
+                            Protocol1_9TO1_8.FIX_JSON.write(disconnectPacket, ChatColor.translateAlternateColorCodes('&', ViaVersion.getConfig().getBlockedDisconnectMsg()));
                             disconnectPacket.send(BaseProtocol.class);
 
                             wrapper.cancel();

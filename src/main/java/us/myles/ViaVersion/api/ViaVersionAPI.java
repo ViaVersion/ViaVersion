@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.command.ViaVersionCommand;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -114,6 +115,8 @@ public interface ViaVersionAPI {
 
     /**
      * Get the supported protocol versions
+     * This method removes any blocked protocol versions.
+     * @see ProtocolRegistry#getSupportedVersions() for full list.
      *
      * @return a list of protocol versions
      */

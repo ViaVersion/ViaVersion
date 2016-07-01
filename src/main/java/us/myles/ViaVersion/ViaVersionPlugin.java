@@ -450,7 +450,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     @Override
     public SortedSet<Integer> getSupportedVersions() {
-        return ProtocolRegistry.getSupportedVersions();
+        SortedSet<Integer> outputSet = new TreeSet<>(ProtocolRegistry.getSupportedVersions());
+        outputSet.removeAll(getConf().getBlockedProtocols());
+
+        return outputSet;
     }
 
     @Override
