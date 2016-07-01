@@ -2,12 +2,14 @@
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 
-**Allows the connection of 1.9 clients to 1.8**
-**1.10 clients on 1.8 / 1.9 servers**
+**Allows the connection of higher client versions to lower server versions**
 
-This took 100s hours of work, so if you enjoy this consider looking into contacting me and supporting my projects.
+Allows 1.10, 1.9 on 1.8 server and 1.10 on a 1.9 server.
+
+**User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
 **Contributor Chat:** https://gitter.im/MylesIsCool/ViaVersion
+
 
 
 Sources:
