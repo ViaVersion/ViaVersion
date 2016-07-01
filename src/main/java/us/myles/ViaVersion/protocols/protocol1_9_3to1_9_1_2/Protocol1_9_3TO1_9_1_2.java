@@ -13,15 +13,10 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.sotrage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.ChunkType;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Protocol1_9_3TO1_9_1_2 extends Protocol {
     @Override
@@ -81,34 +76,34 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
                         Chunk1_9_1_2Type type = new Chunk1_9_1_2Type(clientWorld);
-                        if (wrapper.isReadable(type, 0)) {
-                            Chunk chunk = wrapper.read(type);
+                        //         if (wrapper.isReadable(type, 0)) {
+                        Chunk chunk = wrapper.read(type);
 //                            if(rawChunk instanceof Chunk1_9to1_8) {
 //                                throw new RuntimeException("Sweet berry candies");
 //                            }
 //                            Chunk1_9_1_2 chunk = (Chunk1_9_1_2) rawChunk;
 
-                            List<CompoundTag> tags = new ArrayList<>();
-                            for (int i = 0; i < chunk.getSections().length; i++) {
-                                ChunkSection section = chunk.getSections()[i];
-                                if (section == null)
-                                    continue;
+                        List<CompoundTag> tags = new ArrayList<>();
+                        for (int i = 0; i < chunk.getSections().length; i++) {
+                            ChunkSection section = chunk.getSections()[i];
+                            if (section == null)
+                                continue;
 
-                                for (int x = 0; x < 16; x++)
-                                    for (int y = 0; y < 16; y++)
-                                        for (int z = 0; z < 16; z++) {
-                                            int block = section.getBlockId(x, y, z);
-                                            if (FakeTileEntity.hasBlock(block)) {
-                                                // NOT SURE WHY Y AND Z WORK THIS WAY, TODO: WORK OUT WHY THIS IS OR FIX W/E BROKE IT
-                                                tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), z + (i << 4), y + (chunk.getZ() << 4), block));
-                                            }
+                            for (int x = 0; x < 16; x++)
+                                for (int y = 0; y < 16; y++)
+                                    for (int z = 0; z < 16; z++) {
+                                        int block = section.getBlockId(x, y, z);
+                                        if (FakeTileEntity.hasBlock(block)) {
+                                            // NOT SURE WHY Y AND Z WORK THIS WAY, TODO: WORK OUT WHY THIS IS OR FIX W/E BROKE IT
+                                            tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), z + (i << 4), y + (chunk.getZ() << 4), block));
                                         }
-                            }
-
-                            wrapper.write(type, chunk);
-                            wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
+                                    }
                         }
+
+                        wrapper.write(type, chunk);
+                        wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
                     }
+                    // }
                 });
             }
         });

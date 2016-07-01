@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.sotrage;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage;
 
 import lombok.Getter;
 import org.bukkit.World;

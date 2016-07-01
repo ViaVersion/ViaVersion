@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ChunkSection1_9_1_2 implements ChunkSection {
@@ -47,7 +46,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
         setBlock(index(x, y, z), type, data);
     }
 
-    public int getBlockId(int x, int y, int z){
+    public int getBlockId(int x, int y, int z) {
         int index = blocks[index(x, y, z)];
         return palette.indexOf(index) >> 4;
     }
@@ -97,9 +96,9 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      * Read blocks from input stream.
      * This reads all the block related data:
      * <ul>
-     *     <li>Block length/palette type</li>
-     *     <li>Palette</li>
-     *     <li>Block hashes/palette reference</li>
+     * <li>Block length/palette type</li>
+     * <li>Palette</li>
+     * <li>Block hashes/palette reference</li>
      * </ul>
      *
      * @param input The buffer to read from.
@@ -111,34 +110,62 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
         palette.clear();
 
         // Reaad bits per block
-        int bitsPerBlock = input.readByte();
+        int bitsPerBlock = input.readUnsignedByte();
         long maxEntryValue = (1L << bitsPerBlock) - 1;
 
-        if(bitsPerBlock == 0) {
-            throw new RuntimeException("Aye me m8 its the global palette!");
+        if (bitsPerBlock == 0) {
+            bitsPerBlock = 13;
         }
+        if (bitsPerBlock < 4) {
+            bitsPerBlock = 4;
+        }
+        if (bitsPerBlock > 8) {
+            bitsPerBlock = 13;
+        }
+        System.out.println("bps: " + bitsPerBlock);
+        if(bitsPerBlock != 13) {
+            // Read palette
+            int paletteLength = Type.VAR_INT.read(input);
 
-        // Read palette
-        int paletteLength = Type.VAR_INT.read(input);
-        for(int i = 0; i < paletteLength; i++) {
-            palette.add(Type.VAR_INT.read(input));
+            for (int i = 0; i < paletteLength; i++) {
+                if (bitsPerBlock != 13) {
+                    palette.add(Type.VAR_INT.read(input));
+                } else {
+                    Type.VAR_INT.read(input);
+                }
+            }
+            System.out.println("length of palette: " + paletteLength);
         }
 
         // Read blocks
         int blockLength = Type.VAR_INT.read(input);
-        long[] blockData = new long[blockLength];
-        for(int i = 0; i < blocks.length; i++) {
-            int bitIndex = i * bitsPerBlock;
-            int startIndex = bitIndex / 64;
-            int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
-            int startBitSubIndex = bitIndex % 64;
-            if(startIndex == endIndex) {
-                blocks[i] = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
-            } else {
-                int endBitSubIndex = 64 - startBitSubIndex;
-                blocks[i] = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
+        if (blockLength > 0) {
+            long[] blockData = new long[blockLength];
+            System.out.println("Block Length: " + blockData.length);
+            for (int i = 0; i < blocks.length; i++) {
+                int bitIndex = i * bitsPerBlock;
+                int startIndex = bitIndex / 64;
+                int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
+                int startBitSubIndex = bitIndex % 64;
+                int val;
+                if (startIndex == endIndex) {
+                    val = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
+                } else {
+                    int endBitSubIndex = 64 - startBitSubIndex;
+                    val = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
+                }
+
+                if (bitsPerBlock == 13) {
+                    int type = val >> 4;
+                    int data = val & 0xF;
+
+                    setBlock(i, type, data);
+                } else {
+                    blocks[i] = val;
+                }
             }
         }
+        System.out.println("done");
     }
 
     /**
@@ -161,7 +188,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
     public void readSkyLight(ByteBuf input) {
         byte[] handle = new byte[LIGHT_LENGTH];
         input.readBytes(handle);
-        if(skyLight != null) {
+        if (skyLight != null) {
             skyLight.setHandle(handle);
             return;
         }

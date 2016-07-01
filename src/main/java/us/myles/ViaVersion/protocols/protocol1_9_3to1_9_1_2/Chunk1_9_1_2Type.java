@@ -8,8 +8,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.sotrage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.BitSet;
