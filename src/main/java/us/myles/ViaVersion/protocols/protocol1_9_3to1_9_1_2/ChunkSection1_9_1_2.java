@@ -48,7 +48,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
 
     public int getBlockId(int x, int y, int z) {
         int index = blocks[index(x, y, z)];
-        return palette.indexOf(index) >> 4;
+        return palette.get(index) >> 4;
     }
 
     /**
