@@ -116,7 +116,6 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
                         clientChunks.setEnvironment(dimensionId);
-                        wrapper.passthroughAll(); // Todo: Fix this
                     }
                 });
             }
@@ -133,7 +132,6 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
-                        wrapper.passthroughAll(); // Todo: Fix this
                     }
                 });
             }
