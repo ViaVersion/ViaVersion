@@ -186,7 +186,7 @@ public class BaseProtocol extends Protocol {
                                     wrapper.user().getChannel().close();
                                 }
                             });
-                                                    }
+                        }
                     }
                 });
             }
