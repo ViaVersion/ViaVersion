@@ -223,6 +223,7 @@ public class PacketWrapper {
         }
         if (readableObjects.size() > 0) {
             packetValues.addAll(readableObjects);
+            readableObjects.clear();
         }
 
         int index = 0;
@@ -267,7 +268,7 @@ public class PacketWrapper {
 
     private void writeRemaining(ByteBuf output) {
         if (inputBuffer != null) {
-            output.writeBytes(inputBuffer);
+            output.writeBytes(inputBuffer, inputBuffer.readableBytes());
         }
     }
 
