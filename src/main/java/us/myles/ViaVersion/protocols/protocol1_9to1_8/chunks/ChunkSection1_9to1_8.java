@@ -89,7 +89,7 @@ public class ChunkSection1_9to1_8 implements ChunkSection {
     }
 
     private int index(int x, int y, int z) {
-        return z << 8 | y << 4 | x;
+        return y << 8 | z << 4 | x;
     }
 
     /**

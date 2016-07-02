@@ -61,9 +61,6 @@ public class Chunk1_9_1_2Type extends BaseChunkType {
 
     @Override
     public void write(ByteBuf output, Chunk input) throws Exception {
-//        if (!(input instanceof Chunk1_9_1_2))
-//            throw new Exception("Tried to send the wrong chunk type from 1.9.3-4 chunk: " + input.getClass());
-//        Chunk1_9_1_2 chunk = (Chunk1_9_1_2) input;
         Chunk chunk = input;
 
         output.writeInt(chunk.getX());
@@ -92,7 +89,5 @@ public class Chunk1_9_1_2Type extends BaseChunkType {
         if (chunk.isBiomeData()) {
             output.writeBytes(chunk.getBiomeData());
         }
-
-//        Type.NBT_ARRAY.write(output, tags.toArray(new CompoundTag[0])); Written by the handler
     }
 }

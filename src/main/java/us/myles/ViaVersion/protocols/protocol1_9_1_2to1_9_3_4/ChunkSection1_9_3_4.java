@@ -3,9 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 
-/**
- * Created by Lennart on 6/23/2016.
- */
 public class ChunkSection1_9_3_4 implements ChunkSection {
     private final byte[] data;
 

@@ -76,12 +76,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
                         Chunk1_9_1_2Type type = new Chunk1_9_1_2Type(clientWorld);
-                        //         if (wrapper.isReadable(type, 0)) {
-                        Chunk chunk = wrapper.read(type);
-//                            if(rawChunk instanceof Chunk1_9to1_8) {
-//                                throw new RuntimeException("Sweet berry candies");
-//                            }
-//                            Chunk1_9_1_2 chunk = (Chunk1_9_1_2) rawChunk;
+                        Chunk chunk = wrapper.passthrough(type);
 
                         List<CompoundTag> tags = new ArrayList<>();
                         for (int i = 0; i < chunk.getSections().length; i++) {
@@ -89,21 +84,20 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                             if (section == null)
                                 continue;
 
-                            for (int x = 0; x < 16; x++)
-                                for (int y = 0; y < 16; y++)
+                            for (int x = 0; x < 16; x++) {
+                                for (int y = 0; y < 16; y++) {
                                     for (int z = 0; z < 16; z++) {
                                         int block = section.getBlockId(x, y, z);
                                         if (FakeTileEntity.hasBlock(block)) {
-                                            // NOT SURE WHY Y AND Z WORK THIS WAY, TODO: WORK OUT WHY THIS IS OR FIX W/E BROKE IT
-                                            tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), z + (i << 4), y + (chunk.getZ() << 4), block));
+                                            tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
                                         }
                                     }
+                                }
+                            }
                         }
 
-                        wrapper.write(type, chunk);
                         wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
                     }
-                    // }
                 });
             }
         });
@@ -112,15 +106,17 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                        wrapper.passthrough(Type.INT);
-                        wrapper.passthrough(Type.UNSIGNED_BYTE);
-                        int dimensionId = wrapper.passthrough(Type.INT);
+                        int dimensionId = wrapper.get(Type.INT, 1);
                         clientChunks.setEnvironment(dimensionId);
-                        wrapper.passthroughAll();
+                        wrapper.passthroughAll(); // Todo: Fix this
                     }
                 });
             }
@@ -130,13 +126,14 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.INT); // 0 - Dimension ID
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.passthrough(Type.INT);
+                        int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
-                        wrapper.passthroughAll();
+                        wrapper.passthroughAll(); // Todo: Fix this
                     }
                 });
             }
