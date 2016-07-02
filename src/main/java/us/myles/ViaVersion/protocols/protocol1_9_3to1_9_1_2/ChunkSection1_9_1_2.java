@@ -122,14 +122,12 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
             bitsPerBlock = 13;
         }
         int paletteLength = Type.VAR_INT.read(input);
-        if (bitsPerBlock != 13) {
-            // Read palette
-            for (int i = 0; i < paletteLength; i++) {
-                if (bitsPerBlock != 13) {
-                    palette.add(Type.VAR_INT.read(input));
-                } else {
-                    Type.VAR_INT.read(input);
-                }
+        // Read palette
+        for (int i = 0; i < paletteLength; i++) {
+            if (bitsPerBlock != 13) {
+                palette.add(Type.VAR_INT.read(input));
+            } else {
+                Type.VAR_INT.read(input);
             }
         }
 
