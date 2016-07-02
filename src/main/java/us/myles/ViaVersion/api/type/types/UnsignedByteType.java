@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.type.TypeConverter;
 
 public class UnsignedByteType extends Type<Short> implements TypeConverter<Short> {
     public UnsignedByteType() {
-        super(Short.class);
+        super("Unsigned Byte", Short.class);
     }
 
     @Override
