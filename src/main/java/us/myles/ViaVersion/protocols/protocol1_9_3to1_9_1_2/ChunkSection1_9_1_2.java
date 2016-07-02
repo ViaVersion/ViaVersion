@@ -105,8 +105,6 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      * @throws Exception
      */
     public void readBlocks(ByteBuf input) throws Exception {
-        // Clear current data
-//        Arrays.fill(blocks, 0);
         palette.clear();
 
         // Reaad bits per block
@@ -122,11 +120,9 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
         if (bitsPerBlock > 8) {
             bitsPerBlock = 13;
         }
-        System.out.println("bps: " + bitsPerBlock);
-        if(bitsPerBlock != 13) {
+        int paletteLength = Type.VAR_INT.read(input);
+        if (bitsPerBlock != 13) {
             // Read palette
-            int paletteLength = Type.VAR_INT.read(input);
-
             for (int i = 0; i < paletteLength; i++) {
                 if (bitsPerBlock != 13) {
                     palette.add(Type.VAR_INT.read(input));
@@ -134,14 +130,11 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
                     Type.VAR_INT.read(input);
                 }
             }
-            System.out.println("length of palette: " + paletteLength);
         }
 
         // Read blocks
-        int blockLength = Type.VAR_INT.read(input);
-        if (blockLength > 0) {
-            long[] blockData = new long[blockLength];
-            System.out.println("Block Length: " + blockData.length);
+        Long[] blockData = Type.LONG_ARRAY.read(input);
+        if (blockData.length > 0) {
             for (int i = 0; i < blocks.length; i++) {
                 int bitIndex = i * bitsPerBlock;
                 int startIndex = bitIndex / 64;
@@ -165,7 +158,6 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
                 }
             }
         }
-        System.out.println("done");
     }
 
     /**
