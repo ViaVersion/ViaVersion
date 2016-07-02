@@ -31,7 +31,7 @@ public class Chunk1_9_3_4Type extends BaseChunkType {
         for (int i = 0; i < blockEntities; i++) {
             nbtData.add(Type.NBT.read(input));
         }
-        return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, sections, nbtData);
+        return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, new ChunkSection1_9_3_4[] {new ChunkSection1_9_3_4(sections)}, nbtData);
     }
 
     @Override
@@ -46,8 +46,8 @@ public class Chunk1_9_3_4Type extends BaseChunkType {
         buffer.writeBoolean(chunk.isGroundUp());
         Type.VAR_INT.write(buffer, chunk.getBitmask());
 
-        Type.VAR_INT.write(buffer, chunk.getSections().length);
-        buffer.writeBytes(chunk.getSections());
+        Type.VAR_INT.write(buffer, chunk.getSections()[0].getData().length);
+        buffer.writeBytes(chunk.getSections()[0].getData());
 
         // no block entities as it's earlier
     }

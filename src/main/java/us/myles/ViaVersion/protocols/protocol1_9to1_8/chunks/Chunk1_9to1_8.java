@@ -36,4 +36,14 @@ public class Chunk1_9to1_8 implements Chunk {
     public boolean hasBiomeData() {
         return biomeData != null && groundUp;
     }
+
+    @Override
+    public boolean isBiomeData() {
+        return biomeData != null;
+    }
+
+    @Override
+    public int getBitmask() {
+        return primaryBitmask;
+    }
 }

@@ -3,12 +3,13 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.List;
 
-public class ChunkSection1_9to1_8 {
+public class ChunkSection1_9to1_8 implements ChunkSection {
     /**
      * Size (dimensions) of blocks in a chunks section.
      */
@@ -88,7 +89,7 @@ public class ChunkSection1_9to1_8 {
     }
 
     private int index(int x, int y, int z) {
-        return z << 8 | y << 4 | x;
+        return y << 8 | z << 4 | x;
     }
 
     /**

@@ -14,7 +14,16 @@ public class Chunk1_9_3_4 implements Chunk {
     private int z;
     private boolean groundUp;
     private int bitmask;
-    private byte[] sections;
+    private ChunkSection1_9_3_4[] sections;
     List<CompoundTag> blockEntities;
 
+    @Override
+    public boolean isBiomeData() {
+        return false;
+    }
+
+    @Override
+    public byte[] getBiomeData() {
+        return new byte[0];
+    }
 }

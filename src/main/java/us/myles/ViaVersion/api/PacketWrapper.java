@@ -223,6 +223,7 @@ public class PacketWrapper {
         }
         if (readableObjects.size() > 0) {
             packetValues.addAll(readableObjects);
+            readableObjects.clear();
         }
 
         int index = 0;
@@ -267,7 +268,7 @@ public class PacketWrapper {
 
     private void writeRemaining(ByteBuf output) {
         if (inputBuffer != null) {
-            output.writeBytes(inputBuffer);
+            output.writeBytes(inputBuffer, inputBuffer.readableBytes());
         }
     }
 
@@ -410,6 +411,10 @@ public class PacketWrapper {
      * Reset the reader, so that it can be read again.
      */
     public void resetReader() {
+        // Move readable objects are packet values
+        this.packetValues.addAll(readableObjects);
+        this.readableObjects.clear();
+        // Move all packet values to the readable for next packet.
         this.readableObjects.addAll(packetValues);
         this.packetValues.clear();
     }

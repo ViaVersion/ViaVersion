@@ -3,12 +3,13 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.List;
 
-public class ChunkSection1_9_1_2 {
+public class ChunkSection1_9_1_2 implements ChunkSection {
     /**
      * Size (dimensions) of blocks in a chunks section.
      */
@@ -45,9 +46,9 @@ public class ChunkSection1_9_1_2 {
         setBlock(index(x, y, z), type, data);
     }
 
-    public int getBlockId(int x, int y, int z){
+    public int getBlockId(int x, int y, int z) {
         int index = blocks[index(x, y, z)];
-        return palette.indexOf(index) >> 4;
+        return palette.get(index) >> 4;
     }
 
     /**
@@ -88,7 +89,103 @@ public class ChunkSection1_9_1_2 {
     }
 
     private int index(int x, int y, int z) {
-        return z << 8 | y << 4 | x;
+        return y << 8 | z << 4 | x;
+    }
+
+    /**
+     * Read blocks from input stream.
+     * This reads all the block related data:
+     * <ul>
+     * <li>Block length/palette type</li>
+     * <li>Palette</li>
+     * <li>Block hashes/palette reference</li>
+     * </ul>
+     *
+     * @param input The buffer to read from.
+     * @throws Exception
+     */
+    public void readBlocks(ByteBuf input) throws Exception {
+        palette.clear();
+
+        // Reaad bits per block
+        int bitsPerBlock = input.readUnsignedByte();
+        long maxEntryValue = (1L << bitsPerBlock) - 1;
+
+        if (bitsPerBlock == 0) {
+            bitsPerBlock = 13;
+        }
+        if (bitsPerBlock < 4) {
+            bitsPerBlock = 4;
+        }
+        if (bitsPerBlock > 8) {
+            bitsPerBlock = 13;
+        }
+        int paletteLength = Type.VAR_INT.read(input);
+        if (bitsPerBlock != 13) {
+            // Read palette
+            for (int i = 0; i < paletteLength; i++) {
+                if (bitsPerBlock != 13) {
+                    palette.add(Type.VAR_INT.read(input));
+                } else {
+                    Type.VAR_INT.read(input);
+                }
+            }
+        }
+
+        // Read blocks
+        Long[] blockData = Type.LONG_ARRAY.read(input);
+        if (blockData.length > 0) {
+            for (int i = 0; i < blocks.length; i++) {
+                int bitIndex = i * bitsPerBlock;
+                int startIndex = bitIndex / 64;
+                int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
+                int startBitSubIndex = bitIndex % 64;
+                int val;
+                if (startIndex == endIndex) {
+                    val = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
+                } else {
+                    int endBitSubIndex = 64 - startBitSubIndex;
+                    val = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
+                }
+
+                if (bitsPerBlock == 13) {
+                    int type = val >> 4;
+                    int data = val & 0xF;
+
+                    setBlock(i, type, data);
+                } else {
+                    blocks[i] = val;
+                }
+            }
+        }
+    }
+
+    /**
+     * Read block light from buffer.
+     *
+     * @param input The buffer to read from
+     */
+    public void readBlockLight(ByteBuf input) {
+        byte[] handle = new byte[LIGHT_LENGTH];
+        input.readBytes(handle);
+        blockLight.setHandle(handle);
+    }
+
+    /**
+     * Read sky light from buffer.
+     * Note: Only sent in overworld!
+     *
+     * @param input The buffer to read from
+     */
+    public void readSkyLight(ByteBuf input) {
+        byte[] handle = new byte[LIGHT_LENGTH];
+        input.readBytes(handle);
+        if (skyLight != null) {
+            skyLight.setHandle(handle);
+            return;
+        }
+
+        this.skyLight = new NibbleArray(handle);
     }
 
     /**

@@ -6,15 +6,14 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.ChunkType;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,35 +73,65 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        ChunkType type = new ChunkType(clientChunks);
-                        if (wrapper.isReadable(type, 0)) {
-                            Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.read(type);
+                        Chunk1_9_1_2Type type = new Chunk1_9_1_2Type(clientWorld);
+                        Chunk chunk = wrapper.passthrough(type);
 
-                            List<CompoundTag> tags = new ArrayList<>();
-                            for (int i = 0; i < chunk.getSections().length; i++) {
-                                ChunkSection1_9to1_8 section = chunk.getSections()[i];
-                                if (section == null)
-                                    continue;
+                        List<CompoundTag> tags = new ArrayList<>();
+                        for (int i = 0; i < chunk.getSections().length; i++) {
+                            ChunkSection section = chunk.getSections()[i];
+                            if (section == null)
+                                continue;
 
-                                for (int x = 0; x < 16; x++)
-                                    for (int y = 0; y < 16; y++)
-                                        for (int z = 0; z < 16; z++) {
-                                            int block = section.getBlockId(x, y, z);
-                                            if (FakeTileEntity.hasBlock(block)) {
-                                                // NOT SURE WHY Y AND Z WORK THIS WAY, TODO: WORK OUT WHY THIS IS OR FIX W/E BROKE IT
-                                                tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), z + (i << 4), y + (chunk.getZ() << 4), block));
-                                            }
+                            for (int x = 0; x < 16; x++) {
+                                for (int y = 0; y < 16; y++) {
+                                    for (int z = 0; z < 16; z++) {
+                                        int block = section.getBlockId(x, y, z);
+                                        if (FakeTileEntity.hasBlock(block)) {
+                                            tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
                                         }
+                                    }
+                                }
                             }
-
-                            wrapper.write(type, chunk);
-                            wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
-                        } else {
-                            wrapper.passthroughAll();
-                            wrapper.write(Type.VAR_INT, 0);
                         }
+
+                        wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
+                    }
+                });
+            }
+        });
+
+        // Join (save dimension id)
+        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                        int dimensionId = wrapper.get(Type.INT, 1);
+                        clientChunks.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
+        // Respawn (save dimension id)
+        registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Dimension ID
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                        int dimensionId = wrapper.get(Type.INT, 0);
+                        clientWorld.setEnvironment(dimensionId);
                     }
                 });
             }
@@ -110,7 +139,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
     }
 
     @Override
-    public void init(UserConnection userConnection) {
-
+    public void init(UserConnection user) {
+        user.put(new ClientWorld(user));
     }
 }
