@@ -38,7 +38,7 @@ public class FakeTileEntity {
         register(Arrays.asList(Material.REDSTONE_COMPARATOR, Material.REDSTONE_COMPARATOR_OFF, Material.REDSTONE_COMPARATOR_ON), "Comparator");
         register(Material.FLOWER_POT, "FlowerPot");
         register(Arrays.asList(Material.STANDING_BANNER, Material.WALL_BANNER, Material.BANNER), "Banner");
-        register(209, "EndGateway"); // todo test
+        register(209, "EndGateway");
         register(Material.COMMAND.getId(), "Control");
     }
 

@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.data;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
@@ -83,6 +84,17 @@ public class UserConnection {
                 }
             });
         }
+    }
+
+    /**
+     * Send a raw packet to the player with returning the future
+     *
+     * @param packet The raw packet to send
+     * @return ChannelFuture of the packet being sent
+     */
+    public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
+        final ChannelHandler handler = channel.pipeline().get("encoder");
+        return channel.pipeline().context(handler).writeAndFlush(packet);
     }
 
     /**

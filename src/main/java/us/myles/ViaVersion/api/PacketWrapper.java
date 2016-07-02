@@ -3,6 +3,7 @@ package us.myles.ViaVersion.api;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -281,7 +282,7 @@ public class PacketWrapper {
      * @param skipCurrentPipeline - Skip the current pipeline
      * @throws Exception if it fails to write
      */
-    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
+    public ChannelFuture send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
         if (!isCancelled()) {
             // Apply current pipeline
             List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
@@ -303,8 +304,9 @@ public class PacketWrapper {
             // Send
             ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
             writeToBuffer(output);
-            user().sendRawPacket(output);
+            return user().sendRawPacketFuture(output);
         }
+        return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
     }
 
     /**
@@ -317,6 +319,20 @@ public class PacketWrapper {
      */
     public void send(Class<? extends Protocol> packetProtocol) throws Exception {
         send(packetProtocol, true);
+    }
+
+    /**
+     * Send this packet to the associated user.
+     * Be careful not to send packets twice.
+     * (Sends it after current)
+     * Also returns the packets ChannelFuture
+     *
+     * @param packetProtocol - The protocol version of the packet.
+     * @return The packets ChannelFuture
+     * @throws Exception if it fails to write
+     */
+    public ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception {
+        return send(packetProtocol, true);
     }
 
     /**

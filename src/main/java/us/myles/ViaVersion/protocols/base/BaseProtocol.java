@@ -1,5 +1,8 @@
 package us.myles.ViaVersion.protocols.base;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -166,18 +169,24 @@ public class BaseProtocol extends Protocol {
             public void registerMap() {
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
+                    public void handle(final PacketWrapper wrapper) throws Exception {
                         int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
                         if (ViaVersion.getConfig().getBlockedProtocols().contains(protocol)) {
                             if (!wrapper.user().getChannel().isOpen()) return;
 
                             PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
                             Protocol1_9TO1_8.FIX_JSON.write(disconnectPacket, ChatColor.translateAlternateColorCodes('&', ViaVersion.getConfig().getBlockedDisconnectMsg()));
-                            disconnectPacket.send(BaseProtocol.class);
+                            wrapper.cancel(); // cancel current
 
-                            wrapper.cancel();
-                            wrapper.user().getChannel().closeFuture();
-                        }
+                            // Send and close
+                            ChannelFuture future = disconnectPacket.sendFuture(BaseProtocol.class);
+                            future.addListener(new GenericFutureListener<Future<? super Void>>() {
+                                @Override
+                                public void operationComplete(Future<? super Void> future) throws Exception {
+                                    wrapper.user().getChannel().close();
+                                }
+                            });
+                                                    }
                     }
                 });
             }
