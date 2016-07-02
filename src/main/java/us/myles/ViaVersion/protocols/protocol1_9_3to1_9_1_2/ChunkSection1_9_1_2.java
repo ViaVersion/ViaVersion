@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Getter;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
@@ -21,7 +22,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
     /**
      * Length of the block data array.
      */
-
+    @Getter
     private final List<Integer> palette = Lists.newArrayList();
     private final int[] blocks;
     private final NibbleArray blockLight;

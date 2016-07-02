@@ -4,25 +4,29 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.bukkit.World;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
+import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public class Chunk1_9_1_2Type extends BaseChunkType {
-    private final ClientWorld clientWorld;
+public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
     public Chunk1_9_1_2Type(ClientWorld clientWorld) {
-        super("1.9.1/2 Chunk");
-        this.clientWorld = clientWorld;
+        super(clientWorld, Chunk.class);
     }
 
     @Override
-    public Chunk read(ByteBuf input) throws Exception {
+    public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
+        boolean replacePistons = world.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && ViaVersion.getConfig().isReplacePistons();
+        int replacementId = ViaVersion.getConfig().getPistonReplacementId();
+
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
@@ -46,8 +50,13 @@ public class Chunk1_9_1_2Type extends BaseChunkType {
             sections[i] = section;
             section.readBlocks(input);
             section.readBlockLight(input);
-            if(clientWorld.getEnvironment() == World.Environment.NORMAL) {
+            if (world.getEnvironment() == World.Environment.NORMAL) {
                 section.readSkyLight(input);
+            }
+            if (replacePistons) {
+                if (section.getPalette().contains(36)) {
+                    section.getPalette().set(section.getPalette().indexOf(36), replacementId);
+                }
             }
         }
 
@@ -60,7 +69,7 @@ public class Chunk1_9_1_2Type extends BaseChunkType {
     }
 
     @Override
-    public void write(ByteBuf output, Chunk input) throws Exception {
+    public void write(ByteBuf output, ClientWorld world, Chunk input) throws Exception {
         Chunk chunk = input;
 
         output.writeInt(chunk.getX());
