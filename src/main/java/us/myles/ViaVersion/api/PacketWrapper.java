@@ -282,31 +282,44 @@ public class PacketWrapper {
      * @param skipCurrentPipeline - Skip the current pipeline
      * @throws Exception if it fails to write
      */
-    public ChannelFuture send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
+    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
         if (!isCancelled()) {
-            // Apply current pipeline
-            List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
-            // Other way if outgoing
-            Collections.reverse(protocols);
-            int index = 0;
-            for (int i = 0; i < protocols.size(); i++) {
-                if (protocols.get(i).getClass().equals(packetProtocol)) {
-                    index = skipCurrentPipeline ? (i + 1) : (i);
-                    break;
-                }
-            }
-
-            // Reset reader before we start
-            resetReader();
-
-            // Apply other protocols
-            apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
-            // Send
-            ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
-            writeToBuffer(output);
-            return user().sendRawPacketFuture(output);
+            ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline);
+            user().sendRawPacket(output);
         }
-        return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
+    }
+
+    /**
+     * Let the packet go through the protocol pipes and write it to ByteBuf
+     *
+     * @param packetProtocol      - The protocol version of the packet.
+     * @param skipCurrentPipeline - Skip the current pipeline
+     * @return Packet buffer
+     * @throws Exception if it fails to write
+     */
+    private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
+        // Apply current pipeline
+        List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
+        // Other way if outgoing
+        Collections.reverse(protocols);
+        int index = 0;
+        for (int i = 0; i < protocols.size(); i++) {
+            if (protocols.get(i).getClass().equals(packetProtocol)) {
+                index = skipCurrentPipeline ? (i + 1) : (i);
+                break;
+            }
+        }
+
+        // Reset reader before we start
+        resetReader();
+
+        // Apply other protocols
+        apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
+        // Send
+        ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+        writeToBuffer(output);
+
+        return output;
     }
 
     /**
@@ -332,7 +345,11 @@ public class PacketWrapper {
      * @throws Exception if it fails to write
      */
     public ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception {
-        return send(packetProtocol, true);
+        if (!isCancelled()) {
+            ByteBuf output = constructPacket(packetProtocol, true);
+            return user().sendRawPacketFuture(output);
+        }
+        return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
     }
 
     /**
