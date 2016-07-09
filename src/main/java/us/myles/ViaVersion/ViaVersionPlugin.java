@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Getter;
 import lombok.NonNull;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -79,7 +80,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
                 getLogger().severe("ViaVersion is already loaded, we're going to kick all the players... because otherwise we'll crash because of ProtocolLib.");
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.kickPlayer("Server reload, please rejoin!");
+                    player.kickPlayer(ChatColor.translateAlternateColorCodes('&', getConf().getReloadDisconnectMsg()));
                 }
 
             } else {

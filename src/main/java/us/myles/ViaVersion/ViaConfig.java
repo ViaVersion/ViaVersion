@@ -180,4 +180,9 @@ public class ViaConfig implements ViaVersionConfig {
     public String getBlockedDisconnectMsg() {
         return plugin.getConfig().getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
     }
+
+    @Override
+    public String getReloadDisconnectMsg() {
+        return plugin.getConfig().getString("reload-disconnect-msg", "Server reload, please rejoin!");
+    }
 }

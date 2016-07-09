@@ -209,4 +209,12 @@ public interface ViaVersionConfig {
      * @return Disconnect message
      */
     String getBlockedDisconnectMsg();
+
+    /**
+     * Get the message sent to players being kicked on reload.
+     * Players are kicked to stop the server crashing
+     *
+     * @return Disconnect message
+     */
+    String getReloadDisconnectMsg();
 }
