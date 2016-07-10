@@ -26,7 +26,8 @@ public class ClientWorld extends StoredObject {
             case 1:
                 return World.Environment.THE_END;
             default:
-                throw new IllegalArgumentException("Invalid environment id:" + id);
+                return World.Environment.NETHER;
+                //throw new IllegalArgumentException("Invalid environment id:" + id);
         }
     }
 }
