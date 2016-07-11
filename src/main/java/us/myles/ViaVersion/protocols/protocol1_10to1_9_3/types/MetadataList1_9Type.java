@@ -8,7 +8,7 @@ import us.myles.ViaVersion.api.type.types.minecraft.Types1_9;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaList1_9_1_10Type extends MetaListTypeTemplate {
+public class MetadataList1_9Type extends MetaListTypeTemplate {
 
     @Override
     public List<Metadata> read(ByteBuf buffer) throws Exception {

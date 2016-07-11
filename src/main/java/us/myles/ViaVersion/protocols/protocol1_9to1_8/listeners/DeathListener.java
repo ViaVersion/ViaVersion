@@ -1,40 +1,28 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
 
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.ViaListener;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
-@RequiredArgsConstructor
-public class DeathListener implements Listener {
-    private final ViaVersionPlugin plugin;
+public class DeathListener extends ViaListener {
+    public DeathListener(ViaVersionPlugin plugin) {
+        super(plugin, Protocol1_9TO1_8.class);
+    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent e) {
         Player p = e.getEntity();
-        if (ViaVersion.getConfig().isShowNewDeathMessages() && checkGamerule(p.getWorld()) && e.getDeathMessage() != null && checkPipeline(p)) {
+        if (isOnPipe(p) && ViaVersion.getConfig().isShowNewDeathMessages() && checkGamerule(p.getWorld()) && e.getDeathMessage() != null)
             sendPacket(p, e.getDeathMessage());
-        }
-    }
-
-    public boolean checkPipeline(Player p) {
-        UserConnection userConnection = plugin.getConnection(p);
-        return userConnection != null && userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class);
-    }
-
-    private UserConnection getUserConnection(Player p) {
-        return plugin.getConnection(p);
     }
 
     public boolean checkGamerule(World w) {
@@ -46,19 +34,19 @@ public class DeathListener implements Listener {
     }
 
     private void sendPacket(final Player p, final String msg) {
-        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+        Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
             @Override
             public void run() {
                 PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p));
                 try {
-                    wrapper.write(Type.VAR_INT, 2);
-                    wrapper.write(Type.VAR_INT, p.getEntityId());
-                    wrapper.write(Type.INT, p.getEntityId());
-                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, msg);
+                    wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
+                    wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID
+                    wrapper.write(Type.INT, p.getEntityId()); // Entity ID
+                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, msg); // Message
+
                     wrapper.send(Protocol1_9TO1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    wrapper.clearInputBuffer();
                 }
             }
         });

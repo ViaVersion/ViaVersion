@@ -1,12 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
 
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -16,30 +14,28 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.ViaListener;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
-public class ArmorListener implements Listener {
+public class ArmorListener extends ViaListener {
 
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
-    private final ViaVersionPlugin plugin;
 
-    public static void sendArmorUpdate(Player player) {
+    public ArmorListener(ViaVersionPlugin plugin) {
+        super(plugin, Protocol1_9TO1_8.class);
+    }
+
+    public void sendArmorUpdate(Player player) {
         // Ensure that the player is on our pipe
-        UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(player);
-        if (userConnection == null) return;
-        if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
+        if (!isOnPipe(player)) return;
 
         int armor = ArmorType.calculateArmorPoints(player.getInventory().getArmorContents());
 
-        PacketWrapper wrapper = new PacketWrapper(0x4B, null, userConnection);
+        PacketWrapper wrapper = new PacketWrapper(0x4B, null, getUserConnection(player));
         try {
             wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
             wrapper.write(Type.INT, 1); // only 1 property
@@ -61,16 +57,14 @@ public class ArmorListener implements Listener {
         HumanEntity human = e.getWhoClicked();
         if (human instanceof Player && e.getInventory() instanceof CraftingInventory) {
             final Player player = (Player) human;
-            if (ViaVersion.getInstance().isPorted(player)) {
-                if (e.getCurrentItem() != null) {
-                    if (ArmorType.isArmor(e.getCurrentItem().getType())) {
-                        sendDelayedArmorUpdate(player);
-                        return;
-                    }
-                }
-                if (e.getRawSlot() >= 5 && e.getRawSlot() <= 8) {
+            if (e.getCurrentItem() != null) {
+                if (ArmorType.isArmor(e.getCurrentItem().getType())) {
                     sendDelayedArmorUpdate(player);
+                    return;
                 }
+            }
+            if (e.getRawSlot() >= 5 && e.getRawSlot() <= 8) {
+                sendDelayedArmorUpdate(player);
             }
         }
     }
@@ -81,12 +75,10 @@ public class ArmorListener implements Listener {
             if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 final Player player = e.getPlayer();
                 // Due to odd bugs it's 3 ticks later
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
                     @Override
                     public void run() {
-                        if (ViaVersion.getInstance().isPorted(player)) {
-                            sendArmorUpdate(player);
-                        }
+                        sendArmorUpdate(player);
                     }
                 }, 3L);
             }
@@ -100,23 +92,20 @@ public class ArmorListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRespawn(PlayerRespawnEvent e) {
-        if (ViaVersion.getInstance().isPorted(e.getPlayer()))
-            sendDelayedArmorUpdate(e.getPlayer());
+        sendDelayedArmorUpdate(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldChange(PlayerChangedWorldEvent e) {
-        if (ViaVersion.getInstance().isPorted(e.getPlayer()))
-            sendArmorUpdate(e.getPlayer());
+        sendArmorUpdate(e.getPlayer());
     }
 
     public void sendDelayedArmorUpdate(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        if (!isOnPipe(player)) return; // Don't start a task if the player is not on the pipe
+        Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
             @Override
             public void run() {
-                if (ViaVersion.getInstance().isPorted(player)) {
-                    sendArmorUpdate(player);
-                }
+                sendArmorUpdate(player);
             }
         });
     }

@@ -105,13 +105,15 @@ public class Protocol1_9TO1_8 extends Protocol {
     @Override
     protected void registerListeners() {
         ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
-        Bukkit.getPluginManager().registerEvents(new ArmorListener(plugin), plugin);
-        Bukkit.getPluginManager().registerEvents(new CommandBlockListener(plugin), plugin);
-        Bukkit.getPluginManager().registerEvents(new DeathListener(plugin), plugin);
-        Bukkit.getPluginManager().registerEvents(new BlockListener(plugin), plugin);
+
+        new ArmorListener(plugin).register();
+        new CommandBlockListener(plugin).register();
+        new DeathListener(plugin).register();
+        new BlockListener(plugin).register();
+
         if (Bukkit.getVersion().toLowerCase().contains("paper") || Bukkit.getVersion().toLowerCase().contains("taco")) {
             plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot patch: Fixes block placement.");
-            Bukkit.getPluginManager().registerEvents(new PaperPatch(), plugin);
+            new PaperPatch(plugin).register();
         }
         if (plugin.getConf().isStimulatePlayerTick())
             new ViaIdleThread(plugin.getPortedPlayers()).runTaskTimer(plugin, 1L, 1L); // Updates player's idle status

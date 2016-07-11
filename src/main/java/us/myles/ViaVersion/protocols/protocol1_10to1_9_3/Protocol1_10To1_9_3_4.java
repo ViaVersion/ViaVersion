@@ -11,17 +11,17 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.Meta1_9_1_10Type;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetaList1_9_1_10Type;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.Metadata1_9Type;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetadataList1_9Type;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Protocol1_10To1_9_3_4 extends Protocol {
     @Deprecated
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaList1_9_1_10Type();
+    public static final Type<List<Metadata>> METADATA_LIST = new MetadataList1_9Type();
     @Deprecated
-    public static final Type<Metadata> METADATA = new Meta1_9_1_10Type();
+    public static final Type<Metadata> METADATA = new Metadata1_9Type();
 
     public static ValueTransformer<Short, Float> toNewPitch = new ValueTransformer<Short, Float>(Type.FLOAT) {
         @Override

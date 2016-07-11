@@ -3,14 +3,12 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -20,11 +18,10 @@ import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.ViaListener;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
@@ -32,10 +29,11 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.lang.reflect.Method;
 
-@RequiredArgsConstructor
-public class CommandBlockListener implements Listener {
+public class CommandBlockListener extends ViaListener {
 
-    private final ViaVersionPlugin plugin;
+    public CommandBlockListener(ViaVersionPlugin plugin) {
+        super(plugin, Protocol1_9TO1_8.class);
+    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent e) {
@@ -44,7 +42,9 @@ public class CommandBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRespawn(final PlayerRespawnEvent e) {
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+        if (!isOnPipe(e.getPlayer())) return;
+
+        Bukkit.getScheduler().runTaskLater(getPlugin(), new Runnable() {
             @Override
             public void run() {
                 sendOp(e.getPlayer());
@@ -59,12 +59,7 @@ public class CommandBlockListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent e) {
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && plugin.isPorted(e.getPlayer()) && e.getPlayer().isOp()) {
-            // Ensure that the player is on our pipe
-            UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(e.getPlayer());
-            if (userConnection == null) return;
-            if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
-
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && isOnPipe(e.getPlayer()) && e.getPlayer().isOp()) {
             try {
                 sendCommandBlockPacket(e.getClickedBlock(), e.getPlayer());
             } catch (Exception ex) {
@@ -74,16 +69,13 @@ public class CommandBlockListener implements Listener {
     }
 
     private void sendOp(Player p) {
-        if (p.isOp() && plugin.isPorted(p)) {
-            // Ensure that the player is on our pipe
-            UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(p);
-            if (userConnection == null) return;
-            if (!userConnection.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) return;
-
+        if (p.isOp() && isOnPipe(p)) {
             try {
-                PacketWrapper wrapper = new PacketWrapper(0x1B, null, userConnection); // Entity status
-                wrapper.write(Type.INT, p.getEntityId());
+                PacketWrapper wrapper = new PacketWrapper(0x1B, null, getUserConnection(p)); // Entity status
+
+                wrapper.write(Type.INT, p.getEntityId()); // Entity ID
                 wrapper.write(Type.BYTE, (byte) 26); //Hardcoded op permission level
+
                 wrapper.send(Protocol1_9TO1_8.class);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -99,9 +91,7 @@ public class CommandBlockListener implements Listener {
         Object tileEntityCommand = ReflectionUtil.get(cmd, "commandBlock", ReflectionUtil.nms("TileEntityCommand"));
         Object updatePacket = ReflectionUtil.invoke(tileEntityCommand, "getUpdatePacket");
 
-        UserConnection userConnection = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(player);
-
-        PacketWrapper wrapper = generatePacket(updatePacket, userConnection);
+        PacketWrapper wrapper = generatePacket(updatePacket, getUserConnection(player));
         wrapper.send(Protocol1_9TO1_8.class);
     }
 
