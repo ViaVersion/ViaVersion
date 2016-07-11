@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.UUID;
 
-@Getter
+@Getter(AccessLevel.PROTECTED)
 @RequiredArgsConstructor
 public abstract class ViaListener implements Listener {
     private final ViaVersionPlugin plugin;
@@ -25,7 +26,7 @@ public abstract class ViaListener implements Listener {
      * @param player Player object
      * @return The UserConnection
      */
-    public UserConnection getUserConnection(@NonNull Player player) {
+    protected UserConnection getUserConnection(@NonNull Player player) {
         return getUserConnection(player.getUniqueId());
     }
 
@@ -35,7 +36,7 @@ public abstract class ViaListener implements Listener {
      * @param uuid UUID object
      * @return The UserConnection
      */
-    public UserConnection getUserConnection(@NonNull UUID uuid) {
+    protected UserConnection getUserConnection(@NonNull UUID uuid) {
         if (!plugin.isPorted(uuid)) return null;
         return plugin.getConnection(uuid);
     }
@@ -46,7 +47,7 @@ public abstract class ViaListener implements Listener {
      * @param player Player Object
      * @return True if on pipe
      */
-    public boolean isOnPipe(Player player) {
+    protected boolean isOnPipe(Player player) {
         return isOnPipe(player.getUniqueId());
     }
 
@@ -56,7 +57,7 @@ public abstract class ViaListener implements Listener {
      * @param uuid UUID Object
      * @return True if on pipe
      */
-    public boolean isOnPipe(UUID uuid) {
+    protected boolean isOnPipe(UUID uuid) {
         UserConnection userConnection = getUserConnection(uuid);
         return userConnection != null &&
                 userConnection.get(ProtocolInfo.class).getPipeline().contains(requiredPipeline);
