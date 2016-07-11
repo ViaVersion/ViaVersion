@@ -5,7 +5,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
-public class Meta1_10Type extends MetaTypeTemplate {
+public class Meta1_9_1_10Type extends MetaTypeTemplate {
 
     @Override
     public Metadata read(ByteBuf buffer) throws Exception {

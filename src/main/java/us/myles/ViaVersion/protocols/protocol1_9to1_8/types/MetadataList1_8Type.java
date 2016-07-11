@@ -8,7 +8,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetadataListType extends MetaListTypeTemplate {
+public class MetadataList1_8Type extends MetaListTypeTemplate {
 
     @Override
     public List<Metadata> read(ByteBuf buffer) throws Exception {
@@ -26,10 +26,6 @@ public class MetadataListType extends MetaListTypeTemplate {
 
     @Override
     public void write(ByteBuf buffer, List<Metadata> object) throws Exception {
-        for (Metadata m : object) {
-            Protocol1_9TO1_8.METADATA.write(buffer, m);
-        }
-        // Write end of list
-        Protocol1_9TO1_8.METADATA.write(buffer, null);
+        throw new UnsupportedOperationException("1.8 MetadataList writing is not implemented");
     }
 }

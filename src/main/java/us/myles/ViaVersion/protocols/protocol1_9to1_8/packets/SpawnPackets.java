@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
@@ -107,7 +108,7 @@ public class SpawnPackets {
                                     // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                                     Metadata potion = new Metadata(5, NewType.Slot.getTypeID(), Type.ITEM, item);
                                     meta.add(potion);
-                                    wrapper.write(Protocol1_9TO1_8.METADATA_LIST, meta);
+                                    wrapper.write(Protocol1_10To1_9_3_4.METADATA_LIST, meta);
                                 }
                             });
                             metaPacket.send(Protocol1_9TO1_8.class);
@@ -206,11 +207,11 @@ public class SpawnPackets {
                 map(Type.SHORT); // 10 - Velocity Y
                 map(Type.SHORT); // 11 - Velocity Z
 
-                map(Protocol1_9TO1_8.METADATA_LIST);
+                map(Protocol1_9TO1_8.METADATA_LIST, Protocol1_10To1_9_3_4.METADATA_LIST);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (tracker.getClientEntityTypes().containsKey(entityID)) {
@@ -225,7 +226,7 @@ public class SpawnPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.handleMetadata(entityID, metadataList);
@@ -311,12 +312,12 @@ public class SpawnPackets {
                     }
                 });
 
-                map(Protocol1_9TO1_8.METADATA_LIST);
+                map(Protocol1_9TO1_8.METADATA_LIST, Protocol1_10To1_9_3_4.METADATA_LIST);
 
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (tracker.getClientEntityTypes().containsKey(entityID)) {
@@ -332,7 +333,7 @@ public class SpawnPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_9TO1_8.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.handleMetadata(entityID, metadataList);

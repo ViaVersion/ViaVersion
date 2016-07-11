@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataTypes;
 
-public class MetadataType extends MetaTypeTemplate {
+public class Metadata1_8Type extends MetaTypeTemplate {
 
     @Override
     public Metadata read(ByteBuf buffer) throws Exception {
@@ -20,12 +20,6 @@ public class MetadataType extends MetaTypeTemplate {
 
     @Override
     public void write(ByteBuf buffer, Metadata object) throws Exception {
-        if (object == null) {
-            buffer.writeByte(255);
-        } else {
-            buffer.writeByte(object.getId());
-            buffer.writeByte(object.getTypeID());
-            object.getType().write(buffer, object.getValue());
-        }
+        throw new UnsupportedOperationException("1.8 Metadata writing is not implemented!");
     }
 }

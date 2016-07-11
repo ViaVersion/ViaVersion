@@ -17,8 +17,8 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.MetadataListType;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.MetadataType;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Metadata1_8Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.MetadataList1_8Type;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,8 +26,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class Protocol1_9TO1_8 extends Protocol {
-    public static Type<List<Metadata>> METADATA_LIST = new MetadataListType();
-    public static Type<Metadata> METADATA = new MetadataType();
+    public static Type<List<Metadata>> METADATA_LIST = new MetadataList1_8Type();
+    public static Type<Metadata> METADATA = new Metadata1_8Type();
     private static Gson gson = new GsonBuilder().create();
     public static ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
