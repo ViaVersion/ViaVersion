@@ -10,8 +10,9 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.minecraft.Types1_8;
+import us.myles.ViaVersion.api.type.types.minecraft.Types1_9;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
@@ -176,11 +177,11 @@ public class EntityPackets {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
-                map(Protocol1_9TO1_8.METADATA_LIST, Protocol1_10To1_9_3_4.METADATA_LIST); // 1 - Metadata List
+                map(Types1_8.METADATA_LIST, Types1_9.METADATA_LIST); // 1 - Metadata List
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (tracker.getClientEntityTypes().containsKey(entityID)) {
@@ -197,7 +198,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.handleMetadata(entityID, metadataList);
@@ -208,7 +209,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Protocol1_10To1_9_3_4.METADATA_LIST, 0);
+                        List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         if (metadataList.size() == 0) {
                             wrapper.cancel();
                         }

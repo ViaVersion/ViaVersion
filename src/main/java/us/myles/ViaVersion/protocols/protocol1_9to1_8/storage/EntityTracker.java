@@ -19,8 +19,8 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.minecraft.Types1_9;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
@@ -275,7 +275,7 @@ public class EntityTracker extends StoredObject {
         if (metadataBuffer.containsKey(entityID)) {
             PacketWrapper wrapper = new PacketWrapper(0x39, null, getUser());
             wrapper.write(Type.VAR_INT, entityID);
-            wrapper.write(Protocol1_10To1_9_3_4.METADATA_LIST, metadataBuffer.get(entityID));
+            wrapper.write(Types1_9.METADATA_LIST, metadataBuffer.get(entityID));
             MetadataRewriter.transform(getClientEntityTypes().get(entityID), metadataBuffer.get(entityID));
             handleMetadata(entityID, metadataBuffer.get(entityID));
             if (metadataBuffer.get(entityID).size() > 0) {

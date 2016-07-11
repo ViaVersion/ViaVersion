@@ -3,7 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.api.type.types.minecraft.Types1_8;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class MetadataList1_8Type extends MetaListTypeTemplate {
         List<Metadata> list = new ArrayList<>();
         Metadata m;
         do {
-            m = Protocol1_9TO1_8.METADATA.read(buffer);
+            m = Types1_8.METADATA.read(buffer);
             if (m != null) {
                 list.add(m);
             }

@@ -26,8 +26,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class Protocol1_9TO1_8 extends Protocol {
+    @Deprecated
     public static Type<List<Metadata>> METADATA_LIST = new MetadataList1_8Type();
+    @Deprecated
     public static Type<Metadata> METADATA = new Metadata1_8Type();
+
     private static Gson gson = new GsonBuilder().create();
     public static ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
