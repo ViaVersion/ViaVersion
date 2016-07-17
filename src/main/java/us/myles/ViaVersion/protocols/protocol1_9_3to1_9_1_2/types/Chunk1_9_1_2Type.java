@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,6 +12,8 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks.Chunk1_9_1_2;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks.ChunkSection1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,21 +9,16 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class Chunk1_9_3_4 implements Chunk {
+public class Chunk1_9_1_2 implements Chunk {
     private int x;
     private int z;
     private boolean groundUp;
     private int bitmask;
-    private ChunkSection1_9_3_4[] sections;
+    private final ChunkSection1_9_1_2[] sections;
+    private byte[] biomeData;
     List<CompoundTag> blockEntities;
 
-    @Override
     public boolean isBiomeData() {
-        return false;
-    }
-
-    @Override
-    public byte[] getBiomeData() {
-        return new byte[0];
+        return biomeData != null;
     }
 }

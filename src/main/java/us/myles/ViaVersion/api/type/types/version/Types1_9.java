@@ -1,9 +1,7 @@
-package us.myles.ViaVersion.api.type.types.minecraft;
+package us.myles.ViaVersion.api.type.types.version;
 
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.Metadata1_9Type;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetadataList1_9Type;
 
 import java.util.List;
 

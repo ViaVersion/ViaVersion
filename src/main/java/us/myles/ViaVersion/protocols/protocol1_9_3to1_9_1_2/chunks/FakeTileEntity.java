@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
 
 import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;

@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
+package us.myles.ViaVersion.api.type.types.version;
 
 
 import io.netty.buffer.ByteBuf;

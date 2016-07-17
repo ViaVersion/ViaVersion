@@ -1,10 +1,12 @@
-package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
+package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types;
 
 import io.netty.buffer.ByteBuf;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.Chunk1_9_3_4;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.ChunkSection1_9_3_4;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,8 @@
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
+package us.myles.ViaVersion.api.type.types.version;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
-import us.myles.ViaVersion.api.type.types.minecraft.Types1_8;
 
 import java.util.ArrayList;
 import java.util.List;

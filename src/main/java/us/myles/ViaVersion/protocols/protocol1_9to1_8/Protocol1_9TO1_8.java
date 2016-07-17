@@ -13,12 +13,12 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
+import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Metadata1_8Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.MetadataList1_8Type;
 
 import java.util.List;
 import java.util.UUID;

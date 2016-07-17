@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4;
+package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;

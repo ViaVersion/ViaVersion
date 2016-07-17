@@ -8,11 +8,11 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.minecraft.Types1_9;
+import us.myles.ViaVersion.api.type.types.version.Metadata1_9Type;
+import us.myles.ViaVersion.api.type.types.version.MetadataList1_9Type;
+import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.Metadata1_9Type;
-import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types.MetadataList1_9Type;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

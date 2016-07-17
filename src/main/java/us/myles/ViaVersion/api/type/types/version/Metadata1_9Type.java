@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_10to1_9_3.types;
+package us.myles.ViaVersion.api.type.types.version;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
