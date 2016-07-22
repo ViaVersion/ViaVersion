@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -25,6 +26,10 @@ public class PaperPatch extends ViaListener {
     public void onPlace(BlockPlaceEvent e) {
         if (isOnPipe(e.getPlayer())) {
             Location diff = e.getPlayer().getLocation().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
+            Material block = e.getBlockPlaced().getType();
+            if (!block.isSolid()) {
+                return;
+            }
             if (e.getPlayer().getLocation().getBlock().equals(e.getBlock())) {
                 e.setCancelled(true);
             } else {
