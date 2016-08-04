@@ -21,8 +21,9 @@ import java.util.UUID;
 public class UpdateUtil {
 
     public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
-    private final static String URL = "http://api.spiget.org/v1/resources/";
+    private final static String URL = "http://api.spiget.org/v2/resources/";
     private final static int PLUGIN = 19254;
+	private final static String LATEST_VERSION = "/versions/latest";
 
     public static void sendUpdateMessage(final UUID uuid, final Plugin plugin) {
         new BukkitRunnable() {
@@ -94,7 +95,7 @@ public class UpdateUtil {
 
     private static String getNewestVersion() {
         try {
-            URL url = new URL(URL + PLUGIN + "?" + System.currentTimeMillis());
+            URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
             connection.addRequestProperty("User-Agent", "ViaVersion " + ViaVersion.getInstance().getVersion());
@@ -114,7 +115,7 @@ public class UpdateUtil {
                 e.printStackTrace();
                 return null;
             }
-            return (String) statistics.get("version");
+            return (String) statistics.get("name");
         } catch (MalformedURLException e) {
             return null;
         } catch (IOException e) {
