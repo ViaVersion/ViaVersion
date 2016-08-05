@@ -19,7 +19,9 @@ public class Metadata1_8Type extends MetaTypeTemplate {
     }
 
     @Override
-    public void write(ByteBuf buffer, Metadata object) throws Exception {
-        throw new UnsupportedOperationException("1.8 Metadata writing is not implemented!");
+    public void write(ByteBuf buffer, Metadata meta) throws Exception {
+        byte item = (byte) (meta.getTypeID() << 5 | meta.getId() & 0x1F);
+        buffer.writeByte(item);
+        meta.getType().write(buffer, meta.getValue());
     }
 }

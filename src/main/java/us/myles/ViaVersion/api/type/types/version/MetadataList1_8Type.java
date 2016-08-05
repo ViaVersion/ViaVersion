@@ -25,6 +25,8 @@ public class MetadataList1_8Type extends MetaListTypeTemplate {
 
     @Override
     public void write(ByteBuf buffer, List<Metadata> object) throws Exception {
-        throw new UnsupportedOperationException("1.8 MetadataList writing is not implemented");
+        for (Metadata data : object)
+            Types1_8.METADATA.write(buffer, data);
+        buffer.writeByte(127);
     }
 }
