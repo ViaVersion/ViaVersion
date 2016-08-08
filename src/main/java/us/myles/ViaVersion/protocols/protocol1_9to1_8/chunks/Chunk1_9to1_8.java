@@ -3,7 +3,11 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+
+import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
@@ -45,5 +49,10 @@ public class Chunk1_9to1_8 implements Chunk {
     @Override
     public int getBitmask() {
         return primaryBitmask;
+    }
+
+    @Override
+    public List<CompoundTag> getBlockEntities() {
+        return Collections.emptyList();
     }
 }

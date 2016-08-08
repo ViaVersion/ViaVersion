@@ -11,11 +11,10 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.BlockEntity;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.Chunk1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
-    public static Type<Chunk> CHUNK = new Chunk1_9_3_4Type();
 
     @Override
     protected void registerPackets() {
@@ -60,8 +59,50 @@ public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        Chunk chunk = wrapper.passthrough(CHUNK);
-                        BlockEntity.handle(((Chunk1_9_3_4) chunk).getBlockEntities(), wrapper.user());
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+
+                        Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
+                        Chunk chunk = wrapper.passthrough(type);
+
+                        BlockEntity.handle(chunk.getBlockEntities(), wrapper.user());
+                    }
+                });
+            }
+        });
+
+        // Join (save dimension id)
+        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+
+                        int dimensionId = wrapper.get(Type.INT, 1);
+                        clientChunks.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
+        // Respawn (save dimension id)
+        registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Dimension ID
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+
+                        int dimensionId = wrapper.get(Type.INT, 0);
+                        clientWorld.setEnvironment(dimensionId);
                     }
                 });
             }
@@ -70,6 +111,7 @@ public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-
+        if (!userConnection.has(ClientWorld.class))
+            userConnection.put(new ClientWorld(userConnection));
     }
 }

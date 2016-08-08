@@ -1,56 +1,102 @@
 package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.bukkit.World;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
+import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.Chunk1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.ChunkSection1_9_3_4;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
-public class Chunk1_9_3_4Type extends BaseChunkType {
-    public Chunk1_9_3_4Type() {
-        super("1.9.3 Chunk");
+public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
+
+    public Chunk1_9_3_4Type(ClientWorld param) {
+        super(param, Chunk.class);
     }
 
     @Override
-    public Chunk read(ByteBuf input) throws Exception {
+    public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
-        int size = Type.VAR_INT.read(input);
+        Type.VAR_INT.read(input);
 
-        byte[] sections = new byte[size];
-        input.readBytes(sections);
-
-        int blockEntities = Type.VAR_INT.read(input);
-        List<CompoundTag> nbtData = new ArrayList<>();
-        for (int i = 0; i < blockEntities; i++) {
-            nbtData.add(Type.NBT.read(input));
+        BitSet usedSections = new BitSet(16);
+        ChunkSection1_9_3_4[] sections = new ChunkSection1_9_3_4[16];
+        // Calculate section count from bitmask
+        for (int i = 0; i < 16; i++) {
+            if ((primaryBitmask & (1 << i)) != 0) {
+                usedSections.set(i);
+            }
         }
-        return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, new ChunkSection1_9_3_4[] {new ChunkSection1_9_3_4(sections)}, nbtData);
+
+        // Read sections
+        for (int i = 0; i < 16; i++) {
+            if (!usedSections.get(i)) continue; // Section not set
+            ChunkSection1_9_3_4 section = new ChunkSection1_9_3_4();
+            sections[i] = section;
+            section.readBlocks(input);
+            section.readBlockLight(input);
+            if (world.getEnvironment() == World.Environment.NORMAL) {
+                section.readSkyLight(input);
+            }
+        }
+
+        byte[] biomeData = groundUp ? new byte[256] : null;
+        if (groundUp) {
+            input.readBytes(biomeData);
+        }
+
+        List<CompoundTag> nbtData = Arrays.asList(Type.NBT_ARRAY.read(input));
+
+        return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
     }
 
     @Override
-    public void write(ByteBuf buffer, Chunk input) throws Exception {
-        if (!(input instanceof Chunk1_9_3_4))
-            throw new Exception("Tried to send the wrong chunk type from 1.9.3-4 chunk: " + input.getClass());
-        Chunk1_9_3_4 chunk = (Chunk1_9_3_4) input;
+    public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
+        output.writeInt(chunk.getX());
+        output.writeInt(chunk.getZ());
 
-        buffer.writeInt(chunk.getX());
-        buffer.writeInt(chunk.getZ());
+        output.writeBoolean(chunk.isGroundUp());
+        Type.VAR_INT.write(output, chunk.getBitmask());
 
-        buffer.writeBoolean(chunk.isGroundUp());
-        Type.VAR_INT.write(buffer, chunk.getBitmask());
+        ByteBuf buf = Unpooled.buffer();
+        for (int i = 0; i < 16; i++) {
+            ChunkSection section = chunk.getSections()[i];
+            if (section == null) continue; // Section not set
+            section.writeBlocks(buf);
+            section.writeBlockLight(buf);
 
-        Type.VAR_INT.write(buffer, chunk.getSections()[0].getData().length);
-        buffer.writeBytes(chunk.getSections()[0].getData());
+            if (!section.hasSkyLight()) continue; // No sky light, we're done here.
+            section.writeSkyLight(buf);
 
-        // no block entities as it's earlier
+        }
+        buf.readerIndex(0);
+        Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
+        output.writeBytes(buf);
+        buf.release(); // release buffer
+
+        // Write biome data
+        if (chunk.isBiomeData()) {
+            output.writeBytes(chunk.getBiomeData());
+        }
+
+        // Don't write block entities
+    }
+
+    @Override
+    public Class<? extends Type> getBaseClass() {
+        return BaseChunkType.class;
     }
 }
