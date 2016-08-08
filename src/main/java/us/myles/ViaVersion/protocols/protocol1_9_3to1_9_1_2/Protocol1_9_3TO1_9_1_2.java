@@ -142,6 +142,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
 
     @Override
     public void init(UserConnection user) {
-        user.put(new ClientWorld(user));
+        if (!user.has(ClientWorld.class))
+            user.put(new ClientWorld(user));
     }
 }

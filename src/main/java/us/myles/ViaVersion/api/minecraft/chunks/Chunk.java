@@ -1,5 +1,9 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+
+import java.util.List;
+
 public interface Chunk {
     int getX();
 
@@ -14,4 +18,6 @@ public interface Chunk {
     byte[] getBiomeData();
 
     int getBitmask();
+
+    List<CompoundTag> getBlockEntities();
 }
