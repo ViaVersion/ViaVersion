@@ -2,6 +2,8 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 import java.util.List;
 
@@ -34,13 +36,14 @@ public class MetadataRewriter {
             // Husk - 23
             Optional<Metadata> options = getById(metadata, 13);
             if (options.isPresent()) {
-                if (((int) options.get().getValue()) == 0) {
-                    return currentType;
+                int value = (int) options.get().getValue();
+                if (value > 0 && value < 6) {
+                    metadata.add(new Metadata(16, NewType.VarInt.getTypeID(), Type.VAR_INT, value - 1)); // Add profession type to new metadata
+                    return 27;
                 }
-                if (((int) options.get().getValue()) == 6) {
+                if (value == 6) {
                     return 23;
                 }
-                int profession = ((int) options.get().getValue()) - 1;
             }
         }
         if (currentType == 100) {
