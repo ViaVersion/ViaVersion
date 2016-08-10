@@ -44,6 +44,7 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
                         wrapper.set(Type.VAR_INT, 1, type);
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).getClientEntityTypes().put(wrapper.get(Type.VAR_INT, 0), type);
+                        MetadataRewriter.handleMetadata(type, wrapper.get(Types1_9.METADATA_LIST, 0));
                     }
                 });
             }
@@ -71,6 +72,17 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Types1_9.METADATA_LIST); // 1 - Metadata list
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        if (!wrapper.user().get(EntityTracker.class).getClientEntityTypes().containsKey(entityId)) {
+                            return;
+                        }
+                        int type = wrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+                        MetadataRewriter.handleMetadata(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    }
+                });
             }
         });
 
