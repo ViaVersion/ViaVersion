@@ -153,7 +153,6 @@ public class MetadataRewriter {
                     }
                 }
             } catch (Exception e) {
-                ;
                 metadatas.remove(metadata);
                 if (!ViaVersion.getConfig().isSuppressMetadataErrors() || ViaVersion.getInstance().isDebug()) {
                     System.out.println("An error occurred with entity metadata handler");
