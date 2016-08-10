@@ -3,9 +3,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_10.storage;
 import lombok.Getter;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
