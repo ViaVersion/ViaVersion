@@ -32,12 +32,40 @@ public class MetadataRewriter {
         if (currentType == 54) {
             // ZombieVillager - 27
             // Husk - 23
+            Optional<Metadata> options = getById(metadata, 13);
+            if (options.isPresent()) {
+                if (((int) options.get().getValue()) == 0) {
+                    return currentType;
+                }
+                if (((int) options.get().getValue()) == 6) {
+                    return 23;
+                }
+                int profession = ((int) options.get().getValue()) - 1;
+            }
         }
         if (currentType == 100) {
             // SkeletonHorse - 28
             // ZombieHorse - 29
             // Donkey - 31
             // Mule - 32
+            Optional<Metadata> options = getById(metadata, 14);
+            if (options.isPresent()) {
+                if (((int) options.get().getValue()) == 0) {
+                    return currentType;
+                }
+                if (((int) options.get().getValue()) == 1) {
+                    return 31;
+                }
+                if (((int) options.get().getValue()) == 2) {
+                    return 32;
+                }
+                if (((int) options.get().getValue()) == 3) {
+                    return 29;
+                }
+                if (((int) options.get().getValue()) == 4) {
+                    return 28;
+                }
+            }
         }
         return currentType;
     }

@@ -38,8 +38,12 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        // Change Type :)
+                        int type = wrapper.get(Type.VAR_INT, 1);
+                        type = MetadataRewriter.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                        wrapper.set(Type.VAR_INT, 1, type);
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).getClientEntityTypes().put(wrapper.get(Type.VAR_INT, 0), wrapper.get(Type.VAR_INT, 1));
+                        wrapper.user().get(EntityTracker.class).getClientEntityTypes().put(wrapper.get(Type.VAR_INT, 0), type);
                     }
                 });
             }
