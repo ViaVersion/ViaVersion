@@ -7,10 +7,13 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.packets.InventoryPackets;
 
 public class ProtocolSnapshotTo1_10 extends Protocol {
     @Override
     protected void registerPackets() {
+        InventoryPackets.register(this);
+
         // Spawn mob packet
         registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
             @Override
