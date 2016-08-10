@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-public class EntityTracker extends StoredObject{
+public class EntityTracker extends StoredObject {
     private final Map<Integer, Integer> clientEntityTypes = new ConcurrentHashMap<>();
 
     public EntityTracker(UserConnection user) {
