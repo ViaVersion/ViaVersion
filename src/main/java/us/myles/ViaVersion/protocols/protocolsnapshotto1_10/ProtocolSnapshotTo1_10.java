@@ -32,7 +32,7 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
-                        // TODO FIND OUT WHAT THE NEW VAR_INT IS
+                        wrapper.write(Type.VAR_INT, 1); // 2 - Pickup Count
                     }
                 });
             }
