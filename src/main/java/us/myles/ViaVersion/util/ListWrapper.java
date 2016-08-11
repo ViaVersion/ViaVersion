@@ -1,6 +1,9 @@
 package us.myles.ViaVersion.util;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public abstract class ListWrapper implements List {
     public final Object lock = new Object();
