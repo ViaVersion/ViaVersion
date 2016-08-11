@@ -51,7 +51,7 @@ public class ProtocolVersion {
         register(v1_9_2 = new ProtocolVersion(109, "1.9.2"));
         register(v1_9_3 = new ProtocolVersion(110, "1.9.3/4"));
         register(v1_10 = new ProtocolVersion(210, "1.10"));
-        register(vSNAPSHOT = new ProtocolVersion(301, "1.11-SNAPSHOT"));
+        register(vSNAPSHOT = new ProtocolVersion(302, "1.11-SNAPSHOT"));
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
