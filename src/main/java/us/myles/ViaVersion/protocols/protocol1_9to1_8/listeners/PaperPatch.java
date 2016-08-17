@@ -18,7 +18,7 @@ public class PaperPatch extends ViaListener {
     /*
     This patch is applied when Paper is detected.
     I'm unsure of what causes this but essentially,
-    placing blocks where your standing works?
+    placing blocks where you're standing works?
     If there is a better fix then we'll replace this.
      */
 
