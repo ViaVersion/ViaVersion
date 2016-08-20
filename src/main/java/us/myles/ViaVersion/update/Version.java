@@ -2,21 +2,26 @@ package us.myles.ViaVersion.update;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Version implements Comparable<Version> {
-    private int[] parts;
+    private static Pattern semVer = Pattern.compile("(?<a>0|[1-9]\\d*)\\.(?<b>0|[1-9]\\d*)(?:\\.(?<c>0|[1-9]\\d*))?(?:-(?<tag>[A-z0-9.-]*))?");
+    private int[] parts = new int[3];
+    private String tag;
 
     public Version(String value) {
         if (value == null)
             throw new IllegalArgumentException("Version can not be null");
 
-        if (!value.matches("^[0-9]+(\\.[0-9]+)*$"))
+        Matcher matcher = semVer.matcher(value);
+        if (!matcher.matches())
             throw new IllegalArgumentException("Invalid version format");
+        parts[0] = Integer.parseInt(matcher.group("a"));
+        parts[1] = Integer.parseInt(matcher.group("b"));
+        parts[2] = matcher.group("c") == null ? 0 : Integer.parseInt(matcher.group("c"));
 
-        String[] split = value.split("\\.");
-        parts = new int[split.length];
-
-        for (int i = 0; i < split.length; i += 1)
-            parts[i] = Integer.parseInt(split[i]);
+        tag = matcher.group("tag") == null ? "" : matcher.group("tag");
     }
 
     public static int compare(Version verA, Version verB) {
@@ -33,6 +38,12 @@ public class Version implements Comparable<Version> {
             if (partA > partB) return 1;
         }
 
+        // Simple tag check
+        if (verA.tag.length() == 0 && verB.tag.length() > 0)
+            return 1;
+        if (verA.tag.length() > 0 && verB.tag.length() == 0)
+            return -1;
+
         return 0;
     }
 
@@ -47,7 +58,7 @@ public class Version implements Comparable<Version> {
         for (int i = 0; i < parts.length; i += 1)
             split[i] = String.valueOf(parts[i]);
 
-        return StringUtils.join(split, ".");
+        return StringUtils.join(split, ".") + (tag.length() != 0 ? "-" + tag : "");
     }
 
     @Override
@@ -58,5 +69,9 @@ public class Version implements Comparable<Version> {
     @Override
     public boolean equals(Object that) {
         return that instanceof Version && equals(this, (Version) that);
+    }
+
+    public String getTag() {
+        return tag;
     }
 }
