@@ -21,6 +21,7 @@ import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
@@ -60,7 +61,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
 
         if (protocolSupport) {
-            getLogger().info("Patching to prevent concurrency issues...");
+            getLogger().info("Hooking into ProtocolSupport, to prevent issues!");
             try {
                 patchLists();
             } catch (Exception e) {
@@ -84,7 +85,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 }
 
             } else {
-                getLogger().severe("ViaVersion is already loaded, this should work fine... Otherwise reboot the server!!!");
+                getLogger().severe("ViaVersion is already loaded, this should work fine. If you get any console errors, try rebooting.");
 
             }
         }
@@ -125,9 +126,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                 gatherProtocolVersion();
                 // Check if there are any pipes to this version
                 if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
-                    getLogger().info("ViaVersion detected protocol version: " + ProtocolRegistry.SERVER_PROTOCOL);
+                    getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
                     if (!ProtocolRegistry.isWorkingPipe()) {
-                        getLogger().warning("ViaVersion will not function on the current protocol.");
+                        getLogger().warning("ViaVersion does not have any compatible versions for this server version, please read our resource page carefully.");
                     }
                 }
                 ProtocolRegistry.refreshVersions();
@@ -151,7 +152,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
 
     @Override
     public void onDisable() {
-        getLogger().info("ViaVersion is disabling, if this is a reload it may not work.");
+        getLogger().info("ViaVersion is disabling, if this is a reload and you experience issues consider rebooting.");
         uninject();
     }
 
@@ -222,7 +223,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
         try {
             Object connection = getServerConnection();
             if (connection == null) {
-                getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
+                getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
                 return;
             }
             for (Field field : connection.getClass().getDeclaredFields()) {
@@ -256,7 +257,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
             }
             System.setProperty("ViaVersion", getDescription().getVersion());
         } catch (Exception e) {
-            getLogger().severe("Unable to inject handlers, are you on 1.8? ");
+            getLogger().severe("Unable to inject ViaVersion, please post these details on our GitHub and ensure you're using a compatible server version.");
             e.printStackTrace();
         }
     }
@@ -265,7 +266,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
     public void patchLists() throws Exception {
         Object connection = getServerConnection();
         if (connection == null) {
-            getLogger().warning("We failed to find the ServerConnection? :( What server are you running?");
+            getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
             return;
         }
         for (Field field : connection.getClass().getDeclaredFields()) {
@@ -325,12 +326,12 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                     PluginDescriptionFile yaml = ReflectionUtil.get(cl, "description", PluginDescriptionFile.class);
                     throw new Exception("Unable to inject, due to " + bootstrapAcceptor.getClass().getName() + ", try without the plugin " + yaml.getName() + "?");
                 } else {
-                    throw new Exception("Unable to find childHandler, weird server version? " + bootstrapAcceptor.getClass().getName());
+                    throw new Exception("Unable to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
                 }
 
             }
         } catch (Exception e) {
-            getLogger().severe("Have you got late-bind enabled with something else?");
+            getLogger().severe("We failed to inject ViaVersion, have you got late-bind enabled with something else?");
             e.printStackTrace();
         }
     }
@@ -345,7 +346,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                     ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((ViaVersionInitializer) oldInit).getOriginal());
                 }
             } catch (Exception e) {
-                System.out.println("Failed to remove injection... reload won't work with connections sorry");
+                System.out.println("Failed to remove injection handler, reload won't work with connections, please reboot!");
             }
         }
         injectedFutures.clear();
@@ -357,7 +358,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaVersionAPI {
                     pair.getKey().set(pair.getValue(), ((ListWrapper) o).getOriginalList());
                 }
             } catch (IllegalAccessException e) {
-                System.out.println("Failed to remove injection... reload might not work with connections sorry");
+                System.out.println("Failed to remove injection, reload won't work with connections, please reboot!");
             }
         }
 
