@@ -23,7 +23,7 @@ public class UpdateUtil {
     public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
     private final static String URL = "http://api.spiget.org/v2/resources/";
     private final static int PLUGIN = 19254;
-	private final static String LATEST_VERSION = "/versions/latest";
+    private final static String LATEST_VERSION = "/versions/latest";
 
     public static void sendUpdateMessage(final UUID uuid, final Plugin plugin) {
         new BukkitRunnable() {
@@ -82,13 +82,17 @@ public class UpdateUtil {
         try {
             current = new Version(ViaVersion.getInstance().getVersion());
         } catch (IllegalArgumentException e) {
-            return "You are using a debug/custom version, consider updating.";
+            return "You are using a custom version, consider updating.";
         }
         Version newest = new Version(newestString);
         if (current.compareTo(newest) < 0)
-            return "There is a newer version available: " + newest.toString();
+            return "There is a newer version available: " + newest.toString() + ", you're on: " + current.toString();
         else if (console && current.compareTo(newest) != 0) {
-            return "You are running a newer version than is released!";
+            if (current.getTag().toLowerCase().startsWith("dev") || current.getTag().toLowerCase().startsWith("snapshot")) {
+                return "You are running a development version, please report any bugs to GitHub.";
+            } else {
+                return "You are running a newer version than is released!";
+            }
         }
         return null;
     }

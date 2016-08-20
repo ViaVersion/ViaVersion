@@ -132,6 +132,7 @@ public class ViaCommandHandler implements ViaVersionCommand, CommandExecutor, Ta
         registerSubCommand(new ListSubCmd());
         registerSubCommand(new PPSSubCmd());
         registerSubCommand(new DebugSubCmd());
+        registerSubCommand(new DumpSubCmd());
         registerSubCommand(new DisplayLeaksSubCmd());
         registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
