@@ -1,6 +1,7 @@
 # ViaVersion 0.9.8
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
+IRC: [#viaversion](http://buzz.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
 
 **Allows the connection of higher client versions to lower server versions**
 
@@ -14,39 +15,11 @@ Allows 1.10, 1.9 on 1.8 server and 1.10 on a 1.9 server.
 
 Sources:
 --------
+**wiki.vg** (Used for various information, we also contribute back)
 
-**wiki.vg** (Protocol info, though I did have to find a lot myself)
-
-**Burger** We use this tool to get protocol and other useful information for new / undocumented Minecraft versions
+**Burger** (See [PAaaS](https://github.com/Matsv/Paaas))
 
 **OpenNBT** (used for slot rewriting)
-
-
-
-All Time Contributors:
---------
-
-**Myself** (harhar)
-
-**Matsv**
-
-**HugoDaBosss**
-
-**SanderGielisse**
-
-**Paulomart**
-
-**gigosaurus**
-
-**fillefilip8**
-
-**lenis0012**
-
-**fuzzy_bot**
-
-**joserobjr**
-
-
 
 Releases / Dev Builds:
 --------
