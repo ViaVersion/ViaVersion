@@ -1,6 +1,7 @@
 # ViaVersion 0.9.8
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
+
 IRC: [#viaversion](http://buzz.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
 
 **Allows the connection of higher client versions to lower server versions**
@@ -20,6 +21,8 @@ Sources:
 **Burger** (See [PAaaS](https://github.com/Matsv/Paaas))
 
 **OpenNBT** (used for slot rewriting)
+
+
 
 Releases / Dev Builds:
 --------
@@ -43,5 +46,5 @@ License:
 
 MIT License, see LICENSE for more details.
 
-Thanks!
 
+Special thanks to all our [Contributors](https://github.com/MylesIsCool/ViaVersion/graphs/contributors)
