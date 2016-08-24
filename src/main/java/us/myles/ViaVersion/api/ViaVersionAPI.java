@@ -17,6 +17,7 @@ public interface ViaVersionAPI {
      *
      * @param player Bukkit player object
      * @return True if the client is modified (At the moment it also means version 1.9 and higher)
+     * @deprecated As of 0.9.9, because all players are ported use {@link #getPlayerVersion(Player)}
      */
     boolean isPorted(Player player);
 
@@ -42,7 +43,9 @@ public interface ViaVersionAPI {
      *
      * @param playerUUID UUID of a player
      * @return True if the client is on 1.9
+     * @deprecated As of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)}
      */
+    @Deprecated
     boolean isPorted(UUID playerUUID);
 
     /**
@@ -116,9 +119,9 @@ public interface ViaVersionAPI {
     /**
      * Get the supported protocol versions
      * This method removes any blocked protocol versions.
-     * @see ProtocolRegistry#getSupportedVersions() for full list.
      *
      * @return a list of protocol versions
+     * @see ProtocolRegistry#getSupportedVersions() for full list.
      */
     SortedSet<Integer> getSupportedVersions();
 
