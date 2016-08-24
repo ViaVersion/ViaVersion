@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class DumpSubCmd extends ViaSubCommand {
@@ -52,7 +53,9 @@ public class DumpSubCmd extends ViaSubCommand {
         for (Plugin p : Bukkit.getPluginManager().getPlugins())
             plugins.add(new PluginInfo(p.isEnabled(), p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), p.getDescription().getAuthors()));
 
-        final DumpTemplate template = new DumpTemplate(version, plugins);
+        Map<String, Object> configuration = ((ViaVersionPlugin) ViaVersion.getInstance()).getConfig().getValues(false);
+
+        final DumpTemplate template = new DumpTemplate(version, configuration, plugins);
 
         Bukkit.getScheduler().runTaskAsynchronously((ViaVersionPlugin) ViaVersion.getInstance(), new Runnable() {
             @Override

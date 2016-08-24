@@ -93,4 +93,9 @@ public class ProtocolVersion {
     public int hashCode() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s(%d)", this.getName(), this.getId());
+    }
 }
