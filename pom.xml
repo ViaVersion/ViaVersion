@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>ViaVersion</name>
-    <description>Allow 1.8 clients to join 1.9 bukkit servers!</description>
+    <description>Allow newer clients to join older server versions.</description>
     <inceptionYear>2016</inceptionYear>
     <url>https://www.spigotmc.org/resources/viaversion.19254/</url>
 
