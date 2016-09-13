@@ -1,6 +1,6 @@
 name: ViaVersion
 main: us.myles.ViaVersion.ViaVersionPlugin
-authors: [_MylesC, Matsv]
+authors: [_MylesC, Matsv, MiniDigger]
 version: ${project.version}
 load: postworld
 loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer]
