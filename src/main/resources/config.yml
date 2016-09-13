@@ -1,5 +1,5 @@
-# Thanks for downloading ViaVersion
-# Ensure you look through all these options
+# Thanks for downloading ViaVersion.
+# Ensure you look through all these options.
 # If you need help:
 # viaversion.com - Discussion tab
 # IRC - https://elmer.spi.gt/iris/?nick=&channels=viaversion #viaversion on irc.spi.gt
@@ -10,12 +10,12 @@
 #
 # Should ViaVersion check for updates?
 checkforupdates: true
-# Send the supported versions with the Status (Ping) response packet
+# Send the supported versions with the Status (Ping) response packet.
 send-supported-versions: false
-# Block specific Minecraft protocols that ViaVersion allows
+# Block specific Minecraft protocols that ViaVersion allows.
 # List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers
 block-protocols: []
-# Change the blocked disconnect message
+# Change the blocked disconnect message.
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
 # If you use ProtocolLib, we can't reload without kicking the players.
 # (We don't suggest using reload either, use a plugin manager)
@@ -40,9 +40,9 @@ max-pps-kick-msg: "You are sending too many packets!"
 # Period to track (in seconds)
 # Use -1 to disable.
 tracking-period: 6
-# How many packets per second counts as a warning
+# How many packets per second counts as a warning.
 tracking-warning-pps: 120
-# How many warnings over the interval can we have
+# How many warnings over the interval can we have.
 # This can never be higher than "tracking-period"
 tracking-max-warnings: 4
 tracking-max-kick-msg: "You are sending too many packets, :("
@@ -56,12 +56,12 @@ tracking-max-kick-msg: "You are sending too many packets, :("
 prevent-collision: true
 # If the above is true, should we automatically team players until you do?
 auto-team: true
-# When enabled if certain metadata can't be read we won't tell you about it
+# When enabled if certain metadata can't be read we won't tell you about it.
 suppress-metadata-errors: false
-# When enabled 1.9 & 1.10 will be able to block by using shields
+# When enabled 1.9 & 1.10 will be able to block by using shields.
 shield-blocking: true
 # Should we enable our hologram patch?
-# If they're in the wrong place enable this
+# If they're in the wrong place enable this.
 hologram-patch: false
 # This is the offset, should work as default when enabled.
 hologram-y: -0.96
@@ -75,9 +75,9 @@ bossbar-patch: true
 bossbar-anti-flicker: false
 # This will show the new effect indicator in the top-right corner for 1.9 & 1.10 players.
 use-new-effect-indicator: true
-# Show the new death messages for 1.9 & 1.10 on the death screen
+# Show the new death messages for 1.9 & 1.10 on the death screen.
 use-new-deathmessages: false
-# Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
+# Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items.
 item-cache: true
 # Patch the Anti xray to work on 1.9 & 1.10 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
 anti-xray-patch: true
@@ -85,5 +85,5 @@ anti-xray-patch: true
 replace-pistons: false
 # What id should we replace with, default is air. (careful of players getting stuck standing on them)
 replacement-piston-id: 0
-# Force the string -> json transform
+# Force the string -> json transform.
 force-json-transform: false
