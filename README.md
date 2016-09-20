@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 
-IRC: [#viaversion](http://buzz.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
+IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
 
 **Allows the connection of higher client versions to lower server versions**
 
