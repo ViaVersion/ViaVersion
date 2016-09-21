@@ -248,7 +248,7 @@ public class InventoryPackets {
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.BYTE); // 2 - Button
                 map(Type.SHORT); // 3 - Action
-                map(Type.BYTE); // 4 - Mode
+                map(Type.VAR_INT, Type.BYTE); // 4 - Mode
                 map(Type.ITEM); // 5 - Clicked Item
                 handler(new PacketHandler() {
                     @Override
