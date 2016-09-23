@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>viaversion-parent</artifactId>
+        <groupId>us.myles</groupId>
+        <version>1.0.0-ALPHA-16w38a</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>viaversion</artifactId>
+
+    <build>
+        <finalName>${project.name}-${project.version}</finalName>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <defaultGoal>clean install</defaultGoal>
+        <resources>
+            <resource>
+                <targetPath>.</targetPath>
+                <filtering>false</filtering>
+                <directory>.</directory>
+                <includes>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+            <resource>
+                <targetPath>.</targetPath>
+                <filtering>true</filtering>
+                <directory>src/main/resources/</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!-- Maven Java Compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${jdkVersion}</source>
+                    <target>${jdkVersion}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Libs Shading and Relocation -->
+            <plugin>
+                <!--Relocate all lib we use in order to fix class loading errors if we use different versions
+                than already loaded libs (i.e. by Mojang -> gson)-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <minimizeJar>false</minimizeJar>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.spacehq.opennbt</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.gson</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.gson</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.javassist</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-common</artifactId>
+            <version>1.0.0-ALPHA-16w38a</version>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-bukkit</artifactId>
+            <version>1.0.0-ALPHA-16w38a</version>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-bungee</artifactId>
+            <version>1.0.0-ALPHA-16w38a</version>
+        </dependency>
+    </dependencies>
+
+</project>
