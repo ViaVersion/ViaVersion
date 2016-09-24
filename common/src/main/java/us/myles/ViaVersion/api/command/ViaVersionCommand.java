@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api.command;
 
+import java.util.List;
+
 public interface ViaVersionCommand {
     /**
      * Register your own subcommand inside ViaVersion
@@ -24,4 +26,22 @@ public interface ViaVersionCommand {
      * @return ViaSubCommand instance
      */
     ViaSubCommand getSubCommand(String name);
+
+    /**
+     * Executed when the Command sender executes the command
+     *
+     * @param sender Sender object
+     * @param args arguments provided
+     * @return was successful
+     */
+    boolean onCommand(ViaCommandSender sender, String[] args);
+
+    /**
+     * Executed when the Command sender tab-completes
+     *
+     * @param sender Sender object
+     * @param args arguments provided
+     * @return was successful
+     */
+    List<String> onTabComplete(ViaCommandSender sender, String[] args);
 }

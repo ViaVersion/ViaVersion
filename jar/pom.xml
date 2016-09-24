@@ -17,7 +17,7 @@
         <defaultGoal>clean install</defaultGoal>
         <resources>
             <resource>
-                <targetPath>.</targetPath>https://github.com/MylesIsCool/ViaVersion/blob/master/ISSUE_TEMPLATE.md
+                <targetPath>.</targetPath>
                 <filtering>false</filtering>
                 <directory>.</directory>
                 <includes>

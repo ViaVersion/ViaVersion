@@ -41,6 +41,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         return commandMap.get(name.toLowerCase());
     }
 
+    @Override
     public boolean onCommand(ViaCommandSender sender, String[] args) {
         if (args.length == 0) {
             showHelp(sender);
@@ -66,6 +67,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         return result;
     }
 
+    @Override
     public List<String> onTabComplete(ViaCommandSender sender, String[] args) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
         List<String> output = new ArrayList<>();
