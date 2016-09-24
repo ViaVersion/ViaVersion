@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.boss.ViaBossBar;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -80,7 +81,7 @@ public interface ViaVersionAPI {
      * @param title The title
      * @param color The color
      * @param style The style
-     * @return Bossbar instance
+     * @return BossBar instance
      */
     BossBar createBossBar(String title, BossColor color, BossStyle style);
 
@@ -91,7 +92,7 @@ public interface ViaVersionAPI {
      * @param health Number between 0 and 1
      * @param color  The color
      * @param style  The style
-     * @return Bossbar instance
+     * @return BossBar instance
      */
     BossBar createBossBar(String title, float health, BossColor color, BossStyle style);
 

@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
@@ -144,10 +145,10 @@ public class UserConnection {
         pendingDisconnect = true;
         if (get(ProtocolInfo.class).getUuid() != null) {
             final UUID uuid = get(ProtocolInfo.class).getUuid();
-            ViaVersion.getPlatform().runSync(new Runnable() {
+            Via.getPlatform().runSync(new Runnable() {
                 @Override
                 public void run() {
-                    if (!ViaVersion.getPlatform().kickPlayer(uuid, ChatColor.translateAlternateColorCodes('&', reason))) {
+                    if (!Via.getPlatform().kickPlayer(uuid, ChatColor.translateAlternateColorCodes('&', reason))) {
                         getChannel().close(); // =)
                     }
                 }

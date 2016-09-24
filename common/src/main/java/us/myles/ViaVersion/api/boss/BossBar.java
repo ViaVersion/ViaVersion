@@ -1,17 +1,18 @@
 package us.myles.ViaVersion.api.boss;
 
-import org.bukkit.entity.Player;
+import org.apache.commons.lang.NotImplementedException;
+import us.myles.ViaVersion.api.Via;
 
 import java.util.Set;
 import java.util.UUID;
 
-public interface BossBar {
+public abstract class BossBar {
     /**
      * Get the current title
      *
      * @return the title
      */
-    String getTitle();
+    public abstract String getTitle();
 
     /**
      * Change the title
@@ -19,14 +20,14 @@ public interface BossBar {
      * @param title Title can be in either JSON or just text
      * @return The BossBar object
      */
-    BossBar setTitle(String title);
+    public abstract BossBar setTitle(String title);
 
     /**
      * Get the health
      *
      * @return float between 0F - 1F
      */
-    float getHealth();
+    public abstract float getHealth();
 
     /**
      * Change the health
@@ -34,14 +35,14 @@ public interface BossBar {
      * @param health this float has to be between 0F - 1F
      * @return The BossBar object
      */
-    BossBar setHealth(float health);
+    public abstract BossBar setHealth(float health);
 
     /**
      * Get the bossbar color
      *
      * @return The colour
      */
-    BossColor getColor();
+    public abstract BossColor getColor();
 
     /**
      * Yay colors!
@@ -49,14 +50,14 @@ public interface BossBar {
      * @param color Whatever color you want!
      * @return The BossBar object
      */
-    BossBar setColor(BossColor color);
+    public abstract BossBar setColor(BossColor color);
 
     /**
      * Get the bosbar style
      *
      * @return BossStyle
      */
-    BossStyle getStyle();
+    public abstract BossStyle getStyle();
 
     /**
      * Change the bosbar style
@@ -64,7 +65,7 @@ public interface BossBar {
      * @param style BossStyle
      * @return The BossBar object
      */
-    BossBar setStyle(BossStyle style);
+    public abstract BossBar setStyle(BossStyle style);
 
     /**
      * Show the bossbar to a player.
@@ -72,7 +73,9 @@ public interface BossBar {
      * @param player The player
      * @return The BossBar object
      */
-    BossBar addPlayer(Player player);
+    public BossBar addPlayer(Object player){
+        throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
+    }
 
     /**
      * Show the bossbar to a player (uuid)
@@ -80,15 +83,17 @@ public interface BossBar {
      * @param player uuid of the player
      * @return The BossBar object
      */
-    BossBar addPlayer(UUID player);
-
+    public abstract BossBar addPlayer(UUID player);
+    
     /**
      * add multiple players
      *
      * @param players list of players
      * @return The BossBar object
      */
-    BossBar addPlayers(Player... players);
+    public BossBar addPlayers(Object... players){
+        throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
+    }
 
     /**
      * Remove the bossbar from a player
@@ -96,7 +101,11 @@ public interface BossBar {
      * @param player The player
      * @return The BossBar object
      */
-    BossBar removePlayer(Player player);
+    public BossBar removePlayer(Object player){
+        throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
+    }
+
+    public abstract BossBar removePlayer(UUID uuid);
 
     /**
      * Add flags
@@ -104,7 +113,7 @@ public interface BossBar {
      * @param flag The flag to add
      * @return The BossBar object
      */
-    BossBar addFlag(BossFlag flag);
+    public abstract BossBar addFlag(BossFlag flag);
 
     /**
      * Remove flags.
@@ -112,39 +121,39 @@ public interface BossBar {
      * @param flag The flag to remove
      * @return The BossBar object
      */
-    BossBar removeFlag(BossFlag flag);
+    public abstract BossBar removeFlag(BossFlag flag);
 
     /**
      * @param flag The flag to check against
      * @return True if it has the flag
      */
-    boolean hasFlag(BossFlag flag);
+    public abstract boolean hasFlag(BossFlag flag);
 
     /**
      * Get players
      *
      * @return UUIDS from players (sorry I lied)
      */
-    Set<UUID> getPlayers();
+    public abstract Set<UUID> getPlayers();
 
     /**
      * Show the bossbar to everyone (In the getPlayer set)
      *
      * @return The BossBar object
      */
-    BossBar show();
+    public abstract BossBar show();
 
     /**
      * Hide the bossbar from everyone (In the getPlayer set)
      *
      * @return The BossBar object
      */
-    BossBar hide();
+    public abstract BossBar hide();
 
     /**
      * Is it visible?
      *
      * @return visibility changable with show() and hide()
      */
-    boolean isVisible();
+    public abstract boolean isVisible();
 }
