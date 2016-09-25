@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
 
 import com.google.common.base.Optional;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
@@ -75,8 +75,7 @@ public class MetadataRewriter {
             }
             return currentType;
         } catch (Exception e) {
-            ;
-            if (!ViaVersion.getConfig().isSuppressMetadataErrors() || ViaVersion.getInstance().isDebug()) {
+            if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
                 System.out.println("An error occurred with entity type rewriter");
                 System.out.println("Metadata: " + metadata);
                 e.printStackTrace();
@@ -154,7 +153,7 @@ public class MetadataRewriter {
                 }
             } catch (Exception e) {
                 metadatas.remove(metadata);
-                if (!ViaVersion.getConfig().isSuppressMetadataErrors() || ViaVersion.getInstance().isDebug()) {
+                if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
                     System.out.println("An error occurred with entity metadata handler");
                     System.out.println("Metadata: " + metadata);
                     e.printStackTrace();

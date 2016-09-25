@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
-import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.ListTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
@@ -140,7 +139,7 @@ public class ItemRewriter {
 
     public static void toServer(Item item) {
         if (item != null) {
-            if (item.getId() == Material.MONSTER_EGG.getId() && item.getData() == 0) {
+            if (item.getId() == 383 && item.getData() == 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
                 int data = 0;
                 if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
@@ -155,7 +154,7 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) data);
             }
-            if (item.getId() == Material.POTION.getId()) {
+            if (item.getId() == 373) { // Potion
                 CompoundTag tag = item.getTag();
                 int data = 0;
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
@@ -169,11 +168,11 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) data);
             }
-            //Splash potion
+            // Splash potion
             if (item.getId() == 438) {
                 CompoundTag tag = item.getTag();
                 int data = 0;
-                item.setId((short) Material.POTION.getId());
+                item.setId((short) 373); // Potion
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
                     StringTag potion = tag.get("Potion");
                     String potionName = potion.getValue().replace("minecraft:", "");
@@ -190,7 +189,7 @@ public class ItemRewriter {
 
     public static void toClient(Item item) {
         if (item != null) {
-            if (item.getId() == Material.MONSTER_EGG.getId() && item.getData() != 0) {
+            if (item.getId() == 383 && item.getData() != 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
                     tag = new CompoundTag("tag");
@@ -204,7 +203,7 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) 0);
             }
-            if (item.getId() == Material.POTION.getId()) {
+            if (item.getId() == 373) { // Potion
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
                     tag = new CompoundTag("tag");
@@ -219,7 +218,7 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) 0);
             }
-            if (item.getId() == Material.WRITTEN_BOOK.getId()) {
+            if (item.getId() == 387) { // WRITTEN_BOOK
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
                     tag = new CompoundTag("tag");

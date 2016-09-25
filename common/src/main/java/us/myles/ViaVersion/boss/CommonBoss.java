@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.Validate;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
@@ -45,7 +45,7 @@ public abstract class CommonBoss extends BossBar {
     @Override
     public BossBar setTitle(@NonNull String title) {
         this.title = title;
-        sendPacket(ViaBossBar.UpdateAction.UPDATE_TITLE);
+        sendPacket(CommonBoss.UpdateAction.UPDATE_TITLE);
         return this;
     }
 
@@ -53,7 +53,7 @@ public abstract class CommonBoss extends BossBar {
     public BossBar setHealth(float health) {
         Validate.isTrue((health >= 0 && health <= 1), "Health must be between 0 and 1");
         this.health = health;
-        sendPacket(ViaBossBar.UpdateAction.UPDATE_HEALTH);
+        sendPacket(CommonBoss.UpdateAction.UPDATE_HEALTH);
         return this;
     }
 
@@ -65,14 +65,14 @@ public abstract class CommonBoss extends BossBar {
     @Override
     public BossBar setColor(@NonNull BossColor color) {
         this.color = color;
-        sendPacket(ViaBossBar.UpdateAction.UPDATE_STYLE);
+        sendPacket(CommonBoss.UpdateAction.UPDATE_STYLE);
         return this;
     }
 
     @Override
     public BossBar setStyle(@NonNull BossStyle style) {
         this.style = style;
-        sendPacket(ViaBossBar.UpdateAction.UPDATE_STYLE);
+        sendPacket(CommonBoss.UpdateAction.UPDATE_STYLE);
         return this;
     }
 
@@ -81,7 +81,7 @@ public abstract class CommonBoss extends BossBar {
         if (!players.contains(player)) {
             players.add(player);
             if (visible)
-                sendPacket(player, getPacket(ViaBossBar.UpdateAction.ADD));
+                sendPacket(player, getPacket(CommonBoss.UpdateAction.ADD));
         }
         return this;
     }
@@ -99,7 +99,7 @@ public abstract class CommonBoss extends BossBar {
     public BossBar addFlag(@NonNull BossFlag flag) {
         if (!hasFlag(flag))
             flags.add(flag);
-        sendPacket(ViaBossBar.UpdateAction.UPDATE_FLAGS);
+        sendPacket(CommonBoss.UpdateAction.UPDATE_FLAGS);
         return this;
     }
 
@@ -107,7 +107,7 @@ public abstract class CommonBoss extends BossBar {
     public BossBar removeFlag(@NonNull BossFlag flag) {
         if (hasFlag(flag))
             flags.remove(flag);
-        sendPacket(ViaBossBar.UpdateAction.UPDATE_FLAGS);
+        sendPacket(CommonBoss.UpdateAction.UPDATE_FLAGS);
         return this;
     }
 
@@ -141,7 +141,7 @@ public abstract class CommonBoss extends BossBar {
     private void setVisible(boolean value) {
         if (visible != value) {
             visible = value;
-            sendPacket(value ? ViaBossBar.UpdateAction.ADD : ViaBossBar.UpdateAction.REMOVE);
+            sendPacket(value ? CommonBoss.UpdateAction.ADD : CommonBoss.UpdateAction.REMOVE);
         }
     }
 
@@ -153,12 +153,12 @@ public abstract class CommonBoss extends BossBar {
     }
 
     private void sendPacket(UUID uuid, ByteBuf buf) {
-        if (!ViaVersion.getInstance().isPorted(uuid) || !(ViaVersion.getInstance().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
+        if (!Via.getAPI().isPorted(uuid) || !(Via.getAPI().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
             players.remove(uuid);
             buf.release();
             return;
         }
-        ViaVersion.getInstance().sendRawPacket(uuid, buf);
+        Via.getAPI().sendRawPacket(uuid, buf);
     }
 
     private ByteBuf getPacket(UpdateAction action) {

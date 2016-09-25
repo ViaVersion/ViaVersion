@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
@@ -49,8 +48,8 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
     @Override
     public Chunk read(ByteBuf input, ClientChunks param) throws Exception {
-        boolean replacePistons = param.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && ViaVersion.getConfig().isReplacePistons();
-        int replacementId = ViaVersion.getConfig().getPistonReplacementId();
+        boolean replacePistons = param.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && Via.getConfig().isReplacePistons();
+        int replacementId = Via.getConfig().getPistonReplacementId();
 
         int chunkX = input.readInt();
         int chunkZ = input.readInt();

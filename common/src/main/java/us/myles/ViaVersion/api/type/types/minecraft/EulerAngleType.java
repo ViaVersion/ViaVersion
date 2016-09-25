@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
-import org.bukkit.util.EulerAngle;
+import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.type.Type;
 
 public class EulerAngleType extends Type<EulerAngle> {
@@ -20,8 +20,8 @@ public class EulerAngleType extends Type<EulerAngle> {
 
     @Override
     public void write(ByteBuf buffer, EulerAngle object) throws Exception {
-        Type.FLOAT.write(buffer, (float) object.getX());
-        Type.FLOAT.write(buffer, (float) object.getY());
-        Type.FLOAT.write(buffer, (float) object.getZ());
+        Type.FLOAT.write(buffer, object.getX());
+        Type.FLOAT.write(buffer, object.getY());
+        Type.FLOAT.write(buffer, object.getZ());
     }
 }

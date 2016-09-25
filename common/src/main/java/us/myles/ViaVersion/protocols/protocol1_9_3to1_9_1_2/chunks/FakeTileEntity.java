@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
 
-import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
@@ -18,28 +17,28 @@ public class FakeTileEntity {
     private static Map<Integer, CompoundTag> tileEntities = new ConcurrentHashMap<>();
 
     static {
-        register(Material.FURNACE, "Furnace");
-        register(Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST), "Chest");
-        register(Material.ENDER_CHEST, "EnderChest");
-        register(Material.JUKEBOX, "RecordPlayer");
-        register(Material.DISPENSER, "Trap");
-        register(Material.DROPPER, "Dropper");
-        register(Arrays.asList(Material.SIGN_POST, Material.WALL_SIGN), "Sign");
-        register(Material.MOB_SPAWNER, "MobSpawner");
-        register(Material.NOTE_BLOCK, "Music");
-        register(Arrays.asList(Material.PISTON_BASE, Material.PISTON_EXTENSION, Material.PISTON_STICKY_BASE, Material.PISTON_MOVING_PIECE), "Piston");
-        register(Arrays.asList(Material.BREWING_STAND, Material.CAULDRON), "Cauldron");
-        register(Material.ENCHANTMENT_TABLE, "EnchantTable");
-        register(Arrays.asList(Material.ENDER_PORTAL, Material.ENDER_PORTAL_FRAME), "Airportal");
-        register(Material.BEACON, "Beacon");
-        register(Arrays.asList(Material.SKULL, Material.SKULL_ITEM), "Skull");
-        register(Arrays.asList(Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED), "DLDetector");
-        register(Material.HOPPER, "Hopper");
-        register(Arrays.asList(Material.REDSTONE_COMPARATOR, Material.REDSTONE_COMPARATOR_OFF, Material.REDSTONE_COMPARATOR_ON), "Comparator");
-        register(Material.FLOWER_POT, "FlowerPot");
-        register(Arrays.asList(Material.STANDING_BANNER, Material.WALL_BANNER, Material.BANNER), "Banner");
+        register(Arrays.asList(61, 62), "Furnace");
+        register(Arrays.asList(54, 146), "Chest");
+        register(130, "EnderChest");
+        register(84, "RecordPlayer");
+        register(23, "Trap"); // Dispenser
+        register(158, "Dropper");
+        register(Arrays.asList(63, 68), "Sign");
+        register(52, "MobSpawner");
+        register(25, "Music"); // Note Block
+        register(Arrays.asList(33, 34, 29, 36), "Piston");
+        register(117, "Cauldron"); // Brewing stand
+        register(116, "EnchantTable");
+        register(Arrays.asList(119, 120), "Airportal"); // End portal
+        register(138, "Beacon");
+        register(144, "Skull");
+        register(Arrays.asList(178, 151), "DLDetector");
+        register(154, "Hopper");
+        register(Arrays.asList(149, 150), "Comparator");
+        register(140, "FlowerPot");
+        register(Arrays.asList(176, 177), "Banner");
         register(209, "EndGateway");
-        register(Material.COMMAND.getId(), "Control");
+        register(137, "Control");
     }
 
     private static void register(Integer material, String name) {
@@ -48,13 +47,9 @@ public class FakeTileEntity {
         tileEntities.put(material, comp);
     }
 
-    private static void register(Material material, String name) {
-        register(material.getId(), name);
-    }
-
-    private static void register(List<Material> materials, String name) {
-        for (Material m : materials)
-            register(m.getId(), name);
+    private static void register(List<Integer> materials, String name) {
+        for (int m : materials)
+            register(m, name);
     }
 
     public static boolean hasBlock(int block) {

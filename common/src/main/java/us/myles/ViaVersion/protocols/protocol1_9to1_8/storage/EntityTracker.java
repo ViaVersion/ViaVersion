@@ -6,10 +6,9 @@ import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
@@ -39,7 +38,7 @@ public class EntityTracker extends StoredObject {
     private final Map<Integer, BossBar> bossBarMap = new ConcurrentHashMap<>();
     private final Set<Integer> validBlocking = Sets.newConcurrentHashSet();
     private final Set<Integer> knownHolograms = Sets.newConcurrentHashSet();
-    private final Cache<Position, Material> blockInteractions = CacheBuilder.newBuilder().maximumSize(10).expireAfterAccess(250, TimeUnit.MILLISECONDS).build();
+    private final Cache<Position, Integer> blockInteractions = CacheBuilder.newBuilder().maximumSize(10).expireAfterAccess(250, TimeUnit.MILLISECONDS).build();
     @Setter
     private boolean blocking = false;
     @Setter
@@ -111,7 +110,7 @@ public class EntityTracker extends StoredObject {
     }
 
     public void addBlockInteraction(Position p) {
-        blockInteractions.put(p, Material.AIR);
+        blockInteractions.put(p, 0);
     }
 
     public void handleMetadata(int entityID, List<Metadata> metadataList) {
@@ -153,7 +152,7 @@ public class EntityTracker extends StoredObject {
                 if (metadata.getId() == 0) {
                     // Byte
                     byte data = (byte) metadata.getValue();
-                    if (entityID != getEntityID() && ViaVersion.getConfig().isShieldBlocking()) {
+                    if (entityID != getEntityID() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityID)) {
                                 Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
@@ -180,7 +179,7 @@ public class EntityTracker extends StoredObject {
                                 Type.VAR_INT.write(buf, 0x25); // Relative Move Packet
                                 Type.VAR_INT.write(buf, entityID);
                                 buf.writeShort(0);
-                                buf.writeShort((short) (128D * (ViaVersion.getConfig().getHologramYOffset() * 32D)));
+                                buf.writeShort((short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
                                 buf.writeShort(0);
                                 buf.writeBoolean(true);
                                 getUser().sendRawPacket(buf, false);
@@ -192,28 +191,28 @@ public class EntityTracker extends StoredObject {
             }
             UUID uuid = getUser().get(ProtocolInfo.class).getUuid();
             // Boss bar
-            if (ViaVersion.getConfig().isBossbarPatch()) {
+            if (Via.getConfig().isBossbarPatch()) {
                 if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
                     if (metadata.getId() == 2) {
                         BossBar bar = bossBarMap.get(entityID);
                         String title = (String) metadata.getValue();
                         title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
                         if (bar == null) {
-                            bar = ViaVersion.getInstance().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
+                            bar = Via.getAPI().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityID, bar);
                             bar.addPlayer(uuid);
                             bar.show();
                         } else {
                             bar.setTitle(title);
                         }
-                    } else if (metadata.getId() == 6 && !ViaVersion.getConfig().isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
+                    } else if (metadata.getId() == 6 && !Via.getConfig().isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
                         BossBar bar = bossBarMap.get(entityID);
                         // Make health range between 0 and 1
                         float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
                         float health = Math.max(0.0f, Math.min(((float) metadata.getValue()) / maxHealth, 1.0f));
                         if (bar == null) {
                             String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
-                            bar = ViaVersion.getInstance().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
+                            bar = Via.getAPI().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityID, bar);
                             bar.addPlayer(uuid);
                             bar.show();

@@ -2,11 +2,9 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -124,7 +122,7 @@ public class PlayerPackets {
 
                             wrapper.passthrough(Type.STRING); // Name tag visibility
 
-                            wrapper.write(Type.STRING, ViaVersion.getConfig().isPreventCollision() ? "never" : "");
+                            wrapper.write(Type.STRING, Via.getConfig().isPreventCollision() ? "never" : "");
 
                             wrapper.passthrough(Type.BYTE); // Colour
                         }
@@ -137,12 +135,12 @@ public class PlayerPackets {
                                 if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {
                                     if (mode == 4) {
                                         // since removing add to auto team
-                                        ((ViaVersionPlugin) ViaVersion.getInstance()).run(new Runnable() {
+                                        Via.getPlatform().runSync(new Runnable() {
                                             @Override
                                             public void run() {
                                                 entityTracker.sendTeamPacket(true);
                                             }
-                                        }, false);
+                                        });
                                     } else {
                                         // since adding remove from auto team
                                         entityTracker.sendTeamPacket(false);
@@ -477,7 +475,7 @@ public class PlayerPackets {
                         if (name.equalsIgnoreCase("MC|BSign")) {
                             Item item = wrapper.passthrough(Type.ITEM);
                             if (item != null) {
-                                item.setId((short) Material.WRITTEN_BOOK.getId());
+                                item.setId((short) 387); // Written Book
                             }
                         }
                         if (name.equalsIgnoreCase("MC|AutoCmd")) {

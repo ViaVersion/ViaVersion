@@ -2,10 +2,10 @@ package us.myles.ViaVersion.api.type;
 
 
 import lombok.Getter;
-import org.bukkit.util.EulerAngle;
-import org.bukkit.util.Vector;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
 import us.myles.ViaVersion.api.type.types.minecraft.*;

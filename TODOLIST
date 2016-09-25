@@ -1,8 +1,6 @@
 Migrate EntityUtil to be cool
 Fix 1.9to1.8
-Fix 1.9.3to1.9.1/2
-Fix snapshot to 1.10
-Fix BaseProtocol
+Migrate listeners in BaseProtocol
 Fix BossBar to use Generics
 Register Listeners Properly
 Fix commands

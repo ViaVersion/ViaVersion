@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -104,7 +103,7 @@ public class SpawnPackets {
                                 public void write(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.VAR_INT, entityID);
                                     List<Metadata> meta = new ArrayList<>();
-                                    Item item = new Item((short) Material.POTION.getId(), (byte) 1, (short) data, null);
+                                    Item item = new Item((short) 373, (byte) 1, (short) data, null); // Potion
                                     ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
                                     // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                                     Metadata potion = new Metadata(5, NewType.Slot.getTypeID(), Type.ITEM, item);

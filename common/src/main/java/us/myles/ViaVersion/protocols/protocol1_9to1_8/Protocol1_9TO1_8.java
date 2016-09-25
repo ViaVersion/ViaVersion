@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -15,7 +15,6 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
 import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
-import us.myles.ViaVersion.listeners.protocol1_9to1_8.*;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
@@ -53,7 +52,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         try {
             gson.fromJson(line, JsonObject.class);
         } catch (Exception e) {
-            if (ViaVersion.getConfig().isForceJsonTransform()) {
+            if (Via.getConfig().isForceJsonTransform()) {
                 return constructJson(line);
             } else {
                 System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
@@ -86,7 +85,7 @@ public class Protocol1_9TO1_8 extends Protocol {
                 }).get(10, TimeUnit.SECONDS);
             } catch (Exception e) {
                 System.out.println("Error fetching hand item: " + e.getClass().getName());
-                if (ViaVersion.getInstance().isDebug())
+                if (Via.getManager().isDebug())
                     e.printStackTrace();
                 return null;
             }
@@ -145,5 +144,15 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new InventoryTracker(userConnection));
         // Place block tracker
         userConnection.put(new PlaceBlockTracker(userConnection));
+    }
+
+    public static boolean isSword(int id) {
+        if (id == 267) return true; // Iron
+        if (id == 268) return true; // Wood
+        if (id == 272) return true; // Stone
+        if (id == 276) return true; // Diamond
+        if (id == 283) return true; // Gold
+
+        return false;
     }
 }

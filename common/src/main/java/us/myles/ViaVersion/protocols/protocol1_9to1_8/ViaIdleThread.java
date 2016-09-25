@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -29,7 +30,7 @@ public class ViaIdleThread extends BukkitRunnable {
     private Method handleFlying;
 
     public ViaIdleThread(Map<UUID, UserConnection> portedPlayers) {
-        USE_NMS = ViaVersion.getConfig().isNMSPlayerTicking();
+        USE_NMS = Via.getConfig().isNMSPlayerTicking();
 
         this.portedPlayers = portedPlayers;
         Class<?> idlePacketClass;

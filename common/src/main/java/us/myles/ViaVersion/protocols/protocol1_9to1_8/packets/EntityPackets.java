@@ -1,8 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
-import org.bukkit.Material;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -85,11 +84,11 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        if (ViaVersion.getConfig().isHologramPatch()) {
+                        if (Via.getConfig().isHologramPatch()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                             if (tracker.getKnownHolograms().contains(entityID)) {
                                 Double newValue = wrapper.get(Type.DOUBLE, 1);
-                                newValue += (ViaVersion.getConfig().getHologramYOffset());
+                                newValue += (Via.getConfig().getHologramYOffset());
                                 wrapper.set(Type.DOUBLE, 1, newValue);
                             }
                         }
@@ -159,11 +158,9 @@ public class EntityPackets {
                         Item stack = wrapper.get(Type.ITEM, 0);
 
                         if (stack != null) {
-                            if (Material.getMaterial(stack.getId()) != null) {
-                                if (Material.getMaterial(stack.getId()).name().endsWith("SWORD")) {
-                                    entityTracker.getValidBlocking().add(entityID);
-                                    return;
-                                }
+                            if (Protocol1_9TO1_8.isSword(stack.getId())) {
+                                entityTracker.getValidBlocking().add(entityID);
+                                return;
                             }
                         }
                         entityTracker.getValidBlocking().remove(entityID);
@@ -231,7 +228,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         boolean showParticles = wrapper.read(Type.BOOLEAN); //In 1.8 = true->Show particles : false->Hide particles
-                        boolean newEffect = ViaVersion.getConfig().isNewEffectIndicator();
+                        boolean newEffect = Via.getConfig().isNewEffectIndicator();
                         //0: hide, 1: shown without indictator, 2: shown with indicator, 3: hide with beacon indicator but we don't use it.
                         wrapper.write(Type.BYTE, (byte) (showParticles ? newEffect ? 2 : 1 : 0));
                     }

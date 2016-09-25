@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
-import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -168,7 +167,7 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        if (ViaVersion.getConfig().isAutoTeam()) {
+                        if (Via.getConfig().isAutoTeam()) {
                             EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             entityTracker.setAutoTeam(true);
                             entityTracker.sendTeamPacket(true);
@@ -259,19 +258,17 @@ public class WorldPackets {
                         // Write item in hand
                         Item item = Protocol1_9TO1_8.getHandItem(wrapper.user());
                         // Blocking patch
-                        if (ViaVersion.getConfig().isShieldBlocking()) {
+                        if (Via.getConfig().isShieldBlocking()) {
                             if (item != null) {
-                                if (Material.getMaterial(item.getId()) != null) {
-                                    if (Material.getMaterial(item.getId()).name().endsWith("SWORD")) {
-                                        if (hand == 0) {
-                                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                                            if (!tracker.isBlocking()) {
-                                                tracker.setBlocking(true);
-                                                Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                                tracker.setSecondHand(shield);
-                                            }
-                                            wrapper.cancel();
+                                if (Protocol1_9TO1_8.isSword(item.getId())) {
+                                    if (hand == 0) {
+                                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                                        if (!tracker.isBlocking()) {
+                                            tracker.setBlocking(true);
+                                            Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                            tracker.setSecondHand(shield);
                                         }
+                                        wrapper.cancel();
                                     }
                                 }
                             }

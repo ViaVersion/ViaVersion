@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 
 import org.bukkit.entity.EntityType;
-import org.bukkit.util.EulerAngle;
-import org.bukkit.util.Vector;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.minecraft.EulerAngle;
+import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;

@@ -54,7 +54,7 @@ public class ClientChunks extends StoredObject {
             int[] zcoords = mapChunkBulkRef.getFieldValue("b", packet, int[].class);
             Object[] chunkMaps = mapChunkBulkRef.getFieldValue("c", packet, Object[].class);
 
-            if (ViaVersion.getConfig().isAntiXRay() && ViaVersion.getInstance().isSpigot()) { //Spigot anti-xray patch
+            if (Via.getConfig().isAntiXRay() && Via.getInstance().isSpigot()) { //Spigot anti-xray patch
                 try {
                     Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
 

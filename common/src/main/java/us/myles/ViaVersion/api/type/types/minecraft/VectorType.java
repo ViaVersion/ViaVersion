@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
-import org.bukkit.util.Vector;
+import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.type.Type;
 
 public class VectorType extends Type<Vector> {
