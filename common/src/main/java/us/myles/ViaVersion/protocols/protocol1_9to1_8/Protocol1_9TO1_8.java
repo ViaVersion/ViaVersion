@@ -15,6 +15,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
 import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
@@ -81,6 +82,7 @@ public class Protocol1_9TO1_8 extends Protocol {
     @Override
     protected void register(ViaProviders providers) {
         providers.register(HandItemProvider.class, new HandItemProvider());
+        providers.register(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
         providers.require(MovementTransmitterProvider.class);
         if (Via.getConfig().isStimulatePlayerTick()) {
             Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
@@ -89,6 +91,8 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     @Override
     public boolean isFiltered(Class packetClass) {
+        if (!Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).isEnabled())
+            return false;
         return packetClass.getName().endsWith("PacketPlayOutMapChunkBulk");
     }
 

@@ -125,6 +125,30 @@ public class WorldPackets {
             }
         });
 
+        // Bulk Chunk Packet
+        protocol.registerOutgoing(State.PLAY, 0x26, -1, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+//                        ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+//                        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.passthrough(new ChunkType(clientChunks));
+//                        if (chunk.isUnloadPacket())
+//                            wrapper.setId(0x1D);
+//
+//                        // eat any other data (Usually happens with unload packets)
+//                        wrapper.read(Type.REMAINING_BYTES);
+                        // TODO: Implement Bulk Chunks
+                        // Boolean
+                        // Column Count
+
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
         // Update Block Entity Packet
         protocol.registerOutgoing(State.PLAY, 0x35, 0x09, new PacketRemapper() {
             @Override

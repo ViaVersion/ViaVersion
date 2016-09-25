@@ -14,7 +14,9 @@ import us.myles.ViaVersion.listeners.UpdateListener;
 import us.myles.ViaVersion.listeners.protocol1_9to1_8.*;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -56,6 +58,8 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
 
         /* Providers */
+        Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
+        Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
         Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
             @Override
             public Item getHandItem(final UserConnection info) {
