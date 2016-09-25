@@ -35,17 +35,6 @@
         </resources>
 
         <plugins>
-            <!-- Maven Java Compiler -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <source>${jdkVersion}</source>
-                    <target>${jdkVersion}</target>
-                </configuration>
-            </plugin>
-
             <!-- Libs Shading and Relocation -->
             <plugin>
                 <!--Relocate all lib we use in order to fix class loading errors if we use different versions

@@ -63,7 +63,7 @@ public class ProtocolRegistry {
 
         if (Via.getPlatform().isPluginEnabled()) {
             protocol.registerListeners();
-            protocol.registerProviders(Via.getManager().getProviders());
+            protocol.register(Via.getManager().getProviders());
             refreshVersions();
         } else {
             registerList.add(protocol);
@@ -110,7 +110,7 @@ public class ProtocolRegistry {
     public static void onServerLoaded() {
         for (Protocol protocol : registerList) {
             protocol.registerListeners();
-            protocol.registerProviders(Via.getManager().getProviders());
+            protocol.register(Via.getManager().getProviders());
         }
         registerList.clear();
     }

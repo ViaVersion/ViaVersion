@@ -13,7 +13,7 @@ public class ViaVersion {
 
     public static void setInstance(ViaVersionPlugin plugin) {
         Validate.isTrue(instance == null, "Instance is already set");
-        ViaVersion.instance = plugin;
+        ViaVersion.instance = (ViaVersionAPI) plugin.getApi();
         ViaVersion.config = plugin.getConf();
     }
 }

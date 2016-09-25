@@ -37,8 +37,8 @@ public abstract class ViaListener implements Listener {
      * @return The UserConnection
      */
     protected UserConnection getUserConnection(@NonNull UUID uuid) {
-        if (!plugin.isPorted(uuid)) return null;
-        return plugin.getConnection(uuid);
+        if (!Via.getAPI().isPorted(uuid)) return null;
+        return Via.getManager().getConnection(uuid);
     }
 
     /**

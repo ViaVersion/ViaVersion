@@ -44,8 +44,13 @@ public class ViaManager {
         if (platform.getConf().isCheckForUpdates())
             UpdateUtil.sendUpdateMessage();
         // Inject
-        // TODO: Get errors
-        injector.inject();
+        try {
+            injector.inject();
+        } catch (Exception e) {
+            getPlatform().getLogger().severe("ViaVersion failed to inject:");
+            e.printStackTrace();
+            return;
+        }
         // Mark as injected
         System.setProperty("ViaVersion", getPlatform().getPluginVersion());
         // If successful
@@ -58,9 +63,15 @@ public class ViaManager {
         });
 
     }
+
     public void onServerLoaded() {
         // Load Server Protocol
-        ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
+        try {
+            ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
+        } catch (Exception e) {
+            getPlatform().getLogger().severe("ViaVersion failed to get the server protocol!");
+            e.printStackTrace();
+        }
         // Check if there are any pipes to this version
         if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
             getPlatform().getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
@@ -81,7 +92,12 @@ public class ViaManager {
     public void destroy() {
         // Uninject
         getPlatform().getLogger().info("ViaVersion is disabling, if this is a reload and you experience issues consider rebooting.");
-        injector.uninject();
+        try {
+            injector.uninject();
+        } catch (Exception e) {
+            getPlatform().getLogger().severe("ViaVersion failed to uninject:");
+            e.printStackTrace();
+        }
     }
 
     public void addPortedClient(UserConnection info) {

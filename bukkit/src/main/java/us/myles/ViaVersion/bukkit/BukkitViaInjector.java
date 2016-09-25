@@ -6,6 +6,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.plugin.PluginDescriptionFile;
 import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
@@ -23,12 +24,11 @@ public class BukkitViaInjector implements ViaInjector {
     private List<Pair<Field, Object>> injectedLists = new ArrayList<>();
 
     @Override
-    public void inject() {
+    public void inject() throws Exception {
         try {
             Object connection = getServerConnection();
             if (connection == null) {
-                getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
-                return;
+                throw new Exception("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
             }
             for (Field field : connection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
@@ -40,7 +40,11 @@ public class BukkitViaInjector implements ViaInjector {
                         public synchronized void handleAdd(Object o) {
                             synchronized (this) {
                                 if (o instanceof ChannelFuture) {
-                                    injectChannelFuture((ChannelFuture) o);
+                                    try {
+                                        injectChannelFuture((ChannelFuture) o);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                         }
@@ -61,12 +65,12 @@ public class BukkitViaInjector implements ViaInjector {
             }
 
         } catch (Exception e) {
-            getLogger().severe("Unable to inject ViaVersion, please post these details on our GitHub and ensure you're using a compatible server version.");
-            e.printStackTrace();
+            Via.getPlatform().getLogger().severe("Unable to inject ViaVersion, please post these details on our GitHub and ensure you're using a compatible server version.");
+            throw e;
         }
     }
 
-    private void injectChannelFuture(ChannelFuture future) {
+    private void injectChannelFuture(ChannelFuture future) throws Exception {
         try {
             ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
             try {
@@ -87,8 +91,8 @@ public class BukkitViaInjector implements ViaInjector {
 
             }
         } catch (Exception e) {
-            getLogger().severe("We failed to inject ViaVersion, have you got late-bind enabled with something else?");
-            e.printStackTrace();
+            Via.getPlatform().getLogger().severe("We failed to inject ViaVersion, have you got late-bind enabled with something else?");
+            throw e;
         }
     }
 
@@ -123,7 +127,7 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     @Override
-    public int getServerProtocolVersion() {
+    public int getServerProtocolVersion() throws Exception {
         try {
             Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
@@ -164,9 +168,9 @@ public class BukkitViaInjector implements ViaInjector {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            // We couldn't work it out... We'll just use ping and hope for the best...
+            throw new Exception("Failed to get server", e);
         }
+        throw new Exception("Failed to get server");
     }
 
     public static Object getServerConnection() throws Exception {
@@ -188,7 +192,7 @@ public class BukkitViaInjector implements ViaInjector {
     public static void patchLists() throws Exception {
         Object connection = getServerConnection();
         if (connection == null) {
-            getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
+            Via.getPlatform().getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
             return;
         }
         for (Field field : connection.getClass().getDeclaredFields()) {
