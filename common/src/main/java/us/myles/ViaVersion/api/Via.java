@@ -11,10 +11,11 @@ public class Via {
     @Getter
     private static ViaManager manager;
 
-    public static void init(ViaPlatform platform) {
-        Validate.isTrue(platform == null, "Platform is already set");
-        Via.platform = platform;
-        Via.manager = new ViaManager(platform);
+    public static void init(ViaManager viaManager) {
+        Validate.isTrue(manager == null, "ViaManager is already set");
+
+        Via.platform = viaManager.getPlatform();
+        Via.manager = viaManager;
     }
 
     public static ViaAPI getAPI() {

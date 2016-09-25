@@ -1,5 +1,6 @@
 package us.myles.ViaVersion;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -18,9 +19,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
+@Builder
 public class ViaManager {
-    private ViaPlatform platform;
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
+    private ViaPlatform platform;
     private ViaProviders providers = new ViaProviders();
     @Setter
     private boolean debug = false;
@@ -28,10 +30,6 @@ public class ViaManager {
     private ViaInjector injector;
     private ViaCommandHandler commandHandler;
     private ViaPlatformLoader loader;
-
-    public ViaManager(ViaPlatform platform) {
-        this.platform = platform;
-    }
 
     public void init() {
         if (System.getProperty("ViaVersion") != null) {

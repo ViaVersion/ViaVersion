@@ -45,8 +45,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     public ViaVersionPlugin() {
         // Config magic
         conf = new ViaConfig(this);
+        // Command handler
+        commandHandler = new BukkitCommandHandler();
         // Init platform
-        Via.init(this);
+        Via.init(ViaManager.builder()
+                .platform(this)
+                .commandHandler(commandHandler)
+                .injector(new BukkitViaInjector())
+                .build());
         // For compatibility
         ViaVersion.setInstance(this);
 
@@ -95,7 +101,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
             Via.getManager().init();
         }
 
-        getCommand("viaversion").setExecutor(commandHandler = new BukkitCommandHandler());
+        getCommand("viaversion").setExecutor(commandHandler);
         getCommand("viaversion").setTabCompleter(commandHandler);
 
         // Warn them if they have anti-xray on and they aren't using spigot
