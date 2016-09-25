@@ -9,7 +9,8 @@
     <version>1.0.0-ALPHA-modules</version>
     <packaging>pom</packaging>
 
-    <name>ViaVersion</name>
+    <name>viaversion-parent</name>
+
     <description>Allow newer clients to join older server versions.</description>
     <inceptionYear>2016</inceptionYear>
     <url>https://www.spigotmc.org/resources/viaversion.19254/</url>

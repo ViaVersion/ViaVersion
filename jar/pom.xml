@@ -8,11 +8,11 @@
         <version>1.0.0-ALPHA-modules</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <name>viaversion-jar</name>
     <artifactId>viaversion</artifactId>
 
     <build>
-        <finalName>${project.name}-${project.version}</finalName>
+        <finalName>ViaVersion-${project.version}</finalName>
         <defaultGoal>clean install</defaultGoal>
         <resources>
             <resource>
@@ -75,17 +75,17 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-common</artifactId>
-            <version>1.0.0-ALPHA-modules</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-bukkit</artifactId>
-            <version>1.0.0-ALPHA-modules</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-bungee</artifactId>
-            <version>1.0.0-ALPHA-modules</version>
+            <version>${parent.version}</version>
         </dependency>
     </dependencies>
 
