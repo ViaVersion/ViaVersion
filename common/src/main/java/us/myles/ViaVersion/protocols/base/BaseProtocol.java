@@ -1,21 +1,21 @@
 package us.myles.ViaVersion.protocols.base;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class BaseProtocol extends Protocol {
+    private static Gson gson = new GsonBuilder().create(); // TODO: Possibly global gson provider?
 
     @Override
     protected void registerPackets() {
@@ -48,30 +49,32 @@ public class BaseProtocol extends Protocol {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
-                            JSONObject json = (JSONObject) new JSONParser().parse(originalStatus);
-                            JSONObject version = (JSONObject) json.get("version");
-                            int protocolVersion = ((Long) version.get("protocol")).intValue();
+                            JsonObject json = gson.fromJson(originalStatus, JsonObject.class);
+                            JsonObject version = json.get("version").getAsJsonObject();
+                            int protocolVersion = ((Long) version.get("protocol").getAsLong()).intValue();
 
-                            if (ViaVersion.getConfig().isSendSupportedVersions()) //Send supported versions
-                                version.put("supportedVersions", ViaVersion.getInstance().getSupportedVersions());
+                            if (Via.getConfig().isSendSupportedVersions()) //Send supported versions
+                                version.add("supportedVersions", gson.toJsonTree(Via.getAPI().getSupportedVersions()));
 
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) // Set the Server protocol if the detection on startup failed
                                 ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
 
                             List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
                             if (protocols != null) {
-                                if (protocolVersion != 9999) //Fix ServerListPlus
-                                    version.put("protocol", info.getProtocolVersion());
+                                if (protocolVersion != 9999) {
+                                    //Fix ServerListPlus
+                                    version.addProperty("protocol", info.getProtocolVersion());
+                                }
                             } else {
                                 // not compatible :(, *plays very sad violin*
                                 wrapper.user().setActive(false);
                             }
 
-                            if (ViaVersion.getConfig().getBlockedProtocols().contains(info.getProtocolVersion()))
-                                version.put("protocol", -1); // Show blocked versions as outdated
+                            if (Via.getConfig().getBlockedProtocols().contains(info.getProtocolVersion()))
+                                version.addProperty("protocol", -1); // Show blocked versions as outdated
 
-                            wrapper.set(Type.STRING, 0, json.toJSONString()); // Update value
-                        } catch (ParseException e) {
+                            wrapper.set(Type.STRING, 0, gson.toJson(json)); // Update value
+                        } catch (JsonParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -100,14 +103,14 @@ public class BaseProtocol extends Protocol {
                         info.setUuid(uuid);
                         info.setUsername(wrapper.get(Type.STRING, 1));
                         // Add to ported clients
-                        ((ViaVersionPlugin) ViaVersion.getInstance()).addPortedClient(wrapper.user());
+                        Via.getManager().addPortedClient(wrapper.user());
 
                         if (info.getPipeline().pipes().size() == 1 && info.getPipeline().pipes().get(0).getClass() == BaseProtocol.class) // Only base protocol
                             wrapper.user().setActive(false);
 
-                        if (ViaVersion.getInstance().isDebug()) {
+                        if (Via.getManager().isDebug()) {
                             // Print out the route to console
-                            ((ViaVersionPlugin) ViaVersion.getInstance()).getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
+                            Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
                                     new Object[]{
                                             wrapper.get(Type.STRING, 1),
                                             info.getProtocolVersion(),
@@ -171,11 +174,11 @@ public class BaseProtocol extends Protocol {
                     @Override
                     public void handle(final PacketWrapper wrapper) throws Exception {
                         int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
-                        if (ViaVersion.getConfig().getBlockedProtocols().contains(protocol)) {
+                        if (Via.getConfig().getBlockedProtocols().contains(protocol)) {
                             if (!wrapper.user().getChannel().isOpen()) return;
 
                             PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
-                            Protocol1_9TO1_8.FIX_JSON.write(disconnectPacket, ChatColor.translateAlternateColorCodes('&', ViaVersion.getConfig().getBlockedDisconnectMsg()));
+                            Protocol1_9TO1_8.FIX_JSON.write(disconnectPacket, ChatColor.translateAlternateColorCodes('&', Via.getConfig().getBlockedDisconnectMsg()));
                             wrapper.cancel(); // cancel current
 
                             // Send and close

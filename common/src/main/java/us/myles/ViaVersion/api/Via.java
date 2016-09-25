@@ -21,4 +21,9 @@ public class Via {
         Validate.isTrue(platform != null, "ViaVersion has not loaded the Platform");
         return Via.platform.getApi();
     }
+
+    public static ViaVersionConfig getConfig() {
+        Validate.isTrue(platform != null, "ViaVersion has not loaded the Platform");
+        return Via.platform.getConf();
+    }
 }

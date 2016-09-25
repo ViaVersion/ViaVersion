@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -140,7 +141,7 @@ public class MetadataRewriter {
                 }
             } catch (Exception e) {
                 list.remove(entry);
-                if (!ViaVersion.getConfig().isSuppressMetadataErrors() || ViaVersion.getInstance().isDebug()) {
+                if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
                     System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
                     if (type != null)
                         System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.getId());

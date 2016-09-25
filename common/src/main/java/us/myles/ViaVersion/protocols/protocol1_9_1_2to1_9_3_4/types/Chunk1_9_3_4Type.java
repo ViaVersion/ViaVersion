@@ -2,8 +2,8 @@ package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.bukkit.World;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
@@ -48,7 +48,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
             sections[i] = section;
             section.readBlocks(input);
             section.readBlockLight(input);
-            if (world.getEnvironment() == World.Environment.NORMAL) {
+            if (world.getEnvironment() == Environment.NORMAL) {
                 section.readSkyLight(input);
             }
         }

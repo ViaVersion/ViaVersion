@@ -2,9 +2,9 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.bukkit.World;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
@@ -27,8 +27,8 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
     @Override
     public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
-        boolean replacePistons = world.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && ViaVersion.getConfig().isReplacePistons();
-        int replacementId = ViaVersion.getConfig().getPistonReplacementId();
+        boolean replacePistons = world.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && Via.getConfig().isReplacePistons();
+        int replacementId = Via.getConfig().getPistonReplacementId();
 
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
@@ -53,7 +53,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             sections[i] = section;
             section.readBlocks(input);
             section.readBlockLight(input);
-            if (world.getEnvironment() == World.Environment.NORMAL) {
+            if (world.getEnvironment() == Environment.NORMAL) {
                 section.readSkyLight(input);
             }
             if (replacePistons) {
