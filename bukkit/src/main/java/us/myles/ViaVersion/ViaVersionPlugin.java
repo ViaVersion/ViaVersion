@@ -8,14 +8,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bukkit.BukkitCommandHandler;
+import us.myles.ViaVersion.bukkit.BukkitCommandSender;
 import us.myles.ViaVersion.bukkit.BukkitViaAPI;
 import us.myles.ViaVersion.bukkit.BukkitViaInjector;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;
-import us.myles.ViaVersion.listeners.UpdateListener;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.UUID;
@@ -88,7 +89,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
             Via.getManager().init();
         }
 
-        Bukkit.getPluginManager().registerEvents(new UpdateListener(), this);
 
         getCommand("viaversion").setExecutor(commandHandler = new BukkitCommandHandler());
         getCommand("viaversion").setTabCompleter(commandHandler);
@@ -187,6 +187,16 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     @Override
     public void runSync(Runnable runnable) {
         getServer().getScheduler().runTask(this, runnable);
+    }
+
+    @Override
+    public ViaCommandSender[] getOnlinePlayers() {
+        ViaCommandSender[] array = new ViaCommandSender[Bukkit.getOnlinePlayers().size()];
+        int i = 0;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            array[i++] = new BukkitCommandSender(player);
+        }
+        return array;
     }
 
     @Override

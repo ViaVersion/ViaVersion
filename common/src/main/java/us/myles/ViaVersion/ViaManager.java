@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
+import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
@@ -26,6 +27,7 @@ public class ViaManager {
     // Internals
     private ViaInjector injector;
     private ViaCommandHandler commandHandler;
+    private ViaPlatformLoader loader;
 
     public ViaManager(ViaPlatform platform) {
         this.platform = platform;

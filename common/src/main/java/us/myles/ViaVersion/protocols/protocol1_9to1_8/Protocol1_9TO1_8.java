@@ -3,8 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
-import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -103,23 +101,7 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     @Override
     protected void registerListeners() {
-        ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
 
-        new ArmorListener(plugin).register();
-        new CommandBlockListener(plugin).register();
-        new DeathListener(plugin).register();
-        new BlockListener(plugin).register();
-
-        if (Bukkit.getVersion().toLowerCase().contains("paper") || Bukkit.getVersion().toLowerCase().contains("taco")) {
-            plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot patch: Fixes block placement.");
-            new PaperPatch(plugin).register();
-        }
-        if (plugin.getConf().isStimulatePlayerTick())
-            new ViaIdleThread(plugin.getPortedPlayers()).runTaskTimer(plugin, 1L, 1L); // Updates player's idle status
-        if (plugin.getConf().isItemCache()) {
-            new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
-            HandItemCache.CACHE = true;
-        }
     }
 
     @Override

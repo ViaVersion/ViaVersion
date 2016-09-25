@@ -9,3 +9,5 @@ Add new info to dump for platform
 Migrate Bukkit types to our own :D
 
 Important: Create builder for ViaManager which allows supplying on the command exectutor, injector, platform :D
+
+Important: Add BukkitViaLoader to ViaManager sequence

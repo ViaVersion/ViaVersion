@@ -9,10 +9,6 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -204,14 +200,7 @@ public class BaseProtocol extends Protocol {
 
     @Override
     protected void registerListeners() {
-        final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
 
-        Bukkit.getPluginManager().registerEvents(new Listener() {
-            @EventHandler
-            public void onPlayerQuit(PlayerQuitEvent e) {
-                plugin.removePortedClient(e.getPlayer().getUniqueId());
-            }
-        }, plugin);
     }
 
     @Override
