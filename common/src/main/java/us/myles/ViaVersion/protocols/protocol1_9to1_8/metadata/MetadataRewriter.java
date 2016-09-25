@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 
-import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.minecraft.Vector;
@@ -8,17 +7,18 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class MetadataRewriter {
-    public static void transform(EntityType type, List<Metadata> list) {
+    public static void transform(EntityUtil.EntityType type, List<Metadata> list) {
         short id = -1;
         int data = -1;
         for (Metadata entry : new ArrayList<>(list)) {
-            MetaIndex metaIndex = MetaIndex.getIndex(type, entry.getId());
+            MetaIndex metaIndex = MetaIndex.searchIndex(type, entry.getId());
             try {
                 if (metaIndex != null) {
                     if (metaIndex.getNewType() != NewType.Discontinued) {
@@ -38,7 +38,7 @@ public class MetadataRewriter {
                                     entry.setValue(((Integer) value).byteValue());
                                 }
                                 // After writing the last one
-                                if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityType.PLAYER) {
+                                if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityUtil.EntityType.PLAYER) {
                                     Byte val = 0;
                                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                                         val = 1;

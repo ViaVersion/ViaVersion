@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
-import org.bukkit.entity.EntityType;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -96,7 +95,7 @@ public class SpawnPackets {
                         final int data = wrapper.get(Type.INT, 0); // Data
 
                         int typeID = wrapper.get(Type.BYTE, 0);
-                        if (EntityUtil.getTypeFromID(typeID, true) == EntityType.SPLASH_POTION) {
+                        if (EntityUtil.getTypeFromID(typeID, true) == EntityUtil.EntityType.SPLASH_POTION) {
                             // Convert this to meta data, woo!
                             PacketWrapper metaPacket = wrapper.create(0x39, new ValueCreator() {
                                 @Override
@@ -130,7 +129,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.getClientEntityTypes().put(entityID, EntityType.EXPERIENCE_ORB);
+                        tracker.getClientEntityTypes().put(entityID, EntityUtil.EntityType.EXPERIENCE_ORB);
                         tracker.sendMetadataBuffer(entityID);
                     }
                 });
@@ -156,7 +155,7 @@ public class SpawnPackets {
                         // Currently only lightning uses this
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.getClientEntityTypes().put(entityID, EntityType.LIGHTNING);
+                        tracker.getClientEntityTypes().put(entityID, EntityUtil.EntityType.LIGHTNING);
                         tracker.sendMetadataBuffer(entityID);
                     }
                 });
@@ -247,7 +246,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.getClientEntityTypes().put(entityID, EntityType.PAINTING);
+                        tracker.getClientEntityTypes().put(entityID, EntityUtil.EntityType.PAINTING);
                         tracker.sendMetadataBuffer(entityID);
                     }
                 });
@@ -281,7 +280,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.getClientEntityTypes().put(entityID, EntityType.PLAYER);
+                        tracker.getClientEntityTypes().put(entityID, EntityUtil.EntityType.PLAYER);
                         tracker.sendMetadataBuffer(entityID);
                     }
                 });

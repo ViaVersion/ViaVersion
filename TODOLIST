@@ -1,4 +1,3 @@
-Migrate EntityUtil to be cool
 Fix 1.9to1.8
 Migrate listeners in BaseProtocol
 Register Listeners Properly
