@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion-parent</artifactId>
-    <version>1.0.0-ALPHA-16w38a</version>
+    <version>1.0.0-ALPHA-modules</version>
     <packaging>pom</packaging>
 
     <name>ViaVersion</name>
@@ -114,18 +114,4 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <!-- Maven Java Compiler -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
