@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
@@ -38,7 +39,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
             boolean second = info.incrementReceived();
             // Check PPS
             if (second) {
-                if (((ViaVersionPlugin) ViaVersion.getInstance()).handlePPS(info))
+                if (((ViaVersionPlugin) Via.getPlatform()).handlePPS(info))
                     return;
             }
 

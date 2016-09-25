@@ -23,9 +23,6 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
@@ -38,6 +35,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     private ViaConfig conf;
     @Getter
     private ViaAPI<Player> api = new BukkitViaAPI(this);
+    private List<Runnable> queuedTasks = new ArrayList<>();
+    private List<Runnable> asyncQueuedTasks = new ArrayList<>();
 
     public ViaVersionPlugin() {
         // Config magic
@@ -106,6 +105,18 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         if (conf.isAntiXRay() && !spigot) {
             getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
         }
+
+        // Run queued tasks
+        for (Runnable r : queuedTasks) {
+            Bukkit.getScheduler().runTask(this, r);
+        }
+        queuedTasks.clear();
+
+        // Run async queued tasks
+        for (Runnable r : asyncQueuedTasks) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, r);
+        }
+        asyncQueuedTasks.clear();
     }
 
     @Override
@@ -120,25 +131,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
     public boolean isSpigot() {
         return this.spigot;
-    }
-
-    public void run(final Runnable runnable, boolean wait) {
-        try {
-            Future f = Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    runnable.run();
-                    return true;
-                }
-            });
-            if (wait) {
-                f.get(10, TimeUnit.SECONDS);
-            }
-        } catch (Exception e) {
-            System.out.println("Failed to run task: " + e.getClass().getName());
-            if (ViaVersion.getInstance().isDebug())
-                e.printStackTrace();
-        }
     }
 
     public boolean isProtocolSupport() {
@@ -187,12 +179,22 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
     @Override
     public int runAsync(Runnable runnable) {
-        return getServer().getScheduler().runTaskAsynchronously(this, runnable).getTaskId();
+        if (isPluginEnabled()) {
+            return getServer().getScheduler().runTaskAsynchronously(this, runnable).getTaskId();
+        } else {
+            asyncQueuedTasks.add(runnable);
+            return -1;
+        }
     }
 
     @Override
     public int runSync(Runnable runnable) {
-        return getServer().getScheduler().runTask(this, runnable).getTaskId();
+        if (isPluginEnabled()) {
+            return getServer().getScheduler().runTask(this, runnable).getTaskId();
+        } else {
+            queuedTasks.add(runnable);
+            return -1;
+        }
     }
 
     @Override

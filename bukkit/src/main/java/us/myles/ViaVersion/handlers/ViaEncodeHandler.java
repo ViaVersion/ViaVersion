@@ -3,7 +3,9 @@ package us.myles.ViaVersion.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
@@ -27,7 +29,7 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
-        if (ViaVersion.getInstance().isCompatSpigotBuild()) {
+        if (((ViaVersionPlugin) Via.getPlatform()).isCompatSpigotBuild()) {
             Field ver = minecraftEncoder.getClass().getDeclaredField("version");
             ver.setAccessible(true);
             ver.set(minecraftEncoder, ver.get(this));
