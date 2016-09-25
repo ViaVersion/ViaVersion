@@ -318,6 +318,8 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID (Target)
                 map(Type.VAR_INT); // 1 - Action Type
+
+                // Cancel second hand to prevent double interact
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -328,7 +330,10 @@ public class EntityPackets {
                             wrapper.passthrough(Type.FLOAT); // 4 - Z
                         }
                         if (type == 0 || type == 2) {
-                            wrapper.read(Type.VAR_INT); // 2/5 - Hand
+                            int hand = wrapper.read(Type.VAR_INT); // 2/5 - Hand
+
+                            if (hand == 1)
+                                wrapper.cancel();
                         }
                     }
                 });
