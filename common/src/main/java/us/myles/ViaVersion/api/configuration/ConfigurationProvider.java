@@ -7,7 +7,7 @@ public interface ConfigurationProvider {
     /**
      * Sets the specified path to the given value.
      *
-     * @param path Path of the object to set.
+     * @param path  Path of the object to set.
      * @param value New value to set the path to
      */
     void set(String path, Object value);
@@ -22,5 +22,5 @@ public interface ConfigurationProvider {
      *
      * @return Map with key->values
      */
-    Map<String,Object> getValues();
+    Map<String, Object> getValues();
 }

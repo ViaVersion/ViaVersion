@@ -9,7 +9,6 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.dump.DumpTemplate;
-import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.dump.VersionInfo;
 
 import java.io.InputStreamReader;
@@ -18,8 +17,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 

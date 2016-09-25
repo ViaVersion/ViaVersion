@@ -64,6 +64,7 @@ public abstract class Protocol {
     protected void register(ViaProviders providers) {
 
     }
+
     /**
      * Register the packets for this protocol
      */

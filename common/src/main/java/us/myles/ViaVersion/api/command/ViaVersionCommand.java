@@ -31,7 +31,7 @@ public interface ViaVersionCommand {
      * Executed when the Command sender executes the command
      *
      * @param sender Sender object
-     * @param args arguments provided
+     * @param args   arguments provided
      * @return was successful
      */
     boolean onCommand(ViaCommandSender sender, String[] args);
@@ -40,7 +40,7 @@ public interface ViaVersionCommand {
      * Executed when the Command sender tab-completes
      *
      * @param sender Sender object
-     * @param args arguments provided
+     * @param args   arguments provided
      * @return was successful
      */
     List<String> onTabComplete(ViaCommandSender sender, String[] args);

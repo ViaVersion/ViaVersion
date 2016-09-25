@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.minecraft.metadata;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import us.myles.ViaVersion.api.type.Type;
 
 @AllArgsConstructor

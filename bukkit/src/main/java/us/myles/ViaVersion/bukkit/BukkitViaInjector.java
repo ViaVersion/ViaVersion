@@ -8,7 +8,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ConcurrentList;
 import us.myles.ViaVersion.util.ListWrapper;

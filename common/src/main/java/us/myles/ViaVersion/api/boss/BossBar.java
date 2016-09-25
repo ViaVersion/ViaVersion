@@ -75,7 +75,7 @@ public abstract class BossBar<T> {
      * @deprecated Deprecated use UUID's instead of Player objects {@link #addPlayer(UUID)}
      */
     @Deprecated
-    public BossBar addPlayer(T player){
+    public BossBar addPlayer(T player) {
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
@@ -86,7 +86,7 @@ public abstract class BossBar<T> {
      * @return The BossBar object
      */
     public abstract BossBar addPlayer(UUID player);
-    
+
     /**
      * add multiple players
      *
@@ -95,7 +95,7 @@ public abstract class BossBar<T> {
      * @deprecated Deprecated use UUID's instead of Player objects {@link #addPlayer(UUID)}
      */
     @Deprecated
-    public BossBar addPlayers(T... players){
+    public BossBar addPlayers(T... players) {
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
@@ -107,7 +107,7 @@ public abstract class BossBar<T> {
      * @deprecated Deprecated use UUID's instead of Player objects {@link #removePlayer(UUID)}
      */
     @Deprecated
-    public BossBar removePlayer(T player){
+    public BossBar removePlayer(T player) {
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 

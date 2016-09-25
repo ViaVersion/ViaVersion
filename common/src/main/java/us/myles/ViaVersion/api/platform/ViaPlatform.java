@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.api.platform;
 
 import com.google.gson.JsonObject;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;

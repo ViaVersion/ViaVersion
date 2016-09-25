@@ -13,7 +13,6 @@ import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.listeners.UpdateListener;
 import us.myles.ViaVersion.listeners.protocol1_9to1_8.*;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;

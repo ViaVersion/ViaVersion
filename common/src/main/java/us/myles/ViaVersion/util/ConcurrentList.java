@@ -8,9 +8,10 @@ import java.util.*;
 /**
  * Created by wea_ondara licensed under MIT
  * Same license as in LICENSE
- *
+ * <p>
  * Taken from:
  * https://github.com/weaondara/BungeePerms/blob/master/src/main/java/net/alpenblock/bungeeperms/util/ConcurrentList.java
+ *
  * @param <E> List Type
  */
 public class ConcurrentList<E> extends ArrayList<E> {

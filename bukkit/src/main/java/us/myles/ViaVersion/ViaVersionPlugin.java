@@ -15,7 +15,6 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bukkit.BukkitCommandHandler;
 import us.myles.ViaVersion.bukkit.BukkitCommandSender;
 import us.myles.ViaVersion.bukkit.BukkitViaAPI;

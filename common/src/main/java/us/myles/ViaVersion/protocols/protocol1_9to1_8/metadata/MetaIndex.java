@@ -183,7 +183,7 @@ public enum MetaIndex {
         do {
             Optional<MetaIndex> optMeta = getIndex(currentType, index);
 
-            if (optMeta.isPresent()){
+            if (optMeta.isPresent()) {
                 return optMeta.get();
             }
 

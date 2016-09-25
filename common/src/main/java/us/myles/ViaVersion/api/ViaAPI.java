@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.util.SortedSet;
