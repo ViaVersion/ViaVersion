@@ -50,8 +50,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot patch: Fixes block placement.");
             new PaperPatch(plugin).register();
         }
-        if (plugin.getConf().isStimulatePlayerTick())
-            new ViaIdleThread(Via.getManager().getPortedPlayers()).runTaskTimer(plugin, 1L, 1L); // Updates player's idle status
         if (plugin.getConf().isItemCache()) {
             new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
             HandItemCache.CACHE = true;

@@ -16,6 +16,7 @@ import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
 import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
 
 import java.util.List;
@@ -78,8 +79,12 @@ public class Protocol1_9TO1_8 extends Protocol {
     }
 
     @Override
-    protected void registerProviders(ViaProviders providers) {
+    protected void register(ViaProviders providers) {
         providers.register(HandItemProvider.class, new HandItemProvider());
+        providers.require(MovementTransmitterProvider.class);
+        if (Via.getConfig().isStimulatePlayerTick()) {
+            Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
+        }
     }
 
     @Override

@@ -23,6 +23,8 @@ public interface ViaPlatform<T> {
 
     public void runSync(Runnable runnable);
 
+    public void runRepeatingSync(Runnable runnable, Long ticks);
+
     public ViaCommandSender[] getOnlinePlayers();
 
     public void sendMessage(UUID uuid, String message);

@@ -57,11 +57,11 @@ public abstract class Protocol {
     }
 
     /**
-     * Register providers for this protocol
+     * Handle protocol registration phase, use this to register providers / tasks.
      *
      * @param providers The current providers
      */
-    protected void registerProviders(ViaProviders providers) {
+    protected void register(ViaProviders providers) {
 
     }
     /**
