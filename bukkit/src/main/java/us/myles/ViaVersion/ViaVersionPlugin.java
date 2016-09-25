@@ -15,10 +15,7 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bukkit.BukkitCommandHandler;
-import us.myles.ViaVersion.bukkit.BukkitCommandSender;
-import us.myles.ViaVersion.bukkit.BukkitViaAPI;
-import us.myles.ViaVersion.bukkit.BukkitViaInjector;
+import us.myles.ViaVersion.bukkit.*;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.ReflectionUtil;
@@ -52,6 +49,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
                 .platform(this)
                 .commandHandler(commandHandler)
                 .injector(new BukkitViaInjector())
+                .loader(new BukkitViaLoader(this))
                 .build());
         // For compatibility
         ViaVersion.setInstance(this);

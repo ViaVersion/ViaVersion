@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-@Builder
 public class ViaManager {
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
     private ViaPlatform platform;
@@ -30,6 +29,14 @@ public class ViaManager {
     private ViaInjector injector;
     private ViaCommandHandler commandHandler;
     private ViaPlatformLoader loader;
+
+    @Builder
+    public ViaManager(ViaPlatform platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
+        this.platform = platform;
+        this.injector = injector;
+        this.commandHandler = commandHandler;
+        this.loader = loader;
+    }
 
     public void init() {
         if (System.getProperty("ViaVersion") != null) {
