@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
+import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ViaManager {
     private ViaPlatform platform;
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
+    private ViaProviders providers = new ViaProviders();
     @Setter
     private boolean debug = false;
     // Internals
@@ -51,19 +53,29 @@ public class ViaManager {
         platform.runSync(new Runnable() {
             @Override
             public void run() {
-                ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
-
-                // Check if there are any pipes to this version
-                if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
-                    getPlatform().getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
-                    if (!ProtocolRegistry.isWorkingPipe()) {
-                        getPlatform().getLogger().warning("ViaVersion does not have any compatible versions for this server version, please read our resource page carefully.");
-                    }
-                }
-                ProtocolRegistry.refreshVersions();
+                onServerLoaded();
             }
         });
 
+    }
+    public void onServerLoaded() {
+        // Load Server Protocol
+        ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
+        // Check if there are any pipes to this version
+        if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
+            getPlatform().getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
+            if (!ProtocolRegistry.isWorkingPipe()) {
+                getPlatform().getLogger().warning("ViaVersion does not have any compatible versions for this server version, please read our resource page carefully.");
+            }
+        }
+        // Load Listeners / Tasks
+        ProtocolRegistry.onServerLoaded();
+
+        // Load Platform
+        loader.load();
+
+        // Refresh Versions
+        ProtocolRegistry.refreshVersions();
     }
 
     public void destroy() {

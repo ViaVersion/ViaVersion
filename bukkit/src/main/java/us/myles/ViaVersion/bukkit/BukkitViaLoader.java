@@ -7,10 +7,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.listeners.UpdateListener;
 import us.myles.ViaVersion.listeners.protocol1_9to1_8.*;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
 public class BukkitViaLoader implements ViaPlatformLoader {
@@ -32,6 +40,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }, plugin);
 
         /* 1.9 client to 1.8 server */
+
         new ArmorListener(plugin).register();
         new CommandBlockListener(plugin).register();
         new DeathListener(plugin).register();
@@ -47,5 +56,34 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
             HandItemCache.CACHE = true;
         }
+
+        /* Providers */
+        Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
+            @Override
+            public Item getHandItem(final UserConnection info) {
+                if (HandItemCache.CACHE) {
+                    return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
+                } else {
+                    try {
+                        return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Item>() {
+                            @Override
+                            public Item call() throws Exception {
+                                UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
+                                if (Bukkit.getPlayer(playerUUID) != null) {
+                                    return HandItemCache.convert(Bukkit.getPlayer(playerUUID).getItemInHand());
+                                }
+                                return null;
+                            }
+                        }).get(10, TimeUnit.SECONDS);
+                    } catch (Exception e) {
+                        System.out.println("Error fetching hand item: " + e.getClass().getName());
+                        if (Via.getManager().isDebug())
+                            e.printStackTrace();
+                        return null;
+                    }
+                }
+            }
+        });
+
     }
 }

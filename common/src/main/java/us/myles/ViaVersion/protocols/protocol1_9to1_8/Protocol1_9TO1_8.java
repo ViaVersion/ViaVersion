@@ -8,19 +8,17 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
 import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
 
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 public class Protocol1_9TO1_8 extends Protocol {
     @Deprecated
@@ -67,27 +65,7 @@ public class Protocol1_9TO1_8 extends Protocol {
     }
 
     public static Item getHandItem(final UserConnection info) {
-        if (HandItemCache.CACHE) {
-            return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
-        } else {
-            try {
-                return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Item>() {
-                    @Override
-                    public Item call() throws Exception {
-                        UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
-                        if (Bukkit.getPlayer(playerUUID) != null) {
-                            return Item.getItem(Bukkit.getPlayer(playerUUID).getItemInHand());
-                        }
-                        return null;
-                    }
-                }).get(10, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                System.out.println("Error fetching hand item: " + e.getClass().getName());
-                if (Via.getManager().isDebug())
-                    e.printStackTrace();
-                return null;
-            }
-        }
+        return Via.getManager().getProviders().get(HandItemProvider.class).getHandItem(info);
     }
 
     @Override
@@ -100,8 +78,8 @@ public class Protocol1_9TO1_8 extends Protocol {
     }
 
     @Override
-    protected void registerListeners() {
-
+    protected void registerProviders(ViaProviders providers) {
+        providers.register(HandItemProvider.class, new HandItemProvider());
     }
 
     @Override

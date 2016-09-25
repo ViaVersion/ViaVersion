@@ -5,6 +5,7 @@ import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
@@ -47,11 +48,22 @@ public abstract class Protocol {
 
     /**
      * Register listeners for this protocol
+     *
+     * @deprecated No longer used as listeners are registered in {@link us.myles.ViaVersion.api.platform.ViaPlatformLoader#load}
      */
+    @Deprecated
     protected void registerListeners() {
 
     }
 
+    /**
+     * Register providers for this protocol
+     *
+     * @param providers The current providers
+     */
+    protected void registerProviders(ViaProviders providers) {
+
+    }
     /**
      * Register the packets for this protocol
      */

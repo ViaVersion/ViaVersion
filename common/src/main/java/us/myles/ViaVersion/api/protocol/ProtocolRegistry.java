@@ -63,6 +63,7 @@ public class ProtocolRegistry {
 
         if (Via.getPlatform().isPluginEnabled()) {
             protocol.registerListeners();
+            protocol.registerProviders(Via.getManager().getProviders());
             refreshVersions();
         } else {
             registerList.add(protocol);
@@ -106,9 +107,10 @@ public class ProtocolRegistry {
     /**
      * Called when the server is enabled, to register any non registered listeners.
      */
-    public static void registerListeners() {
+    public static void onServerLoaded() {
         for (Protocol protocol : registerList) {
             protocol.registerListeners();
+            protocol.registerProviders(Via.getManager().getProviders());
         }
         registerList.clear();
     }
