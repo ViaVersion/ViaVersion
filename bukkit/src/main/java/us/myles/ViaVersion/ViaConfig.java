@@ -1,12 +1,14 @@
 package us.myles.ViaVersion;
 
 import us.myles.ViaVersion.api.ViaVersionConfig;
+import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.util.Configuration;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
-public class ViaConfig implements ViaVersionConfig {
+public class ViaConfig implements ViaVersionConfig, ConfigurationProvider {
     private final ViaVersionPlugin plugin;
 
     public ViaConfig(ViaVersionPlugin plugin) {
@@ -184,5 +186,20 @@ public class ViaConfig implements ViaVersionConfig {
     @Override
     public String getReloadDisconnectMsg() {
         return plugin.getConfig().getString("reload-disconnect-msg", "Server reload, please rejoin!");
+    }
+
+    @Override
+    public void set(String path, Object value) {
+        plugin.getConfig().set(path, value);
+    }
+
+    @Override
+    public void saveConfig() {
+        plugin.saveConfig();
+    }
+
+    @Override
+    public Map<String, Object> getValues() {
+        return plugin.getConfig().getValues(false);
     }
 }

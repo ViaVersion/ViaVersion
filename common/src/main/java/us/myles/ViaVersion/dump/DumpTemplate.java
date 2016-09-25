@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.dump;
 
+import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,5 +12,5 @@ import java.util.Map;
 public class DumpTemplate {
     private VersionInfo versionInfo;
     private Map<String, Object> configuration;
-    private List<PluginInfo> plugins;
+    private JsonObject platformDump;
 }

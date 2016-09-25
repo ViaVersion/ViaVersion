@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import org.bukkit.command.CommandSender;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
+import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
 public class DontBugMeSubCmd extends ViaSubCommand {
     @Override
@@ -19,11 +18,11 @@ public class DontBugMeSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
+        ConfigurationProvider provider = Via.getPlatform().getConfigurationProvider();
+        boolean newValue = !Via.getConfig().isCheckForUpdates();
 
-        boolean newValue = !ViaVersion.getConfig().isCheckForUpdates();
-        plugin.getConfig().set("checkforupdates", newValue);
-        plugin.saveConfig();
+        provider.set("checkforupdates", newValue);
+        provider.saveConfig();
         sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));
 
         return true;

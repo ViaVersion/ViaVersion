@@ -1,14 +1,18 @@
 package us.myles.ViaVersion;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
+import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
@@ -17,8 +21,11 @@ import us.myles.ViaVersion.bukkit.BukkitCommandSender;
 import us.myles.ViaVersion.bukkit.BukkitViaAPI;
 import us.myles.ViaVersion.bukkit.BukkitViaInjector;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;
+import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -88,7 +95,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         if (lateBind) {
             Via.getManager().init();
         }
-
 
         getCommand("viaversion").setExecutor(commandHandler = new BukkitCommandHandler());
         getCommand("viaversion").setTabCompleter(commandHandler);
@@ -177,13 +183,23 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     }
 
     @Override
-    public void runAsync(Runnable runnable) {
-        getServer().getScheduler().runTaskAsynchronously(this, runnable);
+    public int runAsync(Runnable runnable) {
+        return getServer().getScheduler().runTaskAsynchronously(this, runnable).getTaskId();
     }
 
     @Override
-    public void runSync(Runnable runnable) {
-        getServer().getScheduler().runTask(this, runnable);
+    public int runSync(Runnable runnable) {
+        return getServer().getScheduler().runTask(this, runnable).getTaskId();
+    }
+
+    @Override
+    public int runRepeatingSync(Runnable runnable, Long ticks) {
+        return getServer().getScheduler().runTaskTimer(this, runnable, ticks, 0).getTaskId(); // TODO or the other way around?
+    }
+
+    @Override
+    public void cancelTask(int taskId) {
+        getServer().getScheduler().cancelTask(taskId);
     }
 
     @Override
@@ -221,6 +237,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     }
 
     @Override
+    public ConfigurationProvider getConfigurationProvider() {
+        return conf;
+    }
+
+    @Override
     public void onReload() {
         if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
             getLogger().severe("ViaVersion is already loaded, we're going to kick all the players... because otherwise we'll crash because of ProtocolLib.");
@@ -231,5 +252,19 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         } else {
             getLogger().severe("ViaVersion is already loaded, this should work fine. If you get any console errors, try rebooting.");
         }
+    }
+
+    @Override
+    public JsonObject getDump() {
+        JsonObject platformSpecific = new JsonObject();
+
+        List<PluginInfo> plugins = new ArrayList<>();
+        for (Plugin p : Bukkit.getPluginManager().getPlugins())
+            plugins.add(new PluginInfo(p.isEnabled(), p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), p.getDescription().getAuthors()));
+
+        platformSpecific.add("plugins", new Gson().toJsonTree(plugins));
+        // TODO more? ProtocolLib things etc?
+
+        return platformSpecific;
     }
 }

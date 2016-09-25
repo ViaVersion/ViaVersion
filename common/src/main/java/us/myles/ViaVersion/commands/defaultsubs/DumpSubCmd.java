@@ -3,6 +3,8 @@ package us.myles.ViaVersion.commands.defaultsubs;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import net.md_5.bungee.api.ChatColor;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
@@ -37,22 +39,19 @@ public class DumpSubCmd extends ViaSubCommand {
     @Override
     public boolean execute(final ViaCommandSender sender, String[] args) {
         VersionInfo version = new VersionInfo(
-                Bukkit.getServer().getVersion(),
-                Bukkit.getServer().getBukkitVersion(),
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
                 ProtocolRegistry.SERVER_PROTOCOL,
-                ProtocolRegistry.getSupportedVersions());
+                ProtocolRegistry.getSupportedVersions(),
+                Via.getPlatform().getPlatformName(),
+                Via.getPlatform().getPluginVersion()
+        );
 
-        List<PluginInfo> plugins = new ArrayList<>();
-        for (Plugin p : Bukkit.getPluginManager().getPlugins())
-            plugins.add(new PluginInfo(p.isEnabled(), p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), p.getDescription().getAuthors()));
+        Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
 
-        Map<String, Object> configuration = ((ViaVersionPlugin) ViaVersion.getInstance()).getConfig().getValues(false);
+        final DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump());
 
-        final DumpTemplate template = new DumpTemplate(version, configuration, plugins);
-
-        Bukkit.getScheduler().runTaskAsynchronously((ViaVersionPlugin) ViaVersion.getInstance(), new Runnable() {
+        Via.getPlatform().runAsync(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -75,7 +74,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     sender.sendMessage(ChatColor.GREEN + "We've made a dump with useful information, report your issue and provide this url: " + getUrl(output.get("key").getAsString()));
                 } catch (Exception e) {
                     sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
-                    ((ViaVersionPlugin) ViaVersion.getInstance()).getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);
                 }
             }
         });

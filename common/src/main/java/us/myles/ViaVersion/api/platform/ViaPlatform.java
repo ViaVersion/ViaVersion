@@ -1,8 +1,11 @@
 package us.myles.ViaVersion.api.platform;
 
+import com.google.gson.JsonObject;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
+import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -13,29 +16,35 @@ import java.util.logging.Logger;
  * @param <T> - The player type for the platform, used for API related methods
  */
 public interface ViaPlatform<T> {
-    public Logger getLogger();
+    Logger getLogger();
 
-    public String getPlatformName();
+    String getPlatformName();
 
-    public String getPluginVersion();
+    String getPluginVersion();
 
-    public void runAsync(Runnable runnable);
+    int runAsync(Runnable runnable);
 
-    public void runSync(Runnable runnable);
+    int runSync(Runnable runnable);
 
-    public void runRepeatingSync(Runnable runnable, Long ticks);
+    int runRepeatingSync(Runnable runnable, Long ticks);
 
-    public ViaCommandSender[] getOnlinePlayers();
+    void cancelTask(int taskId);
 
-    public void sendMessage(UUID uuid, String message);
+    ViaCommandSender[] getOnlinePlayers();
 
-    public boolean kickPlayer(UUID uuid, String message);
+    void sendMessage(UUID uuid, String message);
 
-    public boolean isPluginEnabled();
+    boolean kickPlayer(UUID uuid, String message);
 
-    public ViaAPI<T> getApi();
+    boolean isPluginEnabled();
 
-    public ViaVersionConfig getConf();
+    ViaAPI<T> getApi();
 
-    public void onReload();
+    ViaVersionConfig getConf();
+
+    ConfigurationProvider getConfigurationProvider();
+
+    void onReload();
+
+    JsonObject getDump();
 }

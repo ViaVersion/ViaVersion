@@ -17,7 +17,7 @@ public class ReloadSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        Via.getConfig().reloadConfig();
+        Via.getPlatform().getConfigurationProvider().saveConfig();
         sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
         return true;
     }
