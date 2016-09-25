@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,16 +24,16 @@ public class UpdateUtil {
     private final static Gson gson = new GsonBuilder().create();
 
     public static void sendUpdateMessage(final UUID uuid) {
-        ViaVersion.getPlatform().runAsync(new Runnable() {
+        Via.getPlatform().runAsync(new Runnable() {
             @Override
             public void run() {
                 final String message = getUpdateMessage(false);
                 if (message != null) {
-                    ViaVersion.getPlatform().runSync(
+                    Via.getPlatform().runSync(
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    ViaVersion.getPlatform().sendMessage(uuid, PREFIX + message);
+                                    Via.getPlatform().sendMessage(uuid, PREFIX + message);
                                 }
                             }
                     );
@@ -43,16 +43,16 @@ public class UpdateUtil {
     }
 
     public static void sendUpdateMessage() {
-        ViaVersion.getPlatform().runAsync(new Runnable() {
+        Via.getPlatform().runAsync(new Runnable() {
             @Override
             public void run() {
                 final String message = getUpdateMessage(true);
                 if (message != null) {
-                    ViaVersion.getPlatform().runSync(
+                    Via.getPlatform().runSync(
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    ViaVersion.getPlatform().getLogger().warning(message);
+                                    Via.getPlatform().getLogger().warning(message);
                                 }
                             }
                     );
@@ -62,7 +62,7 @@ public class UpdateUtil {
     }
 
     private static String getUpdateMessage(boolean console) {
-        if (ViaVersion.getInstance().getVersion().equals("${project.version}")) {
+        if (Via.getPlatform().getPluginVersion().equals("${project.version}")) {
             return "You are using a debug/custom version, consider updating.";
         }
         String newestString = getNewestVersion();
@@ -75,7 +75,7 @@ public class UpdateUtil {
         }
         Version current;
         try {
-            current = new Version(ViaVersion.getInstance().getVersion());
+            current = new Version(Via.getPlatform().getPluginVersion());
         } catch (IllegalArgumentException e) {
             return "You are using a custom version, consider updating.";
         }
@@ -97,7 +97,7 @@ public class UpdateUtil {
             URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
-            connection.addRequestProperty("User-Agent", "ViaVersion " + ViaVersion.getInstance().getVersion());
+            connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion());
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;

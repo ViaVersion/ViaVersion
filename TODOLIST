@@ -1,0 +1,14 @@
+Migrate EntityUtil to be cool
+Fix 1.9to1.8
+Fix 1.9.3to1.9.1/2
+Fix 1.9.1/2to1.9.3/4
+Fix snapshot to 1.10
+Fix BaseProtocol
+Fix BossBar to use Generics
+Register Listeners Properly
+Fix commands
+Handle injector errors
+Add new info to dump for platform
+Migrate Bukkit types to our own :D
+
+Important: Create builder for ViaManager which allows supplying on the command exectutor, injector, platform :D

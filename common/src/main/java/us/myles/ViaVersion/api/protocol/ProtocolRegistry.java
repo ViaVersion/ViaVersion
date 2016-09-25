@@ -3,7 +3,7 @@ package us.myles.ViaVersion.api.protocol;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2TO1_9_3_4;
@@ -61,7 +61,7 @@ public class ProtocolRegistry {
             registryMap.get(version).put(output, protocol);
         }
 
-        if (ViaVersion.getPlatform().isPluginEnabled()) {
+        if (Via.getPlatform().isPluginEnabled()) {
             protocol.registerListeners();
             refreshVersions();
         } else {

@@ -3,7 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -24,6 +24,7 @@ public class ClientChunks extends StoredObject {
 
     static {
         try {
+            // TODO: Abstract this ?
             mapChunkBulkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
             mapChunkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
             if (ViaVersion.getInstance().isSpigot()) {
@@ -31,7 +32,7 @@ public class ClientChunks extends StoredObject {
                 worldRef = ReflectionUtil.nms("World");
             }
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to initialise chunks reflection", e);
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to initialise chunks reflection", e);
         }
     }
 
@@ -83,7 +84,7 @@ public class ClientChunks extends StoredObject {
                 list.add(chunkPacket);
             }
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to transform chunks bulk", e);
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to transform chunks bulk", e);
         }
         return list;
     }

@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.packets.Direction;
@@ -74,7 +74,7 @@ public class ProtocolPipeline extends Protocol {
 
         super.transform(direction, state, packetWrapper);
 
-        if (ViaVersion.getInstance().isDebug()) {
+        if (Via.getManager().isDebug()) {
             // Debug packet
             String packet = "UNKNOWN";
 
@@ -109,7 +109,7 @@ public class ProtocolPipeline extends Protocol {
                 }
             }
             String name = packet + "[" + userConnection.get(ProtocolInfo.class).getProtocolVersion() + "]";
-            ViaPlatform platform = ViaVersion.getPlatform();
+            ViaPlatform platform = Via.getPlatform();
 
             String actualUsername = packetWrapper.user().get(ProtocolInfo.class).getUsername();
             String username = actualUsername != null ? actualUsername + " " : "";

@@ -2,7 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.bukkit.Bukkit;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.type.PartialType;
@@ -134,7 +134,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
 
         // Check remaining bytes
         if (bytesLeft > 0) {
-            Bukkit.getLogger().log(Level.WARNING, bytesLeft + " Bytes left after reading chunks! (" + groundUp + ")");
+            Via.getPlatform().getLogger().log(Level.WARNING, bytesLeft + " Bytes left after reading chunks! (" + groundUp + ")");
         }
 
         // Return chunks

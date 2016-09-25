@@ -12,7 +12,6 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.TypeConverter;
 import us.myles.ViaVersion.exception.InformativeException;
-import us.myles.ViaVersion.handlers.ViaDecodeHandler;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -25,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PacketWrapper {
+    public static int PASSTHROUGH_ID = 1000;
+
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
@@ -461,7 +462,7 @@ public class PacketWrapper {
     public void sendToServer() throws Exception {
         if (!isCancelled()) {
             ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
-            Type.VAR_INT.write(output, ViaDecodeHandler.PASSTHROUGH_ID); // Pass through
+            Type.VAR_INT.write(output, PacketWrapper.PASSTHROUGH_ID); // Pass through
 
             writeToBuffer(output);
 

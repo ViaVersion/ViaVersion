@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
 
-import org.bukkit.Material;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -31,7 +30,7 @@ public class ItemRewriter {
     }
 
     private static boolean hasEntityTag(Item item) {
-        if (item != null && item.getId() == Material.MONSTER_EGG.getId()) {
+        if (item != null && item.getId() == 383) { // Monster Egg
             CompoundTag tag = item.getTag();
             if (tag != null && tag.contains("EntityTag") && tag.get("EntityTag") instanceof CompoundTag) {
                 if (((CompoundTag) tag.get("EntityTag")).get("id") instanceof StringTag) {

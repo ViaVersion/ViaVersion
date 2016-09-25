@@ -7,7 +7,6 @@ import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.Map;

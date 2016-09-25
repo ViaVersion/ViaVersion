@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 public abstract class ListWrapper implements List {
-    public final Object lock = new Object();
     private final List list;
 
     public ListWrapper(List inputList) {

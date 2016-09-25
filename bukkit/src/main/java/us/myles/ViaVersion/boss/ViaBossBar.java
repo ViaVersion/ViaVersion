@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.boss.BossStyle;
 
 @Getter
 public class ViaBossBar extends CommonBoss {
+    // TODO: Fix to use generics
 
     public ViaBossBar(String title, float health, BossColor color, BossStyle style) {
         super(title, health, color, style);

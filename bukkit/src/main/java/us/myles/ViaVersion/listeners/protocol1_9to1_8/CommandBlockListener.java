@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
+package us.myles.ViaVersion.listeners.protocol1_9to1_8;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;

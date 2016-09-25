@@ -15,5 +15,4 @@ public class UpdateListener implements Listener {
             UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId());
         }
     }
-
 }

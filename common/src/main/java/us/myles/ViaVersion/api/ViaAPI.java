@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.api;
 
 import io.netty.buffer.ByteBuf;
-import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
@@ -11,25 +10,20 @@ import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import java.util.SortedSet;
 import java.util.UUID;
 
-@Deprecated
-public interface ViaVersionAPI extends ViaAPI<Player> {
-    /**
-     * Is the player connection modified by ViaVersion?
-     *
-     * @param player Bukkit player object
-     * @return True if the client is modified (At the moment it also means version 1.9 and higher)
-     * @deprecated As of 0.9.9, because all players are ported use {@link #getPlayerVersion(Player)}
-     */
-    boolean isPorted(Player player);
-
+/**
+ * Represents the ViaAPI
+ *
+ * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
+ */
+public interface ViaAPI<T> {
     /**
      * Get protocol number from a player
      * Will also retrieve version from ProtocolSupport if it's being used.
      *
-     * @param player Bukkit player object
+     * @param player Platform player object, eg. Bukkit this is Player
      * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
      */
-    int getPlayerVersion(Player player);
+    int getPlayerVersion(T player);
 
     /**
      * Get protocol number from a player
@@ -59,11 +53,11 @@ public interface ViaVersionAPI extends ViaAPI<Player> {
     /**
      * Send a raw packet to the player (Use new IDs)
      *
-     * @param player The player to send packet
+     * @param player Platform player object, eg. Bukkit this is Player
      * @param packet The packet, you need a VarInt ID then the packet contents.
      * @throws IllegalArgumentException If not on 1.9 throws IllegalArg
      */
-    void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException;
+    void sendRawPacket(T player, ByteBuf packet) throws IllegalArgumentException;
 
     /**
      * Send a raw packet to the player (Use new IDs)
@@ -96,28 +90,6 @@ public interface ViaVersionAPI extends ViaAPI<Player> {
     BossBar createBossBar(String title, float health, BossColor color, BossStyle style);
 
     /**
-     * Get if global debug is enabled
-     *
-     * @return true if debug is enabled
-     */
-    boolean isDebug();
-
-    /**
-     * Get ViaVersions command handler
-     *
-     * @return command handler
-     */
-    ViaVersionCommand getCommandHandler();
-
-    /**
-     * Get if this version is a compatibility build for spigot.
-     * Eg. 1.9.1 / 1.9.2 allow certain versions to connect
-     *
-     * @return True if it is
-     */
-    boolean isCompatSpigotBuild();
-
-    /**
      * Get the supported protocol versions
      * This method removes any blocked protocol versions.
      *
@@ -125,20 +97,4 @@ public interface ViaVersionAPI extends ViaAPI<Player> {
      * @see ProtocolRegistry#getSupportedVersions() for full list.
      */
     SortedSet<Integer> getSupportedVersions();
-
-    /**
-     * Gets if the server uses spigot
-     * <p>
-     * Note: Will only work after ViaVersion load
-     *
-     * @return True if spigot
-     */
-    boolean isSpigot();
-
-    /**
-     * Gets if protocol support is also being used.
-     *
-     * @return True if it is being used.
-     */
-    boolean isProtocolSupport();
 }

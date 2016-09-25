@@ -20,7 +20,6 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
 
     private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
-    public static int PASSTHROUGH_ID = 1000;
 
     public ViaDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
         this.info = info;

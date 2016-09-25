@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.listeners;
+package us.myles.ViaVersion.listeners.protocol1_9to1_8;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
