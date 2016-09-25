@@ -1,11 +1,7 @@
 Fix 1.9to1.8
-Migrate listeners in BaseProtocol
-Register Listeners Properly
 Fix commands
 Handle injector errors
 Add new info to dump for platform
 Migrate Bukkit types to our own :D
 
 Important: Create builder for ViaManager which allows supplying on the command exectutor, injector, platform :D
-
-Important: Add BukkitViaLoader to ViaManager sequence
