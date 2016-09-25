@@ -2,7 +2,10 @@ package us.myles.ViaVersion.bukkit;
 
 import lombok.AllArgsConstructor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
+
+import java.util.UUID;
 
 @AllArgsConstructor
 public class BukkitCommandSender implements ViaCommandSender {
@@ -16,5 +19,19 @@ public class BukkitCommandSender implements ViaCommandSender {
     @Override
     public void sendMessage(String msg) {
         sender.sendMessage(msg);
+    }
+
+    @Override
+    public UUID getUUID() {
+        if (sender instanceof Player) {
+            return ((Player) sender).getUniqueId();
+        } else {
+            return UUID.fromString(getName());
+        }
+    }
+
+    @Override
+    public String getName() {
+        return sender.getName();
     }
 }

@@ -2,8 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
@@ -11,54 +9,39 @@ import java.util.HashMap;
 @Getter
 public enum ArmorType {
 
-    LEATHER_HELMET(1, 298, Material.LEATHER_HELMET),
-    LEATHER_CHESTPLATE(3, 299, Material.LEATHER_CHESTPLATE),
-    LEATHER_LEGGINGS(2, 300, Material.LEATHER_LEGGINGS),
-    LEATHER_BOOTS(1, 301, Material.LEATHER_BOOTS),
-    CHAINMAIL_HELMET(2, 302, Material.CHAINMAIL_HELMET),
-    CHAINMAIL_CHESTPLATE(5, 303, Material.CHAINMAIL_CHESTPLATE),
-    CHAINMAIL_LEGGINGS(4, 304, Material.CHAINMAIL_LEGGINGS),
-    CHAINMAIL_BOOTS(1, 305, Material.CHAINMAIL_BOOTS),
-    IRON_HELMET(2, 306, Material.IRON_HELMET),
-    IRON_CHESTPLATE(6, 307, Material.IRON_CHESTPLATE),
-    IRON_LEGGINGS(5, 308, Material.IRON_LEGGINGS),
-    IRON_BOOTS(2, 309, Material.IRON_BOOTS),
-    DIAMOND_HELMET(3, 310, Material.DIAMOND_HELMET),
-    DIAMOND_CHESTPLATE(8, 311, Material.DIAMOND_CHESTPLATE),
-    DIAMOND_LEGGINGS(6, 312, Material.DIAMOND_LEGGINGS),
-    DIAMOND_BOOTS(3, 313, Material.DIAMOND_BOOTS),
-    GOLD_HELMET(2, 314, Material.GOLD_HELMET),
-    GOLD_CHESTPLATE(5, 315, Material.GOLD_CHESTPLATE),
-    GOLD_LEGGINGS(3, 316, Material.GOLD_LEGGINGS),
-    GOLD_BOOTS(1, 317, Material.GOLD_BOOTS),
-    NONE(0, 0, Material.AIR);
+    LEATHER_HELMET(1, 298),
+    LEATHER_CHESTPLATE(3, 299),
+    LEATHER_LEGGINGS(2, 300),
+    LEATHER_BOOTS(1, 301),
+    CHAINMAIL_HELMET(2, 302),
+    CHAINMAIL_CHESTPLATE(5, 303),
+    CHAINMAIL_LEGGINGS(4, 304),
+    CHAINMAIL_BOOTS(1, 305),
+    IRON_HELMET(2, 306),
+    IRON_CHESTPLATE(6, 307),
+    IRON_LEGGINGS(5, 308),
+    IRON_BOOTS(2, 309),
+    DIAMOND_HELMET(3, 310),
+    DIAMOND_CHESTPLATE(8, 311),
+    DIAMOND_LEGGINGS(6, 312),
+    DIAMOND_BOOTS(3, 313),
+    GOLD_HELMET(2, 314),
+    GOLD_CHESTPLATE(5, 315),
+    GOLD_LEGGINGS(3, 316),
+    GOLD_BOOTS(1, 317),
+    NONE(0, 0);
 
-    private static HashMap<Material, ArmorType> armor;
+    private static HashMap<Integer, ArmorType> armor;
 
     static {
-        armor = new HashMap<Material, ArmorType>();
+        armor = new HashMap<>();
         for (ArmorType a : ArmorType.values()) {
-            armor.put(a.getType(), a);
+            armor.put(a.getId(), a);
         }
     }
 
     private final int armorPoints;
     private final int id;
-    private final Material type;
-
-    public static ArmorType findByType(Material type) {
-        ArmorType t = armor.get(type);
-        return t == null ? ArmorType.NONE : t;
-    }
-
-    public static int calculateArmorPoints(ItemStack[] armor) {
-        int total = 0;
-        for (ItemStack anArmor : armor) {
-            if (anArmor != null)
-                total += findByType(anArmor.getType()).getArmorPoints();
-        }
-        return total;
-    }
 
     public static ArmorType findById(int id) {
         for (ArmorType a : ArmorType.values())
@@ -67,9 +50,9 @@ public enum ArmorType {
         return ArmorType.NONE;
     }
 
-    public static boolean isArmor(Material material) {
+    public static boolean isArmor(int id) {
         for (ArmorType a : ArmorType.values())
-            if (a.getType() == material)
+            if (a.getId() == id)
                 return true;
         return false;
     }
@@ -83,8 +66,7 @@ public enum ArmorType {
         return total;
     }
 
-    public Material getType() {
-        return this.type;
+    public int getId() {
+        return this.id;
     }
-
 }

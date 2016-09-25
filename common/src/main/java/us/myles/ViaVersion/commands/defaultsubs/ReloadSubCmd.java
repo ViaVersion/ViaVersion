@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 
@@ -18,9 +17,7 @@ public class ReloadSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
-
-        plugin.getConf().generateConfig();
+        Via.getConfig().reloadConfig();
         sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
         return true;
     }

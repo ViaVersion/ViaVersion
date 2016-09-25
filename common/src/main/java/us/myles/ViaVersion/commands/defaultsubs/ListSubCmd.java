@@ -1,9 +1,6 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
@@ -35,8 +32,8 @@ public class ListSubCmd extends ViaSubCommand {
             }
         });
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            int playerVersion = ViaVersion.getInstance().getPlayerVersion(p);
+        for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
+            int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
             ProtocolVersion key = ProtocolVersion.getProtocol(playerVersion);
             if (!playerVersions.containsKey(key))
                 playerVersions.put(key, new HashSet<String>());

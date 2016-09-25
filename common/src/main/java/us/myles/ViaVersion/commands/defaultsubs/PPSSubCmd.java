@@ -1,10 +1,6 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -35,13 +31,13 @@ public class PPSSubCmd extends ViaSubCommand {
         int clients = 0;
         long max = 0;
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!ViaVersion.getInstance().isPorted(p))
+        for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
+            if (!Via.getAPI().isPorted(p.getUUID()))
                 continue;
-            int playerVersion = ViaVersion.getInstance().getPlayerVersion(p);
+            int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
             if (!playerVersions.containsKey(playerVersion))
                 playerVersions.put(playerVersion, new HashSet<String>());
-            UserConnection uc = ((ViaVersionPlugin) ViaVersion.getInstance()).getConnection(p);
+            UserConnection uc = Via.getManager().getConnection(p.getUUID());
             if (uc.getPacketsPerSecond() > -1) {
                 playerVersions.get(playerVersion).add(p.getName() + " (" + uc.getPacketsPerSecond() + " PPS)");
                 totalPackets += uc.getPacketsPerSecond();

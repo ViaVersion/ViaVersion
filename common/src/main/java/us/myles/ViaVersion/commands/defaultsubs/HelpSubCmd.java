@@ -1,11 +1,8 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import org.bukkit.command.CommandSender;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.commands.ViaCommandHandler;
 
 public class HelpSubCmd extends ViaSubCommand {
     @Override
@@ -20,9 +17,7 @@ public class HelpSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
-
-        ((ViaCommandHandler) plugin.getCommandHandler()).showHelp(sender);
+        Via.getManager().getCommandHandler().showHelp(sender);
         return true;
     }
 }

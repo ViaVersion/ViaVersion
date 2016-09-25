@@ -217,4 +217,9 @@ public interface ViaVersionConfig {
      * @return Disconnect message
      */
     String getReloadDisconnectMsg();
+
+    /**
+     * Reloads the config from disk
+     */
+    void reloadConfig();
 }

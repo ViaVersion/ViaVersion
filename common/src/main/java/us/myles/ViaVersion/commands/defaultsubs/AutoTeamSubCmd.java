@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
@@ -20,7 +21,7 @@ public class AutoTeamSubCmd extends ViaSubCommand {
     public boolean execute(ViaCommandSender sender, String[] args) {
         ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
 
-        boolean newValue = !ViaVersion.getConfig().isAutoTeam();
+        boolean newValue = !Via.getConfig().isAutoTeam();
         plugin.getConfig().set("auto-team", newValue);
         plugin.saveConfig();
         sendMessage(sender, "&6We will %s", (newValue ? "&aautomatically team players" : "&cno longer auto team players"));

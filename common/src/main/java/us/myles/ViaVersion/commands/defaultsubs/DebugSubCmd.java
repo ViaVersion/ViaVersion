@@ -1,8 +1,6 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import org.bukkit.command.CommandSender;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 
@@ -19,10 +17,8 @@ public class DebugSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ViaVersionPlugin plugin = (ViaVersionPlugin) ViaVersion.getInstance();
-
-        plugin.setDebug(!plugin.isDebug());
-        sendMessage(sender, "&6Debug mode is now %s", (plugin.isDebug() ? "&aenabled" : "&cdisabled"));
+        Via.getManager().setDebug(!Via.getManager().isDebug());
+        sendMessage(sender, "&6Debug mode is now %s", (Via.getManager().isDebug() ? "&aenabled" : "&cdisabled"));
         return true;
     }
 }

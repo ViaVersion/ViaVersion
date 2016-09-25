@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.platform;
 
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
+import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -21,6 +22,8 @@ public interface ViaPlatform<T> {
     public void runAsync(Runnable runnable);
 
     public void runSync(Runnable runnable);
+
+    public ViaCommandSender[] getOnlinePlayers();
 
     public void sendMessage(UUID uuid, String message);
 

@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.ItemStack;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.ViaListener;
@@ -33,7 +34,11 @@ public class ArmorListener extends ViaListener {
         // Ensure that the player is on our pipe
         if (!isOnPipe(player)) return;
 
-        int armor = ArmorType.calculateArmorPoints(player.getInventory().getArmorContents());
+
+        int armor = 0;
+        for (ItemStack stack : player.getInventory().getArmorContents()) {
+            armor += ArmorType.findById(stack.getTypeId()).getArmorPoints();
+        }
 
         PacketWrapper wrapper = new PacketWrapper(0x4B, null, getUserConnection(player));
         try {
@@ -58,7 +63,7 @@ public class ArmorListener extends ViaListener {
         if (human instanceof Player && e.getInventory() instanceof CraftingInventory) {
             final Player player = (Player) human;
             if (e.getCurrentItem() != null) {
-                if (ArmorType.isArmor(e.getCurrentItem().getType())) {
+                if (ArmorType.isArmor(e.getCurrentItem().getTypeId())) {
                     sendDelayedArmorUpdate(player);
                     return;
                 }

@@ -48,7 +48,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                 // Transform
                 ByteBuf newPacket = ctx.alloc().buffer();
                 try {
-                    if (id == ViaDecodeHandler.PASSTHROUGH_ID) {
+                    if (id == PacketWrapper.PASSTHROUGH_ID) {
                         newPacket.writeBytes(bytebuf);
                     } else {
                         PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);

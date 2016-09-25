@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
 import io.netty.util.ResourceLeakDetector;
-import org.bukkit.command.CommandSender;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 
