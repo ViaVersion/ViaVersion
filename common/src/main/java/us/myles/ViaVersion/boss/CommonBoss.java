@@ -18,7 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import java.util.*;
 
 @Getter
-public abstract class CommonBoss extends BossBar {
+public abstract class CommonBoss<T> extends BossBar<T> {
     private UUID uuid;
     private String title;
     private float health;

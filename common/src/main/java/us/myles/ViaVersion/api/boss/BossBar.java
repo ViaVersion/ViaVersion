@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.Via;
 import java.util.Set;
 import java.util.UUID;
 
-public abstract class BossBar {
+public abstract class BossBar<T> {
     /**
      * Get the current title
      *
@@ -72,8 +72,10 @@ public abstract class BossBar {
      *
      * @param player The player
      * @return The BossBar object
+     * @deprecated Deprecated use UUID's instead of Player objects {@link #addPlayer(UUID)}
      */
-    public BossBar addPlayer(Object player){
+    @Deprecated
+    public BossBar addPlayer(T player){
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
@@ -90,8 +92,10 @@ public abstract class BossBar {
      *
      * @param players list of players
      * @return The BossBar object
+     * @deprecated Deprecated use UUID's instead of Player objects {@link #addPlayer(UUID)}
      */
-    public BossBar addPlayers(Object... players){
+    @Deprecated
+    public BossBar addPlayers(T... players){
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
@@ -100,8 +104,10 @@ public abstract class BossBar {
      *
      * @param player The player
      * @return The BossBar object
+     * @deprecated Deprecated use UUID's instead of Player objects {@link #removePlayer(UUID)}
      */
-    public BossBar removePlayer(Object player){
+    @Deprecated
+    public BossBar removePlayer(T player){
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
