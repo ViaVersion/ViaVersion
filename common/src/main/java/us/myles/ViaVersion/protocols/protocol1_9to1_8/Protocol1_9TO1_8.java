@@ -91,9 +91,8 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     @Override
     public boolean isFiltered(Class packetClass) {
-        if (!Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).isEnabled())
-            return false;
-        return packetClass.getName().endsWith("PacketPlayOutMapChunkBulk");
+        return Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).isFiltered(packetClass);
+
     }
 
     @Override

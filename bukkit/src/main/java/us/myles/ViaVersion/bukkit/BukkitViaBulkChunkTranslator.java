@@ -19,7 +19,6 @@ public class BukkitViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
 
     static {
         try {
-            // TODO: Abstract this ?
             mapChunkBulkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
             mapChunkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
             if (((ViaVersionPlugin) Via.getPlatform()).isSpigot()) {
@@ -74,7 +73,7 @@ public class BukkitViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
     }
 
     @Override
-    public boolean isEnabled() {
-        return true;
+    public boolean isFiltered(Class<?> packetClass) {
+        return packetClass.getName().endsWith("PacketPlayOutMapChunkBulk");
     }
 }

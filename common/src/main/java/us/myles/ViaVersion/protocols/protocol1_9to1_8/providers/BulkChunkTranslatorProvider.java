@@ -11,7 +11,7 @@ public class BulkChunkTranslatorProvider implements Provider {
         return Arrays.asList(packet);
     }
 
-    public boolean isEnabled() {
+    public boolean isFiltered(Class<?> packet) {
         return false;
     }
 }

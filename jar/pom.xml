@@ -18,7 +18,7 @@
             <resource>
                 <targetPath>.</targetPath>
                 <filtering>false</filtering>
-                <directory>.</directory>
+                <directory>../</directory>
                 <includes>
                     <include>LICENSE</include>
                 </includes>
@@ -57,6 +57,10 @@
                             <pattern>org.javassist</pattern>
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.apache</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.apache</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -75,17 +79,22 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-common</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-bukkit</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-bungee</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-sponge</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
