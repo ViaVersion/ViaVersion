@@ -9,6 +9,10 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTransla
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.sponge.listeners.ClientLeaveListener;
 import us.myles.ViaVersion.sponge.listeners.UpdateListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.ArmorListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.BlockListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.CommandBlockListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.DeathListener;
 import us.myles.ViaVersion.sponge.providers.SpongeViaBulkChunkTranslator;
 import us.myles.ViaVersion.sponge.providers.SpongeViaMovementTransmitter;
 
@@ -25,15 +29,11 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         Sponge.getEventManager().registerListeners(plugin, new ClientLeaveListener());
 //        /* 1.9 client to 1.8 server */
 //
-//        new ArmorListener(plugin).register();
-//        new CommandBlockListener(plugin).register();
-//        new DeathListener(plugin).register();
-//        new BlockListener(plugin).register();
-//
-//        if (Bukkit.getVersion().toLowerCase().contains("paper") || Bukkit.getVersion().toLowerCase().contains("taco")) {
-//            plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot patch: Fixes block placement.");
-//            new PaperPatch(plugin).register();
-//        }
+        new ArmorListener(plugin).register();
+        new CommandBlockListener(plugin).register();
+        new DeathListener(plugin).register();
+        new BlockListener(plugin).register();
+
 //        if (plugin.getConf().isItemCache()) {
 //            new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
 //            HandItemCache.CACHE = true;

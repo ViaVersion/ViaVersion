@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.listeners.protocol1_9to1_8;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,12 +7,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaListener;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
-public class DeathListener extends ViaListener {
+public class DeathListener extends ViaBukkitListener {
     public DeathListener(ViaVersionPlugin plugin) {
         super(plugin, Protocol1_9TO1_8.class);
     }
@@ -34,7 +34,7 @@ public class DeathListener extends ViaListener {
     }
 
     private void sendPacket(final Player p, final String msg) {
-        Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
+        Via.getPlatform().runSync(new Runnable() {
             @Override
             public void run() {
                 PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p));

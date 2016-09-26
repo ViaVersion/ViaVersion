@@ -1,10 +1,8 @@
 package us.myles.ViaVersion.sponge;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
-import us.myles.ViaVersion.SpongePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.boss.BossBar;

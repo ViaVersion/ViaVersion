@@ -15,14 +15,15 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.ViaListener;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.util.UUID;
 
-public class ArmorListener extends ViaListener {
+public class ArmorListener extends ViaBukkitListener {
 
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
 
@@ -107,7 +108,7 @@ public class ArmorListener extends ViaListener {
 
     public void sendDelayedArmorUpdate(final Player player) {
         if (!isOnPipe(player)) return; // Don't start a task if the player is not on the pipe
-        Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+        Via.getPlatform().runSync(new Runnable() {
             @Override
             public void run() {
                 sendArmorUpdate(player);

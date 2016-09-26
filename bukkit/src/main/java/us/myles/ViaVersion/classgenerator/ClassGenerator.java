@@ -9,7 +9,6 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.handlers.ViaDecodeHandler;
 import us.myles.ViaVersion.handlers.ViaEncodeHandler;
 import us.myles.ViaVersion.util.NMSUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 public class ClassGenerator {
     private static HandlerConstructor constructor = new BasicHandlerConstructor();

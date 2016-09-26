@@ -2,14 +2,11 @@ package us.myles.ViaVersion.bungee.util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.MinecraftDecoder;
 import net.md_5.bungee.protocol.MinecraftEncoder;
-import us.myles.ViaVersion.Bungee;
-import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,6 +33,7 @@ public class BungeePipelineUtil {
             System.out.println("Netty issue?");
         }
     }
+
     public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {

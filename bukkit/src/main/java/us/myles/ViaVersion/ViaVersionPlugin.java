@@ -18,7 +18,6 @@ import us.myles.ViaVersion.bukkit.*;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.NMSUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.ArrayList;
 import java.util.List;

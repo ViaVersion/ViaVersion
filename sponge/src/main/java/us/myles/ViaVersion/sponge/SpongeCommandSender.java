@@ -3,7 +3,6 @@ package us.myles.ViaVersion.sponge;
 import lombok.AllArgsConstructor;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.serializer.TextSerializer;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 

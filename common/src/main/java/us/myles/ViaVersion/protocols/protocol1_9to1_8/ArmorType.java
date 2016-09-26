@@ -9,27 +9,27 @@ import java.util.HashMap;
 @Getter
 public enum ArmorType {
 
-    LEATHER_HELMET(1, 298),
-    LEATHER_CHESTPLATE(3, 299),
-    LEATHER_LEGGINGS(2, 300),
-    LEATHER_BOOTS(1, 301),
-    CHAINMAIL_HELMET(2, 302),
-    CHAINMAIL_CHESTPLATE(5, 303),
-    CHAINMAIL_LEGGINGS(4, 304),
-    CHAINMAIL_BOOTS(1, 305),
-    IRON_HELMET(2, 306),
-    IRON_CHESTPLATE(6, 307),
-    IRON_LEGGINGS(5, 308),
-    IRON_BOOTS(2, 309),
-    DIAMOND_HELMET(3, 310),
-    DIAMOND_CHESTPLATE(8, 311),
-    DIAMOND_LEGGINGS(6, 312),
-    DIAMOND_BOOTS(3, 313),
-    GOLD_HELMET(2, 314),
-    GOLD_CHESTPLATE(5, 315),
-    GOLD_LEGGINGS(3, 316),
-    GOLD_BOOTS(1, 317),
-    NONE(0, 0);
+    LEATHER_HELMET(1, 298, "minecraft:leather_helmet"),
+    LEATHER_CHESTPLATE(3, 299, "minecraft:leather_chestplate"),
+    LEATHER_LEGGINGS(2, 300, "minecraft:leather_leggings"),
+    LEATHER_BOOTS(1, 301, "minecraft:leather_boots"),
+    CHAINMAIL_HELMET(2, 302, "minecraft:chainmail_helmet"),
+    CHAINMAIL_CHESTPLATE(5, 303, "minecraft:chainmail_chestplate"),
+    CHAINMAIL_LEGGINGS(4, 304, "minecraft:chainmail_leggings"),
+    CHAINMAIL_BOOTS(1, 305, "minecraft:chainmail_boots"),
+    IRON_HELMET(2, 306, "minecraft:iron_helmet"),
+    IRON_CHESTPLATE(6, 307, "minecraft:iron_chestplate"),
+    IRON_LEGGINGS(5, 308, "minecraft:iron_leggings"),
+    IRON_BOOTS(2, 309, "minecraft:iron_boots"),
+    DIAMOND_HELMET(3, 310, "minecraft:diamond_helmet"),
+    DIAMOND_CHESTPLATE(8, 311, "minecraft:diamond_chestplate"),
+    DIAMOND_LEGGINGS(6, 312, "minecraft:diamond_leggings"),
+    DIAMOND_BOOTS(3, 313, "minecraft:diamond_boots"),
+    GOLD_HELMET(2, 314, "minecraft:gold_helmet"),
+    GOLD_CHESTPLATE(5, 315, "minecraft:gold_chestplate"),
+    GOLD_LEGGINGS(3, 316, "minecraft:gold_leggings"),
+    GOLD_BOOTS(1, 317, "minecraft:gold_boots"),
+    NONE(0, 0, "none");
 
     private static HashMap<Integer, ArmorType> armor;
 
@@ -42,12 +42,20 @@ public enum ArmorType {
 
     private final int armorPoints;
     private final int id;
+    private final String type;
 
     public static ArmorType findById(int id) {
         for (ArmorType a : ArmorType.values())
             if (a.getId() == id)
                 return a;
         return ArmorType.NONE;
+    }
+
+    public static ArmorType findByType(String type) {
+        for (ArmorType a : ArmorType.values())
+            if (a.getType().equals(type))
+                return a;
+        return NONE;
     }
 
     public static boolean isArmor(int id) {
@@ -57,13 +65,11 @@ public enum ArmorType {
         return false;
     }
 
-    public static int calculateArmorPoints(int[] armor) {
-        int total = 0;
-        for (int anArmor : armor) {
-            if (anArmor != -1)
-                total += findById(anArmor).getArmorPoints();
-        }
-        return total;
+    public static boolean isArmor(String type) {
+        for (ArmorType a : ArmorType.values())
+            if (a.getType().equals(type))
+                return true;
+        return false;
     }
 
     public int getId() {

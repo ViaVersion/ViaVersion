@@ -1,12 +1,6 @@
 package us.myles.ViaVersion.api;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import us.myles.ViaVersion.ViaVersionPlugin;
+import lombok.*;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -14,21 +8,11 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import java.util.UUID;
 
 @Getter(AccessLevel.PROTECTED)
+@Setter(AccessLevel.PROTECTED)
 @RequiredArgsConstructor
-public abstract class ViaListener implements Listener {
-    private final ViaVersionPlugin plugin;
+public abstract class ViaListener {
     private final Class<? extends Protocol> requiredPipeline;
     private boolean registered = false;
-
-    /**
-     * Get the UserConnection from a player
-     *
-     * @param player Player object
-     * @return The UserConnection
-     */
-    protected UserConnection getUserConnection(@NonNull Player player) {
-        return getUserConnection(player.getUniqueId());
-    }
 
     /**
      * Get the UserConnection from an UUID
@@ -39,16 +23,6 @@ public abstract class ViaListener implements Listener {
     protected UserConnection getUserConnection(@NonNull UUID uuid) {
         if (!Via.getAPI().isPorted(uuid)) return null;
         return Via.getManager().getConnection(uuid);
-    }
-
-    /**
-     * Checks if the player is on the selected pipe
-     *
-     * @param player Player Object
-     * @return True if on pipe
-     */
-    protected boolean isOnPipe(Player player) {
-        return isOnPipe(player.getUniqueId());
     }
 
     /**
@@ -64,12 +38,7 @@ public abstract class ViaListener implements Listener {
     }
 
     /**
-     * Register as Bukkit event
+     * Register the event
      */
-    public void register() {
-        if (registered) return;
-
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        registered = true;
-    }
+    public abstract void register();
 }

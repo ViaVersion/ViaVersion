@@ -10,8 +10,8 @@ import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.sponge.handlers.ViaVersionInitializer;
-import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion.util.ListWrapper;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

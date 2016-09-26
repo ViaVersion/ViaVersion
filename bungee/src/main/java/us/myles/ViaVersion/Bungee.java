@@ -11,11 +11,11 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bungee.command.BungeeCommand;
-import us.myles.ViaVersion.bungee.command.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.BungeeViaAPI;
 import us.myles.ViaVersion.bungee.BungeeViaInjector;
 import us.myles.ViaVersion.bungee.BungeeViaLoader;
+import us.myles.ViaVersion.bungee.command.BungeeCommand;
+import us.myles.ViaVersion.bungee.command.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.command.BungeeCommandSender;
 import us.myles.ViaVersion.bungee.config.BungeeConfigAPI;
 

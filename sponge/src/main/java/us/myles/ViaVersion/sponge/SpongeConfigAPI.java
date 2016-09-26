@@ -6,7 +6,10 @@ import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SpongeConfigAPI implements ViaVersionConfig, ConfigurationProvider {
     private final File defaultConfig;

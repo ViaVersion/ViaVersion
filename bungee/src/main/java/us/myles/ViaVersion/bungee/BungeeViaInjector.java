@@ -26,6 +26,7 @@ public class BungeeViaInjector implements ViaInjector {
             throw e;
         }
     }
+
     @Override
     public void uninject() {
         // TODO: Uninject from players currently online

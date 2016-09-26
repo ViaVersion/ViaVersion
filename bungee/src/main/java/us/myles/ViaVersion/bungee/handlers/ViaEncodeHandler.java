@@ -2,7 +2,6 @@ package us.myles.ViaVersion.bungee.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.MinecraftEncoder;
