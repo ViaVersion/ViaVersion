@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.sponge.util.ReflectionUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.List;
 import java.util.logging.Level;

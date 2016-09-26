@@ -23,6 +23,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.DataOutput;
@@ -88,7 +89,7 @@ public class CommandBlockListener extends ViaListener {
             return;
         CommandBlock cmd = (CommandBlock) b.getState();
 
-        Object tileEntityCommand = ReflectionUtil.get(cmd, "commandBlock", ReflectionUtil.nms("TileEntityCommand"));
+        Object tileEntityCommand = ReflectionUtil.get(cmd, "commandBlock", NMSUtil.nms("TileEntityCommand"));
         Object updatePacket = ReflectionUtil.invoke(tileEntityCommand, "getUpdatePacket");
 
         PacketWrapper wrapper = generatePacket(updatePacket, getUserConnection(player));
@@ -98,12 +99,12 @@ public class CommandBlockListener extends ViaListener {
     private PacketWrapper generatePacket(Object updatePacket, UserConnection usr) throws Exception {
         PacketWrapper wrapper = new PacketWrapper(0x09, null, usr); // Update block entity
 
-        long[] pos = getPosition(ReflectionUtil.get(updatePacket, "a", ReflectionUtil.nms("BlockPosition")));
+        long[] pos = getPosition(ReflectionUtil.get(updatePacket, "a", NMSUtil.nms("BlockPosition")));
 
         wrapper.write(Type.POSITION, new Position(pos[0], pos[1], pos[2])); //Block position
         wrapper.write(Type.BYTE, (byte) 2); // Action id always 2
 
-        CompoundTag nbt = getNBT(ReflectionUtil.get(updatePacket, "c", ReflectionUtil.nms("NBTTagCompound")));
+        CompoundTag nbt = getNBT(ReflectionUtil.get(updatePacket, "c", NMSUtil.nms("NBTTagCompound")));
         if (nbt == null) {
             wrapper.write(Type.BYTE, (byte) 0); //If nbt is null. Use 0 as nbt
             return wrapper;
@@ -125,12 +126,12 @@ public class CommandBlockListener extends ViaListener {
     }
 
     private boolean isR1() {
-        return ReflectionUtil.getVersion().equals("v1_8_R1");
+        return NMSUtil.getVersion().equals("v1_8_R1");
     }
 
     private CompoundTag getNBT(Object obj) throws Exception {
         ByteBuf buf = Unpooled.buffer();
-        Method m = ReflectionUtil.nms("NBTCompressedStreamTools").getMethod("a", ReflectionUtil.nms("NBTTagCompound"), DataOutput.class);
+        Method m = NMSUtil.nms("NBTCompressedStreamTools").getMethod("a", NMSUtil.nms("NBTTagCompound"), DataOutput.class);
         m.invoke(null, obj, new DataOutputStream(new ByteBufOutputStream(buf)));
         try {
             return Type.NBT.read(buf);

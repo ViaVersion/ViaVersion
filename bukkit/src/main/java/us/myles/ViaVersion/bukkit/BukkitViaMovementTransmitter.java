@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
+import us.myles.ViaVersion.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
 
         Class<?> idlePacketClass;
         try {
-            idlePacketClass = ReflectionUtil.nms("PacketPlayInFlying");
+            idlePacketClass = NMSUtil.nms("PacketPlayInFlying");
         } catch (ClassNotFoundException e) {
             return; // We'll hope this is 1.9.4+
         }
@@ -45,19 +46,19 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
         }
         if (USE_NMS) {
             try {
-                getHandle = ReflectionUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
+                getHandle = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
             } catch (NoSuchMethodException | ClassNotFoundException e) {
                 throw new RuntimeException("Couldn't find CraftPlayer", e);
             }
 
             try {
-                connection = ReflectionUtil.nms("EntityPlayer").getDeclaredField("playerConnection");
+                connection = NMSUtil.nms("EntityPlayer").getDeclaredField("playerConnection");
             } catch (NoSuchFieldException | ClassNotFoundException e) {
                 throw new RuntimeException("Couldn't find Player Connection", e);
             }
 
             try {
-                handleFlying = ReflectionUtil.nms("PlayerConnection").getDeclaredMethod("a", idlePacketClass);
+                handleFlying = NMSUtil.nms("PlayerConnection").getDeclaredMethod("a", idlePacketClass);
             } catch (NoSuchMethodException | ClassNotFoundException e) {
                 throw new RuntimeException("Couldn't find CraftPlayer", e);
             }

@@ -8,6 +8,7 @@ import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.handlers.ViaDecodeHandler;
 import us.myles.ViaVersion.handlers.ViaEncodeHandler;
+import us.myles.ViaVersion.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 public class ClassGenerator {
@@ -27,8 +28,8 @@ public class ClassGenerator {
                 }
 
                 if (ViaVersion.getInstance().isCompatSpigotBuild()) {
-                    Class decodeSuper = ReflectionUtil.nms("PacketDecoder");
-                    Class encodeSuper = ReflectionUtil.nms("PacketEncoder");
+                    Class decodeSuper = NMSUtil.nms("PacketDecoder");
+                    Class encodeSuper = NMSUtil.nms("PacketEncoder");
                     // Generate the classes
                     addSpigotCompatibility(pool, ViaDecodeHandler.class, decodeSuper);
                     addSpigotCompatibility(pool, ViaEncodeHandler.class, encodeSuper);

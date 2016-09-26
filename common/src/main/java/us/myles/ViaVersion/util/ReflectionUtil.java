@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.util;
 
 import com.google.common.collect.Maps;
-import org.bukkit.Bukkit;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,20 +10,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public class ReflectionUtil {
-    private static String BASE = Bukkit.getServer().getClass().getPackage().getName();
-    private static String NMS = BASE.replace("org.bukkit.craftbukkit", "net.minecraft.server");
-
-    public static Class<?> nms(String className) throws ClassNotFoundException {
-        return Class.forName(NMS + "." + className);
-    }
-
-    public static Class<?> obc(String className) throws ClassNotFoundException {
-        return Class.forName(BASE + "." + className);
-    }
-
-    public static String getVersion() {
-        return BASE.substring(BASE.lastIndexOf('.') + 1);
-    }
 
     public static Object invokeStatic(Class<?> clazz, String method) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method m = clazz.getDeclaredMethod(method);
@@ -40,6 +25,12 @@ public class ReflectionUtil {
         Field field = clazz.getDeclaredField(f);
         field.setAccessible(true);
         return (T) field.get(null);
+    }
+
+    public static void setStatic(Class<?> clazz, String f, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(f);
+        field.setAccessible(true);
+        field.set(null, value);
     }
 
     public static <T> T getSuper(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
@@ -72,6 +63,7 @@ public class ReflectionUtil {
         field.setAccessible(true);
         field.set(o, value);
     }
+
 
     public static final class ClassReflection {
         private final Class<?> handle;

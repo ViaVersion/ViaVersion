@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.handlers.ViaVersionInitializer;
 import us.myles.ViaVersion.util.ConcurrentList;
 import us.myles.ViaVersion.util.ListWrapper;
+import us.myles.ViaVersion.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -128,9 +129,9 @@ public class BukkitViaInjector implements ViaInjector {
     @Override
     public int getServerProtocolVersion() throws Exception {
         try {
-            Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
+            Class<?> serverClazz = NMSUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Class<?> pingClazz = ReflectionUtil.nms("ServerPing");
+            Class<?> pingClazz = NMSUtil.nms("ServerPing");
             Object ping = null;
             // Search for ping method
             for (Field f : serverClazz.getDeclaredFields()) {
@@ -173,7 +174,7 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     public static Object getServerConnection() throws Exception {
-        Class<?> serverClazz = ReflectionUtil.nms("MinecraftServer");
+        Class<?> serverClazz = NMSUtil.nms("MinecraftServer");
         Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
         Object connection = null;
         for (Method m : serverClazz.getDeclaredMethods()) {

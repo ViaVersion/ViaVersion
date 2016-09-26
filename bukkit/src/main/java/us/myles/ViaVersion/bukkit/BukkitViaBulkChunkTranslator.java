@@ -5,6 +5,7 @@ import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.ViaVersion.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Method;
@@ -19,10 +20,10 @@ public class BukkitViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
 
     static {
         try {
-            mapChunkBulkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunkBulk"));
-            mapChunkRef = new ReflectionUtil.ClassReflection(ReflectionUtil.nms("PacketPlayOutMapChunk"));
+            mapChunkBulkRef = new ReflectionUtil.ClassReflection(NMSUtil.nms("PacketPlayOutMapChunkBulk"));
+            mapChunkRef = new ReflectionUtil.ClassReflection(NMSUtil.nms("PacketPlayOutMapChunk"));
             if (((ViaVersionPlugin) Via.getPlatform()).isSpigot()) {
-                obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
+                obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, NMSUtil.nms("World"));
             }
         } catch (ClassNotFoundException e) {
             // Ignore as server is probably 1.9+

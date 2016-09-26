@@ -28,15 +28,18 @@ public class Bungee extends Plugin implements ViaPlatform {
     public void onLoad() {
         api = new BungeeViaAPI();
         config = new BungeeConfigProvider();
-    }
-
-    @Override
-    public void onEnable() {
+        // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
                 .injector(new BungeeViaInjector())
                 .loader(new BungeeViaLoader())
                 .build());
+    }
+
+    @Override
+    public void onEnable() {
+        // Inject
+        Via.getManager().init();
     }
 
     @Override

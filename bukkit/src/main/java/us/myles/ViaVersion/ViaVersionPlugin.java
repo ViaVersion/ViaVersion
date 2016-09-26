@@ -17,6 +17,7 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.*;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
         // Check if it's a spigot build with a protocol mod
         try {
-            compatSpigotBuild = ReflectionUtil.nms("PacketEncoder").getDeclaredField("version") != null;
+            compatSpigotBuild = NMSUtil.nms("PacketEncoder").getDeclaredField("version") != null;
         } catch (Exception e) {
             compatSpigotBuild = false;
         }
