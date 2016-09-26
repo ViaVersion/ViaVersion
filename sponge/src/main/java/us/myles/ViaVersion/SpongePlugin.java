@@ -1,10 +1,12 @@
 package us.myles.ViaVersion;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -16,9 +18,12 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
+import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -42,7 +47,7 @@ public class SpongePlugin implements ViaPlatform {
     private Logger logger;
 
     @Listener
-    public void onServerStart(GameStartedServerEvent event) {
+    public void onServerStart(GameAboutToStartServerEvent event) {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
@@ -50,6 +55,7 @@ public class SpongePlugin implements ViaPlatform {
         asyncExecutor = game.getScheduler().createAsyncExecutor(this);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, Arrays.asList("viaversion", "viaver"));
+        getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded, injecting!");
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -153,11 +159,25 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public void onReload() {
-        // TODO: Warning?
+        getLogger().severe("ViaVersion is already loaded, this should work fine. If you get any console errors, try rebooting.");
     }
 
     @Override
     public JsonObject getDump() {
-        return new JsonObject();
+        JsonObject platformSpecific = new JsonObject();
+
+        List<PluginInfo> plugins = new ArrayList<>();
+        for (PluginContainer p : game.getPluginManager().getPlugins()) {
+            plugins.add(new PluginInfo(
+                    true,
+                    p.getName(),
+                    p.getVersion().orElse("Unknown Version"),
+                    p.getInstance().isPresent() ? p.getInstance().get().getClass().getCanonicalName() : "Unknown",
+                    p.getAuthors()
+            ));
+        }
+        platformSpecific.add("plugins", new Gson().toJsonTree(plugins));
+
+        return platformSpecific;
     }
 }
