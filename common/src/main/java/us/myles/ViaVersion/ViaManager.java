@@ -57,7 +57,6 @@ public class ViaManager {
         // Mark as injected
         System.setProperty("ViaVersion", getPlatform().getPluginVersion());
         // If successful
-        // TODO: This method might run in onLoad, ensure sync tasks can still run if plugin not enabled.
         platform.runSync(new Runnable() {
             @Override
             public void run() {
