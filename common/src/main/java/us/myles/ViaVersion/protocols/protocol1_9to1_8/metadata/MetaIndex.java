@@ -15,10 +15,10 @@ public enum MetaIndex {
     // entity
     ENTITY_STATUS(ENTITY, 0, Type.Byte, NewType.Byte),
     ENTITY_AIR(ENTITY, 1, Type.Short, NewType.VarInt),
+    ENTITY_NAMETAG(ENTITY, 2, Type.String, NewType.String), // in the entity class @ spigot 1.8.8, blame wiki.vg
+    ENTITY_ALWAYS_SHOW_NAMETAG(ENTITY, 3, Type.Byte, NewType.Boolean), // in the entity class @ Spigot 1.8.8, blame wiki.vg
     ENTITY_SILENT(ENTITY, 4, Type.Byte, NewType.Boolean),
     // living entity
-    LIVINGENTITY_NAMETAG(ENTITY_LIVING, 2, Type.String, NewType.String),
-    LIVINGENTITY_ALWAYS_SHOW_NAMETAG(ENTITY_LIVING, 3, Type.Byte, NewType.Boolean),
     LIVINGENTITY_HEALTH(ENTITY_LIVING, 6, Type.Float, NewType.Float),
     LIVINGENTITY_POTION_EFFECT_COLOR(ENTITY_LIVING, 7, Type.Int, NewType.VarInt),
     LIVINGENTITY_IS_POTION_AMBIENT(ENTITY_LIVING, 8, Type.Byte, NewType.Boolean),
