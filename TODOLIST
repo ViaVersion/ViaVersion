@@ -1,6 +1,0 @@
-PORT STUFF TO GUAVA :D (so we dont need to include commons)
-Stop using new Gson() everywhere
-Java docs (for platforms etc)
-Add comments to sponge api
-Fix task ids, methods for sponge
-Find all the TODO's and check they're done.
