@@ -1,8 +1,7 @@
 PORT STUFF TO GUAVA :D (so we dont need to include commons)
-Test on SpongeForge, only tested SpongeVanilla
 Stop using new Gson() everywhere
 Java docs (for platforms etc)
-Config implementation for sponge
+Add comments to sponge api
 Port bukkit listeners to sponge maybe
 Fix task ids, methods for sponge
 Find all the TODO's and check they're done.

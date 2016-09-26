@@ -13,7 +13,7 @@ public class ViaConfig implements ViaVersionConfig, ConfigurationProvider {
 
     public ViaConfig(ViaVersionPlugin plugin) {
         this.plugin = plugin;
-        generateConfig();
+        reloadConfig();
     }
 
     public void generateConfig() {
@@ -196,6 +196,11 @@ public class ViaConfig implements ViaVersionConfig, ConfigurationProvider {
     @Override
     public void saveConfig() {
         plugin.saveConfig();
+    }
+
+    @Override
+    public void reloadConfig() {
+        generateConfig();
     }
 
     @Override

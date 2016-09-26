@@ -3,7 +3,11 @@ package us.myles.ViaVersion;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
@@ -21,6 +25,7 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,13 +42,18 @@ import java.util.logging.Logger;
 public class SpongePlugin implements ViaPlatform {
     @Inject
     private Game game;
+
     @Inject
     private PluginContainer container;
 
+    @Inject
+    @DefaultConfig(sharedRoot = false)
+    private File defaultConfig;
+
+    private SpongeViaAPI api = new SpongeViaAPI();
     private SpongeExecutorService asyncExecutor;
     private SpongeExecutorService syncExecutor;
-    private SpongeConfigAPI conf = new SpongeConfigAPI(this);
-    private SpongeViaAPI api = new SpongeViaAPI();
+    private SpongeConfigAPI conf;
     private Logger logger;
 
     @Listener
@@ -51,6 +61,7 @@ public class SpongePlugin implements ViaPlatform {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
+        conf = new SpongeConfigAPI(defaultConfig.getParentFile());
         syncExecutor = game.getScheduler().createSyncExecutor(this);
         asyncExecutor = game.getScheduler().createAsyncExecutor(this);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();

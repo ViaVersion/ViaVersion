@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 // TODO implement
-public class BungeeConfigProvider implements ViaVersionConfig, ConfigurationProvider {
+public class BungeeConfigAPI implements ViaVersionConfig, ConfigurationProvider {
     @Override
     public boolean isCheckForUpdates() {
         return false;
@@ -166,6 +166,11 @@ public class BungeeConfigProvider implements ViaVersionConfig, ConfigurationProv
 
     @Override
     public void saveConfig() {
+
+    }
+
+    @Override
+    public void reloadConfig() {
 
     }
 

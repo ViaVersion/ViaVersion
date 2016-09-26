@@ -18,6 +18,11 @@ public interface ConfigurationProvider {
     void saveConfig();
 
     /**
+     * Reloads the config
+     */
+    void reloadConfig();
+
+    /**
      * Get all the configuration values
      *
      * @return Map with key->values
