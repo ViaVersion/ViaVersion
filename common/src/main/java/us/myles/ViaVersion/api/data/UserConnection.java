@@ -7,6 +7,7 @@ import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.Map;
@@ -130,6 +131,37 @@ public class UserConnection {
         }
         // increase total
         this.receivedPackets++;
+        return false;
+    }
+
+    public boolean handlePPS() {
+        ViaVersionConfig conf = Via.getConfig();
+        // Max PPS Checker
+        if (conf.getMaxPPS() > 0) {
+            if (getPacketsPerSecond() >= conf.getMaxPPS()) {
+                disconnect(conf.getMaxPPSKickMessage().replace("%pps", ((Long) getPacketsPerSecond()).intValue() + ""));
+                return true; // don't send current packet
+            }
+        }
+
+        // Tracking PPS Checker
+        if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
+            if (getSecondsObserved() > conf.getTrackingPeriod()) {
+                // Reset
+                setWarnings(0);
+                setSecondsObserved(1);
+            } else {
+                setSecondsObserved(getSecondsObserved() + 1);
+                if (getPacketsPerSecond() >= conf.getWarningPPS()) {
+                    setWarnings(getWarnings() + 1);
+                }
+
+                if (getWarnings() >= conf.getMaxWarnings()) {
+                    disconnect(conf.getMaxWarningsKickMessage().replace("%pps", ((Long) getPacketsPerSecond()).intValue() + ""));
+                    return true; // don't send current packet
+                }
+            }
+        }
         return false;
     }
 

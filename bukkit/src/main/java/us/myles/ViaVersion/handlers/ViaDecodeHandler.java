@@ -39,7 +39,7 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
             boolean second = info.incrementReceived();
             // Check PPS
             if (second) {
-                if (((ViaVersionPlugin) Via.getPlatform()).handlePPS(info))
+                if (info.handlePPS())
                     return;
             }
 

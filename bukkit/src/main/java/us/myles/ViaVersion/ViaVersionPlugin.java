@@ -137,36 +137,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         return protocolSupport;
     }
 
-    public boolean handlePPS(UserConnection info) {
-        // Max PPS Checker
-        if (conf.getMaxPPS() > 0) {
-            if (info.getPacketsPerSecond() >= conf.getMaxPPS()) {
-                info.disconnect(conf.getMaxPPSKickMessage().replace("%pps", ((Long) info.getPacketsPerSecond()).intValue() + ""));
-                return true; // don't send current packet
-            }
-        }
-
-        // Tracking PPS Checker
-        if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
-            if (info.getSecondsObserved() > conf.getTrackingPeriod()) {
-                // Reset
-                info.setWarnings(0);
-                info.setSecondsObserved(1);
-            } else {
-                info.setSecondsObserved(info.getSecondsObserved() + 1);
-                if (info.getPacketsPerSecond() >= conf.getWarningPPS()) {
-                    info.setWarnings(info.getWarnings() + 1);
-                }
-
-                if (info.getWarnings() >= conf.getMaxWarnings()) {
-                    info.disconnect(conf.getMaxWarningsKickMessage().replace("%pps", ((Long) info.getPacketsPerSecond()).intValue() + ""));
-                    return true; // don't send current packet
-                }
-            }
-        }
-        return false;
-    }
-
     @Override
     public String getPlatformName() {
         return "Bukkit";
