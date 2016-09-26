@@ -4,6 +4,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import org.spongepowered.api.MinecraftVersion;
+import org.spongepowered.api.Sponge;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
@@ -118,64 +120,17 @@ public class SpongeViaInjector implements ViaInjector {
     }
 
     public static Object getServer() throws Exception {
-        Class<?> serverClazz = Class.forName("net.minecraft.server.MinecraftServer");
-        for (Method m : serverClazz.getDeclaredMethods()) {
-            if (m.getParameterCount() == 0) {
-                if ((m.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
-                    if (m.getReturnType().equals(serverClazz)) {
-                        return m.invoke(null);
-                    }
-                }
-            }
-        }
-        throw new Exception("Could not find MinecraftServer static field!");
+        return Sponge.getServer();
     }
 
     @Override
     public int getServerProtocolVersion() throws Exception {
+        MinecraftVersion mcv = Sponge.getPlatform().getMinecraftVersion();
         try {
-            Class<?> serverClazz = Class.forName("net.minecraft.server.MinecraftServer");
-            Object server = getServer();
-            Class<?> pingClazz = Class.forName("net.minecraft.network.ServerStatusResponse");
-            Object ping = null;
-            // Search for ping method
-            for (Field f : serverClazz.getDeclaredFields()) {
-                if (f.getType() != null) {
-                    if (f.getType().getSimpleName().equals("ServerStatusResponse")) {
-                        f.setAccessible(true);
-                        ping = f.get(server);
-                    }
-                }
-            }
-            if (ping != null) {
-                Object serverData = null;
-                for (Field f : pingClazz.getDeclaredFields()) {
-                    if (f.getType() != null) {
-                        if (f.getType().getSimpleName().endsWith("MinecraftProtocolVersionIdentifier")) {
-                            f.setAccessible(true);
-                            serverData = f.get(ping);
-                        }
-                    }
-                }
-                if (serverData != null) {
-                    int protocolVersion = -1;
-                    for (Field f : serverData.getClass().getDeclaredFields()) {
-                        if (f.getType() != null) {
-                            if (f.getType() == int.class) {
-                                f.setAccessible(true);
-                                protocolVersion = (int) f.get(serverData);
-                            }
-                        }
-                    }
-                    if (protocolVersion != -1) {
-                        return protocolVersion;
-                    }
-                }
-            }
+            return (int) mcv.getClass().getDeclaredMethod("getProtocol").invoke(mcv);
         } catch (Exception e) {
-            throw new Exception("Failed to get server", e);
+            throw new Exception("Failed to get server protocol", e);
         }
-        throw new Exception("Failed to get server");
     }
 
     public static Object getServerConnection() throws Exception {

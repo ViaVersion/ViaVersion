@@ -15,9 +15,12 @@ public class SpongeViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
     private static ReflectionUtil.ClassReflection mapChunkRef;
 
     static {
+
         try {
             mapChunkBulkRef = new ReflectionUtil.ClassReflection(Class.forName("net.minecraft.network.play.server.S26PacketMapChunkBulk"));
             mapChunkRef = new ReflectionUtil.ClassReflection(Class.forName("net.minecraft.network.play.server.S21PacketChunkData"));
+        } catch (ClassNotFoundException e) {
+            // Ignore as server is probably 1.9+
         } catch (Exception e) {
             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to initialise chunks reflection", e);
         }

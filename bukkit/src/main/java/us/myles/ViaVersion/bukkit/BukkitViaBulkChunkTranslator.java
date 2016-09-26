@@ -24,6 +24,8 @@ public class BukkitViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
             if (((ViaVersionPlugin) Via.getPlatform()).isSpigot()) {
                 obfuscateRef = Class.forName("org.spigotmc.AntiXray").getMethod("obfuscate", int.class, int.class, int.class, byte[].class, ReflectionUtil.nms("World"));
             }
+        } catch (ClassNotFoundException e) {
+            // Ignore as server is probably 1.9+
         } catch (Exception e) {
             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to initialise chunks reflection", e);
         }

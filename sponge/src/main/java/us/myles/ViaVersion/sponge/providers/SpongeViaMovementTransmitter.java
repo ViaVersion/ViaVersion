@@ -14,7 +14,7 @@ public class SpongeViaMovementTransmitter extends MovementTransmitterProvider {
         try {
             idlePacketClass = Class.forName("net.minecraft.network.play.client.C03PacketPlayer");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Couldn't find idle packet, help!", e);
+            return; // We'll hope this is 1.9.4+
         }
         try {
             idlePacket = idlePacketClass.newInstance();
@@ -31,11 +31,15 @@ public class SpongeViaMovementTransmitter extends MovementTransmitterProvider {
 
     @Override
     public Object getFlyingPacket() {
+        if (idlePacket == null)
+            throw new NullPointerException("Could not locate flying packet");
         return idlePacket2;
     }
 
     @Override
     public Object getGroundPacket() {
+        if (idlePacket == null)
+            throw new NullPointerException("Could not locate flying packet");
         return idlePacket;
     }
 }

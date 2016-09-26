@@ -5,3 +5,4 @@ Java docs (for platforms etc)
 Config implementation for sponge
 Port bukkit listeners to sponge maybe
 Fix task ids, methods for sponge
+Find all the TODO's and check they're done.
