@@ -460,6 +460,7 @@ public class PacketWrapper {
      * @throws Exception If it failed to write
      */
     public void sendToServer() throws Exception {
+        // TODO: Fix for bungee
         if (!isCancelled()) {
             ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
             Type.VAR_INT.write(output, PacketWrapper.PASSTHROUGH_ID); // Pass through

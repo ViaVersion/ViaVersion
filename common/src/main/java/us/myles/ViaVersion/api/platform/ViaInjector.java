@@ -6,4 +6,6 @@ public interface ViaInjector {
     public void uninject() throws Exception;
 
     public int getServerProtocolVersion() throws Exception;
+
+    public String getEncoderName();
 }

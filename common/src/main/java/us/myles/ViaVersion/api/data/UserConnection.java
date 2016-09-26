@@ -73,7 +73,7 @@ public class UserConnection {
      * @param currentThread Should it run in the same thread
      */
     public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
-        final ChannelHandler handler = channel.pipeline().get("encoder");
+        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
         if (currentThread) {
             channel.pipeline().context(handler).writeAndFlush(packet);
         } else {
@@ -93,7 +93,7 @@ public class UserConnection {
      * @return ChannelFuture of the packet being sent
      */
     public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
-        final ChannelHandler handler = channel.pipeline().get("encoder");
+        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
         return channel.pipeline().context(handler).writeAndFlush(packet);
     }
 

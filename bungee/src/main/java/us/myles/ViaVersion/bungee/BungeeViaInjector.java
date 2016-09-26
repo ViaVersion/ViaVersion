@@ -37,4 +37,9 @@ public class BungeeViaInjector implements ViaInjector {
     public int getServerProtocolVersion() throws Exception {
         return 47;
     }
+
+    @Override
+    public String getEncoderName() {
+        return "packet-encoder";
+    }
 }
