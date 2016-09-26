@@ -5,6 +5,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import net.md_5.bungee.protocol.MinecraftDecoder;
+import net.md_5.bungee.protocol.MinecraftEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
@@ -37,12 +40,12 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         // Add originals
         this.method.invoke(this.original, socketChannel);
         // Add our transformers
-        MessageToByteEncoder encoder = new ViaEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
-        ByteToMessageDecoder decoder = new ViaDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
-        ViaPacketHandler chunkHandler = new ViaPacketHandler(info);
+        ViaEncodeHandler encoder = new ViaEncodeHandler(info, (MinecraftEncoder) socketChannel.pipeline().get("packet-encoder"));
+        ViaDecodeHandler decoder = new ViaDecodeHandler(info, (MinecraftDecoder) socketChannel.pipeline().get("packet-decoder"));
+//        ViaPacketHandler chunkHandler = new ViaPacketHandler(info);
 
-        socketChannel.pipeline().replace("encoder", "encoder", encoder);
-        socketChannel.pipeline().replace("decoder", "decoder", decoder);
-        socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
+        socketChannel.pipeline().replace("packet-encoder", "packet-encoder", encoder);
+        socketChannel.pipeline().replace("packet-decoder", "packet-decoder", decoder);
+//        socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
     }
 }

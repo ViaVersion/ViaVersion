@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -30,6 +31,10 @@ public class ReflectionUtil {
     public static void setStatic(Class<?> clazz, String f, Object value) throws NoSuchFieldException, IllegalAccessException {
         Field field = clazz.getDeclaredField(f);
         field.setAccessible(true);
+        // Remove any final stuff
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         field.set(null, value);
     }
 

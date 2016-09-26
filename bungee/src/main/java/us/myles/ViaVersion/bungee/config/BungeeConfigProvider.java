@@ -3,6 +3,7 @@ package us.myles.ViaVersion.bungee.config;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -145,7 +146,7 @@ public class BungeeConfigProvider implements ViaVersionConfig, ConfigurationProv
 
     @Override
     public List<Integer> getBlockedProtocols() {
-        return null;
+        return Arrays.asList();
     }
 
     @Override

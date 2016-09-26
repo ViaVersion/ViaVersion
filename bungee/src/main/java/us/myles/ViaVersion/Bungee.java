@@ -1,6 +1,7 @@
 package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -10,6 +11,8 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
+import us.myles.ViaVersion.bungee.command.BungeeCommand;
+import us.myles.ViaVersion.bungee.command.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.BungeeViaAPI;
 import us.myles.ViaVersion.bungee.BungeeViaInjector;
 import us.myles.ViaVersion.bungee.BungeeViaLoader;
@@ -23,16 +26,20 @@ public class Bungee extends Plugin implements ViaPlatform {
 
     private BungeeViaAPI api;
     private BungeeConfigProvider config;
+    private BungeeCommandHandler commandHandler;
 
     @Override
     public void onLoad() {
         api = new BungeeViaAPI();
         config = new BungeeConfigProvider();
+        commandHandler = new BungeeCommandHandler();
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
                 .injector(new BungeeViaInjector())
                 .loader(new BungeeViaLoader())
+                .commandHandler(commandHandler)
                 .build());
     }
 
