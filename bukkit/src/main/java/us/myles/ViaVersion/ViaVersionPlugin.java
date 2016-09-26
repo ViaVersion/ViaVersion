@@ -13,7 +13,6 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.*;
 import us.myles.ViaVersion.classgenerator.ClassGenerator;

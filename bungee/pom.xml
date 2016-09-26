@@ -24,13 +24,31 @@
         </resources>
     </build>
 
+    <repositories>
+        <!-- Bungee repo -->
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- BungeeCord -->
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.9-SNAPSHOT</version>
+            <version>1.10-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-common</artifactId>
+            <version>1.0.0-ALPHA-modules</version>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-common</artifactId>
+            <version>1.0.0-ALPHA-modules</version>
         </dependency>
     </dependencies>
 </project>
