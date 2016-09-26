@@ -48,6 +48,12 @@
             <id>spacehq-repo</id>
             <url>https://repo.spacehq.org/content/repositories/releases/</url>
         </repository>
+
+        <!-- Bungee repo -->
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
     </repositories>
 
     <dependencies>
