@@ -3,8 +3,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ public class MetadataRewriter {
                 if (options.isPresent()) {
                     int value = (int) options.get().getValue();
                     if (value > 0 && value < 6) {
-                        metadata.add(new Metadata(16, NewType.VarInt.getTypeID(), Type.VAR_INT, value - 1)); // Add profession type to new metadata
+                        metadata.add(new Metadata(16, MetaType1_9.VarInt, value - 1)); // Add profession type to new metadata
                         return 27;
                     }
                     if (value == 6) {
@@ -90,8 +89,7 @@ public class MetadataRewriter {
                 if (type == 4 || type == 68) { // Guardians
                     int oldid = metadata.getId();
                     if (oldid == 12) {
-                        metadata.setType(Type.BOOLEAN);
-                        metadata.setTypeID(NewType.Boolean.getTypeID());
+                        metadata.setMetaType(MetaType1_9.Boolean);
                         boolean val = (((byte) metadata.getValue()) & 0x02) == 0x02;
                         metadata.setValue(val);
                     }
@@ -144,9 +142,9 @@ public class MetadataRewriter {
                         // Chested Horse
                         if (metadata.getId() == 13) {
                             if ((((byte) metadata.getValue()) & 0x08) == 0x08) {
-                                metadatas.add(new Metadata(15, NewType.Boolean.getTypeID(), Type.BOOLEAN, true));
+                                metadatas.add(new Metadata(15, MetaType1_9.Boolean, true));
                             } else {
-                                metadatas.add(new Metadata(15, NewType.Boolean.getTypeID(), Type.BOOLEAN, false));
+                                metadatas.add(new Metadata(15, MetaType1_9.Boolean, false));
                             }
                         }
                     }

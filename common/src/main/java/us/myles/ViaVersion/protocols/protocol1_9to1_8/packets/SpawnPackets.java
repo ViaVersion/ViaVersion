@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -15,7 +16,6 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.util.EntityUtil;
 
@@ -105,7 +105,7 @@ public class SpawnPackets {
                                     Item item = new Item((short) 373, (byte) 1, (short) data, null); // Potion
                                     ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
                                     // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
-                                    Metadata potion = new Metadata(5, NewType.Slot.getTypeID(), Type.ITEM, item);
+                                    Metadata potion = new Metadata(5, MetaType1_9.Slot, item);
                                     meta.add(potion);
                                     wrapper.write(Types1_9.METADATA_LIST, meta);
                                 }

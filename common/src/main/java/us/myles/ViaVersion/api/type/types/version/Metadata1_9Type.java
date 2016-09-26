@@ -2,8 +2,8 @@ package us.myles.ViaVersion.api.type.types.version;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.NewType;
 
 public class Metadata1_9Type extends MetaTypeTemplate {
 
@@ -12,9 +12,9 @@ public class Metadata1_9Type extends MetaTypeTemplate {
         short index = buffer.readUnsignedByte();
 
         if (index == 0xff) return null; //End of metadata
-        NewType type = NewType.byId(buffer.readByte());
+        MetaType1_9 type = MetaType1_9.byId(buffer.readByte());
 
-        return new Metadata(index, type.getTypeID(), type.getType(), type.getType().read(buffer));
+        return new Metadata(index, type, type.getType().read(buffer));
     }
 
     @Override
@@ -23,8 +23,8 @@ public class Metadata1_9Type extends MetaTypeTemplate {
             buffer.writeByte(255);
         } else {
             buffer.writeByte(object.getId());
-            buffer.writeByte(object.getTypeID());
-            object.getType().write(buffer, object.getValue());
+            buffer.writeByte(object.getMetaType().getTypeID());
+            object.getMetaType().getType().write(buffer, object.getValue());
         }
     }
 }

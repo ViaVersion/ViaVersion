@@ -4,7 +4,10 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.util.EntityUtil;
@@ -21,20 +24,19 @@ public class MetadataRewriter {
             MetaIndex metaIndex = MetaIndex.searchIndex(type, entry.getId());
             try {
                 if (metaIndex != null) {
-                    if (metaIndex.getNewType() != NewType.Discontinued) {
-                        if (metaIndex.getNewType() != NewType.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
+                    if (metaIndex.getNewType() != MetaType1_9.Discontinued) {
+                        if (metaIndex.getNewType() != MetaType1_9.BlockID || id != -1 && data == -1 || id == -1 && data != -1) { // block ID is only written if we have both parts
                             entry.setId(metaIndex.getNewIndex());
-                            entry.setTypeID(metaIndex.getNewType().getTypeID());
+                            entry.setMetaType(metaIndex.getNewType());
                         }
                         Object value = entry.getValue();
                         switch (metaIndex.getNewType()) {
                             case Byte:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.BYTE);
                                 // convert from int, byte
-                                if (metaIndex.getOldType() == Type.Byte) {
+                                if (metaIndex.getOldType() == MetaType1_8.Byte) {
                                     entry.setValue(value);
                                 }
-                                if (metaIndex.getOldType() == Type.Int) {
+                                if (metaIndex.getOldType() == MetaType1_8.Int) {
                                     entry.setValue(((Integer) value).byteValue());
                                 }
                                 // After writing the last one
@@ -44,13 +46,12 @@ public class MetadataRewriter {
                                         val = 1;
                                     }
                                     int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
-                                    int typeID = MetaIndex.PLAYER_HAND.getNewType().getTypeID();
-                                    Metadata metadata = new Metadata(newIndex, typeID, us.myles.ViaVersion.api.type.Type.BYTE, val);
+                                    MetaType metaType = MetaIndex.PLAYER_HAND.getNewType();
+                                    Metadata metadata = new Metadata(newIndex, metaType, val);
                                     list.add(metadata);
                                 }
                                 break;
                             case OptUUID:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.OPTIONAL_UUID);
                                 String owner = (String) value;
                                 UUID toWrite = null;
                                 if (owner.length() != 0) {
@@ -62,12 +63,11 @@ public class MetadataRewriter {
                                 entry.setValue(toWrite);
                                 break;
                             case BlockID:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.VAR_INT);
                                 // if we have both sources :))
-                                if (metaIndex.getOldType() == Type.Byte) {
+                                if (metaIndex.getOldType() == MetaType1_8.Byte) {
                                     data = (Byte) value;
                                 }
-                                if (metaIndex.getOldType() == Type.Short) {
+                                if (metaIndex.getOldType() == MetaType1_8.Short) {
                                     id = (Short) value;
                                 }
                                 if (id != -1 && data != -1) {
@@ -80,50 +80,42 @@ public class MetadataRewriter {
                                 }
                                 break;
                             case VarInt:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.VAR_INT);
                                 // convert from int, short, byte
-                                if (metaIndex.getOldType() == Type.Byte) {
+                                if (metaIndex.getOldType() == MetaType1_8.Byte) {
                                     entry.setValue(((Byte) value).intValue());
                                 }
-                                if (metaIndex.getOldType() == Type.Short) {
+                                if (metaIndex.getOldType() == MetaType1_8.Short) {
                                     entry.setValue(((Short) value).intValue());
                                 }
-                                if (metaIndex.getOldType() == Type.Int) {
+                                if (metaIndex.getOldType() == MetaType1_8.Int) {
                                     entry.setValue(value);
                                 }
                                 break;
                             case Float:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.FLOAT);
                                 entry.setValue(value);
                                 break;
                             case String:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.STRING);
                                 entry.setValue(value);
                                 break;
                             case Boolean:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.BOOLEAN);
                                 if (metaIndex == MetaIndex.AGEABLE_AGE)
                                     entry.setValue((Byte) value < 0);
                                 else
                                     entry.setValue((Byte) value != 0);
                                 break;
                             case Slot:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.ITEM);
                                 entry.setValue(value);
                                 ItemRewriter.toClient((Item) entry.getValue());
                                 break;
                             case Position:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.VECTOR);
                                 Vector vector = (Vector) value;
                                 entry.setValue(vector);
                                 break;
                             case Vector3F:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.ROTATION);
                                 EulerAngle angle = (EulerAngle) value;
                                 entry.setValue(angle);
                                 break;
                             case Chat:
-                                entry.setType(us.myles.ViaVersion.api.type.Type.STRING);
                                 value = Protocol1_9TO1_8.fixJson((String) value);
                                 entry.setValue(value);
                                 break;

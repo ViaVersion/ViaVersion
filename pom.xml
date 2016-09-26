@@ -114,6 +114,13 @@
             <artifactId>bungeecord-chat</artifactId>
             <version>1.10-SNAPSHOT</version>
         </dependency>
+
+        <!-- Guava magic -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,12 +1,13 @@
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
+package us.myles.ViaVersion.api.minecraft.metadata.types;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
 import us.myles.ViaVersion.api.type.Type;
 
 @RequiredArgsConstructor
 @Getter
-public enum NewType {
+public enum MetaType1_9 implements MetaType {
     Byte(0, Type.BYTE),
     VarInt(1, Type.VAR_INT),
     Float(2, Type.FLOAT),
@@ -25,7 +26,7 @@ public enum NewType {
     private final int typeID;
     private final Type type;
 
-    public static NewType byId(int id) {
+    public static MetaType1_9 byId(int id) {
         return values()[id];
     }
 
