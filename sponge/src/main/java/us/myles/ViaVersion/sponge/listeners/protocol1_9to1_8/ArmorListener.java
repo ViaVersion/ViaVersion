@@ -3,6 +3,7 @@ package us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
+import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
@@ -34,8 +35,6 @@ public class ArmorListener extends ViaSpongeListener {
 
 
         int armor = 0;
-
-        // TODO is there a method like getArmorContents?
         armor += calculate(player.getHelmet());
         armor += calculate(player.getChestplate());
         armor += calculate(player.getLeggings());
@@ -91,17 +90,17 @@ public class ArmorListener extends ViaSpongeListener {
 
     @Listener
     public void onRespawn(RespawnPlayerEvent e) {
-        if (!isOnPipe(e.getTargetEntity().getUniqueId())) return;
-
         sendDelayedArmorUpdate(e.getTargetEntity());
     }
 
-    //  TODO find world change event
-//    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//    public void onWorldChange(PlayerChangedWorldEvent e) {
-//        sendArmorUpdate(e.getPlayer());
-//    }
-//
+    @Listener
+    public void onWorldChange(DisplaceEntityEvent.Teleport e) {
+        if (!(e.getTargetEntity() instanceof Player)) return;
+        if (!e.getFromTransform().getExtent().getUniqueId().equals(e.getToTransform().getExtent().getUniqueId())) {
+            sendArmorUpdate((Player) e.getTargetEntity());
+        }
+    }
+
     public void sendDelayedArmorUpdate(final Player player) {
         if (!isOnPipe(player.getUniqueId())) return; // Don't start a task if the player is not on the pipe
         Via.getPlatform().runSync(new Runnable() {

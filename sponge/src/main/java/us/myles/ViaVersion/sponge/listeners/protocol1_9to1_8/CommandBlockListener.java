@@ -30,7 +30,7 @@ import java.io.DataOutputStream;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-// TODO Change to bytebuf to not use reflection bullshit?
+// TODO Change to bytebuf to not use reflection bullsh*t
 public class CommandBlockListener extends ViaSpongeListener {
     public CommandBlockListener(SpongePlugin plugin) {
         super(plugin, Protocol1_9TO1_8.class);

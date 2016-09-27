@@ -17,7 +17,7 @@ public class BlockListener extends ViaSpongeListener {
         super(plugin, Protocol1_9TO1_8.class);
     }
 
-    @Listener // TODO is there better way to do this?
+    @Listener
     public void placeBlock(ChangeBlockEvent.Place e, @Root Player player) {
         if (isOnPipe(player.getUniqueId())) {
             Location loc = e.getTransactions().get(0).getFinal().getLocation().get();
