@@ -57,10 +57,6 @@
                             <pattern>org.javassist</pattern>
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
                         </relocation>
-                        <relocation>
-                            <pattern>org.apache</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.apache</shadedPattern>
-                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>

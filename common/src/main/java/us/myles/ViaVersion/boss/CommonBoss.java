@@ -1,11 +1,11 @@
 package us.myles.ViaVersion.boss;
 
+import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.Validate;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
@@ -29,8 +29,8 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     private Set<BossFlag> flags;
 
     public CommonBoss(String title, float health, BossColor color, BossStyle style) {
-        Validate.notNull(title, "Title cannot be null");
-        Validate.isTrue((health >= 0 && health <= 1), "Health must be between 0 and 1");
+        Preconditions.checkNotNull(title, "Title cannot be null");
+        Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1");
 
         this.uuid = UUID.randomUUID();
         this.title = title;
@@ -51,7 +51,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public BossBar setHealth(float health) {
-        Validate.isTrue((health >= 0 && health <= 1), "Health must be between 0 and 1");
+        Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1");
         this.health = health;
         sendPacket(CommonBoss.UpdateAction.UPDATE_HEALTH);
         return this;

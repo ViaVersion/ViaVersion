@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.base;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -8,7 +10,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.StringUtils;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -110,7 +111,7 @@ public class BaseProtocol extends Protocol {
                                     new Object[]{
                                             wrapper.get(Type.STRING, 1),
                                             info.getProtocolVersion(),
-                                            StringUtils.join(info.getPipeline().pipes(), ", ")
+                                            Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
                                     });
                         }
                     }

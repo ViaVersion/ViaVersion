@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.commands;
 
+import com.google.common.base.Preconditions;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.Validate;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
@@ -25,7 +25,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
     @Override
     public void registerSubCommand(@NonNull ViaSubCommand command) throws Exception {
-        Validate.isTrue(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid subcommand name");
+        Preconditions.checkArgument(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid subcommand name");
         if (hasSubCommand(command.name()))
             throw new Exception("ViaSubCommand " + command.name() + " does already exists!"); //Maybe another exception later.
         commandMap.put(command.name().toLowerCase(), command);

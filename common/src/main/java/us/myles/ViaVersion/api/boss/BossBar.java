@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.api.boss;
 
-import org.apache.commons.lang.NotImplementedException;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.Set;
@@ -76,7 +75,7 @@ public abstract class BossBar<T> {
      */
     @Deprecated
     public BossBar addPlayer(T player) {
-        throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
+        throw new UnsupportedOperationException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
     /**
@@ -96,7 +95,7 @@ public abstract class BossBar<T> {
      */
     @Deprecated
     public BossBar addPlayers(T... players) {
-        throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
+        throw new UnsupportedOperationException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
     /**
@@ -108,7 +107,7 @@ public abstract class BossBar<T> {
      */
     @Deprecated
     public BossBar removePlayer(T player) {
-        throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
+        throw new UnsupportedOperationException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
     /**

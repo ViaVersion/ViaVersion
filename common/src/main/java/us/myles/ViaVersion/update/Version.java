@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.update;
 
-import org.apache.commons.lang.StringUtils;
+import com.google.common.base.Joiner;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +72,7 @@ public class Version implements Comparable<Version> {
         for (int i = 0; i < parts.length; i += 1)
             split[i] = String.valueOf(parts[i]);
 
-        return StringUtils.join(split, ".") + (tag.length() != 0 ? "-" + tag : "");
+        return Joiner.on(".").join(split) + (tag.length() != 0 ? "-" + tag : "");
     }
 
     @Override

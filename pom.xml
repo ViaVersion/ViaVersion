@@ -100,14 +100,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Apache Commons Lang -->
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- ChatColour API -->
         <dependency>
             <groupId>net.md-5</groupId>
