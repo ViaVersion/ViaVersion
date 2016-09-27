@@ -23,13 +23,13 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
     @Deprecated
     public static final Type<Metadata> METADATA = new Metadata1_9Type();
 
-    public static ValueTransformer<Short, Float> toNewPitch = new ValueTransformer<Short, Float>(Type.FLOAT) {
+    public static final ValueTransformer<Short, Float> toNewPitch = new ValueTransformer<Short, Float>(Type.FLOAT) {
         @Override
         public Float transform(PacketWrapper wrapper, Short inputValue) throws Exception {
             return inputValue / 63.5F;
         }
     };
-    public static ValueTransformer<List<Metadata>, List<Metadata>> transformMetadata = new ValueTransformer<List<Metadata>, List<Metadata>>(Types1_9.METADATA_LIST) {
+    public static final ValueTransformer<List<Metadata>, List<Metadata>> transformMetadata = new ValueTransformer<List<Metadata>, List<Metadata>>(Types1_9.METADATA_LIST) {
         @Override
         public List<Metadata> transform(PacketWrapper wrapper, List<Metadata> inputValue) throws Exception {
             List<Metadata> metaList = new CopyOnWriteArrayList<>(inputValue);

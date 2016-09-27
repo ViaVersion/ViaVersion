@@ -21,7 +21,6 @@ public abstract class ViaListener {
      * @return The UserConnection
      */
     protected UserConnection getUserConnection(@NonNull UUID uuid) {
-        if (!Via.getAPI().isPorted(uuid)) return null;
         return Via.getManager().getConnection(uuid);
     }
 

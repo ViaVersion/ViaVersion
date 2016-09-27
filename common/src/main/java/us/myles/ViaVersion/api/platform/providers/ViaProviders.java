@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ViaProviders {
-    private Map<Class<? extends Provider>, Provider> providers = new HashMap<>();
-    private List<Class<? extends Provider>> lonelyProviders = new ArrayList<>();
+    private final Map<Class<? extends Provider>, Provider> providers = new HashMap<>();
+    private final List<Class<? extends Provider>> lonelyProviders = new ArrayList<>();
 
     public void require(Class<? extends Provider> provider) {
         lonelyProviders.add(provider);

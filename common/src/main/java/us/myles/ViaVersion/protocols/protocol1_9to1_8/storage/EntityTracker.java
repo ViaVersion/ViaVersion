@@ -98,9 +98,7 @@ public class EntityTracker extends StoredObject {
     public boolean interactedBlockRecently(int x, int y, int z) {
         if (blockInteractions.size() == 0)
             return false;
-        Iterator<Position> it = blockInteractions.asMap().keySet().iterator();
-        while (it.hasNext()) {
-            Position p = it.next();
+        for (Position p : blockInteractions.asMap().keySet()) {
             if (p.getX() == x)
                 if (p.getY() == y)
                     if (p.getZ() == z)

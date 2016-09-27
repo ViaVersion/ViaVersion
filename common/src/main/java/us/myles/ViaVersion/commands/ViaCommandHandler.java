@@ -12,7 +12,7 @@ import us.myles.ViaVersion.commands.defaultsubs.*;
 import java.util.*;
 
 public abstract class ViaCommandHandler implements ViaVersionCommand {
-    private Map<String, ViaSubCommand> commandMap;
+    private final Map<String, ViaSubCommand> commandMap;
 
     public ViaCommandHandler() {
         commandMap = new HashMap<>();
@@ -49,14 +49,14 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         }
 
         if (!hasSubCommand(args[0])) {
-            sender.sendMessage(color("&cThis command is not found"));
+            sender.sendMessage(color("&cThis commands is not found"));
             showHelp(sender);
             return false;
         }
         ViaSubCommand handler = getSubCommand(args[0]);
 
         if (!hasPermission(sender, handler.permission())) {
-            sender.sendMessage(color("&cYou are not allowed to use this command!"));
+            sender.sendMessage(color("&cYou are not allowed to use this commands!"));
             return false;
         }
 
@@ -100,10 +100,14 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         return output;
     }
 
+    /**
+     * Shows the ViaVersion help to a sender
+     * @param sender The sender to send the help to
+     */
     public void showHelp(ViaCommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
         if (allowed.size() == 0) {
-            sender.sendMessage(color("&cYou are not allowed to use this command!"));
+            sender.sendMessage(color("&cYou are not allowed to use this commands!"));
             return;
         }
         sender.sendMessage(color("&aViaVersion &c" + Via.getPlatform().getPluginVersion()));
@@ -137,6 +141,12 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         registerSubCommand(new ReloadSubCmd());
     }
 
+    /**
+     * Replaces colour codes in a string
+     *
+     * @param string String to replace
+     * @return The output String
+     */
     public static String color(String string) {
         try {
             string = ChatColor.translateAlternateColorCodes('&', string); //Dont replace all & with $ like we did before.
@@ -145,6 +155,13 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         return string;
     }
 
+    /**
+     * Send a colour coded string with replacements to a user
+     *
+     * @param sender  The target to send the message to
+     * @param message The message
+     * @param args    The objects to replace
+     */
     public static void sendMessage(@NonNull ViaCommandSender sender, String message, Object... args) {
         sender.sendMessage(color(args == null ? message : String.format(message, args)));
     }

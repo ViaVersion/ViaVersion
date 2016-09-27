@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Effect {
 
-    private static HashMap<Integer, Integer> effects;
+    private final static HashMap<Integer, Integer> effects;
 
     static {
         effects = new HashMap<>();

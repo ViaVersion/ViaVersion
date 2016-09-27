@@ -16,10 +16,19 @@ public class PlaceBlockTracker extends StoredObject {
         super(user);
     }
 
+    /**
+     * Check if a certain amount of time has passed
+     *
+     * @param ms The amount of time in MS
+     * @return True if it has passed
+     */
     public boolean isExpired(int ms) {
         return System.currentTimeMillis() > (lastPlaceTimestamp + ms);
     }
 
+    /**
+     * Set the last place time to the current time
+     */
     public void updateTime() {
         lastPlaceTimestamp = System.currentTimeMillis();
     }

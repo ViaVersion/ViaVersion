@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Protocol {
-    private Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
-    private Map<Pair<State, Integer>, ProtocolPacket> outgoing = new HashMap<>();
+    private final Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
+    private final Map<Pair<State, Integer>, ProtocolPacket> outgoing = new HashMap<>();
 
     public Protocol() {
         registerPackets();

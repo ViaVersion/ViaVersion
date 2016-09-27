@@ -2,7 +2,7 @@ package us.myles.ViaVersion;
 
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.util.Configuration;
+import us.myles.ViaVersion.bukkit.util.Configuration;
 
 import java.io.File;
 import java.util.List;

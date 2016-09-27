@@ -44,6 +44,12 @@ public enum ArmorType {
     private final int id;
     private final String type;
 
+    /**
+     * Find an armour type by the item id
+     * @param id ID of the item
+     *
+     * @return Return the ArmourType, ArmourType.NONE if not found
+     */
     public static ArmorType findById(int id) {
         for (ArmorType a : ArmorType.values())
             if (a.getId() == id)
@@ -51,6 +57,12 @@ public enum ArmorType {
         return ArmorType.NONE;
     }
 
+    /**
+     * Find an armour type by the item string
+     * @param type String name for the item
+     *
+     * @return Return the ArmourType, ArmourType.NONE if not found
+     */
     public static ArmorType findByType(String type) {
         for (ArmorType a : ArmorType.values())
             if (a.getType().equals(type))
@@ -58,6 +70,11 @@ public enum ArmorType {
         return NONE;
     }
 
+    /**
+     * Check if an item id is armour
+     * @param id The item ID
+     * @return True if the item is a piece of armour
+     */
     public static boolean isArmor(int id) {
         for (ArmorType a : ArmorType.values())
             if (a.getId() == id)
@@ -65,6 +82,11 @@ public enum ArmorType {
         return false;
     }
 
+    /**
+     * Check if an item id is armour
+     * @param type The item material name
+     * @return True if the item is a piece of armour
+     */
     public static boolean isArmor(String type) {
         for (ArmorType a : ArmorType.values())
             if (a.getType().equals(type))
@@ -72,6 +94,10 @@ public enum ArmorType {
         return false;
     }
 
+    /**
+     * Get the Minecraft ID for the Armour Type
+     * @return The ID
+     */
     public int getId() {
         return this.id;
     }

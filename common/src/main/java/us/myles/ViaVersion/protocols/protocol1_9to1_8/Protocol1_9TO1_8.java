@@ -28,8 +28,8 @@ public class Protocol1_9TO1_8 extends Protocol {
     @Deprecated
     public static Type<Metadata> METADATA = new Metadata1_8Type();
 
-    private static Gson gson = new GsonBuilder().create();
-    public static ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
+    private static final Gson gson = new GsonBuilder().create();
+    public static final ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
         public String transform(PacketWrapper wrapper, String line) {
             return fixJson(line);

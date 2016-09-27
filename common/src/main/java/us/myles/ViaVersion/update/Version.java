@@ -6,8 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Version implements Comparable<Version> {
-    private static Pattern semVer = Pattern.compile("(?<a>0|[1-9]\\d*)\\.(?<b>0|[1-9]\\d*)(?:\\.(?<c>0|[1-9]\\d*))?(?:-(?<tag>[A-z0-9.-]*))?");
-    private int[] parts = new int[3];
+    private static final Pattern semVer = Pattern.compile("(?<a>0|[1-9]\\d*)\\.(?<b>0|[1-9]\\d*)(?:\\.(?<c>0|[1-9]\\d*))?(?:-(?<tag>[A-z0-9.-]*))?");
+    private final int[] parts = new int[3];
     private String tag;
 
     public Version(String value) {
@@ -24,6 +24,13 @@ public class Version implements Comparable<Version> {
         tag = matcher.group("tag") == null ? "" : matcher.group("tag");
     }
 
+    /**
+     * Compare two versions
+     *
+     * @param verA The first version
+     * @param verB The second
+     * @return 0 if they are the same, 1 if versionA is newer, -1 if versionA is older
+     */
     public static int compare(Version verA, Version verB) {
         if (verA == verB) return 0;
         if (verA == null) return -1;
@@ -47,6 +54,13 @@ public class Version implements Comparable<Version> {
         return 0;
     }
 
+    /**
+     * Check if a version is the same
+     *
+     * @param verA The first
+     * @param verB The second
+     * @return True if they are the same
+     */
     public static boolean equals(Version verA, Version verB) {
         return verA == verB || verA != null && verB != null && compare(verA, verB) == 0;
     }
@@ -71,6 +85,11 @@ public class Version implements Comparable<Version> {
         return that instanceof Version && equals(this, (Version) that);
     }
 
+    /**
+     * Get the tag, eg. -ALPHA
+     *
+     * @return The version tag
+     */
     public String getTag() {
         return tag;
     }

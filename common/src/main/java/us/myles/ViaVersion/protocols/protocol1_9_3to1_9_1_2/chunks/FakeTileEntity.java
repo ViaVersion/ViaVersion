@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * It requires now to have all tile entity data included in the chunk packet, otherwise it'll crash.
  */
 public class FakeTileEntity {
-    private static Map<Integer, CompoundTag> tileEntities = new ConcurrentHashMap<>();
+    private static final Map<Integer, CompoundTag> tileEntities = new ConcurrentHashMap<>();
 
     static {
         register(Arrays.asList(61, 62), "Furnace");

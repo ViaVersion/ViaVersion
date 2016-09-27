@@ -32,8 +32,6 @@ public class PPSSubCmd extends ViaSubCommand {
         long max = 0;
 
         for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
-            if (!Via.getAPI().isPorted(p.getUUID()))
-                continue;
             int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
             if (!playerVersions.containsKey(playerVersion))
                 playerVersions.put(playerVersion, new HashSet<String>());

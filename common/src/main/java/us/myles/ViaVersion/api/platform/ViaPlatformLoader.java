@@ -1,5 +1,8 @@
 package us.myles.ViaVersion.api.platform;
 
 public interface ViaPlatformLoader {
-    public void load();
+    /**
+     * Initialise the loading for a platform, eg. registering listeners / providers / events etc.
+     */
+    void load();
 }

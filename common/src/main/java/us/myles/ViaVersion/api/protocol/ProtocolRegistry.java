@@ -20,10 +20,10 @@ public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
     public static int SERVER_PROTOCOL = -1;
     // Input Version -> Output Version & Protocol (Allows fast lookup)
-    private static Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
-    private static Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
-    private static List<Protocol> registerList = Lists.newCopyOnWriteArrayList();
-    private static Set<Integer> supportedVersions = Sets.newConcurrentHashSet();
+    private static final Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
+    private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
+    private static final List<Protocol> registerList = Lists.newCopyOnWriteArrayList();
+    private static final Set<Integer> supportedVersions = Sets.newConcurrentHashSet();
 
     static {
         // Base Protocol

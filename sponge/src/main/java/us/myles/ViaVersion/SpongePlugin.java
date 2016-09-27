@@ -20,6 +20,13 @@ import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.*;
+import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
+import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
+import us.myles.ViaVersion.sponge.platform.SpongeConfigAPI;
+import us.myles.ViaVersion.sponge.platform.SpongeViaAPI;
+import us.myles.ViaVersion.sponge.platform.SpongeViaInjector;
+import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
+import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 
 import java.io.File;
 import java.util.ArrayList;

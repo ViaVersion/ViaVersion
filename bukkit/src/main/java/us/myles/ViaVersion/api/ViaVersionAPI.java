@@ -103,9 +103,9 @@ public interface ViaVersionAPI extends ViaAPI<Player> {
     boolean isDebug();
 
     /**
-     * Get ViaVersions command handler
+     * Get ViaVersions commands handler
      *
-     * @return command handler
+     * @return commands handler
      */
     ViaVersionCommand getCommandHandler();
 

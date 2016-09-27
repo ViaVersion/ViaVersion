@@ -20,7 +20,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import java.util.List;
 
 public class EntityPackets {
-    public static ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
+    public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
         @Override
         public Short transform(PacketWrapper wrapper, Byte inputValue) {
             return (short) (inputValue * 128);

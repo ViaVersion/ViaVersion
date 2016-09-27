@@ -72,9 +72,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
     }
 
     @Override
-    public void write(ByteBuf output, ClientWorld world, Chunk input) throws Exception {
-        Chunk chunk = input;
-
+    public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 

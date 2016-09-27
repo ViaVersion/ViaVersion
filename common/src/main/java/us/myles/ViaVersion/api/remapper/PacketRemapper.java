@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PacketRemapper {
-    private List<Pair<ValueReader, ValueWriter>> valueRemappers = new ArrayList<>();
+    private final List<Pair<ValueReader, ValueWriter>> valueRemappers = new ArrayList<>();
 
     public PacketRemapper() {
         registerMap();

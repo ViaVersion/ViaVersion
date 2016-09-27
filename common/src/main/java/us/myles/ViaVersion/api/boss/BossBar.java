@@ -111,6 +111,12 @@ public abstract class BossBar<T> {
         throw new NotImplementedException("This method is not implemented for the platform " + Via.getPlatform().getPlatformName());
     }
 
+    /**
+     * Removes the bossbar from a player
+     *
+     * @param uuid The platers YYUD
+     * @return The BossBar object
+     */
     public abstract BossBar removePlayer(UUID uuid);
 
     /**

@@ -28,7 +28,7 @@ public interface ViaVersionCommand {
     ViaSubCommand getSubCommand(String name);
 
     /**
-     * Executed when the Command sender executes the command
+     * Executed when the Command sender executes the commands
      *
      * @param sender Sender object
      * @param args   arguments provided

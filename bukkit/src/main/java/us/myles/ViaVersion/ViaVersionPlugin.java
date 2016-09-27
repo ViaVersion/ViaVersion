@@ -14,10 +14,14 @@ import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bukkit.*;
-import us.myles.ViaVersion.classgenerator.ClassGenerator;
+import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
+import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
+import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaInjector;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
 import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.util.NMSUtil;
+import us.myles.ViaVersion.bukkit.util.NMSUtil;
 
 import java.util.ArrayList;
 import java.util.List;

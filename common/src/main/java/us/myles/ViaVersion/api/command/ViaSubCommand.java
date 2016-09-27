@@ -9,14 +9,14 @@ public abstract class ViaSubCommand {
     /**
      * Subcommand name
      *
-     * @return The command name
+     * @return The commands name
      */
     public abstract String name();
 
     /**
      * subcommand description, this'll show in /viaversion list
      *
-     * @return The command description
+     * @return The commands description
      */
     public abstract String description();
 
@@ -24,7 +24,7 @@ public abstract class ViaSubCommand {
      * Usage example:
      * "playerversion [name]"
      *
-     * @return The command usage
+     * @return The commands usage
      */
     public String usage() {
         return name();
@@ -33,7 +33,7 @@ public abstract class ViaSubCommand {
     /**
      * Permission, null for everyone
      *
-     * @return The permission required to use the command
+     * @return The permission required to use the commands
      */
     public String permission() {
         return "viaversion.admin";
@@ -44,7 +44,7 @@ public abstract class ViaSubCommand {
      *
      * @param sender Command sender
      * @param args   Arguments
-     * @return command executed succesfully if false, show usage
+     * @return commands executed succesfully if false, show usage
      */
     public abstract boolean execute(ViaCommandSender sender, String[] args);
 
@@ -66,7 +66,7 @@ public abstract class ViaSubCommand {
     /**
      * Send message formatted / colored
      *
-     * @param sender  command sender
+     * @param sender  commands sender
      * @param message string message
      * @param args    optional objects
      */

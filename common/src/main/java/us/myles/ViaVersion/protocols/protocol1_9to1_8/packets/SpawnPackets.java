@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpawnPackets {
-    public static ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
+    public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
         @Override
         public Double transform(PacketWrapper wrapper, Integer inputValue) {
             return inputValue / 32D;

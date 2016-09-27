@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PacketWrapper {
-    public static int PASSTHROUGH_ID = 1000;
+    public static final int PASSTHROUGH_ID = 1000;
 
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
@@ -32,8 +32,8 @@ public class PacketWrapper {
     @Setter
     @Getter
     private int id = -1;
-    private LinkedList<Pair<Type, Object>> readableObjects = new LinkedList<>();
-    private List<Pair<Type, Object>> packetValues = new ArrayList<>();
+    private final LinkedList<Pair<Type, Object>> readableObjects = new LinkedList<>();
+    private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
 
     public PacketWrapper(int packetID, ByteBuf inputBuffer, UserConnection userConnection) {
         this.id = packetID;
@@ -404,7 +404,7 @@ public class PacketWrapper {
      * @param index     The index to start from
      * @param pipeline  The pipeline
      * @return The current packetwrapper
-     * @throws Exception
+     * @throws Exception If it fails to transform a packet, exception will be thrown
      */
     public PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
         for (int i = index; i < pipeline.size(); i++) { // Copy to prevent from removal.

@@ -140,8 +140,8 @@ public enum PacketType {
     PLAY_SET_COMPRESSION(State.PLAY, Direction.OUTGOING, 0x46, -1),
     PLAY_UPDATE_ENTITY_NBT(State.PLAY, Direction.OUTGOING, 0x49, -1);
 
-    private static HashMap<Short, PacketType> oldids = new HashMap<>();
-    private static HashMap<Short, PacketType> newids = new HashMap<>();
+    private static final HashMap<Short, PacketType> oldids = new HashMap<>();
+    private static final HashMap<Short, PacketType> newids = new HashMap<>();
 
     static {
         for (PacketType pt : PacketType.values()) {

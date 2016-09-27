@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class BaseProtocol extends Protocol {
-    private static Gson gson = new GsonBuilder().create(); // TODO: Possibly global gson provider?
+    private final static Gson gson = new GsonBuilder().create(); // TODO: Possibly global gson provider?
 
     @Override
     protected void registerPackets() {
@@ -196,11 +196,6 @@ public class BaseProtocol extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         // Nothing gets added, ProtocolPipeline handles ProtocolInfo
-    }
-
-    @Override
-    protected void registerListeners() {
-
     }
 
     @Override

@@ -103,7 +103,7 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
      * </ul>
      *
      * @param input The buffer to read from.
-     * @throws Exception
+     * @throws Exception If it fails to read
      */
     public void readBlocks(ByteBuf input) throws Exception {
         palette.clear();
