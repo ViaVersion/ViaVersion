@@ -1,9 +1,6 @@
 package us.myles.ViaVersion.protocols.base;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
@@ -23,13 +20,13 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
 public class BaseProtocol extends Protocol {
-    private final static Gson gson = new GsonBuilder().create(); // TODO: Possibly global gson provider?
 
     @Override
     protected void registerPackets() {
@@ -46,12 +43,12 @@ public class BaseProtocol extends Protocol {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
-                            JsonObject json = gson.fromJson(originalStatus, JsonObject.class);
+                            JsonObject json = GsonUtil.getGson().fromJson(originalStatus, JsonObject.class);
                             JsonObject version = json.get("version").getAsJsonObject();
                             int protocolVersion = ((Long) version.get("protocol").getAsLong()).intValue();
 
                             if (Via.getConfig().isSendSupportedVersions()) //Send supported versions
-                                version.add("supportedVersions", gson.toJsonTree(Via.getAPI().getSupportedVersions()));
+                                version.add("supportedVersions", GsonUtil.getGson().toJsonTree(Via.getAPI().getSupportedVersions()));
 
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) // Set the Server protocol if the detection on startup failed
                                 ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
@@ -70,7 +67,7 @@ public class BaseProtocol extends Protocol {
                             if (Via.getConfig().getBlockedProtocols().contains(info.getProtocolVersion()))
                                 version.addProperty("protocol", -1); // Show blocked versions as outdated
 
-                            wrapper.set(Type.STRING, 0, gson.toJson(json)); // Update value
+                            wrapper.set(Type.STRING, 0, GsonUtil.getGson().toJson(json)); // Update value
                         } catch (JsonParseException e) {
                             e.printStackTrace();
                         }

@@ -1,6 +1,5 @@
 package us.myles.ViaVersion;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -20,8 +19,9 @@ import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaInjector;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
-import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
+import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -240,7 +240,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         for (Plugin p : Bukkit.getPluginManager().getPlugins())
             plugins.add(new PluginInfo(p.isEnabled(), p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), p.getDescription().getAuthors()));
 
-        platformSpecific.add("plugins", new Gson().toJsonTree(plugins));
+        platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
         // TODO more? ProtocolLib things etc?
 
         return platformSpecific;

@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
@@ -10,6 +8,7 @@ import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.dump.DumpTemplate;
 import us.myles.ViaVersion.dump.VersionInfo;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.InputStreamReader;
 import java.io.InvalidObjectException;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.logging.Level;
 
 public class DumpSubCmd extends ViaSubCommand {
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     public String name() {
@@ -59,10 +57,10 @@ public class DumpSubCmd extends ViaSubCommand {
                     con.setDoOutput(true);
 
                     OutputStream out = con.getOutputStream();
-                    out.write(gson.toJson(template).getBytes(Charset.forName("UTF-8")));
+                    out.write(GsonUtil.getGson().toJson(template).getBytes(Charset.forName("UTF-8")));
                     out.close();
 
-                    JsonObject output = gson.fromJson(new InputStreamReader(con.getInputStream()), JsonObject.class);
+                    JsonObject output = GsonUtil.getGson().fromJson(new InputStreamReader(con.getInputStream()), JsonObject.class);
                     con.getInputStream().close();
 
                     if (!output.has("key"))

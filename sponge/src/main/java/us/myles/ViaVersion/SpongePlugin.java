@@ -1,6 +1,5 @@
 package us.myles.ViaVersion;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.spongepowered.api.Game;
@@ -19,7 +18,7 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.sponge.*;
+import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
 import us.myles.ViaVersion.sponge.platform.SpongeConfigAPI;
@@ -27,6 +26,7 @@ import us.myles.ViaVersion.sponge.platform.SpongeViaAPI;
 import us.myles.ViaVersion.sponge.platform.SpongeViaInjector;
 import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -190,7 +190,7 @@ public class SpongePlugin implements ViaPlatform {
                     p.getAuthors()
             ));
         }
-        platformSpecific.add("plugins", new Gson().toJsonTree(plugins));
+        platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
 
         return platformSpecific;
     }

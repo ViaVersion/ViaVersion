@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -19,22 +17,21 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTransla
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.List;
 
 public class Protocol1_9TO1_8 extends Protocol {
-    @Deprecated
-    public static Type<List<Metadata>> METADATA_LIST = new MetadataList1_8Type();
-    @Deprecated
-    public static Type<Metadata> METADATA = new Metadata1_8Type();
-
-    private static final Gson gson = new GsonBuilder().create();
     public static final ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
         public String transform(PacketWrapper wrapper, String line) {
             return fixJson(line);
         }
     };
+    @Deprecated
+    public static Type<List<Metadata>> METADATA_LIST = new MetadataList1_8Type();
+    @Deprecated
+    public static Type<Metadata> METADATA = new Metadata1_8Type();
 
     public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {
@@ -48,7 +45,7 @@ public class Protocol1_9TO1_8 extends Protocol {
             }
         }
         try {
-            gson.fromJson(line, JsonObject.class);
+            GsonUtil.getGson().fromJson(line, JsonObject.class);
         } catch (Exception e) {
             if (Via.getConfig().isForceJsonTransform()) {
                 return constructJson(line);
@@ -63,11 +60,21 @@ public class Protocol1_9TO1_8 extends Protocol {
     private static String constructJson(String text) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("text", text);
-        return gson.toJson(jsonObject);
+        return GsonUtil.getGson().toJson(jsonObject);
     }
 
     public static Item getHandItem(final UserConnection info) {
         return Via.getManager().getProviders().get(HandItemProvider.class).getHandItem(info);
+    }
+
+    public static boolean isSword(int id) {
+        if (id == 267) return true; // Iron
+        if (id == 268) return true; // Wood
+        if (id == 272) return true; // Stone
+        if (id == 276) return true; // Diamond
+        if (id == 283) return true; // Gold
+
+        return false;
     }
 
     @Override
@@ -112,15 +119,5 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new InventoryTracker(userConnection));
         // Place block tracker
         userConnection.put(new PlaceBlockTracker(userConnection));
-    }
-
-    public static boolean isSword(int id) {
-        if (id == 267) return true; // Iron
-        if (id == 268) return true; // Wood
-        if (id == 272) return true; // Stone
-        if (id == 276) return true; // Diamond
-        if (id == 283) return true; // Gold
-
-        return false;
     }
 }

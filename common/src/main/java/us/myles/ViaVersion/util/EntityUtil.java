@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
+// 1.10 Entity / Object ids
 public class EntityUtil {
 
     public static EntityType getTypeFromID(int typeID, boolean isObject) {

@@ -1,11 +1,10 @@
 package us.myles.ViaVersion.update;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +20,6 @@ public class UpdateUtil {
     private final static String URL = "http://api.spiget.org/v2/resources/";
     private final static int PLUGIN = 19254;
     private final static String LATEST_VERSION = "/versions/latest";
-    private final static Gson gson = new GsonBuilder().create();
 
     public static void sendUpdateMessage(final UUID uuid) {
         Via.getPlatform().runAsync(new Runnable() {
@@ -108,7 +106,7 @@ public class UpdateUtil {
             br.close();
             JsonObject statistics;
             try {
-                statistics = gson.fromJson(content, JsonObject.class);
+                statistics = GsonUtil.getGson().fromJson(content, JsonObject.class);
             } catch (JsonParseException e) {
                 e.printStackTrace();
                 return null;
