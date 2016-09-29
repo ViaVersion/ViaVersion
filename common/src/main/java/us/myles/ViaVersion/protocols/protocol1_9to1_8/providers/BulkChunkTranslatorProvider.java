@@ -42,7 +42,7 @@ public class BulkChunkTranslatorProvider implements Provider {
             chunkPacket.write(Type.INT, meta.getX());
             chunkPacket.write(Type.INT, meta.getZ());
             chunkPacket.write(Type.BOOLEAN, true); // Always ground-up
-            chunkPacket.write(Type.UNSIGNED_SHORT, meta.getBitMask() & 0x0F);
+            chunkPacket.write(Type.UNSIGNED_SHORT, meta.getBitMask());
             chunkPacket.write(Type.VAR_INT, meta.getLength());
             chunkPacket.write(customByteType, meta.getData());
 
