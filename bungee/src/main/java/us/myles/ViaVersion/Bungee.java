@@ -10,14 +10,12 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bungee.platform.BungeeViaAPI;
-import us.myles.ViaVersion.bungee.platform.BungeeViaInjector;
-import us.myles.ViaVersion.bungee.platform.BungeeViaLoader;
+import us.myles.ViaVersion.bungee.platform.*;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
-import us.myles.ViaVersion.bungee.platform.BungeeConfigAPI;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -60,23 +58,27 @@ public class Bungee extends Plugin implements ViaPlatform {
     }
 
     @Override
-    public int runAsync(Runnable runnable) {
-        return getProxy().getScheduler().runAsync(this, runnable).getId();
+    public TaskId runAsync(Runnable runnable) {
+        return new BungeeTaskId(getProxy().getScheduler().runAsync(this, runnable).getId());
     }
 
     @Override
-    public int runSync(Runnable runnable) {
-        return getProxy().getScheduler().runAsync(this, runnable).getId(); // TODO don't run sync @ Bungee?
+    public TaskId runSync(Runnable runnable) {
+        return new BungeeTaskId(getProxy().getScheduler().runAsync(this, runnable).getId());
     }
 
     @Override
-    public int runRepeatingSync(Runnable runnable, Long ticks) {
-        return getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS).getId();
+    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
+        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS).getId());
     }
 
     @Override
-    public void cancelTask(int taskId) {
-        getProxy().getScheduler().cancel(taskId);
+    public void cancelTask(TaskId taskId) {
+        if (taskId == null) return;
+        if (taskId.getObject() == null) return;
+        if (taskId instanceof BungeeTaskId) {
+            getProxy().getScheduler().cancel((Integer) taskId.getObject());
+        }
     }
 
     @Override
@@ -125,7 +127,7 @@ public class Bungee extends Plugin implements ViaPlatform {
 
     @Override
     public void onReload() {
-        // TODO handle
+        // Injector prints a message <3
     }
 
     @Override

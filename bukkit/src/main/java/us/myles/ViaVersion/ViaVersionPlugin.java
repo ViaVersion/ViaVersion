@@ -12,10 +12,12 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
+import us.myles.ViaVersion.bukkit.platform.BukkitTaskId;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaInjector;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
@@ -151,33 +153,37 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     }
 
     @Override
-    public int runAsync(Runnable runnable) {
+    public TaskId runAsync(Runnable runnable) {
         if (isPluginEnabled()) {
-            return getServer().getScheduler().runTaskAsynchronously(this, runnable).getTaskId();
+            return new BukkitTaskId(getServer().getScheduler().runTaskAsynchronously(this, runnable).getTaskId());
         } else {
             asyncQueuedTasks.add(runnable);
-            return -1;
+            return new BukkitTaskId(null);
         }
     }
 
     @Override
-    public int runSync(Runnable runnable) {
+    public TaskId runSync(Runnable runnable) {
         if (isPluginEnabled()) {
-            return getServer().getScheduler().runTask(this, runnable).getTaskId();
+            return new BukkitTaskId(getServer().getScheduler().runTask(this, runnable).getTaskId());
         } else {
             queuedTasks.add(runnable);
-            return -1;
+            return new BukkitTaskId(null);
         }
     }
 
     @Override
-    public int runRepeatingSync(Runnable runnable, Long ticks) {
-        return getServer().getScheduler().runTaskTimer(this, runnable, ticks, 0).getTaskId(); // TODO or the other way around?
+    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
+        return new BukkitTaskId(getServer().getScheduler().runTaskTimer(this, runnable, ticks, 0).getTaskId());
     }
 
     @Override
-    public void cancelTask(int taskId) {
-        getServer().getScheduler().cancelTask(taskId);
+    public void cancelTask(TaskId taskId) {
+        if (taskId == null) return;
+        if (taskId.getObject() == null) return;
+        if (taskId instanceof BukkitTaskId) {
+            getServer().getScheduler().cancelTask((Integer) taskId.getObject());
+        }
     }
 
     @Override

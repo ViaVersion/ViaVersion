@@ -16,15 +16,13 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
-import us.myles.ViaVersion.sponge.platform.SpongeConfigAPI;
-import us.myles.ViaVersion.sponge.platform.SpongeViaAPI;
-import us.myles.ViaVersion.sponge.platform.SpongeViaInjector;
-import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
+import us.myles.ViaVersion.sponge.platform.*;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -98,28 +96,30 @@ public class SpongePlugin implements ViaPlatform {
     }
 
     @Override
-    public int runAsync(Runnable runnable) {
+    public TaskId runAsync(Runnable runnable) {
         asyncExecutor.execute(runnable);
-        return -1;
+        return new SpongeTaskId(null);
     }
 
     @Override
-    public int runSync(Runnable runnable) {
+    public TaskId runSync(Runnable runnable) {
         syncExecutor.execute(runnable);
-        return -1;
+        return new SpongeTaskId(null);
     }
 
     @Override
-    public int runRepeatingSync(Runnable runnable, Long ticks) {
+    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
         Long time = ticks * 50L;
-        syncExecutor.scheduleAtFixedRate(runnable, time, time, TimeUnit.MILLISECONDS);
-        // use id?
-        return -1;
+        return new SpongeTaskId(syncExecutor.scheduleAtFixedRate(runnable, time, time, TimeUnit.MILLISECONDS).getTask());
     }
 
     @Override
-    public void cancelTask(int taskId) {
-        // oh.
+    public void cancelTask(TaskId taskId) {
+        if (taskId == null) return;
+        if (taskId.getObject() == null) return;
+        if (taskId instanceof SpongeTaskId) {
+            ((SpongeTaskId) taskId).getObject().cancel();
+        }
     }
 
     @Override

@@ -42,7 +42,7 @@ public interface ViaPlatform<T> {
      * @param runnable The task to run
      * @return The Task ID
      */
-    int runAsync(Runnable runnable);
+    TaskId runAsync(Runnable runnable);
 
     /**
      * Run a task Sync
@@ -50,7 +50,7 @@ public interface ViaPlatform<T> {
      * @param runnable The task to run
      * @return The Task ID
      */
-    int runSync(Runnable runnable);
+    TaskId runSync(Runnable runnable);
 
     /**
      * Run a task at a repeating interval.
@@ -60,14 +60,14 @@ public interface ViaPlatform<T> {
      * @param ticks    The interval to run it at
      * @return The Task ID
      */
-    int runRepeatingSync(Runnable runnable, Long ticks);
+    TaskId runRepeatingSync(Runnable runnable, Long ticks);
 
     /**
      * Cancel a task
      *
      * @param taskId The task ID to cancel
      */
-    void cancelTask(int taskId);
+    void cancelTask(TaskId taskId);
 
     /**
      * Get the online players
