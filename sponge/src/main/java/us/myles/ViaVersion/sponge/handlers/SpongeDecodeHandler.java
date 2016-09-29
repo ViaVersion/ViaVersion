@@ -1,14 +1,11 @@
-package us.myles.ViaVersion.bungee.handlers;
+package us.myles.ViaVersion.sponge.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.protocol.MinecraftDecoder;
-import net.md_5.bungee.protocol.Protocol;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -17,13 +14,12 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class ViaDecodeHandler extends MinecraftDecoder {
+public class SpongeDecodeHandler extends ByteToMessageDecoder {
 
-    private final MinecraftDecoder minecraftDecoder;
+    private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
 
-    public ViaDecodeHandler(UserConnection info, MinecraftDecoder minecraftDecoder) {
-        super(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion());
+    public SpongeDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
         this.info = info;
         this.minecraftDecoder = minecraftDecoder;
     }
@@ -72,7 +68,7 @@ public class ViaDecodeHandler extends MinecraftDecoder {
 
             // call minecraft decoder
             try {
-                list.addAll(BungeePipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
@@ -89,15 +85,5 @@ public class ViaDecodeHandler extends MinecraftDecoder {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (PipelineUtil.containsCause(cause, CancelException.class)) return;
         super.exceptionCaught(ctx, cause);
-    }
-
-    @Override
-    public void setProtocol(Protocol protocol) {
-        this.minecraftDecoder.setProtocol(protocol);
-    }
-
-    @Override
-    public void setProtocolVersion(int protocolVersion) {
-        this.minecraftDecoder.setProtocolVersion(protocolVersion);
     }
 }

@@ -6,8 +6,8 @@ import javassist.expr.ExprEditor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.ViaVersion;
-import us.myles.ViaVersion.bukkit.handlers.ViaDecodeHandler;
-import us.myles.ViaVersion.bukkit.handlers.ViaEncodeHandler;
+import us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler;
+import us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 
 public class ClassGenerator {
@@ -30,14 +30,14 @@ public class ClassGenerator {
                     Class decodeSuper = NMSUtil.nms("PacketDecoder");
                     Class encodeSuper = NMSUtil.nms("PacketEncoder");
                     // Generate the classes
-                    addSpigotCompatibility(pool, ViaDecodeHandler.class, decodeSuper);
-                    addSpigotCompatibility(pool, ViaEncodeHandler.class, encodeSuper);
+                    addSpigotCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
+                    addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 } else {
                     Class decodeSuper = Class.forName(getPSPackage() + ".wrapped.WrappedDecoder");
                     Class encodeSuper = Class.forName(getPSPackage() + ".wrapped.WrappedEncoder");
                     // Generate the classes
-                    addPSCompatibility(pool, ViaDecodeHandler.class, decodeSuper);
-                    addPSCompatibility(pool, ViaEncodeHandler.class, encodeSuper);
+                    addPSCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
+                    addPSCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 }
 
 
@@ -53,10 +53,10 @@ public class ClassGenerator {
                 pool.importPackage("io.netty.handler.codec");
                 // Implement Methods
                 generated.addMethod(CtMethod.make("public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {\n" +
-                        "        return new ViaEncodeHandler(info, minecraftEncoder);\n" +
+                        "        return new BukkitEncodeHandler(info, minecraftEncoder);\n" +
                         "    }", generated));
                 generated.addMethod(CtMethod.make("public ByteToMessageDecoder newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {\n" +
-                        "        return new ViaDecodeHandler(info, minecraftDecoder);\n" +
+                        "        return new BukkitDecodeHandler(info, minecraftDecoder);\n" +
                         "    }", generated));
 
                 constructor = (HandlerConstructor) generated.toClass(HandlerConstructor.class.getClassLoader()).newInstance();

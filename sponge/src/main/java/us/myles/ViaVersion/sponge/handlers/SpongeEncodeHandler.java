@@ -1,15 +1,11 @@
-package us.myles.ViaVersion.bungee.handlers;
+package us.myles.ViaVersion.sponge.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.MinecraftEncoder;
-import net.md_5.bungee.protocol.Protocol;
+import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -17,25 +13,27 @@ import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class ViaEncodeHandler extends MinecraftEncoder {
+public class SpongeEncodeHandler extends MessageToByteEncoder {
     private final UserConnection info;
-    private final MinecraftEncoder minecraftEncoder;
+    private final MessageToByteEncoder minecraftEncoder;
 
-    public ViaEncodeHandler(UserConnection info, MinecraftEncoder minecraftEncoder) {
-        super(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion());
+    public SpongeEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
         this.info = info;
         this.minecraftEncoder = minecraftEncoder;
     }
 
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, DefinedPacket o, final ByteBuf bytebuf) throws Exception {
-        // call minecraft encoder
-        try {
-            BungeePipelineUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof Exception) {
-                throw (Exception) e.getCause();
+    protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
+        // handle the packet type
+        if (!(o instanceof ByteBuf)) {
+            // call minecraft encoder
+            try {
+                PipelineUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof Exception) {
+                    throw (Exception) e.getCause();
+                }
             }
         }
         if (bytebuf.readableBytes() == 0) {
@@ -68,15 +66,5 @@ public class ViaEncodeHandler extends MinecraftEncoder {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (PipelineUtil.containsCause(cause, CancelException.class)) return;
         super.exceptionCaught(ctx, cause);
-    }
-
-    @Override
-    public void setProtocol(Protocol protocol) {
-        this.minecraftEncoder.setProtocol(protocol);
-    }
-
-    @Override
-    public void setProtocolVersion(int protocolVersion) {
-        this.minecraftEncoder.setProtocolVersion(protocolVersion);
     }
 }

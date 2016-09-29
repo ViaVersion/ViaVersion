@@ -10,12 +10,12 @@ import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
-public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
+public class SpongeChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final ChannelInitializer<SocketChannel> original;
     private Method method;
 
-    public ViaVersionInitializer(ChannelInitializer<SocketChannel> oldInit) {
+    public SpongeChannelInitializer(ChannelInitializer<SocketChannel> oldInit) {
         this.original = oldInit;
         try {
             this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
@@ -37,9 +37,9 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         // Add originals
         this.method.invoke(this.original, socketChannel);
         // Add our transformers
-        MessageToByteEncoder encoder = new ViaEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
-        ByteToMessageDecoder decoder = new ViaDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
-        ViaPacketHandler chunkHandler = new ViaPacketHandler(info);
+        MessageToByteEncoder encoder = new SpongeEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
+        ByteToMessageDecoder decoder = new SpongeDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
+        SpongePacketHandler chunkHandler = new SpongePacketHandler(info);
 
         socketChannel.pipeline().replace("encoder", "encoder", encoder);
         socketChannel.pipeline().replace("decoder", "decoder", decoder);

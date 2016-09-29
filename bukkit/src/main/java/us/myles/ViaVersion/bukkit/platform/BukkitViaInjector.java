@@ -8,7 +8,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.bukkit.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.bukkit.handlers.BukkitChannelInitializer;
 import us.myles.ViaVersion.util.ConcurrentList;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
@@ -75,7 +75,7 @@ public class BukkitViaInjector implements ViaInjector {
             ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
             try {
                 ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
+                ChannelInitializer newInit = new BukkitChannelInitializer(oldInit);
 
                 ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
                 injectedFutures.add(future);
@@ -103,8 +103,8 @@ public class BukkitViaInjector implements ViaInjector {
             ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
             try {
                 ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                if (oldInit instanceof ViaVersionInitializer) {
-                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((ViaVersionInitializer) oldInit).getOriginal());
+                if (oldInit instanceof BukkitChannelInitializer) {
+                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((BukkitChannelInitializer) oldInit).getOriginal());
                 }
             } catch (Exception e) {
                 System.out.println("Failed to remove injection handler, reload won't work with connections, please reboot!");

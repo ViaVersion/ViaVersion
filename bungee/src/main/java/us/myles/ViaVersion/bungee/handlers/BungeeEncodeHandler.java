@@ -1,43 +1,49 @@
-package us.myles.ViaVersion.sponge.handlers;
+package us.myles.ViaVersion.bungee.handlers;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-public class ViaEncodeHandler extends MessageToByteEncoder {
+@ChannelHandler.Sharable
+public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     private final UserConnection info;
-    private final MessageToByteEncoder minecraftEncoder;
+    private boolean handledCompression = false;
 
-    public ViaEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
+    public BungeeEncodeHandler(UserConnection info) {
         this.info = info;
-        this.minecraftEncoder = minecraftEncoder;
     }
 
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
-        // handle the packet type
-        if (!(o instanceof ByteBuf)) {
-            // call minecraft encoder
-            try {
-                PipelineUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                }
-            }
-        }
+    protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         if (bytebuf.readableBytes() == 0) {
             throw new CancelException();
+        }
+        boolean needsCompress = false;
+        if (!handledCompression) {
+            if (ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
+                // Need to decompress this packet due to bad order
+                bytebuf = BungeePipelineUtil.decompress(ctx, bytebuf);
+                ChannelHandler encoder = ctx.pipeline().get("via-decoder");
+                ChannelHandler decoder = ctx.pipeline().get("via-encoder");
+                ctx.pipeline().remove(encoder);
+                ctx.pipeline().remove(decoder);
+                ctx.pipeline().addAfter("decompress", "via-decoder", encoder);
+                ctx.pipeline().addAfter("compress", "via-encoder", decoder);
+                needsCompress = true;
+                handledCompression = true;
+            }
         }
         // Increment sent
         info.incrementSent();
@@ -60,6 +66,11 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
                 oldPacket.release();
             }
         }
+
+        if (needsCompress) {
+            bytebuf = BungeePipelineUtil.compress(ctx, bytebuf);
+        }
+        out.add(bytebuf.retain());
     }
 
     @Override
@@ -67,4 +78,5 @@ public class ViaEncodeHandler extends MessageToByteEncoder {
         if (PipelineUtil.containsCause(cause, CancelException.class)) return;
         super.exceptionCaught(ctx, cause);
     }
+
 }

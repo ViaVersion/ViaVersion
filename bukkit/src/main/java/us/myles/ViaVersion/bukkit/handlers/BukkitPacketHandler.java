@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.bungee.handlers;
+package us.myles.ViaVersion.bukkit.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,10 +8,10 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.List;
 
-public class ViaPacketHandler extends MessageToMessageEncoder {
+public class BukkitPacketHandler extends MessageToMessageEncoder {
     private final UserConnection info;
 
-    public ViaPacketHandler(UserConnection info) {
+    public BukkitPacketHandler(UserConnection info) {
         this.info = info;
     }
 

@@ -1,8 +1,9 @@
-package us.myles.ViaVersion.sponge.handlers;
+package us.myles.ViaVersion.bungee.handlers;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
@@ -11,21 +12,19 @@ import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class ViaDecodeHandler extends ByteToMessageDecoder {
+@ChannelHandler.Sharable
+public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
-    private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
 
-    public ViaDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
+    public BungeeDecodeHandler(UserConnection info) {
         this.info = info;
-        this.minecraftDecoder = minecraftDecoder;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
+    protected void decode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         // use transformers
         if (bytebuf.readableBytes() > 0) {
             // Ignore if pending disconnect
@@ -64,20 +63,11 @@ public class ViaDecodeHandler extends ByteToMessageDecoder {
                     newPacket.release();
                     throw e;
                 }
+            } else {
+                bytebuf.retain();
             }
 
-            // call minecraft decoder
-            try {
-                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                }
-            } finally {
-                if (info.isActive()) {
-                    bytebuf.release();
-                }
-            }
+            out.add(bytebuf);
         }
     }
 

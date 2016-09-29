@@ -14,12 +14,12 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class ViaDecodeHandler extends ByteToMessageDecoder {
+public class BukkitDecodeHandler extends ByteToMessageDecoder {
 
     private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
 
-    public ViaDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
+    public BukkitDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
         this.info = info;
         this.minecraftDecoder = minecraftDecoder;
     }

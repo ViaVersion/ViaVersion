@@ -12,12 +12,12 @@ import us.myles.ViaVersion.bukkit.classgenerator.HandlerConstructor;
 
 import java.lang.reflect.Method;
 
-public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
+public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final ChannelInitializer<SocketChannel> original;
     private Method method;
 
-    public ViaVersionInitializer(ChannelInitializer<SocketChannel> oldInit) {
+    public BukkitChannelInitializer(ChannelInitializer<SocketChannel> oldInit) {
         this.original = oldInit;
         try {
             this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
@@ -43,7 +43,7 @@ public class ViaVersionInitializer extends ChannelInitializer<SocketChannel> {
         // Add our transformers
         MessageToByteEncoder encoder = constructor.newEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
         ByteToMessageDecoder decoder = constructor.newDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
-        ViaPacketHandler chunkHandler = new ViaPacketHandler(info);
+        BukkitPacketHandler chunkHandler = new BukkitPacketHandler(info);
 
         socketChannel.pipeline().replace("encoder", "encoder", encoder);
         socketChannel.pipeline().replace("decoder", "decoder", decoder);

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.MinecraftDecoder;
 import net.md_5.bungee.protocol.MinecraftEncoder;
@@ -19,14 +20,14 @@ public class BungeePipelineUtil {
 
     static {
         try {
-            DECODE_METHOD = MinecraftDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
+            DECODE_METHOD = MessageToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             System.out.println("Netty issue?");
         }
         try {
-            ENCODE_METHOD = MinecraftEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, DefinedPacket.class, ByteBuf.class);
+            ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -34,7 +35,7 @@ public class BungeePipelineUtil {
         }
     }
 
-    public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
+    public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
             BungeePipelineUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
@@ -44,11 +45,31 @@ public class BungeePipelineUtil {
         return output;
     }
 
-    public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) throws InvocationTargetException {
+    public static ByteBuf callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
+        ByteBuf output = ctx.alloc().buffer();
         try {
-            BungeePipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, msg, output);
+            BungeePipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, input, output);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        }
+        return output;
+    }
+
+    public static ByteBuf decompress(ChannelHandlerContext ctx, ByteBuf bytebuf) {
+        try {
+            return (ByteBuf) callDecode((MessageToMessageDecoder) ctx.pipeline().get("decompress"), ctx.pipeline().context("decompress"), bytebuf).get(0);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return ctx.alloc().buffer();
+        }
+    }
+
+    public static ByteBuf compress(ChannelHandlerContext ctx, ByteBuf bytebuf) {
+        try {
+            return callEncode((MessageToByteEncoder) ctx.pipeline().get("compress"), ctx.pipeline().context("compress"), bytebuf);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return ctx.alloc().buffer();
         }
     }
 }

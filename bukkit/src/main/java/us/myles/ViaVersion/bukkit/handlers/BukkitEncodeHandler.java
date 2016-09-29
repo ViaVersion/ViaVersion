@@ -16,11 +16,11 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class ViaEncodeHandler extends MessageToByteEncoder {
+public class BukkitEncodeHandler extends MessageToByteEncoder {
     private final UserConnection info;
     private final MessageToByteEncoder minecraftEncoder;
 
-    public ViaEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
+    public BukkitEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
         this.info = info;
         this.minecraftEncoder = minecraftEncoder;
     }

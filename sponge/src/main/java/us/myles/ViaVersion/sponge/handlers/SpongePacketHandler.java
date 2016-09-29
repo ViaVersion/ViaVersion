@@ -8,10 +8,10 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.List;
 
-public class ViaPacketHandler extends MessageToMessageEncoder {
+public class SpongePacketHandler extends MessageToMessageEncoder {
     private final UserConnection info;
 
-    public ViaPacketHandler(UserConnection info) {
+    public SpongePacketHandler(UserConnection info) {
         this.info = info;
     }
 

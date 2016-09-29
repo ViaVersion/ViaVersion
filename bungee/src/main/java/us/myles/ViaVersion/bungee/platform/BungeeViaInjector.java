@@ -5,7 +5,7 @@ import io.netty.channel.ChannelInitializer;
 import net.md_5.bungee.netty.PipelineUtils;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.bungee.handlers.ViaVersionInitializer;
+import us.myles.ViaVersion.bungee.handlers.BungeeChannelInitializer;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 public class BungeeViaInjector implements ViaInjector {
@@ -14,7 +14,7 @@ public class BungeeViaInjector implements ViaInjector {
         try {
             try {
                 ChannelInitializer<Channel> oldInit = PipelineUtils.SERVER_CHILD;
-                ChannelInitializer newInit = new ViaVersionInitializer(oldInit);
+                ChannelInitializer newInit = new BungeeChannelInitializer(oldInit);
 
                 ReflectionUtil.setStatic(PipelineUtils.class, "SERVER_CHILD", newInit);
             } catch (NoSuchFieldException e) {
@@ -41,6 +41,6 @@ public class BungeeViaInjector implements ViaInjector {
 
     @Override
     public String getEncoderName() {
-        return "packet-encoder";
+        return "via-encoder";
     }
 }
