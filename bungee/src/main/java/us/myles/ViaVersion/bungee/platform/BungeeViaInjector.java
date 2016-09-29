@@ -50,4 +50,9 @@ public class BungeeViaInjector implements ViaInjector {
     public String getEncoderName() {
         return "via-encoder";
     }
+
+    @Override
+    public String getDecoderName() {
+        return "via-decoder";
+    }
 }

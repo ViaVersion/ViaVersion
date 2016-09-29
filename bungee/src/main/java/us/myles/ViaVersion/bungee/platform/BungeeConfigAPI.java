@@ -116,7 +116,7 @@ public class BungeeConfigAPI implements ViaVersionConfig, ConfigurationProvider 
 
     @Override
     public boolean isStimulatePlayerTick() {
-        return false;
+        return true;
     }
 
     @Override

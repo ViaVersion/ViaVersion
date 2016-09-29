@@ -178,6 +178,11 @@ public class BukkitViaInjector implements ViaInjector {
         return "encoder";
     }
 
+    @Override
+    public String getDecoderName() {
+        return "decoder";
+    }
+
     public static Object getServerConnection() throws Exception {
         Class<?> serverClazz = NMSUtil.nms("MinecraftServer");
         Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");

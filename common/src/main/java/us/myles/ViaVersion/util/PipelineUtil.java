@@ -95,6 +95,7 @@ public class PipelineUtil {
         boolean mark = false;
         for (String s : pipeline.names()) {
             if (mark) {
+                System.out.println("Context before: " + s);
                 return pipeline.context(pipeline.get(s));
             }
             if (s.equalsIgnoreCase(name))

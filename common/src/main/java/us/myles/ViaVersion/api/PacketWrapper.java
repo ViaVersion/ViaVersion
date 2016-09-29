@@ -455,19 +455,16 @@ public class PacketWrapper {
 
     /**
      * Send the current packet to the server.
-     * (Ensure the ID is suitable for the server version)
+     * (Ensure the ID is suitable for viaversion)
      *
      * @throws Exception If it failed to write
      */
     public void sendToServer() throws Exception {
-        // TODO: Fix for bungee
         if (!isCancelled()) {
             ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
-            Type.VAR_INT.write(output, PacketWrapper.PASSTHROUGH_ID); // Pass through
-
             writeToBuffer(output);
 
-            PipelineUtil.getContextBefore("decompress", user().getChannel().pipeline()).fireChannelRead(output);
+            user().getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(output);
         }
     }
 

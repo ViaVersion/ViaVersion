@@ -29,4 +29,11 @@ public interface ViaInjector {
      * @return The name
      */
     String getEncoderName();
+
+    /**
+     * Get the name of the decoder for then netty pipeline for this platform.
+     *
+     * @return The name
+     */
+    String getDecoderName();
 }

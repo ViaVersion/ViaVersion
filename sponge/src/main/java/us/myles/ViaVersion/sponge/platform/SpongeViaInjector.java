@@ -137,6 +137,11 @@ public class SpongeViaInjector implements ViaInjector {
         return "encoder";
     }
 
+    @Override
+    public String getDecoderName() {
+        return "decoder";
+    }
+
     public static Object getServerConnection() throws Exception {
         Class<?> serverClazz = Class.forName("net.minecraft.server.MinecraftServer");
         Object server = getServer();
