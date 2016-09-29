@@ -9,4 +9,4 @@ softdepend: [ProtocolSupport, PacketListenerApi]
 commands:
   viaversion:
     description: Shows ViaVersion Version and more.
-    aliases: [viaver]
+    aliases: [viaver, vvbukkit]

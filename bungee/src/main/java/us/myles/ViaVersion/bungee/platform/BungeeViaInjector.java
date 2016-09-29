@@ -36,14 +36,13 @@ public class BungeeViaInjector implements ViaInjector {
 
     @Override
     public void uninject() {
-        // TODO: Uninject from players currently online
         Via.getPlatform().getLogger().severe("ViaVersion cannot remove itself from Bungee without a reboot!");
     }
 
 
     @Override
     public int getServerProtocolVersion() throws Exception {
-        return 47;
+        return 47; // TODO Config Option
     }
 
     @Override

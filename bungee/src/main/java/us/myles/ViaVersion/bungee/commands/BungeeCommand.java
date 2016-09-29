@@ -7,7 +7,7 @@ public class BungeeCommand extends Command {
     private final BungeeCommandHandler handler;
 
     public BungeeCommand(BungeeCommandHandler handler) {
-        super("viaversion", "", "viaver"); // The CommandHandler will handle the permission
+        super("viaversion", "", "viaver", "vvbungee"); // The CommandHandler will handle the permission
         this.handler = handler;
     }
 

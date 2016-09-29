@@ -68,7 +68,7 @@ public class SpongePlugin implements ViaPlatform {
         syncExecutor = game.getScheduler().createSyncExecutor(this);
         asyncExecutor = game.getScheduler().createAsyncExecutor(this);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
-        game.getCommandManager().register(this, commandHandler, Arrays.asList("viaversion", "viaver"));
+        game.getCommandManager().register(this, commandHandler, Arrays.asList("viaversion", "viaver", "vvsponge"));
         getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded, injecting!");
         // Init platform
         Via.init(ViaManager.builder()

@@ -95,7 +95,7 @@ public class UpdateUtil {
             URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
-            connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion());
+            connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;

@@ -9,7 +9,6 @@ public class BungeeViaLoader implements ViaPlatformLoader {
     @Override
     public void load() {
         // TODO: Config
-        // TODO: Platform specific commands
         Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
     }
 }
