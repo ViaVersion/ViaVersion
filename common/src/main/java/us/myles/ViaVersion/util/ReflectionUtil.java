@@ -31,10 +31,6 @@ public class ReflectionUtil {
     public static void setStatic(Class<?> clazz, String f, Object value) throws NoSuchFieldException, IllegalAccessException {
         Field field = clazz.getDeclaredField(f);
         field.setAccessible(true);
-        // Remove any final stuff
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         field.set(null, value);
     }
 

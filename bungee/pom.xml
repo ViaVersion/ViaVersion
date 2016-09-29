@@ -33,14 +33,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- BungeeCord Proxy -->
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-proxy</artifactId>
-            <version>1.4.7-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Common Module -->
         <dependency>
             <groupId>us.myles</groupId>

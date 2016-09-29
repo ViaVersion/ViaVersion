@@ -151,10 +151,9 @@ public class WorldPackets {
                                 throw new IOException("transformMapChunkBulk returned the wrong object type");
 
                             PacketWrapper output = (PacketWrapper) obj;
-
                             ByteBuf buffer = Unpooled.buffer();
+                            output.setId(-1); // -1 for no writing of id
                             output.writeToBuffer(buffer);
-
                             PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
                             chunkPacket.send(Protocol1_9TO1_8.class, false);
                         }
