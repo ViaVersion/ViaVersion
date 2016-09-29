@@ -8,7 +8,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmit
 public class BungeeViaLoader implements ViaPlatformLoader {
     @Override
     public void load() {
-        // TODO: Movement Transmitter
         // TODO: Config
         // TODO: Platform specific commands
         Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
