@@ -12,8 +12,6 @@ import java.util.Set;
 
 @Getter
 public class ClientChunks extends StoredObject {
-
-
     private final Set<Long> loadedChunks = Sets.newConcurrentHashSet();
     private final Set<Long> bulkChunks = Sets.newConcurrentHashSet();
 
@@ -25,7 +23,7 @@ public class ClientChunks extends StoredObject {
         return ((long) msw << 32) + lsw - -2147483648L;
     }
 
-    public List<Object> transformMapChunkBulk(Object packet) {
+    public List<Object> transformMapChunkBulk(Object packet) throws Exception {
         return Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).transformMapChunkBulk(packet, this);
     }
 }

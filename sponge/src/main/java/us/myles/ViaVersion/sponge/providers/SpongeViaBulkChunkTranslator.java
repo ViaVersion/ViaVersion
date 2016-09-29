@@ -55,4 +55,9 @@ public class SpongeViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
     public boolean isFiltered(Class<?> packetClass) {
         return packetClass.getName().endsWith("S26PacketMapChunkBulk");
     }
+
+    @Override
+    public boolean isPacketLevel() {
+        return false;
+    }
 }

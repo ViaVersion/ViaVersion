@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -15,12 +17,16 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.ChunkType;
+
+import java.io.IOException;
+import java.util.List;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {
@@ -132,18 +138,26 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-//                        ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-//                        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.passthrough(new ChunkType(clientChunks));
-//                        if (chunk.isUnloadPacket())
-//                            wrapper.setId(0x1D);
-//
-//                        // eat any other data (Usually happens with unload packets)
-//                        wrapper.read(Type.REMAINING_BYTES);
-                        // TODO: Implement Bulk Chunks
-                        // Boolean
-                        // Column Count
+                        wrapper.cancel(); // Cancel the packet from being sent
+                        BulkChunkTranslatorProvider provider = Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class);
 
-                        wrapper.cancel();
+                        // Don't read the packet
+                        if (!provider.isPacketLevel())
+                            return;
+
+                        List<Object> list = provider.transformMapChunkBulk(wrapper, wrapper.user().get(ClientChunks.class));
+                        for (Object obj : list) {
+                            if (!(obj instanceof PacketWrapper))
+                                throw new IOException("transformMapChunkBulk returned the wrong object type");
+
+                            PacketWrapper output = (PacketWrapper) obj;
+
+                            ByteBuf buffer = Unpooled.buffer();
+                            output.writeToBuffer(buffer);
+
+                            PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
+                            chunkPacket.send(Protocol1_9TO1_8.class, false);
+                        }
                     }
                 });
             }

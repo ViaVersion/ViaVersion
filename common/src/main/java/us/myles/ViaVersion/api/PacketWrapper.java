@@ -358,7 +358,7 @@ public class PacketWrapper {
      * Be careful not to send packets twice.
      * (Sends it after current)
      * <br />
-     * <b>This method is no longer used, it's favoured to use send(Protocol) as it will handle the pipeline properly.</b>
+     * <b>This method is no longer used, it's favoured to use {@link #send(Class)} as it will handle the pipeline properly.</b>
      *
      * @throws Exception if it fails to write
      */

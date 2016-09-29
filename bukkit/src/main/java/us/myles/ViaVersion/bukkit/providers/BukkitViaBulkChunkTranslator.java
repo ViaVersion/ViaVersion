@@ -3,9 +3,9 @@ package us.myles.ViaVersion.bukkit.providers;
 import com.google.common.collect.Lists;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Method;
@@ -78,5 +78,10 @@ public class BukkitViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
     @Override
     public boolean isFiltered(Class<?> packetClass) {
         return packetClass.getName().endsWith("PacketPlayOutMapChunkBulk");
+    }
+
+    @Override
+    public boolean isPacketLevel() {
+        return false;
     }
 }
