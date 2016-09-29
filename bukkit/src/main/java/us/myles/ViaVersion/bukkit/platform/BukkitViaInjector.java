@@ -9,9 +9,9 @@ import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.bukkit.handlers.BukkitChannelInitializer;
+import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.util.ConcurrentList;
 import us.myles.ViaVersion.util.ListWrapper;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;

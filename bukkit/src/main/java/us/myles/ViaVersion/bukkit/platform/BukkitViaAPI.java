@@ -16,8 +16,8 @@ import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.boss.ViaBossBar;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.bukkit.util.ProtocolSupportUtil;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.Map;
 import java.util.SortedSet;

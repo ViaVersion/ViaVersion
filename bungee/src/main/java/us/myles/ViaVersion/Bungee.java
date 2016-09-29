@@ -12,10 +12,10 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bungee.platform.*;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
+import us.myles.ViaVersion.bungee.platform.*;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ public class Bungee extends Plugin implements ViaPlatform {
     @Override
     public void onLoad() {
         api = new BungeeViaAPI();
-        config = new BungeeConfigAPI();
+        config = new BungeeConfigAPI(getDataFolder());
         commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
         // Init platform

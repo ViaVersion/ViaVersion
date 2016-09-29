@@ -102,6 +102,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
     /**
      * Shows the ViaVersion help to a sender
+     *
      * @param sender The sender to send the help to
      */
     public void showHelp(ViaCommandSender sender) {

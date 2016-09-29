@@ -1,5 +1,7 @@
-package us.myles.ViaVersion.bungee.platform;
+package us.myles.ViaVersion.bukkit.platform;
 
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Config;
 
@@ -7,18 +9,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class BungeeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch");
+public class BukkitConfigAPI extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList();
 
-    public BungeeConfigAPI(File configFile) {
-        super(new File(configFile, "config.yml"));
+    public BukkitConfigAPI() {
+        super(new File(((ViaVersionPlugin) Via.getPlatform()).getDataFolder(), "config.yml"));
     }
 
     @Override
-    public List<String> getUnsupportedOptions() {
-        return UNSUPPORTED;
-    }
-
     public boolean isCheckForUpdates() {
         return getBoolean("checkforupdates", true);
     }
@@ -110,7 +108,7 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isAntiXRay() {
-        return false;
+        return getBoolean("anti-xray-patch", true);
     }
 
     @Override
@@ -125,12 +123,12 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isItemCache() {
-        return false;
+        return getBoolean("item-cache", true);
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return false;
+        return getBoolean("nms-player-ticking", true);
     }
 
     @Override
@@ -166,5 +164,10 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public String getReloadDisconnectMsg() {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
+    }
+
+    @Override
+    public List<String> getUnsupportedOptions() {
+        return UNSUPPORTED;
     }
 }

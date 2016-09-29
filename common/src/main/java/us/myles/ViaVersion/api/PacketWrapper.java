@@ -15,7 +15,6 @@ import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;

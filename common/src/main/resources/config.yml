@@ -32,7 +32,7 @@ reload-disconnect-msg: "Server reload, please rejoin!"
 #
 # What is the maximum per second a client can send (Use %pps to display their pps)
 # Use -1 to disable.
-max-pps: 600
+max-pps: 800
 max-pps-kick-msg: "You are sending too many packets!"
 #
 # We can also kick them if over a period they send over a threshold a certain amount of times.

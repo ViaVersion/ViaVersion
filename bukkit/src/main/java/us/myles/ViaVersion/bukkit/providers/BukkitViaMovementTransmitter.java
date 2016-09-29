@@ -4,10 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -1,29 +1,22 @@
 package us.myles.ViaVersion.sponge.platform;
 
-import org.yaml.snakeyaml.Yaml;
 import us.myles.ViaVersion.api.ViaVersionConfig;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.util.Config;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-public class SpongeConfigAPI implements ViaVersionConfig, ConfigurationProvider {
-    private final File defaultConfig;
-    private Map<Object, Object> config;
-    private ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() {
-        @Override
-        protected Yaml initialValue() {
-            return new Yaml();
-        }
-    };
+public class SpongeConfigAPI extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch");
 
-    public SpongeConfigAPI(File defaultConfig) {
-        this.defaultConfig = defaultConfig;
-        reloadConfig();
+    public SpongeConfigAPI(File configFile) {
+        super(new File(configFile, "config.yml"));
+    }
+
+    @Override
+    public List<String> getUnsupportedOptions() {
+        return UNSUPPORTED;
     }
 
     public boolean isCheckForUpdates() {
@@ -87,7 +80,7 @@ public class SpongeConfigAPI implements ViaVersionConfig, ConfigurationProvider 
 
     @Override
     public int getMaxPPS() {
-        return getInt("max-pps", 140);
+        return getInt("max-pps", 800);
     }
 
     @Override
@@ -117,7 +110,7 @@ public class SpongeConfigAPI implements ViaVersionConfig, ConfigurationProvider 
 
     @Override
     public boolean isAntiXRay() {
-        return getBoolean("anti-xray-patch", true);
+        return false;
     }
 
     @Override
@@ -173,108 +166,5 @@ public class SpongeConfigAPI implements ViaVersionConfig, ConfigurationProvider 
     @Override
     public String getReloadDisconnectMsg() {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
-    }
-
-    @Override
-    public void set(String path, Object value) {
-        config.put(path, value);
-    }
-
-    @Override
-    public void saveConfig() {
-        if (!defaultConfig.isDirectory()) {
-            defaultConfig.mkdir();
-        }
-        File config = new File(defaultConfig, "config.yml");
-        try (FileWriter fw = new FileWriter(config)) {
-            yaml.get().dump(this.config, fw);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void reloadConfig() {
-        if (!defaultConfig.isDirectory()) {
-            defaultConfig.mkdir();
-        }
-        File config = new File(defaultConfig, "config.yml");
-        URL jarConfigFile = this.getClass().getClassLoader().getResource("config.yml");
-        this.config = null;
-        if (config.exists()) {
-            try (FileInputStream input = new FileInputStream(config)) {
-                this.config = (Map<Object, Object>) yaml.get().load(input);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (this.config == null) {
-            this.config = new HashMap<>();
-        }
-        Map<Object, Object> defaults;
-        try (InputStream stream = jarConfigFile.openStream()) {
-            defaults = (Map<Object, Object>) yaml.get().load(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        // Merge with defaultLoader
-        for (Object key : this.config.keySet()) {
-            // Set option in new conf if exists
-            if (defaults.containsKey(key)) {
-                defaults.put(key, this.config.get(key));
-            }
-        }
-        this.config = defaults;
-        // Save
-        saveConfig();
-
-    }
-
-    public boolean getBoolean(String key, boolean def) {
-        if (this.config.containsKey(key)) {
-            return (boolean) this.config.get(key);
-        } else {
-            return def;
-        }
-    }
-
-    public String getString(String key, String def) {
-        if (this.config.containsKey(key)) {
-            return (String) this.config.get(key);
-        } else {
-            return def;
-        }
-    }
-
-    public int getInt(String key, int def) {
-        if (this.config.containsKey(key)) {
-            return (int) this.config.get(key);
-        } else {
-            return def;
-        }
-    }
-
-    public double getDouble(String key, double def) {
-        if (this.config.containsKey(key)) {
-            return (double) this.config.get(key);
-        } else {
-            return def;
-        }
-    }
-
-    public List<Integer> getIntegerList(String key) {
-        if (this.config.containsKey(key)) {
-            return (List<Integer>) this.config.get(key);
-        } else {
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public Map<String, Object> getValues() {
-        return (Map<String, Object>) ((Map) this.config);
     }
 }

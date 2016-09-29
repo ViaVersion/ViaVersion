@@ -46,8 +46,8 @@ public enum ArmorType {
 
     /**
      * Find an armour type by the item id
-     * @param id ID of the item
      *
+     * @param id ID of the item
      * @return Return the ArmourType, ArmourType.NONE if not found
      */
     public static ArmorType findById(int id) {
@@ -59,8 +59,8 @@ public enum ArmorType {
 
     /**
      * Find an armour type by the item string
-     * @param type String name for the item
      *
+     * @param type String name for the item
      * @return Return the ArmourType, ArmourType.NONE if not found
      */
     public static ArmorType findByType(String type) {
@@ -72,6 +72,7 @@ public enum ArmorType {
 
     /**
      * Check if an item id is armour
+     *
      * @param id The item ID
      * @return True if the item is a piece of armour
      */
@@ -84,6 +85,7 @@ public enum ArmorType {
 
     /**
      * Check if an item id is armour
+     *
      * @param type The item material name
      * @return True if the item is a piece of armour
      */
@@ -96,6 +98,7 @@ public enum ArmorType {
 
     /**
      * Get the Minecraft ID for the Armour Type
+     *
      * @return The ID
      */
     public int getId() {

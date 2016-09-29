@@ -17,10 +17,7 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
-import us.myles.ViaVersion.bukkit.platform.BukkitTaskId;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaInjector;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
+import us.myles.ViaVersion.bukkit.platform.*;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -37,7 +34,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     private boolean lateBind = false;
     private boolean protocolSupport = false;
     @Getter
-    private ViaConfig conf;
+    private BukkitConfigAPI conf;
     @Getter
     private ViaAPI<Player> api = new BukkitViaAPI(this);
     private List<Runnable> queuedTasks = new ArrayList<>();
@@ -45,7 +42,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
     public ViaVersionPlugin() {
         // Config magic
-        conf = new ViaConfig(this);
+        conf = new BukkitConfigAPI();
         // Command handler
         commandHandler = new BukkitCommandHandler();
         // Init platform

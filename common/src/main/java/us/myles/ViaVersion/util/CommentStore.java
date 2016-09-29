@@ -1,29 +1,25 @@
-package us.myles.ViaVersion.bukkit.util;
+package us.myles.ViaVersion.util;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
+import com.google.common.io.CharStreams;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-public class Configuration extends YamlConfiguration {
+public class CommentStore {
     private final Map<String, List<String>> headers = Maps.newConcurrentMap();
-    private final File file;
+    private final char pathSeperator;
+    private final int indents;
     private List<String> mainHeader = Lists.newArrayList();
-    private boolean loadHeaders;
 
-    public Configuration(File file) {
-        this.file = file;
+    public CommentStore(char pathSeperator, int indents) {
+        this.pathSeperator = pathSeperator;
+        this.indents = indents;
     }
 
     /**
@@ -65,43 +61,13 @@ public class Configuration extends YamlConfiguration {
         return headers.get(key);
     }
 
-    public <T> T get(String key, Class<T> type) {
-        return type.cast(get(key));
-    }
-
-    /**
-     * Reload config from file.
-     */
-    public void reload() {
-        reload(headers.isEmpty());
-    }
-
-    /**
-     * Reload config from file.
-     *
-     * @param loadHeaders Whether or not to load headers.
-     */
-    public void reload(boolean loadHeaders) {
-        this.loadHeaders = loadHeaders;
-        try {
-            load(file);
-        } catch (Exception e) {
-            Bukkit.getLogger().log(Level.WARNING, "failed to reload file", e);
-        }
-    }
-
-    @Override
-    public void loadFromString(String contents) throws InvalidConfigurationException {
-        if (!loadHeaders) {
-            super.loadFromString(contents);
-            return;
-        }
+    public void storeComments(InputStream inputStream) throws IOException {
+        InputStreamReader reader = new InputStreamReader(inputStream);
+        String contents = CharStreams.toString(reader);
 
         StringBuilder memoryData = new StringBuilder();
-
         // Parse headers
-        final int indentLength = options().indent();
-        final String pathSeparator = Character.toString(options().pathSeparator());
+        final String pathSeparator = Character.toString(this.pathSeperator);
         int currentIndents = 0;
         String key = "";
         List<String> headers = Lists.newArrayList();
@@ -122,12 +88,12 @@ public class Configuration extends YamlConfiguration {
                 continue;
             }
 
-            int indents = indent / indentLength;
+            int indents = indent / this.indents;
             if (indents <= currentIndents) {
                 // Remove last section of key
                 String[] array = key.split(Pattern.quote(pathSeparator));
                 int backspace = currentIndents - indents + 1;
-                key = join(array, options().pathSeparator(), 0, array.length - backspace);
+                key = join(array, this.pathSeperator, 0, array.length - backspace);
             }
 
             // Add new section to key
@@ -143,32 +109,13 @@ public class Configuration extends YamlConfiguration {
                 headers = Lists.newArrayList();
             }
         }
-
-        // Parse remaining text
-        super.loadFromString(memoryData.toString());
-
-        // Clear bukkit header
-        options().header(null);
     }
 
-    /**
-     * Save config to file
-     */
-    public void save() {
-        if (headers.isEmpty() && mainHeader.isEmpty()) {
-            try {
-                super.save(file);
-            } catch (IOException e) {
-                Bukkit.getLogger().log(Level.WARNING, "Failed to save file", e);
-            }
-            return;
-        }
-
+    public void writeComments(String yaml, File output) throws IOException {
         // Custom save
-        final int indentLength = options().indent();
-        final String pathSeparator = Character.toString(options().pathSeparator());
-        String content = saveToString();
-        StringBuilder fileData = new StringBuilder(buildHeader());
+        final int indentLength = this.indents;
+        final String pathSeparator = Character.toString(this.pathSeperator);
+        StringBuilder fileData = new StringBuilder();
         int currentIndents = 0;
         String key = "";
         for (String h : mainHeader) {
@@ -176,7 +123,7 @@ public class Configuration extends YamlConfiguration {
             fileData.append("#> ").append(h).append('\n');
         }
 
-        for (String line : content.split("\n")) {
+        for (String line : yaml.split("\n")) {
             if (line.isEmpty()) continue; // Skip empty lines
             int indent = getSuccessiveCharCount(line, ' ');
             int indents = indent / indentLength;
@@ -185,7 +132,7 @@ public class Configuration extends YamlConfiguration {
                 // Remove last section of key
                 String[] array = key.split(Pattern.quote(pathSeparator));
                 int backspace = currentIndents - indents + 1;
-                key = join(array, options().pathSeparator(), 0, array.length - backspace);
+                key = join(array, this.pathSeperator, 0, array.length - backspace);
             }
 
             // Add new section to key
@@ -203,11 +150,9 @@ public class Configuration extends YamlConfiguration {
         // Write data to file
         FileWriter writer = null;
         try {
-            writer = new FileWriter(file);
+            writer = new FileWriter(output);
             writer.write(fileData.toString());
             writer.flush();
-        } catch (IOException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Failed to save file", e);
         } finally {
             if (writer != null) {
                 try {
