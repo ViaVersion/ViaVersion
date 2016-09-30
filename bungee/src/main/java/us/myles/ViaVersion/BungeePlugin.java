@@ -1,7 +1,6 @@
 package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -15,6 +14,7 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
@@ -25,7 +25,10 @@ import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -153,7 +156,6 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
             plugins.add(new PluginInfo(true, p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), Arrays.asList(p.getDescription().getAuthor())));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
-        // TODO more? ProtocolLib things etc?
 
         return platformSpecific;
     }
@@ -163,17 +165,25 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
     }
 
-    // Set the handshake version every time someone connects to any server TODO reflection
+    // Set the handshake version every time someone connects to any server
     @EventHandler
     public void onServerConnect(ServerConnectEvent e) throws NoSuchFieldException, IllegalAccessException {
-        us.myles.ViaVersion.api.data.UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
+        UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (!user.has(BungeeStorage.class)) {
             user.put(new BungeeStorage(user, e.getPlayer()));
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
-        UserConnection connection = (UserConnection) e.getPlayer();
-        connection.getPendingConnection().getHandshake().setProtocolVersion(protocolId);
+        try {
+            Object pendingConnection = ReflectionUtil.invoke(e.getPlayer(), "getPendingConnection");
+            Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
+            Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
+            setProtocol.invoke(handshake, protocolId);
+        } catch (NoSuchMethodException e1) {
+            e1.printStackTrace();
+        } catch (InvocationTargetException e1) {
+            e1.printStackTrace();
+        }
     }
 
 }

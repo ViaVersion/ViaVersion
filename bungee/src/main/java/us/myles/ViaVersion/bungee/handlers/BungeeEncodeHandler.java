@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.netty.ChannelWrapper;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -92,8 +91,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         super.exceptionCaught(ctx, cause);
     }
 
-    // TODO reflection
-    public void checkServerChange() throws NoSuchFieldException, IllegalAccessException {
+    public void checkServerChange() throws Exception {
         if (info.has(BungeeStorage.class)) {
             BungeeStorage storage = info.get(BungeeStorage.class);
             ProxiedPlayer player = storage.getPlayer();
@@ -111,10 +109,9 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                     }
 
                     int protocolId = ProtocolDetectorService.getProtocolId(serverName);
-                    net.md_5.bungee.UserConnection connection = (net.md_5.bungee.UserConnection) player;
 
-                    ChannelWrapper wrapper = ReflectionUtil.get(connection, "ch", ChannelWrapper.class);
-                    wrapper.setVersion(protocolId);
+                    Object wrapper = ReflectionUtil.get(player, "ch", Object.class);
+                    wrapper.getClass().getDeclaredMethod("setVersion", int.class).invoke(wrapper, protocolId);
 
                     us.myles.ViaVersion.api.data.UserConnection viaConnection = Via.getManager().getConnection(player.getUniqueId());
                     ProtocolInfo info = viaConnection.get(ProtocolInfo.class);
@@ -127,7 +124,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                             pipeline.add(prot.getValue());
                         }
                     }
-                    connection.init();
+                    ReflectionUtil.invoke(player, "init");
                 }
             }
         }
