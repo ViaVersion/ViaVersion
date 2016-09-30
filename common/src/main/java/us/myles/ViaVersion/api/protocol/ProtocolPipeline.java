@@ -162,4 +162,9 @@ public class ProtocolPipeline extends Protocol {
     public List<Protocol> pipes() {
         return protocolList;
     }
+
+    public void cleanPipes() {
+        pipes().clear();
+        registerPackets();
+    }
 }
