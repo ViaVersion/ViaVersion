@@ -28,8 +28,6 @@ public class ProtocolDetectorService implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Checking protocol ids"); // TODO remove message after confirming that it works
-
         for (final Map.Entry<String, ServerInfo> lists : plugin.getProxy().getServers().entrySet()) {
             lists.getValue().ping(new Callback<ServerPing>() {
                 @Override
