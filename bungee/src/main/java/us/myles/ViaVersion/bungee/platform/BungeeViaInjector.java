@@ -5,9 +5,11 @@ import io.netty.channel.ChannelInitializer;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.bungee.handlers.BungeeChannelInitializer;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 public class BungeeViaInjector implements ViaInjector {
     @Override
@@ -42,7 +44,7 @@ public class BungeeViaInjector implements ViaInjector {
 
     @Override
     public int getServerProtocolVersion() throws Exception {
-        return 47; // TODO Config Option
+        return (int) ReflectionUtil.getStatic(Class.forName("net.md_5.bungee.protocol.ProtocolConstants"), "SUPPORTED_VERSION_IDS", List.class).get(0);
     }
 
     @Override
