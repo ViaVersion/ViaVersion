@@ -1,7 +1,10 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
 
+import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_11Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -25,6 +28,31 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
     protected void registerPackets() {
         InventoryPackets.register(this);
 
+        // Spawn Object
+        registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity id
+                map(Type.UUID); // 1 - UUID
+                map(Type.BYTE); // 2 - Type
+
+                // Track Entity
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        byte type = wrapper.get(Type.BYTE, 0);
+
+                        Entity1_11Types.EntityType entType = Entity1_11Types.getTypeFromId(type, true);
+
+                        // Register Type ID
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                    }
+                });
+            }
+        });
+
         // Spawn mob packet
         registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
             @Override
@@ -46,13 +74,17 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
                         // Change Type :)
                         int type = wrapper.get(Type.VAR_INT, 1);
-                        type = MetadataRewriter.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
-                        wrapper.set(Type.VAR_INT, 1, type);
+
+                        Entity1_11Types.EntityType entType = MetadataRewriter.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                        if (entType != null)
+                            wrapper.set(Type.VAR_INT, 1, entType.getId());
+
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).getClientEntityTypes().put(wrapper.get(Type.VAR_INT, 0), type);
-                        MetadataRewriter.handleMetadata(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -84,11 +116,41 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        if (!wrapper.user().get(EntityTracker.class).getClientEntityTypes().containsKey(entityId)) {
+
+                        Optional<Entity1_11Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
+                        if (!type.isPresent())
                             return;
+
+                        MetadataRewriter.handleMetadata(entityId, type.get(), wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                    }
+                });
+            }
+        });
+
+        // Entity teleport
+        registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity id
+                map(Type.DOUBLE); // 1 - x
+                map(Type.DOUBLE); // 2 - y
+                map(Type.DOUBLE); // 3 - z
+                map(Type.BYTE); // 4 - yaw
+                map(Type.BYTE); // 5 - pitch
+                map(Type.BOOLEAN); // 6 - onGround
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        if (Via.getConfig().isHologramPatch()) {
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            if (tracker.isHologram(entityID)) {
+                                Double newValue = wrapper.get(Type.DOUBLE, 1);
+                                newValue -= (Via.getConfig().getHologramYOffset());
+                                wrapper.set(Type.DOUBLE, 1, newValue);
+                            }
                         }
-                        int type = wrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
-                        MetadataRewriter.handleMetadata(type, wrapper.get(Types1_9.METADATA_LIST, 0));
                     }
                 });
             }

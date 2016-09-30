@@ -33,7 +33,7 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isShowNewDeathMessages() {
-        return getBoolean("use-new-deathmessages", false);
+        return getBoolean("use-new-deathmessages", true);
     }
 
     @Override

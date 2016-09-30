@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.util;
+package us.myles.ViaVersion.api.entities;
 
 import com.google.common.base.Optional;
 import lombok.AllArgsConstructor;
@@ -6,13 +6,13 @@ import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 // 1.10 Entity / Object ids
-public class EntityUtil {
+public class Entity1_10Types {
 
-    public static EntityType getTypeFromID(int typeID, boolean isObject) {
+    public static EntityType getTypeFromId(int typeID, boolean isObject) {
         Optional<EntityType> type;
 
         if (isObject)
-            type = PCObjectTypes.getPCEntity(typeID);
+            type = ObjectTypes.getPCEntity(typeID);
         else
             type = EntityType.findById(typeID);
 
@@ -135,7 +135,7 @@ public class EntityUtil {
 
     @AllArgsConstructor
     @Getter
-    public enum PCObjectTypes {
+    public enum ObjectTypes {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
@@ -165,11 +165,11 @@ public class EntityUtil {
         private final int id;
         private final EntityType type;
 
-        public static Optional<PCObjectTypes> findById(int id) {
+        public static Optional<ObjectTypes> findById(int id) {
             if (id == -1)
                 return Optional.absent();
 
-            for (PCObjectTypes ent : PCObjectTypes.values())
+            for (ObjectTypes ent : ObjectTypes.values())
                 if (ent.getId() == id)
                     return Optional.of(ent);
 
@@ -177,7 +177,7 @@ public class EntityUtil {
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
-            Optional<PCObjectTypes> output = findById(id);
+            Optional<ObjectTypes> output = findById(id);
 
             if (!output.isPresent())
                 return Optional.absent();

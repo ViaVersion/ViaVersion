@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -23,7 +24,6 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
-import us.myles.ViaVersion.util.EntityUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class EntityTracker extends StoredObject {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
-    private final Map<Integer, EntityUtil.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
     private final Map<Integer, BossBar> bossBarMap = new ConcurrentHashMap<>();
@@ -116,37 +116,37 @@ public class EntityTracker extends StoredObject {
             return;
         }
 
-        EntityUtil.EntityType type = clientEntityTypes.get(entityID);
+        Entity1_10Types.EntityType type = clientEntityTypes.get(entityID);
         for (Metadata metadata : new ArrayList<>(metadataList)) {
             // Fix: wither (crash fix)
-            if (type == EntityUtil.EntityType.WITHER) {
+            if (type == Entity1_10Types.EntityType.WITHER) {
                 if (metadata.getId() == 10) {
                     metadataList.remove(metadata);
                     //metadataList.add(new Metadata(10, NewType.Byte.getTypeID(), Type.BYTE, 0));
                 }
             }
             // Fix: enderdragon (crash fix)
-            if (type == EntityUtil.EntityType.ENDER_DRAGON) {
+            if (type == Entity1_10Types.EntityType.ENDER_DRAGON) {
                 if (metadata.getId() == 11) {
                     metadataList.remove(metadata);
                     //   metadataList.add(new Metadata(11, NewType.Byte.getTypeID(), Type.VAR_INT, 0));
                 }
             }
 
-            if (type == EntityUtil.EntityType.SKELETON) {
+            if (type == Entity1_10Types.EntityType.SKELETON) {
                 if ((getMetaByIndex(metadataList, 12)) == null) {
                     metadataList.add(new Metadata(12, MetaType1_9.Boolean, true));
                 }
             }
 
             //ECHOPET Patch
-            if (type == EntityUtil.EntityType.HORSE) {
+            if (type == Entity1_10Types.EntityType.HORSE) {
                 // Wrong metadata value from EchoPet, patch since it's discontinued. (https://github.com/DSH105/EchoPet/blob/06947a8b08ce40be9a518c2982af494b3b99d140/modules/API/src/main/java/com/dsh105/echopet/compat/api/entity/HorseArmour.java#L22)
                 if (metadata.getId() == 16 && (int) metadata.getValue() == Integer.MIN_VALUE)
                     metadata.setValue(0);
             }
 
-            if (type == EntityUtil.EntityType.PLAYER) {
+            if (type == Entity1_10Types.EntityType.PLAYER) {
                 if (metadata.getId() == 0) {
                     // Byte
                     byte data = (byte) metadata.getValue();
@@ -162,7 +162,7 @@ public class EntityTracker extends StoredObject {
                     }
                 }
             }
-            if (type == EntityUtil.EntityType.ARMOR_STAND && Via.getConfig().isHologramPatch()) {
+            if (type == Entity1_10Types.EntityType.ARMOR_STAND && Via.getConfig().isHologramPatch()) {
                 if (metadata.getId() == 0 && getMetaByIndex(metadataList, 10) != null) {
                     Metadata meta = getMetaByIndex(metadataList, 10); //Only happens if the armorstand is small
                     byte data = (byte) metadata.getValue();
@@ -190,11 +190,11 @@ public class EntityTracker extends StoredObject {
             UUID uuid = getUser().get(ProtocolInfo.class).getUuid();
             // Boss bar
             if (Via.getConfig().isBossbarPatch()) {
-                if (type == EntityUtil.EntityType.ENDER_DRAGON || type == EntityUtil.EntityType.WITHER) {
+                if (type == Entity1_10Types.EntityType.ENDER_DRAGON || type == Entity1_10Types.EntityType.WITHER) {
                     if (metadata.getId() == 2) {
                         BossBar bar = bossBarMap.get(entityID);
                         String title = (String) metadata.getValue();
-                        title = title.isEmpty() ? (type == EntityUtil.EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
+                        title = title.isEmpty() ? (type == Entity1_10Types.EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
                         if (bar == null) {
                             bar = Via.getAPI().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityID, bar);
@@ -206,10 +206,10 @@ public class EntityTracker extends StoredObject {
                     } else if (metadata.getId() == 6 && !Via.getConfig().isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
                         BossBar bar = bossBarMap.get(entityID);
                         // Make health range between 0 and 1
-                        float maxHealth = type == EntityUtil.EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
+                        float maxHealth = type == Entity1_10Types.EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
                         float health = Math.max(0.0f, Math.min(((float) metadata.getValue()) / maxHealth, 1.0f));
                         if (bar == null) {
-                            String title = type == EntityUtil.EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
+                            String title = type == Entity1_10Types.EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
                             bar = Via.getAPI().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityID, bar);
                             bar.addPlayer(uuid);

@@ -3,13 +3,13 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 import com.google.common.base.Optional;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.util.EntityUtil;
 
 import java.util.HashMap;
 
-import static us.myles.ViaVersion.util.EntityUtil.EntityType.*;
+import static us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType.*;
 
 @Getter
 public enum MetaIndex {
@@ -142,20 +142,20 @@ public enum MetaIndex {
     ENDERDRAGON_FLAG(ENDER_DRAGON, 15, MetaType1_8.Byte, MetaType1_9.Discontinued),
     ENDERDRAGON_PHASE(ENDER_DRAGON, 11, MetaType1_8.Byte, MetaType1_9.VarInt);
 
-    private static final HashMap<Pair<EntityUtil.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
+    private static final HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
     static {
         for (MetaIndex index : MetaIndex.values())
             metadataRewrites.put(new Pair<>(index.getClazz(), index.getIndex()), index);
     }
 
-    private EntityUtil.EntityType clazz;
+    private Entity1_10Types.EntityType clazz;
     private int newIndex;
     private MetaType1_9 newType;
     private MetaType1_8 oldType;
     private int index;
 
-    MetaIndex(EntityUtil.EntityType type, int index, MetaType1_8 oldType, MetaType1_9 newType) {
+    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, MetaType1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.newIndex = index;
@@ -163,7 +163,7 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    MetaIndex(EntityUtil.EntityType type, int index, MetaType1_8 oldType, int newIndex, MetaType1_9 newType) {
+    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, int newIndex, MetaType1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.oldType = oldType;
@@ -171,7 +171,7 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    private static Optional<MetaIndex> getIndex(EntityUtil.EntityType type, int index) {
+    private static Optional<MetaIndex> getIndex(Entity1_10Types.EntityType type, int index) {
         Pair pair = new Pair<>(type, index);
         if (metadataRewrites.containsKey(pair)) {
             return Optional.of(metadataRewrites.get(pair));
@@ -180,8 +180,8 @@ public enum MetaIndex {
         return Optional.absent();
     }
 
-    public static MetaIndex searchIndex(EntityUtil.EntityType type, int index) {
-        EntityUtil.EntityType currentType = type;
+    public static MetaIndex searchIndex(Entity1_10Types.EntityType type, int index) {
+        Entity1_10Types.EntityType currentType = type;
         do {
             Optional<MetaIndex> optMeta = getIndex(currentType, index);
 

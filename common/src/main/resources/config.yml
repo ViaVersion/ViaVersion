@@ -48,6 +48,16 @@ tracking-max-warnings: 4
 tracking-max-kick-msg: "You are sending too many packets, :("
 #
 #----------------------------------------------------------#
+#                 MULTIPLE VERSIONS OPTIONS                #
+#----------------------------------------------------------#
+#
+# Should we enable our hologram patch?
+# If they're in the wrong place enable this
+hologram-patch: false
+# This is the offset, should work as default when enabled.
+hologram-y: -0.96
+#
+#----------------------------------------------------------#
 #         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #
 #----------------------------------------------------------#
 #
@@ -60,11 +70,6 @@ auto-team: true
 suppress-metadata-errors: false
 # When enabled 1.9 & 1.10 will be able to block by using shields
 shield-blocking: true
-# Should we enable our hologram patch?
-# If they're in the wrong place enable this
-hologram-patch: false
-# This is the offset, should work as default when enabled.
-hologram-y: -0.96
 # Enable player tick simulation, this fixes eating, drinking, nether portals.
 simulate-pt: true
 # Should we use nms player to simulate packets, (may fix anti-cheat issues)
@@ -76,7 +81,7 @@ bossbar-anti-flicker: false
 # This will show the new effect indicator in the top-right corner for 1.9 & 1.10 players.
 use-new-effect-indicator: true
 # Show the new death messages for 1.9 & 1.10 on the death screen
-use-new-deathmessages: false
+use-new-deathmessages: true
 # Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
 item-cache: true
 # Patch the Anti xray to work on 1.9 & 1.10 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.

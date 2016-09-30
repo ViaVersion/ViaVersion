@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -19,7 +20,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
-import us.myles.ViaVersion.util.EntityUtil;
 
 public class PlayerPackets {
     public static void register(Protocol protocol) {
@@ -165,7 +165,7 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.getClientEntityTypes().put(entityID, EntityUtil.EntityType.PLAYER);
+                        tracker.getClientEntityTypes().put(entityID, Entity1_10Types.EntityType.PLAYER);
                         tracker.setEntityID(entityID);
                     }
                 });
