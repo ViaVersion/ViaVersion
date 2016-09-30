@@ -4,7 +4,10 @@ import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.event.EventHandler;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
@@ -20,7 +23,7 @@ import us.myles.ViaVersion.bungee.platform.*;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class Bungee extends Plugin implements ViaPlatform {
+public class Bungee extends Plugin implements ViaPlatform, Listener {
 
     private BungeeViaAPI api;
     private BungeeConfigAPI config;
@@ -39,6 +42,8 @@ public class Bungee extends Plugin implements ViaPlatform {
                 .loader(new BungeeViaLoader())
                 .commandHandler(commandHandler)
                 .build());
+
+        getProxy().getPluginManager().registerListener(this, this);
     }
 
     @Override
@@ -132,7 +137,12 @@ public class Bungee extends Plugin implements ViaPlatform {
 
     @Override
     public JsonObject getDump() {
-        return null;
+        return new JsonObject();
+    }
+
+    @EventHandler
+    public void onQuit(PlayerDisconnectEvent e) {
+        Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
     }
 
 }
