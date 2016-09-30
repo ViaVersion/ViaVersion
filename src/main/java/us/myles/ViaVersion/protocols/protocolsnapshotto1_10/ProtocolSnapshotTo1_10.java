@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
+import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
@@ -13,6 +14,13 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.packets.InventoryPac
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.storage.EntityTracker;
 
 public class ProtocolSnapshotTo1_10 extends Protocol {
+    private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
+        @Override
+        public Short transform(PacketWrapper wrapper, Float inputValue) throws Exception {
+            return (short) (inputValue * 16);
+        }
+    };
+
     @Override
     protected void registerPackets() {
         InventoryPackets.register(this);
@@ -99,6 +107,24 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
                             wrapper.user().get(EntityTracker.class).removeEntity(entity);
                     }
                 });
+            }
+        });
+
+        /*
+            INCOMING PACKETS
+         */
+
+        // Block placement
+        registerIncoming(State.PLAY, 0x1C, 0x1C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // 0 - Location
+                map(Type.VAR_INT); // 1 - Face
+                map(Type.VAR_INT); // 2 - Hand
+
+                map(Type.FLOAT, toOldByte);
+                map(Type.FLOAT, toOldByte);
+                map(Type.FLOAT, toOldByte);
             }
         });
     }
