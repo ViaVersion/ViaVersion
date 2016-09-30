@@ -57,7 +57,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     con.setDoOutput(true);
 
                     OutputStream out = con.getOutputStream();
-                    out.write(GsonUtil.getGson().toJson(template).getBytes(Charset.forName("UTF-8")));
+                    out.write(GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(Charset.forName("UTF-8")));
                     out.close();
 
                     JsonObject output = GsonUtil.getGson().fromJson(new InputStreamReader(con.getInputStream()), JsonObject.class);

@@ -19,11 +19,16 @@ import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
 import us.myles.ViaVersion.bungee.platform.*;
+import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.util.GsonUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class Bungee extends Plugin implements ViaPlatform, Listener {
+public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     private BungeeViaAPI api;
     private BungeeConfigAPI config;
@@ -137,7 +142,16 @@ public class Bungee extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public JsonObject getDump() {
-        return new JsonObject();
+        JsonObject platformSpecific = new JsonObject();
+
+        List<PluginInfo> plugins = new ArrayList<>();
+        for (Plugin p : ProxyServer.getInstance().getPluginManager().getPlugins())
+            plugins.add(new PluginInfo(true, p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), Arrays.asList(p.getDescription().getAuthor())));
+
+        platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
+        // TODO more? ProtocolLib things etc?
+
+        return platformSpecific;
     }
 
     @EventHandler
