@@ -1,10 +1,12 @@
 package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -19,6 +21,7 @@ import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
 import us.myles.ViaVersion.bungee.platform.*;
+import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -44,7 +47,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         Via.init(ViaManager.builder()
                 .platform(this)
                 .injector(new BungeeViaInjector())
-                .loader(new BungeeViaLoader())
+                .loader(new BungeeViaLoader(this))
                 .commandHandler(commandHandler)
                 .build());
 
@@ -158,5 +161,39 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     public void onQuit(PlayerDisconnectEvent e) {
         Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
     }
+
+    // Set the handshake version every time someone connects to any server TODO reflection
+    @EventHandler
+    public void onServerConnect(ServerConnectEvent e) throws NoSuchFieldException, IllegalAccessException {
+        int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
+        UserConnection connection = (UserConnection) e.getPlayer();
+        connection.getPendingConnection().getHandshake().setProtocolVersion(protocolId);
+    }
+
+        /*
+        TODO: Change when connected
+        System.out.println("Switching servers..");
+        if (!ProtocolDetectorService.hasProtocolId(e.getServer().getInfo().getName())) {
+            getLogger().severe("Could not find the protocol id for server " + e.getServer());
+            return;
+        }
+
+        int protocolId = ProtocolDetectorService.getProtocolId(e.getServer().getInfo().getName());
+        UserConnection connection = (UserConnection) e.getPlayer();
+
+        ChannelWrapper wrapper = ReflectionUtil.get(connection, "ch", ChannelWrapper.class);
+        wrapper.setVersion(protocolId);
+
+        us.myles.ViaVersion.api.data.UserConnection viaConnection =  Via.getManager().getConnection(e.getPlayer().getUniqueId());
+        ProtocolInfo info = viaConnection.get(ProtocolInfo.class);
+        // Choose the pipe
+        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
+        ProtocolPipeline pipeline = viaConnection.get(ProtocolInfo.class).getPipeline();
+        if (protocols != null) {
+            pipeline.pipes().clear();
+            for (Pair<Integer, Protocol> prot : protocols) {
+                pipeline.add(prot.getValue());
+            }
+        }*/
 
 }
