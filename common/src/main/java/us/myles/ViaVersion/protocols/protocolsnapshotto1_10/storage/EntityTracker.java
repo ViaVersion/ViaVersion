@@ -19,7 +19,7 @@ public class EntityTracker extends StoredObject {
     }
 
     public void removeEntity(int entityId) {
-        removeEntity(entityId);
+        clientEntityTypes.remove(entityId);
         if (isHologram(entityId))
             removeHologram(entityId);
     }
