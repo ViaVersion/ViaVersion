@@ -99,7 +99,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             if (player.getServer() != null) {
                 if (player.getServer() != null && !player.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
 
-                    System.out.println("Server change " + player.getServer().getInfo().getName());
+                    System.out.println("Server change " + player.getServer().getInfo().getName() + " curr" + storage.getCurrentServer());
                     String serverName = player.getServer().getInfo().getName();
 
                     storage.setCurrentServer(serverName);
@@ -118,31 +118,36 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
                     System.out.println(info.getProtocolVersion() + ">" + protocolId + " " + protocols);
                     ProtocolPipeline pipeline = viaConnection.get(ProtocolInfo.class).getPipeline();
-                    if (protocols != null) {
-                        viaConnection.clearStoredObjects();
-                        pipeline.cleanPipes();
 
+                    viaConnection.clearStoredObjects();
+                    pipeline.cleanPipes();
+
+                    if (protocols != null)
                         for (Pair<Integer, Protocol> prot : protocols) {
                             pipeline.add(prot.getValue());
                         }
-                        viaConnection.put(info);
-                        viaConnection.setActive(true);
-
-                        // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
-                        for (Pair<Integer, Protocol> protocol : protocols) {
-                            protocol.getValue().init(viaConnection);
-                        }
 
 
-                        Object wrapper = ReflectionUtil.get(player, "ch", Object.class);
-                        wrapper.getClass().getDeclaredMethod("setVersion", int.class).invoke(wrapper, protocolId);
-                        ReflectionUtil.invoke(player, "init");
-                    } else {
-                        viaConnection.setActive(false);
+                    viaConnection.put(info);
+                    viaConnection.put(storage);
+
+                    viaConnection.setActive(protocols != null);
+
+                    // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
+                    for (Protocol protocol : pipeline.pipes()) {
+                        protocol.init(viaConnection);
                     }
+
+                    Object wrapper = ReflectionUtil.get(player, "ch", Object.class);
+                    wrapper.getClass().getDeclaredMethod("setVersion", int.class).invoke(wrapper, protocolId);
+//                    ReflectionUtil.invoke(player, "init");
+
+                    Object entityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class).invoke(null, protocolId);
+                    ReflectionUtil.set(player, "entityRewrite", entityMap);
+
+                    System.out.println("VERSION:" + ((net.md_5.bungee.UserConnection) player).getPendingConnection().getVersion());
                 }
             }
         }
     }
-
 }

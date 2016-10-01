@@ -29,13 +29,20 @@ public class ProtocolDetectorService implements Runnable {
     @Override
     public void run() {
         for (final Map.Entry<String, ServerInfo> lists : plugin.getProxy().getServers().entrySet()) {
-            lists.getValue().ping(new Callback<ServerPing>() {
-                @Override
-                public void done(ServerPing serverPing, Throwable throwable) {
-                    if (throwable == null)
-                        protocolIds.put(lists.getKey(), serverPing.getVersion().getProtocol());
-                }
-            });
+            updateProtocolInfo(lists.getKey(), lists.getValue());
         }
     }
+
+    private void updateProtocolInfo(final String key, ServerInfo value) {
+        value.ping(new Callback<ServerPing>() {
+            @Override
+            public void done(ServerPing serverPing, Throwable throwable) {
+                if (throwable == null)
+                    protocolIds.put(key, serverPing.getVersion().getProtocol());
+                else
+                    throwable.printStackTrace();
+            }
+        });
+    }
+
 }

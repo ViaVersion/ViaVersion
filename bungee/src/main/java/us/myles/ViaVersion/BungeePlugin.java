@@ -174,6 +174,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     public void onServerConnect(ServerConnectEvent e) throws NoSuchFieldException, IllegalAccessException {
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (!user.has(BungeeStorage.class)) {
+            System.out.println("new storage");
             user.put(new BungeeStorage(user, e.getPlayer()));
         }
 
@@ -181,16 +182,14 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
 
         // Check if ViaVersion can support that version
-        if (protocols != null) {
-            try {
-                Object pendingConnection = ReflectionUtil.invoke(e.getPlayer(), "getPendingConnection");
-                Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
-                Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
-                setProtocol.invoke(handshake, protocolId);
-                System.out.println("Changed server protocol id " + protocolId + " clientProtocol:" + user.get(ProtocolInfo.class).getProtocolVersion() + " path:" + protocols);
-            } catch (NoSuchMethodException | InvocationTargetException e1) {
-                e1.printStackTrace();
-            }
+        try {
+            Object pendingConnection = ReflectionUtil.invoke(e.getPlayer(), "getPendingConnection");
+            Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
+            Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
+            setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
+            System.out.println("Changed server protocol id " + protocolId + " clientProtocol:" + user.get(ProtocolInfo.class).getProtocolVersion() + " path:" + protocols);
+        } catch (NoSuchMethodException | InvocationTargetException e1) {
+            e1.printStackTrace();
         }
     }
 
