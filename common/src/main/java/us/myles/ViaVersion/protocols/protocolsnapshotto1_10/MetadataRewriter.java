@@ -161,32 +161,32 @@ public class MetadataRewriter {
                             }
                         }
                     }
-                    if (type.is(EntityType.ARMOR_STAND) && Via.getConfig().isHologramPatch()) {
-                        Optional<Metadata> flags = getById(metadatas, 11);
-                        Optional<Metadata> customName = getById(metadatas, 2);
-                        Optional<Metadata> customNameVisible = getById(metadatas, 3);
-                        if (metadata.getId() == 0 && flags.isPresent() && customName.isPresent() && customNameVisible.isPresent()) {
-                            Metadata meta = flags.get();
-                            byte data = (byte) metadata.getValue();
-                            // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
-                            if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                                    && ((String) customName.get().getValue()).length() != 0 && (boolean) customNameVisible.get().getValue()) {
-                                EntityTracker tracker = connection.get(EntityTracker.class);
-                                if (!tracker.isHologram(entityId)) {
-                                    tracker.addHologram(entityId);
-                                    try {
-                                        // Send movement
-                                        PacketWrapper wrapper = new PacketWrapper(0x25, null, connection);
-                                        wrapper.write(Type.VAR_INT, entityId);
-                                        wrapper.write(Type.SHORT, (short) 0);
-                                        wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
-                                        wrapper.write(Type.SHORT, (short) 0);
-                                        wrapper.write(Type.BOOLEAN, true);
+                }
+                if (type.is(EntityType.ARMOR_STAND) && Via.getConfig().isHologramPatch()) {
+                    Optional<Metadata> flags = getById(metadatas, 11);
+                    Optional<Metadata> customName = getById(metadatas, 2);
+                    Optional<Metadata> customNameVisible = getById(metadatas, 3);
+                    if (metadata.getId() == 0 && flags.isPresent() && customName.isPresent() && customNameVisible.isPresent()) {
+                        Metadata meta = flags.get();
+                        byte data = (byte) metadata.getValue();
+                        // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
+                        if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
+                                && ((String) customName.get().getValue()).length() != 0 && (boolean) customNameVisible.get().getValue()) {
+                            EntityTracker tracker = connection.get(EntityTracker.class);
+                            if (!tracker.isHologram(entityId)) {
+                                tracker.addHologram(entityId);
+                                try {
+                                    // Send movement
+                                    PacketWrapper wrapper = new PacketWrapper(0x25, null, connection);
+                                    wrapper.write(Type.VAR_INT, entityId);
+                                    wrapper.write(Type.SHORT, (short) 0);
+                                    wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
+                                    wrapper.write(Type.SHORT, (short) 0);
+                                    wrapper.write(Type.BOOLEAN, true);
 
-                                        wrapper.send(ProtocolSnapshotTo1_10.class);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                    wrapper.send(ProtocolSnapshotTo1_10.class);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
@@ -201,6 +201,7 @@ public class MetadataRewriter {
                 }
             }
         }
+
     }
 
     public static Optional<Metadata> getById(List<Metadata> metadatas, int id) {

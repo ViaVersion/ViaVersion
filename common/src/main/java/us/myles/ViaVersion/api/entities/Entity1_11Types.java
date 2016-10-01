@@ -160,10 +160,6 @@ public class Entity1_11Types {
             return Optional.absent();
         }
 
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
         public boolean is(EntityType... types) {
             for (EntityType type : types)
                 if (is(type))
@@ -171,14 +167,18 @@ public class Entity1_11Types {
             return false;
         }
 
+        public boolean is(EntityType type) {
+            return this == type;
+        }
+
         public boolean isOrHasParent(EntityType type) {
             EntityType parent = this;
 
             do {
-                if (parent == type)
+                if (parent.equals(type))
                     return true;
 
-                parent = type.getParent();
+                parent = parent.getParent();
             } while (parent != null);
 
             return false;
