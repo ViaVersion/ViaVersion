@@ -41,8 +41,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     private List<Runnable> asyncQueuedTasks = new ArrayList<>();
 
     public ViaVersionPlugin() {
-        // Config magic
-        conf = new BukkitConfigAPI();
         // Command handler
         commandHandler = new BukkitCommandHandler();
         // Init platform
@@ -52,6 +50,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
                 .injector(new BukkitViaInjector())
                 .loader(new BukkitViaLoader(this))
                 .build());
+        // Config magic
+        conf = new BukkitConfigAPI();
         // For compatibility
         ViaVersion.setInstance(this);
 

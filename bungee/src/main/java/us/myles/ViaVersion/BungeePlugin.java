@@ -9,6 +9,7 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
@@ -17,6 +18,8 @@ import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
+import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
@@ -24,6 +27,7 @@ import us.myles.ViaVersion.bungee.platform.*;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
@@ -174,15 +178,19 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
-        try {
-            Object pendingConnection = ReflectionUtil.invoke(e.getPlayer(), "getPendingConnection");
-            Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
-            Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
-            setProtocol.invoke(handshake, protocolId);
-        } catch (NoSuchMethodException e1) {
-            e1.printStackTrace();
-        } catch (InvocationTargetException e1) {
-            e1.printStackTrace();
+        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
+
+        // Check if ViaVersion can support that version
+        if (protocols != null) {
+            try {
+                Object pendingConnection = ReflectionUtil.invoke(e.getPlayer(), "getPendingConnection");
+                Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
+                Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
+                setProtocol.invoke(handshake, protocolId);
+                System.out.println("Changed server protocol id " + protocolId + " clientProtocol:" + user.get(ProtocolInfo.class).getProtocolVersion() + " path:" + protocols);
+            } catch (NoSuchMethodException | InvocationTargetException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 

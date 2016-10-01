@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
@@ -53,7 +54,9 @@ public class BaseProtocol extends Protocol {
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) // Set the Server protocol if the detection on startup failed
                                 ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
 
-                            List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
+                            int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                            List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+
                             if (protocols != null) {
                                 if (protocolVersion != 9999) {
                                     //Fix ServerListPlus
@@ -137,13 +140,14 @@ public class BaseProtocol extends Protocol {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setProtocolVersion(protVer);
                         // Choose the pipe
-                        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), ProtocolRegistry.SERVER_PROTOCOL);
+                        int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
                         ProtocolPipeline pipeline = wrapper.user().get(ProtocolInfo.class).getPipeline();
                         if (protocols != null) {
                             for (Pair<Integer, Protocol> prot : protocols) {
                                 pipeline.add(prot.getValue());
                             }
-                            wrapper.set(Type.VAR_INT, 0, ProtocolRegistry.SERVER_PROTOCOL);
+                            wrapper.set(Type.VAR_INT, 0, protocol);
                         }
 
                         // Change state
@@ -194,6 +198,11 @@ public class BaseProtocol extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         // Nothing gets added, ProtocolPipeline handles ProtocolInfo
+    }
+
+    @Override
+    protected void register(ViaProviders providers) {
+        providers.register(VersionProvider.class, new VersionProvider());
     }
 
     @Override

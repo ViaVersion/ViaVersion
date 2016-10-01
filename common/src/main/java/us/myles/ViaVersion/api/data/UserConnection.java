@@ -67,6 +67,14 @@ public class UserConnection {
     }
 
     /**
+     * Clear all the stored objects
+     * Used for bungee when switching servers.
+     */
+    public void clearStoredObjects() {
+        storedObjects.clear();
+    }
+
+    /**
      * Send a raw packet to the player
      *
      * @param packet        The raw packet to send
