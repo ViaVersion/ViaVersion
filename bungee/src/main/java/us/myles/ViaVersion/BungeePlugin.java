@@ -174,7 +174,6 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     public void onServerConnect(ServerConnectEvent e) throws NoSuchFieldException, IllegalAccessException {
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (!user.has(BungeeStorage.class)) {
-            System.out.println("new storage");
             user.put(new BungeeStorage(user, e.getPlayer()));
         }
 

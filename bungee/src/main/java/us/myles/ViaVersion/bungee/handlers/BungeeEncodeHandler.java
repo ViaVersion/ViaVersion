@@ -98,8 +98,6 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
             if (player.getServer() != null) {
                 if (player.getServer() != null && !player.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
-
-                    System.out.println("Server change " + player.getServer().getInfo().getName() + " curr" + storage.getCurrentServer());
                     String serverName = player.getServer().getInfo().getName();
 
                     storage.setCurrentServer(serverName);
@@ -144,8 +142,6 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
                     Object entityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class).invoke(null, protocolId);
                     ReflectionUtil.set(player, "entityRewrite", entityMap);
-
-                    System.out.println("VERSION:" + ((net.md_5.bungee.UserConnection) player).getPendingConnection().getVersion());
                 }
             }
         }
