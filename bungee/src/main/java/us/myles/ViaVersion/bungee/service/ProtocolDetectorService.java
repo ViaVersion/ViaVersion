@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.bungee.service;
 
+import lombok.Getter;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -11,9 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProtocolDetectorService implements Runnable {
     private static final Map<String, Integer> protocolIds = new ConcurrentHashMap<>();
     private BungeePlugin plugin;
+    @Getter
+    private static ProtocolDetectorService instance;
 
     public ProtocolDetectorService(BungeePlugin plugin) {
         this.plugin = plugin;
+        instance = this;
     }
 
     public static Integer getProtocolId(String serverName) {
@@ -39,8 +43,6 @@ public class ProtocolDetectorService implements Runnable {
             public void done(ServerPing serverPing, Throwable throwable) {
                 if (throwable == null)
                     protocolIds.put(key, serverPing.getVersion().getProtocol());
-                else
-                    throwable.printStackTrace();
             }
         });
     }
