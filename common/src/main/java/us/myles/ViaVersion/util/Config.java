@@ -17,7 +17,6 @@ public abstract class Config implements ConfigurationProvider {
         @Override
         protected Yaml initialValue() {
             DumperOptions options = new DumperOptions();
-//            options.setPrettyFlow(true);
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             return new Yaml(options);
         }
