@@ -186,7 +186,6 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
             Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
             Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
             setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
-            System.out.println("Changed server protocol id " + protocolId + " clientProtocol:" + user.get(ProtocolInfo.class).getProtocolVersion() + " path:" + protocols);
         } catch (NoSuchMethodException | InvocationTargetException e1) {
             e1.printStackTrace();
         }

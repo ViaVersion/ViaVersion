@@ -114,7 +114,6 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                     ProtocolInfo info = viaConnection.get(ProtocolInfo.class);
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
-                    System.out.println(info.getProtocolVersion() + ">" + protocolId + " " + protocols);
                     ProtocolPipeline pipeline = viaConnection.get(ProtocolInfo.class).getPipeline();
 
                     viaConnection.clearStoredObjects();
