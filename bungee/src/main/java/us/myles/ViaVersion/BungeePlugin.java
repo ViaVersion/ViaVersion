@@ -58,8 +58,6 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
                 .loader(new BungeeViaLoader(this))
                 .commandHandler(commandHandler)
                 .build());
-
-        getProxy().getPluginManager().registerListener(this, this);
     }
 
     @Override
@@ -137,7 +135,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     }
 
     @Override
-    public ViaVersionConfig getConf() {
+    public BungeeConfigAPI getConf() {
         return config;
     }
 
@@ -160,7 +158,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
             plugins.add(new PluginInfo(true, p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), Arrays.asList(p.getDescription().getAuthor())));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
-        platformSpecific.add("servers", GsonUtil.getGson().toJsonTree(ProtocolDetectorService.getProtocolIds()));
+        platformSpecific.add("servers", GsonUtil.getGson().toJsonTree(ProtocolDetectorService.getDetectedIds()));
         return platformSpecific;
     }
 

@@ -13,7 +13,6 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.TaskId;
@@ -162,7 +161,7 @@ public class SpongePlugin implements ViaPlatform {
     }
 
     @Override
-    public ViaVersionConfig getConf() {
+    public SpongeConfigAPI getConf() {
         return conf;
     }
 

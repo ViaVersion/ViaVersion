@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.bungee.platform;
 
 import lombok.AllArgsConstructor;
+import net.md_5.bungee.api.ProxyServer;
 import us.myles.ViaVersion.BungeePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
@@ -18,9 +19,13 @@ public class BungeeViaLoader implements ViaPlatformLoader {
 
     @Override
     public void load() {
+        // Listeners
+        ProxyServer.getInstance().getPluginManager().registerListener(plugin, plugin);
+        // Providers
         Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
         Via.getManager().getProviders().use(VersionProvider.class, new BungeeVersionProvider());
-
-        plugin.getProxy().getScheduler().schedule(plugin, new ProtocolDetectorService(plugin), 0, 1, TimeUnit.MINUTES);
+        if (plugin.getConf().getBungeePingInterval() > 0) {
+            plugin.getProxy().getScheduler().schedule(plugin, new ProtocolDetectorService(plugin), 0, plugin.getConf().getBungeePingInterval(), TimeUnit.SECONDS);
+        }
     }
 }

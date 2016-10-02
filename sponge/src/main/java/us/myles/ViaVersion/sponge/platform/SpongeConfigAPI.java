@@ -6,12 +6,18 @@ import us.myles.ViaVersion.util.Config;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class SpongeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch");
+    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers");
 
     public SpongeConfigAPI(File configFile) {
         super(new File(configFile, "config.yml"));
+    }
+
+    @Override
+    protected void handleConfig(Map<String, Object> config) {
+        // Nothing Currently
     }
 
     @Override

@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.bungee.providers;
 
 import com.google.common.collect.Lists;
+import net.md_5.bungee.api.ProxyServer;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
@@ -11,7 +12,7 @@ import java.util.List;
 public class BungeeVersionProvider extends VersionProvider {
     private static Class<?> ref;
 
-    public BungeeVersionProvider() {
+    static {
         try {
             ref = Class.forName("net.md_5.bungee.protocol.ProtocolConstants");
         } catch (Exception e) {
@@ -35,7 +36,7 @@ public class BungeeVersionProvider extends VersionProvider {
 
         // Older than bungee supports, get the lowest version
         if (info.getProtocolVersion() < list.get(0)) {
-            return list.get(0);
+            return getLowestSupportedVersion();
         }
 
         // Loop through all protocols to get the closest protocol id that bungee supports
@@ -46,5 +47,19 @@ public class BungeeVersionProvider extends VersionProvider {
 
         System.out.println("Panic, no protocol id found for " + info.getProtocolVersion());
         return info.getProtocolVersion();
+    }
+
+    public static int getLowestSupportedVersion() {
+        List<Integer> list;
+        try {
+            list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
+            return list.get(0);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        // Fallback
+        return ProxyServer.getInstance().getProtocolVersion();
     }
 }

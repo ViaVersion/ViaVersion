@@ -51,7 +51,8 @@ public class ProtocolVersion {
         register(v1_9_2 = new ProtocolVersion(109, "1.9.2"));
         register(v1_9_3 = new ProtocolVersion(110, "1.9.3/4"));
         register(v1_10 = new ProtocolVersion(210, "1.10"));
-        register(vSNAPSHOT = new ProtocolVersion(309, "1.11-SNAPSHOT"));
+        // Snapshot uses colon as dashes are used other places...
+        register(vSNAPSHOT = new ProtocolVersion(309, "1.11:SNAPSHOT"));
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
@@ -78,6 +79,24 @@ public class ProtocolVersion {
 
     public static List<ProtocolVersion> getProtocols() {
         return Collections.unmodifiableList(new ArrayList<>(versions.values()));
+    }
+
+    public static ProtocolVersion getClosest(String protocol) {
+        for (ProtocolVersion version : versions.values()) {
+            if (version.getName().equals(protocol))
+                return version;
+            if (version.getName().equals(protocol + ".x"))
+                return version;
+            String[] parts = version.getName().split("-");
+            for (String part : parts) {
+                if (part.equalsIgnoreCase(protocol)) {
+                    return version;
+                }
+                if (part.equals(protocol + ".x"))
+                    return version;
+            }
+        }
+        return null;
     }
 
     @Override

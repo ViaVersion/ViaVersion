@@ -3,9 +3,10 @@
 # If you need help:
 # viaversion.com - Discussion tab
 # IRC - https://elmer.spi.gt/iris/?nick=&channels=viaversion #viaversion on irc.spi.gt
+# Docs - https://docs.viaversion.com/display/VIAVERSION/Configuration
 #
 #----------------------------------------------------------#
-#                     GLOBAL OPTIONS                        #
+#                     GLOBAL OPTIONS                       #
 #----------------------------------------------------------#
 #
 # Should ViaVersion check for updates?
@@ -23,7 +24,29 @@ block-disconnect-msg: "You are using an unsupported Minecraft version!"
 reload-disconnect-msg: "Server reload, please rejoin!"
 #
 #----------------------------------------------------------#
-#                  GLOBAL PACKET LIMITER                    #
+#                     BUNGEE OPTIONS                       #
+#----------------------------------------------------------#
+#
+# BungeeCord allows you to have different server versions inside.
+# Instead of you entering all the versions of these servers, we can ping them.
+#
+# What interval would you like us to ping at? (in seconds)
+# Use -1 to disable.
+bungee-ping-interval: 60
+# If the above is enabled, should we save the info to the config (in the section below)
+bungee-ping-save: true
+# To get a servers protocol, ViaVersion will do the following:
+# Look for the server in the following section, then look for the last ping if bungee-ping is enabled
+# otherwise use default.
+#
+# The format for the following is:
+#  servername: protocolversion
+# You can find protocol ids on http://wiki.vg/Protocol_version_numbers
+# It will fallback to the default option if none found.
+bungee-servers: {}
+#
+#----------------------------------------------------------#
+#                  GLOBAL PACKET LIMITER                   #
 #----------------------------------------------------------#
 #
 #

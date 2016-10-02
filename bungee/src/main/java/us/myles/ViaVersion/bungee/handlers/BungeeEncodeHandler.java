@@ -102,12 +102,6 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
                     storage.setCurrentServer(serverName);
 
-                    // TODO HANDLE
-                    if (!ProtocolDetectorService.hasProtocolId(serverName)) {
-                        Via.getPlatform().getLogger().severe("Could not find the protocol id for server " + serverName);
-                        return;
-                    }
-
                     int protocolId = ProtocolDetectorService.getProtocolId(serverName);
 
                     UserConnection viaConnection = Via.getManager().getConnection(player.getUniqueId());
@@ -124,7 +118,6 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                             pipeline.add(prot.getValue());
                         }
 
-
                     viaConnection.put(info);
                     viaConnection.put(storage);
 
@@ -137,7 +130,6 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
                     Object wrapper = ReflectionUtil.get(player, "ch", Object.class);
                     wrapper.getClass().getDeclaredMethod("setVersion", int.class).invoke(wrapper, protocolId);
-//                    ReflectionUtil.invoke(player, "init");
 
                     Object entityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class).invoke(null, protocolId);
                     ReflectionUtil.set(player, "entityRewrite", entityMap);

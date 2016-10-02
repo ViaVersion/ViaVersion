@@ -8,9 +8,10 @@ import us.myles.ViaVersion.util.Config;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class BukkitConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList();
+    private static List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers");
 
     public BukkitConfigAPI() {
         super(new File(((ViaVersionPlugin) Via.getPlatform()).getDataFolder(), "config.yml"));
@@ -164,6 +165,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public String getReloadDisconnectMsg() {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
+    }
+
+    @Override
+    protected void handleConfig(Map<String, Object> config) {
+        // Nothing currently
     }
 
     @Override

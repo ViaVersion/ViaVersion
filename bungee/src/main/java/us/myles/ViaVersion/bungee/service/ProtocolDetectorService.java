@@ -2,16 +2,22 @@ package us.myles.ViaVersion.bungee.service;
 
 import lombok.Getter;
 import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import us.myles.ViaVersion.BungeePlugin;
+import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.bungee.platform.BungeeConfigAPI;
+import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtocolDetectorService implements Runnable {
-    private static final Map<String, Integer> protocolIds = new ConcurrentHashMap<>();
+    private static final Map<String, Integer> detectedProtocolIds = new ConcurrentHashMap<>();
     private BungeePlugin plugin;
     @Getter
     private static ProtocolDetectorService instance;
@@ -22,13 +28,21 @@ public class ProtocolDetectorService implements Runnable {
     }
 
     public static Integer getProtocolId(String serverName) {
-        if (!hasProtocolId(serverName))
-            return -1;
-        return protocolIds.get(serverName);
-    }
-
-    public static boolean hasProtocolId(String serverName) {
-        return protocolIds.containsKey(serverName);
+        // Step 1. Check Config
+        Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
+        if (servers.containsKey(serverName)) {
+            return servers.get(serverName);
+        }
+        // Step 2. Check Detected
+        if (detectedProtocolIds.containsKey(serverName)) {
+            return detectedProtocolIds.get(serverName);
+        }
+        // Step 3. Use Default
+        if (servers.containsKey("default")) {
+            return servers.get("default");
+        }
+        // Step 4: Use bungee lowest supported... *cries*
+        return BungeeVersionProvider.getLowestSupportedVersion();
     }
 
     @Override
@@ -42,14 +56,27 @@ public class ProtocolDetectorService implements Runnable {
         value.ping(new Callback<ServerPing>() {
             @Override
             public void done(ServerPing serverPing, Throwable throwable) {
-                if (throwable == null)
-                    protocolIds.put(key, serverPing.getVersion().getProtocol());
+                if (throwable == null) {
+                    detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
+                    if (((BungeeConfigAPI) Via.getConfig()).isBungeePingSave()) {
+                        Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
+                        if (servers.containsKey(key)) {
+                            if (servers.get(key) == serverPing.getVersion().getProtocol()) {
+                                return;
+                            }
+                        }
+                        // Save Server
+                        servers.put(key, serverPing.getVersion().getProtocol());
+                        // Save
+                        Via.getPlatform().getConfigurationProvider().saveConfig();
+                    }
+                }
             }
         });
     }
 
-    public static Map<String, Integer> getProtocolIds() {
-        return new HashMap<>(protocolIds);
+    public static Map<String, Integer> getDetectedIds() {
+        return new HashMap<>(detectedProtocolIds);
     }
 
 }

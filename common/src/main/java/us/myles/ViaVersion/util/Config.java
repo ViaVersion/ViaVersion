@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.util;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
@@ -9,17 +10,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Config implements ConfigurationProvider {
     private static ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() {
         @Override
         protected Yaml initialValue() {
-            return new Yaml();
+            DumperOptions options = new DumperOptions();
+//            options.setPrettyFlow(true);
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            return new Yaml(options);
         }
     };
     private CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
-    private Map<String, Object> config;
+    private ConcurrentHashMap<String, Object> config;
 
     public Config(File configFile) {
         this.configFile = configFile;
@@ -70,11 +75,15 @@ public abstract class Config implements ConfigurationProvider {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // Call Handler
+        handleConfig(defaults);
         // Save
         saveConfig(location, defaults);
 
         return defaults;
     }
+
+    protected abstract void handleConfig(Map<String, Object> config);
 
     public void saveConfig(File location, Map<String, Object> config) {
         try {
@@ -100,12 +109,20 @@ public abstract class Config implements ConfigurationProvider {
     @Override
     public void reloadConfig() {
         this.configFile.getParentFile().mkdirs();
-        this.config = loadConfig(this.configFile);
+        this.config = new ConcurrentHashMap<>(loadConfig(this.configFile));
     }
 
     @Override
     public Map<String, Object> getValues() {
         return this.config;
+    }
+
+    public <T> T get(String key, Class<T> clazz, T def) {
+        if (this.config.containsKey(key)) {
+            return (T) this.config.get(key);
+        } else {
+            return def;
+        }
     }
 
     public boolean getBoolean(String key, boolean def) {

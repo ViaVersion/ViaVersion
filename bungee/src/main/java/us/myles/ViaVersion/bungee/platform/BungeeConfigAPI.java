@@ -1,17 +1,50 @@
 package us.myles.ViaVersion.bungee.platform;
 
 import us.myles.ViaVersion.api.ViaVersionConfig;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch");
 
     public BungeeConfigAPI(File configFile) {
         super(new File(configFile, "config.yml"));
+    }
+
+    @Override
+    protected void handleConfig(Map<String, Object> config) {
+        // Parse servers
+        Map<String, Object> servers;
+        if (!(config.get("bungee-servers") instanceof Map)) {
+            servers = new HashMap<>();
+        } else {
+            servers = (Map) config.get("bungee-servers");
+        }
+        // Convert any bad Protocol Ids
+        for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
+            if (!(entry.getValue() instanceof Integer)) {
+                if (entry.getValue() instanceof String) {
+                    ProtocolVersion found = ProtocolVersion.getClosest((String) entry.getValue());
+                    if (found != null) {
+                        servers.put(entry.getKey(), found.getId());
+                    } else {
+                        servers.remove(entry.getKey()); // Remove!
+                    }
+                } else {
+                    servers.remove(entry.getKey()); // Remove!
+                }
+            }
+        }
+        // Ensure default exists
+        if (!servers.containsKey("default")) {
+            servers.put("default", BungeeVersionProvider.getLowestSupportedVersion());
+        }
+        // Put back
+        config.put("bungee-servers", servers);
     }
 
     @Override
@@ -166,5 +199,34 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public String getReloadDisconnectMsg() {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
+    }
+
+    /**
+     * What is the interval for checking servers via ping
+     * -1 for disabled
+     *
+     * @return Ping interval in seconds
+     */
+    public int getBungeePingInterval() {
+        return getInt("bungee-ping-interval", 60);
+    }
+
+    /**
+     * Should the bungee ping be saved to the config on change.
+     *
+     * @return True if it should save
+     */
+    public boolean isBungeePingSave() {
+        return getBoolean("bungee-ping-save", true);
+    }
+
+    /**
+     * Get the listed server protocols in the config.
+     * default will be listed as default.
+     *
+     * @return Map of String, Integer
+     */
+    public Map<String, Integer> getBungeeServerProtocols() {
+        return get("bungee-servers", Map.class, new HashMap<>());
     }
 }
