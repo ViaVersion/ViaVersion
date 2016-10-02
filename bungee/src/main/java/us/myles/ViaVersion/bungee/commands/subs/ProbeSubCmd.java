@@ -1,25 +1,28 @@
 package us.myles.ViaVersion.bungee.commands.subs;
 
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
+import us.myles.ViaVersion.bungee.platform.BungeeConfigAPI;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 
-// TODO better name
-public class SearchServersSubCmd extends ViaSubCommand {
+public class ProbeSubCmd extends ViaSubCommand {
     @Override
     public String name() {
-        return "searchservers";
+        return "probe";
     }
 
     @Override
     public String description() {
-        return "Force ViaVersion to search for servers to update the version list (Also happens every minute)";
+        return "Forces ViaVersion to scan server protocol versions " +
+                (((BungeeConfigAPI) Via.getConfig()).getBungeePingInterval() == -1 ?
+                        "" : "(Also happens at an interval)");
     }
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
         ProtocolDetectorService.getInstance().run();
-        sendMessage(sender, "&6Started searching for subservers");
+        sendMessage(sender, "&6Started searching for protocol versions");
         return true;
     }
 }
