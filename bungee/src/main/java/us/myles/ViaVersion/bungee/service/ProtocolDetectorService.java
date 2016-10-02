@@ -6,6 +6,7 @@ import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import us.myles.ViaVersion.BungeePlugin;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,6 +46,10 @@ public class ProtocolDetectorService implements Runnable {
                     protocolIds.put(key, serverPing.getVersion().getProtocol());
             }
         });
+    }
+
+    public static Map<String, Integer> getProtocolIds() {
+        return new HashMap<>(protocolIds);
     }
 
 }
