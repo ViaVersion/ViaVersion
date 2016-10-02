@@ -12,7 +12,6 @@ import net.md_5.bungee.event.EventHandler;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -83,7 +82,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public TaskId runSync(Runnable runnable) {
-        return new BungeeTaskId(getProxy().getScheduler().runAsync(this, runnable).getId());
+        return runAsync(runnable);
     }
 
     @Override
@@ -112,13 +111,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        getProxy().getPlayer(uuid).sendMessage(new TextComponent(message));
+        getProxy().getPlayer(uuid).sendMessage(TextComponent.fromLegacyText(message));
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         if (getProxy().getPlayer(uuid) != null) {
-            getProxy().getPlayer(uuid).disconnect(new TextComponent(message));
+            getProxy().getPlayer(uuid).disconnect(TextComponent.fromLegacyText(message));
             return true;
         }
         return false;
