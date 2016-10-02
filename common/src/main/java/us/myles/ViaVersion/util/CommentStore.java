@@ -63,8 +63,12 @@ public class CommentStore {
 
     public void storeComments(InputStream inputStream) throws IOException {
         InputStreamReader reader = new InputStreamReader(inputStream);
-        String contents = CharStreams.toString(reader);
-
+        String contents;
+        try {
+            contents = CharStreams.toString(reader);
+        } finally {
+            reader.close();
+        }
         StringBuilder memoryData = new StringBuilder();
         // Parse headers
         final String pathSeparator = Character.toString(this.pathSeperator);

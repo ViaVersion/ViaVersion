@@ -2,6 +2,7 @@ package us.myles.ViaVersion.util;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.representer.Representer;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
 import java.io.*;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public abstract class Config implements ConfigurationProvider {
     private static ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() {
@@ -18,12 +19,14 @@ public abstract class Config implements ConfigurationProvider {
         protected Yaml initialValue() {
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-            return new Yaml(options);
+            options.setPrettyFlow(false);
+            options.setIndent(2);
+            return new Yaml(new YamlConstructor(), new Representer(), options);
         }
     };
     private CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
-    private ConcurrentHashMap<String, Object> config;
+    private ConcurrentSkipListMap<String, Object> config;
 
     public Config(File configFile) {
         this.configFile = configFile;
@@ -108,7 +111,7 @@ public abstract class Config implements ConfigurationProvider {
     @Override
     public void reloadConfig() {
         this.configFile.getParentFile().mkdirs();
-        this.config = new ConcurrentHashMap<>(loadConfig(this.configFile));
+        this.config = new ConcurrentSkipListMap<>(loadConfig(this.configFile));
     }
 
     @Override
