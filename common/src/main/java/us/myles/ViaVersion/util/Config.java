@@ -88,7 +88,7 @@ public abstract class Config implements ConfigurationProvider {
 
     @Override
     public void set(String path, Object value) {
-        set(path, value);
+        config.put(path, value);
     }
 
     @Override
