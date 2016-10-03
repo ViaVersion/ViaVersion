@@ -13,7 +13,12 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.sponge.listeners.ClientLeaveListener;
 import us.myles.ViaVersion.sponge.listeners.UpdateListener;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.*;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.BlockListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.CommandBlockListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.DeathListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.HandItemCache;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
 import us.myles.ViaVersion.sponge.providers.SpongeViaBulkChunkTranslator;
 import us.myles.ViaVersion.sponge.providers.SpongeViaMovementTransmitter;
 
@@ -28,7 +33,12 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         /* Base Protocol */
         Sponge.getEventManager().registerListeners(plugin, new ClientLeaveListener());
         /* 1.9 client to 1.8 server */
-        new ArmorListener(plugin).register();
+        try {
+            Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
+            new Sponge4ArmorListener().register();
+        } catch (ClassNotFoundException e) {
+            new Sponge5ArmorListener(plugin).register();
+        }
         new CommandBlockListener(plugin).register();
         new DeathListener(plugin).register();
         new BlockListener(plugin).register();

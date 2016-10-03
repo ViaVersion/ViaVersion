@@ -1,5 +1,6 @@
-package us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8;
+package us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge4;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
@@ -10,22 +11,24 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
-import us.myles.ViaVersion.SpongePlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.ViaListener;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
-import us.myles.ViaVersion.sponge.listeners.ViaSpongeListener;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ArmorListener extends ViaSpongeListener {
+public class Sponge4ArmorListener extends ViaListener{
+    private static Field entityIdField;
+
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
 
-    public ArmorListener(SpongePlugin plugin) {
-        super(plugin, Protocol1_9TO1_8.class);
+    public Sponge4ArmorListener() {
+        super(Protocol1_9TO1_8.class);
     }
 
     //
@@ -109,5 +112,30 @@ public class ArmorListener extends ViaSpongeListener {
                 sendArmorUpdate(player);
             }
         });
+    }
+
+    @Override
+    public void register() {
+        if (isRegistered()) return;
+
+        Sponge.getEventManager().registerListeners(Via.getPlatform(), this);
+        setRegistered(true);
+    }
+
+    protected int getEntityId(Player p) {
+        try {
+            if (entityIdField == null) {
+                entityIdField = p.getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredField("field_145783_c");
+                entityIdField.setAccessible(true);
+            }
+
+            return entityIdField.getInt(p);
+        } catch (Exception e) {
+            Via.getPlatform().getLogger().severe("Could not get the entity id, please report this on our Github");
+            e.printStackTrace();
+        }
+
+        Via.getPlatform().getLogger().severe("Could not get the entity id, please report this on our Github");
+        return -1;
     }
 }

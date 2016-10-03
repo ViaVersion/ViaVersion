@@ -9,7 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>viaversion-sponge</artifactId>
+    <artifactId>viaversion-sponge-legacy</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -60,20 +61,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Sponge API 5 -->
+        <!-- Sponge API API 4 -->
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>5.0.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- Legacy Support -->
-        <dependency>
-            <groupId>us.myles</groupId>
-            <artifactId>viaversion-sponge-legacy</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

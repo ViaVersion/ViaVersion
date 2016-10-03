@@ -4,6 +4,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ItemGrabber;
+import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ItemGrabber;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +20,16 @@ public class HandItemCache implements Runnable {
     private static ConcurrentHashMap<UUID, Item> handCache = new ConcurrentHashMap<>();
     private static Field GET_DAMAGE;
     private static Method GET_ID;
+    private static ItemGrabber grabber;
+
+    static {
+        try {
+            Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
+            grabber = new Sponge4ItemGrabber();
+        } catch (ClassNotFoundException e) {
+            grabber = new Sponge5ItemGrabber();
+        }
+    }
 
     public static Item getHandItem(UUID player) {
         if (!handCache.containsKey(player))
@@ -30,7 +42,7 @@ public class HandItemCache implements Runnable {
         List<UUID> players = new ArrayList<>(handCache.keySet());
 
         for (Player p : Sponge.getServer().getOnlinePlayers()) {
-            handCache.put(p.getUniqueId(), convert(p.getItemInHand().orElse(null)));
+            handCache.put(p.getUniqueId(), convert(grabber.getItem(p)));
             players.remove(p.getUniqueId());
         }
         // Remove offline players
