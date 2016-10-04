@@ -1,0 +1,4 @@
+name: ViaVersion
+main: us.myles.ViaVersion.BungeePlugin
+author: _MylesC, Matsv
+version: ${project.version}

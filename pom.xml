@@ -5,14 +5,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>us.myles</groupId>
-    <artifactId>viaversion</artifactId>
-    <version>1.0.0-ALPHA-16w39c</version>
-    <packaging>jar</packaging>
+    <artifactId>viaversion-parent</artifactId>
+    <version>1.0.0-ALPHA-modules</version>
+    <packaging>pom</packaging>
 
-    <name>ViaVersion</name>
+    <name>viaversion-parent</name>
+
     <description>Allow newer clients to join older server versions.</description>
     <inceptionYear>2016</inceptionYear>
     <url>https://www.spigotmc.org/resources/viaversion.19254/</url>
+
+    <modules>
+        <module>common</module>
+        <module>bukkit</module>
+        <module>bungee</module>
+        <module>sponge</module>
+        <module>jar</module>
+        <module>sponge-legacy</module>
+    </modules>
 
     <prerequisites>
         <maven>3.3.3</maven>
@@ -23,106 +33,9 @@
         <projectEncoding>UTF-8</projectEncoding>
         <project.build.sourceEncoding>${projectEncoding}</project.build.sourceEncoding>
         <project.build.outputEncoding>${projectEncoding}</project.build.outputEncoding>
-        <jdkVersion>1.7</jdkVersion>
-        <!-- <testJreVersion>1.7</testJreVersion> -->
-
-        <!-- Change Bukkit Version HERE! -->
-        <bukkitVersion>1.8.8-R0.1-SNAPSHOT</bukkitVersion>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
-
-    <build>
-        <finalName>${project.name}-${project.version}</finalName>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <defaultGoal>clean install</defaultGoal>
-        <!-- <testSourceDirectory>src/test/java</testSourceDirectory> -->
-
-        <resources>
-            <resource>
-                <targetPath>.</targetPath>
-                <filtering>false</filtering>
-                <directory>.</directory>
-                <includes>
-                    <include>LICENSE</include>
-                </includes>
-            </resource>
-            <resource>
-                <targetPath>.</targetPath>
-                <filtering>true</filtering>
-                <directory>src/main/resources/</directory>
-                <includes>
-                    <include>*</include>
-                </includes>
-            </resource>
-        </resources>
-        <!--
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-        -->
-
-        <plugins>
-            <!-- Maven Java Compiler -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <source>${jdkVersion}</source>
-                    <target>${jdkVersion}</target>
-                    <!--
-                    <testSource>${testJreVersion}</testSource>
-                    <testTarget>${testJreVersion}</testTarget>
-                    -->
-                </configuration>
-            </plugin>
-            <!-- Unit Test Plugin
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
-                <configuration>
-                    <argLine>-Dfile.encoding=${projectEncoding} ${argLine}</argLine>
-                </configuration>
-            </plugin>
-			-->
-            <!-- Libs Shading and Relocation -->
-            <plugin>
-                <!--Relocate all lib we use in order to fix class loading errors if we use different versions
-                than already loaded libs (i.e. by Mojang -> gson)-->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
-                <configuration>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <minimizeJar>false</minimizeJar>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.spacehq.opennbt</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>com.google.gson</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.gson</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.javassist</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
     <repositories>
         <!-- SpigotMC Repo (Bukkit API) -->
@@ -145,29 +58,13 @@
     </repositories>
 
     <dependencies>
-        <!-- Bukkit API, http://www.spigotmc.org/ or http://bukkit.org/ -->
+        <!-- Lombok -->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkitVersion}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.6</version>
             <scope>provided</scope>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <artifactId>junit</artifactId>
-                    <groupId>junit</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>gson</artifactId>
-                    <groupId>com.google.code.gson</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>persistence-api</artifactId>
-                    <groupId>javax.persistence</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
-
         <!-- Javassist (Bytecode Library) -->
         <dependency>
             <groupId>org.javassist</groupId>
@@ -204,20 +101,20 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--Bungeecord-->
+        <!-- ChatColour API -->
         <dependency>
             <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.9-SNAPSHOT</version>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.10-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Guava magic -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>17.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>

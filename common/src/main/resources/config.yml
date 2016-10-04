@@ -1,0 +1,117 @@
+# Thanks for downloading ViaVersion
+# Ensure you look through all these options
+# If you need help:
+# viaversion.com - Discussion tab
+# IRC - https://elmer.spi.gt/iris/?nick=&channels=viaversion #viaversion on irc.spi.gt
+# Docs - https://docs.viaversion.com/display/VIAVERSION/Configuration
+#
+#----------------------------------------------------------#
+#                     GLOBAL OPTIONS                       #
+#----------------------------------------------------------#
+#
+# Should ViaVersion check for updates?
+checkforupdates: true
+# Send the supported versions with the Status (Ping) response packet
+send-supported-versions: false
+# Block specific Minecraft protocols that ViaVersion allows
+# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers
+block-protocols: []
+# Change the blocked disconnect message
+block-disconnect-msg: "You are using an unsupported Minecraft version!"
+# If you use ProtocolLib, we can't reload without kicking the players.
+# (We don't suggest using reload either, use a plugin manager)
+# You can customise the message we kick people with if you use ProtocolLib here.
+reload-disconnect-msg: "Server reload, please rejoin!"
+#
+#----------------------------------------------------------#
+#                     BUNGEE OPTIONS                       #
+#----------------------------------------------------------#
+#
+# BungeeCord allows you to have different server versions inside.
+# Instead of you entering all the versions of these servers, we can ping them.
+#
+# What interval would you like us to ping at? (in seconds)
+# Use -1 to disable.
+bungee-ping-interval: 60
+# If the above is enabled, should we save the info to the config (in the section below)
+bungee-ping-save: true
+# To get a servers protocol, ViaVersion will do the following:
+# Look for the server in the following section, then look for the last ping if bungee-ping is enabled
+# otherwise use default.
+#
+# The format for the following is:
+#  servername: protocolversion
+# You can find protocol ids on http://wiki.vg/Protocol_version_numbers
+# It will fallback to the default option if none found.
+bungee-servers: {}
+#
+#----------------------------------------------------------#
+#                  GLOBAL PACKET LIMITER                   #
+#----------------------------------------------------------#
+#
+#
+# Packets Per Second (PPS) limiter (Use -1 on max-pps and tracking-period to disable)
+# Clients by default send around 20-90 packets per second.
+#
+# What is the maximum per second a client can send (Use %pps to display their pps)
+# Use -1 to disable.
+max-pps: 800
+max-pps-kick-msg: "You are sending too many packets!"
+#
+# We can also kick them if over a period they send over a threshold a certain amount of times.
+#
+# Period to track (in seconds)
+# Use -1 to disable.
+tracking-period: 6
+# How many packets per second counts as a warning
+tracking-warning-pps: 120
+# How many warnings over the interval can we have
+# This can never be higher than "tracking-period"
+tracking-max-warnings: 4
+tracking-max-kick-msg: "You are sending too many packets, :("
+#
+#----------------------------------------------------------#
+#                 MULTIPLE VERSIONS OPTIONS                #
+#----------------------------------------------------------#
+#
+# Should we enable our hologram patch?
+# If they're in the wrong place enable this
+hologram-patch: false
+# This is the offset, should work as default when enabled.
+hologram-y: -0.96
+#
+#----------------------------------------------------------#
+#         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #
+#----------------------------------------------------------#
+#
+# No collide options, these allow you to configure how collision works.
+# Do you want us to prevent collision?
+prevent-collision: true
+# If the above is true, should we automatically team players until you do?
+auto-team: true
+# When enabled if certain metadata can't be read we won't tell you about it
+suppress-metadata-errors: false
+# When enabled 1.9 & 1.10 will be able to block by using shields
+shield-blocking: true
+# Enable player tick simulation, this fixes eating, drinking, nether portals.
+simulate-pt: true
+# Should we use nms player to simulate packets, (may fix anti-cheat issues)
+nms-player-ticking: true
+# Should we patch boss bars so they work? (Default: true, disable if you're having issues)
+bossbar-patch: true
+# If your boss bar flickers on 1.9 & 1.10, set this to 'true'. It will keep all boss bars on 100% (not recommended)
+bossbar-anti-flicker: false
+# This will show the new effect indicator in the top-right corner for 1.9 & 1.10 players.
+use-new-effect-indicator: true
+# Show the new death messages for 1.9 & 1.10 on the death screen
+use-new-deathmessages: true
+# Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
+item-cache: true
+# Patch the Anti xray to work on 1.9 & 1.10 (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
+anti-xray-patch: true
+# Should we replace extended pistons to fix 1.10.1 (Only on chunk load)
+replace-pistons: false
+# What id should we replace with, default is air. (careful of players getting stuck standing on them)
+replacement-piston-id: 0
+# Force the string -> json transform
+force-json-transform: false
