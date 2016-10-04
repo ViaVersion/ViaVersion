@@ -90,6 +90,32 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
             }
         });
 
+        // Sound effect
+        registerOutgoing(State.PLAY, 0x46, 0x46, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Sound name
+                map(Type.VAR_INT); // 1 - Sound Category
+                map(Type.INT); // 2 - x
+                map(Type.INT); // 3 - y
+                map(Type.INT); // 4 - z
+                map(Type.FLOAT); // 5 - Volume
+                map(Type.FLOAT); // 6 - Pitch
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.VAR_INT, 0);
+                        id = getNewSoundId(id);
+
+                        if (id == -1) // Removed
+                            wrapper.cancel();
+                        wrapper.set(Type.VAR_INT, 0, id);
+                    }
+                });
+            }
+        });
+
         // Collect item packet
         registerOutgoing(State.PLAY, 0x48, 0x48, new PacketRemapper() {
             @Override
@@ -190,6 +216,31 @@ public class ProtocolSnapshotTo1_10 extends Protocol {
             }
         });
     }
+
+    private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
+        if (id == 196) // Experience orb sound got removed
+            return -1;
+
+        int newId = id;
+        if (id >= 85) // Hello shulker boxes
+            newId += 2;
+        if (id >= 194) // Hello evocation things
+            newId += 8;
+        if (id >= 196) // Rip the Experience orb touch sound :'(
+            newId -= 1;
+        if (id >= 269) // Hello Liama's
+            newId += 8;
+        if (id >= 370) // Hello Vex
+            newId += 4;
+        if (id >= 376) // Hello vindication
+            newId += 3;
+        if (id >= 427) // Hello empty bottle
+            newId += 1;
+        if (id > 441) // Hello item totem use
+            newId += 1;
+        return newId;
+    }
+
 
     @Override
     public void init(UserConnection userConnection) {
