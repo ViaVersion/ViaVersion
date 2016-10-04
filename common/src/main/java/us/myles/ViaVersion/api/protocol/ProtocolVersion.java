@@ -27,7 +27,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_9_2;
     public static final ProtocolVersion v1_9_3;
     public static final ProtocolVersion v1_10;
-    public static final ProtocolVersion vSNAPSHOT;
+    public static final ProtocolVersion v1_11;
     public static final ProtocolVersion unknown;
 
     private final int id;
@@ -52,7 +52,7 @@ public class ProtocolVersion {
         register(v1_9_3 = new ProtocolVersion(110, "1.9.3/4"));
         register(v1_10 = new ProtocolVersion(210, "1.10"));
         // Snapshot uses colon as dashes are used other places...
-        register(vSNAPSHOT = new ProtocolVersion(309, "1.11:SNAPSHOT"));
+        register(v1_11 = new ProtocolVersion(309, "1.11:SNAPSHOT")); // TODO change to the full version
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 

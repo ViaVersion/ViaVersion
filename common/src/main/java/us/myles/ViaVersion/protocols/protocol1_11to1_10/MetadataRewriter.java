@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
+package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -8,7 +8,7 @@ import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,7 +184,7 @@ public class MetadataRewriter {
                                     wrapper.write(Type.SHORT, (short) 0);
                                     wrapper.write(Type.BOOLEAN, true);
 
-                                    wrapper.send(ProtocolSnapshotTo1_10.class);
+                                    wrapper.send(Protocol1_11To1_10.class);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

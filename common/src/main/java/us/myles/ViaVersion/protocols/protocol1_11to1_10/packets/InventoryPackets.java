@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_10.packets;
+package us.myles.ViaVersion.protocols.protocol1_11to1_10.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -6,11 +6,11 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.ProtocolSnapshotTo1_10;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.ItemRewriter;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 
 public class InventoryPackets {
-    public static void register(ProtocolSnapshotTo1_10 protocol) {
+    public static void register(Protocol1_11To1_10 protocol) {
         /*
             Incoming packets
          */

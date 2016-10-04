@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_10;
+package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -13,10 +13,10 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_10.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
 
-public class ProtocolSnapshotTo1_10 extends Protocol {
+public class Protocol1_11To1_10 extends Protocol {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
         @Override
         public Short transform(PacketWrapper wrapper, Float inputValue) throws Exception {

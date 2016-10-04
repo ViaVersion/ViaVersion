@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_10.storage;
+package us.myles.ViaVersion.protocols.protocol1_11to1_10.storage;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
