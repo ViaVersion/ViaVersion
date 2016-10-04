@@ -19,14 +19,14 @@ public interface ViaVersionConfig {
     boolean isPreventCollision();
 
     /**
-     * Get if 1.9 & 1.10 clients are shown the new effect indicator in the top-right corner
+     * Get if 1.9 &amp; 1.10 clients are shown the new effect indicator in the top-right corner
      *
      * @return true if the using of the new effect indicator is enabled
      */
     boolean isNewEffectIndicator();
 
     /**
-     * Get if 1.9 & 1.10 clients are shown the new death message on the death screen
+     * Get if 1.9 &amp; 1.10 clients are shown the new death message on the death screen
      *
      * @return true if enabled
      */
@@ -40,28 +40,28 @@ public interface ViaVersionConfig {
     boolean isSuppressMetadataErrors();
 
     /**
-     * Get if blocking in 1.9 & 1.10 appears as a player holding a shield
+     * Get if blocking in 1.9 &amp; 1.10 appears as a player holding a shield
      *
      * @return true if shield blocking is enabled
      */
     boolean isShieldBlocking();
 
     /**
-     * Get if armor stand positions are fixed so holograms show up at the correct height in 1.9 & 1.10
+     * Get if armor stand positions are fixed so holograms show up at the correct height in 1.9 &amp; 1.10
      *
      * @return true if hologram patching is enabled
      */
     boolean isHologramPatch();
 
     /**
-     * Get if boss bars are fixed for 1.9 & 1.10 clients
+     * Get if boss bars are fixed for 1.9 &amp; 1.10 clients
      *
      * @return true if boss bar patching is enabled
      */
     boolean isBossbarPatch();
 
     /**
-     * Get if the boss bars for 1.9 & 1.10 clients are being stopped from flickering
+     * Get if the boss bars for 1.9 &amp; 1.10 clients are being stopped from flickering
      * This will keep all boss bars on 100% (not recommended)
      *
      * @return true if boss bar anti flickering is enabled
@@ -108,7 +108,7 @@ public interface ViaVersionConfig {
     /**
      * Get the kick message sent if the user hits the max packets per second.
      *
-     * @return Kick message, with colour codes using '&amp;'
+     * @return Kick message, with colour codes using '&amp;amp;'
      */
     String getMaxPPSKickMessage();
 
@@ -136,7 +136,7 @@ public interface ViaVersionConfig {
     /**
      * Get the kick message sent if the user goes over the warnings in the interval
      *
-     * @return Kick message, with colour codes using '&amp;'
+     * @return Kick message, with colour codes using '&amp;amp;'
      */
     String getMaxWarningsKickMessage();
 

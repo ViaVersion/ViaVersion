@@ -25,7 +25,7 @@ public interface ConfigurationProvider {
     /**
      * Get all the configuration values
      *
-     * @return Map with key->values
+     * @return Map with key-values
      */
     Map<String, Object> getValues();
 }
