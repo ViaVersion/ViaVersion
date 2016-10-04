@@ -20,8 +20,8 @@
         <module>bukkit</module>
         <module>bungee</module>
         <module>sponge</module>
-        <module>jar</module>
         <module>sponge-legacy</module>
+        <module>jar</module>
     </modules>
 
     <prerequisites>
