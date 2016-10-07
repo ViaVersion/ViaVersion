@@ -158,16 +158,17 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
 
     public int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
         int newId = id;
-        if (id >= 24) //Blame the enchantment table sound
-            newId += 1;
-        if (id >= 248) //Blame the husk
+        // sound mappings need to go in reverse so the new values don't jump into the next section
+        if (id >= 372) //Blame the wither skeleton
+            newId += 4;
+        if (id >= 354) //Blame the stray
             newId += 4;
         if (id >= 296) //Blame the polar bear
             newId += 6;
-        if (id >= 354) //Blame the stray
+        if (id >= 248) //Blame the husk
             newId += 4;
-        if (id >= 372) //Blame the wither skeleton
-            newId += 4;
+        if (id >= 24) //Blame the enchantment table sound
+            newId += 1;
         return newId;
     }
 
