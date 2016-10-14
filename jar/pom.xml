@@ -47,15 +47,15 @@
                     <relocations>
                         <relocation>
                             <pattern>org.spacehq.opennbt</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>
+                            <shadedPattern>us.myles.ViaVersion.libs.opennbt</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.google.gson</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.gson</shadedPattern>
+                            <shadedPattern>us.myles.ViaVersion.libs.gson</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.javassist</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
+                            <shadedPattern>us.myles.ViaVersion.libs.javassist</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
