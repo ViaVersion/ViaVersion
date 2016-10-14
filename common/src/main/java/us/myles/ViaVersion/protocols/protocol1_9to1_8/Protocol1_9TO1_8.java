@@ -8,12 +8,10 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
 import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
@@ -81,15 +79,6 @@ public class Protocol1_9TO1_8 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // Disconnect workaround (JSON!)
-        registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Reason
-            }
-        });
-
-        // Other Handlers
         SpawnPackets.register(this);
         InventoryPackets.register(this);
         EntityPackets.register(this);
