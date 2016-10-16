@@ -28,7 +28,6 @@ import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,10 +38,25 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
+    private static Method getPendingConnection;
+    private static Method getHandshake;
+    private static Method setProtocol;
 
     private BungeeViaAPI api;
     private BungeeConfigAPI config;
     private BungeeCommandHandler commandHandler;
+
+    static {
+        try {
+            getPendingConnection = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getPendingConnection");
+            getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
+            setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onLoad() {
@@ -179,13 +193,11 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
         // Check if ViaVersion can support that version
         try {
-            Object pendingConnection = ReflectionUtil.invoke(e.getPlayer(), "getPendingConnection");
-            Object handshake = ReflectionUtil.invoke(pendingConnection, "getHandshake");
-            Method setProtocol = handshake.getClass().getDeclaredMethod("setProtocolVersion", int.class);
+            Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
+            Object handshake = getHandshake.invoke(pendingConnection);
             setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
-        } catch (NoSuchMethodException | InvocationTargetException e1) {
+        } catch (InvocationTargetException e1) {
             e1.printStackTrace();
         }
     }
-
 }

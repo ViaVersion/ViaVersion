@@ -2,17 +2,14 @@ package us.myles.ViaVersion.bungee.service;
 
 import lombok.Getter;
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import us.myles.ViaVersion.BungeePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.bungee.platform.BungeeConfigAPI;
 import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
