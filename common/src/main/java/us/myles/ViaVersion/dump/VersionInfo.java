@@ -11,7 +11,7 @@ public class VersionInfo {
     private String javaVersion;
     private String operatingSystem;
     private int serverProtocol;
-    private Set<Integer> enabledPipelines;
+    private Set<Integer> enabledProtocols;
     private String platformName;
     private String platformVersion;
 }
