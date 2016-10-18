@@ -3,12 +3,16 @@ package us.myles.ViaVersion.bukkit.classgenerator;
 import javassist.*;
 import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
+
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler;
 import us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
+import us.myles.ViaVersion.handlers.ViaHandler;
 
 public class ClassGenerator {
     private static HandlerConstructor constructor = new BasicHandlerConstructor();
@@ -124,16 +128,25 @@ public class ClassGenerator {
                 if (superclass.getName().endsWith("Decoder")) {
                     // Decoder
                     generated.addMethod(CtMethod.make("public void setRealDecoder(IPacketDecoder dec) {\n" +
-                            "        WrappedDecoder decoder = new WrappedDecoder();" +
-                            "        decoder.setRealDecoder(dec);\n" +
-                            "        this.minecraftDecoder = decoder;\n" +
+                            "        ((WrappedDecoder) this.minecraftDecoder).setRealDecoder(dec);\n" +
                             "    }", generated));
                 } else {
                     // Encoder
+                    pool.importPackage("protocolsupport.api");
+                    pool.importPackage("java.lang.reflect");
                     generated.addMethod(CtMethod.make("public void setRealEncoder(IPacketEncoder enc) {\n" +
-                            "        WrappedEncoder encoder = new WrappedEncoder();" +
-                            "        encoder.setRealEncoder(enc);\n" +
-                            "        this.minecraftEncoder = encoder;\n" +
+                            "         try {\n" +
+                                          // Tell ProtocolSupport to decode MINECRAFT_FUTURE packets using the default decoder (for 1.9.4)
+                            "             Field field = enc.getClass().getDeclaredField(\"version\");\n" +
+                            "             field.setAccessible(true);\n" +
+                            "             ProtocolVersion version = (ProtocolVersion) field.get(enc);\n" +
+
+                            "             if (version == ProtocolVersion.MINECRAFT_FUTURE) enc = enc.getClass().getConstructor(\n" +
+                            "                 new Class[]{ProtocolVersion.class}).newInstance(new Object[] {ProtocolVersion.getLatest()});\n" +
+                            "         } catch (Exception e) {\n" +
+                                          // I guess we're not on 1.9.4
+                            "         }\n" +
+                            "        ((WrappedEncoder) this.minecraftEncoder).setRealEncoder(enc);\n" +
                             "    }", generated));
                 }
             }
