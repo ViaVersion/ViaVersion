@@ -58,7 +58,7 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
 
     public void transform(ByteBuf bytebuf) throws Exception {
         if (bytebuf.readableBytes() == 0) {
-            throw new CancelException();
+            return; // Someone Already Decoded It!
         }
         // Increment sent
         info.incrementSent();
