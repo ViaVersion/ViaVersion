@@ -20,8 +20,9 @@ import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
-import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 @ChannelHandler.Sharable
@@ -128,13 +129,34 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                         protocol.init(viaConnection);
                     }
 
-                    Object wrapper = ReflectionUtil.get(player, "ch", Object.class);
-                    wrapper.getClass().getDeclaredMethod("setVersion", int.class).invoke(wrapper, protocolId);
+                    Object wrapper = channelWrapper.get(player);
+                    setVersion.invoke(wrapper, protocolId);
 
-                    Object entityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class).invoke(null, protocolId);
-                    ReflectionUtil.set(player, "entityRewrite", entityMap);
+                    Object entityMap = getEntityMap.invoke(null, protocolId);
+                    entityRewrite.set(player, entityMap);
                 }
             }
+        }
+    }
+    private static Method getEntityMap = null;
+    private static Method setVersion = null;
+    private static Field entityRewrite = null;
+    private static Field channelWrapper = null;
+
+    static {
+        try {
+            getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
+            setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
+            channelWrapper = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("ch");
+            channelWrapper.setAccessible(true);
+            entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
+            entityRewrite.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
         }
     }
 }

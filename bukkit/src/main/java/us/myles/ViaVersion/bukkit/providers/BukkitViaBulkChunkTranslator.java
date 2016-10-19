@@ -43,11 +43,11 @@ public class BukkitViaBulkChunkTranslator extends BulkChunkTranslatorProvider {
             if (Via.getConfig().isAntiXRay() && ((ViaVersionPlugin) Via.getPlatform()).isSpigot()) { //Spigot anti-xray patch
                 try {
                     Object world = mapChunkBulkRef.getFieldValue("world", packet, Object.class);
+                    Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
+                    Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
 
                     for (int i = 0; i < xcoords.length; ++i) {
-                        Object spigotConfig = ReflectionUtil.getPublic(world, "spigotConfig", Object.class);
-                        Object antiXrayInstance = ReflectionUtil.getPublic(spigotConfig, "antiXrayInstance", Object.class);
-
+                        // TODO: Possibly optimise this
                         Object b = ReflectionUtil.get(chunkMaps[i], "b", Object.class);
                         Object a = ReflectionUtil.get(chunkMaps[i], "a", Object.class);
 
