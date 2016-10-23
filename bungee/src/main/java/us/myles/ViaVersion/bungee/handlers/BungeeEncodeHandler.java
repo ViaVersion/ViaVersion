@@ -110,14 +110,16 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
                     ProtocolPipeline pipeline = viaConnection.get(ProtocolInfo.class).getPipeline();
-
                     viaConnection.clearStoredObjects();
                     pipeline.cleanPipes();
-
-                    if (protocols != null)
+                    if (protocols == null) {
+                        // TODO Check Bungee Supported Protocols? *shrugs*
+                        protocolId = info.getProtocolVersion();
+                    } else {
                         for (Pair<Integer, Protocol> prot : protocols) {
                             pipeline.add(prot.getValue());
                         }
+                    }
 
                     viaConnection.put(info);
                     viaConnection.put(storage);
@@ -138,6 +140,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             }
         }
     }
+
     private static Method getEntityMap = null;
     private static Method setVersion = null;
     private static Field entityRewrite = null;
