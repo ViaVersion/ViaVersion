@@ -19,7 +19,7 @@ public class BungeeCommandSender implements ViaCommandSender {
 
     @Override
     public void sendMessage(String msg) {
-        sender.sendMessage(new TextComponent(msg));
+        sender.sendMessage(TextComponent.fromLegacyText(msg));
     }
 
     @Override
