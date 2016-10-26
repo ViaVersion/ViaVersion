@@ -71,7 +71,22 @@ public class SpongeViaInjector implements ViaInjector {
 
     private void injectChannelFuture(ChannelFuture future) throws Exception {
         try {
-            ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
+            List<String> names = future.channel().pipeline().names();
+            ChannelHandler bootstrapAcceptor = null;
+            // Pick best
+            for (String name : names) {
+                ChannelHandler handler = future.channel().pipeline().get(name);
+                try {
+                    ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
+                    bootstrapAcceptor = handler;
+                } catch (Exception e) {
+                    // Not this one
+                }
+            }
+            // Default to first (Also allows blame to work)
+            if (bootstrapAcceptor == null) {
+                bootstrapAcceptor = future.channel().pipeline().first();
+            }
             try {
                 ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
                 ChannelInitializer newInit = new SpongeChannelInitializer(oldInit);
