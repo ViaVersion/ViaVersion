@@ -3,16 +3,12 @@ package us.myles.ViaVersion.bukkit.classgenerator;
 import javassist.*;
 import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
-
-import java.lang.reflect.InvocationTargetException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler;
 import us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
-import us.myles.ViaVersion.handlers.ViaHandler;
 
 public class ClassGenerator {
     private static HandlerConstructor constructor = new BasicHandlerConstructor();
@@ -37,8 +33,8 @@ public class ClassGenerator {
                     addSpigotCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
                     addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 } else {
-                    Class decodeSuper = Class.forName(getPSPackage() + ".wrapped.WrappedDecoder");
-                    Class encodeSuper = Class.forName(getPSPackage() + ".wrapped.WrappedEncoder");
+                    Class decodeSuper = Class.forName(getPSPackage().equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketDecoder" : getPSPackage() + ".wrapped.WrappedDecoder");
+                    Class encodeSuper = Class.forName(getPSPackage().equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketEncoder" : getPSPackage() + ".wrapped.WrappedEncoder");
                     // Generate the classes
                     addPSCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
                     addPSCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
@@ -114,6 +110,7 @@ public class ClassGenerator {
     }
 
     private static Class addPSCompatibility(ClassPool pool, Class input, Class superclass) {
+        boolean newPS = getPSPackage().equals("unknown");
         String newName = "us.myles.ViaVersion.classgenerator.generated." + input.getSimpleName();
 
         try {
@@ -122,32 +119,34 @@ public class ClassGenerator {
                 CtClass toExtend = pool.get(superclass.getName());
                 generated.setSuperclass(toExtend);
 
-                // Override setRealEncoder / setRealDecoder
-                pool.importPackage(getPSPackage());
-                pool.importPackage(getPSPackage() + ".wrapped");
-                if (superclass.getName().endsWith("Decoder")) {
-                    // Decoder
-                    generated.addMethod(CtMethod.make("public void setRealDecoder(IPacketDecoder dec) {\n" +
-                            "        ((WrappedDecoder) this.minecraftDecoder).setRealDecoder(dec);\n" +
-                            "    }", generated));
-                } else {
-                    // Encoder
-                    pool.importPackage("protocolsupport.api");
-                    pool.importPackage("java.lang.reflect");
-                    generated.addMethod(CtMethod.make("public void setRealEncoder(IPacketEncoder enc) {\n" +
-                            "         try {\n" +
-                                          // Tell ProtocolSupport to decode MINECRAFT_FUTURE packets using the default decoder (for 1.9.4)
-                            "             Field field = enc.getClass().getDeclaredField(\"version\");\n" +
-                            "             field.setAccessible(true);\n" +
-                            "             ProtocolVersion version = (ProtocolVersion) field.get(enc);\n" +
+                if (!newPS) {
+                    // Override setRealEncoder / setRealDecoder
+                    pool.importPackage(getPSPackage());
+                    pool.importPackage(getPSPackage() + ".wrapped");
+                    if (superclass.getName().endsWith("Decoder")) {
+                        // Decoder
+                        generated.addMethod(CtMethod.make("public void setRealDecoder(IPacketDecoder dec) {\n" +
+                                "        ((WrappedDecoder) this.minecraftDecoder).setRealDecoder(dec);\n" +
+                                "    }", generated));
+                    } else {
+                        // Encoder
+                        pool.importPackage("protocolsupport.api");
+                        pool.importPackage("java.lang.reflect");
+                        generated.addMethod(CtMethod.make("public void setRealEncoder(IPacketEncoder enc) {\n" +
+                                "         try {\n" +
+                                // Tell ProtocolSupport to decode MINECRAFT_FUTURE packets using the default decoder (for 1.9.4)
+                                "             Field field = enc.getClass().getDeclaredField(\"version\");\n" +
+                                "             field.setAccessible(true);\n" +
+                                "             ProtocolVersion version = (ProtocolVersion) field.get(enc);\n" +
 
-                            "             if (version == ProtocolVersion.MINECRAFT_FUTURE) enc = enc.getClass().getConstructor(\n" +
-                            "                 new Class[]{ProtocolVersion.class}).newInstance(new Object[] {ProtocolVersion.getLatest()});\n" +
-                            "         } catch (Exception e) {\n" +
-                                          // I guess we're not on 1.9.4
-                            "         }\n" +
-                            "        ((WrappedEncoder) this.minecraftEncoder).setRealEncoder(enc);\n" +
-                            "    }", generated));
+                                "             if (version == ProtocolVersion.MINECRAFT_FUTURE) enc = enc.getClass().getConstructor(\n" +
+                                "                 new Class[]{ProtocolVersion.class}).newInstance(new Object[] {ProtocolVersion.getLatest()});\n" +
+                                "         } catch (Exception e) {\n" +
+                                // I guess we're not on 1.9.4
+                                "         }\n" +
+                                "        ((WrappedEncoder) this.minecraftEncoder).setRealEncoder(enc);\n" +
+                                "    }", generated));
+                    }
                 }
             }
             return generated.toClass(HandlerConstructor.class.getClassLoader());
