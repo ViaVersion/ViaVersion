@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
+import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -18,6 +19,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -121,8 +123,13 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
                         Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.passthrough(new ChunkType(clientChunks));
-                        if (chunk.isUnloadPacket())
+                        if (chunk.isUnloadPacket()) {
                             wrapper.setId(0x1D);
+
+                            // Remove commandBlocks on chunk unload
+                            CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                            provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
+                        }
 
                         // eat any other data (Usually happens with unload packets)
                         wrapper.read(Type.REMAINING_BYTES);
@@ -189,6 +196,9 @@ public class WorldPackets {
                             }
                         }
                         if (action == 2) { // Update Command Block
+                            CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                            provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NBT, 0));
+
                             // To prevent window issues don't send updates
                             wrapper.cancel();
                         }
@@ -385,6 +395,27 @@ public class WorldPackets {
                         }
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         tracker.addBlockInteraction(new Position(x, y, z));
+                    }
+                });
+
+                // Handle CommandBlocks
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+
+                        Position pos = wrapper.get(Type.POSITION, 0);
+                        Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
+                        // Send the Update Block Entity packet if present
+                        if (tag.isPresent()) {
+                            PacketWrapper updateBlockEntity = new PacketWrapper(0x09, null, wrapper.user());
+
+                            updateBlockEntity.write(Type.POSITION, pos);
+                            updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
+                            updateBlockEntity.write(Type.NBT, tag.get());
+
+                            updateBlockEntity.send(Protocol1_9TO1_8.class);
+                        }
                     }
                 });
 

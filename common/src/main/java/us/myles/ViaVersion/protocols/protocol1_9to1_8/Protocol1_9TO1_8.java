@@ -12,10 +12,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -95,6 +92,7 @@ public class Protocol1_9TO1_8 extends Protocol {
     protected void register(ViaProviders providers) {
         providers.register(HandItemProvider.class, new HandItemProvider());
         providers.register(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
+        providers.register(CommandBlockProvider.class, new CommandBlockProvider());
         providers.register(EntityIdProvider.class, new EntityIdProvider());
         providers.require(MovementTransmitterProvider.class);
         if (Via.getConfig().isStimulatePlayerTick()) {
@@ -125,5 +123,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         userConnection.put(new InventoryTracker(userConnection));
         // Place block tracker
         userConnection.put(new PlaceBlockTracker(userConnection));
+        // CommandBlock storage
+        userConnection.put(new CommandBlockStorage(userConnection));
     }
 }

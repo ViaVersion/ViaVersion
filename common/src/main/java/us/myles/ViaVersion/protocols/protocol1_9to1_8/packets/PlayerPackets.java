@@ -18,6 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -183,6 +184,16 @@ public class PlayerPackets {
                         tracker.setGameMode(GameMode.getById(wrapper.get(Type.UNSIGNED_BYTE, 0))); //Set player gamemode
                     }
                 });
+
+                // Gotta fake their op
+                handler(new PacketHandler() {
+                            @Override
+                            public void handle(PacketWrapper wrapper) throws Exception {
+                                CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                                provider.sendPermission(wrapper.user());
+                            }
+                        }
+                );
             }
         });
 
@@ -321,6 +332,15 @@ public class PlayerPackets {
 
                         int gamemode = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         wrapper.user().get(EntityTracker.class).setGameMode(GameMode.getById(gamemode));
+                    }
+                });
+
+                // Fake permissions to get Commandblocks working
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                        provider.sendPermission(wrapper.user());
                     }
                 });
             }
