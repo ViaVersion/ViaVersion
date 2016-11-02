@@ -5,32 +5,23 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
 import us.myles.ViaVersion.bungee.platform.*;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
-import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,25 +29,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
-    private static Method getPendingConnection;
-    private static Method getHandshake;
-    private static Method setProtocol;
-
     private BungeeViaAPI api;
     private BungeeConfigAPI config;
     private BungeeCommandHandler commandHandler;
-
-    static {
-        try {
-            getPendingConnection = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getPendingConnection");
-            getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
-            setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onLoad() {
@@ -178,26 +153,5 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
         Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
-    }
-
-    // Set the handshake version every time someone connects to any server
-    @EventHandler
-    public void onServerConnect(ServerConnectEvent e) throws NoSuchFieldException, IllegalAccessException {
-        UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
-        if (!user.has(BungeeStorage.class)) {
-            user.put(new BungeeStorage(user, e.getPlayer()));
-        }
-
-        int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
-        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
-
-        // Check if ViaVersion can support that version
-        try {
-            Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
-            Object handshake = getHandshake.invoke(pendingConnection);
-            setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
-        } catch (InvocationTargetException e1) {
-            e1.printStackTrace();
-        }
     }
 }

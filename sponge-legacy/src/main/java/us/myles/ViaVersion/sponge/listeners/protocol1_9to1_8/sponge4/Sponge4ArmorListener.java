@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Sponge4ArmorListener extends ViaListener{
+public class Sponge4ArmorListener extends ViaListener {
     private static Field entityIdField;
 
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");

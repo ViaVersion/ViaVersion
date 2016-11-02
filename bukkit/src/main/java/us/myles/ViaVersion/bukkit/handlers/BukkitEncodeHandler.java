@@ -8,7 +8,8 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.handlers.*;
+import us.myles.ViaVersion.handlers.ChannelHandlerContextWrapper;
+import us.myles.ViaVersion.handlers.ViaHandler;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
@@ -23,10 +24,11 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
         try {
             versionField = NMSUtil.nms("PacketEncoder").getDeclaredField("version");
             versionField.setAccessible(true);
-        } catch (Exception e){
+        } catch (Exception e) {
             // Not compat version
         }
     }
+
     private final UserConnection info;
     private final MessageToByteEncoder minecraftEncoder;
 
