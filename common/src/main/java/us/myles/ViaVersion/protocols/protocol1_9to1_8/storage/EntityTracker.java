@@ -24,6 +24,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +45,7 @@ public class EntityTracker extends StoredObject {
     @Setter
     private boolean autoTeam = false;
     @Setter
-    private int entityID;
+    private int entityID = -1;
     @Setter
     private Position currentlyDigging = null;
     private boolean teamExists = false;
@@ -150,7 +151,7 @@ public class EntityTracker extends StoredObject {
                 if (metadata.getId() == 0) {
                     // Byte
                     byte data = (byte) metadata.getValue();
-                    if (entityID != getEntityID() && Via.getConfig().isShieldBlocking()) {
+                    if (entityID != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityID)) {
                                 Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
@@ -283,6 +284,14 @@ public class EntityTracker extends StoredObject {
                 }
             }
             metadataBuffer.remove(entityID);
+        }
+    }
+
+    public int getProvidedEntityId() {
+        try {
+            return Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(getUser());
+        } catch (Exception e) {
+            return entityID;
         }
     }
 }

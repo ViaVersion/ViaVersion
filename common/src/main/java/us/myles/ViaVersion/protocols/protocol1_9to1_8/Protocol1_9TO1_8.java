@@ -5,17 +5,15 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Metadata1_8Type;
-import us.myles.ViaVersion.api.type.types.version.MetadataList1_8Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
@@ -30,10 +28,6 @@ public class Protocol1_9TO1_8 extends Protocol {
             return fixJson(line);
         }
     };
-    @Deprecated
-    public static Type<List<Metadata>> METADATA_LIST = new MetadataList1_8Type();
-    @Deprecated
-    public static Type<Metadata> METADATA = new Metadata1_8Type();
 
     public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {
@@ -101,6 +95,7 @@ public class Protocol1_9TO1_8 extends Protocol {
     protected void register(ViaProviders providers) {
         providers.register(HandItemProvider.class, new HandItemProvider());
         providers.register(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
+        providers.register(EntityIdProvider.class, new EntityIdProvider());
         providers.require(MovementTransmitterProvider.class);
         if (Via.getConfig().isStimulatePlayerTick()) {
             Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
