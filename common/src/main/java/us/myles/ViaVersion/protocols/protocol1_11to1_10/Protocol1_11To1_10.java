@@ -198,6 +198,27 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
+        // Title packet
+        registerOutgoing(State.PLAY, 0x45, 0x45, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Action
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int action = wrapper.get(Type.VAR_INT, 0);
+
+                        // Handle the new ActionBar
+                        if (action >= 2)
+                            wrapper.set(Type.VAR_INT, 0, action + 1);
+                    }
+                });
+
+
+            }
+        });
+
         /*
             INCOMING PACKETS
          */
