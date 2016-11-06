@@ -69,4 +69,8 @@ public class CommandBlockStorage extends StoredObject {
 
         return Optional.of(tag);
     }
+
+    public void unloadChunks() {
+        storedCommandBlocks.clear();
+    }
 }

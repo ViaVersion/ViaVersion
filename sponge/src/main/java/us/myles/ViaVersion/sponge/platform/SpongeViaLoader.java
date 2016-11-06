@@ -14,7 +14,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmit
 import us.myles.ViaVersion.sponge.listeners.ClientLeaveListener;
 import us.myles.ViaVersion.sponge.listeners.UpdateListener;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.BlockListener;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.CommandBlockListener;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.DeathListener;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.HandItemCache;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
@@ -39,7 +38,6 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         } catch (ClassNotFoundException e) {
             new Sponge5ArmorListener(plugin).register();
         }
-        new CommandBlockListener(plugin).register();
         new DeathListener(plugin).register();
         new BlockListener(plugin).register();
 

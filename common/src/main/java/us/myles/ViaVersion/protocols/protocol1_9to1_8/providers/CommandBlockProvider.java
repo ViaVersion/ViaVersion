@@ -62,4 +62,9 @@ public class CommandBlockProvider implements Provider {
     public boolean isEnabled() {
         return true;
     }
+
+    public void unloadChunks(UserConnection userConnection) {
+        if (isEnabled())
+            getStorage(userConnection).unloadChunks();
+    }
 }

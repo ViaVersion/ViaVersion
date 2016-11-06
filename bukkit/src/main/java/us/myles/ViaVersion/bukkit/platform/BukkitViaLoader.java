@@ -45,7 +45,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         /* 1.9 client to 1.8 server */
 
         new ArmorListener(plugin).register();
-        new CommandBlockListener(plugin).register();
         new DeathListener(plugin).register();
         new BlockListener(plugin).register();
 

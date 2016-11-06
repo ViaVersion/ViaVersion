@@ -341,6 +341,7 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                         provider.sendPermission(wrapper.user());
+                        provider.unloadChunks(wrapper.user());
                     }
                 });
             }
