@@ -14,5 +14,6 @@ public class VersionInfo {
     private Set<Integer> enabledProtocols;
     private String platformName;
     private String platformVersion;
+    private String pluginVersion;
 }
 

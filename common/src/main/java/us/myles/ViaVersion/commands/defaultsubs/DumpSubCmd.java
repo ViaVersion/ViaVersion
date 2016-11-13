@@ -39,6 +39,7 @@ public class DumpSubCmd extends ViaSubCommand {
                 ProtocolRegistry.SERVER_PROTOCOL,
                 ProtocolRegistry.getSupportedVersions(),
                 Via.getPlatform().getPlatformName(),
+                Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion()
         );
 

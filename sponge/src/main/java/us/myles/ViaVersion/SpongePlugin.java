@@ -86,7 +86,12 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public String getPlatformName() {
-        return "Sponge";
+        return game.getPlatform().getApi().getName();
+    }
+
+    @Override
+    public String getPlatformVersion() {
+        return game.getPlatform().getApi().getId();
     }
 
     @Override

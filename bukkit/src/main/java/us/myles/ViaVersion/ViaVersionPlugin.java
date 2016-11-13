@@ -141,6 +141,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
     @Override
     public String getPlatformName() {
+        return Bukkit.getServer().getName();
+    }
+
+    @Override
+    public String getPlatformVersion() {
         return Bukkit.getServer().getVersion();
     }
 

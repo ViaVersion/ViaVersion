@@ -30,6 +30,13 @@ public interface ViaPlatform<T> {
     String getPlatformName();
 
     /**
+     * Get the platform version
+     *
+     * @return Platforn version
+     */
+    String getPlatformVersion();
+
+    /**
      * Get the plugin version
      *
      * @return Plugin version as a semver string

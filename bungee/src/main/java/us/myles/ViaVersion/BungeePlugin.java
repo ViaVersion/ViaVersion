@@ -56,6 +56,11 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public String getPlatformName() {
+        return getProxy().getName();
+    }
+
+    @Override
+    public String getPlatformVersion() {
         return getProxy().getVersion();
     }
 
