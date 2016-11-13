@@ -19,9 +19,6 @@ hs_err_pid*
 # Ignore IDEA directory
 .idea/*
 
-# Include the project's code style settings file
-!.idea/codeStyleSettings.xml
-
 # Include the project's dictionary
 !.idea/dictionaries/
 !.idea/dictionaries/*

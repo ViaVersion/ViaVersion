@@ -1,4 +1,4 @@
-### What is the output link of /viaversion dump?
+### What is the output link of /viaversion dump? 
 
 
 ### Are you using any additional software like BungeeCord? If so, what software and version? (Please list your plugins as well)

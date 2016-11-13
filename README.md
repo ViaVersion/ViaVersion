@@ -1,4 +1,4 @@
-# ViaVersion 0.9.9
+# ViaVersion 1.0.0 - Spigot, Sponge, BungeeCord
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 
@@ -6,7 +6,11 @@ IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt fo
 
 **Allows the connection of higher client versions to lower server versions**
 
-Allows 1.10, 1.9 on 1.8 server and 1.10 on a 1.9 server.
+Supported Versions:
+
+[![Table] (http://i.imgur.com/SVVhFQ4.png)](http://i.imgur.com/SVVhFQ4.png)
+
+On Bukkit you may also use ProtocolSupport, but ensure you have the right build for your server version.
 
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
