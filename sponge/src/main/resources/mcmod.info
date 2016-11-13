@@ -1,0 +1,12 @@
+[
+    {
+        "modid": "viaversion",
+        "name": "ViaVersion",
+        "version": "${project.version}",
+        "description": "${project.description}",
+        "authorList": [
+            "_MylesC",
+            "Matsv"
+        ]
+    }
+]

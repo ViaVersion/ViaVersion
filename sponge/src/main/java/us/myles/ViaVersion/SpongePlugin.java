@@ -37,7 +37,8 @@ import java.util.logging.Logger;
         name = "ViaVersion",
         version = VersionInfo.VERSION,
         authors = {"_MylesC", "Matsv"},
-        description = "Allow newer Minecraft versions to connect to an older server version."
+        description = "Allow newer Minecraft versions to connect to an older server version.",
+        dependencies = {}
 )
 public class SpongePlugin implements ViaPlatform {
     @Inject
