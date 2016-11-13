@@ -87,12 +87,12 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public String getPlatformName() {
-        return game.getPlatform().getApi().getName();
+        return game.getPlatform().getImplementation().getName();
     }
 
     @Override
     public String getPlatformVersion() {
-        return game.getPlatform().getApi().getId();
+        return game.getPlatform().getImplementation().getVersion().orElse("Unknown Version");
     }
 
     @Override
