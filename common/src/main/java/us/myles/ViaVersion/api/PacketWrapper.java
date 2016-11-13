@@ -176,7 +176,7 @@ public class PacketWrapper {
                 if (type instanceof TypeConverter) {
                     value = (T) ((TypeConverter) type).from(value);
                 } else {
-                    System.out.println("Possible type mismatch: " + value.getClass().getName() + " -> " + type.getOutputClass());
+                    Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + type.getOutputClass());
                 }
             }
         }
@@ -237,7 +237,7 @@ public class PacketWrapper {
                         if (packetValue.getKey() instanceof TypeConverter) {
                             value = ((TypeConverter) packetValue.getKey()).from(value);
                         } else {
-                            System.out.println("Possible type mismatch: " + value.getClass().getName() + " -> " + packetValue.getKey().getOutputClass());
+                            Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + packetValue.getKey().getOutputClass());
                         }
                     }
                 }

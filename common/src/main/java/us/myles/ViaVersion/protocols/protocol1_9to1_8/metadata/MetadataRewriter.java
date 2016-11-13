@@ -121,7 +121,7 @@ public class MetadataRewriter {
                                 entry.setValue(value);
                                 break;
                             default:
-                                System.out.println("[Out] Unhandled MetaDataType: " + metaIndex.getNewType());
+                                Via.getPlatform().getLogger().warning("[Out] Unhandled MetaDataType: " + metaIndex.getNewType());
                                 list.remove(entry);
                                 break;
                         }

@@ -87,8 +87,8 @@ public class MetadataRewriter {
             }
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
-                System.out.println("An error occurred with entity type rewriter");
-                System.out.println("Metadata: " + metadata);
+                Via.getPlatform().getLogger().warning("An error occurred with entity type rewriter");
+                Via.getPlatform().getLogger().warning("Metadata: " + metadata);
                 e.printStackTrace();
             }
         }
@@ -195,8 +195,8 @@ public class MetadataRewriter {
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
-                    System.out.println("An error occurred with entity metadata handler");
-                    System.out.println("Metadata: " + metadata);
+                    Via.getPlatform().getLogger().warning("An error occurred with entity metadata handler");
+                    Via.getPlatform().getLogger().warning("Metadata: " + metadata);
                     e.printStackTrace();
                 }
             }

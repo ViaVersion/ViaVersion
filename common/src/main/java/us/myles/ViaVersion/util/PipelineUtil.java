@@ -21,14 +21,12 @@ public class PipelineUtil {
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
-            System.out.println("Netty issue?");
         }
         try {
             ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
-            System.out.println("Netty issue?");
         }
     }
 

@@ -2,6 +2,7 @@ package us.myles.ViaVersion.bungee.providers;
 
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ProxyServer;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
@@ -16,7 +17,7 @@ public class BungeeVersionProvider extends VersionProvider {
         try {
             ref = Class.forName("net.md_5.bungee.protocol.ProtocolConstants");
         } catch (Exception e) {
-            System.out.println("Could not detect the ProtocolConstants class");
+            Via.getPlatform().getLogger().severe("Could not detect the ProtocolConstants class");
             e.printStackTrace();
         }
     }
@@ -45,7 +46,7 @@ public class BungeeVersionProvider extends VersionProvider {
                 return protocol;
         }
 
-        System.out.println("Panic, no protocol id found for " + info.getProtocolVersion());
+        Via.getPlatform().getLogger().severe("Panic, no protocol id found for " + info.getProtocolVersion());
         return info.getProtocolVersion();
     }
 
