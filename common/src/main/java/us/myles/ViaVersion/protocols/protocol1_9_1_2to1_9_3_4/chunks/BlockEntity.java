@@ -52,7 +52,7 @@ public class BlockEntity {
                 updateBlockEntity(pos, (short) newId, tag, connection);
             } catch (Exception e) {
                 if (Via.getManager().isDebug()) {
-                    System.out.println("Block Entity: " + e.getMessage() + ": " + tag);
+                    Via.getPlatform().getLogger().warning("Block Entity: " + e.getMessage() + ": " + tag);
                 }
             }
         }

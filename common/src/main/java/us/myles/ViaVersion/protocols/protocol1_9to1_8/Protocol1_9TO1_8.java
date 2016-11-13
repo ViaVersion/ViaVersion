@@ -43,7 +43,7 @@ public class Protocol1_9TO1_8 extends Protocol {
             if (Via.getConfig().isForceJsonTransform()) {
                 return constructJson(line);
             } else {
-                System.out.println("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+                Via.getPlatform().getLogger().warning("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
                 return "{\"text\":\"\"}";
             }
         }

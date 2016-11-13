@@ -78,7 +78,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                             }
                         }).get(10, TimeUnit.SECONDS);
                     } catch (Exception e) {
-                        System.out.println("Error fetching hand item: " + e.getClass().getName());
+                        Via.getPlatform().getLogger().severe("Error fetching hand item: " + e.getClass().getName());
                         if (Via.getManager().isDebug())
                             e.printStackTrace();
                         return null;

@@ -122,7 +122,7 @@ public class BukkitViaInjector implements ViaInjector {
                     ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((BukkitChannelInitializer) oldInit).getOriginal());
                 }
             } catch (Exception e) {
-                System.out.println("Failed to remove injection handler, reload won't work with connections, please reboot!");
+                Via.getPlatform().getLogger().severe("Failed to remove injection handler, reload won't work with connections, please reboot!");
             }
         }
         injectedFutures.clear();
@@ -134,7 +134,7 @@ public class BukkitViaInjector implements ViaInjector {
                     pair.getKey().set(pair.getValue(), ((ListWrapper) o).getOriginalList());
                 }
             } catch (IllegalAccessException e) {
-                System.out.println("Failed to remove injection, reload won't work with connections, please reboot!");
+                Via.getPlatform().getLogger().severe("Failed to remove injection, reload won't work with connections, please reboot!");
             }
         }
 
