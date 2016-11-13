@@ -107,7 +107,25 @@ public class SpongeViaInjector implements ViaInjector {
     public void uninject() {
         // TODO: Uninject from players currently online
         for (ChannelFuture future : injectedFutures) {
-            ChannelHandler bootstrapAcceptor = future.channel().pipeline().first();
+            List<String> names = future.channel().pipeline().names();
+            ChannelHandler bootstrapAcceptor = null;
+            // Pick best
+            for (String name : names) {
+                ChannelHandler handler = future.channel().pipeline().get(name);
+                try {
+                    ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
+                    if (oldInit instanceof SpongeChannelInitializer) {
+                        bootstrapAcceptor = handler;
+                    }
+                } catch (Exception e) {
+                    // Not this one
+                }
+            }
+            // Default to first
+            if (bootstrapAcceptor == null) {
+                bootstrapAcceptor = future.channel().pipeline().first();
+            }
+
             try {
                 ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
                 if (oldInit instanceof SpongeChannelInitializer) {
