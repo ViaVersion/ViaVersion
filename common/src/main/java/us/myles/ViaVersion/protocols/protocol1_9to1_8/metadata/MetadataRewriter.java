@@ -15,6 +15,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class MetadataRewriter {
     public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
@@ -133,15 +134,18 @@ public class MetadataRewriter {
             } catch (Exception e) {
                 list.remove(entry);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
-                    System.out.println("INCLUDE THIS IN YOUR ERROR LOG!");
+                    Logger log = Via.getPlatform().getLogger();
+
+                    log.warning("This is most likely down to one of your plugins sending bad datawatchers. Please test if this occurs without any plugins except ViaVersion before reporting it on GitHub");
+                    log.warning("Also make sure that all your plugins are compatible with your server version.");
                     if (type != null)
-                        System.out.println("An error occurred with entity meta data for " + type + " OldID: " + entry.getId());
+                        log.severe("An error occurred with entity meta data for " + type + " OldID: " + entry.getId());
                     else
-                        System.out.println("An error occurred with entity meta data for UNKNOWN_ENTITY OldID: " + entry.getId());
+                        log.severe("An error occurred with entity meta data for UNKNOWN_ENTITY OldID: " + entry.getId());
                     if (metaIndex != null) {
-                        System.out.println("Value: " + entry.getValue());
-                        System.out.println("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
-                        System.out.println("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
+                        log.severe("Value: " + entry.getValue());
+                        log.severe("Old ID: " + metaIndex.getIndex() + " New ID: " + metaIndex.getNewIndex());
+                        log.severe("Old Type: " + metaIndex.getOldType() + " New Type: " + metaIndex.getNewType());
                     }
                     e.printStackTrace();
                 }
