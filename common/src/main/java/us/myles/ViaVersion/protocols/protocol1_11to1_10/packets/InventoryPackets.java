@@ -81,14 +81,14 @@ public class InventoryPackets {
                         if (wrapper.get(Type.STRING, 0).equalsIgnoreCase("MC|TrList")) {
                             wrapper.passthrough(Type.INT); // Passthrough Window ID
 
-                            int size = wrapper.passthrough(Type.BYTE);
+                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE)
                             for (int i = 0; i < size; i++) {
-                                ItemRewriter.toClient(wrapper.read(Type.ITEM)); // Input Item
-                                ItemRewriter.toClient(wrapper.read(Type.ITEM)); // Output Item
+                                ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Input Item
+                                ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Output Item
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem)
-                                    ItemRewriter.toClient(wrapper.read(Type.ITEM)); // Second Item
+                                    ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Second Item
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
