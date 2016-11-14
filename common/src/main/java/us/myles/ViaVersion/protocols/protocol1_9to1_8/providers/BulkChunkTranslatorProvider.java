@@ -17,6 +17,7 @@ public class BulkChunkTranslatorProvider implements Provider {
      * @param packet       The NMS Packet
      * @param clientChunks The ClientChunks object for the current player
      * @return A List of all the output packets
+     * @throws Exception If there is an issue translating
      */
     public List<Object> transformMapChunkBulk(Object packet, ClientChunks clientChunks) throws Exception {
         if (!(packet instanceof PacketWrapper))
