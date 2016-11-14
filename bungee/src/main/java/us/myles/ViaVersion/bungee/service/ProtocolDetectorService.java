@@ -45,12 +45,13 @@ public class ProtocolDetectorService implements Runnable {
     @Override
     public void run() {
         for (final Map.Entry<String, ServerInfo> lists : plugin.getProxy().getServers().entrySet()) {
-            updateProtocolInfo(lists.getKey(), lists.getValue());
+            probeServer(lists.getValue());
         }
     }
 
-    private void updateProtocolInfo(final String key, ServerInfo value) {
-        value.ping(new Callback<ServerPing>() {
+    public static void probeServer(final ServerInfo serverInfo) {
+        final String key = serverInfo.getName();
+        serverInfo.ping(new Callback<ServerPing>() {
             @Override
             public void done(ServerPing serverPing, Throwable throwable) {
                 if (throwable == null) {

@@ -2,6 +2,7 @@ package us.myles.ViaVersion.bungee.platform;
 
 import io.netty.buffer.ByteBuf;
 import lombok.NonNull;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
@@ -10,6 +11,7 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.Map;
@@ -74,5 +76,14 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
 
     public Map<UUID, UserConnection> getPortedPlayers() {
         return Via.getManager().getPortedPlayers();
+    }
+
+    /**
+     * Forces ViaVersion to probe a server
+     *
+     * @param serverInfo The serverinfo to probe
+     */
+    public void probeServer(ServerInfo serverInfo) {
+        ProtocolDetectorService.probeServer(serverInfo);
     }
 }
