@@ -76,6 +76,7 @@ public class BungeeServerHandler implements Listener {
     }
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
+        if(user == null) return;
         if (user.has(BungeeStorage.class)) {
             BungeeStorage storage = user.get(BungeeStorage.class);
             ProxiedPlayer player = storage.getPlayer();
