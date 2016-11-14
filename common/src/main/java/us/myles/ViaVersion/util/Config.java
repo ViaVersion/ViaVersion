@@ -145,7 +145,11 @@ public abstract class Config implements ConfigurationProvider {
 
     public int getInt(String key, int def) {
         if (this.config.containsKey(key)) {
-            return (int) this.config.get(key);
+            if (this.config.get(key) instanceof Number) {
+                return ((Number) this.config.get(key)).intValue();
+            } else {
+                return def;
+            }
         } else {
             return def;
         }
@@ -153,7 +157,11 @@ public abstract class Config implements ConfigurationProvider {
 
     public double getDouble(String key, double def) {
         if (this.config.containsKey(key)) {
-            return (double) this.config.get(key);
+            if (this.config.get(key) instanceof Number) {
+                return ((Number) this.config.get(key)).doubleValue();
+            } else {
+                return def;
+            }
         } else {
             return def;
         }
