@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.base;
 
 import com.google.common.base.Joiner;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
@@ -44,10 +45,26 @@ public class BaseProtocol extends Protocol {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
-                            JsonObject json = GsonUtil.getGson().fromJson(originalStatus, JsonObject.class);
-                            JsonObject version = json.get("version").getAsJsonObject();
-                            int protocolVersion = ((Long) version.get("protocol").getAsLong()).intValue();
+                            JsonElement json = GsonUtil.getGson().fromJson(originalStatus, JsonElement.class);
+                            JsonObject version;
+                            int protocolVersion = 0; // Unknown!
 
+                            if (json.isJsonObject()) {
+                                if (json.getAsJsonObject().has("version")) {
+                                    version = json.getAsJsonObject().get("version").getAsJsonObject();
+                                    if (version.has("protocol")) {
+                                        protocolVersion = ((Long) version.get("protocol").getAsLong()).intValue();
+                                    }
+                                } else {
+                                    version = new JsonObject();
+                                    json.getAsJsonObject().add("version", version);
+                                }
+                            } else {
+                                // Format properly
+                                json = new JsonObject();
+                                version = new JsonObject();
+                                json.getAsJsonObject().add("version", version);
+                            }
                             if (Via.getConfig().isSendSupportedVersions()) //Send supported versions
                                 version.add("supportedVersions", GsonUtil.getGson().toJsonTree(Via.getAPI().getSupportedVersions()));
 
