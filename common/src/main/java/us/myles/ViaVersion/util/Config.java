@@ -33,7 +33,7 @@ public abstract class Config implements ConfigurationProvider {
         reloadConfig();
     }
 
-    public Map<String, Object> loadConfig(File location) {
+    public synchronized Map<String, Object> loadConfig(File location) {
         List<String> unsupported = getUnsupportedOptions();
         URL jarConfigFile = Config.class.getClassLoader().getResource("config.yml");
         try {
@@ -87,7 +87,7 @@ public abstract class Config implements ConfigurationProvider {
 
     protected abstract void handleConfig(Map<String, Object> config);
 
-    public void saveConfig(File location, Map<String, Object> config) {
+    public synchronized void saveConfig(File location, Map<String, Object> config) {
         try {
             commentStore.writeComments(yaml.get().dump(config), location);
         } catch (IOException e) {
