@@ -41,7 +41,7 @@ public class ListSubCmd extends ViaSubCommand {
         }
 
         for (Map.Entry<ProtocolVersion, Set<String>> entry : playerVersions.entrySet())
-            sendMessage(sender, "&8[&6%s&8]: &b%s", entry.getKey().getName(), entry.getValue());
+            sendMessage(sender, "&8[&6%s&8] (&7%d&8): &b%s", entry.getKey().getName(), entry.getValue().size(), entry.getValue());
 
         playerVersions.clear();
         return true;
