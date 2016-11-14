@@ -22,13 +22,16 @@ public class MainHandPatch implements Listener {
         try {
             getSettings = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getSettings");
             setMainHand = Class.forName("net.md_5.bungee.protocol.packet.ClientSettings").getDeclaredMethod("setMainHand", int.class);
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
     @EventHandler
     public void onServerConnect(ServerConnectEvent event) {
+        // Ignore if it doesn't exist (Like BungeeCord 1.8)
+        if (setMainHand == null)
+            return;
+
         UserConnection user = Via.getManager().getConnection(event.getPlayer().getUniqueId());
 
         try {
