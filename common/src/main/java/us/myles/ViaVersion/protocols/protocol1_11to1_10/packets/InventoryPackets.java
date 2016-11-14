@@ -81,7 +81,7 @@ public class InventoryPackets {
                         if (wrapper.get(Type.STRING, 0).equalsIgnoreCase("MC|TrList")) {
                             wrapper.passthrough(Type.INT); // Passthrough Window ID
 
-                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE)
+                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
                                 ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Input Item
                                 ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Output Item
