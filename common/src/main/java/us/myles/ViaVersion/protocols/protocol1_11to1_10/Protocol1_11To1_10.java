@@ -236,6 +236,24 @@ public class Protocol1_11To1_10 extends Protocol {
                 map(Type.FLOAT, toOldByte);
             }
         });
+
+        // Chat Message Incoming
+        registerIncoming(State.PLAY, 0x02, 0x02, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - Message
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // 100 character limit on older servers
+                        String msg = wrapper.get(Type.STRING, 0);
+                        if (msg.length() > 100) {
+                            wrapper.set(Type.STRING, 0, msg.substring(0, 100));
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
