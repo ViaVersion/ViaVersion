@@ -226,9 +226,9 @@ public class InventoryPackets {
                             wrapper.create(0x16, new ValueCreator() {
                                 @Override
                                 public void write(PacketWrapper wrapper) throws Exception {
-                                    wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+                                    wrapper.write(Type.BYTE, (byte) 0);
                                     wrapper.write(Type.SHORT, slot);
-                                    wrapper.write(Type.SHORT, (short) -1);
+                                    wrapper.write(Type.ITEM, null);
                                 }
                             }).send(Protocol1_9TO1_8.class);
                             // Finally reset to simulate throwing item
