@@ -47,7 +47,7 @@ public class BungeeServerHandler implements Listener {
 
     // Set the handshake version every time someone connects to any server
     @EventHandler
-    public void onServerConnect(ServerConnectEvent e) throws NoSuchFieldException, IllegalAccessException {
+    public void onServerConnect(ServerConnectEvent e) {
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (!user.has(BungeeStorage.class)) {
             user.put(new BungeeStorage(user, e.getPlayer()));
@@ -61,7 +61,7 @@ public class BungeeServerHandler implements Listener {
             Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
             Object handshake = getHandshake.invoke(pendingConnection);
             setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
-        } catch (InvocationTargetException e1) {
+        } catch (InvocationTargetException | IllegalAccessException e1) {
             e1.printStackTrace();
         }
     }

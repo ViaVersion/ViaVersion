@@ -6,6 +6,7 @@ import us.myles.ViaVersion.BungeePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.bungee.handlers.BungeeServerHandler;
+import us.myles.ViaVersion.bungee.listeners.MainHandPatch;
 import us.myles.ViaVersion.bungee.listeners.UpdateListener;
 import us.myles.ViaVersion.bungee.providers.BungeeEntityIdProvider;
 import us.myles.ViaVersion.bungee.providers.BungeeMovementTransmitter;
@@ -27,6 +28,7 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         ProxyServer.getInstance().getPluginManager().registerListener(plugin, plugin);
         ProxyServer.getInstance().getPluginManager().registerListener(plugin, new UpdateListener());
         ProxyServer.getInstance().getPluginManager().registerListener(plugin, new BungeeServerHandler());
+        ProxyServer.getInstance().getPluginManager().registerListener(plugin, new MainHandPatch());
 
         // Providers
         Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());

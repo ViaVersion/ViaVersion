@@ -433,7 +433,16 @@ public class PlayerPackets {
                 map(Type.VAR_INT, Type.BYTE); // 2 - Chat Mode
                 map(Type.BOOLEAN); // 3 - If Chat Colours on
                 map(Type.UNSIGNED_BYTE); // 4 - Skin Parts
-                map(Type.VAR_INT, Type.NOTHING); // 5 - Main Hand
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int hand = wrapper.read(Type.VAR_INT);
+
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.setMainHand(hand);
+                    }
+                });
             }
         });
 

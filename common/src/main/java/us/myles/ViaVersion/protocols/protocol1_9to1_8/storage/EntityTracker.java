@@ -51,6 +51,8 @@ public class EntityTracker extends StoredObject {
     private boolean teamExists = false;
     @Setter
     private GameMode gameMode;
+    @Setter
+    private int mainHand;
 
     public EntityTracker(UserConnection user) {
         super(user);
