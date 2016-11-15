@@ -114,9 +114,9 @@ public class BaseProtocol extends Protocol {
                         info.setState(State.PLAY);
                         // Save other info
                         String stringUUID = wrapper.get(Type.STRING, 0);
-                        if (stringUUID.length() == 28) {
+                        if (stringUUID.length() == 32) { // Trimmed UUIDs are 32 characters
                             // Trimmed
-                            stringUUID = stringUUID.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
+                            stringUUID = addDashes(stringUUID);
                         }
                         UUID uuid = UUID.fromString(stringUUID);
                         info.setUuid(uuid);
@@ -236,5 +236,14 @@ public class BaseProtocol extends Protocol {
                 packetWrapper.user().setActive(false);
             }
         }
+    }
+
+    public static String addDashes(String trimmedUUID) {
+        StringBuffer idBuff = new StringBuffer(trimmedUUID);
+        idBuff.insert(20, '-');
+        idBuff.insert(16, '-');
+        idBuff.insert(12, '-');
+        idBuff.insert(8, '-');
+        return idBuff.toString();
     }
 }
