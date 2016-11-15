@@ -33,7 +33,8 @@ public class MainHandPatch implements Listener {
             return;
 
         UserConnection user = Via.getManager().getConnection(event.getPlayer().getUniqueId());
-
+        if(user == null) return;
+        
         try {
             if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) {
                 Object settings = getSettings.invoke(event.getPlayer());
