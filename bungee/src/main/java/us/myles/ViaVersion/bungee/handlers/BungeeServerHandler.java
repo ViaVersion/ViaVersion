@@ -76,7 +76,7 @@ public class BungeeServerHandler implements Listener {
     }
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
-        if(user == null) return;
+        if (user == null) return;
         if (user.has(BungeeStorage.class)) {
             BungeeStorage storage = user.get(BungeeStorage.class);
             ProxiedPlayer player = storage.getPlayer();
@@ -89,12 +89,11 @@ public class BungeeServerHandler implements Listener {
 
                     int protocolId = ProtocolDetectorService.getProtocolId(serverName);
 
-                    UserConnection viaConnection = Via.getManager().getConnection(player.getUniqueId());
-                    ProtocolInfo info = viaConnection.get(ProtocolInfo.class);
+                    ProtocolInfo info = user.get(ProtocolInfo.class);
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
-                    ProtocolPipeline pipeline = viaConnection.get(ProtocolInfo.class).getPipeline();
-                    viaConnection.clearStoredObjects();
+                    ProtocolPipeline pipeline = user.get(ProtocolInfo.class).getPipeline();
+                    user.clearStoredObjects();
                     pipeline.cleanPipes();
                     if (protocols == null) {
                         // TODO Check Bungee Supported Protocols? *shrugs*
@@ -105,14 +104,14 @@ public class BungeeServerHandler implements Listener {
                         }
                     }
 
-                    viaConnection.put(info);
-                    viaConnection.put(storage);
+                    user.put(info);
+                    user.put(storage);
 
-                    viaConnection.setActive(protocols != null);
+                    user.setActive(protocols != null);
 
                     // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
                     for (Protocol protocol : pipeline.pipes()) {
-                        protocol.init(viaConnection);
+                        protocol.init(user);
                     }
 
                     Object wrapper = channelWrapper.get(player);
