@@ -12,12 +12,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HandItemCache implements Runnable {
     public static boolean CACHE = false;
-    private static ConcurrentHashMap<UUID, Item> handCache = new ConcurrentHashMap<>();
+    private static Map<UUID, Item> handCache = new ConcurrentHashMap<>();
     private static Field GET_DAMAGE;
     private static Method GET_ID;
     private static ItemGrabber grabber;

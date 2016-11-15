@@ -6,14 +6,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HandItemCache extends BukkitRunnable {
     public static boolean CACHE = false;
-    private static ConcurrentHashMap<UUID, Item> handCache = new ConcurrentHashMap<>();
+    private static Map<UUID, Item> handCache = new ConcurrentHashMap<>();
 
     public static Item getHandItem(UUID player) {
         if (!handCache.containsKey(player))
