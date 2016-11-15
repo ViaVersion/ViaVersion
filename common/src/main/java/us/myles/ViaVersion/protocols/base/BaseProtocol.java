@@ -114,7 +114,8 @@ public class BaseProtocol extends Protocol {
                         info.setState(State.PLAY);
                         // Save other info
                         String stringUUID = wrapper.get(Type.STRING, 0);
-                        if (!stringUUID.contains("-")) {
+                        if (stringUUID.length() == 28) {
+                            // Trimmed
                             stringUUID = stringUUID.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
                         }
                         UUID uuid = UUID.fromString(stringUUID);
