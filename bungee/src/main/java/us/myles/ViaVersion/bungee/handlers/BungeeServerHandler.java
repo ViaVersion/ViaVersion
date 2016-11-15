@@ -49,6 +49,7 @@ public class BungeeServerHandler implements Listener {
     @EventHandler
     public void onServerConnect(ServerConnectEvent e) {
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
+        if (user == null) return;
         if (!user.has(BungeeStorage.class)) {
             user.put(new BungeeStorage(user, e.getPlayer()));
         }
