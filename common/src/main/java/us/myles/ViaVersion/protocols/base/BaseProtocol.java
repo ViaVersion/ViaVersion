@@ -113,7 +113,11 @@ public class BaseProtocol extends Protocol {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setState(State.PLAY);
                         // Save other info
-                        UUID uuid = UUID.fromString(wrapper.get(Type.STRING, 0));
+                        String stringUUID = wrapper.get(Type.STRING, 0);
+                        if (!stringUUID.contains("-")) {
+                            stringUUID = stringUUID.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
+                        }
+                        UUID uuid = UUID.fromString(stringUUID);
                         info.setUuid(uuid);
                         info.setUsername(wrapper.get(Type.STRING, 1));
                         // Add to ported clients
