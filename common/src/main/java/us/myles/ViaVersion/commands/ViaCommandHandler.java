@@ -56,7 +56,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         ViaSubCommand handler = getSubCommand(args[0]);
 
         if (!hasPermission(sender, handler.permission())) {
-            sender.sendMessage(color("&cYou are not allowed to use this commands!"));
+            sender.sendMessage(color("&cYou are not allowed to use this command!"));
             return false;
         }
 
