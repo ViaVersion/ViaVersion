@@ -162,7 +162,7 @@ public class WorldPackets {
                             output.setId(-1); // -1 for no writing of id
                             output.writeToBuffer(buffer);
                             PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
-                            chunkPacket.send(Protocol1_9TO1_8.class, false);
+                            chunkPacket.send(Protocol1_9TO1_8.class, false, true);
                         }
                     }
                 });

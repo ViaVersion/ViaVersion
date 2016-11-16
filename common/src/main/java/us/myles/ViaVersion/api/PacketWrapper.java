@@ -283,9 +283,23 @@ public class PacketWrapper {
      * @throws Exception if it fails to write
      */
     public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
+        send(packetProtocol, skipCurrentPipeline, false);
+    }
+
+    /**
+     * Send this packet to the associated user.
+     * Be careful not to send packets twice.
+     * (Sends it after current)
+     *
+     * @param packetProtocol      - The protocol version of the packet.
+     * @param skipCurrentPipeline - Skip the current pipeline
+     * @param currentThread       - Run in the same thread
+     * @throws Exception if it fails to write
+     */
+    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
             ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline);
-            user().sendRawPacket(output);
+            user().sendRawPacket(output, currentThread);
         }
     }
 
