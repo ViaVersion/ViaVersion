@@ -72,7 +72,7 @@ public class MetadataRewriter {
                                     id = (Short) value;
                                 }
                                 if (id != -1 && data != -1) {
-                                    int combined = id << 4 | data;
+                                    int combined = id | (data & 0xF);
                                     data = -1;
                                     id = -1;
                                     entry.setValue(combined);
