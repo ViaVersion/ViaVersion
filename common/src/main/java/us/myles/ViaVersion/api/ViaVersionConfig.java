@@ -54,6 +54,13 @@ public interface ViaVersionConfig {
     boolean isHologramPatch();
 
     /**
+     * Get if the 1.11 piston animation patch is enabled
+     *
+     * @return true if the piston patch is enabled.
+     */
+    boolean isPistonAnimationPatch();
+
+    /**
      * Get if boss bars are fixed for 1.9 &amp; 1.10 clients
      *
      * @return true if boss bar patching is enabled

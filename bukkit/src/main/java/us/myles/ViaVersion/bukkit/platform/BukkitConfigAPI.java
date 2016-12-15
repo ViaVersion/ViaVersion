@@ -53,6 +53,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isPistonAnimationPatch() {
+        return getBoolean("piston-animation-patch", false);
+    }
+
+    @Override
     public boolean isBossbarPatch() {
         return getBoolean("bossbar-patch", true);
     }

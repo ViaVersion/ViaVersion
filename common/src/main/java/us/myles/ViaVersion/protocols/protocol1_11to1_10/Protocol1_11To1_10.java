@@ -219,6 +219,30 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
+        // Block action packet
+        registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // 0 - Position
+                map(Type.UNSIGNED_BYTE); // 1 - Action ID
+                map(Type.UNSIGNED_BYTE); // 2 - Action Param
+                map(Type.VAR_INT); // 3 - Block Type
+
+                // Cheap hack to ensure it's always right block
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(final PacketWrapper actionWrapper) throws Exception {
+                        if (Via.getConfig().isPistonAnimationPatch()) {
+                            int id = actionWrapper.get(Type.VAR_INT, 0);
+                            if (id == 33 || id == 29) {
+                                actionWrapper.cancel();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         /*
             INCOMING PACKETS
          */
