@@ -37,7 +37,7 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_9_1_2TO1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
         registerProtocol(new Protocol1_10To1_9_3_4(), Collections.singletonList(ProtocolVersion.v1_10.getId()), ProtocolVersion.v1_9_3.getId());
 
-        registerProtocol(new Protocol1_11To1_10(), Collections.singletonList(ProtocolVersion.v1_11.getId()), ProtocolVersion.v1_10.getId());
+        registerProtocol(new Protocol1_11To1_10(), Arrays.asList(ProtocolVersion.v1_11.getId(), ProtocolVersion.v1_11_1.getId()), ProtocolVersion.v1_10.getId());
 
     }
 
