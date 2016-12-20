@@ -29,16 +29,20 @@ public class MainHandPatch implements Listener {
     @EventHandler
     public void onServerConnect(ServerConnectEvent event) {
         // Ignore if it doesn't exist (Like BungeeCord 1.8)
-        if (setMainHand == null)
+        if (setMainHand == null || getSettings == null)
             return;
 
         UserConnection user = Via.getManager().getConnection(event.getPlayer().getUniqueId());
-        if(user == null) return;
-        
+        if (user == null) return;
+
         try {
             if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) {
                 Object settings = getSettings.invoke(event.getPlayer());
-                setMainHand.invoke(settings, user.get(EntityTracker.class).getMainHand());
+                if (settings != null) {
+                    if (user.has(EntityTracker.class)) {
+                        setMainHand.invoke(settings, user.get(EntityTracker.class).getMainHand());
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
