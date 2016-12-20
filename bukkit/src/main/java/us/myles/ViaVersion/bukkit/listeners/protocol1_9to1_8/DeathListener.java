@@ -37,16 +37,19 @@ public class DeathListener extends ViaBukkitListener {
         Via.getPlatform().runSync(new Runnable() {
             @Override
             public void run() {
-                PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p));
-                try {
-                    wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
-                    wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID
-                    wrapper.write(Type.INT, p.getEntityId()); // Entity ID
-                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, msg); // Message
+                // If online
+                if(getUserConnection(p) != null) {
+                    PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p));
+                    try {
+                        wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
+                        wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID
+                        wrapper.write(Type.INT, p.getEntityId()); // Entity ID
+                        Protocol1_9TO1_8.FIX_JSON.write(wrapper, msg); // Message
 
-                    wrapper.send(Protocol1_9TO1_8.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        wrapper.send(Protocol1_9TO1_8.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
