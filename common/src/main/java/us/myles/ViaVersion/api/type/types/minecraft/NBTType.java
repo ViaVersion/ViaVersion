@@ -8,7 +8,9 @@ import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.type.Type;
 
+import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 
 public class NBTType extends Type<CompoundTag> {
@@ -28,7 +30,7 @@ public class NBTType extends Type<CompoundTag> {
             buffer.readerIndex(readerIndex);
             ByteBufInputStream bytebufStream = new ByteBufInputStream(buffer);
             try (DataInputStream dataInputStream = new DataInputStream(bytebufStream)) {
-                return (CompoundTag) NBTIO.readTag(dataInputStream);
+                return (CompoundTag) NBTIO.readTag((DataInput) dataInputStream);
             }
         }
     }
@@ -41,7 +43,7 @@ public class NBTType extends Type<CompoundTag> {
             ByteBufOutputStream bytebufStream = new ByteBufOutputStream(buffer);
             DataOutputStream dataOutputStream = new DataOutputStream(bytebufStream);
 
-            NBTIO.writeTag(dataOutputStream, object);
+            NBTIO.writeTag((DataOutput) dataOutputStream, object);
 
             dataOutputStream.close();
         }

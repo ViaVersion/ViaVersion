@@ -13,7 +13,6 @@
     <artifactId>viaversion-common</artifactId>
     <dependencies>
         <!-- Snake YAML -->
-
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>

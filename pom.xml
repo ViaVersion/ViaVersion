@@ -65,6 +65,7 @@
             <version>1.16.6</version>
             <scope>provided</scope>
         </dependency>
+
         <!-- Javassist (Bytecode Library) -->
         <dependency>
             <groupId>org.javassist</groupId>
@@ -74,11 +75,11 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- NBT Edit Library -->
+        <!-- OpenNBT Library -->
         <dependency>
             <groupId>org.spacehq</groupId>
             <artifactId>opennbt</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
+import com.google.common.io.CharStreams;
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
@@ -10,6 +11,7 @@ import us.myles.ViaVersion.dump.DumpTemplate;
 import us.myles.ViaVersion.dump.VersionInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InvalidObjectException;
 import java.io.OutputStream;
@@ -50,10 +52,19 @@ public class DumpSubCmd extends ViaSubCommand {
         Via.getPlatform().runAsync(new Runnable() {
             @Override
             public void run() {
-                try {
-                    HttpURLConnection con = (HttpURLConnection) new URL("http://hastebin.com/documents").openConnection();
 
+                HttpURLConnection con = null;
+                try {
+                    con = (HttpURLConnection) new URL("http://hastebin.com/documents").openConnection();
+                } catch (IOException e) {
+                    sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);
+                    return;
+                }
+                try {
                     con.setRequestProperty("Content-Type", "text/plain");
+                    // Bypass cloudflare :(
+                    con.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
                     con.setRequestMethod("POST");
                     con.setDoOutput(true);
 
@@ -61,8 +72,11 @@ public class DumpSubCmd extends ViaSubCommand {
                     out.write(GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(Charset.forName("UTF-8")));
                     out.close();
 
-                    JsonObject output = GsonUtil.getGson().fromJson(new InputStreamReader(con.getInputStream()), JsonObject.class);
+                    String rawOutput = CharStreams.toString(new InputStreamReader(con.getInputStream()));
                     con.getInputStream().close();
+                    System.out.println("Raw output: " + rawOutput);
+                    JsonObject output = GsonUtil.getGson().fromJson(rawOutput, JsonObject.class);
+
 
                     if (!output.has("key"))
                         throw new InvalidObjectException("Key is not given in Hastebin output");
@@ -71,6 +85,15 @@ public class DumpSubCmd extends ViaSubCommand {
                 } catch (Exception e) {
                     sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
                     Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);
+                    try {
+                        if (con.getResponseCode() < 200 || con.getResponseCode() > 400) {
+                            String rawOutput = CharStreams.toString(new InputStreamReader(con.getErrorStream()));
+                            con.getErrorStream().close();
+                            Via.getPlatform().getLogger().log(Level.WARNING, "Page returned: " + rawOutput);
+                        }
+                    } catch (IOException e1) {
+                        Via.getPlatform().getLogger().log(Level.WARNING, "Failed to capture further info", e1);
+                    }
                 }
             }
         });
