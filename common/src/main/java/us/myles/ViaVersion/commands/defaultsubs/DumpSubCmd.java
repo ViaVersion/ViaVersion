@@ -53,7 +53,7 @@ public class DumpSubCmd extends ViaSubCommand {
             @Override
             public void run() {
 
-                HttpURLConnection con = null;
+                HttpURLConnection con;
                 try {
                     con = (HttpURLConnection) new URL("https://api.github.com/gists").openConnection();
                 } catch (IOException e) {
@@ -62,7 +62,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     return;
                 }
                 try {
-                    con.setRequestProperty("Content-Type", "application/jsom");
+                    con.setRequestProperty("Content-Type", "application/json");
                     con.addRequestProperty("User-Agent", "ViaVersion");
                     con.setRequestMethod("POST");
                     con.setDoOutput(true);
