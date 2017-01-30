@@ -253,4 +253,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
         return platformSpecific;
     }
+
+    @Override
+    public boolean isOldClientsAllowed() {
+        return !protocolSupport; // Use protocolsupport for older clients
+    }
 }

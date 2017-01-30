@@ -199,4 +199,9 @@ public class SpongePlugin implements ViaPlatform {
 
         return platformSpecific;
     }
+
+    @Override
+    public boolean isOldClientsAllowed() {
+        return true;
+    }
 }

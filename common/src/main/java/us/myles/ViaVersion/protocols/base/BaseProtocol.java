@@ -72,7 +72,12 @@ public class BaseProtocol extends Protocol {
                                 ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
 
                             int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
-                            List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+                            List<Pair<Integer, Protocol>> protocols = null;
+
+                            // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
+                            if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {
+                                protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+                            }
 
                             if (protocols != null) {
                                 if (protocolVersion != 9999) {
@@ -163,7 +168,13 @@ public class BaseProtocol extends Protocol {
                         info.setProtocolVersion(protVer);
                         // Choose the pipe
                         int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
-                        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+                        List<Pair<Integer, Protocol>> protocols = null;
+
+                        // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
+                        if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {
+                            protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+                        }
+
                         ProtocolPipeline pipeline = wrapper.user().get(ProtocolInfo.class).getPipeline();
                         if (protocols != null) {
                             for (Pair<Integer, Protocol> prot : protocols) {

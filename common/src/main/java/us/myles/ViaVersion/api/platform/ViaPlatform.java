@@ -140,4 +140,12 @@ public interface ViaPlatform<T> {
      * @return The json data
      */
     JsonObject getDump();
+
+    /**
+     * Get if older clients are allowed to be used using ViaVersion.
+     * (Only 1.9 on 1.9.2 server is supported by ViaVersion alone)
+     *
+     * @return True if allowed
+     */
+    boolean isOldClientsAllowed();
 }

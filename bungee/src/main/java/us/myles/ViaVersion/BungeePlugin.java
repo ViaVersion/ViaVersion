@@ -155,6 +155,11 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         return platformSpecific;
     }
 
+    @Override
+    public boolean isOldClientsAllowed() {
+        return true;
+    }
+
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
         Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
