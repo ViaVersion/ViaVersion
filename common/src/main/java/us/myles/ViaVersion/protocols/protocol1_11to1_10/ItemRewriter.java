@@ -27,6 +27,7 @@ public class ItemRewriter {
         oldToNewNames.put("EnderDragon", "minecraft:ender_dragon");
         oldToNewNames.put("Enderman", "minecraft:enderman");
         oldToNewNames.put("Endermite", "minecraft:endermite");
+        oldToNewNames.put("EntityHorse", "minecraft:horse");
         oldToNewNames.put("EyeOfEnderSignal", "minecraft:eye_of_ender_signal");
         oldToNewNames.put("FallingSand", "minecraft:falling_block");
         oldToNewNames.put("Fireball", "minecraft:fireball");
@@ -34,7 +35,6 @@ public class ItemRewriter {
         oldToNewNames.put("Ghast", "minecraft:ghast");
         oldToNewNames.put("Giant", "minecraft:giant");
         oldToNewNames.put("Guardian", "minecraft:guardian");
-        oldToNewNames.put("Horse", "minecraft:horse");
         oldToNewNames.put("Husk", "minecraft:husk");
         oldToNewNames.put("Item", "minecraft:item");
         oldToNewNames.put("ItemFrame", "minecraft:item_frame");
