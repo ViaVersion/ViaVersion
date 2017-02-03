@@ -24,6 +24,8 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 
 import java.util.*;
@@ -95,6 +97,8 @@ public class EntityTracker extends StoredObject {
         BossBar bar = bossBarMap.remove(entityID);
         if (bar != null) {
             bar.hide();
+            // Send to provider
+            Via.getManager().getProviders().get(BossBarProvider.class).handleRemove(getUser(), bar.getId());
         }
     }
 
@@ -203,6 +207,9 @@ public class EntityTracker extends StoredObject {
                             bossBarMap.put(entityID, bar);
                             bar.addPlayer(uuid);
                             bar.show();
+
+                            // Send to provider
+                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(getUser(), bar.getId());
                         } else {
                             bar.setTitle(title);
                         }
@@ -217,6 +224,8 @@ public class EntityTracker extends StoredObject {
                             bossBarMap.put(entityID, bar);
                             bar.addPlayer(uuid);
                             bar.show();
+                            // Send to provider
+                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(getUser(), bar.getId());
                         } else {
                             bar.setHealth(health);
                         }
