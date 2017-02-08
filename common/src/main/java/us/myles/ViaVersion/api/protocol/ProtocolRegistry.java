@@ -13,6 +13,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3TO1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9TO1_9_1;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_11_1.ProtocolSnapshotTo1_11_1;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,9 +39,11 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_9_1_2TO1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
         registerProtocol(new Protocol1_10To1_9_3_4(), Collections.singletonList(ProtocolVersion.v1_10.getId()), ProtocolVersion.v1_9_3.getId());
 
-        registerProtocol(new Protocol1_11To1_10(), Arrays.asList(ProtocolVersion.v1_11.getId()), ProtocolVersion.v1_10.getId());
-        registerProtocol(new Protocol1_11_1To1_11(), Arrays.asList(ProtocolVersion.v1_11_1.getId()), ProtocolVersion.v1_11.getId());
+        registerProtocol(new Protocol1_11To1_10(), Collections.singletonList(ProtocolVersion.v1_11.getId()), ProtocolVersion.v1_10.getId());
+        registerProtocol(new Protocol1_11_1To1_11(), Collections.singletonList(ProtocolVersion.v1_11_1.getId()), ProtocolVersion.v1_11.getId());
 
+        // Snapshot
+        registerProtocol(new ProtocolSnapshotTo1_11_1(), Collections.singletonList(ProtocolVersion.snapshot.getId()), ProtocolVersion.v1_11_1.getId());
     }
 
     /**

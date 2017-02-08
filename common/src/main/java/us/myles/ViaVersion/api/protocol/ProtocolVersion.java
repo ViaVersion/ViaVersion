@@ -29,6 +29,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_10;
     public static final ProtocolVersion v1_11;
     public static final ProtocolVersion v1_11_1;
+    public static final ProtocolVersion snapshot;
     public static final ProtocolVersion unknown;
 
     private final int id;
@@ -54,6 +55,7 @@ public class ProtocolVersion {
         register(v1_10 = new ProtocolVersion(210, "1.10"));
         register(v1_11 = new ProtocolVersion(315, "1.11"));
         register(v1_11_1 = new ProtocolVersion(316, "1.11.1"));
+        register(snapshot = new ProtocolVersion(317, "17w06a"));
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
