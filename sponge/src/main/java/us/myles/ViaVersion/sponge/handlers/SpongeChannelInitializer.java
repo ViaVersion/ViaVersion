@@ -7,6 +7,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.lang.reflect.Method;
 
@@ -31,18 +32,23 @@ public class SpongeChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        UserConnection info = new UserConnection(socketChannel);
-        // init protocol
-        new ProtocolPipeline(info);
-        // Add originals
-        this.method.invoke(this.original, socketChannel);
-        // Add our transformers
-        MessageToByteEncoder encoder = new SpongeEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
-        ByteToMessageDecoder decoder = new SpongeDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
-        SpongePacketHandler chunkHandler = new SpongePacketHandler(info);
+        // Ensure ViaVersion is loaded
+        if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
+            UserConnection info = new UserConnection(socketChannel);
+            // init protocol
+            new ProtocolPipeline(info);
+            // Add originals
+            this.method.invoke(this.original, socketChannel);
+            // Add our transformers
+            MessageToByteEncoder encoder = new SpongeEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
+            ByteToMessageDecoder decoder = new SpongeDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
+            SpongePacketHandler chunkHandler = new SpongePacketHandler(info);
 
-        socketChannel.pipeline().replace("encoder", "encoder", encoder);
-        socketChannel.pipeline().replace("decoder", "decoder", decoder);
-        socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
+            socketChannel.pipeline().replace("encoder", "encoder", encoder);
+            socketChannel.pipeline().replace("decoder", "decoder", decoder);
+            socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
+        } else {
+            this.method.invoke(this.original, socketChannel);
+        }
     }
 }
