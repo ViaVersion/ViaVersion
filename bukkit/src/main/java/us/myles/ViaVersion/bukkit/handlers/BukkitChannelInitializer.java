@@ -7,7 +7,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.classgenerator.HandlerConstructor;
 
@@ -34,25 +33,20 @@ public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        // Ensure ViaVersion is loaded
-        if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
-            UserConnection info = new UserConnection(socketChannel);
-            // init protocol
-            new ProtocolPipeline(info);
-            // Add originals
-            this.method.invoke(this.original, socketChannel);
+        UserConnection info = new UserConnection(socketChannel);
+        // init protocol
+        new ProtocolPipeline(info);
+        // Add originals
+        this.method.invoke(this.original, socketChannel);
 
-            HandlerConstructor constructor = ClassGenerator.getConstructor();
-            // Add our transformers
-            MessageToByteEncoder encoder = constructor.newEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
-            ByteToMessageDecoder decoder = constructor.newDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
-            BukkitPacketHandler chunkHandler = new BukkitPacketHandler(info);
+        HandlerConstructor constructor = ClassGenerator.getConstructor();
+        // Add our transformers
+        MessageToByteEncoder encoder = constructor.newEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
+        ByteToMessageDecoder decoder = constructor.newDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
+        BukkitPacketHandler chunkHandler = new BukkitPacketHandler(info);
 
-            socketChannel.pipeline().replace("encoder", "encoder", encoder);
-            socketChannel.pipeline().replace("decoder", "decoder", decoder);
-            socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
-        } else {
-            this.method.invoke(this.original, socketChannel);
-        }
+        socketChannel.pipeline().replace("encoder", "encoder", encoder);
+        socketChannel.pipeline().replace("decoder", "decoder", decoder);
+        socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
     }
 }
