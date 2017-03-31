@@ -46,6 +46,8 @@ public class ViaManager {
         // Check for updates
         if (platform.getConf().isCheckForUpdates())
             UpdateUtil.sendUpdateMessage();
+        // Force class load
+        ProtocolRegistry.getSupportedVersions();
         // Inject
         try {
             injector.inject();
