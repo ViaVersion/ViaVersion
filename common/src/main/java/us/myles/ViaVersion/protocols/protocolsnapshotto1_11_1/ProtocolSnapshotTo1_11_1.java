@@ -5,13 +5,14 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
 public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 17w13b
+        // As of 17w14a
 
         // Outgoing
         // New packet at 0x08
@@ -79,7 +80,33 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x43, 0x45);
         registerOutgoing(State.PLAY, 0x44, 0x46);
         registerOutgoing(State.PLAY, 0x45, 0x47);
-        registerOutgoing(State.PLAY, 0x46, 0x48);
+
+        // Sound effect
+        registerOutgoing(State.PLAY, 0x46, 0x48, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Sound name
+                map(Type.VAR_INT); // 1 - Sound Category
+                map(Type.INT); // 2 - x
+                map(Type.INT); // 3 - y
+                map(Type.INT); // 4 - z
+                map(Type.FLOAT); // 5 - Volume
+                map(Type.FLOAT); // 6 - Pitch
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.VAR_INT, 0);
+                        id = getNewSoundId(id);
+
+                        if (id == -1) // Removed
+                            wrapper.cancel();
+                        wrapper.set(Type.VAR_INT, 0, id);
+                    }
+                });
+            }
+        });
+
         registerOutgoing(State.PLAY, 0x47, 0x49);
         registerOutgoing(State.PLAY, 0x48, 0x4a);
         registerOutgoing(State.PLAY, 0x49, 0x4b);
@@ -91,7 +118,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x01, 0x01, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler(){
+                handler(new PacketHandler() {
 
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -125,7 +152,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x17, 0x17, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler(){
+                handler(new PacketHandler() {
 
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -144,6 +171,13 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x1d, 0x1f);
     }
 
+    private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
+        int newId = id;
+        if (id >= 301) // Hello shulker boxes
+            newId += 6;
+
+        return newId;
+    }
 
     @Override
     public void init(UserConnection userConnection) {
