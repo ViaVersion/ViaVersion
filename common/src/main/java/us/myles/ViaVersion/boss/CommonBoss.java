@@ -1,16 +1,16 @@
 package us.myles.ViaVersion.boss;
 
 import com.google.common.base.Preconditions;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
@@ -80,8 +80,10 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     public BossBar addPlayer(UUID player) {
         if (!players.contains(player)) {
             players.add(player);
-            if (visible)
-                sendPacket(player, getPacket(CommonBoss.UpdateAction.ADD));
+            if (visible) {
+                UserConnection user = Via.getManager().getConnection(player);
+                sendPacket(player, getPacket(CommonBoss.UpdateAction.ADD, user));
+            }
         }
         return this;
     }
@@ -90,7 +92,8 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     public BossBar removePlayer(UUID uuid) {
         if (players.contains(uuid)) {
             players.remove(uuid);
-            sendPacket(uuid, getPacket(UpdateAction.REMOVE));
+            UserConnection user = Via.getManager().getConnection(uuid);
+            sendPacket(uuid, getPacket(UpdateAction.REMOVE, user));
         }
         return this;
     }
@@ -152,52 +155,55 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     private void sendPacket(UpdateAction action) {
         for (UUID uuid : new ArrayList<>(players)) {
-            ByteBuf buf = getPacket(action);
-            sendPacket(uuid, buf);
+            UserConnection connection = Via.getManager().getConnection(uuid);
+            PacketWrapper wrapper = getPacket(action, connection);
+            sendPacket(uuid, wrapper);
         }
     }
 
-    private void sendPacket(UUID uuid, ByteBuf buf) {
+    private void sendPacket(UUID uuid, PacketWrapper wrapper) {
         if (!Via.getAPI().isPorted(uuid) || !(Via.getAPI().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
             players.remove(uuid);
-            buf.release();
             return;
         }
-        Via.getAPI().sendRawPacket(uuid, buf);
+        try {
+            wrapper.send(Protocol1_9TO1_8.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private ByteBuf getPacket(UpdateAction action) {
+    private PacketWrapper getPacket(UpdateAction action, UserConnection connection) {
         try {
-            ByteBuf buf = Unpooled.buffer();
-            Type.VAR_INT.write(buf, 0x0C); // Boss bar packet
-            Type.UUID.write(buf, uuid);
-            Type.VAR_INT.write(buf, action.getId());
+            PacketWrapper wrapper = new PacketWrapper(0x0C, null, connection); // TODO don't use fixed packet ids for future support
+            wrapper.write(Type.UUID, uuid);
+            wrapper.write(Type.VAR_INT, action.getId());
             switch (action) {
                 case ADD:
-                    Type.STRING.write(buf, fixJson(title));
-                    buf.writeFloat(health);
-                    Type.VAR_INT.write(buf, color.getId());
-                    Type.VAR_INT.write(buf, style.getId());
-                    buf.writeByte(flagToBytes());
+                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, title);
+                    wrapper.write(Type.FLOAT, health);
+                    wrapper.write(Type.VAR_INT, color.getId());
+                    wrapper.write(Type.VAR_INT, style.getId());
+                    wrapper.write(Type.BYTE, (byte) flagToBytes());
                     break;
                 case REMOVE:
                     break;
                 case UPDATE_HEALTH:
-                    buf.writeFloat(health);
+                    wrapper.write(Type.FLOAT, health);
                     break;
                 case UPDATE_TITLE:
-                    Type.STRING.write(buf, fixJson(title));
+                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, title);
                     break;
                 case UPDATE_STYLE:
-                    Type.VAR_INT.write(buf, color.getId());
-                    Type.VAR_INT.write(buf, style.getId());
+                    wrapper.write(Type.VAR_INT, color.getId());
+                    wrapper.write(Type.VAR_INT, style.getId());
                     break;
                 case UPDATE_FLAGS:
-                    buf.writeByte(flagToBytes());
+                    wrapper.write(Type.BYTE, (byte) flagToBytes());
                     break;
             }
 
-            return buf;
+            return wrapper;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -209,10 +215,6 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         for (BossFlag flag : flags)
             bitmask |= flag.getId();
         return bitmask;
-    }
-
-    private String fixJson(String text) {
-        return Protocol1_9TO1_8.fixJson(text);
     }
 
     @RequiredArgsConstructor
