@@ -88,7 +88,18 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
         // Incoming
         // New packet at 0x01
-        registerIncoming(State.PLAY, -1, 0x01);
+        registerIncoming(State.PLAY, 0x01, 0x01, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler(){
+
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
         registerIncoming(State.PLAY, 0x01, 0x02);
         registerIncoming(State.PLAY, 0x02, 0x03);
         registerIncoming(State.PLAY, 0x03, 0x04);
@@ -111,7 +122,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x14, 0x15);
         registerIncoming(State.PLAY, 0x15, 0x16);
         // New packet at 0x17
-        registerIncoming(State.PLAY, 0x17, -1, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x17, 0x17, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler(){
