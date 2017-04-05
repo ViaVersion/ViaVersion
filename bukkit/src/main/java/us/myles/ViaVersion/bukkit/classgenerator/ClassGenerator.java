@@ -33,8 +33,16 @@ public class ClassGenerator {
                     addSpigotCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
                     addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 } else {
-                    Class decodeSuper = Class.forName(getPSPackage().equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketDecoder" : getPSPackage() + ".wrapped.WrappedDecoder");
-                    Class encodeSuper = Class.forName(getPSPackage().equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketEncoder" : getPSPackage() + ".wrapped.WrappedEncoder");
+                    // ProtocolSupport compatibility
+                    Class encodeSuper;
+                    Class decodeSuper;
+                    if (isMultiplatformPS()) {
+                        return;
+                    } else {
+                        String psPackage = getOldPSPackage();
+                        decodeSuper = Class.forName(psPackage.equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketDecoder" : psPackage + ".wrapped.WrappedDecoder");
+                        encodeSuper = Class.forName(psPackage.equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketEncoder" : psPackage + ".wrapped.WrappedEncoder");
+                    }
                     // Generate the classes
                     addPSCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
                     addPSCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
@@ -110,7 +118,7 @@ public class ClassGenerator {
     }
 
     private static Class addPSCompatibility(ClassPool pool, Class input, Class superclass) {
-        boolean newPS = getPSPackage().equals("unknown");
+        boolean newPS = getOldPSPackage().equals("unknown");
         String newName = "us.myles.ViaVersion.classgenerator.generated." + input.getSimpleName();
 
         try {
@@ -121,8 +129,8 @@ public class ClassGenerator {
 
                 if (!newPS) {
                     // Override setRealEncoder / setRealDecoder
-                    pool.importPackage(getPSPackage());
-                    pool.importPackage(getPSPackage() + ".wrapped");
+                    pool.importPackage(getOldPSPackage());
+                    pool.importPackage(getOldPSPackage() + ".wrapped");
                     if (superclass.getName().endsWith("Decoder")) {
                         // Decoder
                         generated.addMethod(CtMethod.make("public void setRealDecoder(IPacketDecoder dec) {\n" +
@@ -158,7 +166,7 @@ public class ClassGenerator {
         return null;
     }
 
-    public static String getPSPackage() {
+    public static String getOldPSPackage() {
         if (psPackage == null) {
             try {
                 Class.forName("protocolsupport.protocol.core.IPacketDecoder");
@@ -174,4 +182,14 @@ public class ClassGenerator {
         }
         return psPackage;
     }
+
+    public static boolean isMultiplatformPS() {
+        try {
+            Class.forName("protocolsupport.zplatform.impl.spigot.network.pipeline.SpigotPacketEncoder");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
 }
