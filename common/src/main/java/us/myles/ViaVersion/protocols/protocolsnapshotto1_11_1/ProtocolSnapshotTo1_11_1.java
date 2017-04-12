@@ -12,7 +12,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 17w14a
+        // As of 17w15a
 
         // Outgoing
         // New packet at 0x08
@@ -81,7 +81,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x44, 0x46);
         registerOutgoing(State.PLAY, 0x45, 0x47);
 
-        // Sound effect
+        // Sound effect, TODO: This changed in 17w15a
         registerOutgoing(State.PLAY, 0x46, 0x48, new PacketRemapper() {
             @Override
             public void registerMap() {
