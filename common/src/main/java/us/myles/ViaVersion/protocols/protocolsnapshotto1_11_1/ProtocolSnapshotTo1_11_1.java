@@ -12,7 +12,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 17w15a
+        // As of 17w16a
 
         // Outgoing
         // New packet at 0x08
@@ -173,9 +173,22 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
         int newId = id;
-        if (id >= 301) // Hello shulker boxes
+        if (id >= 26) // End Portal Sounds
+            newId += 2;
+        if (id >= 70) // New Block Notes
+            newId += 4;
+        if (id >= 74) // New Block Note 2
+            newId += 1;
+        if (id >= 143) // Boat Sounds
+            newId += 3;
+        if (id >= 185) // Endereye death
+            newId += 1;
+        if (id >= 263) // Illagers
+            newId += 3;
+        if (id >= 301) // Parrots
             newId += 6;
-
+        if (id >= 317) // Player Sounds
+            newId += 2;
         return newId;
     }
 
