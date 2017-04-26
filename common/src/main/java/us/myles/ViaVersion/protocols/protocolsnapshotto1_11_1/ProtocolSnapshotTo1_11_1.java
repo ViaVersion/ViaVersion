@@ -12,7 +12,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 17w16a
+        // As of 17w17a
 
         // Outgoing
         // New packet at 0x08
@@ -184,7 +184,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         if (id >= 185) // Endereye death
             newId += 1;
         if (id >= 263) // Illagers
-            newId += 3;
+            newId += 7;
         if (id >= 301) // Parrots
             newId += 6;
         if (id >= 317) // Player Sounds
