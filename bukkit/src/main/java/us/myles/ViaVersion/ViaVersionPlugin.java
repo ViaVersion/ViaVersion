@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -23,6 +24,7 @@ import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -119,6 +121,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
             Bukkit.getScheduler().runTaskAsynchronously(this, r);
         }
         asyncQueuedTasks.clear();
+
+        setupMetrics();
     }
 
     @Override
@@ -257,5 +261,21 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     @Override
     public boolean isOldClientsAllowed() {
         return !protocolSupport; // Use protocolsupport for older clients
+    }
+
+    // IntelliJ complains about duplicates, its the same code but with different bStats modules...
+    @SuppressWarnings("Duplicates")
+    private void setupMetrics() {
+        try {
+            Metrics metrics = new Metrics(this);
+            metrics.addCustomChart(new Metrics.AdvancedPie("protocol_versions") {
+                @Override
+                public HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap) {
+                    return Via.getManager().getMetrics(valueMap);
+                }
+            });
+        } catch (Exception ex) {
+            Via.getPlatform().getLogger().warning("Error while enabling metrics! " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
     }
 }

@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import org.bstats.Metrics;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
@@ -26,10 +27,7 @@ import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -46,6 +44,9 @@ public class SpongePlugin implements ViaPlatform {
 
     @Inject
     private PluginContainer container;
+
+    @Inject
+    private Metrics metrics;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -78,6 +79,8 @@ public class SpongePlugin implements ViaPlatform {
 
         // Inject!
         Via.getManager().init();
+
+        setupMetrics();
     }
 
     @Override
@@ -203,5 +206,20 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    // IntelliJ complains about duplicates, its the same code but with different bStats modules...
+    @SuppressWarnings("Duplicates")
+    private void setupMetrics() {
+        try {
+            metrics.addCustomChart(new Metrics.AdvancedPie("protocol_versions") {
+                @Override
+                public HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap) {
+                    return Via.getManager().getMetrics(valueMap);
+                }
+            });
+        } catch (Exception ex) {
+            Via.getPlatform().getLogger().warning("Error while enabling metrics! " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
     }
 }

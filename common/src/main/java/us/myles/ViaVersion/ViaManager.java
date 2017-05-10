@@ -3,6 +3,8 @@ package us.myles.ViaVersion;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
@@ -14,6 +16,7 @@ import us.myles.ViaVersion.commands.ViaCommandHandler;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.update.UpdateUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,4 +119,19 @@ public class ViaManager {
         return portedPlayers.get(playerUUID);
     }
 
+    /**
+     * Collects the protocol versions of all online players and puts them into the valueMap, ready to be send to the metrics service
+     *
+     * @param valueMap the map where the data should be inserted into
+     * @return the valueMap with the added values
+     */
+    public HashMap<String, Integer> getMetrics(HashMap<String, Integer> valueMap) {
+        for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
+            int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
+            ProtocolVersion key = ProtocolVersion.getProtocol(playerVersion);
+            Integer count = valueMap.get(key.getName());
+            valueMap.put(key.getName(), count == null ? 0 : ++count);
+        }
+        return valueMap;
+    }
 }

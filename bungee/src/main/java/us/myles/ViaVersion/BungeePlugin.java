@@ -8,6 +8,7 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import org.bstats.Metrics;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -24,6 +25,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +54,8 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     public void onEnable() {
         // Inject
         Via.getManager().init();
+
+        setupMetrics();
     }
 
     @Override
@@ -163,5 +167,21 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
         Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+    }
+
+    // IntelliJ complains about duplicates, its the same code but with different bStats modules...
+    @SuppressWarnings("Duplicates")
+    private void setupMetrics() {
+        try {
+            Metrics metrics = new Metrics(this);
+            metrics.addCustomChart(new Metrics.AdvancedPie("protocol_versions") {
+                @Override
+                public HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap) {
+                    return Via.getManager().getMetrics(valueMap);
+                }
+            });
+        } catch (Exception ex) {
+            Via.getPlatform().getLogger().warning("Error while enabling metrics! " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
     }
 }
