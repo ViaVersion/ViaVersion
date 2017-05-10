@@ -57,6 +57,10 @@
                             <pattern>org.javassist</pattern>
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.org.bstats</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>

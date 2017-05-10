@@ -86,6 +86,12 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-    </dependencies>
 
+        <!-- bStats -->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-sponge</artifactId>
+            <version>${bstatsVersion}</version>
+        </dependency>
+    </dependencies>
 </project>

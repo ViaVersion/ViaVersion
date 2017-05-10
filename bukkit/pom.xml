@@ -60,5 +60,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- bStats -->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>${bstatsVersion}</version>
+        </dependency>
     </dependencies>
 </project>

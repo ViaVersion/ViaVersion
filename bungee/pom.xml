@@ -39,5 +39,12 @@
             <artifactId>viaversion-common</artifactId>
             <version>1.0.5-SNAPSHOT</version>
         </dependency>
+
+        <!-- bStats-->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bungeecord</artifactId>
+            <version>${bstatsVersion}</version>
+        </dependency>
     </dependencies>
 </project>
