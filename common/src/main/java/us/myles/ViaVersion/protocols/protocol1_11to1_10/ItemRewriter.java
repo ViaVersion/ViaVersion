@@ -97,6 +97,7 @@ public class ItemRewriter {
                 }
             }
         }
+        if (stack.getAmount() <= 0) stack.setAmount((byte) 1);
     }
 
     public static void toServer(Item item) {
