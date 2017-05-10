@@ -303,7 +303,7 @@ public class SpawnPackets {
                             packet.write(Type.VAR_INT, 0);
                             packet.write(Type.ITEM, new Item(item, (byte) 1, (short) 0, null));
                             try {
-                                packet.send(Protocol1_9TO1_8.class);
+                                packet.send(Protocol1_9TO1_8.class, true, true);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

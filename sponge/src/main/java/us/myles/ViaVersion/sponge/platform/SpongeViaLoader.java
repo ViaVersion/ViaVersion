@@ -42,7 +42,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         new BlockListener(plugin).register();
 
         if (plugin.getConf().isItemCache()) {
-            Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L); // Updates player's items :)
+            Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L); // Updates players items :)
             HandItemCache.CACHE = true;
         }
 
