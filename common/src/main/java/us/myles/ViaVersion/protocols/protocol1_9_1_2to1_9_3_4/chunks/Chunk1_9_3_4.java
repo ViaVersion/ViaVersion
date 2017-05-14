@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 
 import java.util.List;

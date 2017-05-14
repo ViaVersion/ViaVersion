@@ -44,16 +44,16 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
         </repository>
 
-        <!-- SpaceHQ Repo-->
-        <repository>
-            <id>spacehq-repo</id>
-            <url>https://repo.spacehq.org/content/repositories/releases/</url>
-        </repository>
-
         <!-- Bungee repo -->
         <repository>
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+
+        <!-- ViaVersion repo -->
+        <repository>
+            <id>viaversion-repo</id>
+            <url>https://repo.viaversion.com</url>
         </repository>
     </repositories>
 
@@ -76,10 +76,11 @@
         </dependency>
 
         <!-- OpenNBT Library -->
+        <!--Version 1.0 is conflicting with Maven Central (2012)-->
         <dependency>
-            <groupId>org.spacehq</groupId>
+            <groupId>com.github.steveice10</groupId>
             <artifactId>opennbt</artifactId>
-            <version>1.1</version>
+            <version>1.1-SNAPSHOT</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

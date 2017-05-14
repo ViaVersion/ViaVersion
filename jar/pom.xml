@@ -46,7 +46,7 @@
                     <minimizeJar>false</minimizeJar>
                     <relocations>
                         <relocation>
-                            <pattern>org.spacehq.opennbt</pattern>
+                            <pattern>com.github.steveice10.opennbt</pattern>
                             <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>
                         </relocation>
                         <relocation>

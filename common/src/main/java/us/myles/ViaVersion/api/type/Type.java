@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.api.type;
 
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import lombok.Getter;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.Vector;
