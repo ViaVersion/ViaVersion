@@ -1,10 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_11Types;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -15,6 +18,8 @@ import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.types.Chunk1_11Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_11To1_10 extends Protocol {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
@@ -243,6 +248,88 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
+        // Update Block Entity
+        registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // 0 - Position
+                map(Type.UNSIGNED_BYTE); // 1 - Action
+                map(Type.NBT); // 2 - NBT data
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1) {
+                            CompoundTag tag = wrapper.get(Type.NBT, 0);
+                            EntityIdRewriter.toClientSpawner(tag);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Chunk Data
+        registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+
+                        Chunk1_11Type type = new Chunk1_11Type(clientWorld);
+                        Chunk chunk = wrapper.passthrough(type);
+
+                        if (chunk.getBlockEntities() == null) return;
+                        for (CompoundTag tag : chunk.getBlockEntities()) {
+                            if (tag.contains("id") &&
+                                    ((StringTag) tag.get("id")).getValue().equals("MobSpawner")) {
+                                EntityIdRewriter.toClientSpawner(tag);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // Join (save dimension id)
+        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+
+                        int dimensionId = wrapper.get(Type.INT, 1);
+                        clientChunks.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
+        // Respawn (save dimension id)
+        registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Dimension ID
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+
+                        int dimensionId = wrapper.get(Type.INT, 0);
+                        clientWorld.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
         /*
             INCOMING PACKETS
          */
@@ -314,5 +401,7 @@ public class Protocol1_11To1_10 extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker(userConnection));
+        if (!userConnection.has(ClientWorld.class))
+            userConnection.put(new ClientWorld(userConnection));
     }
 }

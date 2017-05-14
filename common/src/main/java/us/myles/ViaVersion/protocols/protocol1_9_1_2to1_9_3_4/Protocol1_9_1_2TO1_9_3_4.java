@@ -53,6 +53,7 @@ public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
             }
         });
 
+        // Chunk Packet
         registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
