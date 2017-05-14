@@ -97,7 +97,7 @@ public class ItemRewriter {
                 }
             }
         }
-        if (item.getAmount() <= 0) item.setAmount((byte) 1);
+        if (item != null && item.getAmount() <= 0) item.setAmount((byte) 1);
     }
 
     public static void toServer(Item item) {
