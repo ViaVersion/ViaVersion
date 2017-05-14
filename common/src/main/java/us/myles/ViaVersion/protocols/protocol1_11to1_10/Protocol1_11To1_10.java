@@ -18,7 +18,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.types.Chunk1_11Type;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_11To1_10 extends Protocol {
@@ -277,7 +277,7 @@ public class Protocol1_11To1_10 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk1_11Type type = new Chunk1_11Type(clientWorld);
+                        Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk chunk = wrapper.passthrough(type);
 
                         if (chunk.getBlockEntities() == null) return;
