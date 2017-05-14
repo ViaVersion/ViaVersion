@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.IntTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 
 import java.util.Arrays;
 import java.util.List;

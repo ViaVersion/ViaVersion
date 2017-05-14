@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;

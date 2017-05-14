@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.api.minecraft.item;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import lombok.*;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 @Getter
 @Setter

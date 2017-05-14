@@ -1,9 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.ListTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
-import org.spacehq.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
 import java.util.Collections;
