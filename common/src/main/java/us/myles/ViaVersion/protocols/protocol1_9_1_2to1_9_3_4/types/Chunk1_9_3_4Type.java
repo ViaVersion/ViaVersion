@@ -92,7 +92,8 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
             output.writeBytes(chunk.getBiomeData());
         }
 
-        // Don't write block entities
+        // Write Block Entities
+        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
     }
 
     @Override

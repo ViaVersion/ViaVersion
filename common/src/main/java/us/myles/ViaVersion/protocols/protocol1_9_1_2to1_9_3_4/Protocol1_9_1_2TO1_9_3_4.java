@@ -13,6 +13,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.BlockEntity;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 
 public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
 
@@ -53,6 +54,7 @@ public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
             }
         });
 
+        // Chunk Packet
         registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -61,9 +63,11 @@ public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
-                        Chunk chunk = wrapper.passthrough(type);
+                        Chunk1_9_3_4Type newType = new Chunk1_9_3_4Type(clientWorld);
+                        Chunk1_9_1_2Type oldType = new Chunk1_9_1_2Type(clientWorld); // Get the old type to not write Block Entities
 
+                        Chunk chunk = wrapper.read(newType);
+                        wrapper.write(oldType, chunk);
                         BlockEntity.handle(chunk.getBlockEntities(), wrapper.user());
                     }
                 });

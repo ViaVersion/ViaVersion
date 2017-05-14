@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.ItemRewriter;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 
 public class InventoryPackets {
@@ -27,7 +27,7 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
-                        ItemRewriter.toClient(stack);
+                        EntityIdRewriter.toClientItem(stack);
                     }
                 });
             }
@@ -45,7 +45,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item[] stacks = wrapper.get(Type.ITEM_ARRAY, 0);
                         for (Item stack : stacks)
-                            ItemRewriter.toClient(stack);
+                            EntityIdRewriter.toClientItem(stack);
                     }
                 });
             }
@@ -63,7 +63,7 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
-                        ItemRewriter.toClient(stack);
+                        EntityIdRewriter.toClientItem(stack);
                     }
                 });
             }
@@ -83,12 +83,12 @@ public class InventoryPackets {
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
-                                ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Input Item
-                                ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Output Item
+                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Input Item
+                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Output Item
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem)
-                                    ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); // Second Item
+                                    EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Second Item
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
@@ -119,7 +119,7 @@ public class InventoryPackets {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.ITEM, 0);
-                                ItemRewriter.toServer(item);
+                                EntityIdRewriter.toServerItem(item);
                             }
                         });
                     }
@@ -137,7 +137,7 @@ public class InventoryPackets {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.ITEM, 0);
-                                ItemRewriter.toServer(item);
+                                EntityIdRewriter.toServerItem(item);
                             }
                         });
                     }
