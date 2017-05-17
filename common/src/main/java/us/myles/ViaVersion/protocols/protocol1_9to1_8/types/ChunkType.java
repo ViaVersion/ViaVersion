@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.Via;
@@ -16,6 +17,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.logging.Level;
 
@@ -137,7 +139,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         }
 
         // Return chunks
-        return new Chunk1_9to1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData);
+        return new Chunk1_9to1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData, new ArrayList<CompoundTag>());
     }
 
     @Override
@@ -172,9 +174,5 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         if (chunk.hasBiomeData()) {
             output.writeBytes(chunk.getBiomeData());
         }
-
-
     }
-
-
 }
