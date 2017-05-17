@@ -17,7 +17,6 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntit
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Protocol1_9_3TO1_9_1_2 extends Protocol {
@@ -80,7 +79,7 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                         Chunk1_9_1_2Type type = new Chunk1_9_1_2Type(clientWorld);
                         Chunk chunk = wrapper.passthrough(type);
 
-                        List<CompoundTag> tags = new ArrayList<>();
+                        List<CompoundTag> tags = chunk.getBlockEntities();
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection section = chunk.getSections()[i];
                             if (section == null)
@@ -98,7 +97,8 @@ public class Protocol1_9_3TO1_9_1_2 extends Protocol {
                             }
                         }
 
-                        wrapper.write(Type.NBT_ARRAY, tags.toArray(new CompoundTag[0]));
+                        // Send (for clients on this version)
+                        wrapper.write(Type.NBT_ARRAY, chunk.getBlockEntities().toArray(new CompoundTag[0]));
                     }
                 });
             }
