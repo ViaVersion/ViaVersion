@@ -1,12 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
-public class ItemRewriter {
+public class EntityIdRewriter {
     private static BiMap<String, String> oldToNewNames = HashBiMap.create();
 
     static {
@@ -87,20 +87,32 @@ public class ItemRewriter {
         oldToNewNames.put("ZombieVillager", "minecraft:zombie_villager");
     }
 
-    public static void toClient(Item item) {
-        if (hasEntityTag(item)) {
-            CompoundTag entityTag = item.getTag().get("EntityTag");
-            if (entityTag.get("id") instanceof StringTag) {
-                StringTag id = entityTag.get("id");
-                if (oldToNewNames.containsKey(id.getValue())) {
-                    id.setValue(oldToNewNames.get(id.getValue()));
-                }
+    public static void toClient(CompoundTag tag) {
+        if (tag.get("id") instanceof StringTag) {
+            StringTag id = tag.get("id");
+            if (oldToNewNames.containsKey(id.getValue())) {
+                id.setValue(oldToNewNames.get(id.getValue()));
             }
         }
-        if (item.getAmount() <= 0) item.setAmount((byte) 1);
     }
 
-    public static void toServer(Item item) {
+    public static void toClientSpawner(CompoundTag tag) {
+        if (tag != null && tag.contains("SpawnData")) {
+            CompoundTag spawnData = tag.get("SpawnData");
+            if (spawnData != null && spawnData.contains("id"))
+                toClient(spawnData);
+        }
+    }
+
+    public static void toClientItem(Item item) {
+        if (hasEntityTag(item)) {
+            CompoundTag entityTag = item.getTag().get("EntityTag");
+            toClient(entityTag);
+        }
+        if (item != null && item.getAmount() <= 0) item.setAmount((byte) 1);
+    }
+
+    public static void toServerItem(Item item) {
         if (hasEntityTag(item)) {
             CompoundTag entityTag = item.getTag().get("EntityTag");
             if (entityTag.get("id") instanceof StringTag) {

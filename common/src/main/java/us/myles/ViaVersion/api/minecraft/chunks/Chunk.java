@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 
 import java.util.List;
 

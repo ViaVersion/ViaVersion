@@ -1,11 +1,11 @@
 package us.myles.ViaVersion.api.type.types.minecraft;
 
+import com.github.steveice10.opennbt.NBTIO;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import org.spacehq.opennbt.NBTIO;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.io.DataInput;

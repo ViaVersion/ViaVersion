@@ -1,10 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Optional;
 import lombok.Getter;
 import lombok.Setter;
-import org.spacehq.opennbt.tag.builtin.ByteTag;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;

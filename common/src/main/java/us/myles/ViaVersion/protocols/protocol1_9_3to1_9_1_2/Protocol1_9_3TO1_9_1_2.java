@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.IntTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
