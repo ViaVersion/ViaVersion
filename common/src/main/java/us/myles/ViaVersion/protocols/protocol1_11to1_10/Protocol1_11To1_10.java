@@ -280,6 +280,9 @@ public class Protocol1_11To1_10 extends Protocol {
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk chunk = wrapper.passthrough(type);
 
+                        // Clear any other bytes (This is a workaround for a issue with 1.9.2 encoder adding nbt list)
+                        wrapper.clearInputBuffer();
+
                         if (chunk.getBlockEntities() == null) return;
                         for (CompoundTag tag : chunk.getBlockEntities()) {
                             if (tag.contains("id") &&
