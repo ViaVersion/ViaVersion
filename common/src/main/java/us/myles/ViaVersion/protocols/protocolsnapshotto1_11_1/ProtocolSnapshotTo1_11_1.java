@@ -12,7 +12,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 17w18a
+        // As of 1.12-pre3
 
         // Outgoing
         // New packet at 0x08
@@ -112,6 +112,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x49, 0x4b);
         registerOutgoing(State.PLAY, 0x4a, 0x4c);
         registerOutgoing(State.PLAY, 0x4b, 0x4d);
+        // New packet at 0x4e
 
         // Incoming
         // New packet at 0x01
@@ -169,6 +170,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x1b, 0x1d);
         registerIncoming(State.PLAY, 0x1c, 0x1e);
         registerIncoming(State.PLAY, 0x1d, 0x1f);
+        // New packet at 0x20
     }
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
