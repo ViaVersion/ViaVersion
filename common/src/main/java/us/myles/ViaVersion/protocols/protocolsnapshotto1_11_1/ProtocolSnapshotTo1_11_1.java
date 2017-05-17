@@ -1,12 +1,19 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_11_1;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
@@ -41,7 +48,49 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x1d, 0x1e);
         registerOutgoing(State.PLAY, 0x1e, 0x1f);
         registerOutgoing(State.PLAY, 0x1f, 0x20);
-        registerOutgoing(State.PLAY, 0x20, 0x21);
+        // Chunk Data
+        registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+
+                        Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
+                        Chunk chunk = wrapper.passthrough(type);
+
+                        for (int i = 0; i < chunk.getSections().length; i++) {
+                            ChunkSection section = chunk.getSections()[i];
+                            if (section == null)
+                                continue;
+
+                            for (int x = 0; x < 16; x++) {
+                                for (int y = 0; y < 16; y++) {
+                                    for (int z = 0; z < 16; z++) {
+                                        int block = section.getBlockId(x, y, z);
+                                        // Is this a bed?
+                                        if (block == 26) {
+                                            //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
+                                            CompoundTag tag = new CompoundTag("");
+                                            tag.put(new IntTag("color", 14)); // Set color to red (Default in previous versions)
+                                            tag.put(new IntTag("x", x + (chunk.getX() << 4)));
+                                            tag.put(new IntTag("y", y + (i << 4)));
+                                            tag.put(new IntTag("z", z + (chunk.getZ() << 4)));
+                                            tag.put(new StringTag("id", "minecraft:bed"));
+
+                                            // Add a fake block entity
+                                            chunk.getBlockEntities().add(tag);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x21, 0x22);
         registerOutgoing(State.PLAY, 0x22, 0x23);
         registerOutgoing(State.PLAY, 0x23, 0x24);
