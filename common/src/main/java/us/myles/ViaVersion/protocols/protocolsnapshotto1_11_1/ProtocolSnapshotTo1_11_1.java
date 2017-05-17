@@ -171,6 +171,18 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x1c, 0x1e);
         registerIncoming(State.PLAY, 0x1d, 0x1f);
         // New packet at 0x20
+        registerIncoming(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
     }
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
