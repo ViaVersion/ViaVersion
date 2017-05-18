@@ -19,7 +19,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 1.12-pre3
+        // As of 1.12-pre4
 
         // Outgoing
         // New packet at 0x08
