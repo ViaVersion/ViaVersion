@@ -93,7 +93,26 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         });
         registerOutgoing(State.PLAY, 0x21, 0x22);
         registerOutgoing(State.PLAY, 0x22, 0x23);
-        registerOutgoing(State.PLAY, 0x23, 0x24);
+        // Join Packet
+        registerOutgoing(State.PLAY, 0x23, 0x24, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+
+                        int dimensionId = wrapper.get(Type.INT, 1);
+                        clientChunks.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
         registerOutgoing(State.PLAY, 0x24, 0x25);
         registerOutgoing(State.PLAY, 0x25, 0x26);
         registerOutgoing(State.PLAY, 0x26, 0x27);
@@ -110,7 +129,24 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         // New packet at 0x31
         registerOutgoing(State.PLAY, 0x31, 0x33);
         registerOutgoing(State.PLAY, 0x32, 0x34);
-        registerOutgoing(State.PLAY, 0x33, 0x35);
+        // Respawn Packet
+        registerOutgoing(State.PLAY, 0x33, 0x35, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Dimension ID
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+
+                        int dimensionId = wrapper.get(Type.INT, 0);
+                        clientWorld.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
         registerOutgoing(State.PLAY, 0x34, 0x36);
         registerOutgoing(State.PLAY, 0x35, 0x37);
         registerOutgoing(State.PLAY, 0x36, 0x38);
@@ -257,6 +293,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-
+        if (!userConnection.has(ClientWorld.class))
+            userConnection.put(new ClientWorld(userConnection));
     }
 }
