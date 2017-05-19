@@ -191,10 +191,10 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x09, 0x0a);
         registerIncoming(State.PLAY, 0x0a, 0x0b);
         registerIncoming(State.PLAY, 0x0b, 0x0c);
-        // Mojang moved 0x0D to 0x0F
+        // Mojang swapped 0x0F to 0x0D
         registerIncoming(State.PLAY, 0x0f, 0x0d);
-
         registerIncoming(State.PLAY, 0x0c, 0x0e);
+        // Mojang swapped 0x0F to 0x0D
         registerIncoming(State.PLAY, 0x0d, 0x0f);
         registerIncoming(State.PLAY, 0x0e, 0x10);
         registerIncoming(State.PLAY, 0x10, 0x11);
