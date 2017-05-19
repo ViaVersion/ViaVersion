@@ -19,37 +19,11 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 1.12-pre4
+        // As of 1.12-pre5
 
         // Outgoing
-        // New packet at 0x08
-        registerOutgoing(State.PLAY, 0x08, 0x09);
-        registerOutgoing(State.PLAY, 0x09, 0x0a);
-        registerOutgoing(State.PLAY, 0x0a, 0x0b);
-        registerOutgoing(State.PLAY, 0x0b, 0x0c);
-        // error here, 0x0c
-        registerOutgoing(State.PLAY, 0x0c, 0x0d);
-        registerOutgoing(State.PLAY, 0x0d, 0x0e);
-        registerOutgoing(State.PLAY, 0x0e, 0x0f);
-        registerOutgoing(State.PLAY, 0x0f, 0x10);
-        registerOutgoing(State.PLAY, 0x10, 0x11);
-        registerOutgoing(State.PLAY, 0x11, 0x12);
-        registerOutgoing(State.PLAY, 0x12, 0x13);
-        registerOutgoing(State.PLAY, 0x13, 0x14);
-        registerOutgoing(State.PLAY, 0x14, 0x15);
-        registerOutgoing(State.PLAY, 0x15, 0x16);
-        registerOutgoing(State.PLAY, 0x16, 0x17);
-        registerOutgoing(State.PLAY, 0x17, 0x18);
-        registerOutgoing(State.PLAY, 0x18, 0x19);
-        registerOutgoing(State.PLAY, 0x19, 0x1a);
-        registerOutgoing(State.PLAY, 0x1a, 0x1b);
-        registerOutgoing(State.PLAY, 0x1b, 0x1c);
-        registerOutgoing(State.PLAY, 0x1c, 0x1d);
-        registerOutgoing(State.PLAY, 0x1d, 0x1e);
-        registerOutgoing(State.PLAY, 0x1e, 0x1f);
-        registerOutgoing(State.PLAY, 0x1f, 0x20);
         // Chunk Data
-        registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -91,10 +65,8 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x21, 0x22);
-        registerOutgoing(State.PLAY, 0x22, 0x23);
         // Join Packet
-        registerOutgoing(State.PLAY, 0x23, 0x24, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -113,24 +85,17 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x24, 0x25);
+        // 0x28 moved to 0x25
+        registerOutgoing(State.PLAY, 0x28, 0x25);
         registerOutgoing(State.PLAY, 0x25, 0x26);
         registerOutgoing(State.PLAY, 0x26, 0x27);
         registerOutgoing(State.PLAY, 0x27, 0x28);
-        registerOutgoing(State.PLAY, 0x28, 0x29);
-        registerOutgoing(State.PLAY, 0x29, 0x2a);
-        registerOutgoing(State.PLAY, 0x2a, 0x2b);
-        registerOutgoing(State.PLAY, 0x2b, 0x2c);
-        registerOutgoing(State.PLAY, 0x2c, 0x2d);
-        registerOutgoing(State.PLAY, 0x2d, 0x2e);
-        registerOutgoing(State.PLAY, 0x2e, 0x2f);
-        registerOutgoing(State.PLAY, 0x2f, 0x30);
-        registerOutgoing(State.PLAY, 0x30, 0x32);
-        // New packet at 0x31
-        registerOutgoing(State.PLAY, 0x31, 0x33);
-        registerOutgoing(State.PLAY, 0x32, 0x34);
+        // New packet at 0x30
+        registerOutgoing(State.PLAY, 0x30, 0x31);
+        registerOutgoing(State.PLAY, 0x31, 0x32);
+        registerOutgoing(State.PLAY, 0x32, 0x33);
         // Respawn Packet
-        registerOutgoing(State.PLAY, 0x33, 0x35, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x33, 0x34, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -147,7 +112,8 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x34, 0x36);
+        registerOutgoing(State.PLAY, 0x34, 0x35);
+        // New packet at 0x36
         registerOutgoing(State.PLAY, 0x35, 0x37);
         registerOutgoing(State.PLAY, 0x36, 0x38);
         registerOutgoing(State.PLAY, 0x37, 0x39);
@@ -166,7 +132,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x44, 0x46);
         registerOutgoing(State.PLAY, 0x45, 0x47);
 
-        // Sound effect, TODO: This changed in 17w15a
+        // Sound effect, should work fine, might need checking for parrots?
         registerOutgoing(State.PLAY, 0x46, 0x48, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -195,9 +161,10 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x47, 0x49);
         registerOutgoing(State.PLAY, 0x48, 0x4a);
         registerOutgoing(State.PLAY, 0x49, 0x4b);
-        registerOutgoing(State.PLAY, 0x4a, 0x4c);
-        registerOutgoing(State.PLAY, 0x4b, 0x4d);
-        // New packet at 0x4e
+        // New packet at 0x4c
+        registerOutgoing(State.PLAY, 0x4a, 0x4d);
+        registerOutgoing(State.PLAY, 0x4d, 0x4e);
+
 
         // Incoming
         // New packet at 0x01
@@ -224,10 +191,12 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x09, 0x0a);
         registerIncoming(State.PLAY, 0x0a, 0x0b);
         registerIncoming(State.PLAY, 0x0b, 0x0c);
-        registerIncoming(State.PLAY, 0x0c, 0x0d);
-        registerIncoming(State.PLAY, 0x0d, 0x0e);
-        registerIncoming(State.PLAY, 0x0e, 0x0f);
-        registerIncoming(State.PLAY, 0x0f, 0x10);
+        // Mojang moved 0x0D to 0x0F
+        registerIncoming(State.PLAY, 0x0f, 0x0d);
+
+        registerIncoming(State.PLAY, 0x0c, 0x0e);
+        registerIncoming(State.PLAY, 0x0d, 0x0f);
+        registerIncoming(State.PLAY, 0x0e, 0x10);
         registerIncoming(State.PLAY, 0x10, 0x11);
         registerIncoming(State.PLAY, 0x11, 0x12);
         registerIncoming(State.PLAY, 0x12, 0x13);
@@ -248,15 +217,8 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
             }
         });
         registerIncoming(State.PLAY, 0x16, 0x18);
-        registerIncoming(State.PLAY, 0x17, 0x19);
-        registerIncoming(State.PLAY, 0x18, 0x1a);
-        registerIncoming(State.PLAY, 0x19, 0x1b);
-        registerIncoming(State.PLAY, 0x1a, 0x1c);
-        registerIncoming(State.PLAY, 0x1b, 0x1d);
-        registerIncoming(State.PLAY, 0x1c, 0x1e);
-        registerIncoming(State.PLAY, 0x1d, 0x1f);
-        // New packet at 0x20
-        registerIncoming(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+        // New packet 0x19
+        registerIncoming(State.PLAY, 0x19, 0x19, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -268,6 +230,13 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
                 });
             }
         });
+        registerIncoming(State.PLAY, 0x17, 0x1a);
+        registerIncoming(State.PLAY, 0x18, 0x1b);
+        registerIncoming(State.PLAY, 0x19, 0x1c);
+        registerIncoming(State.PLAY, 0x1a, 0x1d);
+        registerIncoming(State.PLAY, 0x1b, 0x1e);
+        registerIncoming(State.PLAY, 0x1c, 0x1f);
+        registerIncoming(State.PLAY, 0x1d, 0x20);
     }
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
