@@ -163,8 +163,7 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x49, 0x4b);
         // New packet at 0x4c
         registerOutgoing(State.PLAY, 0x4a, 0x4d);
-        registerOutgoing(State.PLAY, 0x4d, 0x4e);
-
+        registerOutgoing(State.PLAY, 0x4b, 0x4e);
 
         // Incoming
         // New packet at 0x01
