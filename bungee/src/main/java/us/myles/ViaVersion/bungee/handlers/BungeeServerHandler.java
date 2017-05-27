@@ -8,6 +8,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
@@ -15,6 +16,7 @@ import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -79,6 +81,15 @@ public class BungeeServerHandler implements Listener {
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
+        // Manually hide ViaVersion-created BossBars if the childserver was version 1.8.x (#666)
+        if (user.has(EntityTracker.class)) {
+            EntityTracker tracker = user.get(EntityTracker.class);
+
+            if (tracker.getBossBarMap() != null)
+                for (BossBar bar : tracker.getBossBarMap().values())
+                    bar.hide();
+        }
+        // Handle server/version change
         if (user.has(BungeeStorage.class)) {
             BungeeStorage storage = user.get(BungeeStorage.class);
             ProxiedPlayer player = storage.getPlayer();

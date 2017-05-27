@@ -37,14 +37,12 @@ public class BukkitViaInjector implements ViaInjector {
                     // Inject the list
                     List wrapper = new ListWrapper((List) value) {
                         @Override
-                        public synchronized void handleAdd(Object o) {
-                            synchronized (this) {
-                                if (o instanceof ChannelFuture) {
-                                    try {
-                                        injectChannelFuture((ChannelFuture) o);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                        public void handleAdd(Object o) {
+                            if (o instanceof ChannelFuture) {
+                                try {
+                                    injectChannelFuture((ChannelFuture) o);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
