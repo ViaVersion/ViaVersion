@@ -36,7 +36,7 @@ public class PPSSubCmd extends ViaSubCommand {
             if (!playerVersions.containsKey(playerVersion))
                 playerVersions.put(playerVersion, new HashSet<String>());
             UserConnection uc = Via.getManager().getConnection(p.getUUID());
-            if (uc.getPacketsPerSecond() > -1) {
+            if (uc != null && uc.getPacketsPerSecond() > -1) {
                 playerVersions.get(playerVersion).add(p.getName() + " (" + uc.getPacketsPerSecond() + " PPS)");
                 totalPackets += uc.getPacketsPerSecond();
                 if (uc.getPacketsPerSecond() > max) {
