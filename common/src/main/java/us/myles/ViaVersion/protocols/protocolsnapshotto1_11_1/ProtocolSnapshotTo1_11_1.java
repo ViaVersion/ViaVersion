@@ -256,6 +256,8 @@ public class ProtocolSnapshotTo1_11_1 extends Protocol {
             newId += 33;
         if (id >= 317) // Player Sounds
             newId += 2;
+        if (id >= 491) // UI toast sound
+            newId += 3;
         return newId;
     }
 
