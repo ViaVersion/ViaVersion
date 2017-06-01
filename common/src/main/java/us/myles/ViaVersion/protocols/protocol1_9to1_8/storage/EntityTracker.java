@@ -162,6 +162,8 @@ public class EntityTracker extends StoredObject {
                             if (validBlocking.contains(entityID)) {
                                 Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityID, shield);
+                            } else {
+                                setSecondHand(entityID, null);
                             }
                         } else {
                             setSecondHand(entityID, null);
