@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_11_1;
+package us.myles.ViaVersion.protocols.protocol1_12to1_11_1;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
@@ -15,13 +15,12 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class ProtocolSnapshotTo1_11_1 extends Protocol {
+public class Protocol1_12To1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        // As of 1.12-pre5
-
         // Outgoing
+
         // Chunk Data
         registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
