@@ -306,18 +306,20 @@ public class WorldPackets {
                         Item item = Protocol1_9TO1_8.getHandItem(wrapper.user());
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
-                            if (item != null) {
-                                if (Protocol1_9TO1_8.isSword(item.getId())) {
-                                    if (hand == 0) {
-                                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                                        if (!tracker.isBlocking()) {
-                                            tracker.setBlocking(true);
-                                            Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                            tracker.setSecondHand(shield);
-                                        }
-                                        wrapper.cancel();
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            
+                            if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
+                                if (hand == 0) {
+                                    if (!tracker.isBlocking()) {
+                                        tracker.setBlocking(true);
+                                        Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                        tracker.setSecondHand(shield);
                                     }
+                                    wrapper.cancel();
                                 }
+                            } else {
+                                tracker.setSecondHand(null);
+                                tracker.setBlocking(false);
                             }
                         }
                         wrapper.write(Type.ITEM, item);
