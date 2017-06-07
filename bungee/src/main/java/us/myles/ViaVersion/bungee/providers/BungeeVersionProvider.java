@@ -4,10 +4,13 @@ import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ProxyServer;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BungeeVersionProvider extends VersionProvider {
@@ -28,21 +31,26 @@ public class BungeeVersionProvider extends VersionProvider {
             return super.getServerProtocol(user);
         // TODO Have one constant list forever until restart? (Might limit plugins if they change this)
         List<Integer> list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
+        List<Integer> sorted = new ArrayList<>(list);
+        Collections.sort(sorted);
 
         ProtocolInfo info = user.get(ProtocolInfo.class);
 
         // Bungee supports it
-        if (list.contains(info.getProtocolVersion()))
+        if (sorted.contains(info.getProtocolVersion()))
             return info.getProtocolVersion();
 
         // Older than bungee supports, get the lowest version
-        if (info.getProtocolVersion() < list.get(0)) {
+        if (info.getProtocolVersion() < sorted.get(0)) {
             return getLowestSupportedVersion();
         }
 
-        // Loop through all protocols to get the closest protocol id that bungee supports
-        for (Integer protocol : Lists.reverse(list)) {
-            if (info.getProtocolVersion() > protocol)
+        // Loop through all protocols to get the closest protocol id that bungee supports (and that viaversion does too)
+
+        // TODO: This needs a better fix, i.e checking ProtocolRegistry to see if it would work.
+        // This is more of a workaround for snapshot support by bungee.
+        for (Integer protocol : Lists.reverse(sorted)) {
+            if (info.getProtocolVersion() > protocol && ProtocolVersion.isRegistered(protocol))
                 return protocol;
         }
 
