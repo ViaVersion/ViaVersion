@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
@@ -60,6 +61,13 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
         }
 
         List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+
+        // Read all the remaining bytes (workaround for #681)
+        if (input.readableBytes() > 0) {
+            byte[] array = Type.REMAINING_BYTES.read(input);
+            if (Via.getManager().isDebug())
+                System.out.println("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
+        }
 
         return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
     }
