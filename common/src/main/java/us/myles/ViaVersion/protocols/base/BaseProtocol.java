@@ -70,7 +70,11 @@ public class BaseProtocol extends Protocol {
 
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) // Set the Server protocol if the detection on startup failed
                                 ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
-
+                            // Ensure the server has a version provider
+                            if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
+                                wrapper.user().setActive(false);
+                                return;
+                            }
                             int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
                             List<Pair<Integer, Protocol>> protocols = null;
 
@@ -166,6 +170,11 @@ public class BaseProtocol extends Protocol {
 
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setProtocolVersion(protVer);
+                        // Ensure the server has a version provider
+                        if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
+                            wrapper.user().setActive(false);
+                            return;
+                        }
                         // Choose the pipe
                         int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
                         List<Pair<Integer, Protocol>> protocols = null;
