@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_11to1_10.packets;
+package us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -6,11 +6,11 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.EntityIdRewriter;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
 
 public class InventoryPackets {
-    public static void register(Protocol1_11To1_10 protocol) {
+    public static void register(Protocol1_12To1_11_1 protocol) {
         /*
             Incoming packets
          */
@@ -27,7 +27,7 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
-                        EntityIdRewriter.toClientItem(stack);
+                        BedRewriter.toClientItem(stack);
                     }
                 });
             }
@@ -45,7 +45,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item[] stacks = wrapper.get(Type.ITEM_ARRAY, 0);
                         for (Item stack : stacks)
-                            EntityIdRewriter.toClientItem(stack);
+                            BedRewriter.toClientItem(stack);
                     }
                 });
             }
@@ -63,7 +63,7 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
-                        EntityIdRewriter.toClientItem(stack);
+                        BedRewriter.toClientItem(stack);
                     }
                 });
             }
@@ -83,12 +83,12 @@ public class InventoryPackets {
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
-                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Input Item
-                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Output Item
+                                BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Input Item
+                                BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Output Item
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem)
-                                    EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Second Item
+                                    BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Second Item
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
@@ -119,7 +119,7 @@ public class InventoryPackets {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.ITEM, 0);
-                                EntityIdRewriter.toServerItem(item);
+                                BedRewriter.toServerItem(item);
                             }
                         });
                     }
@@ -137,7 +137,7 @@ public class InventoryPackets {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.ITEM, 0);
-                                EntityIdRewriter.toServerItem(item);
+                                BedRewriter.toServerItem(item);
                             }
                         });
                     }
