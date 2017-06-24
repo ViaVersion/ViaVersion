@@ -17,6 +17,12 @@ public class MetadataRewriter {
                     // Apply rewrite
                     BedRewriter.toClientItem((Item) metadata.getValue());
                 }
+                // Evocation Illager aggressive property became 13
+                if (type.is(Entity1_12Types.EntityType.EVOCATION_ILLAGER)) {
+                    if (metadata.getId() == 12) {
+                        metadata.setId(13);
+                    }
+                }
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
