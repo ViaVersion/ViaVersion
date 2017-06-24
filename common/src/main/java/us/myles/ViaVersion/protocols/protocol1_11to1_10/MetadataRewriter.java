@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.Type;
@@ -99,6 +100,10 @@ public class MetadataRewriter {
     public static void handleMetadata(int entityId, EntityType type, List<Metadata> metadatas, UserConnection connection) {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
+                if(metadata.getValue() instanceof Item) {
+                    // Apply rewrite
+                    EntityIdRewriter.toClientItem((Item) metadata.getValue());
+                }
                 if (type.is(EntityType.ELDER_GUARDIAN) || type.is(EntityType.GUARDIAN)) { // Guardians
                     int oldid = metadata.getId();
                     if (oldid == 12) {
