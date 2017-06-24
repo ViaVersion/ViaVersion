@@ -57,7 +57,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
-                map(Type.UNSIGNED_BYTE, Type.VAR_INT); // 2 - Entity Type
+                map(Type.VAR_INT); // 2 - Entity Type
                 map(Type.DOUBLE); // 3 - X
                 map(Type.DOUBLE); // 4 - Y
                 map(Type.DOUBLE); // 5 - Z
