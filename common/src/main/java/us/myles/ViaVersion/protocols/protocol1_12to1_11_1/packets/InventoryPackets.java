@@ -12,7 +12,7 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
 public class InventoryPackets {
     public static void register(Protocol1_12To1_11_1 protocol) {
         /*
-            Incoming packets
+            Outgoing packets
          */
 
         // Set slot packet

@@ -52,7 +52,7 @@ public class InventoryPackets {
         });
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x3C, 0x3E, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x3C, 0x3C, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -105,7 +105,7 @@ public class InventoryPackets {
          */
 
         // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x07, 0x08, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x07, 0x07, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -127,7 +127,7 @@ public class InventoryPackets {
         );
 
         // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x18, 0x1b, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x18, 0x18, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.SHORT); // 0 - Slot
