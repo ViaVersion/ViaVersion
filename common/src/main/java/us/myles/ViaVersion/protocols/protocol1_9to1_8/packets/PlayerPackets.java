@@ -136,15 +136,11 @@ public class PlayerPackets {
                                 if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {
                                     if (mode == 4) {
                                         // since removing add to auto team
-                                        Via.getPlatform().runSync(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                entityTracker.sendTeamPacket(true);
-                                            }
-                                        });
+                                        entityTracker.sendTeamPacket(true, false);
+
                                     } else {
                                         // since adding remove from auto team
-                                        entityTracker.sendTeamPacket(false);
+                                        entityTracker.sendTeamPacket(false, true);
                                     }
                                 }
                             }

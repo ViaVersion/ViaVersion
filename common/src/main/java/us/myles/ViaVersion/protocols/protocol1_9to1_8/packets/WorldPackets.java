@@ -217,7 +217,7 @@ public class WorldPackets {
                         if (Via.getConfig().isAutoTeam()) {
                             EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             entityTracker.setAutoTeam(true);
-                            entityTracker.sendTeamPacket(true);
+                            entityTracker.sendTeamPacket(true, true);
                         }
                     }
                 });

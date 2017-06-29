@@ -241,10 +241,10 @@ public class EntityTracker extends StoredObject {
         return null;
     }
 
-    public void sendTeamPacket(boolean b) {
+    public void sendTeamPacket(boolean add, boolean now) {
         PacketWrapper wrapper = new PacketWrapper(0x41, null, getUser());
         wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
-        if (b) {
+        if (add) {
             // add
             if (!teamExists) {
                 wrapper.write(Type.BYTE, (byte) 0); // make team
@@ -263,9 +263,9 @@ public class EntityTracker extends StoredObject {
         } else {
             wrapper.write(Type.BYTE, (byte) 1); // remove team
         }
-        teamExists = b;
+        teamExists = add;
         try {
-            wrapper.send(Protocol1_9TO1_8.class);
+            wrapper.send(Protocol1_9TO1_8.class, true, now);
         } catch (Exception e) {
             e.printStackTrace();
         }
