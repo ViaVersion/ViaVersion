@@ -82,6 +82,8 @@ hologram-y: -0.96
 # Should we disable piston animation for 1.11/1.11.1 clients?
 # In some cases when firing lots of pistons it crashes them.
 piston-animation-patch: false
+# Should we fix nbt for 1.12 and above clients in chat messages (causes invalid item)
+chat-nbt-fix: true
 #
 #----------------------------------------------------------#
 #         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #

@@ -24,6 +24,7 @@ public abstract class Config implements ConfigurationProvider {
             return new Yaml(new YamlConstructor(), new Representer(), options);
         }
     };
+
     private CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
     private ConcurrentSkipListMap<String, Object> config;

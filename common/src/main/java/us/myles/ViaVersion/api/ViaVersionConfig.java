@@ -204,6 +204,13 @@ public interface ViaVersionConfig {
     boolean isForceJsonTransform();
 
     /**
+     * Should we fix nbt array's in json chat messages for 1.12 clients
+     *
+     * @return True if enabled
+     */
+    boolean is1_12NBTArrayFix();
+
+    /**
      * Get the blocked protocols
      *
      * @return An Integer list

@@ -165,6 +165,11 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean is1_12NBTArrayFix() {
+        return getBoolean("chat-nbt-fix", true);
+    }
+
+    @Override
     public List<Integer> getBlockedProtocols() {
         return getIntegerList("block-protocols");
     }

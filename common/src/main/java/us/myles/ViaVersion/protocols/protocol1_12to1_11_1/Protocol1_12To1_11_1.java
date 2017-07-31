@@ -4,7 +4,10 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.base.Optional;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_12Types;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -19,6 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPacke
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 public class Protocol1_12To1_11_1 extends Protocol {
 
@@ -85,6 +89,29 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
+        // Chat message packet
+        registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Chat Message (json)
+                map(Type.BYTE); // 1 - Chat Positon
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (!Via.getConfig().is1_12NBTArrayFix()) return;
+                        try {
+                            JsonElement obj = new JsonParser().parse(wrapper.get(Type.STRING, 0));
+                            ChatItemRewriter.toClient(obj, wrapper.user());
+                            wrapper.set(Type.STRING, 0, obj.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
         // Chunk Data
         registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
             @Override
@@ -128,6 +155,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                 });
             }
         });
+
         // Join Packet
         registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
             @Override
