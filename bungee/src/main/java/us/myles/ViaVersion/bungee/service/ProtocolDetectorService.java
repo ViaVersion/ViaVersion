@@ -63,10 +63,13 @@ public class ProtocolDetectorService implements Runnable {
                                 return;
                             }
                         }
-                        // Save Server
-                        servers.put(key, serverPing.getVersion().getProtocol());
+                        // Ensure we're the only ones writing to the config
+                        synchronized (Via.getPlatform().getConfigurationProvider()) {
+                            servers.put(key, serverPing.getVersion().getProtocol());
+                        }
                         // Save
                         Via.getPlatform().getConfigurationProvider().saveConfig();
+
                     }
                 }
             }
