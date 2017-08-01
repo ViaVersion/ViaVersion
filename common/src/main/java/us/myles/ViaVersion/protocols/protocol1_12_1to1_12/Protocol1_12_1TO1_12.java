@@ -2,6 +2,8 @@ package us.myles.ViaVersion.protocols.protocol1_12_1to1_12;
 
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
 public class Protocol1_12_1TO1_12 extends Protocol {
@@ -44,6 +46,37 @@ public class Protocol1_12_1TO1_12 extends Protocol {
         registerOutgoing(State.PLAY, 0x4c, 0x4d);
         registerOutgoing(State.PLAY, 0x4d, 0x4e);
         registerOutgoing(State.PLAY, 0x4e, 0x4f);
+
+        // TODO Where did the Prepare Crafting Grid packet go to?
+        registerIncoming(State.PLAY, 0x01, -1);
+
+        registerIncoming(State.PLAY, 0x02, 0x01);
+        registerIncoming(State.PLAY, 0x03, 0x02);
+        registerIncoming(State.PLAY, 0x04, 0x03);
+        registerIncoming(State.PLAY, 0x05, 0x04);
+        registerIncoming(State.PLAY, 0x06, 0x05);
+        registerIncoming(State.PLAY, 0x07, 0x06);
+        registerIncoming(State.PLAY, 0x08, 0x07);
+        registerIncoming(State.PLAY, 0x09, 0x08);
+        registerIncoming(State.PLAY, 0x0a, 0x09);
+        registerIncoming(State.PLAY, 0x0b, 0x0a);
+        registerIncoming(State.PLAY, 0x0c, 0x0b);
+        registerIncoming(State.PLAY, 0x0d, 0x0c);
+        registerIncoming(State.PLAY, 0x0e, 0x0d);
+        registerIncoming(State.PLAY, 0x0f, 0x0e);
+        registerIncoming(State.PLAY, 0x10, 0x0f);
+        registerIncoming(State.PLAY, 0x11, 0x10);
+        registerIncoming(State.PLAY, 0x12, 0x11);
+
+        // TODO hello new packet
+        registerIncoming(State.PLAY, -1, 0x12, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.BYTE); // 0 - Unknown
+                map(Type.VAR_INT); // 1 - Unknown
+                map(Type.BOOLEAN); // 2 - Unknown
+            }
+        });
 
 
     }
