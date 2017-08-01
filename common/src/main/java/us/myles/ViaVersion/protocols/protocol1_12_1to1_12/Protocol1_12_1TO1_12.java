@@ -1,7 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_12_1to1_12;
 
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
@@ -75,6 +77,13 @@ public class Protocol1_12_1TO1_12 extends Protocol {
                 map(Type.BYTE); // 0 - Unknown
                 map(Type.VAR_INT); // 1 - Unknown
                 map(Type.BOOLEAN); // 2 - Unknown
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
             }
         });
 
