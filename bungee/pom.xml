@@ -5,7 +5,7 @@
     <parent>
         <artifactId>viaversion-parent</artifactId>
         <groupId>us.myles</groupId>
-        <version>1.2.0-17w31a-SNAPSHOT</version>
+        <version>1.2.0-1_12_1-pre1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-common</artifactId>
-            <version>1.2.0-17w31a-SNAPSHOT</version>
+            <version>1.2.0-1_12_1-pre1</version>
         </dependency>
     </dependencies>
 </project>
