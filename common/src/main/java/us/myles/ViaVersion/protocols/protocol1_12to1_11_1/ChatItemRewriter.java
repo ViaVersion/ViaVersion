@@ -20,9 +20,13 @@ public class ChatItemRewriter {
                     if (hoverEvent.has("action") && hoverEvent.has("value")) {
                         String type = hoverEvent.get("action").getAsString();
                         if (type.equals("show_item") || type.equals("show_entity")) {
-                            String value = hoverEvent.get("value").getAsString();
-                            value = indexRemoval.matcher(value).replaceAll("");
-                            hoverEvent.addProperty("value", value);
+                            if (hoverEvent.get("value").isJsonPrimitive()) {
+                                if (hoverEvent.get("value").getAsJsonPrimitive().isString()) {
+                                    String value = hoverEvent.get("value").getAsString();
+                                    value = indexRemoval.matcher(value).replaceAll("");
+                                    hoverEvent.addProperty("value", value);
+                                }
+                            }
                         }
                     }
                 }
