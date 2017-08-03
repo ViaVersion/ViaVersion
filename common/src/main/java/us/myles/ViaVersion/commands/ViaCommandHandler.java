@@ -25,7 +25,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
     @Override
     public void registerSubCommand(@NonNull ViaSubCommand command) throws Exception {
-        Preconditions.checkArgument(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid subcommand name");
+        Preconditions.checkArgument(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid sub-command name.");
         if (hasSubCommand(command.name()))
             throw new Exception("ViaSubCommand " + command.name() + " does already exists!"); //Maybe another exception later.
         commandMap.put(command.name().toLowerCase(), command);
@@ -49,7 +49,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         }
 
         if (!hasSubCommand(args[0])) {
-            sender.sendMessage(color("&cThis commands is not found"));
+            sender.sendMessage(color("&cThis command does not exist."));
             showHelp(sender);
             return false;
         }
@@ -108,7 +108,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
     public void showHelp(ViaCommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
         if (allowed.size() == 0) {
-            sender.sendMessage(color("&cYou are not allowed to use this commands!"));
+            sender.sendMessage(color("&cYou are not allowed to use these commands!"));
             return;
         }
         sender.sendMessage(color("&aViaVersion &c" + Via.getPlatform().getPluginVersion()));
