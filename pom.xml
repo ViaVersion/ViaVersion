@@ -76,7 +76,7 @@
         </dependency>
 
         <!-- OpenNBT Library -->
-        <!--Version 1.0 is conflicting with Maven Central (2012)-->
+        <!-- Version 1.0 is conflicting with Maven Central (2012) -->
         <dependency>
             <groupId>com.github.steveice10</groupId>
             <artifactId>opennbt</artifactId>
