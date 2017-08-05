@@ -44,7 +44,7 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
         </repository>
 
-        <!-- Bungee Repository -->
+        <!-- BungeeCord Repository -->
         <repository>
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
