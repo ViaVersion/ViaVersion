@@ -38,19 +38,19 @@
     </properties>
 
     <repositories>
-        <!-- SpigotMC Repo (Bukkit API) -->
+        <!-- SpigotMC Repository (Bukkit API) -->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
         </repository>
 
-        <!-- Bungee repo -->
+        <!-- Bungee Repository -->
         <repository>
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
 
-        <!-- ViaVersion repo -->
+        <!-- ViaVersion Repository -->
         <repository>
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
