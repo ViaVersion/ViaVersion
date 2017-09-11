@@ -29,14 +29,21 @@ public abstract class Config implements ConfigurationProvider {
     private final File configFile;
     private ConcurrentSkipListMap<String, Object> config;
 
+    /**
+     * Create a new Config instance, this will *not* load the config by default.
+     * To load config see {@link #reloadConfig()}
+     *
+     * @param configFile The location of where the config is loaded/saved.
+     */
     public Config(File configFile) {
         this.configFile = configFile;
-        reloadConfig();
     }
+
+    public abstract URL getDefaultConfigURL();
 
     public synchronized Map<String, Object> loadConfig(File location) {
         List<String> unsupported = getUnsupportedOptions();
-        URL jarConfigFile = Config.class.getClassLoader().getResource("config.yml");
+        URL jarConfigFile = getDefaultConfigURL();
         try {
             commentStore.storeComments(jarConfigFile.openStream());
             for (String option : unsupported) {

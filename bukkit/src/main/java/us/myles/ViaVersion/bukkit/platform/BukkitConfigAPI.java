@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
 
     public BukkitConfigAPI() {
         super(new File(((ViaVersionPlugin) Via.getPlatform()).getDataFolder(), "config.yml"));
+        // Load config
+        reloadConfig();
     }
 
     @Override
@@ -175,6 +178,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public String getReloadDisconnectMsg() {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
+    }
+
+    @Override
+    public URL getDefaultConfigURL() {
+        return BukkitConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override

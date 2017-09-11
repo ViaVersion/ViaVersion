@@ -3,6 +3,7 @@ package us.myles.ViaVersion;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -62,7 +63,7 @@ public class SpongePlugin implements ViaPlatform {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
-        conf = new SpongeConfigAPI(defaultConfig.getParentFile());
+        conf = new SpongeConfigAPI(container, defaultConfig.getParentFile());
         syncExecutor = game.getScheduler().createSyncExecutor(this);
         asyncExecutor = game.getScheduler().createAsyncExecutor(this);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();

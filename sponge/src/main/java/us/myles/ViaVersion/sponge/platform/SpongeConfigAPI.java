@@ -1,18 +1,35 @@
 package us.myles.ViaVersion.sponge.platform;
 
+import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers");
+    private final PluginContainer pluginContainer;
 
-    public SpongeConfigAPI(File configFile) {
+    public SpongeConfigAPI(PluginContainer pluginContainer, File configFile) {
         super(new File(configFile, "config.yml"));
+        this.pluginContainer = pluginContainer;
+        // Load config
+        reloadConfig();
+    }
+
+    @Override
+    public URL getDefaultConfigURL() {
+        Optional<Asset> config = pluginContainer.getAsset("config.yml");
+        if (!config.isPresent()) {
+            throw new IllegalArgumentException("Default config is missing from jar");
+        }
+        return config.get().getUrl();
     }
 
     @Override

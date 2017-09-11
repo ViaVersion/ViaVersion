@@ -6,6 +6,7 @@ import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 public class BungeeConfigAPI extends Config implements ViaVersionConfig {
@@ -13,6 +14,13 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     public BungeeConfigAPI(File configFile) {
         super(new File(configFile, "config.yml"));
+        // Load config
+        reloadConfig();
+    }
+
+    @Override
+    public URL getDefaultConfigURL() {
+        return BungeeConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override
