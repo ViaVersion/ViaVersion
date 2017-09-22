@@ -186,6 +186,41 @@ public class ItemRewriter {
             }
         }
     }
+    
+    public static void rewriteBookToServer(Item item) {
+        short id = item.getId();
+        if (id != 387) {
+            return;
+        }
+        CompoundTag tag = item.getTag();
+        ListTag pages = tag.get("pages");
+        if (pages == null) { // is this even possible?
+            return;
+        }
+        for (int i = 0; i < pages.size(); i++) {
+            Tag pageTag = pages.get(i);
+            if (!(pageTag instanceof StringTag)) {
+                continue;
+            }
+            StringTag stag = (StringTag) pageTag;
+            String value = stag.getValue();
+            if (value.replaceAll(" ", "").isEmpty()) {
+                value = "\"" + fixBookSpaceChars(value) + "\"";
+            } else {
+                value = fixBookSpaceChars(value);
+            }
+            stag.setValue(value);
+        }
+    }
+    
+    private static String fixBookSpaceChars(String str) {
+        if (!str.startsWith(" ")) {
+            return str;
+        }
+        // hacky but it works :)
+        str = "\u00A7r" + str;
+        return str;
+    }
 
     public static void toClient(Item item) {
         if (item != null) {

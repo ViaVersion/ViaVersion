@@ -500,8 +500,9 @@ public class PlayerPackets {
                         String name = wrapper.get(Type.STRING, 0);
                         if (name.equalsIgnoreCase("MC|BSign")) {
                             Item item = wrapper.passthrough(Type.ITEM);
-                            if (item != null) {
+                            if (item != null) { //TODO: HERE
                                 item.setId((short) 387); // Written Book
+                                ItemRewriter.rewriteBookToServer(item);
                             }
                         }
                         if (name.equalsIgnoreCase("MC|AutoCmd")) {
