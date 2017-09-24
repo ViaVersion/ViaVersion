@@ -502,6 +502,7 @@ public class PlayerPackets {
                             Item item = wrapper.passthrough(Type.ITEM);
                             if (item != null) {
                                 item.setId((short) 387); // Written Book
+                                ItemRewriter.rewriteBookToServer(item);
                             }
                         }
                         if (name.equalsIgnoreCase("MC|AutoCmd")) {
