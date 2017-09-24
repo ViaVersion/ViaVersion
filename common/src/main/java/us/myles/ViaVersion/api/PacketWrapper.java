@@ -149,10 +149,11 @@ public class PacketWrapper {
             }
         } else {
             Pair<Type, Object> read = readableObjects.poll();
-            if (read.getKey().equals(type) || (type.getBaseClass().equals(read.getKey().getBaseClass()) && type.getOutputClass().equals(read.getKey().getOutputClass()))) {
+            Type rtype = read.getKey();
+            if (rtype.equals(type) || (type.getBaseClass().equals(rtype.getBaseClass()) && type.getOutputClass().equals(rtype.getOutputClass()))) {
                 return (T) read.getValue();
             } else {
-                if (type == Type.NOTHING) {
+                if (rtype == Type.NOTHING) {
                     return read(type); // retry
                 } else {
                     Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
