@@ -5,7 +5,7 @@ import us.myles.ViaVersion.api.platform.providers.Provider;
 
 public class InvContainerItemProvider implements Provider {
 
-    public boolean registerInvClickPacket(int windowId, short slotId, byte button, short amumber, int mode, UserConnection uconnection) {
+    public boolean registerInvClickPacket(short windowId, short slotId, short anumber, UserConnection uconnection) {
         return false; // not supported :/ plays very sad violin
     }
 }
