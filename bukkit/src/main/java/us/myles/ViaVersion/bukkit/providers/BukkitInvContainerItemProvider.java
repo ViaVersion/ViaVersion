@@ -29,6 +29,7 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
     private boolean supported;
     // packet class
     private Class<?> wclickPacketClass;
+    private Object clickTypeEnum;
     // Use for nms
     private Method nmsItemMethod;
     private Method ephandle;
@@ -76,16 +77,19 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
         }
         Object cinstance = null;
         try {
-            Object nmsItem = nmsItemMethod.invoke(null, itemstack);
-            // TODO: PASSTHROUGH PROTOCOLS? (Make InvItemStorage inheritance from Item?)
             cinstance = wclickPacketClass.newInstance();
+            Object nmsItem = nmsItemMethod.invoke(null, itemstack);
             ReflectionUtil.set(cinstance, "a", (int) storage.getWindowId());
             ReflectionUtil.set(cinstance, "slot", (int) slotId);
             ReflectionUtil.set(cinstance, "button", 0); // shift + left mouse click
             ReflectionUtil.set(cinstance, "d", storage.getActionNumber());
             ReflectionUtil.set(cinstance, "item", nmsItem);
-            // TODO: THIS MUST BE AN ENUM on 1.9+ SERVERS!!
-            ReflectionUtil.set(cinstance, "shift", 1); // mode
+            int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
+            if (protocolId == 47) {
+                ReflectionUtil.set(cinstance, "shift", 1);
+            } else if (protocolId >= 107) { // 1.9+
+                ReflectionUtil.set(cinstance, "shift", clickTypeEnum);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -115,7 +119,7 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
     private void scheduleTask(BukkitInvContainerUpdateTask utask) {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         Plugin instance = Bukkit.getServer().getPluginManager().getPlugin("ViaVersion");
-        scheduler.runTaskLater(instance, utask, 5); // 5 ticks later.
+        scheduler.runTaskLater(instance, utask, 2); // 2 ticks later (possible double click action).
     }
 
     private void setupReflection() {
@@ -124,6 +128,9 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
         }
         try {
             this.wclickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
+            Class<?> eclassz = NMSUtil.nms("InventoryClickType");
+            Object[] constants = eclassz.getEnumConstants();
+            this.clickTypeEnum = constants[1]; // QUICK_MOVE
             Class<?> citemStack = NMSUtil.obc("inventory.CraftItemStack");
             this.nmsItemMethod = citemStack.getDeclaredMethod("asNMSCopy", ItemStack.class);
         } catch (Exception e) {
@@ -152,15 +159,9 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
 
     private boolean isSupported() {
         int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
-        if (protocolId == 47) {
+        if (protocolId >= 47 && protocolId <= 316) {
             return true; // 1.8
-        } /**else if (protocolId >= 107 && protocolId <= 110) {
-            return true; // 1.9
-          } else if (protocolId == 210) {
-            return true; // 1.10
-          } else if (protocolId == 315 || protocolId == 316) {
-            return true; // 1.11
-          }*/
+        }
         // this is not needed on 1.12+
         return false;
     }

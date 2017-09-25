@@ -40,12 +40,10 @@ public class BukkitInvContainerUpdateTask implements Runnable {
                 for (InvItemStorage storage : items) {
                     Object packet = provider.buildWindowClickPacket(p, storage);
                     boolean result = provider.sendPlayer(p, packet);
-                    System.out.println("item result: " + result);
                     if (!result) {
                         break;
                     }
                 }
-                System.out.println("items: " + items);
                 items.clear();
             }
         } finally {
