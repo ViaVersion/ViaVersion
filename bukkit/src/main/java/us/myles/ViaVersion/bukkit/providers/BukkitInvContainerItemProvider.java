@@ -123,7 +123,7 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
     private void scheduleTask(BukkitInvContainerUpdateTask utask) {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         Plugin instance = Bukkit.getServer().getPluginManager().getPlugin("ViaVersion");
-        scheduler.runTaskLater(instance, utask, 2); // 2 ticks later (possible double click action).
+        scheduler.runTaskLater(instance, utask, 5); // 5 ticks later (possible double click action).
     }
 
     private void setupReflection() {
