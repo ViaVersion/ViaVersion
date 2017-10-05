@@ -20,7 +20,7 @@ public class BukkitInvContainerUpdateTask implements Runnable {
     public BukkitInvContainerUpdateTask(BukkitInvContainerItemProvider provider, UUID uuid) {
         this.provider = provider;
         this.uuid = uuid;
-        this.items = Collections.synchronizedList(new ArrayList<>());
+        this.items = Collections.synchronizedList(new ArrayList<InvItemStorage>());
     }
 
     public void addItem(short windowId, short slotId, short anumber) {

@@ -26,7 +26,7 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 
 public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
 
-    private static Map<UUID, BukkitInvContainerUpdateTask> updateTasks = new ConcurrentHashMap<>();
+    private static Map<UUID, BukkitInvContainerUpdateTask> updateTasks = new ConcurrentHashMap<UUID, BukkitInvContainerUpdateTask>();
     private boolean supported;
     // packet class
     private Class<?> wclickPacketClass;
