@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SpongeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers");
+    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "quick-move-action-fix");
     private final PluginContainer pluginContainer;
 
     public SpongeConfigAPI(PluginContainer pluginContainer, File configFile) {
@@ -184,6 +184,11 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public boolean is1_12NBTArrayFix() {
         return getBoolean("chat-nbt-fix", true);
+    }
+    
+    @Override
+    public boolean is1_12QuickMoveActionFix() {
+        return false;
     }
 
     @Override

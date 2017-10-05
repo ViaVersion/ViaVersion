@@ -64,7 +64,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         /* Providers */
         Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
         Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
-        Via.getManager().getProviders().use(InvContainerItemProvider.class, new BukkitInvContainerItemProvider());
+        if (plugin.getConf().is1_12QuickMoveActionFix()) {
+            Via.getManager().getProviders().use(InvContainerItemProvider.class, new BukkitInvContainerItemProvider());
+        }
         Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
             @Override
             public Item getHandItem(final UserConnection info) {

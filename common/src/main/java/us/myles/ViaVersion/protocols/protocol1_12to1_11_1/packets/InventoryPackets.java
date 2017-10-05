@@ -120,9 +120,13 @@ public class InventoryPackets {
                         handler(new PacketHandler() {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
+                                Item item = wrapper.get(Type.ITEM, 0);
+                                if (!Via.getConfig().is1_12QuickMoveActionFix()) {
+                                    BedRewriter.toServerItem(item);
+                                    return;
+                                }
                                 byte button = wrapper.get(Type.BYTE, 0);
                                 int mode = wrapper.get(Type.VAR_INT, 0);
-                                Item item = wrapper.get(Type.ITEM, 0);
                                 // QUICK_MOVE PATCH (Shift + (click/double click))
                                 if (mode == 1 && button == 0 && item == null) { 
                                     short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);

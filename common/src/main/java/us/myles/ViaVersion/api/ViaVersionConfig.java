@@ -209,7 +209,14 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_12NBTArrayFix();
-
+    
+    /**
+     * Should we fix shift quick move action for 1.12 clients
+     *
+     * @return True if enabled
+     */
+    boolean is1_12QuickMoveActionFix();
+    
     /**
      * Get the blocked protocols
      *
