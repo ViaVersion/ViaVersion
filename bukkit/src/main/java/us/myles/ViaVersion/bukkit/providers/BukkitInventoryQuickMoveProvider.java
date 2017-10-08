@@ -1,5 +1,19 @@
 package us.myles.ViaVersion.bukkit.providers;
 
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
+import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.bukkit.tasks.protocol1_12to1_11_1.BukkitInventoryUpdateTask;
+import us.myles.ViaVersion.bukkit.util.NMSUtil;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
+import us.myles.ViaVersion.util.ReflectionUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,63 +21,46 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
+public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider {
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bukkit.protocol1_12to1_11_1.BukkitInvContainerUpdateTask;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InvContainerItemProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.InvItemStorage;
-import us.myles.ViaVersion.util.ReflectionUtil;
-
-public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
-
-    private static Map<UUID, BukkitInvContainerUpdateTask> updateTasks = new ConcurrentHashMap<UUID, BukkitInvContainerUpdateTask>();
+    private static Map<UUID, BukkitInventoryUpdateTask> updateTasks = new ConcurrentHashMap<UUID, BukkitInventoryUpdateTask>();
     private boolean supported;
     // packet class
-    private Class<?> wclickPacketClass;
+    private Class<?> windowClickPacketClass;
     private Object clickTypeEnum;
     // Use for nms
     private Method nmsItemMethod;
-    private Method ephandle;
+    private Method craftPlayerHandle;
     private Field connection;
     private Method packetMethod;
 
-    public BukkitInvContainerItemProvider() {
+    public BukkitInventoryQuickMoveProvider() {
         this.supported = isSupported();
         setupReflection();
     }
 
     @Override
-    public boolean registerInvClickPacket(short windowId, short slotId, short anumber, UserConnection uconnection) {
+    public boolean registerQuickMove(short windowId, short slotId, short actionId, UserConnection userConnection) {
         if (!supported) {
             return false;
         }
-        ProtocolInfo info = uconnection.get(ProtocolInfo.class);
+        ProtocolInfo info = userConnection.get(ProtocolInfo.class);
         UUID uuid = info.getUuid();
-        BukkitInvContainerUpdateTask utask = updateTasks.get(uuid);
-        final boolean registered = utask != null;
+        BukkitInventoryUpdateTask updateTask = updateTasks.get(uuid);
+        final boolean registered = updateTask != null;
         if (!registered) {
-            utask = new BukkitInvContainerUpdateTask(this, uuid);
-            updateTasks.put(uuid, utask);
+            updateTask = new BukkitInventoryUpdateTask(this, uuid);
+            updateTasks.put(uuid, updateTask);
         }
         // http://wiki.vg/index.php?title=Protocol&oldid=13223#Click_Window
-        utask.addItem(windowId, slotId, anumber);
+        updateTask.addItem(windowId, slotId, actionId);
         if (!registered) {
-            scheduleTask(utask);
+            Via.getPlatform().runSync(updateTask, 5L);
         }
         return true;
     }
 
-    public Object buildWindowClickPacket(Player p, InvItemStorage storage) {
+    public Object buildWindowClickPacket(Player p, ItemTransaction storage) {
         if (!supported) {
             return null;
         }
@@ -79,25 +76,25 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
         if (itemstack == null) {
             return null;
         }
-        Object cinstance = null;
+        Object packet = null;
         try {
-            cinstance = wclickPacketClass.newInstance();
+            packet = windowClickPacketClass.newInstance();
             Object nmsItem = nmsItemMethod.invoke(null, itemstack);
-            ReflectionUtil.set(cinstance, "a", (int) storage.getWindowId());
-            ReflectionUtil.set(cinstance, "slot", (int) slotId);
-            ReflectionUtil.set(cinstance, "button", 0); // shift + left mouse click
-            ReflectionUtil.set(cinstance, "d", storage.getActionNumber());
-            ReflectionUtil.set(cinstance, "item", nmsItem);
+            ReflectionUtil.set(packet, "a", (int) storage.getWindowId());
+            ReflectionUtil.set(packet, "slot", (int) slotId);
+            ReflectionUtil.set(packet, "button", 0); // shift + left mouse click
+            ReflectionUtil.set(packet, "d", storage.getActionId());
+            ReflectionUtil.set(packet, "item", nmsItem);
             int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
             if (protocolId == ProtocolVersion.v1_8.getId()) {
-                ReflectionUtil.set(cinstance, "shift", 1);
+                ReflectionUtil.set(packet, "shift", 1);
             } else if (protocolId >= ProtocolVersion.v1_9.getId()) { // 1.9+
-                ReflectionUtil.set(cinstance, "shift", clickTypeEnum);
+                ReflectionUtil.set(packet, "shift", clickTypeEnum);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return cinstance;
+        return packet;
     }
 
     public boolean sendPlayer(Player p, Object packet) {
@@ -105,10 +102,10 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
             return false;
         }
         try {
-            Object entityPlayer = ephandle.invoke(p);
-            Object pconnection = connection.get(entityPlayer);
+            Object entityPlayer = craftPlayerHandle.invoke(p);
+            Object playerConnection = connection.get(entityPlayer);
             // send
-            packetMethod.invoke(pconnection, packet);
+            packetMethod.invoke(playerConnection, packet);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             return false;
@@ -120,46 +117,36 @@ public class BukkitInvContainerItemProvider extends InvContainerItemProvider {
         updateTasks.remove(uuid);
     }
 
-    private void scheduleTask(BukkitInvContainerUpdateTask utask) {
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        Plugin instance = Bukkit.getServer().getPluginManager().getPlugin("ViaVersion");
-        scheduler.runTaskLater(instance, utask, 5); // 5 ticks later (possible double click action).
-    }
-
     private void setupReflection() {
         if (!supported) {
             return;
         }
         try {
-            this.wclickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
+            this.windowClickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
             int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
             if (protocolId >= ProtocolVersion.v1_9.getId()) {
                 Class<?> eclassz = NMSUtil.nms("InventoryClickType");
                 Object[] constants = eclassz.getEnumConstants();
                 this.clickTypeEnum = constants[1]; // QUICK_MOVE
             }
-            Class<?> citemStack = NMSUtil.obc("inventory.CraftItemStack");
-            this.nmsItemMethod = citemStack.getDeclaredMethod("asNMSCopy", ItemStack.class);
+            Class<?> craftItemStack = NMSUtil.obc("inventory.CraftItemStack");
+            this.nmsItemMethod = craftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class);
         } catch (Exception e) {
-            this.supported = false;
             throw new RuntimeException("Couldn't find required inventory classes", e);
         }
         try {
-            this.ephandle = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
+            this.craftPlayerHandle = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
-            this.supported = false;
             throw new RuntimeException("Couldn't find CraftPlayer", e);
         }
         try {
             this.connection = NMSUtil.nms("EntityPlayer").getDeclaredField("playerConnection");
         } catch (NoSuchFieldException | ClassNotFoundException e) {
-            this.supported = false;
             throw new RuntimeException("Couldn't find Player Connection", e);
         }
         try {
-            this.packetMethod = NMSUtil.nms("PlayerConnection").getDeclaredMethod("a", wclickPacketClass);
+            this.packetMethod = NMSUtil.nms("PlayerConnection").getDeclaredMethod("a", windowClickPacketClass);
         } catch (NoSuchMethodException | ClassNotFoundException e) {
-            this.supported = false;
             throw new RuntimeException("Couldn't find CraftPlayer", e);
         }
     }

@@ -7,9 +7,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Getter
-public class InvItemStorage {
-
+public class ItemTransaction {
     private short windowId;
     private short slotId;
-    private short actionNumber;
+    private short actionId;
 }

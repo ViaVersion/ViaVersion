@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InvContainerItemProvider;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 
 public class InventoryPackets {
     public static void register(Protocol1_12To1_11_1 protocol) {
@@ -128,12 +128,12 @@ public class InventoryPackets {
                                 byte button = wrapper.get(Type.BYTE, 0);
                                 int mode = wrapper.get(Type.VAR_INT, 0);
                                 // QUICK_MOVE PATCH (Shift + (click/double click))
-                                if (mode == 1 && button == 0 && item == null) { 
+                                if (mode == 1 && button == 0 && item == null) {
                                     short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
                                     short slotId = wrapper.get(Type.SHORT, 0);
-                                    short anumber = wrapper.get(Type.SHORT, 1);
-                                    InvContainerItemProvider provider = Via.getManager().getProviders().get(InvContainerItemProvider.class);
-                                    boolean succeed = provider.registerInvClickPacket(windowId, slotId, anumber, wrapper.user());
+                                    short actionId = wrapper.get(Type.SHORT, 1);
+                                    InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
+                                    boolean succeed = provider.registerQuickMove(windowId, slotId, actionId, wrapper.user());
                                     if (succeed) {
                                         wrapper.cancel();
                                     }

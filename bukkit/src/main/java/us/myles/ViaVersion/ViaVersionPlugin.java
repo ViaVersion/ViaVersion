@@ -175,6 +175,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     }
 
     @Override
+    public TaskId runSync(Runnable runnable, Long ticks) {
+        return new BukkitTaskId(getServer().getScheduler().runTaskLater(this, runnable, ticks).getTaskId());
+    }
+
+    @Override
     public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
         return new BukkitTaskId(getServer().getScheduler().runTaskTimer(this, runnable, ticks, 0).getTaskId());
     }

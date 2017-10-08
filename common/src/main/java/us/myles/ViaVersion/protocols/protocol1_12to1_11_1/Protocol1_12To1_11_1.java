@@ -20,7 +20,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InvContainerItemProvider;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -389,7 +389,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
     
     @Override
     protected void register(ViaProviders providers) {
-        providers.register(InvContainerItemProvider.class, new InvContainerItemProvider());
+        providers.register(InventoryQuickMoveProvider.class, new InventoryQuickMoveProvider());
     }
 
     @Override

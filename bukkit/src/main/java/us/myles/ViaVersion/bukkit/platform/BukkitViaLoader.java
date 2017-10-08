@@ -14,11 +14,11 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.bukkit.listeners.UpdateListener;
 import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.*;
-import us.myles.ViaVersion.bukkit.providers.BukkitInvContainerItemProvider;
+import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InvContainerItemProvider;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
@@ -65,7 +65,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
         Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
         if (plugin.getConf().is1_12QuickMoveActionFix()) {
-            Via.getManager().getProviders().use(InvContainerItemProvider.class, new BukkitInvContainerItemProvider());
+            Via.getManager().getProviders().use(InventoryQuickMoveProvider.class, new BukkitInventoryQuickMoveProvider());
         }
         Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
             @Override

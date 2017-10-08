@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.bukkit.protocol1_12to1_11_1;
+package us.myles.ViaVersion.bukkit.tasks.protocol1_12to1_11_1;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,23 +8,23 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import us.myles.ViaVersion.bukkit.providers.BukkitInvContainerItemProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.InvItemStorage;
+import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
 
-public class BukkitInvContainerUpdateTask implements Runnable {
+public class BukkitInventoryUpdateTask implements Runnable {
 
-    private BukkitInvContainerItemProvider provider;
+    private BukkitInventoryQuickMoveProvider provider;
     private final UUID uuid;
-    private final List<InvItemStorage> items;
+    private final List<ItemTransaction> items;
 
-    public BukkitInvContainerUpdateTask(BukkitInvContainerItemProvider provider, UUID uuid) {
+    public BukkitInventoryUpdateTask(BukkitInventoryQuickMoveProvider provider, UUID uuid) {
         this.provider = provider;
         this.uuid = uuid;
-        this.items = Collections.synchronizedList(new ArrayList<InvItemStorage>());
+        this.items = Collections.synchronizedList(new ArrayList<ItemTransaction>());
     }
 
-    public void addItem(short windowId, short slotId, short anumber) {
-        InvItemStorage storage = new InvItemStorage(windowId, slotId, anumber);
+    public void addItem(short windowId, short slotId, short actionId) {
+        ItemTransaction storage = new ItemTransaction(windowId, slotId, actionId);
         items.add(storage);
     }
 
@@ -37,7 +37,7 @@ public class BukkitInvContainerUpdateTask implements Runnable {
         }
         try {
             synchronized (items) {
-                for (InvItemStorage storage : items) {
+                for (ItemTransaction storage : items) {
                     Object packet = provider.buildWindowClickPacket(p, storage);
                     boolean result = provider.sendPlayer(p, packet);
                     if (!result) {
