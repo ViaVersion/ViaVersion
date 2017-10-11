@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -8,6 +9,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 
 public class InventoryPackets {
     public static void register(Protocol1_12To1_11_1 protocol) {
@@ -119,7 +121,26 @@ public class InventoryPackets {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.ITEM, 0);
-                                BedRewriter.toServerItem(item);
+                                if (!Via.getConfig().is1_12QuickMoveActionFix()) {
+                                    BedRewriter.toServerItem(item);
+                                    return;
+                                }
+                                byte button = wrapper.get(Type.BYTE, 0);
+                                int mode = wrapper.get(Type.VAR_INT, 0);
+                                // QUICK_MOVE PATCH (Shift + (click/double click))
+                                if (mode == 1 && button == 0 && item == null) {
+                                    short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                                    short slotId = wrapper.get(Type.SHORT, 0);
+                                    short actionId = wrapper.get(Type.SHORT, 1);
+                                    InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
+                                    boolean succeed = provider.registerQuickMove(windowId, slotId, actionId, wrapper.user());
+                                    if (succeed) {
+                                        wrapper.cancel();
+                                    }
+                                    // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
+                                } else {
+                                    BedRewriter.toServerItem(item);
+                                }
                             }
                         });
                     }

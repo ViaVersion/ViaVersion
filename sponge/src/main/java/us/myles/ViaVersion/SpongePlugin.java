@@ -3,7 +3,6 @@ package us.myles.ViaVersion;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -111,6 +110,12 @@ public class SpongePlugin implements ViaPlatform {
     public TaskId runSync(Runnable runnable) {
         syncExecutor.execute(runnable);
         return new SpongeTaskId(null);
+    }
+
+    @Override
+    public TaskId runSync(Runnable runnable, Long ticks) {
+        Long delay = ticks * 50L;
+        return new SpongeTaskId(syncExecutor.schedule(runnable, delay, TimeUnit.MILLISECONDS).getTask());
     }
 
     @Override

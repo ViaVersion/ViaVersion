@@ -80,6 +80,11 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     }
 
     @Override
+    public TaskId runSync(Runnable runnable, Long ticks) {
+        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS).getId());
+    }
+
+    @Override
     public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
         return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS).getId());
     }

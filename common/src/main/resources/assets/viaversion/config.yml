@@ -84,6 +84,8 @@ hologram-y: -0.96
 piston-animation-patch: false
 # Should we fix nbt for 1.12 and above clients in chat messages (causes invalid item)
 chat-nbt-fix: true
+# Should we fix shift quick move action for 1.12 clients (causes shift + double click not to work when moving items) (only works on 1.8-1.11.2 bukkit based servers)
+quick-move-action-fix: true
 #
 #----------------------------------------------------------#
 #         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #

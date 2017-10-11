@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.*;
 
 public class BungeeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch");
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix");
 
     public BungeeConfigAPI(File configFile) {
         super(new File(configFile, "config.yml"));
@@ -202,6 +202,11 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public boolean is1_12NBTArrayFix() {
         return getBoolean("chat-nbt-fix", true);
+    }
+    
+    @Override
+    public boolean is1_12QuickMoveActionFix() {
+        return false;
     }
 
     @Override

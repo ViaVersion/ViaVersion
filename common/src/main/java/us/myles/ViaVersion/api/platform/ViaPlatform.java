@@ -60,6 +60,16 @@ public interface ViaPlatform<T> {
     TaskId runSync(Runnable runnable);
 
     /**
+     * Run a task Sync after a interval
+     * This must be only used after plugin enable.
+     *
+     * @param runnable The task to run
+     * @param ticks    The interval to run it after
+     * @return The Task ID
+     */
+    TaskId runSync(Runnable runnable, Long ticks);
+
+    /**
      * Run a task at a repeating interval.
      * Initial interval is the same as repeat.
      *
