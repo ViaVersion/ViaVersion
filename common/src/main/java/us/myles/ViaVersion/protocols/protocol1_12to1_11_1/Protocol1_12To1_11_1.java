@@ -104,6 +104,10 @@ public class Protocol1_12To1_11_1 extends Protocol {
                         if (!Via.getConfig().is1_12NBTArrayFix()) return;
                         try {
                             JsonElement obj = new JsonParser().parse(wrapper.get(Type.STRING, 0));
+                            if (!TranslateRewriter.toClient(obj, wrapper.user())) {
+                                wrapper.cancel();
+                                return;
+                            }
                             ChatItemRewriter.toClient(obj, wrapper.user());
                             wrapper.set(Type.STRING, 0, obj.toString());
                         } catch (Exception e) {
@@ -386,7 +390,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             newId += 3;
         return newId;
     }
-    
+
     @Override
     protected void register(ViaProviders providers) {
         providers.register(InventoryQuickMoveProvider.class, new InventoryQuickMoveProvider());
