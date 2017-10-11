@@ -1,12 +1,10 @@
 package us.myles.ViaVersion.bukkit.platform;
 
 import lombok.AllArgsConstructor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -52,8 +50,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         new DeathListener(plugin).register();
         new BlockListener(plugin).register();
 
-        if (Bukkit.getVersion().toLowerCase().contains("paper") || Bukkit.getVersion().toLowerCase().contains("taco")) {
-            plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot patch: Fixes block placement.");
+        if (Bukkit.getVersion().toLowerCase().contains("paper")
+                || Bukkit.getVersion().toLowerCase().contains("taco")
+                || Bukkit.getVersion().toLowerCase().contains("torch")) {
+            plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot/Torch patch: Fixes block placement.");
             new PaperPatch(plugin).register();
         }
         if (plugin.getConf().isItemCache()) {
