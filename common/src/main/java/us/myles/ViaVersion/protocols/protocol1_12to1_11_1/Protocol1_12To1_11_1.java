@@ -312,7 +312,36 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x01, 0x02);
         registerIncoming(State.PLAY, 0x02, 0x03);
         registerIncoming(State.PLAY, 0x03, 0x04);
-        registerIncoming(State.PLAY, 0x04, 0x05);
+        // Client Settings (max length changed)
+        registerIncoming(State.PLAY, 0x04, 0x05, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - Locale
+                map(Type.BYTE); // 1 - view distance
+                map(Type.VAR_INT); // 2 - chat mode
+                map(Type.BOOLEAN); // 3 - chat colors
+                map(Type.UNSIGNED_BYTE); // 4 - chat flags
+                map(Type.VAR_INT); // 5 - main hand
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // As part of the fix for MC-111054, the max length of
+                        // the locale was raised to 16 (from 7), and the client
+                        // now makes sure that resource packs have names in that
+                        // length.  However, for older servers, it is still 7,
+                        // and thus the server will reject it (and the client
+                        // won't know that the pack's invalid).
+                        // The fix is to just silently lower the length.  The
+                        // server doesn't actually use the locale anywhere, so
+                        // this is fine.
+                        String locale = wrapper.get(Type.STRING, 0);
+                        if (locale.length() > 7) {
+                            wrapper.set(Type.STRING, 0, locale.substring(0, 7));
+                        }
+                    }
+                });
+            }
+        });
         registerIncoming(State.PLAY, 0x05, 0x06);
         registerIncoming(State.PLAY, 0x06, 0x07);
         // registerIncoming(State.PLAY, 0x07, 0x08); - Handled in InventoryPackets
