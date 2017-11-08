@@ -86,8 +86,6 @@ public class Protocol1_12_1TO1_12 extends Protocol {
                 });
             }
         });
-
-
     }
 
     @Override
