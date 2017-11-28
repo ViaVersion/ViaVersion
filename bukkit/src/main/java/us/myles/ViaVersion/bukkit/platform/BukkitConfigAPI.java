@@ -167,7 +167,7 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     
     @Override
     public boolean is1_12QuickMoveActionFix() {
-        return getBoolean("quick-move-action-fix", true);
+        return getBoolean("quick-move-action-fix", false);
     }
 
     @Override
