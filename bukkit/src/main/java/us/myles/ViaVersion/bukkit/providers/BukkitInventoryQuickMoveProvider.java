@@ -44,6 +44,9 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         if (!supported) {
             return false;
         }
+        if (slotId < 0) { // clicked out of inv slot
+            return false;
+        }
         ProtocolInfo info = userConnection.get(ProtocolInfo.class);
         UUID uuid = info.getUuid();
         BukkitInventoryUpdateTask updateTask = updateTasks.get(uuid);
@@ -66,9 +69,6 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         }
         InventoryView inv = p.getOpenInventory();
         short slotId = storage.getSlotId();
-        if (slotId < 0) { // clicked out of inv slot
-            return null;
-        }
         if (slotId > inv.countSlots()) {
             return null; // wrong container open?
         }

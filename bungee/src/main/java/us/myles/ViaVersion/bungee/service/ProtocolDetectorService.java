@@ -54,7 +54,7 @@ public class ProtocolDetectorService implements Runnable {
         serverInfo.ping(new Callback<ServerPing>() {
             @Override
             public void done(ServerPing serverPing, Throwable throwable) {
-                if (throwable == null) {
+                if (throwable == null && serverPing != null && serverPing.getVersion() != null) {
                     detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
                     if (((BungeeConfigAPI) Via.getConfig()).isBungeePingSave()) {
                         Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
@@ -69,7 +69,6 @@ public class ProtocolDetectorService implements Runnable {
                         }
                         // Save
                         Via.getPlatform().getConfigurationProvider().saveConfig();
-
                     }
                 }
             }
