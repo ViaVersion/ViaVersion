@@ -4,10 +4,10 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
 
-public class ItemArrayType extends BaseItemArrayType {
+public class FlatItemArrayType extends BaseItemArrayType {
 
-    public ItemArrayType() {
-        super("Item Array");
+    public FlatItemArrayType() {
+        super("Flat Item Array");
     }
 
     @Override
@@ -15,7 +15,7 @@ public class ItemArrayType extends BaseItemArrayType {
         int amount = Type.SHORT.read(buffer);
         Item[] array = new Item[amount];
         for (int i = 0; i < amount; i++) {
-            array[i] = Type.ITEM.read(buffer);
+            array[i] = Type.FLAT_ITEM.read(buffer);
         }
         return array;
     }
@@ -24,7 +24,7 @@ public class ItemArrayType extends BaseItemArrayType {
     public void write(ByteBuf buffer, Item[] object) throws Exception {
         Type.SHORT.write(buffer, (short) object.length);
         for (Item o : object) {
-            Type.ITEM.write(buffer, o);
+            Type.FLAT_ITEM.write(buffer, o);
         }
     }
 }

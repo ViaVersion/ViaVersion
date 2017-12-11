@@ -22,7 +22,6 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
     /**
      * Length of the block data array.
      */
-    @Getter
     private final List<Integer> palette = Lists.newArrayList();
     private final int[] blocks;
     private final NibbleArray blockLight;
@@ -112,7 +111,7 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
     public void readBlocks(ByteBuf input) throws Exception {
         palette.clear();
 
-        // Reaad bits per block
+        // Read bits per block
         int bitsPerBlock = input.readUnsignedByte();
         long maxEntryValue = (1L << bitsPerBlock) - 1;
 
@@ -293,5 +292,10 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
         int bitCount = buf.readableBytes();
         buf.release();
         return bitCount;
+    }
+
+    @Override
+    public List<Integer> getPalette() {
+        return palette;
     }
 }

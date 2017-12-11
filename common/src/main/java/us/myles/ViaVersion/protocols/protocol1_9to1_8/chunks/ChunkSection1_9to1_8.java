@@ -155,6 +155,11 @@ public class ChunkSection1_9to1_8 implements ChunkSection {
         output.writeBytes(skyLight.getHandle());
     }
 
+    @Override
+    public List<Integer> getPalette() {
+        return palette;
+    }
+
     /**
      * Check if sky light is present
      *

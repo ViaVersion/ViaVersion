@@ -4,9 +4,9 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
 
-public class ItemType extends BaseItemType {
-    public ItemType() {
-        super("Item");
+public class FlatItemType extends BaseItemType {
+    public FlatItemType() {
+        super("FlatItem");
     }
 
     @Override
@@ -18,7 +18,6 @@ public class ItemType extends BaseItemType {
             Item item = new Item();
             item.setId(id);
             item.setAmount(buffer.readByte());
-            item.setData(buffer.readShort());
             item.setTag(Type.NBT.read(buffer));
             return item;
         }
@@ -31,7 +30,6 @@ public class ItemType extends BaseItemType {
         } else {
             buffer.writeShort(object.getId());
             buffer.writeByte(object.getAmount());
-            buffer.writeShort(object.getData());
             Type.NBT.write(buffer, object.getTag());
         }
     }

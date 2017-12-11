@@ -22,7 +22,6 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
     /**
      * Length of the block data array.
      */
-    @Getter
     private final List<Integer> palette = Lists.newArrayList();
     private final int[] blocks;
     private final NibbleArray blockLight;
@@ -248,6 +247,11 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      */
     public void writeSkyLight(ByteBuf output) {
         output.writeBytes(skyLight.getHandle());
+    }
+
+    @Override
+    public List<Integer> getPalette() {
+        return palette;
     }
 
     /**

@@ -2,6 +2,8 @@ package us.myles.ViaVersion.api.minecraft.chunks;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.List;
+
 public interface ChunkSection {
     int getBlock(int x, int y, int z);
 
@@ -16,4 +18,6 @@ public interface ChunkSection {
     boolean hasSkyLight();
 
     void writeSkyLight(ByteBuf output) throws Exception;
+
+    List<Integer> getPalette();
 }
