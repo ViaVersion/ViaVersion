@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -10,7 +12,11 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.MappingData;
 
 public class InventoryPackets {
+    private static String NBT_TAG_NAME;
+
     public static void register(Protocol protocol) {
+        NBT_TAG_NAME = "ViaVersion|" + protocol.getClass().getSimpleName();
+
         /*
             Outgoing packets
          */
@@ -122,7 +128,7 @@ public class InventoryPackets {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.FLAT_ITEM, 0);
-//                                EntityIdRewriter.toServerItem(item);
+                                toServer(item);
                             }
                         });
                     }
@@ -139,8 +145,8 @@ public class InventoryPackets {
                         handler(new PacketHandler() {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.ITEM, 0);
-//                                EntityIdRewriter.toServerItem(item);
+                                Item item = wrapper.get(Type.FLAT_ITEM, 0);
+                                toServer(item);
                             }
                         });
                     }
@@ -151,14 +157,38 @@ public class InventoryPackets {
     public static void toClient(Item item) {
         if (item == null) return;
         int rawId = (item.getId() << 4 | item.getData() & 0xF);
+        int originalId = rawId;
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
                 rawId = item.getId() << 4;
             } else {
-                rawId = 0;
+                System.out.println("FAILED TO GET ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
+                rawId = 16; // Stone
             }
         }
         item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
         item.setData((short) 0);
+        // Save original id
+        if (item.getTag() == null) {
+            item.setTag(new CompoundTag("tag"));
+        }
+        item.getTag().put(new IntTag(NBT_TAG_NAME, originalId));
+    }
+
+    public static void toServer(Item item) {
+        if (item == null) return;
+        if (item.getTag() != null) {
+            CompoundTag tag = item.getTag();
+            // Check for valid tag
+            if (tag.contains(NBT_TAG_NAME)) {
+                if (tag.get(NBT_TAG_NAME) instanceof IntTag) {
+                    int rawId = (int) tag.get(NBT_TAG_NAME).getValue();
+                    item.setId((short) (rawId >> 4));
+                    item.setData((short) (rawId & 0xF));
+                    // Remove the tag
+                    tag.remove(NBT_TAG_NAME);
+                }
+            }
+        }
     }
 }
