@@ -110,7 +110,7 @@ public class WorldPackets {
                 // TODO: This packet has changed
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) {
                         wrapper.cancel();
                     }
                 });
@@ -122,7 +122,11 @@ public class WorldPackets {
         if (MappingData.oldToNewBlocks.containsKey(oldId)) {
             return MappingData.oldToNewBlocks.get(oldId);
         } else {
-            System.out.println("Missing block " + oldId);
+            if (MappingData.oldToNewBlocks.containsKey((oldId >> 4) << 4)) {
+                System.out.println("Missing block " + oldId);
+                return MappingData.oldToNewBlocks.get((oldId >> 4) << 4);
+            }
+            System.out.println("Missing block completely " + oldId);
             // Default stone
             return 1;
         }
