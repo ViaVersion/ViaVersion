@@ -67,15 +67,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                             index = input.length();
                             length = 0;
                         } else {
-                            // Otherwise find the last space
-                            int lastSpace = input.lastIndexOf(" ");
-                            if (lastSpace == -1) {
-                                index = 0;
-                                length = input.length();
-                            } else {
-                                index = lastSpace;
-                                length = input.length() - lastSpace;
-                            }
+                            // Otherwise find the last space (+1 as we include it)
+                            int lastSpace = input.lastIndexOf(" ") + 1;
+                            index = lastSpace;
+                            length = input.length() - lastSpace;
                         }
                         // Write index + length
                         wrapper.write(Type.VAR_INT, index);
