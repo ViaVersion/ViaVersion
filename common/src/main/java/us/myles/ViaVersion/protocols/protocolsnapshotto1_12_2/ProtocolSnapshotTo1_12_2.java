@@ -162,40 +162,13 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x28, 0x29);
         registerOutgoing(State.PLAY, 0x29, 0x2A);
         registerOutgoing(State.PLAY, 0x2A, 0x2B);
-
-        // Craft Recipe Response
-        registerOutgoing(State.PLAY, 0x2B, 0x2C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                // TODO: This packet has changed
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
-
+        registerOutgoing(State.PLAY, 0x2B, 0x2C);
         registerOutgoing(State.PLAY, 0x2C, 0x2D);
         registerOutgoing(State.PLAY, 0x2D, 0x2E);
         registerOutgoing(State.PLAY, 0x2E, 0x2F);
         registerOutgoing(State.PLAY, 0x2F, 0x30);
         registerOutgoing(State.PLAY, 0x30, 0x31);
-
-        // Unlock Recipes
-        registerOutgoing(State.PLAY, 0x31, 0x32, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                // TODO: This packet has changed
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        registerOutgoing(State.PLAY, 0x31, 0x32);
 
         registerOutgoing(State.PLAY, 0x33, 0x34);
         registerOutgoing(State.PLAY, 0x34, 0x35);
@@ -232,11 +205,17 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x42, 0x43, new PacketRemapper() {
             @Override
             public void registerMap() {
-                // TODO: This packet has changed
+                map(Type.STRING);
+                map(Type.BYTE);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
+                        if (wrapper.get(Type.BYTE, 0) == 0 || wrapper.get(Type.BYTE, 0) == 1) {
+                            wrapper.passthrough(Type.STRING);
+                            String type = wrapper.read(Type.STRING);
+                            // integer or hearts
+                            wrapper.write(Type.VAR_INT, type.equals("integer") ? 0 : 1);
+                        }
                     }
                 });
             }
@@ -295,19 +274,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        // Craft Recipe Request
-        registerIncoming(State.PLAY, 0x12, 0x12, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                // TODO: This packet has changed
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        registerIncoming(State.PLAY, 0x12, 0x12);
     }
 
     @Override
