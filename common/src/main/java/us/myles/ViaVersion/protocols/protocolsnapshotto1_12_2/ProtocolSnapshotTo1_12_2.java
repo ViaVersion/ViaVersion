@@ -55,14 +55,43 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             public void registerMap() {
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
+
+                        String input = wrapper.user().get(TabCompleteTracker.class).getInput();
                         // Start & End
-                        wrapper.write(Type.VAR_INT, 0);
-                        wrapper.write(Type.VAR_INT, 0);
+                        int index;
+                        int length;
+                        // If no input or new word (then it's the start)
+                        if (input.endsWith(" ") || input.length() == 0) {
+                            index = input.length();
+                            length = 0;
+                        } else {
+                            // Otherwise find the last space
+                            int lastSpace = input.lastIndexOf(" ");
+                            if (lastSpace == -1) {
+                                index = 0;
+                                length = input.length();
+                            } else {
+                                index = lastSpace;
+                                length = input.length() - lastSpace;
+                            }
+                        }
+                        // Write index + length
+                        wrapper.write(Type.VAR_INT, index);
+                        wrapper.write(Type.VAR_INT, length);
+
+                        int count = wrapper.passthrough(Type.VAR_INT);
+                        for (int i = 0; i < count; i++) {
+                            String suggestion = wrapper.read(Type.STRING);
+                            // If we're at the start then handle removing slash
+                            if (suggestion.startsWith("/") && index == 0) {
+                                suggestion = suggestion.substring(1);
+                            }
+                            wrapper.write(Type.STRING, suggestion);
+                        }
                     }
                 });
-                // Passthrough the reset
             }
         });
 
@@ -250,7 +279,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 // Prepend /
                 map(Type.STRING, new ValueTransformer<String, String>(Type.STRING) {
                     @Override
-                    public String transform(PacketWrapper wrapper, String inputValue) throws Exception {
+                    public String transform(PacketWrapper wrapper, String inputValue) {
+                        wrapper.user().get(TabCompleteTracker.class).setInput(inputValue);
                         return "/" + inputValue;
                     }
                 });

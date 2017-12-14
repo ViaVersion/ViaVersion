@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 public class TabCompleteTracker extends StoredObject {
     private int transactionId;
+    private String input;
 
     public TabCompleteTracker(UserConnection user) {
         super(user);
@@ -16,5 +17,13 @@ public class TabCompleteTracker extends StoredObject {
 
     public void setTransactionId(int transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
     }
 }
