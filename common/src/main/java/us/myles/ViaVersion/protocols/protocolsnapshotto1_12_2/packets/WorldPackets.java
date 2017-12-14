@@ -64,18 +64,7 @@ public class WorldPackets {
         });
 
         // Named Sound Effect
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                // TODO: This packet has changed
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A);
 
         // Chunk Data
         protocol.registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {
