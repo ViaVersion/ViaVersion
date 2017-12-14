@@ -5,6 +5,8 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.remapper.ValueCreator;
+import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -12,6 +14,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.EntityPack
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
 
 // Development of 1.13 support!
 public class ProtocolSnapshotTo1_12_2 extends Protocol {
@@ -50,13 +53,16 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0xE, 0x10, new PacketRemapper() {
             @Override
             public void registerMap() {
-                // TODO: This packet has changed
-                handler(new PacketHandler() {
+                create(new ValueCreator() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
+                    public void write(PacketWrapper wrapper) {
+                        wrapper.write(Type.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
+                        // Start & End
+                        wrapper.write(Type.VAR_INT, 0);
+                        wrapper.write(Type.VAR_INT, 0);
                     }
                 });
+                // Passthrough the reset
             }
         });
 
@@ -92,6 +98,29 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
                         clientChunks.setEnvironment(dimensionId);
+
+                        // Send fake declare commands
+                        wrapper.create(0x11, new ValueCreator() {
+                            @Override
+                            public void write(PacketWrapper wrapper) {
+                                wrapper.write(Type.VAR_INT, 2); // Size
+                                // Write root node
+                                wrapper.write(Type.VAR_INT, 0); // Mark as command
+                                wrapper.write(Type.VAR_INT, 1); // 1 child
+                                wrapper.write(Type.VAR_INT, 1); // Child is at 1
+
+                                // Write arg node
+                                wrapper.write(Type.VAR_INT, 0x02 | 0x04 | 0x10); // Mark as command
+                                wrapper.write(Type.VAR_INT, 0); // No children
+                                // Extra data
+                                wrapper.write(Type.STRING, "args"); // Arg name
+                                wrapper.write(Type.STRING, "brigadier:string");
+                                wrapper.write(Type.VAR_INT, 2); // Greedy
+                                wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
+
+                                wrapper.write(Type.VAR_INT, 0); // Root node index
+                            }
+                        }).send(ProtocolSnapshotTo1_12_2.class);
                     }
                 });
             }
@@ -210,11 +239,27 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerIncoming(State.PLAY, 0x1, 0x4, new PacketRemapper() {
             @Override
             public void registerMap() {
-                // TODO: This packet has changed
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
+                        int tid = wrapper.read(Type.VAR_INT);
+                        // Save transaction id
+                        wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);
+                    }
+                });
+                // Prepend /
+                map(Type.STRING, new ValueTransformer<String, String>(Type.STRING) {
+                    @Override
+                    public String transform(PacketWrapper wrapper, String inputValue) throws Exception {
+                        return "/" + inputValue;
+                    }
+                });
+                // Fake the end of the packet
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) {
+                        wrapper.write(Type.BOOLEAN, false);
+                        wrapper.write(Type.OPTIONAL_POSITION, null);
                     }
                 });
             }
@@ -238,6 +283,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new TabCompleteTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
     }
