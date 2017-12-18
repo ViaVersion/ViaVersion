@@ -17,10 +17,7 @@ public class FlatItemType extends BaseItemType {
         } else {
             Item item = new Item();
             item.setId(id);
-            item.setAmount(buffer.readByte());
-            if (id != 0) {
-                item.setTag(Type.NBT.read(buffer));
-            }
+            item.setTag(Type.NBT.read(buffer));
             return item;
         }
     }
@@ -32,9 +29,7 @@ public class FlatItemType extends BaseItemType {
         } else {
             buffer.writeShort(object.getId());
             buffer.writeByte(object.getAmount());
-            if (object.getId() != 0) {
-                Type.NBT.write(buffer, object.getTag());
-            }
+            Type.NBT.write(buffer, object.getTag());
         }
     }
 }

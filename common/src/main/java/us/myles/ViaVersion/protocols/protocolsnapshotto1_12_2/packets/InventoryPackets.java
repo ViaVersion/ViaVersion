@@ -27,7 +27,7 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
-                map(Type.FLAT_ITEM); // 2 - Slot Value
+                map(Type.ITEM, Type.FLAT_ITEM); // 2 - Slot Value
 
                 handler(new PacketHandler() {
                     @Override
@@ -44,7 +44,7 @@ public class InventoryPackets {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.FLAT_ITEM_ARRAY); // 1 - Window Values
+                map(Type.ITEM_ARRAY, Type.FLAT_ITEM_ARRAY); // 1 - Window Values
 
                 handler(new PacketHandler() {
                     @Override
@@ -73,12 +73,22 @@ public class InventoryPackets {
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
-                                toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Input Item
-                                toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Output Item
+                                // Input Item
+                                Item input = wrapper.read(Type.ITEM);
+                                toClient(input);
+                                wrapper.write(Type.ITEM, input);
+                                // Output Item
+                                Item output = wrapper.read(Type.ITEM);
+                                toClient(output);
+                                wrapper.write(Type.ITEM, output);
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
-                                if (secondItem)
-                                    toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Second Item
+                                if (secondItem) {
+                                    // Second Item
+                                    Item second = wrapper.read(Type.ITEM);
+                                    toClient(second);
+                                    wrapper.write(Type.ITEM, second);
+                                }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
@@ -96,7 +106,7 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.VAR_INT); // 1 - Slot ID
-                map(Type.FLAT_ITEM); // 2 - Item
+                map(Type.ITEM, Type.FLAT_ITEM); // 2 - Item
 
                 handler(new PacketHandler() {
                     @Override
@@ -122,7 +132,7 @@ public class InventoryPackets {
                         map(Type.BYTE); // 2 - Button
                         map(Type.SHORT); // 3 - Action number
                         map(Type.VAR_INT); // 4 - Mode
-                        map(Type.FLAT_ITEM); // 5 - Clicked Item
+                        map(Type.FLAT_ITEM, Type.ITEM); // 5 - Clicked Item
 
                         handler(new PacketHandler() {
                             @Override
@@ -140,7 +150,7 @@ public class InventoryPackets {
                     @Override
                     public void registerMap() {
                         map(Type.SHORT); // 0 - Slot
-                        map(Type.FLAT_ITEM); // 1 - Clicked Item
+                        map(Type.FLAT_ITEM, Type.ITEM); // 1 - Clicked Item
 
                         handler(new PacketHandler() {
                             @Override
