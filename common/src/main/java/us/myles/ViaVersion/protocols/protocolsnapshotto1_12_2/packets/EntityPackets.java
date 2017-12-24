@@ -102,10 +102,8 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
                         Optional<Entity1_12Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
-                        if (!type.isPresent())
-                            return;
 
-                        MetadataRewriter.handleMetadata(entityId, type.get(), wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
+                        MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }

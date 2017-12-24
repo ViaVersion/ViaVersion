@@ -163,7 +163,19 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x2E, 0x2F);
         registerOutgoing(State.PLAY, 0x2F, 0x30);
         registerOutgoing(State.PLAY, 0x30, 0x31);
-        registerOutgoing(State.PLAY, 0x31, 0x32);
+        // Recipe
+        registerOutgoing(State.PLAY, 0x31, 0x32, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // TODO: This has changed >.>
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
 
         registerOutgoing(State.PLAY, 0x33, 0x34);
         registerOutgoing(State.PLAY, 0x34, 0x35);
@@ -269,7 +281,21 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerIncoming(State.PLAY, 0x12, 0x12);
+        // Craft recipe request
+        registerIncoming(State.PLAY, 0x12, 0x12, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // TODO: This has changed >.>
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+
+        // TODO: Sound effect
     }
 
     @Override

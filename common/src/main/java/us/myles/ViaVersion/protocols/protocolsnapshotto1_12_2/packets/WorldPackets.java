@@ -30,6 +30,7 @@ public class WorldPackets {
                 });
             }
         });
+
         // Block Change
         protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
             @Override
@@ -44,6 +45,7 @@ public class WorldPackets {
                 });
             }
         });
+
         // Multi Block Change
         protocol.registerOutgoing(State.PLAY, 0x10, 0xF, new PacketRemapper() {
             @Override
@@ -107,7 +109,7 @@ public class WorldPackets {
         });
     }
 
-    private static int toNewId(int oldId) {
+    public static int toNewId(int oldId) {
         if (MappingData.oldToNewBlocks.containsKey(oldId)) {
             return MappingData.oldToNewBlocks.get(oldId);
         } else {
