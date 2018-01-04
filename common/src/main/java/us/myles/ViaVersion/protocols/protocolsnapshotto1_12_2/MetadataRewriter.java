@@ -20,10 +20,14 @@ public class MetadataRewriter {
             if (metadata.getMetaType().getTypeID() > 4)
                 metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID() + 1));
 
-            // TODO Fix displayname
+            // Handle String -> Chat DisplayName
             if (metadata.getId() == 2) {
                 metadata.setMetaType(MetaType1_13.OptChat);
-                metadata.setValue(metadata.getValue() != null ? Protocol1_9TO1_8.fixJson((String) metadata.getValue()) : null);
+                if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
+                    metadata.setValue(Protocol1_9TO1_8.fixJson((String) metadata.getValue()));
+                } else {
+                    metadata.setValue(null);
+                }
             }
 
             // 1.13 changed item to flat item (no data)

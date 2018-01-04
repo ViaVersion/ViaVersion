@@ -33,7 +33,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         // Outgoing packets
 
         // Statistics
-        registerOutgoing(State.PLAY, 0x7, 0x7, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x07, 0x07, new PacketRemapper() {
             @Override
             public void registerMap() {
                 // TODO: This packet has changed
@@ -253,7 +253,19 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4A, 0x4D);
         registerOutgoing(State.PLAY, 0x4B, 0x4E);
         registerOutgoing(State.PLAY, 0x4C, 0x4F);
-        registerOutgoing(State.PLAY, 0x4D, 0x50);
+        // Advancements
+        registerOutgoing(State.PLAY, 0x4D, 0x50, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // TODO Temporary cancel advancements because of 'Non [a-z0-9/._-] character in path of location: minecraft:? https://fs.matsv.nl/media?id=auwje4z4lxw.png
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x4E, 0x51);
         registerOutgoing(State.PLAY, 0x4F, 0x52);
         // New packet 0x52 - Declare Recipes
