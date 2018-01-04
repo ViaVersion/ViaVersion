@@ -17,6 +17,7 @@ public class FlatItemType extends BaseItemType {
         } else {
             Item item = new Item();
             item.setId(id);
+            item.setAmount(buffer.readByte());
             item.setTag(Type.NBT.read(buffer));
             return item;
         }

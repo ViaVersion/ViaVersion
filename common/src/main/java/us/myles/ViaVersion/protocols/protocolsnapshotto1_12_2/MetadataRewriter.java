@@ -55,9 +55,5 @@ public class MetadataRewriter {
                 }
             }
         }
-
-        for (Metadata metadata : metadatas) {
-            System.out.println(metadata.getMetaType() instanceof MetaType1_13);
-        }
     }
 }

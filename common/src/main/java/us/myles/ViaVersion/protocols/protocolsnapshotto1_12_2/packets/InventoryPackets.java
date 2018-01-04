@@ -137,7 +137,7 @@ public class InventoryPackets {
                         handler(new PacketHandler() {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.FLAT_ITEM, 0);
+                                Item item = wrapper.get(Type.ITEM, 0);
                                 toServer(item);
                             }
                         });
@@ -155,7 +155,7 @@ public class InventoryPackets {
                         handler(new PacketHandler() {
                             @Override
                             public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.FLAT_ITEM, 0);
+                                Item item = wrapper.get(Type.ITEM, 0);
                                 toServer(item);
                             }
                         });
