@@ -157,14 +157,26 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x28, 0x29);
         registerOutgoing(State.PLAY, 0x29, 0x2A);
         registerOutgoing(State.PLAY, 0x2A, 0x2B);
-        registerOutgoing(State.PLAY, 0x2B, 0x2C);
+        // Craft recipe response
+        registerOutgoing(State.PLAY, 0x2B, 0x2C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // TODO This packet changed
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x2C, 0x2D);
         registerOutgoing(State.PLAY, 0x2D, 0x2E);
         registerOutgoing(State.PLAY, 0x2E, 0x2F);
-        registerOutgoing(State.PLAY, 0x2F, 0x30);
-        registerOutgoing(State.PLAY, 0x30, 0x31);
+        registerOutgoing(State.PLAY, 0x2F, 0x31);
+        registerOutgoing(State.PLAY, 0x30, 0x32);
         // Recipe
-        registerOutgoing(State.PLAY, 0x31, 0x32, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x31, 0x33, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -177,11 +189,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x33, 0x34);
-        registerOutgoing(State.PLAY, 0x34, 0x35);
+        registerOutgoing(State.PLAY, 0x33, 0x35);
+        registerOutgoing(State.PLAY, 0x34, 0x36);
 
         // Respawn (save dimension id)
-        registerOutgoing(State.PLAY, 0x35, 0x36, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x35, 0x37, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -196,20 +208,20 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x36, 0x37);
-        registerOutgoing(State.PLAY, 0x37, 0x38);
-        registerOutgoing(State.PLAY, 0x38, 0x39);
-        registerOutgoing(State.PLAY, 0x39, 0x3A);
-        registerOutgoing(State.PLAY, 0x3A, 0x3B);
-        registerOutgoing(State.PLAY, 0x3B, 0x3C);
+        registerOutgoing(State.PLAY, 0x36, 0x38);
+        registerOutgoing(State.PLAY, 0x37, 0x39);
+        registerOutgoing(State.PLAY, 0x38, 0x3A);
+        registerOutgoing(State.PLAY, 0x39, 0x3B);
+        registerOutgoing(State.PLAY, 0x3A, 0x3C);
+        registerOutgoing(State.PLAY, 0x3B, 0x3D);
 
-        registerOutgoing(State.PLAY, 0x3D, 0x3E);
-        registerOutgoing(State.PLAY, 0x3E, 0x3F);
+        registerOutgoing(State.PLAY, 0x3D, 0x3F);
+        registerOutgoing(State.PLAY, 0x3E, 0x40);
 
-        registerOutgoing(State.PLAY, 0x40, 0x41);
-        registerOutgoing(State.PLAY, 0x41, 0x42);
+        registerOutgoing(State.PLAY, 0x40, 0x42);
+        registerOutgoing(State.PLAY, 0x41, 0x43);
         // Scoreboard Objective
-        registerOutgoing(State.PLAY, 0x42, 0x43, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x42, 0x44, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -228,20 +240,22 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x43, 0x44);
-        registerOutgoing(State.PLAY, 0x44, 0x45);
-        registerOutgoing(State.PLAY, 0x45, 0x46);
-        registerOutgoing(State.PLAY, 0x46, 0x47);
-        registerOutgoing(State.PLAY, 0x47, 0x48);
-        registerOutgoing(State.PLAY, 0x48, 0x49);
+        // TODO UPDATE BLOCK ENTITY?
+
+        registerOutgoing(State.PLAY, 0x43, 0x45);
+        registerOutgoing(State.PLAY, 0x44, 0x46);
+        registerOutgoing(State.PLAY, 0x45, 0x47);
+        registerOutgoing(State.PLAY, 0x46, 0x48);
+        registerOutgoing(State.PLAY, 0x47, 0x49);
+        registerOutgoing(State.PLAY, 0x48, 0x4A);
         // New packet 0x4A - Stop sound (TODO: Migrate from Plugin Messages)
-        registerOutgoing(State.PLAY, 0x49, 0x4B);
-        registerOutgoing(State.PLAY, 0x4A, 0x4C);
-        registerOutgoing(State.PLAY, 0x4B, 0x4D);
-        registerOutgoing(State.PLAY, 0x4C, 0x4E);
-        registerOutgoing(State.PLAY, 0x4D, 0x4F);
-        registerOutgoing(State.PLAY, 0x4E, 0x50);
-        registerOutgoing(State.PLAY, 0x4F, 0x51);
+        registerOutgoing(State.PLAY, 0x49, 0x4C);
+        registerOutgoing(State.PLAY, 0x4A, 0x4D);
+        registerOutgoing(State.PLAY, 0x4B, 0x4E);
+        registerOutgoing(State.PLAY, 0x4C, 0x4F);
+        registerOutgoing(State.PLAY, 0x4D, 0x50);
+        registerOutgoing(State.PLAY, 0x4E, 0x51);
+        registerOutgoing(State.PLAY, 0x4F, 0x52);
         // New packet 0x52 - Declare Recipes
         // New packet 0x53 - Tags
 

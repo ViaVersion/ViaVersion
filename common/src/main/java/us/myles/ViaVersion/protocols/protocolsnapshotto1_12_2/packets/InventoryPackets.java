@@ -101,7 +101,7 @@ public class InventoryPackets {
         });
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x3F, 0x40, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x3F, 0x41, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID

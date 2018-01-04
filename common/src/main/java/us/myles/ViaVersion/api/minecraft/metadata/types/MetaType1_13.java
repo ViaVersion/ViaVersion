@@ -13,15 +13,17 @@ public enum MetaType1_13 implements MetaType {
     Float(2, Type.FLOAT),
     String(3, Type.STRING),
     Chat(4, Type.STRING),
-    Slot(5, Type.FLAT_ITEM),
-    Boolean(6, Type.BOOLEAN),
-    Vector3F(7, Type.ROTATION),
-    Position(8, Type.POSITION),
-    OptPosition(9, Type.OPTIONAL_POSITION),
-    Direction(10, Type.VAR_INT),
-    OptUUID(11, Type.OPTIONAL_UUID),
-    BlockID(12, Type.VAR_INT),
-    NBTTag(13, Type.NBT),
+    OptChat(5, Type.OPTIONAL_CHAT),
+    Slot(6, Type.FLAT_ITEM),
+    Boolean(7, Type.BOOLEAN),
+    Vector3F(8, Type.ROTATION),
+    Position(9, Type.POSITION),
+    OptPosition(10, Type.OPTIONAL_POSITION),
+    Direction(11, Type.VAR_INT),
+    OptUUID(12, Type.OPTIONAL_UUID),
+    BlockID(13, Type.VAR_INT),
+    NBTTag(14, Type.NBT),
+    UNKNOWN(15, null), // TODO do research
     Discontinued(99, null);
 
     private final int typeID;
