@@ -240,10 +240,44 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        // TODO UPDATE BLOCK ENTITY?
-
         registerOutgoing(State.PLAY, 0x43, 0x45);
-        registerOutgoing(State.PLAY, 0x44, 0x46);
+        // Team packet
+        registerOutgoing(State.PLAY, 0x44, 0x46, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // 0 - Team Name
+                map(Type.BYTE); // 1 - Mode
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        byte action = wrapper.get(Type.BYTE, 0);
+
+                        if (action == 0 || action == 2) {
+                            wrapper.passthrough(Type.STRING); // Display Name
+
+                            wrapper.read(Type.STRING); // Prefix !REMOVED! TODO alternative or drop?
+                            wrapper.read(Type.STRING); // Suffix !REMOVED!
+
+                            wrapper.passthrough(Type.BYTE); // Flags
+
+                            wrapper.passthrough(Type.STRING); // Name Tag Visibility
+                            wrapper.passthrough(Type.STRING); // Collision rule
+
+                            // Handle new colors
+                            byte color = wrapper.read(Type.BYTE);
+
+                            if (color == -1) // -1 is no longer active, use white instead
+                                wrapper.write(Type.VAR_INT, 15);
+                            else
+                                wrapper.write(Type.VAR_INT, (int) color);
+
+                        }
+                    }
+                });
+
+            }
+        });
         registerOutgoing(State.PLAY, 0x45, 0x47);
         registerOutgoing(State.PLAY, 0x46, 0x48);
         registerOutgoing(State.PLAY, 0x47, 0x49);

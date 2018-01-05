@@ -18,18 +18,6 @@ import java.util.List;
 public class WorldPackets {
     public static void register(Protocol protocol) {
         // Outgoing packets
-        protocol.registerOutgoing(State.PLAY, 0x9, 0x9, new PacketRemapper() {
-
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
 
         // Block Change
         protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
@@ -65,7 +53,7 @@ public class WorldPackets {
             }
         });
 
-        // Named Sound Effect
+        // Named Sound Effect TODO String -> Identifier? Check if identifier is present?
         protocol.registerOutgoing(State.PLAY, 0x19, 0x1A);
 
         // Chunk Data
@@ -122,4 +110,5 @@ public class WorldPackets {
             return 1;
         }
     }
+
 }
