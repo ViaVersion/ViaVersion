@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
@@ -49,7 +48,7 @@ public class ChunkSection1_9to1_8 implements ChunkSection {
 
     @Override
     public void setFlatBlock(int x, int y, int z, int type) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public int getBlockId(int x, int y, int z) {
