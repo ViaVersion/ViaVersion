@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -13,6 +14,8 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
 
@@ -364,5 +367,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         userConnection.put(new TabCompleteTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
+        userConnection.put(new BlockStorage(userConnection));
+    }
+
+    @Override
+    protected void register(ViaProviders providers) {
+        providers.register(BlockEntityProvider.class, new BlockEntityProvider());
     }
 }

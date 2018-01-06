@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import lombok.Getter;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
@@ -44,6 +43,25 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
      */
     public void setBlock(int x, int y, int z, int type, int data) {
         setBlock(index(x, y, z), type, data);
+    }
+
+    /**
+     * Set a flat block in the chunks
+     *
+     * @param x    Block X
+     * @param y    Block Y
+     * @param z    Block Z
+     * @param type The type of the block
+     */
+    @Override
+    public void setFlatBlock(int x, int y, int z, int type) {
+        int index = palette.indexOf(type);
+        if (index == -1) {
+            index = palette.size();
+            palette.add(type);
+        }
+
+        blocks[index(x, y, z)] = index;
     }
 
     public int getBlockId(int x, int y, int z) {

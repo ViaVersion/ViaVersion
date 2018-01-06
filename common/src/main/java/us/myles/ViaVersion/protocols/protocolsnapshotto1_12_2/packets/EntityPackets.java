@@ -94,7 +94,6 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
                         Entity1_12Types.EntityType entType = Entity1_12Types.EntityType.PLAYER;
-                        System.out.println("REGISTER PLAYER");
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());

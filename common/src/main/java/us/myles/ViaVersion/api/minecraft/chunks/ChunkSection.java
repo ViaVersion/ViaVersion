@@ -9,6 +9,8 @@ public interface ChunkSection {
 
     void setBlock(int x, int y, int z, int type, int data);
 
+    void setFlatBlock(int x, int y, int z, int type);
+
     int getBlockId(int x, int y, int z);
 
     void writeBlocks(ByteBuf output) throws Exception;
