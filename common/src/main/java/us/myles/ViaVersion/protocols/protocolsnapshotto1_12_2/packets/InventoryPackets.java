@@ -70,7 +70,7 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
-                        // Handle stopsound change
+                        // Handle stopsound change TODO change location of this remap to other class?
                         if (channel.equalsIgnoreCase("MC|StopSound")) {
                             String originalSource = wrapper.read(Type.STRING);
                             String originalSound = wrapper.read(Type.STRING);
@@ -89,7 +89,6 @@ public class InventoryPackets {
                                     finalSource = Optional.of(SoundSource.MASTER);
                                 }
 
-                                System.out.println(finalSource.get());
                                 wrapper.write(Type.VAR_INT, finalSource.get().getId());
                             }
                             if (!originalSound.isEmpty()) {
