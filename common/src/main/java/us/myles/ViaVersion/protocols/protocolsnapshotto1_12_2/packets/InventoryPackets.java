@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -9,7 +10,8 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.MappingData;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
 
 public class InventoryPackets {
     private static String NBT_TAG_NAME;
@@ -67,8 +69,37 @@ public class InventoryPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        // TODO: StopSound?
-                        if (wrapper.get(Type.STRING, 0).equalsIgnoreCase("MC|TrList")) {
+                        String channel = wrapper.get(Type.STRING, 0);
+                        // Handle stopsound change
+                        if (channel.equalsIgnoreCase("MC|StopSound")) {
+                            String originalSource = wrapper.read(Type.STRING);
+                            String originalSound = wrapper.read(Type.STRING);
+
+                            // Reset the packet
+                            wrapper.clearPacket();
+                            wrapper.setId(0x4B);
+
+                            byte flags = 0;
+                            wrapper.write(Type.BYTE, flags); // Placeholder
+                            if (!originalSource.isEmpty()) {
+                                flags |= 1;
+                                Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
+                                if (!finalSource.isPresent()) {
+                                    System.out.println("Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                                    finalSource = Optional.of(SoundSource.MASTER);
+                                }
+
+                                System.out.println(finalSource.get());
+                                wrapper.write(Type.VAR_INT, finalSource.get().getId());
+                            }
+                            if (!originalSound.isEmpty()) {
+                                flags |= 2;
+                                wrapper.write(Type.STRING, originalSound);
+                            }
+
+                            wrapper.set(Type.BYTE, 0, flags); // Update flags
+                        }
+                        if (channel.equalsIgnoreCase("MC|TrList")) {
                             wrapper.passthrough(Type.INT); // Passthrough Window ID
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);

@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
@@ -285,8 +286,25 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x46, 0x48);
         registerOutgoing(State.PLAY, 0x47, 0x49);
         registerOutgoing(State.PLAY, 0x48, 0x4A);
-        // New packet 0x4A - Stop sound (TODO: Migrate from Plugin Messages)
-        registerOutgoing(State.PLAY, 0x49, 0x4C);
+
+        // Sound Effect packet
+        registerOutgoing(State.PLAY, 0x49, 0x4C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Sound ID
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int soundId = wrapper.get(Type.VAR_INT, 0);
+
+                        // Handle new 'Pumpkin Carve' sound
+                        if (soundId >= 86)
+                            wrapper.set(Type.VAR_INT, 0, soundId + 1);
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x4A, 0x4D);
         registerOutgoing(State.PLAY, 0x4B, 0x4E);
         registerOutgoing(State.PLAY, 0x4C, 0x4F);

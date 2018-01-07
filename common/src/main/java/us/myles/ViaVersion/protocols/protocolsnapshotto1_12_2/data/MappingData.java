@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2;
+package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
