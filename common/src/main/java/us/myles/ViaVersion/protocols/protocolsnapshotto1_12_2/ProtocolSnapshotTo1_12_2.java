@@ -16,6 +16,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.EntityPack
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
@@ -391,5 +392,6 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
     @Override
     protected void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
+        providers.register(PaintingProvider.class, new PaintingProvider());
     }
 }

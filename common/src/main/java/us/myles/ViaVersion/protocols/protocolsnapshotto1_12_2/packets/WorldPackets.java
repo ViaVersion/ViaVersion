@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -17,11 +18,37 @@ import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {
         // Outgoing packets
+
+        // Spawn Painting
+        protocol.registerOutgoing(State.PLAY, 0x04, 0x04, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.UUID); // 1 - Entity UUID
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        PaintingProvider provider = Via.getManager().getProviders().get(PaintingProvider.class);
+                        String motive = wrapper.read(Type.STRING);
+
+                        Optional<Integer> id = provider.getIntByIdentifier(motive);
+
+                        if (!id.isPresent())
+                            System.out.println("Could not find painting motive: " + motive + " falling back to default (0)");
+
+                        wrapper.write(Type.VAR_INT, id.or(0));
+                    }
+                });
+            }
+        });
+
         // Update Block Entity
         protocol.registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
             @Override
