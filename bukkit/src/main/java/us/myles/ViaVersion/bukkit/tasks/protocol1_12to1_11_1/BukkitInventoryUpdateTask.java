@@ -39,7 +39,7 @@ public class BukkitInventoryUpdateTask implements Runnable {
             synchronized (items) {
                 for (ItemTransaction storage : items) {
                     Object packet = provider.buildWindowClickPacket(p, storage);
-                    boolean result = provider.sendPlayer(p, packet);
+                    boolean result = provider.sendPacketToServer(p, packet);
                     if (!result) {
                         break;
                     }
