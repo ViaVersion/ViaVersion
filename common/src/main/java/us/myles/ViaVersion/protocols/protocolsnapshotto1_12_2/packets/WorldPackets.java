@@ -20,6 +20,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Chunk1_13Type;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {
@@ -136,7 +137,8 @@ public class WorldPackets {
                         BlockStorage storage = wrapper.user().get(BlockStorage.class);
 
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
-                        Chunk chunk = wrapper.passthrough(type);
+                        Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
+                        Chunk chunk = wrapper.read(type);
 
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection section = chunk.getSections()[i];
@@ -181,6 +183,7 @@ public class WorldPackets {
                                 chunk.getSections()[y >> 4].setFlatBlock(x, y, z, newId);
                             }
                         }
+                        wrapper.write(type1_13,chunk);
                     }
                 });
             }
