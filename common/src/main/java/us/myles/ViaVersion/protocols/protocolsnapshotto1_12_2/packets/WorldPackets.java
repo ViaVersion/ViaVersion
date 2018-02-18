@@ -139,6 +139,7 @@ public class WorldPackets {
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
                         Chunk chunk = wrapper.read(type);
+                        wrapper.write(type1_13,chunk);
 
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection section = chunk.getSections()[i];
@@ -183,7 +184,6 @@ public class WorldPackets {
                                 chunk.getSections()[y >> 4].setFlatBlock(x, y, z, newId);
                             }
                         }
-                        wrapper.write(type1_13,chunk);
                     }
                 });
             }
