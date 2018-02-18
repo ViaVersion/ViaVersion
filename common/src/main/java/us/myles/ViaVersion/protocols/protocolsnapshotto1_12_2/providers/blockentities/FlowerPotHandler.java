@@ -12,28 +12,28 @@ public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler 
     private static final Map<Pair<String, Integer>, Integer> flowers = new ConcurrentHashMap<>();
 
     static {
-        register("minecraft:air", 0, 4466);
-        register("minecraft:sapling", 0, 4467);
-        register("minecraft:sapling", 1, 4468);
-        register("minecraft:sapling", 2, 4469);
-        register("minecraft:sapling", 3, 4470);
-        register("minecraft:sapling", 4, 4471);
-        register("minecraft:sapling", 5, 4472);
-        register("minecraft:tallgrass", 2, 4473);
-        register("minecraft:yellow_flower", 0, 4474);
-        register("minecraft:red_flower", 0, 4475);
-        register("minecraft:red_flower", 1, 4476);
-        register("minecraft:red_flower", 2, 4477);
-        register("minecraft:red_flower", 3, 4478);
-        register("minecraft:red_flower", 4, 4479);
-        register("minecraft:red_flower", 5, 4480);
-        register("minecraft:red_flower", 6, 4481);
-        register("minecraft:red_flower", 7, 4482);
-        register("minecraft:red_flower", 8, 4483);
-        register("minecraft:red_mushroom", 0, 4484);
-        register("minecraft:brown_mushroom", 0, 4485);
-        register("minecraft:deadbush", 0, 4486);
-        register("minecraft:cactus", 0, 4487);
+        register("minecraft:air", 0, 4487);
+        register("minecraft:sapling", 0, 4488);
+        register("minecraft:sapling", 1, 4489);
+        register("minecraft:sapling", 2, 4490);
+        register("minecraft:sapling", 3, 4491);
+        register("minecraft:sapling", 4, 4492);
+        register("minecraft:sapling", 5, 4493);
+        register("minecraft:tallgrass", 2, 4494);
+        register("minecraft:yellow_flower", 0, 4495);
+        register("minecraft:red_flower", 0, 4496);
+        register("minecraft:red_flower", 1, 4497);
+        register("minecraft:red_flower", 2, 4498);
+        register("minecraft:red_flower", 3, 4499);
+        register("minecraft:red_flower", 4, 4500);
+        register("minecraft:red_flower", 5, 4501);
+        register("minecraft:red_flower", 6, 4502);
+        register("minecraft:red_flower", 7, 4503);
+        register("minecraft:red_flower", 8, 4504);
+        register("minecraft:red_mushroom", 0, 4505);
+        register("minecraft:brown_mushroom", 0, 4506);
+        register("minecraft:deadbush", 0, 4507);
+        register("minecraft:cactus", 0, 4508);
 
     }
 
