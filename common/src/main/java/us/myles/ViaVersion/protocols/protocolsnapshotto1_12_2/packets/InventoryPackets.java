@@ -13,6 +13,8 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
 
+import java.util.Map;
+
 public class InventoryPackets {
     private static String NBT_TAG_NAME;
 
@@ -202,7 +204,7 @@ public class InventoryPackets {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
                 rawId = item.getId() << 4;
             } else {
-                System.out.println("FAILED TO GET ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
+                System.out.println("FAILED TO GET 1.13 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
                 rawId = 16; // Stone
             }
         }
@@ -217,18 +219,32 @@ public class InventoryPackets {
 
     public static void toServer(Item item) {
         if (item == null) return;
+        int rawId = -1;
         if (item.getTag() != null) {
             CompoundTag tag = item.getTag();
             // Check for valid tag
             if (tag.contains(NBT_TAG_NAME)) {
                 if (tag.get(NBT_TAG_NAME) instanceof IntTag) {
-                    int rawId = (int) tag.get(NBT_TAG_NAME).getValue();
-                    item.setId((short) (rawId >> 4));
-                    item.setData((short) (rawId & 0xF));
+                    rawId = (int) tag.get(NBT_TAG_NAME).getValue();
                     // Remove the tag
                     tag.remove(NBT_TAG_NAME);
                 }
             }
+        }
+        if (rawId == -1){
+            int itemID = item.getId();
+            for (Map.Entry<Integer,Integer> entry : MappingData.oldToNewItems.entrySet()){
+                if (entry.getValue() == itemID){
+                    rawId = entry.getKey();
+                    break;
+                }
+            }
+        }
+        if (rawId != -1) {
+            item.setId((short) (rawId >> 4));
+            item.setData((short) (rawId & 0xF));
+        } else {
+            System.out.println("FAILED TO GET 1.12 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
         }
     }
 }
