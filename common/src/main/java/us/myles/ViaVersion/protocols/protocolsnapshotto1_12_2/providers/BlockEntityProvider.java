@@ -10,6 +10,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.ProtocolSnapshotTo
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.BannerHandler;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.BedHandler;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.FlowerPotHandler;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.SkullHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +22,7 @@ public class BlockEntityProvider implements Provider {
         handlers.put("minecraft:flower_pot", new FlowerPotHandler());
         handlers.put("minecraft:bed", new BedHandler());
         handlers.put("minecraft:banner", new BannerHandler());
+        handlers.put("minecraft:skull", new SkullHandler());
     }
 
     /**

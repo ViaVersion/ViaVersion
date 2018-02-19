@@ -89,6 +89,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                                 suggestion = suggestion.substring(1);
                             }
                             wrapper.write(Type.STRING, suggestion);
+                            wrapper.write(Type.BOOLEAN, false);
                         }
                     }
                 });
