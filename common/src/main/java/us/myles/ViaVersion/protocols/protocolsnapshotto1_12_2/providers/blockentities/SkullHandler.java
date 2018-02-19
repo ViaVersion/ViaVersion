@@ -8,6 +8,8 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEnt
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 
 public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
+    private final int SKULL_WALL_START = 4669;
+    private final int SKULL_END = 4788;
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
@@ -18,36 +20,15 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
             return -1;
         }
 
-        int data = storage.get(position).getOriginal() & 0xF;
+        int id = storage.get(position).getOriginal();
 
-        byte type = (Byte) tag.get("SkullType").getValue();
-
-        int add = 0;
-
-        // wall head start
-        int blockId = 4669;
-
-        switch (data % 6) {
-            case 1:
-                add = (Byte) tag.get("Rot").getValue() + 4;
-                break;
-            case 2:
-                add = 0;
-                break;
-            case 3:
-                add = 2;
-                break;
-            case 4:
-                add = 3;
-                break;
-            case 5:
-                add = 1;
-                break;
+        if (id >= SKULL_WALL_START && id <= SKULL_END) {
+            id += (byte) tag.get("SkullType").getValue() * 20 + (byte) tag.get("Rot").getValue();
+        } else {
+            System.out.println("Why does this block have the skull block entity? :(" + tag);
         }
 
-        blockId += add + type * 20;
-
-        return blockId;
+        return id;
     }
     private long getLong(Tag tag) {
         return ((Integer) tag.getValue()).longValue();
