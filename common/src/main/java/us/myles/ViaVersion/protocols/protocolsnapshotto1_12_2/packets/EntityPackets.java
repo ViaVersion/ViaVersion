@@ -24,7 +24,7 @@ public class EntityPackets {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - UUID
                 map(Type.BYTE); // 2 - Type
-
+                // TODO handle new 1.13 entities
                 // Track Entity
                 handler(new PacketHandler() {
                     @Override
