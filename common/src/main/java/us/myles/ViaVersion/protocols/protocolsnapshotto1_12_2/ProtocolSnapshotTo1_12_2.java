@@ -299,10 +299,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int soundId = wrapper.get(Type.VAR_INT, 0);
-
-                        // Handle new 'Pumpkin Carve' sound
-                        if (soundId >= 86)
-                            wrapper.set(Type.VAR_INT, 0, soundId + 1);
+                        wrapper.set(Type.VAR_INT, 0, getNewSoundID(soundId));
                     }
                 });
             }
@@ -377,8 +374,6 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-
-        // TODO: Sound effect
     }
 
     @Override
@@ -394,5 +389,26 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
     protected void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
+    }
+
+    private int getNewSoundID(final int oldID){
+        int newID = oldID;
+        if (oldID >= 10)
+            newID += 5;
+        if (oldID >= 86)
+            newID++;
+        if (oldID >= 352)
+            newID += 5;
+        if (oldID >= 438)
+            newID++;
+        if (oldID >= 443)
+            newID += 12;
+        if (oldID >= 485)
+            newID++;
+        if (oldID >= 508)
+            newID += 2;
+        if (oldID >= 524)
+            newID += 8;
+        return newID;
     }
 }
