@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_12Types;
+import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MetadataRewriter {
-    public static void handleMetadata(int entityId, Entity1_12Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
+    public static void handleMetadata(int entityId, Entity1_13Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             // Handle new MetaTypes
             if (metadata.getMetaType().getTypeID() > 4)
@@ -42,7 +43,7 @@ public class MetadataRewriter {
 
             // Handle other changes
             try {
-                if (type != null && type.is(Entity1_12Types.EntityType.AREA_EFFECT_CLOUD)) {
+                if (type != null && type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD)) {
                     if (metadata.getId() == 9 || metadata.getId() == 10 || metadata.getId() == 11) {
                         // TODO: AreaEffectCloud has lost 2 integers and gained "ef"
                         // Will be implemented when more info is known
