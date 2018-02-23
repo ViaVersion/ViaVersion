@@ -3,13 +3,13 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_12Types;
+import us.myles.ViaVersion.api.entities.Entity1_13Types;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject {
-    private final Map<Integer, Entity1_12Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    private final Map<Integer, Entity1_13Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 
     public EntityTracker(UserConnection user) {
         super(user);
@@ -19,7 +19,7 @@ public class EntityTracker extends StoredObject {
         clientEntityTypes.remove(entityId);
     }
 
-    public void addEntity(int entityId, Entity1_12Types.EntityType type) {
+    public void addEntity(int entityId, Entity1_13Types.EntityType type) {
         clientEntityTypes.put(entityId, type);
     }
 
@@ -27,7 +27,7 @@ public class EntityTracker extends StoredObject {
         return clientEntityTypes.containsKey(entityId);
     }
 
-    public Optional<Entity1_12Types.EntityType> get(int id) {
+    public Optional<Entity1_13Types.EntityType> get(int id) {
         if (!has(id))
             return Optional.absent();
         return Optional.of(clientEntityTypes.get(id));

@@ -397,6 +397,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             newID += 5;
         if (oldID >= 86)
             newID++;
+        if (oldID >= 166)
+            newID += 4;
+        if (oldID >= 226)
+            newID++;
+        if (oldID >= 380)
+            newID += 7;
+        if (oldID >= 385)
+            newID += 4;
         if (oldID >= 352)
             newID += 5;
         if (oldID >= 438)
@@ -407,8 +415,13 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             newID++;
         if (oldID >= 508)
             newID += 2;
+        if (oldID >= 512)
+            newID++;
+        if (oldID >= 514)
+            newID++;
         if (oldID >= 524)
             newID += 8;
         return newID;
+        // TODO 18w08b
     }
 }

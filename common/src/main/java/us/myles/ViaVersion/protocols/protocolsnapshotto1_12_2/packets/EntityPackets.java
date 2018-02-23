@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_12Types;
+import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -32,7 +33,9 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         byte type = wrapper.get(Type.BYTE, 0);
 
-                        Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, true);
+                        Entity1_13Types.EntityType entType = Entity1_13Types.EntityType.valueOf(
+                                Entity1_12Types.getTypeFromId(type, true).name()
+                        );
 
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
@@ -65,7 +68,9 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         int type = wrapper.get(Type.VAR_INT, 1);
 
-                        Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, false);
+                        Entity1_13Types.EntityType entType = Entity1_13Types.EntityType.valueOf(
+                                Entity1_12Types.getTypeFromId(type, false).name()
+                        );
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
 
@@ -93,7 +98,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
-                        Entity1_12Types.EntityType entType = Entity1_12Types.EntityType.PLAYER;
+                        Entity1_13Types.EntityType entType = Entity1_13Types.EntityType.PLAYER;
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
@@ -128,7 +133,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
-                        Optional<Entity1_12Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
+                        Optional<Entity1_13Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
 
                         MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
                     }
