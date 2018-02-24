@@ -133,7 +133,7 @@ public class InventoryPackets {
                                     short slotId = wrapper.get(Type.SHORT, 0);
                                     short actionId = wrapper.get(Type.SHORT, 1);
                                     InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
-                                    boolean succeed = provider.registerQuickMove(windowId, slotId, actionId, wrapper.user());
+                                    boolean succeed = provider.registerQuickMoveAction(windowId, slotId, actionId, wrapper.user());
                                     if (succeed) {
                                         wrapper.cancel();
                                     }
