@@ -37,6 +37,8 @@ public class EntityPackets {
                                 Entity1_12Types.getTypeFromId(type, true).name()
                         );
 
+                        wrapper.set(Type.BYTE, 0, (byte) entType.getId());
+
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                     }
@@ -71,6 +73,9 @@ public class EntityPackets {
                         Entity1_13Types.EntityType entType = Entity1_13Types.EntityType.valueOf(
                                 Entity1_12Types.getTypeFromId(type, false).name()
                         );
+
+                        wrapper.set(Type.VAR_INT, 1, type = entType.getId());
+
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
 
