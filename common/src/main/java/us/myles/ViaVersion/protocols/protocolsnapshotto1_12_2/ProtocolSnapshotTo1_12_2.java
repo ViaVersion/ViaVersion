@@ -151,6 +151,15 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                                 wrapper.write(Type.VAR_INT, 0); // Root node index
                             }
                         }).send(ProtocolSnapshotTo1_12_2.class);
+                        PacketWrapper tagsPacket = wrapper.create(0x54, new ValueCreator() {
+                            @Override
+                            public void write(PacketWrapper wrapper) throws Exception {
+                                wrapper.write(Type.VAR_INT, 0);
+                                wrapper.write(Type.VAR_INT, 0);
+                            }
+                        });
+                        tagsPacket.send(ProtocolSnapshotTo1_12_2.class);
+                        tagsPacket.send(ProtocolSnapshotTo1_12_2.class);
                     }
                 });
             }
