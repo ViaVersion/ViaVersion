@@ -431,6 +431,5 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         if (oldID >= 524)
             newID += 8;
         return newID;
-        // TODO 18w08b
     }
 }
