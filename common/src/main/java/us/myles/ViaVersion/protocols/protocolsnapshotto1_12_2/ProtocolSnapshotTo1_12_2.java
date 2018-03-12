@@ -165,7 +165,27 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x24, 0x25);
+        registerOutgoing(State.PLAY, 0x24, 0x25, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT);
+                map(Type.BYTE);
+                map(Type.BOOLEAN);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int iconCount = wrapper.passthrough(Type.VAR_INT);
+                        for (int i = 0; i < iconCount; i++){
+                            wrapper.passthrough(Type.BYTE);
+                            wrapper.passthrough(Type.BYTE);
+                            wrapper.passthrough(Type.BYTE);
+                            wrapper.write(Type.BOOLEAN, false);
+                        }
+                        wrapper.passthroughAll();
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x25, 0x26);
         registerOutgoing(State.PLAY, 0x26, 0x27);
         registerOutgoing(State.PLAY, 0x27, 0x28);
@@ -402,6 +422,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
     private int getNewSoundID(final int oldID){
         int newID = oldID;
+        if (oldID >= 1)
+            newID += 6; // ambient.underwater...
         if (oldID >= 10)
             newID += 5;
         if (oldID >= 86)
@@ -409,6 +431,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         if (oldID >= 166)
             newID += 4;
         if (oldID >= 226)
+            newID++;
+        if (oldID >= 373)
             newID++;
         if (oldID >= 380)
             newID += 7;
@@ -419,7 +443,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         if (oldID >= 438)
             newID++;
         if (oldID >= 443)
-            newID += 12;
+            newID += 16;
         if (oldID >= 485)
             newID++;
         if (oldID >= 508)
