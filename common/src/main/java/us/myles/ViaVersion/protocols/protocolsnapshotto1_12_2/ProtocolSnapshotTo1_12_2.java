@@ -264,7 +264,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.BYTE, 0) == 0 || wrapper.get(Type.BYTE, 0) == 1) {
+                        if (wrapper.get(Type.BYTE, 0) == 0 || wrapper.get(Type.BYTE, 0) == 2) {
                             wrapper.passthrough(Type.STRING);
                             String type = wrapper.read(Type.STRING);
                             // integer or hearts
