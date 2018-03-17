@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.SpawnEggRewriter;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
 
@@ -204,12 +205,21 @@ public class InventoryPackets {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
                 rawId = item.getId() << 4;
             } else {
-                System.out.println("FAILED TO GET 1.13 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
-                rawId = 16; // Stone
+                rawId = -1;
             }
         }
-        item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
-        item.setData((short) 0);
+        if (rawId == -1) {
+            if (!SpawnEggRewriter.toClient(item)){
+                System.out.println("FAILED TO GET 1.13 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
+                item.setId((short) 1); // stone
+                item.setData((short) 0);
+            }
+        } else {
+            item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
+            item.setData((short) 0);
+        }
+
+
         // Save original id
         if (item.getTag() == null) {
             item.setTag(new CompoundTag("tag"));
@@ -240,6 +250,12 @@ public class InventoryPackets {
                 }
             }
         }
+        if (rawId == -1) {
+            if (SpawnEggRewriter.toServer(item)) {
+                rawId = (item.getId() << 4) | (item.getData() & 0xF);
+            }
+        }
+
         if (rawId != -1) {
             item.setId((short) (rawId >> 4));
             item.setData((short) (rawId & 0xF));
