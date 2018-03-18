@@ -2,13 +2,12 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SpawnEggRewriter {
-    private static Map<String,Integer> entityToEggId = new HashMap<>();
+    private static BiMap<String,Integer> entityToEggId = HashBiMap.create();
 
     static {
         entityToEggId.put("minecraft:bat",620);
@@ -46,7 +45,7 @@ public class SpawnEggRewriter {
         entityToEggId.put("minecraft:spider",652);
         entityToEggId.put("minecraft:squid",653);
         entityToEggId.put("minecraft:stray",654);
-        entityToEggId.put("minecraft:turtle",655);
+        // turtle
         entityToEggId.put("minecraft:vex",656);
         entityToEggId.put("minecraft:villager",657);
         entityToEggId.put("minecraft:vindication_illager",658);
@@ -69,20 +68,20 @@ public class SpawnEggRewriter {
                         item.setId((short) (int) entityToEggId.get(id.getValue()));
                         return true;
                     } else {
-                        System.err.println("Failed to get EntityTag");
+                        System.out.println("Failed to get EntityTag id from spawn egg. " + item.getTag());
                     }
                 } else {
-                    System.err.println("Failed to get EntityTag from spawn egg");
+                    System.out.println("Failed to get EntityTag from spawn egg. " + item.getTag());
                 }
             } else {
-                System.err.println("Failed to get spawn egg: egg doesn't contains NBT tag");
+                System.out.println("Egg doesn't contain NBT tag");
             }
         }
         return false;
     }
 
     public static boolean toServer(Item item) {
-        String entityID = firstKey(entityToEggId, (int) item.getId());
+        String entityID = entityToEggId.inverse().get((int) item.getId());
         if (item != null && entityID != null){
             item.setId((short) 383);
             item.setData((short) 0);
@@ -96,14 +95,5 @@ public class SpawnEggRewriter {
             return true;
         }
         return false;
-    }
-
-    public static <A, B> A firstKey(Map<A, B> map, B value) {
-        for (Map.Entry<A, B> entry : map.entrySet()){
-            if (entry.getValue().equals(value)){
-                return entry.getKey();
-            }
-        }
-        return null;
     }
 }
