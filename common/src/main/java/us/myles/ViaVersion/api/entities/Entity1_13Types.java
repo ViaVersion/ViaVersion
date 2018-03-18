@@ -45,30 +45,38 @@ public class Entity1_13Types {
         FISHING_BOBBER(92, ENTITY), // ais
 
         LIVINGENTITY(-1, ENTITY), // abv
-
+        ARMOR_STAND(1, LIVINGENTITY), // ail
         PLAYER(91, LIVINGENTITY), // aks
 
-        ABW(-1, LIVINGENTITY), // abw
-        ACD(-1, ABW), // acd
-        ABJ(-1, ACD), // abj
-        AGD(-1, ABJ), // agd
-        ACG(-1, AGD), // acg
-        AGR(-1, ACG), // agr
+        ABSTRACT_INSENTIENT(-1, LIVINGENTITY), // abw
+        ENDER_DRAGON(16, ABSTRACT_INSENTIENT), // ahp
 
-        PARROT(49, AGR), // agk
-        OCELOT(47, ACG), // agj
-        WOLF(85, ACG), // agy
-        CHICKEN(7, AGD), // age
-        COW(9, AGD), // agg
+        ABSTRACT_CREATURE(-1, ABSTRACT_INSENTIENT), // acd
+
+        ABSTRACT_AGEABLE(-1, ABSTRACT_CREATURE), // abj
+        VILLAGER(78, ABSTRACT_AGEABLE), // akn
+
+        // Animals
+        ABSTRACT_ANIMAL(-1, ABSTRACT_AGEABLE), // agd
+        CHICKEN(7, ABSTRACT_ANIMAL), // age
+        COW(9, ABSTRACT_ANIMAL), // agg
         MOOSHROOM(46, COW), // agi
-        POLAR_BEAR(53, AGD), // agm
-        PIG(50, AGD), // agl
-        RABBIT(55, AGD), // ago
-        SHEEP(57, AGD), // agq
-        TURTLE(72, AGD), // agv
+        PIG(50, ABSTRACT_ANIMAL), // agl
+        POLAR_BEAR(53, ABSTRACT_ANIMAL), // agm
+        RABBIT(55, ABSTRACT_ANIMAL), // ago
+        SHEEP(57, ABSTRACT_ANIMAL), // agq
+        TURTLE(72, ABSTRACT_ANIMAL), // agv
+
+        ABSTRACT_TAMEABLE_ANIMAL(-1, ABSTRACT_ANIMAL), // acg
+        OCELOT(47, ABSTRACT_TAMEABLE_ANIMAL), // agj
+        WOLF(85, ABSTRACT_TAMEABLE_ANIMAL), // agy
+
+        ABSTRACT_PARROT(-1, ABSTRACT_TAMEABLE_ANIMAL), // agr
+        PARROT(49, ABSTRACT_PARROT), // agk
+
 
         // Horses
-        ABSTRACT_HORSE(-1, AGD), // aha
+        ABSTRACT_HORSE(-1, ABSTRACT_ANIMAL), // aha
         CHESTED_HORSE(-1, ABSTRACT_HORSE), // agz
         DONKEY(11, CHESTED_HORSE), // ahb
         MULE(45, CHESTED_HORSE), // ahf
@@ -77,74 +85,96 @@ public class Entity1_13Types {
         SKELETON_HORSE(62, ABSTRACT_HORSE), // ahg
         ZOMBIE_HORSE(87, ABSTRACT_HORSE), // ahi
 
-        VILLAGER(78, ABJ), // akn
-
         // Golem
-        ABSTRACT_GOLEM(-1, ACD), // agc
+        ABSTRACT_GOLEM(-1, ABSTRACT_CREATURE), // agc
         SNOWMAN(65, ABSTRACT_GOLEM), // ags
         VILLAGER_GOLEM(79, ABSTRACT_GOLEM), // agw
         SHULKER(58, ABSTRACT_GOLEM), // ajx
 
-        AGB(-1, ACD), // agb
-        COD_MOB(8, AGB), // agf
-        PUFFER_FISH(51, AGB), // agn
-        SALMON_MOB(56, AGB), // agp
-        TROPICAL_FISH(71, AGB), // agu
-        AJS(-1, ACD), // ajs
-        WITHER(82, AJS), // aij
-        AJB(-1, AJS), // ajb
-        AKB(-1, AJB), // akb
-        EVOCATION_ILLAGER(20, AKB), // ajl
-        ILLUSION_ILLAGER(30, AKB), // ajq
-        VINDICATION_ILLAGER(80, AJB), // akf
-        BLAZE(4, AJS), // ajd
-        AJC(-1, AJS), // ajc
-        SKELETON(61, AJC), // ajz
-        STRAY(70, AJC), // akd
-        WITHER_SKELETON(83, AJC), // akh
-        CREEPER(10, AJS), // ajf
-        SPIDER(68, AJS), // akc
-        CAVE_SPIDER(6, SPIDER), // aje
-        GUARDIAN(27, AJS), // ajo
+        // Fish
+        ABSTRACT_FISHES(-1, ABSTRACT_CREATURE), // agb
+        COD_MOB(8, ABSTRACT_FISHES), // agf
+        PUFFER_FISH(51, ABSTRACT_FISHES), // agn
+        SALMON_MOB(56, ABSTRACT_FISHES), // agp
+        TROPICAL_FISH(71, ABSTRACT_FISHES), // agu
+
+
+        // Monsters
+        ABSTRACT_MONSTER(-1, ABSTRACT_CREATURE), // ajs
+        BLAZE(4, ABSTRACT_MONSTER), // ajd
+        CREEPER(10, ABSTRACT_MONSTER), // ajf
+        ENDERMITE(18, ABSTRACT_MONSTER), // ajj
+        ENDERMAN(17, ABSTRACT_MONSTER), // aji
+        GIANT(26, ABSTRACT_MONSTER), // ajn
+        SILVERFISH(60, ABSTRACT_MONSTER), // ajy
+        VEX(77, ABSTRACT_MONSTER), // ake
+        WITCH(81, ABSTRACT_MONSTER), // akg
+        WITHER(82, ABSTRACT_MONSTER), // aij
+
+        // Illagers
+        ABSTRACT_ILLAGER_BASE(-1, ABSTRACT_MONSTER), // ajb
+        ABSTRACT_EVO_ILLU_ILLAGER(-1, ABSTRACT_ILLAGER_BASE), // akb
+        EVOCATION_ILLAGER(20, ABSTRACT_EVO_ILLU_ILLAGER), // ajl
+        ILLUSION_ILLAGER(30, ABSTRACT_EVO_ILLU_ILLAGER), // ajq
+        VINDICATION_ILLAGER(80, ABSTRACT_ILLAGER_BASE), // akf
+
+        // Skeletons
+        ABSTRACT_SKELETON(-1, ABSTRACT_MONSTER), // ajc
+        SKELETON(61, ABSTRACT_SKELETON), // ajz
+        STRAY(70, ABSTRACT_SKELETON), // akd
+        WITHER_SKELETON(83, ABSTRACT_SKELETON), // akh
+
+        // Guardians
+        GUARDIAN(27, ABSTRACT_MONSTER), // ajo
         ELDER_GUARDIAN(14, GUARDIAN), // ajh
-        ZOMBIE(86, AJS), // aki
+
+        // Spiders
+        SPIDER(68, ABSTRACT_MONSTER), // akc
+        CAVE_SPIDER(6, SPIDER), // aje
+
+        // Zombies
+        ZOMBIE(86, ABSTRACT_MONSTER), // aki
         DROWNED(13, ZOMBIE), // ajg
         HUSK(29, ZOMBIE), // ajp
         ZOMBIE_PIGMAN(52, ZOMBIE), // aju
         ZOMBIE_VILLAGER(88, ZOMBIE), // akj
-        ENDERMITE(18, AJS), // ajj
-        ENDERMAN(17, AJS), // aji
-        GIANT(26, AJS), // ajn
-        SILVERFISH(60, AJS), // ajy
-        VEX(77, AJS), // ake
-        WITCH(81, AJS), // akg
-        ABT(-1, ABW), // abt
-        GHAST(25, ABT), // ajm
-        PHANTOM(89, ABT), // ajt
-        AFY(-1, ABW), // afy
-        BAT(3, AFY), // afz
-        AGX(-1, ABW), // agx
-        SQUID(69, AGX), // agt
-        ENDER_DRAGON(16, ABW), // ahp
-        SLIME(63, ABW), // aka
+
+        // Flying entities
+        ABSTRACT_FLYING(-1, ABSTRACT_INSENTIENT), // abt
+        GHAST(25, ABSTRACT_FLYING), // ajm
+        PHANTOM(89, ABSTRACT_FLYING), // ajt
+
+        ABSTRACT_AMBIENT(-1, ABSTRACT_INSENTIENT), // afy
+        BAT(3, ABSTRACT_AMBIENT), // afz
+
+        ABSTRACT_WATERMOB(-1, ABSTRACT_INSENTIENT), // agx
+        SQUID(69, ABSTRACT_WATERMOB), // agt
+
+        // Slimes
+        SLIME(63, ABSTRACT_INSENTIENT), // aka
         MAGMA_CUBE(37, SLIME), // ajr
-        ARMOR_STAND(1, LIVINGENTITY), // ail
-        AHN(-1, ENTITY), // ahn
-        AIM(-1, ENTITY), // aim
-        LEASH_KNOT(34, AIM), // aio
-        ITEM_FRAME(32, AIM), // ain
-        PAINTING(48, AIM), // aiq
-        AIU(-1, ENTITY), // aiu
-        LIGHTNING_BOLT(90, AIU), // aiv
-        AKW(-1, ENTITY), // akw
-        ARROW(2, AKW), // aky
-        SPECTRAL_ARROW(67, AKW), // alk
-        TRIDENT(93, AKW), // alq
-        AKX(-1, ENTITY), // akx
-        DRAGON_FIREBALL(12, AKX), // akz
-        FIREBALL(33, AKX), // ald
-        SMALL_FIREBALL(64, AKX), // ali
-        WITHER_SKULL(84, AKX), // alr
+
+        // Hangable objects
+        ABSTRACT_HANGING(-1, ENTITY), // aim
+        LEASH_KNOT(34, ABSTRACT_HANGING), // aio
+        ITEM_FRAME(32, ABSTRACT_HANGING), // ain
+        PAINTING(48, ABSTRACT_HANGING), // aiq
+
+        ABSTRACT_LIGHTNING(-1, ENTITY), // aiu
+        LIGHTNING_BOLT(90, ABSTRACT_LIGHTNING), // aiv
+
+        // Arrows
+        ABSTRACT_ARROW(-1, ENTITY), // akw
+        ARROW(2, ABSTRACT_ARROW), // aky
+        SPECTRAL_ARROW(67, ABSTRACT_ARROW), // alk
+        TRIDENT(93, ABSTRACT_ARROW), // alq
+
+        // Fireballs
+        ABSTRACT_FIREBALL(-1, ENTITY), // akx
+        DRAGON_FIREBALL(12, ABSTRACT_FIREBALL), // akz
+        FIREBALL(33, ABSTRACT_FIREBALL), // ald
+        SMALL_FIREBALL(64, ABSTRACT_FIREBALL), // ali
+        WITHER_SKULL(84, ABSTRACT_FIREBALL), // alr
 
         // Projectiles
         PROJECTILE_ABSTRACT(-1, ENTITY), // all
