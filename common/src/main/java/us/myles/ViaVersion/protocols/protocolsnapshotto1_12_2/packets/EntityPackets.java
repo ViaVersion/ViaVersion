@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -33,17 +32,12 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         byte type = wrapper.get(Type.BYTE, 0);
-                        Optional<Entity1_13Types.ObjectTypes> entType = Entity1_13Types.ObjectTypes.findById(type);
-
-                        if (!entType.isPresent()) {
-                            Via.getPlatform().getLogger().severe("No object type id registered! " + type);
-                            return;
-                        }
+                        Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
 
                         // TODO no object type changes so far
 
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType.get().getType());
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                     }
                 });
             }
@@ -76,7 +70,6 @@ public class EntityPackets {
                         Optional<Integer> optNewType = EntityTypeRewriter.getNewId(type);
                         type = optNewType.or(type);
                         Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, false);
-
 
                         wrapper.set(Type.VAR_INT, 1, type);
 
@@ -144,7 +137,6 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
                         Optional<Entity1_13Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
-
                         MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
                     }
                 });

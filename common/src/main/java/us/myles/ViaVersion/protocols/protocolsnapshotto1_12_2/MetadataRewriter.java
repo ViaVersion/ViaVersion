@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_12Types;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -29,6 +28,11 @@ public class MetadataRewriter {
                 } else {
                     metadata.setValue(null);
                 }
+            }
+
+            // Handle new colors
+            if (type.is(Entity1_13Types.EntityType.WOLF) && metadata.getId() == 17) {
+                metadata.setValue(15 - (int) metadata.getValue());
             }
 
             // 1.13 changed item to flat item (no data)
