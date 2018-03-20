@@ -228,6 +228,7 @@ public class InventoryPackets {
                 }
             }
         }
+        // todo spawn egg
         item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
         item.setData((short) 0);
         item.getTag().put(new IntTag(NBT_TAG_NAME, originalId));
