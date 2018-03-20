@@ -308,8 +308,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                             // Handle new colors
                             byte color = wrapper.read(Type.BYTE);
 
-                            if (color == -1) // -1 is no longer active, use white instead
-                                wrapper.write(Type.VAR_INT, 15);
+                            if (color == -1) // -1 changed to 21
+                                wrapper.write(Type.VAR_INT, 21); // RESET
                             else
                                 wrapper.write(Type.VAR_INT, (int) color);
 

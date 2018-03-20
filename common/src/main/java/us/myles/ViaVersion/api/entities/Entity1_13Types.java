@@ -132,7 +132,7 @@ public class Entity1_13Types {
         SPIDER(68, ABSTRACT_MONSTER), // akc
         CAVE_SPIDER(6, SPIDER), // aje
 
-        // Zombies
+        // Zombies - META CHECKED
         ZOMBIE(86, ABSTRACT_MONSTER), // aki
         DROWNED(13, ZOMBIE), // ajg
         HUSK(29, ZOMBIE), // ajp

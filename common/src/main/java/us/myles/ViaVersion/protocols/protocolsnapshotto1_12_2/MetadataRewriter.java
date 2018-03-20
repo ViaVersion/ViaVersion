@@ -35,8 +35,7 @@ public class MetadataRewriter {
                 if (metadata.getMetaType() == MetaType1_13.Slot) {
                     metadata.setMetaType(MetaType1_13.Slot);
                     InventoryPackets.toClient((Item) metadata.getValue());
-                }
-                if (metadata.getMetaType() == MetaType1_13.BlockID) {
+                } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
                     // Convert to new block id
                     metadata.setValue(WorldPackets.toNewId((int) metadata.getValue()));
                 }
@@ -50,6 +49,11 @@ public class MetadataRewriter {
                     metadata.setValue(15 - (int) metadata.getValue());
                 }
 
+                // Handle new zombie meta (INDEX 15 - Boolean - Zombie is shaking while enabled)
+                if (type.isOrHasParent(Entity1_13Types.EntityType.ZOMBIE)) {
+                    if (metadata.getId() > 14)
+                        metadata.setId(metadata.getId() + 1);
+                }
 
                 // Handle other changes
                 if (type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD)) {
