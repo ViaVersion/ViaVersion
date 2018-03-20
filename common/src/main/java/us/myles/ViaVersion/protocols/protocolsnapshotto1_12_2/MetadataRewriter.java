@@ -55,6 +55,15 @@ public class MetadataRewriter {
                         metadata.setId(metadata.getId() + 1);
                 }
 
+                // Handle Minecart inner block
+                if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
+                    // New block format
+                    int oldId = (int) metadata.getValue();
+                    int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
+                    int newId = WorldPackets.toNewId(combined);
+                    metadata.setValue(newId);
+                }
+
                 // Handle other changes
                 if (type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD)) {
                     if (metadata.getId() == 9 || metadata.getId() == 10 || metadata.getId() == 11) {
