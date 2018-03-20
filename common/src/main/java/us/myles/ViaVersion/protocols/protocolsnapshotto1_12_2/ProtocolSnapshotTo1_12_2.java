@@ -409,6 +409,28 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
+
+        // Recipe Book Data
+        registerIncoming(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Type
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int type = wrapper.get(Type.VAR_INT, 0);
+
+                        if (type == 1) {
+                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
+                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
+                            wrapper.read(Type.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
+                            wrapper.read(Type.BOOLEAN); // Smelting Recipe Filter Active | IGNORE NEW 1.13 FIELD
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
