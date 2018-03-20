@@ -139,7 +139,7 @@ public class WorldPackets {
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
                         Chunk chunk = wrapper.read(type);
-                        wrapper.write(type1_13,chunk);
+                        wrapper.write(type1_13, chunk);
 
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection section = chunk.getSections()[i];
@@ -172,16 +172,16 @@ public class WorldPackets {
                         for (CompoundTag tag : chunk.getBlockEntities()) {
                             int newId = provider.transform(wrapper.user(), null, tag, false);
                             if (newId != -1) {
-                                int x = (int) tag.get("x").getValue() & 0xF;
+                                int x = (int) tag.get("x").getValue();
                                 int y = (int) tag.get("y").getValue();
-                                int z = (int) tag.get("z").getValue() & 0xF;
+                                int z = (int) tag.get("z").getValue();
 
                                 Position position = new Position((long) x, (long) y, (long) z);
                                 // Store the replacement blocks for blockupdates
                                 if (storage.contains(position))
                                     storage.get(position).setReplacement(newId);
 
-                                chunk.getSections()[y >> 4].setFlatBlock(x, y, z, newId);
+                                chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y, z & 0xF, newId);
                             }
                         }
                     }

@@ -43,10 +43,6 @@ public class BlockStorage extends StoredObject {
         super(user);
     }
 
-    public static void main(String[] args) {
-        new BlockStorage(null);
-    }
-
     public void store(Position position, int block) {
         store(position, block, -1);
     }
@@ -80,4 +76,10 @@ public class BlockStorage extends StoredObject {
         private int original;
         private int replacement;
     }
+
+    public static void main(String[] args) {
+        System.out.println(17 & 0xF);
+        System.out.println(0xF);
+    }
+
 }
