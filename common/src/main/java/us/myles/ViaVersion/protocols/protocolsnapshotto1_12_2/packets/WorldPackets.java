@@ -105,17 +105,15 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        BlockStorage storage = wrapper.user().get(BlockStorage.class);
                         int chunkX = wrapper.get(Type.INT, 0);
-                        int chunkZ = wrapper.get(Type.INT, 0);
+                        int chunkZ = wrapper.get(Type.INT, 1);
                         // Convert ids
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int newBlock = toNewId(record.getBlockId());
                             Position position = new Position(
                                     (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
                                     (long) record.getY(),
-                                    (long) ((record.getHorizontal() & 15) + (chunkZ * 16)));
-
+                                    (long) (record.getHorizontal() & 15) + (chunkZ * 16));
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
                     }
