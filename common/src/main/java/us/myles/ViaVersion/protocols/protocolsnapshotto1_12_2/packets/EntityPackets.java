@@ -25,6 +25,12 @@ public class EntityPackets {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - UUID
                 map(Type.BYTE); // 2 - Type
+                map(Type.DOUBLE); // 3 - X
+                map(Type.DOUBLE); // 4 - Y
+                map(Type.DOUBLE); // 5 - Z
+                map(Type.BYTE); // 6 - Pitch
+                map(Type.BYTE); // 7 - Yaw
+                map(Type.INT); // 8 - Data
 
                 // Track Entity
                 handler(new PacketHandler() {
@@ -34,7 +40,11 @@ public class EntityPackets {
                         byte type = wrapper.get(Type.BYTE, 0);
                         Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
 
-                        // TODO no object type changes so far
+                        if (entType != null && entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
+                            int oldId = wrapper.get(Type.INT, 0);
+                            int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
+                            wrapper.set(Type.INT, 0, WorldPackets.toNewId(combined));
+                        }
 
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
