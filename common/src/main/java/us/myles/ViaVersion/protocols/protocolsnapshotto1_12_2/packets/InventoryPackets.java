@@ -198,7 +198,7 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        int rawId = (item.getId() << 4 | item.getData() & 0xF);
+        int rawId = (item.getId() << 16 | item.getData() & 0xFFFF);
         int originalId = rawId;
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
@@ -219,32 +219,29 @@ public class InventoryPackets {
 
     public static void toServer(Item item) {
         if (item == null) return;
-        int rawId = -1;
         if (item.getTag() != null) {
             CompoundTag tag = item.getTag();
             // Check for valid tag
             if (tag.contains(NBT_TAG_NAME)) {
                 if (tag.get(NBT_TAG_NAME) instanceof IntTag) {
-                    rawId = (int) tag.get(NBT_TAG_NAME).getValue();
+                    int rawId = (int) tag.get(NBT_TAG_NAME).getValue();
                     // Remove the tag
                     tag.remove(NBT_TAG_NAME);
+                    item.setId((short) (rawId >> 16));
+                    item.setData((short) (rawId & 0xFFFF));
+                    return;
                 }
             }
         }
-        if (rawId == -1){
-            int itemID = item.getId();
-            for (Map.Entry<Integer,Integer> entry : MappingData.oldToNewItems.entrySet()){
-                if (entry.getValue() == itemID){
-                    rawId = entry.getKey();
-                    break;
-                }
+        int itemID = item.getId();
+        for (Map.Entry<Integer,Integer> entry : MappingData.oldToNewItems.entrySet()){
+            if (entry.getValue() == itemID){
+                int rawId = entry.getKey();
+                item.setId((short) (rawId >> 4));
+                item.setData((short) (rawId & 0xF));
+                return;
             }
         }
-        if (rawId != -1) {
-            item.setId((short) (rawId >> 4));
-            item.setData((short) (rawId & 0xF));
-        } else {
-            System.out.println("FAILED TO GET 1.12 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
-        }
+        System.out.println("FAILED TO GET 1.12 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
     }
 }

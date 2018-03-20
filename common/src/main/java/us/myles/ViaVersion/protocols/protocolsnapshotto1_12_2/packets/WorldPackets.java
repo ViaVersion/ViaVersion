@@ -179,7 +179,7 @@ public class WorldPackets {
                                 if (storage.contains(position))
                                     storage.get(position).setReplacement(newId);
 
-                                chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y, z & 0xF, newId);
+                                chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
                             }
                         }
                     }
