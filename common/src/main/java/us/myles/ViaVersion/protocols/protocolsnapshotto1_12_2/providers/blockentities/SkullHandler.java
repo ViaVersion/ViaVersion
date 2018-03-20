@@ -27,6 +27,7 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
             id += (byte) tag.get("SkullType").getValue() * 20 + (byte) tag.get("Rot").getValue();
         } else {
             System.out.println("Why does this block have the skull block entity? :(" + tag);
+            return -1;
         }
 
         return id;
