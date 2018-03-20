@@ -198,13 +198,14 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        int rawId = (item.getId() << 16 | item.getData() & 0xFFFF);
-        int originalId = rawId;
+        int rawId = (item.getId() << 4 | item.getData() & 0xF);
+        int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
         // Save original id
         CompoundTag tag = item.getTag();
         if (tag == null) {
             item.setTag(tag = new CompoundTag("tag"));
         }
+        item.getTag().put(new IntTag(NBT_TAG_NAME, originalId));
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
                 rawId = item.getId() << 4;
@@ -231,7 +232,6 @@ public class InventoryPackets {
         // todo spawn egg
         item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
         item.setData((short) 0);
-        item.getTag().put(new IntTag(NBT_TAG_NAME, originalId));
     }
 
     public static void toServer(Item item) {
