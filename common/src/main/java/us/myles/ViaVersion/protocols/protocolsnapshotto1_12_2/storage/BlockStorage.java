@@ -77,9 +77,4 @@ public class BlockStorage extends StoredObject {
         private int replacement;
     }
 
-    public static void main(String[] args) {
-        System.out.println(17 & 0xF);
-        System.out.println(0xF);
-    }
-
 }
