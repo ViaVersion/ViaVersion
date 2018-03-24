@@ -47,7 +47,13 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
 
     @Override
     public void setFlatBlock(int x, int y, int z, int type) {
-        throw new UnsupportedOperationException();
+        int index = palette.indexOf(type);
+        if (index == -1) {
+            index = palette.size();
+            palette.add(type);
+        }
+
+        blocks[index(x, y, z)] = index;
     }
 
     public int getBlockId(int x, int y, int z) {
