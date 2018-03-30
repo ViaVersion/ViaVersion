@@ -17,7 +17,9 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class EntityPackets {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
@@ -269,9 +271,63 @@ public class EntityPackets {
             }
         });
 
-        /* Packets which do not have any field remapping or handlers */
+        // Entity Properties Packet
+        protocol.registerOutgoing(State.PLAY, 0x20, 0x4B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); //Entity ID
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int i = wrapper.read(Type.INT); // Number of snapshots
+                        List<Object[]> snapshots = new ArrayList<>(i+1);
 
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x4B); // Entity Properties Packet
+                        // Adds the maximum attack speed on top of the list
+                        snapshots.add(0, new Object[]{
+                                "generic.attackSpeed",
+                                1024.0,
+                                new ArrayList<>(0)
+                        });
+
+                        for (int j = 0; j < i; ++j) {
+                            String s = wrapper.read(Type.STRING); // Attribute name
+                            double d0 = wrapper.read(Type.DOUBLE); // Attribute base value
+                            int k = wrapper.read(Type.VAR_INT); // Number of modifiers
+                            List<Object[]> list = new ArrayList<>(k);
+
+                            for (int l = 0; l < k; ++l) {
+                                list.add(new Object[]{
+                                        wrapper.read(Type.UUID), // Modifier ID
+                                        wrapper.read(Type.DOUBLE), // Modifier amount
+                                        wrapper.read(Type.BYTE) // Modifier operation
+                                });
+                            }
+
+                            snapshots.add(new Object[]{s, d0, list});
+                        }
+
+                        wrapper.write(Type.INT, snapshots.size()); // Number of snapshots
+                        for (Object[] snapshot : snapshots) {
+                            wrapper.write(Type.STRING, (String) snapshot[0]); // Attribute name
+                            wrapper.write(Type.DOUBLE, (Double) snapshot[1]); // Attribute base value
+
+                            @SuppressWarnings("unchecked")
+                            List<Object[]> list = (List<Object[]>) snapshot[2];
+
+                            wrapper.write(Type.VAR_INT, list.size()); // Number of modifiers
+
+                            for (Object[] objects : list) {
+                                wrapper.write(Type.UUID, (UUID) objects[0]); // Modifier ID
+                                wrapper.write(Type.DOUBLE, (Double) objects[1]); // Modifier amount
+                                wrapper.write(Type.BYTE, (Byte) objects[2]); // Modifier operation
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x1A, 0x1B); // Entity Status Packet
         protocol.registerOutgoing(State.PLAY, 0x16, 0x27); // Entity Look Packet
