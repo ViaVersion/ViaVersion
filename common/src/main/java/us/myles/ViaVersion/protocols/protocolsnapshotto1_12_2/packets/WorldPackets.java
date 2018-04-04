@@ -224,8 +224,8 @@ public class WorldPackets {
 
                         Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
 
-                        // Cancel if null
-                        if (particle == null) {
+                        // Cancel if null or completely removed
+                        if (particle == null || particle.getId() == -1) {
                             wrapper.cancel();
                             return;
                         }

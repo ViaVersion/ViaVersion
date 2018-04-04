@@ -111,7 +111,7 @@ public class ParticleRewriter {
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Red 0 - 1
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Green 0 - 1
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Blue 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1));// Scale 0.01 - 4 TODO test scale
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1));// Scale 0.01 - 4
                 return particle;
             }
         };
