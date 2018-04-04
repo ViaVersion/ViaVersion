@@ -21,9 +21,11 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.Painting
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Particle1_13Type;
 
 // Development of 1.13 support!
 public class ProtocolSnapshotTo1_12_2 extends Protocol {
+    public static final Particle1_13Type PARTICLE_TYPE = new Particle1_13Type();
 
     static {
         MappingData.init();

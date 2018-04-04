@@ -33,9 +33,10 @@ public class DumpSubCmd extends ViaSubCommand {
         return "Dump information about your server, this is helpful if you report bugs.";
     }
 
+
     @Override
     public boolean execute(final ViaCommandSender sender, String[] args) {
-        VersionInfo version = new VersionInfo(
+        final VersionInfo version = new VersionInfo(
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
                 ProtocolRegistry.SERVER_PROTOCOL,
@@ -53,58 +54,47 @@ public class DumpSubCmd extends ViaSubCommand {
             @Override
             public void run() {
 
-                HttpURLConnection con;
+                HttpURLConnection con = null;
                 try {
-                    con = (HttpURLConnection) new URL("https://api.github.com/gists").openConnection();
+                    con = (HttpURLConnection) new URL("https://dump.viaversion.com/documents").openConnection();
                 } catch (IOException e) {
                     sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
-                    Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Gist", e);
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to ViaVersion Dump", e);
                     return;
                 }
                 try {
-                    con.setRequestProperty("Content-Type", "application/json");
-                    con.addRequestProperty("User-Agent", "ViaVersion");
+                    con.setRequestProperty("Content-Type", "text/plain");
+                    con.addRequestProperty("User-Agent", "ViaVersion/" + version.getPluginVersion());
                     con.setRequestMethod("POST");
                     con.setDoOutput(true);
 
                     OutputStream out = con.getOutputStream();
-                    String contents = GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template);
-                    // Create payload
-                    JsonObject payload = new JsonObject();
-                    payload.addProperty("description", "ViaVersion Dump");
-                    payload.addProperty("public", "false");
-                    // Create file contents
-                    JsonObject file = new JsonObject();
-                    file.addProperty("content", contents);
-                    // Create file list
-                    JsonObject files = new JsonObject();
-                    files.add("dump.json", file);
-                    payload.add("files", files);
-                    // Write to stream
-                    out.write(GsonUtil.getGson().toJson(payload).getBytes(Charset.forName("UTF-8")));
+                    out.write(GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(Charset.forName("UTF-8")));
                     out.close();
+
+                    if (con.getResponseCode() == 429) {
+                        sender.sendMessage(ChatColor.RED + "You can only paste ones every minute to protect our systems.");
+                        return;
+                    }
 
                     String rawOutput = CharStreams.toString(new InputStreamReader(con.getInputStream()));
                     con.getInputStream().close();
+
                     JsonObject output = GsonUtil.getGson().fromJson(rawOutput, JsonObject.class);
 
+                    if (!output.has("key"))
+                        throw new InvalidObjectException("Key is not given in Hastebin output");
 
-                    if (!output.has("html_url"))
-                        throw new InvalidObjectException("URL is not given in Gist output");
-
-                    sender.sendMessage(ChatColor.GREEN + "We've made a dump with useful information, report your issue and provide this url: " + output.get("html_url").getAsString());
+                    sender.sendMessage(ChatColor.GREEN + "We've made a dump with useful information, report your issue and provide this url: " + getUrl(output.get("key").getAsString()));
                 } catch (Exception e) {
                     sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);
                     try {
-                        if (con.getResponseCode() == 403) {
-                            // Ensure 403 is due to rate limit being hit
-                            if("0".equals(con.getHeaderField("X-RateLimit-Remaining"))) {
-                                Via.getPlatform().getLogger().log(Level.WARNING, "You may only create 60 dumps per hour, please try again later.");
-                                return;
-                            }
+                        if (con.getResponseCode() < 200 || con.getResponseCode() > 400) {
+                            String rawOutput = CharStreams.toString(new InputStreamReader(con.getErrorStream()));
+                            con.getErrorStream().close();
+                            Via.getPlatform().getLogger().log(Level.WARNING, "Page returned: " + rawOutput);
                         }
-                        Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Gist", e);
-
                     } catch (IOException e1) {
                         Via.getPlatform().getLogger().log(Level.WARNING, "Failed to capture further info", e1);
                     }
@@ -113,5 +103,9 @@ public class DumpSubCmd extends ViaSubCommand {
         });
 
         return true;
+    }
+
+    private String getUrl(String id) {
+        return String.format("https://dump.viaversion.com/%s", id);
     }
 }
