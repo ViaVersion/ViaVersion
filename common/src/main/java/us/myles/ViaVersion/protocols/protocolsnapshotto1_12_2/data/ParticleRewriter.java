@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -58,7 +60,7 @@ public class ParticleRewriter {
         add(27, iconcrackHandler()); // (36->27) iconcrack_(id)_(data) -> minecraft:item
         // Item	Slot	The item that will be used.
         add(3, blockHandler()); // (37->3) blockcrack_(id+(data<<12))   -> minecraft:block
-        add(3, blockdustHandler()); // (38->3) blockdust_(id)               -> minecraft:block
+        add(3, blockWithoutMetaHandler()); // (38->3) blockdust_(id)               -> minecraft:block
         // BlockState	VarInt	The ID of the block state.
         add(36); // (39->36) droplet -> minecraft:rain
         add(-1); // (40->-1) take -> REMOVED (TODO REPLACENT/CLIENT_SIDED?)
@@ -67,7 +69,7 @@ public class ParticleRewriter {
         add(16); // (43->16) endrod -> minecraft:end_rod
         add(7); // (44->7) damageindicator -> minecraft:damage_indicator
         add(40); // (45->40) sweepattack -> minecraft:sweep_attack
-        add(20, fallingdustHandler()); // (46->20) fallingdust -> minecraft:falling_dust
+        add(20, blockWithoutMetaHandler()); // (46->20) fallingdust -> minecraft:falling_dust
         // BlockState	VarInt	The ID of the block state.
         add(41); // (47->41) totem -> minecraft:totem_of_undying
         add(38); // (48->38) spit -> minecraft:spit
@@ -117,7 +119,7 @@ public class ParticleRewriter {
         };
     }
 
-    // TODO TEST
+    // Rewrite IconCrack items to new format :)
     private static ParticleDataHandler iconcrackHandler() {
         return new ParticleDataHandler() {
             @Override
@@ -129,6 +131,9 @@ public class ParticleRewriter {
                     item = new Item(data[0].shortValue(), (byte) 1, data[1].shortValue(), null);
                 else
                     return particle;
+
+                // Transform to new Item
+                InventoryPackets.toClient(item);
 
                 particle.getArguments().add(new Particle.ParticleData(Type.FLAT_ITEM, item));
                 return particle;
@@ -146,25 +151,19 @@ public class ParticleRewriter {
         };
     }
 
-    // TODO HANDLE
-    private static ParticleDataHandler blockdustHandler() {
+    // Handle single block ids
+    private static ParticleDataHandler blockWithoutMetaHandler() {
         return new ParticleDataHandler() {
             @Override
             public Particle handler(Particle particle, Integer[] data) {
+                int blockId = data[0].shortValue() << 4;
+                int newBlockId = WorldPackets.toNewId(blockId);
+                particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newBlockId));
                 return particle;
             }
         };
     }
 
-    // TODO HANDLE
-    private static ParticleDataHandler fallingdustHandler() {
-        return new ParticleDataHandler() {
-            @Override
-            public Particle handler(Particle particle, Integer[] data) {
-                return particle;
-            }
-        };
-    }
 
     @Data
     @RequiredArgsConstructor
