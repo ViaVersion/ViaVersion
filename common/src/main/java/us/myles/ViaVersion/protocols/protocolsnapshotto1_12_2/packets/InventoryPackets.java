@@ -198,14 +198,39 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        int rawId = (item.getId() << 4 | item.getData() & 0xF);
-        int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
-        // Save original id
+
+        // create tag
         CompoundTag tag = item.getTag();
         if (tag == null) {
             item.setTag(tag = new CompoundTag("tag"));
         }
-        item.getTag().put(new IntTag(NBT_TAG_NAME, originalId));
+
+        // Save original id
+        int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
+        tag.put(new IntTag(NBT_TAG_NAME, originalId));
+
+        if (isDamageable(item.getId())) {
+            tag.put(new IntTag("Damage", item.getData()));
+        }
+
+        if (item.getId() == 358) { // map
+            tag.put(new IntTag("map", item.getData()));
+        }
+
+        if (item.getId() == 442) { // shield
+            if (tag.get("BlockEntityTag") instanceof CompoundTag) {
+                CompoundTag blockEntityTag = tag.get("BlockEntityTag");
+                if (blockEntityTag.get("Base") instanceof IntTag) {
+                    IntTag base = blockEntityTag.get("Base");
+                    base.setValue(15 - base.getValue()); // invert color id
+                }
+            }
+        }
+
+        // todo spawn egg
+
+        int rawId = (item.getId() << 4 | item.getData() & 0xF);
+
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
                 rawId = item.getId() << 4;
@@ -214,31 +239,19 @@ public class InventoryPackets {
                 rawId = 16; // Stone
             }
         }
-        if (isDamageable(item.getId())) {
-            tag.put(new IntTag("Damage", item.getData()));
-        }
-        if (item.getId() == 358) { // map
-            tag.put(new IntTag("map", item.getData()));
-        }
-        if (item.getId() == 442) { // shield
-            if (tag.get("BlockEntityTag") instanceof CompoundTag) {
-                CompoundTag blockEntityTag = tag.get("BlockEntityTag");
-                if (blockEntityTag.get("Base") instanceof IntTag) {
-                    IntTag base = blockEntityTag.get("Base");
-                    base.setValue(15 - base.getValue());
-                }
-            }
-        }
-        // todo spawn egg
+
         item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
         item.setData((short) 0);
     }
 
     public static void toServer(Item item) {
         if (item == null) return;
+
         Integer rawId = null;
         boolean gotRawIdFromTag = false;
+
         CompoundTag tag = item.getTag();
+
         if (tag != null) {
             // Check for valid tag
             if (tag.contains(NBT_TAG_NAME)) {
@@ -254,31 +267,40 @@ public class InventoryPackets {
             for (Map.Entry<Integer, Integer> entry : MappingData.oldToNewItems.entrySet()) {
                 if (entry.getValue() == item.getId()) {
                     int oldId = entry.getKey();
-                    rawId = oldId >> 4 << 16 | oldId & 0xF;
+                    rawId = (oldId >> 4) << 16 | oldId & 0xF;
+                    break;
                 }
             }
         }
+
         if (rawId != null) {
             item.setId((short) (rawId >> 16));
             item.setData((short) (rawId & 0xFFFF));
-            if (!gotRawIdFromTag) {
+
+            if (tag != null) {
                 if (isDamageable(item.getId())) {
-                    if (tag != null && tag.get("Damage") instanceof IntTag) {
-                        item.setData((short) (int) tag.get("Damage").getValue());
+                    if (tag.get("Damage") instanceof IntTag) {
+                        if (!gotRawIdFromTag)
+                            item.setData((short) (int) tag.get("Damage").getValue());
+                        tag.remove("Damage");
                     }
                 }
+
                 if (item.getId() == 358) { // map
-                    if (tag != null && tag.get("map") instanceof IntTag) {
-                        item.setData((short) (int) tag.get("map").getValue());
+                    if (tag.get("map") instanceof IntTag) {
+                        if (!gotRawIdFromTag)
+                            item.setData((short) (int) tag.get("map").getValue());
+                        tag.remove("map");
                     }
                 }
-            }
-            if (item.getId() == 442) { // shield
-                if (tag != null && tag.get("BlockEntityTag") instanceof CompoundTag) {
-                    CompoundTag blockEntityTag = tag.get("BlockEntityTag");
-                    if (blockEntityTag.get("Base") instanceof IntTag) {
-                        IntTag base = blockEntityTag.get("Base");
-                        base.setValue(15 - base.getValue());
+
+                if (item.getId() == 442) { // shield
+                    if (tag.get("BlockEntityTag") instanceof CompoundTag) {
+                        CompoundTag blockEntityTag = tag.get("BlockEntityTag");
+                        if (blockEntityTag.get("Base") instanceof IntTag) {
+                            IntTag base = blockEntityTag.get("Base");
+                            base.setValue(15 - base.getValue()); // invert color id
+                        }
                     }
                 }
             }
