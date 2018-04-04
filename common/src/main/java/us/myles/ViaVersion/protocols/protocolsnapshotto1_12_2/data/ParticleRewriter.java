@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class ParticleRewriter {
     private static List<NewParticle> particles = new LinkedList<>();
@@ -102,14 +103,14 @@ public class ParticleRewriter {
         Particle handler(Particle particle, Integer[] data);
     }
 
-    // TODO TEST
+    // Randomized because the previous one was a lot of different colors at once! :)
     private static ParticleDataHandler reddustHandler() {
         return new ParticleDataHandler() {
             @Override
             public Particle handler(Particle particle, Integer[] data) {
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1)); // Red 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0)); // Green 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0)); // Blue 0 - 1
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Red 0 - 1
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Green 0 - 1
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Blue 0 - 1
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1));// Scale 0.01 - 4 TODO test scale
                 return particle;
             }
@@ -176,6 +177,12 @@ public class ParticleRewriter {
                 return handler.handler(particle, data);
             return particle;
         }
+    }
+
+    private static Random rand = new Random();
+
+    private static float randomFloat() {
+        return rand.nextFloat();
     }
 
 

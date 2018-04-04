@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import us.myles.ViaVersion.api.type.Type;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.LinkedList;
+import java.util.List;
 
 @Data
 public class Particle {
     private int id;
-    private Set<ParticleData> arguments = new TreeSet<>();
+    private List<ParticleData> arguments = new LinkedList<>();
 
     public Particle(int id) {
         this.id = id;
