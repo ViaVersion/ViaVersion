@@ -80,8 +80,8 @@ public class ParticleRewriter {
          */
     }
 
-    public static Particle rewriteParticle(int particleId, int[] data) {
-        if (particles.size() >= particleId) {
+    public static Particle rewriteParticle(int particleId, Integer[] data) {
+        if (particleId >= particles.size()) {
             Via.getPlatform().getLogger().severe("Failed to transform particles with id " + particleId + " and data " + Arrays.toString(data));
             return null;
         }
@@ -99,14 +99,14 @@ public class ParticleRewriter {
     }
 
     interface ParticleDataHandler {
-        Particle handler(Particle particle, int[] data);
+        Particle handler(Particle particle, Integer[] data);
     }
 
     // TODO TEST
     private static ParticleDataHandler reddustHandler() {
         return new ParticleDataHandler() {
             @Override
-            public Particle handler(Particle particle, int[] data) {
+            public Particle handler(Particle particle, Integer[] data) {
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1)); // Red 0 - 1
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0)); // Green 0 - 1
                 particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0)); // Blue 0 - 1
@@ -120,12 +120,12 @@ public class ParticleRewriter {
     private static ParticleDataHandler iconcrackHandler() {
         return new ParticleDataHandler() {
             @Override
-            public Particle handler(Particle particle, int[] data) {
+            public Particle handler(Particle particle, Integer[] data) {
                 Item item;
                 if (data.length == 1)
-                    item = new Item((short) data[0], (byte) 1, (short) 0, null);
+                    item = new Item(data[0].shortValue(), (byte) 1, (short) 0, null);
                 else if (data.length == 2)
-                    item = new Item((short) data[0], (byte) 1, (short) data[1], null);
+                    item = new Item(data[0].shortValue(), (byte) 1, data[1].shortValue(), null);
                 else
                     return particle;
 
@@ -139,7 +139,7 @@ public class ParticleRewriter {
     private static ParticleDataHandler blockHandler() {
         return new ParticleDataHandler() {
             @Override
-            public Particle handler(Particle particle, int[] data) {
+            public Particle handler(Particle particle, Integer[] data) {
                 return particle;
             }
         };
@@ -149,7 +149,7 @@ public class ParticleRewriter {
     private static ParticleDataHandler blockdustHandler() {
         return new ParticleDataHandler() {
             @Override
-            public Particle handler(Particle particle, int[] data) {
+            public Particle handler(Particle particle, Integer[] data) {
                 return particle;
             }
         };
@@ -159,7 +159,7 @@ public class ParticleRewriter {
     private static ParticleDataHandler fallingdustHandler() {
         return new ParticleDataHandler() {
             @Override
-            public Particle handler(Particle particle, int[] data) {
+            public Particle handler(Particle particle, Integer[] data) {
                 return particle;
             }
         };
@@ -171,7 +171,7 @@ public class ParticleRewriter {
         private final int id;
         private final ParticleDataHandler handler;
 
-        public Particle handle(Particle particle, int[] data) {
+        public Particle handle(Particle particle, Integer[] data) {
             if (handler != null)
                 return handler.handler(particle, data);
             return particle;

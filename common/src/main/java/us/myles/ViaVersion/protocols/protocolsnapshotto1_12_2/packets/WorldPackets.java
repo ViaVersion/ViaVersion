@@ -17,6 +17,8 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.Particle;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
@@ -191,11 +193,50 @@ public class WorldPackets {
         protocol.registerOutgoing(State.PLAY, 0x22, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
-                // TODO: This packet has changed
+                map(Type.INT); // 0 - Particle ID
+                map(Type.BOOLEAN); // 1 - Long Distance
+                map(Type.FLOAT); // 2 - X
+                map(Type.FLOAT); // 3 - Y
+                map(Type.FLOAT); // 4 - Z
+                map(Type.FLOAT); // 5 - Offset X
+                map(Type.FLOAT); // 6 - Offset Y
+                map(Type.FLOAT); // 7 - Offset Z
+                map(Type.FLOAT); // 8 - Particle Data
+                map(Type.INT); // 9 - Particle Count
+
                 handler(new PacketHandler() {
                     @Override
-                    public void handle(PacketWrapper wrapper) {
-                        wrapper.cancel();
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int particleId = wrapper.get(Type.INT, 0);
+
+                        // Get the data (Arrays are overrated)
+                        int dataCount = 0;
+                        // Particles with 1 data [BlockCrack,BlockDust,FallingDust]
+                        if (particleId == 37 || particleId == 38 || particleId == 46)
+                            dataCount = 1;
+                            // Particles with 2 data [IconCrack]
+                        else if (particleId == 36)
+                            dataCount = 2;
+
+                        Integer[] data = new Integer[dataCount];
+                        for (int i = 0; i < data.length; i++)
+                            data[i] = wrapper.read(Type.VAR_INT);
+
+                        Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
+
+                        // Cancel if null
+                        if (particle == null) {
+                            wrapper.cancel();
+                            return;
+                        }
+
+//                        System.out.println("Old particle " + particleId + " " + Arrays.toString(data) +  " new Particle" + particle);
+
+
+                        wrapper.set(Type.INT, 0, particle.getId());
+                        for (Particle.ParticleData particleData : particle.getArguments())
+                            wrapper.write(particleData.getType(), particleData.getValue());
+
                     }
                 });
             }
