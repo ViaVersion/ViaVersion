@@ -7,6 +7,8 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.Particle;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
 
@@ -15,6 +17,7 @@ import java.util.List;
 
 public class MetadataRewriter {
     public static void handleMetadata(int entityId, Entity1_13Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
+        int particleId = 0, parameter1 = 0, parameter2 = 0;
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
                 // Handle new MetaTypes
@@ -66,11 +69,16 @@ public class MetadataRewriter {
 
                 // Handle other changes
                 if (type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD)) {
-                    if (metadata.getId() == 9 || metadata.getId() == 10 || metadata.getId() == 11) {
-                        // TODO: AreaEffectCloud has lost 2 integers and gained "ef"
-                        // Will be implemented when more info is known
-                        metadatas.remove(metadata); // Remove
+                    if (metadata.getId() == 9) {
+                        particleId = (int) metadata.getValue();
+                    } else if (metadata.getId() == 10) {
+                        parameter1 = (int) metadata.getValue();
+                    } else if (metadata.getId() == 11) {
+                        parameter2 = (int) metadata.getValue();
                     }
+
+                    if (metadata.getId() >= 9)
+                        metadatas.remove(metadata); // Remove
                 }
                 // TODO: Boat has changed
             } catch (Exception e) {
@@ -81,6 +89,12 @@ public class MetadataRewriter {
                     e.printStackTrace();
                 }
             }
+        }
+
+        // Handle AreaEffectCloud outside the loop
+        if (type != null && type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD)) {
+            Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
+            metadatas.add(new Metadata(9, MetaType1_13.PARTICLE, particle));
         }
     }
 }
