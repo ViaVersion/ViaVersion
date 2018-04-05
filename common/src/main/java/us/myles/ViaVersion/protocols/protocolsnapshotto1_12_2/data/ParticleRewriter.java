@@ -60,6 +60,7 @@ public class ParticleRewriter {
         add(27, iconcrackHandler()); // (36->27) iconcrack_(id)_(data) -> minecraft:item
         // Item	Slot	The item that will be used.
         add(3, blockHandler()); // (37->3) blockcrack_(id+(data<<12))   -> minecraft:block
+        // BlockState	VarInt	The ID of the block state.
         add(3, blockWithoutMetaHandler()); // (38->3) blockdust_(id)               -> minecraft:block
         // BlockState	VarInt	The ID of the block state.
         add(36); // (39->36) droplet -> minecraft:rain
@@ -135,17 +136,22 @@ public class ParticleRewriter {
                 // Transform to new Item
                 InventoryPackets.toClient(item);
 
-                particle.getArguments().add(new Particle.ParticleData(Type.FLAT_ITEM, item));
+                particle.getArguments().add(new Particle.ParticleData(Type.FLAT_ITEM, item)); // Item Slot	The item that will be used.
                 return particle;
             }
         };
     }
 
-    // TODO HANDLE
+    // Handle (id+(data<<12)) encoded blocks
     private static ParticleDataHandler blockHandler() {
         return new ParticleDataHandler() {
             @Override
             public Particle handler(Particle particle, Integer[] data) {
+                int value = data[0];
+                int combined = (((value & 4095) << 4) | (value >> 12 & 15));
+                int newId = WorldPackets.toNewId(combined);
+
+                particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newId)); // BlockState	VarInt	The ID of the block state.
                 return particle;
             }
         };
@@ -158,7 +164,7 @@ public class ParticleRewriter {
             public Particle handler(Particle particle, Integer[] data) {
                 int blockId = data[0].shortValue() << 4;
                 int newBlockId = WorldPackets.toNewId(blockId);
-                particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newBlockId));
+                particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newBlockId)); // BlockState	VarInt	The ID of the block state.
                 return particle;
             }
         };
