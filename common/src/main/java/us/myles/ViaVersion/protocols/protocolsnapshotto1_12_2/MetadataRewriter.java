@@ -17,7 +17,7 @@ import java.util.List;
 
 public class MetadataRewriter {
     public static void handleMetadata(int entityId, Entity1_13Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
-        int particleId = 0, parameter1 = 0, parameter2 = 0;
+        int particleId = -1, parameter1 = 0, parameter2 = 0;
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
                 // Handle new MetaTypes
@@ -92,7 +92,7 @@ public class MetadataRewriter {
         }
 
         // Handle AreaEffectCloud outside the loop
-        if (type != null && type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD)) {
+        if (type != null && type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) && particleId != -1) {
             Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
             metadatas.add(new Metadata(9, MetaType1_13.PARTICLE, particle));
         }
