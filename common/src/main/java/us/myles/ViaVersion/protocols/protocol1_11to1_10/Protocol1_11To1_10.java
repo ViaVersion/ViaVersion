@@ -259,10 +259,14 @@ public class Protocol1_11To1_10 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1) {
-                            CompoundTag tag = wrapper.get(Type.NBT, 0);
+                        CompoundTag tag = wrapper.get(Type.NBT, 0);
+                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1)
                             EntityIdRewriter.toClientSpawner(tag);
-                        }
+
+                        if (tag.contains("id"))
+                            // Handle new identifier
+                            ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier((String) tag.get("id").getValue()));
+
                     }
                 });
             }
@@ -285,9 +289,13 @@ public class Protocol1_11To1_10 extends Protocol {
 
                         if (chunk.getBlockEntities() == null) return;
                         for (CompoundTag tag : chunk.getBlockEntities()) {
-                            if (tag.contains("id") &&
-                                    ((StringTag) tag.get("id")).getValue().equals("MobSpawner")) {
-                                EntityIdRewriter.toClientSpawner(tag);
+                            if (tag.contains("id")) {
+                                String identifier = ((StringTag) tag.get("id")).getValue();
+                                if (identifier.equals("MobSpawner"))
+                                    EntityIdRewriter.toClientSpawner(tag);
+
+                                // Handle new identifier
+                                ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier(identifier));
                             }
                         }
                     }
