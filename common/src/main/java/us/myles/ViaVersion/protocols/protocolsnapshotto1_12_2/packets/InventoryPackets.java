@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -12,6 +13,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SpawnEggRewriter;
 
 import java.util.Map;
 
@@ -196,6 +198,7 @@ public class InventoryPackets {
         );
     }
 
+    // TODO CLEANUP / SMARTER REWRITE SYSTEM
     public static void toClient(Item item) {
         if (item == null) return;
 
@@ -227,9 +230,24 @@ public class InventoryPackets {
             }
         }
 
-        // todo spawn egg
-
         int rawId = (item.getId() << 4 | item.getData() & 0xF);
+
+        // Handle SpawnEggs
+        if (item.getId() == 383) {
+            if (tag.contains("EntityTag")) {
+                CompoundTag entityTag = tag.get("EntityTag");
+                if (entityTag.contains("id") && entityTag.get("id") instanceof StringTag) {
+                    StringTag identifier = entityTag.get("id");
+                    rawId = SpawnEggRewriter.getSpawnEggId(identifier.getValue());
+                } else {
+                    // Fallback to bat
+                    rawId = 25100288;
+                }
+            } else {
+                // Fallback to bat
+                rawId = 25100288;
+            }
+        }
 
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
             if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
@@ -244,6 +262,7 @@ public class InventoryPackets {
         item.setData((short) 0);
     }
 
+    // TODO cleanup / smarter rewrite system
     public static void toServer(Item item) {
         if (item == null) return;
 
