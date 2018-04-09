@@ -7,6 +7,7 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
@@ -26,10 +27,7 @@ import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -66,18 +64,31 @@ public class SpongePlugin implements ViaPlatform {
         syncExecutor = game.getScheduler().createSyncExecutor(this);
         asyncExecutor = game.getScheduler().createAsyncExecutor(this);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
-        game.getCommandManager().register(this, commandHandler, Arrays.asList("viaversion", "viaver", "vvsponge"));
+        if (game.getCommandManager().getOwnedBy(this).isEmpty()) {
+            game.getCommandManager().register(this, commandHandler, Arrays.asList("viaversion", "viaver", "vvsponge"));
+        }
         getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded, injecting!");
         // Init platform
-        Via.init(ViaManager.builder()
-                .platform(this)
-                .commandHandler(commandHandler)
-                .injector(new SpongeViaInjector())
-                .loader(new SpongeViaLoader(this))
-                .build());
+        if (Via.getManager() == null) {
+            Via.init(ViaManager.builder()
+                    .platform(this)
+                    .commandHandler(commandHandler)
+                    .injector(new SpongeViaInjector())
+                    .loader(new SpongeViaLoader(this))
+                    .build());
+        }
 
         // Inject!
         Via.getManager().init();
+    }
+
+    @Listener
+    public void onServerStop(GameStoppingServerEvent event) {
+        try {
+            Via.getManager().getInjector().uninject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -108,6 +119,7 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public TaskId runSync(Runnable runnable) {
+        // todo spongeforge 1.12.2 not executing
         syncExecutor.execute(runnable);
         return new SpongeTaskId(null);
     }
