@@ -21,6 +21,8 @@ import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.*;
+
 public class Protocol1_11To1_10 extends Protocol {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
         @Override
@@ -90,6 +92,49 @@ public class Protocol1_11To1_10 extends Protocol {
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                    }
+                });
+            }
+        });
+
+        // Plugin message FML Handshake
+        registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (channel.equals("FML|HS")) {
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == 3) { // Registry Data
+                                wrapper.passthrough(Type.BOOLEAN); // Has more
+                                String name = wrapper.passthrough(Type.STRING);
+                                int numberOfIds = wrapper.read(Type.VAR_INT);
+                                Map<String, Integer> ids = new HashMap<>(numberOfIds);
+                                for (int i = 0; i < numberOfIds; i++) {
+                                    ids.put(
+                                            wrapper.read(Type.STRING),
+                                            wrapper.read(Type.VAR_INT)
+                                    );
+                                }
+                                if (name.equals("minecraft:soundevents")) {
+                                    Iterator<Map.Entry<String, Integer>> idsIterator = ids.entrySet().iterator();
+                                    while (idsIterator.hasNext()) {
+                                        Map.Entry<String, Integer> id = idsIterator.next();
+                                        id.setValue(getNewSoundId(id.getValue()));
+                                        if (id.getValue() == -1)
+                                            idsIterator.remove();
+                                    }
+                                }
+                                wrapper.write(Type.VAR_INT, ids.size());
+                                for (Map.Entry<String, Integer> id : ids.entrySet()) {
+                                    wrapper.write(Type.STRING, id.getKey());
+                                    wrapper.write(Type.VAR_INT, id.getValue());
+                                }
+                            }
+                        }
+                        wrapper.passthroughAll();
                     }
                 });
             }
