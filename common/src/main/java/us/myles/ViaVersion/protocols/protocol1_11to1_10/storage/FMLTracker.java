@@ -12,13 +12,21 @@ public class FMLTracker extends StoredObject {
     // todo better check
     @Getter
     @Setter
-    private boolean handshakeComplete;
+    private boolean clientHandshakeComplete;
+    @Setter
+    @Getter
+    private boolean serverHandshakeComplete;
+    public boolean isHandshakeComplete() {
+        return clientHandshakeComplete && serverHandshakeComplete;
+    }
     @Getter
     private Set<Integer> removedSoundIds = Sets.newConcurrentHashSet();
     public FMLTracker(UserConnection user) {
         super(user);
     }
     public void reset() {
-        handshakeComplete = false;
+        clientHandshakeComplete = false;
+        serverHandshakeComplete = false;
+        removedSoundIds.clear();
     }
 }

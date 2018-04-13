@@ -132,7 +132,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                             byte discriminator = wrapper.passthrough(Type.BYTE);
                             if (discriminator == -1) { // ack
                                 byte phase = wrapper.passthrough(Type.BYTE);
-                                if (phase == 3) fmlTracker.setHandshakeComplete(true);
+                                if (phase == 3) fmlTracker.setServerHandshakeComplete(true);
                             } else if (discriminator == -2) { // reset
                                 fmlTracker.reset();
                             }
@@ -378,7 +378,28 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x06, 0x07);
         // registerIncoming(State.PLAY, 0x07, 0x08); - Handled in InventoryPackets
         registerIncoming(State.PLAY, 0x08, 0x09);
-        registerIncoming(State.PLAY, 0x09, 0x0a);
+        // Plugin Message FML Handshake
+        registerIncoming(State.PLAY, 0x09, 0x0a, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (channel.equals("FML|HS")) {
+                            FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == -1) { // ack
+                                byte phase = wrapper.passthrough(Type.BYTE);
+                                if (fmlTracker.isServerHandshakeComplete() && phase == 5)
+                                    fmlTracker.setClientHandshakeComplete(true);
+                            }
+                        }
+                        wrapper.passthroughAll();
+                    }
+                });
+            }
+        });
         registerIncoming(State.PLAY, 0x0a, 0x0b);
         registerIncoming(State.PLAY, 0x0b, 0x0c);
         // Mojang swapped 0x0F to 0x0D

@@ -132,7 +132,7 @@ public class Protocol1_11To1_10 extends Protocol {
                                 }
                             } else if (discriminator == -1) { // ack
                                 byte phase = wrapper.passthrough(Type.BYTE);
-                                if (phase == 3) fmlTracker.setHandshakeComplete(true);
+                                if (phase == 3) fmlTracker.setServerHandshakeComplete(true);
                             } else if (discriminator == -2) { // reset
                                 fmlTracker.reset();
                             }
@@ -411,6 +411,29 @@ public class Protocol1_11To1_10 extends Protocol {
                 map(Type.FLOAT, toOldByte);
                 map(Type.FLOAT, toOldByte);
                 map(Type.FLOAT, toOldByte);
+            }
+        });
+
+        // Plugin Message FML Handshake
+        registerIncoming(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (channel.equals("FML|HS")) {
+                            FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == -1) { // ack
+                                byte phase = wrapper.passthrough(Type.BYTE);
+                                if (fmlTracker.isServerHandshakeComplete() && phase == 5)
+                                    fmlTracker.setClientHandshakeComplete(true);
+                            }
+                        }
+                        wrapper.passthroughAll();
+                    }
+                });
             }
         });
 
