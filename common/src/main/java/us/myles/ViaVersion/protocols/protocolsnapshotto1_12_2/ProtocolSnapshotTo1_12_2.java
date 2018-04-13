@@ -182,7 +182,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int iconCount = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < iconCount; i++){
+                        for (int i = 0; i < iconCount; i++) {
                             wrapper.passthrough(Type.BYTE);
                             wrapper.passthrough(Type.BYTE);
                             wrapper.passthrough(Type.BYTE);
@@ -450,44 +450,47 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         providers.register(PaintingProvider.class, new PaintingProvider());
     }
 
-    private int getNewSoundID(final int oldID){
-        int newID = oldID;
+    // Generated with PAaaS
+    private int getNewSoundID(final int oldID) {
+        int newId = oldID;
         if (oldID >= 1)
-            newID += 6; // ambient.underwater...
+            newId += 6;
         if (oldID >= 10)
-            newID += 5;
+            newId += 5;
         if (oldID >= 86)
-            newID++;
+            newId += 1;
         if (oldID >= 166)
-            newID += 4;
+            newId += 4;
+        if (oldID >= 174)
+            newId += 10;
         if (oldID >= 179)
-            newID += 9;
+            newId += 9;
         if (oldID >= 226)
-            newID++;
-        if (oldID >= 373)
-            newID++;
-        if (oldID >= 380)
-            newID += 7;
-        if (oldID >= 385)
-            newID += 4;
+            newId += 1;
         if (oldID >= 352)
-            newID += 5;
+            newId += 5;
+        if (oldID >= 373)
+            newId += 1;
+        if (oldID >= 380)
+            newId += 7;
+        if (oldID >= 385)
+            newId += 4;
         if (oldID >= 438)
-            newID++;
+            newId += 1;
         if (oldID >= 443)
-            newID += 16;
+            newId += 16;
         if (oldID >= 484)
-            newID++;
+            newId += 1;
         if (oldID >= 485)
-            newID++;
+            newId += 1;
         if (oldID >= 508)
-            newID += 2;
-        if (oldID >= 512)
-            newID++;
-        if (oldID >= 514)
-            newID++;
+            newId += 2;
+        if (oldID >= 513)
+            newId += 1;
+        if (oldID >= 515)
+            newId += 1;
         if (oldID >= 524)
-            newID += 8;
-        return newID;
+            newId += 8;
+        return newId;
     }
 }
