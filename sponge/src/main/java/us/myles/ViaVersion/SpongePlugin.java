@@ -3,10 +3,12 @@ package us.myles.ViaVersion;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
@@ -65,7 +67,7 @@ public class SpongePlugin implements ViaPlatform {
                 commandHandler,
                 Arrays.asList("viaversion", "viaver", "vvsponge")
         );
-        getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded");
+        getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded, initializing platform");
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -76,7 +78,7 @@ public class SpongePlugin implements ViaPlatform {
     }
 
     @Listener
-    public void onServerStart(GameStartingServerEvent event) {
+    public void onServerStart(GameAboutToStartServerEvent event) {
         // Inject!
         getLogger().info("ViaVersion " + getPluginVersion() + " is injecting");
         Via.getManager().init();
