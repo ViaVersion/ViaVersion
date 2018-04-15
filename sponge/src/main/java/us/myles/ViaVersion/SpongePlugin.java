@@ -3,14 +3,11 @@ package us.myles.ViaVersion;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -22,6 +19,7 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
+import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
@@ -80,21 +78,17 @@ public class SpongePlugin implements ViaPlatform {
     @Listener
     public void onServerStart(GameAboutToStartServerEvent event) {
         // Inject!
-        getLogger().info("ViaVersion " + getPluginVersion() + " is injecting");
+        getLogger().info("ViaVersion is injecting");
         Via.getManager().init();
     }
 
     @Listener
     public void onServerStop(GameStoppingServerEvent event) {
         Via.getManager().destroy();
-        for (Task task : game.getScheduler().getScheduledTasks(this)) {
-            task.cancel();
+        ViaPlatformLoader loader = Via.getManager().getLoader();
+        if (loader instanceof SpongeViaLoader) {
+            ((SpongeViaLoader) loader).unload();
         }
-    }
-
-    @Listener
-    public void reloadEvent(GameReloadEvent e) {
-        conf.reloadConfig();
     }
 
     @Override
