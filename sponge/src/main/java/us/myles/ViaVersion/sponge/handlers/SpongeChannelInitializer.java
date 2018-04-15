@@ -8,6 +8,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.lang.reflect.Method;
 
@@ -29,7 +30,9 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel channel) throws Exception {
-        if (channel instanceof SocketChannel) {
+        // Ensure ViaVersion is loaded
+        if (ProtocolRegistry.SERVER_PROTOCOL != -1
+                && channel instanceof SocketChannel) {
             UserConnection info = new UserConnection((SocketChannel) channel);
             // init protocol
             new ProtocolPipeline(info);

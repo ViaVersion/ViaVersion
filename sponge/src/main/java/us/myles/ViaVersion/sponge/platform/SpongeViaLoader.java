@@ -26,14 +26,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SpongeViaLoader implements ViaPlatformLoader {
-    public SpongeViaLoader(SpongePlugin plugin) {
-        this.plugin = plugin;
-    }
 
     private SpongePlugin plugin;
 
     private Set<Object> listeners = new HashSet<>();
     private Set<TaskId> tasks = new HashSet<>();
+
+    public SpongeViaLoader(SpongePlugin plugin) {
+        this.plugin = plugin;
+    }
 
     private void registerListener(Object listener) {
         Sponge.getEventManager().registerListeners(plugin, storeListener(listener));

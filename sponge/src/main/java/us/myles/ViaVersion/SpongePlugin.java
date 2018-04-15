@@ -85,10 +85,6 @@ public class SpongePlugin implements ViaPlatform {
     @Listener
     public void onServerStop(GameStoppingServerEvent event) {
         Via.getManager().destroy();
-        ViaPlatformLoader loader = Via.getManager().getLoader();
-        if (loader instanceof SpongeViaLoader) {
-            ((SpongeViaLoader) loader).unload();
-        }
     }
 
     @Override
@@ -155,13 +151,10 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public ViaCommandSender[] getOnlinePlayers() {
         if (!game.isServerAvailable()) return new ViaCommandSender[0];
-        Collection<Player> players = game.getServer().getOnlinePlayers();
-        ViaCommandSender[] array = new ViaCommandSender[players.size()];
-        int i = 0;
-        for (Player player : players) {
-            array[i++] = new SpongeCommandSender(player);
-        }
-        return array;
+        return game.getServer().getOnlinePlayers()
+                .stream()
+                .map(SpongeCommandSender::new)
+                .toArray(SpongeCommandSender[]::new);
     }
 
     @Override
