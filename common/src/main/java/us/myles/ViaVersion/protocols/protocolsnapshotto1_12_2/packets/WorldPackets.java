@@ -64,6 +64,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Position position = wrapper.get(Type.POSITION, 0);
+                        short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         CompoundTag tag = wrapper.get(Type.NBT, 0);
 
                         BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
@@ -74,6 +75,9 @@ public class WorldPackets {
                             if (storage.contains(position))
                                 storage.get(position).setReplacement(newId);
                         }
+
+                        if (action == 5) // Set type of flower in flower pot
+                            wrapper.cancel(); // Removed
                     }
                 });
             }
