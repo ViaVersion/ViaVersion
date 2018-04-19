@@ -250,8 +250,8 @@ public class InventoryPackets {
         }
 
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
-            if (MappingData.oldToNewItems.containsKey(item.getId() << 4)) {
-                rawId = item.getId() << 4;
+            if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
+                rawId &= ~0xF; // Remove data
             } else {
                 System.out.println("FAILED TO GET 1.13 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
                 rawId = 16; // Stone
@@ -286,45 +286,59 @@ public class InventoryPackets {
             for (Map.Entry<Integer, Integer> entry : MappingData.oldToNewItems.entrySet()) {
                 if (entry.getValue() == item.getId()) {
                     int oldId = entry.getKey();
-                    rawId = (oldId >> 4) << 16 | oldId & 0xF;
+                    // Handle spawn eggs
+                    Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
+                    if (eggEntityId.isPresent()) {
+                        rawId = 383 << 16;
+                        if (tag == null)
+                            item.setTag(tag = new CompoundTag("tag"));
+                        if (!tag.contains("EntityTag")) {
+                            CompoundTag entityTag = new CompoundTag("EntityTag");
+                            entityTag.put(new StringTag("id", eggEntityId.get()));
+                            tag.put(entityTag);
+                        }
+                    } else {
+                        rawId = (oldId >> 4) << 16 | oldId & 0xF;
+                    }
                     break;
                 }
             }
         }
 
-        if (rawId != null) {
-            item.setId((short) (rawId >> 16));
-            item.setData((short) (rawId & 0xFFFF));
+        if (rawId == null) {
+            System.out.println("FAILED TO GET 1.12 ITEM FOR " + item.getId());
+            rawId = 0x10000; // Stone
+        }
 
-            if (tag != null) {
-                if (isDamageable(item.getId())) {
-                    if (tag.get("Damage") instanceof IntTag) {
-                        if (!gotRawIdFromTag)
-                            item.setData((short) (int) tag.get("Damage").getValue());
-                        tag.remove("Damage");
-                    }
+        item.setId((short) (rawId >> 16));
+        item.setData((short) (rawId & 0xFFFF));
+
+        if (tag != null) {
+            if (isDamageable(item.getId())) {
+                if (tag.get("Damage") instanceof IntTag) {
+                    if (!gotRawIdFromTag)
+                        item.setData((short) (int) tag.get("Damage").getValue());
+                    tag.remove("Damage");
                 }
+            }
 
-                if (item.getId() == 358) { // map
-                    if (tag.get("map") instanceof IntTag) {
-                        if (!gotRawIdFromTag)
-                            item.setData((short) (int) tag.get("map").getValue());
-                        tag.remove("map");
-                    }
+            if (item.getId() == 358) { // map
+                if (tag.get("map") instanceof IntTag) {
+                    if (!gotRawIdFromTag)
+                        item.setData((short) (int) tag.get("map").getValue());
+                    tag.remove("map");
                 }
+            }
 
-                if (item.getId() == 442) { // shield
-                    if (tag.get("BlockEntityTag") instanceof CompoundTag) {
-                        CompoundTag blockEntityTag = tag.get("BlockEntityTag");
-                        if (blockEntityTag.get("Base") instanceof IntTag) {
-                            IntTag base = blockEntityTag.get("Base");
-                            base.setValue(15 - base.getValue()); // invert color id
-                        }
+            if (item.getId() == 442) { // shield
+                if (tag.get("BlockEntityTag") instanceof CompoundTag) {
+                    CompoundTag blockEntityTag = tag.get("BlockEntityTag");
+                    if (blockEntityTag.get("Base") instanceof IntTag) {
+                        IntTag base = blockEntityTag.get("Base");
+                        base.setValue(15 - base.getValue()); // invert color id
                     }
                 }
             }
-        } else {
-            System.out.println("FAILED TO GET 1.12 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
         }
     }
 
