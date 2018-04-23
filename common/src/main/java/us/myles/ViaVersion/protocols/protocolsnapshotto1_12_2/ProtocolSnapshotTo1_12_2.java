@@ -158,6 +158,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                                 wrapper.write(Type.VAR_INT, 0); // Root node index
                             }
                         }).send(ProtocolSnapshotTo1_12_2.class);
+
+                        // Send tags packet twice to not crash client
                         PacketWrapper tagsPacket = wrapper.create(0x54, new ValueCreator() {
                             @Override
                             public void write(PacketWrapper wrapper) throws Exception {
@@ -172,21 +174,22 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
+        // Map packet
         registerOutgoing(State.PLAY, 0x24, 0x25, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT);
-                map(Type.BYTE);
-                map(Type.BOOLEAN);
+                map(Type.VAR_INT); // Map id
+                map(Type.BYTE); // Scale
+                map(Type.BOOLEAN); // Tracking Position
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int iconCount = wrapper.passthrough(Type.VAR_INT);
                         for (int i = 0; i < iconCount; i++) {
-                            wrapper.passthrough(Type.BYTE);
-                            wrapper.passthrough(Type.BYTE);
-                            wrapper.passthrough(Type.BYTE);
-                            wrapper.write(Type.BOOLEAN, false);
+                            wrapper.passthrough(Type.BYTE); // Icon X
+                            wrapper.passthrough(Type.BYTE); // Icon Y
+                            wrapper.passthrough(Type.BYTE); // Icon Z
+                            wrapper.write(Type.OPTIONAL_CHAT, null); // Display Name
                         }
                         wrapper.passthroughAll();
                     }
