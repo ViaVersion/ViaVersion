@@ -2,6 +2,7 @@ package us.myles.ViaVersion.sponge.util;
 
 import org.slf4j.Logger;
 
+import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -72,28 +73,7 @@ public class LoggerWrapper extends java.util.logging.Logger {
 
     @Override
     public void log(Level level, String msg, Object[] params) {
-        if (level == Level.FINEST) {
-            base.trace(msg, params);
-            return;
-        }
-        if (level == Level.FINE) {
-            base.debug(msg, params);
-            return;
-        }
-        if (level == Level.WARNING) {
-            base.warn(msg, params);
-            return;
-        }
-        if (level == Level.SEVERE) {
-            base.error(msg, params);
-            return;
-        }
-        if (level == Level.INFO) {
-            base.info(msg, params);
-            return;
-        }
-        base.trace(msg, params);
-        return;
+        log(level, MessageFormat.format(msg, params));
     }
 
     @Override
