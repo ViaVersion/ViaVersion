@@ -165,6 +165,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                             public void write(PacketWrapper wrapper) throws Exception {
                                 wrapper.write(Type.VAR_INT, 0);
                                 wrapper.write(Type.VAR_INT, 0);
+                                wrapper.write(Type.VAR_INT, 0);
                             }
                         });
                         tagsPacket.send(ProtocolSnapshotTo1_12_2.class);
@@ -186,12 +187,22 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int iconCount = wrapper.passthrough(Type.VAR_INT);
                         for (int i = 0; i < iconCount; i++) {
+                            byte directionAndType = wrapper.read(Type.BYTE);
+                            int type = (directionAndType & 0xF0) >> 4;
+                            wrapper.write(Type.VAR_INT, type);
                             wrapper.passthrough(Type.BYTE); // Icon X
-                            wrapper.passthrough(Type.BYTE); // Icon Y
                             wrapper.passthrough(Type.BYTE); // Icon Z
+                            byte direction = (byte) (directionAndType & 0x0F);
+                            wrapper.write(Type.BYTE, direction);
                             wrapper.write(Type.OPTIONAL_CHAT, null); // Display Name
                         }
-                        wrapper.passthroughAll();
+                        int columns = wrapper.passthrough(Type.BYTE);
+                        if (columns > 0) {
+                            wrapper.passthrough(Type.BYTE); // rows
+                            wrapper.passthrough(Type.BYTE); // x
+                            wrapper.passthrough(Type.BYTE); // z
+                            wrapper.passthrough(Type.BYTE_ARRAY); // data
+                        }
                     }
                 });
             }
@@ -458,7 +469,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         int newId = oldID;
         if (oldID >= 1)
             newId += 6;
+        if (oldID >= 9)
+            newId += 4;
         if (oldID >= 10)
+            newId += 5;
+        if (oldID >= 21)
             newId += 5;
         if (oldID >= 86)
             newId += 1;
@@ -470,14 +485,22 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             newId += 9;
         if (oldID >= 226)
             newId += 1;
+        if (oldID >= 271)
+            newId += 1;
+        if (oldID >= 326)
+            newId += 1;
+        if (oldID >= 335)
+            newId += 1;
         if (oldID >= 352)
-            newId += 5;
+            newId += 6;
         if (oldID >= 373)
             newId += 1;
         if (oldID >= 380)
             newId += 7;
         if (oldID >= 385)
             newId += 4;
+        if (oldID >= 412)
+            newId += 5;
         if (oldID >= 438)
             newId += 1;
         if (oldID >= 443)
