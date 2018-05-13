@@ -248,17 +248,18 @@ public class WorldPackets {
     }
 
     public static int toNewId(int oldId) {
-        if (MappingData.oldToNewBlocks.containsKey(oldId)) {
-            return MappingData.oldToNewBlocks.get(oldId);
-        } else {
-            if (MappingData.oldToNewBlocks.containsKey((oldId >> 4) << 4)) {
-                System.out.println("Missing block " + oldId);
-                return MappingData.oldToNewBlocks.get((oldId >> 4) << 4);
-            }
-            System.out.println("Missing block completely " + oldId);
-            // Default stone
-            return 1;
+        Integer newId = MappingData.oldToNewBlocks.get(oldId);
+        if (newId != null) {
+            return newId;
         }
+        newId = MappingData.oldToNewBlocks.get(oldId & ~0xF); // Remove data
+        if (newId != null) {
+            System.out.println("Missing block " + oldId);
+            return newId;
+        }
+        System.out.println("Missing block completely " + oldId);
+        // Default stone
+        return 1;
     }
 
     private static int checkStorage(UserConnection user, Position position, int newId) {
