@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -66,5 +67,10 @@ public class SpawnEggRewriter {
         if (!spawnEggs.containsKey(entityIdentifier))
             return 25100288;
         return (383 << 16 | (spawnEggs.get(entityIdentifier) & 0xFFFF));
+    }
+
+    public static Optional<String> getEntityId(int spawnEggId) {
+        if (spawnEggId >> 16 != 383) return Optional.absent();
+        return Optional.fromNullable(spawnEggs.inverse().get(spawnEggId & 0xFFFF));
     }
 }
