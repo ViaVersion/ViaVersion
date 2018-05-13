@@ -8,22 +8,23 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.util.Set;
 
+@Getter
 public class FMLTracker extends StoredObject {
     // todo better check
-    @Getter
     @Setter
     private boolean clientHandshakeComplete;
     @Setter
-    @Getter
     private boolean serverHandshakeComplete;
-    public boolean isHandshakeComplete() {
-        return clientHandshakeComplete && serverHandshakeComplete;
-    }
-    @Getter
     private Set<Integer> removedSoundIds = Sets.newConcurrentHashSet();
+
     public FMLTracker(UserConnection user) {
         super(user);
     }
+
+    public boolean isHandshakeComplete() {
+        return clientHandshakeComplete && serverHandshakeComplete;
+    }
+
     public void reset() {
         clientHandshakeComplete = false;
         serverHandshakeComplete = false;

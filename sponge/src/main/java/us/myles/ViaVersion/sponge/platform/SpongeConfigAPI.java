@@ -192,6 +192,11 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isForgeFix() {
+        return getBoolean("forge-fix", false);
+    }
+
+    @Override
     public List<Integer> getBlockedProtocols() {
         return getIntegerList("block-protocols");
     }

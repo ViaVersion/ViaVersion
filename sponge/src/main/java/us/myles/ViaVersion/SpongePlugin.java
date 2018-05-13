@@ -2,6 +2,9 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import net.md_5.bungee.chat.TextComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
@@ -12,6 +15,7 @@ import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
@@ -109,6 +113,7 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public TaskId runAsync(Runnable runnable) {
+        // Task breaks API 3
         return new SpongeTaskId(Task.builder()
                 .async()
                 .execute(runnable)
@@ -160,20 +165,24 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public void sendMessage(UUID uuid, String message) {
         if (!game.isServerAvailable()) return;
-        Optional<Player> player = game.getServer().getPlayer(uuid);
-        if (player.isPresent())
-                player.get().sendMessage(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
+        game.getServer().getPlayer(uuid)
+                .ifPresent(p -> p.sendMessage(
+                        TextSerializers
+                                .LEGACY_FORMATTING_CODE
+                                .deserialize(message))
+                );
+        // todo fix messages with links
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         if (!game.isServerAvailable()) return false;
-        Optional<Player> player = game.getServer().getPlayer(uuid);
-        if (player.isPresent()) {
-            player.get().kick(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
-            return true;
-        }
-        return false;
+        return game.getServer().getPlayer(uuid)
+                .map(p -> {
+                    p.kick(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Override

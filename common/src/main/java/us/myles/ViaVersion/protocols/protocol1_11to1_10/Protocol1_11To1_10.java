@@ -106,7 +106,8 @@ public class Protocol1_11To1_10 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.passthrough(Type.STRING);
-                        if (channel.equals("FML|HS")) {
+                        if (Via.getConfig().isForgeFix()
+                                && channel.equals("FML|HS")) {
                             FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
                             byte discriminator = wrapper.passthrough(Type.BYTE);
                             if (discriminator == 3) { // Registry Data
@@ -160,7 +161,8 @@ public class Protocol1_11To1_10 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
                         FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
-                        if (fmlTracker.isHandshakeComplete()){
+                        if (Via.getConfig().isForgeFix()
+                                && fmlTracker.isHandshakeComplete()){
                             if (fmlTracker.getRemovedSoundIds().contains(id))
                                 id = -1;
                             // Forge will handle sound ids
@@ -422,7 +424,8 @@ public class Protocol1_11To1_10 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.passthrough(Type.STRING);
-                        if (channel.equals("FML|HS")) {
+                        if (Via.getConfig().isForgeFix()
+                                && channel.equals("FML|HS")) {
                             FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
                             byte discriminator = wrapper.passthrough(Type.BYTE);
                             if (discriminator == -1) { // ack
