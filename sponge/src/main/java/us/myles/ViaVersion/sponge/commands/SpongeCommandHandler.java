@@ -22,12 +22,13 @@ public class SpongeCommandHandler extends ViaCommandHandler implements CommandCa
         return CommandResult.success();
     }
 
+    @Override
     public List<String> getSuggestions(CommandSource commandSource, String s, @Nullable Location<World> location) throws CommandException {
         return getSuggestions(commandSource, s);
     }
 
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        String[] args = arguments.length() > 0 ? arguments.split(" ") : new String[0];
+        String[] args = arguments.split(" "); // ViaCommandHandler handles empty String in array
         return onTabComplete(new SpongeCommandSender(source), args);
     }
 
