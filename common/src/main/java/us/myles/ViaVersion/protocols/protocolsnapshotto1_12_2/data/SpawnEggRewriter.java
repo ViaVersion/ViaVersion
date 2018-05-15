@@ -30,7 +30,7 @@ public class SpawnEggRewriter {
         registerSpawnEgg("minecraft:mooshroom");
         registerSpawnEgg("minecraft:mule");
         registerSpawnEgg("minecraft:ocelot");
-        registerSpawnEgg("minecraft:puffer_fish");
+
         registerSpawnEgg("minecraft:parrot");
         registerSpawnEgg("minecraft:pig");
         registerSpawnEgg("minecraft:polar_bear");
@@ -44,7 +44,6 @@ public class SpawnEggRewriter {
         registerSpawnEgg("minecraft:spider");
         registerSpawnEgg("minecraft:squid");
         registerSpawnEgg("minecraft:stray");
-        registerSpawnEgg("minecraft:turtle");
         registerSpawnEgg("minecraft:vex");
         registerSpawnEgg("minecraft:villager");
         registerSpawnEgg("minecraft:vindication_illager");
