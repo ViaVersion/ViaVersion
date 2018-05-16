@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2;
 
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
@@ -26,6 +28,12 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Particle1_13T
 // Development of 1.13 support!
 public class ProtocolSnapshotTo1_12_2 extends Protocol {
     public static final Particle1_13Type PARTICLE_TYPE = new Particle1_13Type();
+
+    public static String legacyTextToJson(String legacyText) {
+        return ComponentSerializer.toString(
+                TextComponent.fromLegacyText(legacyText)
+        );
+    }
 
     static {
         MappingData.init();
@@ -313,8 +321,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         if (action == 0 || action == 2) {
                             wrapper.passthrough(Type.STRING); // Display Name
 
-                            wrapper.read(Type.STRING); // Prefix !REMOVED! TODO alternative or drop?
-                            wrapper.read(Type.STRING); // Suffix !REMOVED!
+                            String prefix = wrapper.read(Type.STRING); // Prefix moved
+                            String suffix = wrapper.read(Type.STRING); // Suffix moved
 
                             wrapper.passthrough(Type.BYTE); // Flags
 
@@ -329,6 +337,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                             else
                                 wrapper.write(Type.VAR_INT, (int) color);
 
+                            wrapper.write(Type.STRING, legacyTextToJson(prefix)); // Prefix
+                            wrapper.write(Type.STRING, legacyTextToJson(suffix)); // Suffix
                         }
                     }
                 });
