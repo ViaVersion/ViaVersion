@@ -113,7 +113,6 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public TaskId runAsync(Runnable runnable) {
-        // Task breaks API 3
         return new SpongeTaskId(Task.builder()
                 .async()
                 .execute(runnable)
