@@ -167,11 +167,12 @@ public class SpongePlugin implements ViaPlatform {
         if (!game.isServerAvailable()) return;
         game.getServer().getPlayer(uuid)
                 .ifPresent(p -> p.sendMessage(
-                        TextSerializers
-                                .LEGACY_FORMATTING_CODE
-                                .deserialize(message))
+                        TextSerializers.JSON.deserialize(
+                                ComponentSerializer.toString(
+                                        TextComponent.fromLegacyText(message) // Hacky way to fix links
+                                )
+                        ))
                 );
-        // todo fix messages with links
     }
 
     @Override
