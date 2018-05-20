@@ -361,7 +361,9 @@ public class Protocol1_11To1_10 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // 100 character limit on older servers
                         String msg = wrapper.get(Type.STRING, 0);
-                        if (msg.length() > 100) {
+                        boolean command = msg.startsWith("/");
+                        System.out.println("received a message command: " + command + " length: " + msg.length());
+                        if (msg.length() > 100) { 
                             wrapper.set(Type.STRING, 0, msg.substring(0, 100));
                         }
                     }

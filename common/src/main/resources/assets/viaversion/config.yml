@@ -122,3 +122,13 @@ replace-pistons: false
 replacement-piston-id: 0
 # Force the string -> json transform
 force-json-transform: false
+#----------------------------------------------------------#
+#         NEWER CLIENTS ON 1.8-1.10 SERVERS OPTIONS        #
+#----------------------------------------------------------#
+# Choose the action what we should do when the chat message character limit (100 characters) is exceeded on older servers.
+# Available options: (Default: TRUNCATE)
+# SPLIT (Splits the message into multiple messages (This is NOT supported with commands and they will be TRUNCATED))
+# TRUNCATE (Truncates the chat message if it exceeds 100 characters)
+# PASS_THROUGH [DEVS ONLY] (Passes the chat message and commands throught without touching them. This will REQUIRE custom server software to work!!!)
+# CANCEL (Cancels the chat message & command and sends the player a warning.)
+chat-msg-character-limit-action: DEFAULT

@@ -204,19 +204,27 @@ public interface ViaVersionConfig {
     boolean isForceJsonTransform();
 
     /**
+     * Get settings for what we should do with chat messages 
+     * when they exceed the limit of 100 characters on older servers
+     * 
+     * @return Action for chat messages
+     */
+    String get1_11ChatMsgCharacterLimitAction();
+
+    /**
      * Should we fix nbt array's in json chat messages for 1.12 clients
      *
      * @return True if enabled
      */
     boolean is1_12NBTArrayFix();
-    
+
     /**
      * Should we fix shift quick move action for 1.12 clients
      *
      * @return True if enabled
      */
     boolean is1_12QuickMoveActionFix();
-    
+
     /**
      * Get the blocked protocols
      *

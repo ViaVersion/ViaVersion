@@ -161,6 +161,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public String get1_11ChatMsgCharacterLimitAction() {
+        return getString("chat-msg-character-limit-action", "TRUNCATE");
+    }
+    
+    @Override
     public boolean is1_12NBTArrayFix() {
         return getBoolean("chat-nbt-fix", true);
     }

@@ -198,6 +198,11 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     public boolean isForceJsonTransform() {
         return getBoolean("force-json-transform", false);
     }
+    
+    @Override
+    public String get1_11ChatMsgCharacterLimitAction() {
+        return getString("chat-msg-character-limit-action", "TRUNCATE");
+    }
 
     @Override
     public boolean is1_12NBTArrayFix() {
