@@ -166,18 +166,6 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                                 wrapper.write(Type.VAR_INT, 0); // Root node index
                             }
                         }).send(ProtocolSnapshotTo1_12_2.class);
-
-                        // Send tags packet twice to not crash client
-                        PacketWrapper tagsPacket = wrapper.create(0x54, new ValueCreator() {
-                            @Override
-                            public void write(PacketWrapper wrapper) throws Exception {
-                                wrapper.write(Type.VAR_INT, 0);
-                                wrapper.write(Type.VAR_INT, 0);
-                                wrapper.write(Type.VAR_INT, 0);
-                            }
-                        });
-                        tagsPacket.send(ProtocolSnapshotTo1_12_2.class);
-                        tagsPacket.send(ProtocolSnapshotTo1_12_2.class);
                     }
                 });
             }
@@ -187,9 +175,9 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x24, 0x25, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT); // Map id
-                map(Type.BYTE); // Scale
-                map(Type.BOOLEAN); // Tracking Position
+                map(Type.VAR_INT); // 0 - Map id
+                map(Type.BYTE); // 1 - Scale
+                map(Type.BOOLEAN); // 2 - Tracking Position
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -203,13 +191,6 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                             byte direction = (byte) (directionAndType & 0x0F);
                             wrapper.write(Type.BYTE, direction);
                             wrapper.write(Type.OPTIONAL_CHAT, null); // Display Name
-                        }
-                        int columns = wrapper.passthrough(Type.BYTE);
-                        if (columns > 0) {
-                            wrapper.passthrough(Type.BYTE); // rows
-                            wrapper.passthrough(Type.BYTE); // x
-                            wrapper.passthrough(Type.BYTE); // z
-                            wrapper.passthrough(Type.BYTE_ARRAY); // data
                         }
                     }
                 });
@@ -288,14 +269,15 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x42, 0x44, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
-                map(Type.BYTE);
+                map(Type.STRING); // 0 - Objective name
+                map(Type.BYTE); // 1 - Mode
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        byte mode = wrapper.get(Type.BYTE, 0);
                         // On create or update
-                        if (wrapper.get(Type.BYTE, 0) == 0 || wrapper.get(Type.BYTE, 0) == 2) {
-                            wrapper.passthrough(Type.STRING);
+                        if (mode == 0 || mode == 2) {
+                            wrapper.passthrough(Type.STRING); // Value
                             String type = wrapper.read(Type.STRING);
                             // integer or hearts
                             wrapper.write(Type.VAR_INT, type.equals("integer") ? 0 : 1);
