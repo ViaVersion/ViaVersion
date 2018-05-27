@@ -3,6 +3,8 @@ package us.myles.ViaVersion.api.data;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
@@ -113,7 +115,46 @@ public class UserConnection {
     public void sendRawPacket(final ByteBuf packet) {
         sendRawPacket(packet, false);
     }
+    
 
+    /**
+     * 
+     * Send a raw packet to the server
+     *
+     * @param packet        The raw packet to send
+     * @param currentThread Should it run in the same thread
+     */
+    public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
+        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getDecoderName());
+        final ChannelHandlerContext context = channel.pipeline().context(handler);
+        if (currentThread) {
+            try {
+                ((ChannelInboundHandler) handler).channelRead(context, packet);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            channel.eventLoop().submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ((ChannelInboundHandler) handler).channelRead(context, packet);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Send a raw packet to the server (netty thread)
+     *
+     * @param packet The packet to send
+     */
+    public void sendRawPacketToServer(final ByteBuf packet) {
+        sendRawPacketToServer(packet, false);
+    }
     /**
      * Used for incrementing the number of packets sent to the client
      */

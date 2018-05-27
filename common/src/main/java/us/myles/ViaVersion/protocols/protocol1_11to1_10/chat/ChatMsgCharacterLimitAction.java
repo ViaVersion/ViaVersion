@@ -1,17 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_11to1_10.chat;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
 public enum ChatMsgCharacterLimitAction {
-    SPLIT(false),
-    TRUNCATE(false),
-    PASS_THROUGH(false),
-    CANCEL(true);
+    SPLIT,
+    TRUNCATE,
+    PASS_THROUGH,
+    CANCEL;
 
-    private final boolean notify;
     public static final int CHARACTER_LIMIT = 100;
     private static final ChatMsgCharacterLimitAction[] v = values();
 
@@ -29,14 +23,29 @@ public enum ChatMsgCharacterLimitAction {
     }
 
     public static String[] handleChatMessage(String msg, ChatMsgCharacterLimitAction action) {
-        // TODO: MAKE
         switch (action) {
             case SPLIT:
-                return null;
+                if (msg.startsWith("/")) { // this will not work with commands
+                    return handleChatMessage(msg, TRUNCATE);
+                }
+                int length = msg.length();
+                int alength = length / CHARACTER_LIMIT;
+                if (length % CHARACTER_LIMIT != 0) {
+                    alength++;
+                }
+                String[] lines = new String[alength];
+                int index = 0;
+                for (int i = 0; i < length; i += CHARACTER_LIMIT) {
+                    lines[index++] = msg.substring(i, Math.min(length, i + CHARACTER_LIMIT));
+                }
+                return lines;
             case TRUNCATE:
-                return null;
+                if (msg.length() > CHARACTER_LIMIT) {
+                    msg = msg.substring(0, CHARACTER_LIMIT);
+                }
+                return new String[] {msg};
             case PASS_THROUGH:
-                return null;
+                return new String[] {msg};
             case CANCEL:
                 return null;
             default:

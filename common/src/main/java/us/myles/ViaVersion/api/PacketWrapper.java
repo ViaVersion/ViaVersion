@@ -299,7 +299,7 @@ public class PacketWrapper {
      */
     public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline);
+            ByteBuf output = constructPacket(packetProtocol, Direction.OUTGOING, skipCurrentPipeline);
             user().sendRawPacket(output, currentThread);
         }
     }
@@ -308,15 +308,18 @@ public class PacketWrapper {
      * Let the packet go through the protocol pipes and write it to ByteBuf
      *
      * @param packetProtocol      - The protocol version of the packet.
+     * @param direction           - The direction of this packet
      * @param skipCurrentPipeline - Skip the current pipeline
      * @return Packet buffer
      * @throws Exception if it fails to write
      */
-    private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
+    private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, Direction direction, boolean skipCurrentPipeline) throws Exception {
         // Apply current pipeline
         List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
-        // Other way if outgoing
-        Collections.reverse(protocols);
+        if (direction == Direction.OUTGOING) {
+            // Other way if outgoing
+            Collections.reverse(protocols);
+        }
         int index = 0;
         for (int i = 0; i < protocols.size(); i++) {
             if (protocols.get(i).getClass().equals(packetProtocol)) {
@@ -329,9 +332,12 @@ public class PacketWrapper {
         resetReader();
 
         // Apply other protocols
-        apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
+        apply(direction, user().get(ProtocolInfo.class).getState(), index, protocols);
         // Send
         ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+        if (direction == Direction.INCOMING) {
+            Type.VAR_INT.write(output, PASSTHROUGH_ID);
+        }
         writeToBuffer(output);
 
         return output;
@@ -361,7 +367,7 @@ public class PacketWrapper {
      */
     public ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, true);
+            ByteBuf output = constructPacket(packetProtocol, Direction.OUTGOING, true);
             return user().sendRawPacketFuture(output);
         }
         return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
@@ -464,6 +470,43 @@ public class PacketWrapper {
         // Move all packet values to the readable for next packet.
         this.readableObjects.addAll(packetValues);
         this.packetValues.clear();
+    }
+    
+    /**
+     * Send the current packet to the server.
+     * 
+     * @param packetProtocol      - The protocol version of the packet.
+     * @param skipCurrentPipeline - Skip the current pipeline
+     * @throws Exception If it failed to write
+     */
+    public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
+        sendToServer(packetProtocol, skipCurrentPipeline, false);
+    }
+    
+    /**
+     * Send the current packet to the server.
+     *
+     * @param packetProtocol      - The protocol version of the packet.
+     * @param skipCurrentPipeline - Skip the current pipeline
+     * @param currentThread       - Run in the same thread
+     * @throws Exception if it fails to write
+     */
+    public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+        if (!isCancelled()) {
+            ByteBuf output = constructPacket(packetProtocol, Direction.INCOMING, skipCurrentPipeline);
+            user().sendRawPacketToServer(output, currentThread);
+        }
+    }
+    
+    /**
+     * Send the current packet to the server.
+     * (Sends it after current)
+     *
+     * @param packetProtocol - The protocol version of the packet.
+     * @throws Exception if it fails to write
+     */
+    public void sendToServer(Class<? extends Protocol> packetProtocol) throws Exception {
+        sendToServer(packetProtocol, true);
     }
 
     /**

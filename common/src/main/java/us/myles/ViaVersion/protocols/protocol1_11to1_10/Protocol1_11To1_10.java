@@ -1,8 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 
+import java.util.concurrent.TimeUnit;
+
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.base.Optional;
+
+import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -16,10 +20,12 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.chat.ChatMsgCharacterLimitAction;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 public class Protocol1_11To1_10 extends Protocol {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
@@ -361,10 +367,39 @@ public class Protocol1_11To1_10 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // 100 character limit on older servers
                         String msg = wrapper.get(Type.STRING, 0);
-                        boolean command = msg.startsWith("/");
-                        System.out.println("received a message command: " + command + " length: " + msg.length());
-                        if (msg.length() > 100) { 
-                            wrapper.set(Type.STRING, 0, msg.substring(0, 100));
+                        if (msg.length() > ChatMsgCharacterLimitAction.CHARACTER_LIMIT) {
+                            ChatMsgCharacterLimitAction action = ChatMsgCharacterLimitAction
+                                    .getChatMsgCharacterLimitAction(Via.getConfig().get1_11ChatMsgCharacterLimitAction());
+                            final String[] lines = ChatMsgCharacterLimitAction.handleChatMessage(msg, action);
+                            if (lines == null) {
+                                wrapper.cancel();
+                                PacketWrapper wpacket = new PacketWrapper(0x0F, null, wrapper.user());
+                                //line breaks break the formatting use color codes before every other word
+                                Protocol1_9TO1_8.FIX_JSON.write(wpacket, ChatColor.translateAlternateColorCodes('&', "&cYour message &cwas cancelled &cbecause it &cexceeded the &ccharacter limit &c(" + msg.length() + "/" + ChatMsgCharacterLimitAction.CHARACTER_LIMIT + ")!"));
+                                wpacket.write(Type.BYTE, (byte) 0);
+                                wpacket.send(Protocol1_11To1_10.class);
+                                return;
+                            }
+                            wrapper.set(Type.STRING, 0, lines[0]);
+                            if (lines.length > 1) {
+                                long delay = 20;
+                                for (int i = 1; i < lines.length; i++) {
+                                    final PacketWrapper chatPacket = new PacketWrapper(0x02, null, wrapper.user());
+                                    chatPacket.write(Type.STRING, lines[i]);
+                                    wrapper.user().getChannel().eventLoop().schedule(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                chatPacket.sendToServer(Protocol1_11To1_10.class, true, true);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }, delay, TimeUnit.MILLISECONDS);
+                                    delay += 20;
+                                }
+                            }
                         }
                     }
                 });
