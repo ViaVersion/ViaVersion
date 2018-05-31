@@ -19,8 +19,8 @@ public class BedHandler implements BlockEntityProvider.BlockEntityHandler {
             return -1;
         }
 
-        //                                RED_BED + FIRST_BED
-        int blockId = storage.get(position).getOriginal() - 882 + 658;
+        //                                              RED_BED + FIRST_BED
+        int blockId = storage.get(position).getOriginal() - 954 + 730;
 
         int color = (int) tag.get("color").getValue();
         blockId += (color * 16);
