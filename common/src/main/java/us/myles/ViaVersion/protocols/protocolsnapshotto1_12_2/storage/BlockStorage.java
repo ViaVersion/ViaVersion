@@ -17,24 +17,24 @@ public class BlockStorage extends StoredObject {
 
     static {
         // Flower pots
-        whitelist.add(5175);
+        whitelist.add(5247);
 
         // Add those red beds
         for (int i = 0; i < 16; i++)
-            whitelist.add(882 + i);
+            whitelist.add(954 + i);
 
         // Add the white banners
         for (int i = 0; i < 20; i++)
-            whitelist.add(6764 + i);
+            whitelist.add(6836 + i);
 
         // Add the white wall banners
         for (int i = 0; i < 4; i++) {
-            whitelist.add(7020 + i);
+            whitelist.add(7092 + i);
         }
 
         // Skeleton skulls
         for (int i = 0; i < 5; i++)
-            whitelist.add(5357 + i);
+            whitelist.add(5429 + i);
     }
 
     private Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();

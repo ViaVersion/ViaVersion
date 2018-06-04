@@ -8,8 +8,8 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEnt
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 
 public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
-    private final int SKULL_WALL_START = 5357;
-    private final int SKULL_END = 5476;
+    private final int SKULL_WALL_START = 5429;
+    private final int SKULL_END = 5548;
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
