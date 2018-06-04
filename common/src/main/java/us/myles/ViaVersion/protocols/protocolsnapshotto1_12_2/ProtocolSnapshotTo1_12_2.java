@@ -509,6 +509,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             newId += 1;
         if (oldID >= 524)
             newId += 8;
+        if (oldID >= 531)
+            newId += 1;
         return newId;
     }
 }
