@@ -58,7 +58,7 @@ public class MappingData {
             JsonArray ids = entry.getValue().getAsJsonArray();
             int[] idsArray = new int[ids.size()];
             for (int i = 0; i < ids.size(); i++) {
-                idsArray[i] = Integer.parseInt(ids.get(i).getAsString());
+                idsArray[i] = ids.get(i).getAsInt();
             }
             output.put(entry.getKey(), idsArray);
         }
