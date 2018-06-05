@@ -25,6 +25,8 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTrac
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Particle1_13Type;
 
+import java.util.Map;
+
 // Development of 1.13 support!
 public class ProtocolSnapshotTo1_12_2 extends Protocol {
     public static final Particle1_13Type PARTICLE_TYPE = new Particle1_13Type();
@@ -164,6 +166,37 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                                 wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
 
                                 wrapper.write(Type.VAR_INT, 0); // Root node index
+                            }
+                        }).send(ProtocolSnapshotTo1_12_2.class);
+
+                        // Send tags packet
+                        wrapper.create(0x54, new ValueCreator() {
+                            @Override
+                            public void write(PacketWrapper wrapper) throws Exception {
+                                wrapper.write(Type.VAR_INT, MappingData.blockTags.size()); // block tags
+                                for (Map.Entry<String, int[]> tag : MappingData.blockTags.entrySet()) {
+                                    wrapper.write(Type.STRING, tag.getKey());
+                                    wrapper.write(Type.VAR_INT, tag.getValue().length);
+                                    for (int id : tag.getValue()) {
+                                        wrapper.write(Type.VAR_INT, id);
+                                    }
+                                }
+                                wrapper.write(Type.VAR_INT, MappingData.itemTags.size()); // item tags
+                                for (Map.Entry<String, int[]> tag : MappingData.itemTags.entrySet()) {
+                                    wrapper.write(Type.STRING, tag.getKey());
+                                    wrapper.write(Type.VAR_INT, tag.getValue().length);
+                                    for (int id : tag.getValue()) {
+                                        wrapper.write(Type.VAR_INT, id);
+                                    }
+                                }
+                                wrapper.write(Type.VAR_INT, MappingData.fluidTags.size()); // fluid tags
+                                for (Map.Entry<String, int[]> tag : MappingData.fluidTags.entrySet()) {
+                                    wrapper.write(Type.STRING, tag.getKey());
+                                    wrapper.write(Type.VAR_INT, tag.getValue().length);
+                                    for (int id : tag.getValue()) {
+                                        wrapper.write(Type.VAR_INT, id);
+                                    }
+                                }
                             }
                         }).send(ProtocolSnapshotTo1_12_2.class);
                     }
