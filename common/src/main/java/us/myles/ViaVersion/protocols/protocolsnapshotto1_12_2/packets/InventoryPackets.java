@@ -1,8 +1,6 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -11,6 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.ProtocolSnapshotTo1_12_2;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SpawnEggRewriter;
@@ -212,6 +211,7 @@ public class InventoryPackets {
         int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
         tag.put(new IntTag(NBT_TAG_NAME, originalId));
 
+        // NBT changes
         if (isDamageable(item.getId())) {
             tag.put(new IntTag("Damage", item.getData()));
         }
@@ -230,13 +230,45 @@ public class InventoryPackets {
             }
         }
 
+        // Display Name now uses JSON
+        if (tag.get("display") instanceof CompoundTag) {
+            if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
+                StringTag name = ((CompoundTag) tag.get("display")).get("Name");
+                name.setValue(
+                        ProtocolSnapshotTo1_12_2.legacyTextToJson(
+                                name.getValue()
+                        )
+                );
+            }
+        }
+
+        // ench is now Enchantments and now uses identifiers
+        if (tag.get("ench") instanceof ListTag) {
+            ListTag ench = tag.get("ench");
+            ListTag enchantments = new ListTag("Enchantments", CompoundTag.class);
+            for (Tag enchEntry : ench) {
+                if (enchEntry instanceof CompoundTag) {
+                    CompoundTag enchantmentEntry = new CompoundTag("");
+                    enchantmentEntry.put(new StringTag("id",
+                            MappingData.oldEnchantmentsIds.get(
+                                    (Short) ((CompoundTag) enchEntry).get("id").getValue()
+                            )
+                    ));
+                    enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                    enchantments.add(enchantmentEntry);
+                }
+            }
+            tag.remove("ench");
+            tag.put(enchantments);
+        }
+
         int rawId = (item.getId() << 4 | item.getData() & 0xF);
 
         // Handle SpawnEggs
         if (item.getId() == 383) {
-            if (tag.contains("EntityTag")) {
+            if (tag.get("EntityTag") instanceof CompoundTag) {
                 CompoundTag entityTag = tag.get("EntityTag");
-                if (entityTag.contains("id") && entityTag.get("id") instanceof StringTag) {
+                if (entityTag.get("id") instanceof StringTag) {
                     StringTag identifier = entityTag.get("id");
                     rawId = SpawnEggRewriter.getSpawnEggId(identifier.getValue());
                 } else {
@@ -271,36 +303,33 @@ public class InventoryPackets {
 
         CompoundTag tag = item.getTag();
 
+        // Use tag to get original ID and data
         if (tag != null) {
             // Check for valid tag
-            if (tag.contains(NBT_TAG_NAME)) {
-                if (tag.get(NBT_TAG_NAME) instanceof IntTag) {
-                    rawId = (Integer) tag.get(NBT_TAG_NAME).getValue();
-                    // Remove the tag
-                    tag.remove(NBT_TAG_NAME);
-                    gotRawIdFromTag = true;
-                }
+            if (tag.get(NBT_TAG_NAME) instanceof IntTag) {
+                rawId = (Integer) tag.get(NBT_TAG_NAME).getValue();
+                // Remove the tag
+                tag.remove(NBT_TAG_NAME);
+                gotRawIdFromTag = true;
             }
         }
+
         if (rawId == null) {
-            for (Map.Entry<Integer, Integer> entry : MappingData.oldToNewItems.entrySet()) {
-                if (entry.getValue() == item.getId()) {
-                    int oldId = entry.getKey();
-                    // Handle spawn eggs
-                    Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
-                    if (eggEntityId.isPresent()) {
-                        rawId = 383 << 16;
-                        if (tag == null)
-                            item.setTag(tag = new CompoundTag("tag"));
-                        if (!tag.contains("EntityTag")) {
-                            CompoundTag entityTag = new CompoundTag("EntityTag");
-                            entityTag.put(new StringTag("id", eggEntityId.get()));
-                            tag.put(entityTag);
-                        }
-                    } else {
-                        rawId = (oldId >> 4) << 16 | oldId & 0xF;
+            Integer oldId = MappingData.newToOldItems.get((int) item.getId());
+            if (oldId != null) {
+                // Handle spawn eggs
+                Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
+                if (eggEntityId.isPresent()) {
+                    rawId = 383 << 16;
+                    if (tag == null)
+                        item.setTag(tag = new CompoundTag("tag"));
+                    if (!tag.contains("EntityTag")) {
+                        CompoundTag entityTag = new CompoundTag("EntityTag");
+                        entityTag.put(new StringTag("id", eggEntityId.get()));
+                        tag.put(entityTag);
                     }
-                    break;
+                } else {
+                    rawId = (oldId >> 4) << 16 | oldId & 0xF;
                 }
             }
         }
@@ -313,6 +342,7 @@ public class InventoryPackets {
         item.setId((short) (rawId >> 16));
         item.setData((short) (rawId & 0xFFFF));
 
+        // NBT changes
         if (tag != null) {
             if (isDamageable(item.getId())) {
                 if (tag.get("Damage") instanceof IntTag) {
@@ -338,6 +368,41 @@ public class InventoryPackets {
                         base.setValue(15 - base.getValue()); // invert color id
                     }
                 }
+            }
+
+            // Display Name now uses JSON
+            if (tag.get("display") instanceof CompoundTag) {
+                if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
+                    StringTag name = ((CompoundTag) tag.get("display")).get("Name");
+                    name.setValue(
+                            ProtocolSnapshotTo1_12_2.jsonTextToLegacy(
+                                    name.getValue()
+                            )
+                    );
+                }
+            }
+
+            // ench is now Enchantments and now uses identifiers
+            if (tag.get("Enchantments") instanceof ListTag) {
+                ListTag enchantments = tag.get("Enchantments");
+                ListTag ench = new ListTag("ench", CompoundTag.class);
+                for (Tag enchantmentEntry : enchantments) {
+                    if (enchantmentEntry instanceof CompoundTag) {
+                        CompoundTag enchEntry = new CompoundTag("");
+                        enchEntry.put(
+                                new ShortTag(
+                                        "id",
+                                        MappingData.oldEnchantmentsIds.inverse().get(
+                                                (String) ((CompoundTag) enchantmentEntry).get("id").getValue()
+                                        )
+                                )
+                        );
+                        enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                        ench.add(enchEntry);
+                    }
+                }
+                tag.remove("Enchantment");
+                tag.put(ench);
             }
         }
     }
