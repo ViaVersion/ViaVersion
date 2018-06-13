@@ -41,6 +41,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         MappingData.init();
     }
 
+    public static String jsonTextToLegacy(String value) {
+        return TextComponent.toLegacyText(ComponentSerializer.parse(value));
+    }
+
     @Override
     protected void registerPackets() {
         // Register grouped packet changes
