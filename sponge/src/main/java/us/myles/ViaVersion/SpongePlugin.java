@@ -2,14 +2,19 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import lombok.Getter;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
@@ -37,8 +42,7 @@ import java.util.logging.Logger;
         name = "ViaVersion",
         version = VersionInfo.VERSION,
         authors = {"_MylesC", "Matsv"},
-        description = "Allow newer Minecraft versions to connect to an older server version.",
-        dependencies = {}
+        description = "Allow newer Minecraft versions to connect to an older server version."
 )
 public class SpongePlugin implements ViaPlatform {
     @Inject
@@ -52,22 +56,20 @@ public class SpongePlugin implements ViaPlatform {
     private File defaultConfig;
 
     private SpongeViaAPI api = new SpongeViaAPI();
-    private SpongeExecutorService asyncExecutor;
-    private SpongeExecutorService syncExecutor;
     private SpongeConfigAPI conf;
+
+    @Getter
     private Logger logger;
 
     @Listener
-    public void onServerStart(GameAboutToStartServerEvent event) {
+    public void onGameStart(GameInitializationEvent event) {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
         conf = new SpongeConfigAPI(container, defaultConfig.getParentFile());
-        syncExecutor = game.getScheduler().createSyncExecutor(this);
-        asyncExecutor = game.getScheduler().createAsyncExecutor(this);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
-        game.getCommandManager().register(this, commandHandler, Arrays.asList("viaversion", "viaver", "vvsponge"));
-        getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded, injecting!");
+        game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
+        getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded!");
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -75,14 +77,18 @@ public class SpongePlugin implements ViaPlatform {
                 .injector(new SpongeViaInjector())
                 .loader(new SpongeViaLoader(this))
                 .build());
+    }
 
+    @Listener
+    public void onServerStart(GameAboutToStartServerEvent event) {
         // Inject!
+        logger.info("ViaVersion is injecting!");
         Via.getManager().init();
     }
 
-    @Override
-    public Logger getLogger() {
-        return logger;
+    @Listener
+    public void onServerStop(GameStoppingServerEvent event) {
+        Via.getManager().destroy();
     }
 
     @Override
@@ -102,26 +108,41 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public TaskId runAsync(Runnable runnable) {
-        asyncExecutor.execute(runnable);
-        return new SpongeTaskId(null);
+        return new SpongeTaskId(
+                Task.builder()
+                        .execute(runnable)
+                        .async()
+                        .submit(this)
+        );
     }
 
     @Override
     public TaskId runSync(Runnable runnable) {
-        syncExecutor.execute(runnable);
-        return new SpongeTaskId(null);
+        return new SpongeTaskId(
+                Task.builder()
+                        .execute(runnable)
+                        .submit(this)
+        );
     }
 
     @Override
     public TaskId runSync(Runnable runnable, Long ticks) {
-        Long delay = ticks * 50L;
-        return new SpongeTaskId(syncExecutor.schedule(runnable, delay, TimeUnit.MILLISECONDS).getTask());
+        return new SpongeTaskId(
+                Task.builder()
+                        .execute(runnable)
+                        .delayTicks(ticks)
+                        .submit(this)
+        );
     }
 
     @Override
     public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
-        Long time = ticks * 50L;
-        return new SpongeTaskId(syncExecutor.scheduleAtFixedRate(runnable, time, time, TimeUnit.MILLISECONDS).getTask());
+        return new SpongeTaskId(
+                Task.builder()
+                        .execute(runnable)
+                        .intervalTicks(ticks)
+                        .submit(this)
+        );
     }
 
     @Override
@@ -145,21 +166,24 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        for (Player player : game.getServer().getOnlinePlayers()) {
-            if (player.getUniqueId().equals(uuid))
-                player.sendMessage(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
-        }
+        game.getServer().getPlayer(uuid)
+                .ifPresent(player ->
+                        player.sendMessage(
+                                TextSerializers.JSON.deserialize(
+                                        ComponentSerializer.toString(
+                                                TextComponent.fromLegacyText(message) // Hacky way to fix links
+                                        )
+                                )
+                        )
+                );
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
-        for (Player player : game.getServer().getOnlinePlayers()) {
-            if (player.getUniqueId().equals(uuid)) {
-                player.kick(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
-                return true;
-            }
-        }
-        return false;
+        return game.getServer().getPlayer(uuid).map(player -> {
+            player.kick(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
+            return true;
+        }).orElse(false);
     }
 
     @Override

@@ -1,11 +1,11 @@
 package us.myles.ViaVersion.sponge.platform;
 
-import lombok.AllArgsConstructor;
 import org.spongepowered.api.Sponge;
 import us.myles.ViaVersion.SpongePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
@@ -21,28 +21,47 @@ import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5Armo
 import us.myles.ViaVersion.sponge.providers.SpongeViaBulkChunkTranslator;
 import us.myles.ViaVersion.sponge.providers.SpongeViaMovementTransmitter;
 
-@AllArgsConstructor
+import java.util.HashSet;
+import java.util.Set;
+
 public class SpongeViaLoader implements ViaPlatformLoader {
+
     private SpongePlugin plugin;
+
+    private Set<Object> listeners = new HashSet<>();
+    private Set<TaskId> tasks = new HashSet<>();
+
+    public SpongeViaLoader(SpongePlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    private void registerListener(Object listener) {
+        Sponge.getEventManager().registerListeners(plugin, storeListener(listener));
+    }
+
+    private <T> T storeListener(T listener) {
+        listeners.add(listener);
+        return listener;
+    }
 
     @Override
     public void load() {
         // Update Listener
-        Sponge.getEventManager().registerListeners(plugin, new UpdateListener());
+        registerListener(new UpdateListener());
         /* Base Protocol */
-        Sponge.getEventManager().registerListeners(plugin, new ClientLeaveListener());
+        registerListener(new ClientLeaveListener());
         /* 1.9 client to 1.8 server */
         try {
             Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
-            new Sponge4ArmorListener().register();
+            storeListener(new Sponge4ArmorListener()).register();
         } catch (ClassNotFoundException e) {
-            new Sponge5ArmorListener(plugin).register();
+            storeListener(new Sponge5ArmorListener(plugin)).register();
         }
-        new DeathListener(plugin).register();
-        new BlockListener(plugin).register();
+        storeListener(new DeathListener(plugin)).register();
+        storeListener(new BlockListener(plugin)).register();
 
         if (plugin.getConf().isItemCache()) {
-            Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L); // Updates players items :)
+            tasks.add(Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L)); // Updates players items :)
             HandItemCache.CACHE = true;
         }
 
@@ -59,5 +78,13 @@ public class SpongeViaLoader implements ViaPlatformLoader {
                 }
             }
         });
+    }
+
+    public void unload() {
+        // todo restore providers
+        listeners.forEach(Sponge.getEventManager()::unregisterListeners);
+        listeners.clear();
+        tasks.forEach(Via.getPlatform()::cancelTask);
+        tasks.clear();
     }
 }

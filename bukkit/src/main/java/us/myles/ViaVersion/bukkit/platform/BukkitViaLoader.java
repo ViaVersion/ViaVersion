@@ -1,10 +1,11 @@
 package us.myles.ViaVersion.bukkit.platform;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -21,43 +22,60 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTransla
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-@AllArgsConstructor
 public class BukkitViaLoader implements ViaPlatformLoader {
     private ViaVersionPlugin plugin;
+
+    private Set<Listener> listeners = new HashSet<>();
+    private Set<BukkitTask> tasks = new HashSet<>();
+
+    public BukkitViaLoader(ViaVersionPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public void registerListener(Listener listener) {
+        Bukkit.getPluginManager().registerEvents(storeListener(listener), plugin);
+    }
+
+    public <T extends Listener> T storeListener(T listener) {
+        listeners.add(listener);
+        return listener;
+    }
 
     @Override
     public void load() {
         // Update Listener
-        Bukkit.getPluginManager().registerEvents(new UpdateListener(), plugin);
+        registerListener(new UpdateListener());
 
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
 
-        Bukkit.getPluginManager().registerEvents(new Listener() {
+        registerListener(new Listener() {
             @EventHandler
             public void onPlayerQuit(PlayerQuitEvent e) {
                 Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
             }
-        }, plugin);
+        });
 
         /* 1.9 client to 1.8 server */
 
-        new ArmorListener(plugin).register();
-        new DeathListener(plugin).register();
-        new BlockListener(plugin).register();
+        storeListener(new ArmorListener(plugin)).register();
+        storeListener(new DeathListener(plugin)).register();
+        storeListener(new BlockListener(plugin)).register();
 
         if (Bukkit.getVersion().toLowerCase().contains("paper")
                 || Bukkit.getVersion().toLowerCase().contains("taco")
                 || Bukkit.getVersion().toLowerCase().contains("torch")) {
             plugin.getLogger().info("Enabling PaperSpigot/TacoSpigot/Torch patch: Fixes block placement.");
-            new PaperPatch(plugin).register();
+            storeListener(new PaperPatch(plugin)).register();
         }
         if (plugin.getConf().isItemCache()) {
-            new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L); // Updates player's items :)
+            tasks.add(new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
             HandItemCache.CACHE = true;
         }
 
@@ -94,5 +112,18 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         });
 
+    }
+
+    @Override
+    public void unload() {
+        // todo restore providers
+        for (Listener listener : listeners) {
+            HandlerList.unregisterAll(listener);
+        }
+        listeners.clear();
+        for (BukkitTask task : tasks) {
+            task.cancel();
+        }
+        tasks.clear();
     }
 }
