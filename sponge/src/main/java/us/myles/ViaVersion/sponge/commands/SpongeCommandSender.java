@@ -1,6 +1,8 @@
 package us.myles.ViaVersion.sponge.commands;
 
 import lombok.AllArgsConstructor;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -19,7 +21,12 @@ public class SpongeCommandSender implements ViaCommandSender {
 
     @Override
     public void sendMessage(String msg) {
-        source.sendMessage(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(msg));
+        source.sendMessage(
+                TextSerializers.JSON.deserialize(
+                        ComponentSerializer.toString(
+                                TextComponent.fromLegacyText(msg) // Hacky way to fix links
+                        )
+                ));
     }
 
     @Override

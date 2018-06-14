@@ -102,6 +102,8 @@ public class ViaManager {
             getPlatform().getLogger().severe("ViaVersion failed to uninject:");
             e.printStackTrace();
         }
+        // Unload
+        loader.unload();
     }
 
     public void addPortedClient(UserConnection info) {

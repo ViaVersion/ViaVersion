@@ -18,8 +18,11 @@ import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.FMLTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+
+import java.util.*;
 
 public class Protocol1_11To1_10 extends Protocol {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
@@ -95,6 +98,52 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
+        // Plugin message FML Handshake
+        registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (Via.getConfig().isForgeFix()
+                                && channel.equals("FML|HS")) {
+                            FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == 3) { // Registry Data
+                                wrapper.passthrough(Type.BOOLEAN); // Has more
+                                String name = wrapper.passthrough(Type.STRING);
+                                if (name.equals("minecraft:soundevents")) {
+                                    int numberOfIds = wrapper.read(Type.VAR_INT);
+                                    Map<String, Integer> ids = new HashMap<>(numberOfIds);
+                                    for (int i = 0; i < numberOfIds; i++) {
+                                        ids.put(
+                                                wrapper.read(Type.STRING),
+                                                wrapper.read(Type.VAR_INT)
+                                        );
+                                    }
+                                    fmlTracker.getRemovedSoundIds().add(
+                                            ids.remove("minecraft:entity.experience_orb.touch")
+                                    );
+                                    wrapper.write(Type.VAR_INT, ids.size());
+                                    for (Map.Entry<String, Integer> id : ids.entrySet()) {
+                                        wrapper.write(Type.STRING, id.getKey());
+                                        wrapper.write(Type.VAR_INT, id.getValue());
+                                    }
+                                }
+                            } else if (discriminator == -1) { // ack
+                                byte phase = wrapper.passthrough(Type.BYTE);
+                                if (phase == 3) fmlTracker.setServerHandshakeComplete(true);
+                            } else if (discriminator == -2) { // reset
+                                fmlTracker.reset();
+                            }
+                        }
+                        wrapper.passthroughAll();
+                    }
+                });
+            }
+        });
+
         // Sound effect
         registerOutgoing(State.PLAY, 0x46, 0x46, new PacketRemapper() {
             @Override
@@ -111,7 +160,15 @@ public class Protocol1_11To1_10 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
-                        id = getNewSoundId(id);
+                        FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                        if (Via.getConfig().isForgeFix()
+                                && fmlTracker.isHandshakeComplete()){
+                            if (fmlTracker.getRemovedSoundIds().contains(id))
+                                id = -1;
+                            // Forge will handle sound ids
+                        } else {
+                            id = getNewSoundId(id);
+                        }
 
                         if (id == -1) // Removed
                             wrapper.cancel();
@@ -359,6 +416,30 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
+        // Plugin Message FML Handshake
+        registerIncoming(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (Via.getConfig().isForgeFix()
+                                && channel.equals("FML|HS")) {
+                            FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == -1) { // ack
+                                byte phase = wrapper.passthrough(Type.BYTE);
+                                if (fmlTracker.isServerHandshakeComplete() && phase == 5)
+                                    fmlTracker.setClientHandshakeComplete(true);
+                            }
+                        }
+                        wrapper.passthroughAll();
+                    }
+                });
+            }
+        });
+
         // Chat Message Incoming
         registerIncoming(State.PLAY, 0x02, 0x02, new PacketRemapper() {
             @Override
@@ -414,5 +495,7 @@ public class Protocol1_11To1_10 extends Protocol {
         userConnection.put(new EntityTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
+        if (!userConnection.has(FMLTracker.class))
+            userConnection.put(new FMLTracker(userConnection));
     }
 }

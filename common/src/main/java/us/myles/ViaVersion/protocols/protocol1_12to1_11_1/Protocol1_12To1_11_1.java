@@ -19,6 +19,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.FMLTracker;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker;
@@ -113,6 +114,31 @@ public class Protocol1_12To1_11_1 extends Protocol {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }
+                });
+            }
+        });
+
+        // Plugin message FML Handshake
+        registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (Via.getConfig().isForgeFix()
+                                && channel.equals("FML|HS")) {
+                            FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == -1) { // ack
+                                byte phase = wrapper.passthrough(Type.BYTE);
+                                if (phase == 3) fmlTracker.setServerHandshakeComplete(true);
+                            } else if (discriminator == -2) { // reset
+                                fmlTracker.reset();
+                            }
+                        }
+                        wrapper.passthroughAll();
                     }
                 });
             }
@@ -278,7 +304,15 @@ public class Protocol1_12To1_11_1 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
-                        id = getNewSoundId(id);
+                        FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                        if (Via.getConfig().isForgeFix()
+                                && fmlTracker.isHandshakeComplete()) {
+                            if (fmlTracker.getRemovedSoundIds().contains(id))
+                                id = -1;
+                            // Forge will handle sound ids
+                        } else {
+                            id = getNewSoundId(id);
+                        }
 
                         if (id == -1) // Removed
                             wrapper.cancel();
@@ -346,7 +380,29 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x06, 0x07);
         // registerIncoming(State.PLAY, 0x07, 0x08); - Handled in InventoryPackets
         registerIncoming(State.PLAY, 0x08, 0x09);
-        registerIncoming(State.PLAY, 0x09, 0x0a);
+        // Plugin Message FML Handshake
+        registerIncoming(State.PLAY, 0x09, 0x0a, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (Via.getConfig().isForgeFix()
+                                && channel.equals("FML|HS")) {
+                            FMLTracker fmlTracker = wrapper.user().get(FMLTracker.class);
+                            byte discriminator = wrapper.passthrough(Type.BYTE);
+                            if (discriminator == -1) { // ack
+                                byte phase = wrapper.passthrough(Type.BYTE);
+                                if (fmlTracker.isServerHandshakeComplete() && phase == 5)
+                                    fmlTracker.setClientHandshakeComplete(true);
+                            }
+                        }
+                        wrapper.passthroughAll();
+                    }
+                });
+            }
+        });
         registerIncoming(State.PLAY, 0x0a, 0x0b);
         registerIncoming(State.PLAY, 0x0b, 0x0c);
         // Mojang swapped 0x0F to 0x0D
@@ -430,5 +486,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
         userConnection.put(new EntityTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
+        if (!userConnection.has(FMLTracker.class))
+            userConnection.put(new FMLTracker(userConnection));
     }
 }

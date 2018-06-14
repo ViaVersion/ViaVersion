@@ -1,9 +1,9 @@
 package us.myles.ViaVersion.sponge.platform;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 import us.myles.ViaVersion.api.Pair;
@@ -86,7 +86,7 @@ public class SpongeViaInjector implements ViaInjector {
                 bootstrapAcceptor = future.channel().pipeline().first();
             }
             try {
-                ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
                 ChannelInitializer newInit = new SpongeChannelInitializer(oldInit);
 
                 ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
@@ -111,7 +111,7 @@ public class SpongeViaInjector implements ViaInjector {
             for (String name : names) {
                 ChannelHandler handler = future.channel().pipeline().get(name);
                 try {
-                    ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
+                    ChannelInitializer<Channel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
                     if (oldInit instanceof SpongeChannelInitializer) {
                         bootstrapAcceptor = handler;
                     }
@@ -125,7 +125,7 @@ public class SpongeViaInjector implements ViaInjector {
             }
 
             try {
-                ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
                 if (oldInit instanceof SpongeChannelInitializer) {
                     ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((SpongeChannelInitializer) oldInit).getOriginal());
                 }
