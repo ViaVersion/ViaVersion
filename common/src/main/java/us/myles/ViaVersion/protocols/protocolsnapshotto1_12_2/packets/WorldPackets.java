@@ -22,7 +22,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.ParticleRewri
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Chunk1_13Type;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types.Chunk1_13Type;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {

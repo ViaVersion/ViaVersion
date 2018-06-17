@@ -23,7 +23,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.Painting
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Particle1_13Type;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types.Particle1_13Type;
 
 import java.util.Map;
 
