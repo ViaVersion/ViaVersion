@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type;
+package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.type.Type;
