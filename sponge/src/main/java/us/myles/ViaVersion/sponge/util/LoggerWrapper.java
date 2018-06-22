@@ -2,6 +2,7 @@ package us.myles.ViaVersion.sponge.util;
 
 import org.slf4j.Logger;
 
+import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -20,106 +21,49 @@ public class LoggerWrapper extends java.util.logging.Logger {
 
     @Override
     public void log(Level level, String msg) {
-        if (level == Level.FINEST) {
-            base.trace(msg);
-            return;
-        }
-        if (level == Level.FINE) {
+        if (level == Level.FINE)
             base.debug(msg);
-            return;
-        }
-        if (level == Level.WARNING) {
+        else if (level == Level.WARNING)
             base.warn(msg);
-            return;
-        }
-        if (level == Level.SEVERE) {
+        else if (level == Level.SEVERE)
             base.error(msg);
-            return;
-        }
-        if (level == Level.INFO) {
+        else if (level == Level.INFO)
             base.info(msg);
-            return;
-        }
-        base.trace(msg);
-        return;
+        else
+            base.trace(msg);
     }
 
     @Override
     public void log(Level level, String msg, Object param1) {
-        if (level == Level.FINEST) {
-            base.trace(msg, param1);
-            return;
-        }
-        if (level == Level.FINE) {
+        if (level == Level.FINE)
             base.debug(msg, param1);
-            return;
-        }
-        if (level == Level.WARNING) {
+        else if (level == Level.WARNING)
             base.warn(msg, param1);
-            return;
-        }
-        if (level == Level.SEVERE) {
+        else if (level == Level.SEVERE)
             base.error(msg, param1);
-            return;
-        }
-        if (level == Level.INFO) {
+        else if (level == Level.INFO)
             base.info(msg, param1);
-            return;
-        }
-        base.trace(msg, param1);
-        return;
+        else
+            base.trace(msg, param1);
     }
 
     @Override
     public void log(Level level, String msg, Object[] params) {
-        if (level == Level.FINEST) {
-            base.trace(msg, params);
-            return;
-        }
-        if (level == Level.FINE) {
-            base.debug(msg, params);
-            return;
-        }
-        if (level == Level.WARNING) {
-            base.warn(msg, params);
-            return;
-        }
-        if (level == Level.SEVERE) {
-            base.error(msg, params);
-            return;
-        }
-        if (level == Level.INFO) {
-            base.info(msg, params);
-            return;
-        }
-        base.trace(msg, params);
-        return;
+        log(level, MessageFormat.format(msg, params)); // workaround not formatting correctly
     }
 
     @Override
     public void log(Level level, String msg, Throwable params) {
-        if (level == Level.FINEST) {
-            base.trace(msg, params);
-            return;
-        }
-        if (level == Level.FINE) {
+        if (level == Level.FINE)
             base.debug(msg, params);
-            return;
-        }
-        if (level == Level.WARNING) {
+        else if (level == Level.WARNING)
             base.warn(msg, params);
-            return;
-        }
-        if (level == Level.SEVERE) {
+        else if (level == Level.SEVERE)
             base.error(msg, params);
-            return;
-        }
-        if (level == Level.INFO) {
+        else if (level == Level.INFO)
             base.info(msg, params);
-            return;
-        }
-        base.trace(msg, params);
-        return;
+        else
+            base.trace(msg, params);
     }
 
 }

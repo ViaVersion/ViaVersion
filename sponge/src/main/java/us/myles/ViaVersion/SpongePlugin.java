@@ -55,7 +55,9 @@ public class SpongePlugin implements ViaPlatform {
     @DefaultConfig(sharedRoot = false)
     private File defaultConfig;
 
+    @Getter
     private SpongeViaAPI api = new SpongeViaAPI();
+    @Getter
     private SpongeConfigAPI conf;
 
     @Getter
@@ -189,16 +191,6 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public boolean isPluginEnabled() {
         return true;
-    }
-
-    @Override
-    public ViaAPI getApi() {
-        return api;
-    }
-
-    @Override
-    public SpongeConfigAPI getConf() {
-        return conf;
     }
 
     @Override
