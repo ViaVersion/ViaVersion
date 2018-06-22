@@ -54,6 +54,12 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         // Outgoing packets
 
+        // New packet 0x0 - Login Plugin Message
+        registerOutgoing(State.LOGIN, 0x0, 0x1);
+        registerOutgoing(State.LOGIN, 0x1, 0x2);
+        registerOutgoing(State.LOGIN, 0x2, 0x3);
+        registerOutgoing(State.LOGIN, 0x3, 0x4);
+
         // Statistics
         registerOutgoing(State.PLAY, 0x07, 0x07, new PacketRemapper() {
             @Override
@@ -406,6 +412,22 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         // New packet 0x53 - Tags
 
         // Incoming packets
+
+        // New packet 0x0 - Login Plugin Message
+        registerIncoming(State.LOGIN, -1, 0x0, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+        registerIncoming(State.LOGIN, 0x0, 0x1);
+        registerIncoming(State.LOGIN, 0x1, 0x2);
+
         registerIncoming(State.PLAY, 0x2, 0x1);
         registerIncoming(State.PLAY, 0x3, 0x2);
         registerIncoming(State.PLAY, 0x4, 0x3);

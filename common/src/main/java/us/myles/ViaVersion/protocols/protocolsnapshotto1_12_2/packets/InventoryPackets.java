@@ -100,34 +100,43 @@ public class InventoryPackets {
                             }
 
                             wrapper.set(Type.BYTE, 0, flags); // Update flags
-                        }
-                        if (channel.equalsIgnoreCase("MC|TrList")) {
+                            return;
+                        } else if (channel.equalsIgnoreCase("MC|TrList")) {
+                            channel = "minecraft:trader_list";
                             wrapper.passthrough(Type.INT); // Passthrough Window ID
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
                                 // Input Item
-                                Item input = wrapper.read(Type.ITEM);
-                                toClient(input);
-                                wrapper.write(Type.ITEM, input);
+                                Item input = wrapper.passthrough(Type.ITEM);
+                                InventoryPackets.toClient(input);
                                 // Output Item
-                                Item output = wrapper.read(Type.ITEM);
-                                toClient(output);
-                                wrapper.write(Type.ITEM, output);
+                                Item output = wrapper.passthrough(Type.ITEM);
+                                InventoryPackets.toClient(output);
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem) {
                                     // Second Item
-                                    Item second = wrapper.read(Type.ITEM);
-                                    toClient(second);
-                                    wrapper.write(Type.ITEM, second);
+                                    Item second = wrapper.passthrough(Type.ITEM);
+                                    InventoryPackets.toClient(second);
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
                                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
                             }
+                        } else if (channel.equalsIgnoreCase("MC|Brand")) {
+                            channel = "minecraft:brand";
+                        } else if (channel.equalsIgnoreCase("MC|BOpen")) {
+                            channel = "minecraft:book_open";
+                        } else if (channel.equalsIgnoreCase("MC|DebugPath")) {
+                            channel = "minecraft:debug/paths";
+                        } else if (channel.equalsIgnoreCase("MC|DebugNeighborsUpdate")) {
+                            channel = "minecraft:debug/neighbors_update";
+                        } else {
+                            wrapper.cancel(); // TODO REGISTER channel removed?
                         }
+                        wrapper.set(Type.STRING, 0, channel);
                     }
                 });
             }
