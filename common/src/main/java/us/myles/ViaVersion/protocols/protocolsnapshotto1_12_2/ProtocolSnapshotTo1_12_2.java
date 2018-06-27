@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -465,6 +466,23 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         });
 
         // New 0x0A - Edit book
+        registerIncoming(State.PLAY, -1, 0x0a, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item item = wrapper.read(Type.FLAT_ITEM);
+                        InventoryPackets.toServer(item);
+                        boolean isSigning = wrapper.read(Type.BOOLEAN);
+                        wrapper.clearPacket();
+                        wrapper.setId(0x09); // Plugin Message
+                        wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit");
+                        wrapper.write(Type.ITEM, item);
+                    }
+                });
+            }
+        });
         registerIncoming(State.PLAY, 0x0b, 0x0c);
         registerIncoming(State.PLAY, 0x0A, 0x0B);
         registerIncoming(State.PLAY, 0x0c, 0x0d);
@@ -506,9 +524,29 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         registerIncoming(State.PLAY, 0x13, 0x15);
         registerIncoming(State.PLAY, 0x14, 0x16);
-        registerIncoming(State.PLAY, 0x15, 0x17);
         registerIncoming(State.PLAY, 0x16, 0x18);
-        registerIncoming(State.PLAY, 0x17, 0x19);
+        // Recipe Book Data
+        registerIncoming(State.PLAY, 0x17, 0x19, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Type
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int type = wrapper.get(Type.VAR_INT, 0);
+
+                        if (type == 1) {
+                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
+                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
+                            wrapper.read(Type.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
+                            wrapper.read(Type.BOOLEAN); // Smelting Recipe Filter Active | IGNORE NEW 1.13 FIELD
+                        }
+                    }
+                });
+            }
+        });
+
 
         // New 0x1A - Name Item
         registerIncoming(State.PLAY, -1, 0x1A, new PacketRemapper() {
@@ -537,11 +575,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int slot = wrapper.read(Type.INT);
+                        int slot = wrapper.read(Type.VAR_INT);
                         wrapper.clearPacket();
                         wrapper.setId(0x09); // Plugin Message
                         wrapper.write(Type.STRING, "MC|TrSel");
-                        wrapper.write(Type.VAR_INT, slot);
+                        wrapper.write(Type.INT, slot);
                     }
                 });
             }
@@ -553,11 +591,13 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int potion = wrapper.read(Type.INT);
+                        int primaryEffect = wrapper.read(Type.VAR_INT);
+                        int secondaryEffect = wrapper.read(Type.VAR_INT);
                         wrapper.clearPacket();
                         wrapper.setId(0x09); // Plugin Message
                         wrapper.write(Type.STRING, "MC|Beacon");
-                        wrapper.write(Type.VAR_INT, potion);
+                        wrapper.write(Type.INT, primaryEffect);
+                        wrapper.write(Type.INT, secondaryEffect);
                     }
                 });
             }
@@ -603,14 +643,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.read(Type.INT);
+                        int entityId = wrapper.read(Type.VAR_INT);
                         String command = wrapper.read(Type.STRING);
                         boolean trackOutput = wrapper.read(Type.BOOLEAN);
 
                         wrapper.clearPacket();
                         wrapper.setId(0x09); // Plugin Message
                         wrapper.write(Type.STRING, "MC|AdvCmd");
-                        wrapper.write(Type.VAR_INT, entityId);
+                        wrapper.write(Type.INT, entityId);
                         wrapper.write(Type.STRING, command);
                         wrapper.write(Type.BOOLEAN, trackOutput);
                     }
@@ -688,30 +728,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerIncoming(State.PLAY, 0x1D, 0x25);
         registerIncoming(State.PLAY, 0x1E, 0x26);
         registerIncoming(State.PLAY, 0x1F, 0x27);
-
-
-
-        // Recipe Book Data
-        registerIncoming(State.PLAY, 0x17, 0x17, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Type
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int type = wrapper.get(Type.VAR_INT, 0);
-
-                        if (type == 1) {
-                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
-                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
-                            wrapper.read(Type.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
-                            wrapper.read(Type.BOOLEAN); // Smelting Recipe Filter Active | IGNORE NEW 1.13 FIELD
-                        }
-                    }
-                });
-            }
-        });
+        registerIncoming(State.PLAY, 0x20, 0x28);
     }
 
     @Override
