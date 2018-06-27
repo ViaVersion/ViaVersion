@@ -524,6 +524,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         registerIncoming(State.PLAY, 0x13, 0x15);
         registerIncoming(State.PLAY, 0x14, 0x16);
+        registerIncoming(State.PLAY, 0x15, 0x17);
         registerIncoming(State.PLAY, 0x16, 0x18);
         // Recipe Book Data
         registerIncoming(State.PLAY, 0x17, 0x19, new PacketRemapper() {
