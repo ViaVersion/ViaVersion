@@ -125,7 +125,7 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        int protocol = wrapper.user().get(ProtocolInfo.class).getServerProtocolVersion();
                         if (protocol < ProtocolVersion.v1_13.getId())
                             handleLoginSuccess(wrapper);
                     }
@@ -141,7 +141,7 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        int protocol = wrapper.user().get(ProtocolInfo.class).getServerProtocolVersion();
                         if (protocol >= ProtocolVersion.v1_13.getId())
                             handleLoginSuccess(wrapper);
                     }
