@@ -39,6 +39,16 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         );
     }
 
+    public static final PacketHandler POS_TO_3_INT = new PacketHandler() {
+        @Override
+        public void handle(PacketWrapper wrapper) throws Exception {
+            Position position = wrapper.read(Type.POSITION);
+            wrapper.write(Type.INT, position.getX().intValue());
+            wrapper.write(Type.INT, position.getY().intValue());
+            wrapper.write(Type.INT, position.getZ().intValue());
+        }
+    };
+
     static {
         MappingData.init();
     }
@@ -465,19 +475,19 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        // New 0x0A - Edit book
-        registerIncoming(State.PLAY, -1, 0x0a, new PacketRemapper() {
+        // New 0x0A - Edit book -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x0a, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item item = wrapper.read(Type.FLAT_ITEM);
-                        InventoryPackets.toServer(item);
                         boolean isSigning = wrapper.read(Type.BOOLEAN);
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit");
+
+                        InventoryPackets.toServer(item);
+
+                        wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
                         wrapper.write(Type.ITEM, item);
                     }
                 });
@@ -491,18 +501,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerIncoming(State.PLAY, 0x0f, 0x10);
         registerIncoming(State.PLAY, 0x10, 0x11);
         registerIncoming(State.PLAY, 0x11, 0x12);
-        // New 0x13 - Pick Item
-        registerIncoming(State.PLAY, -1, 0x13, new PacketRemapper() {
+        // New 0x13 - Pick Item -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x13, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
+                create(new ValueCreator() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int slot = wrapper.read(Type.VAR_INT);
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, "MC|PickItem");
-                        wrapper.write(Type.VAR_INT, slot);
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|PickItem"); // Channel
                     }
                 });
             }
@@ -549,18 +555,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         });
 
 
-        // New 0x1A - Name Item
-        registerIncoming(State.PLAY, -1, 0x1A, new PacketRemapper() {
+        // New 0x1A - Name Item -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1A, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
+                create(new ValueCreator() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        String name = wrapper.read(Type.STRING);
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, "MC|ItemName");
-                        wrapper.write(Type.STRING, name);
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|ItemName"); // Channel
                     }
                 });
             }
@@ -569,52 +571,51 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerIncoming(State.PLAY, 0x18, 0x1B);
         registerIncoming(State.PLAY, 0x19, 0x1C);
 
-        // New 0x1D - Select Trade
-        registerIncoming(State.PLAY, -1, 0x1D, new PacketRemapper() {
+        // New 0x1D - Select Trade -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1D, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
+                create(new ValueCreator() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int slot = wrapper.read(Type.VAR_INT);
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, "MC|TrSel");
-                        wrapper.write(Type.INT, slot);
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|TrSel"); // Channel
                     }
                 });
+                map(Type.VAR_INT, Type.INT); // Slot
             }
         });
-        // New 0x1E - Set Beacon Effect
-        registerIncoming(State.PLAY, -1, 0x1E, new PacketRemapper() {
+        // New 0x1E - Set Beacon Effect -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1E, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
+                create(new ValueCreator() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int primaryEffect = wrapper.read(Type.VAR_INT);
-                        int secondaryEffect = wrapper.read(Type.VAR_INT);
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, "MC|Beacon");
-                        wrapper.write(Type.INT, primaryEffect);
-                        wrapper.write(Type.INT, secondaryEffect);
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|Beacon"); // Channel
                     }
                 });
+                map(Type.VAR_INT, Type.INT); // Primary Effect
+                map(Type.VAR_INT, Type.INT); // Secondary Effect
             }
         });
 
         registerIncoming(State.PLAY, 0x1A, 0x1F);
 
-        // New 0x20 - Update Command Block
-        registerIncoming(State.PLAY, -1, 0x20, new PacketRemapper() {
+        // New 0x20 - Update Command Block -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|AutoCmd");
+                    }
+                });
+                handler(POS_TO_3_INT);
+                map(Type.STRING); // Command
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        Position position = wrapper.read(Type.POSITION);
-                        String command = wrapper.read(Type.STRING);
                         int mode = wrapper.read(Type.VAR_INT);
                         byte flags = wrapper.read(Type.BYTE);
 
@@ -622,13 +623,6 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                                 : mode == 1 ? "AUTO"
                                 : "REDSTONE";
 
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, "MC|AutoCmd");
-                        wrapper.write(Type.INT, position.getX().intValue());
-                        wrapper.write(Type.INT, position.getY().intValue());
-                        wrapper.write(Type.INT, position.getZ().intValue());
-                        wrapper.write(Type.STRING, command);
                         wrapper.write(Type.BOOLEAN, (flags & 0x1) != 0); // Track output
                         wrapper.write(Type.STRING, stringMode);
                         wrapper.write(Type.BOOLEAN, (flags & 0x2) != 0); // Is conditional
@@ -637,47 +631,61 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        // New 0x21 - Update Command Block Minecart
-        registerIncoming(State.PLAY, -1, 0x21, new PacketRemapper() {
+        // New 0x21 - Update Command Block Minecart -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x21, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
+                create(new ValueCreator() {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.read(Type.VAR_INT);
-                        String command = wrapper.read(Type.STRING);
-                        boolean trackOutput = wrapper.read(Type.BOOLEAN);
-
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
+                    public void write(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.STRING, "MC|AdvCmd");
-                        wrapper.write(Type.INT, entityId);
-                        wrapper.write(Type.STRING, command);
-                        wrapper.write(Type.BOOLEAN, trackOutput);
                     }
                 });
+                map(Type.VAR_INT, Type.INT); // Entity Id
             }
         });
 
         // 0x1B -> 0x22 in InventoryPackets
 
-        // New 0x23 - Update Structure Block
-        registerIncoming(State.PLAY, -1, 0x23, new PacketRemapper() {
+        // New 0x23 - Update Structure Block -> Message Channel
+        registerIncoming(State.PLAY, 0x09, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|Struct"); // Channel
+                    }
+                });
+                handler(POS_TO_3_INT);
+                map(Type.VAR_INT, Type.BYTE); // Action
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        Position pos = wrapper.read(Type.POSITION);
-                        int action = wrapper.read(Type.VAR_INT);
+                        wrapper.set(Type.BYTE, 0, (byte) (wrapper.get(Type.BYTE, 0) + 1)); // Action
+                    }
+                });
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int mode = wrapper.read(Type.VAR_INT);
-                        String name = wrapper.read(Type.STRING);
-                        byte offsetX = wrapper.read(Type.BYTE);
-                        byte offsetY = wrapper.read(Type.BYTE);
-                        byte offsetZ = wrapper.read(Type.BYTE);
-                        byte sizeX = wrapper.read(Type.BYTE);
-                        byte sizeY = wrapper.read(Type.BYTE);
-                        byte sizeZ = wrapper.read(Type.BYTE);
+                        String stringMode = mode == 0 ? "SAVE"
+                                : mode == 1 ? "LOAD"
+                                : mode == 2 ? "CORNER"
+                                : "DATA";
+                        wrapper.write(Type.STRING, stringMode);
+                    }
+                });
+                map(Type.STRING); // Name
+                map(Type.BYTE, Type.INT); // Offset X
+                map(Type.BYTE, Type.INT); // Offset Y
+                map(Type.BYTE, Type.INT); // Offset Z
+                map(Type.BYTE, Type.INT); // Size X
+                map(Type.BYTE, Type.INT); // Size Y
+                map(Type.BYTE, Type.INT); // Size Z
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int mirror = wrapper.read(Type.VAR_INT);
                         int rotation = wrapper.read(Type.VAR_INT);
                         String metadata = wrapper.read(Type.STRING);
@@ -685,33 +693,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         long seed = wrapper.read(Type.VAR_LONG);
                         byte flags = wrapper.read(Type.BYTE);
 
-                        String stringMode = mode == 0 ? "SAVE"
-                                : mode == 1 ? "LOAD"
-                                : mode == 2 ? "CORNER"
-                                : "DATA";
                         String stringMirror = mirror == 0 ? "NONE"
                                 : mirror == 1 ? "LEFT_RIGHT"
                                 : "FRONT_BACK";
-                        String stringRotation = mirror == 0 ? "NONE"
-                                : mirror == 1 ? "CLOCKWISE_90"
-                                : mirror == 2 ? "CLOCKWISE_180"
+                        String stringRotation = rotation == 0 ? "NONE"
+                                : rotation == 1 ? "CLOCKWISE_90"
+                                : rotation == 2 ? "CLOCKWISE_180"
                                 : "COUNTERCLOCKWISE_90";
 
-                        wrapper.clearPacket();
-                        wrapper.setId(0x09); // Plugin Message
-                        wrapper.write(Type.STRING, "MC|Struct");
-                        wrapper.write(Type.INT, pos.getX().intValue());
-                        wrapper.write(Type.INT, pos.getY().intValue());
-                        wrapper.write(Type.INT, pos.getZ().intValue());
-                        wrapper.write(Type.BYTE, (byte) (action + 1));
-                        wrapper.write(Type.STRING, stringMode);
-                        wrapper.write(Type.STRING, name);
-                        wrapper.write(Type.INT, (int) offsetX);
-                        wrapper.write(Type.INT, (int) offsetY);
-                        wrapper.write(Type.INT, (int) offsetZ);
-                        wrapper.write(Type.INT, (int) sizeX);
-                        wrapper.write(Type.INT, (int) sizeY);
-                        wrapper.write(Type.INT, (int) sizeZ);
                         wrapper.write(Type.STRING, stringMirror);
                         wrapper.write(Type.STRING, stringRotation);
                         wrapper.write(Type.STRING, metadata);
