@@ -14,6 +14,7 @@ import java.util.UUID;
 public class ProtocolInfo extends StoredObject {
     private State state = State.HANDSHAKE;
     private int protocolVersion = -1;
+    private int serverProtocolVersion = -1;
     private String username;
     private UUID uuid;
     private ProtocolPipeline pipeline;

@@ -179,6 +179,7 @@ public class BaseProtocol extends Protocol {
                         }
                         // Choose the pipe
                         int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                        info.setServerProtocolVersion(protocol);
                         List<Pair<Integer, Protocol>> protocols = null;
 
                         // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
@@ -216,7 +217,7 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(final PacketWrapper wrapper) throws Exception {
-                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        int protocol = wrapper.user().get(ProtocolInfo.class).getServerProtocolVersion();
                         if (protocol < ProtocolVersion.v1_13.getId())
                             handleLoginStart(wrapper);
                     }
@@ -232,7 +233,7 @@ public class BaseProtocol extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        int protocol = wrapper.user().get(ProtocolInfo.class).getServerProtocolVersion();
                         if (protocol >= ProtocolVersion.v1_13.getId())
                             handleLoginStart(wrapper);
                     }

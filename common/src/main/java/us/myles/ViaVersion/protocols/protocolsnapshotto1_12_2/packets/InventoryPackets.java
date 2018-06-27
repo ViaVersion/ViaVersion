@@ -136,6 +136,7 @@ public class InventoryPackets {
                         } else {
                             wrapper.cancel(); // TODO REGISTER channel removed?
                         }
+                        // TODO message channel to new packets rewriting
                         wrapper.set(Type.STRING, 0, channel);
                     }
                 });
@@ -188,7 +189,7 @@ public class InventoryPackets {
         );
 
         // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x1B, 0x1B, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x1B, 0x22, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.SHORT); // 0 - Slot

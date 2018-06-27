@@ -53,6 +53,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Variable Types */
     public static final Type<Integer> VAR_INT = new VarIntType();
     public static final Type<Integer[]> VAR_INT_ARRAY = new ArrayType<>(Type.VAR_INT);
+    public static final Type<Long> VAR_LONG = new VarLongType();
+    public static final Type<Long[]> VAR_LONG_ARRAY = new ArrayType<>(Type.VAR_LONG);
     /* Special Types */
     public static final Type<Void> NOTHING = new VoidType(); // This is purely used for remapping.
     /* MC Types */
