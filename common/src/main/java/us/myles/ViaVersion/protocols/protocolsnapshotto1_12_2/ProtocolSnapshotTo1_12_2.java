@@ -658,22 +658,19 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                     }
                 });
                 handler(POS_TO_3_INT);
-                map(Type.VAR_INT, Type.BYTE); // Action
-                handler(new PacketHandler() {
+                map(Type.VAR_INT, new ValueTransformer<Integer, Byte>(Type.BYTE) { // Action
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.BYTE, 0, (byte) (wrapper.get(Type.BYTE, 0) + 1)); // Action
+                    public Byte transform(PacketWrapper wrapper, Integer action) throws Exception {
+                        return (byte) (action + 1);
                     }
-                });
-                handler(new PacketHandler() {
+                }); // Action
+                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int mode = wrapper.read(Type.VAR_INT);
-                        String stringMode = mode == 0 ? "SAVE"
+                    public String transform(PacketWrapper wrapper, Integer mode) throws Exception {
+                        return mode == 0 ? "SAVE"
                                 : mode == 1 ? "LOAD"
                                 : mode == 2 ? "CORNER"
                                 : "DATA";
-                        wrapper.write(Type.STRING, stringMode);
                     }
                 });
                 map(Type.STRING); // Name
@@ -683,27 +680,31 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 map(Type.BYTE, Type.INT); // Size X
                 map(Type.BYTE, Type.INT); // Size Y
                 map(Type.BYTE, Type.INT); // Size Z
+                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) { // Mirror
+                    @Override
+                    public String transform(PacketWrapper wrapper, Integer mirror) throws Exception {
+                        return mirror == 0 ? "NONE"
+                                : mirror == 1 ? "LEFT_RIGHT"
+                                : "FRONT_BACK";
+                    }
+                });
+                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) { // Rotation
+                    @Override
+                    public String transform(PacketWrapper wrapper, Integer rotation) throws Exception {
+                        return rotation == 0 ? "NONE"
+                                : rotation == 1 ? "CLOCKWISE_90"
+                                : rotation == 2 ? "CLOCKWISE_180"
+                                : "COUNTERCLOCKWISE_90";
+                    }
+                });
+                map(Type.STRING);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int mirror = wrapper.read(Type.VAR_INT);
-                        int rotation = wrapper.read(Type.VAR_INT);
-                        String metadata = wrapper.read(Type.STRING);
                         float integrity = wrapper.read(Type.FLOAT);
                         long seed = wrapper.read(Type.VAR_LONG);
                         byte flags = wrapper.read(Type.BYTE);
 
-                        String stringMirror = mirror == 0 ? "NONE"
-                                : mirror == 1 ? "LEFT_RIGHT"
-                                : "FRONT_BACK";
-                        String stringRotation = rotation == 0 ? "NONE"
-                                : rotation == 1 ? "CLOCKWISE_90"
-                                : rotation == 2 ? "CLOCKWISE_180"
-                                : "COUNTERCLOCKWISE_90";
-
-                        wrapper.write(Type.STRING, stringMirror);
-                        wrapper.write(Type.STRING, stringRotation);
-                        wrapper.write(Type.STRING, metadata);
                         wrapper.write(Type.BOOLEAN, (flags & 0x1) != 0); // Ignore Entities
                         wrapper.write(Type.BOOLEAN, (flags & 0x2) != 0); // Show air
                         wrapper.write(Type.BOOLEAN, (flags & 0x4) != 0); // Show bounding box
