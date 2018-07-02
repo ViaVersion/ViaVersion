@@ -116,7 +116,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
     @Override
     public void unload() {
-        // todo restore providers
         for (Listener listener : listeners) {
             HandlerList.unregisterAll(listener);
         }

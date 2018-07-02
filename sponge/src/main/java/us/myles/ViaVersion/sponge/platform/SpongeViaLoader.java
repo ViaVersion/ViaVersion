@@ -81,7 +81,6 @@ public class SpongeViaLoader implements ViaPlatformLoader {
     }
 
     public void unload() {
-        // todo restore providers
         listeners.forEach(Sponge.getEventManager()::unregisterListeners);
         listeners.clear();
         tasks.forEach(Via.getPlatform()::cancelTask);
