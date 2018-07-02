@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type;
+package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
+// todo 1.13-pre2 direct pallete changes
 public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
     public Chunk1_13Type(ClientWorld param) {
         super(param, Chunk.class);
@@ -57,6 +58,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         byte[] biomeData = groundUp ? new byte[256] : null;
         if (groundUp) {
             for (int i = 0; i < 256; i++){
+                // todo use int in Chunk?
                 biomeData[i] = (byte) input.readInt();
             }
         }

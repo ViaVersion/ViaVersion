@@ -5,6 +5,8 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
+import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -23,7 +25,7 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.Painting
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.TabCompleteTracker;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.type.Particle1_13Type;
+import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types.Particle1_13Type;
 
 import java.util.Map;
 
@@ -36,6 +38,16 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 TextComponent.fromLegacyText(legacyText)
         );
     }
+
+    public static final PacketHandler POS_TO_3_INT = new PacketHandler() {
+        @Override
+        public void handle(PacketWrapper wrapper) throws Exception {
+            Position position = wrapper.read(Type.POSITION);
+            wrapper.write(Type.INT, position.getX().intValue());
+            wrapper.write(Type.INT, position.getY().intValue());
+            wrapper.write(Type.INT, position.getZ().intValue());
+        }
+    };
 
     static {
         MappingData.init();
@@ -53,6 +65,12 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         InventoryPackets.register(this);
 
         // Outgoing packets
+
+        // New packet 0x0 - Login Plugin Message
+        registerOutgoing(State.LOGIN, 0x0, 0x1);
+        registerOutgoing(State.LOGIN, 0x1, 0x2);
+        registerOutgoing(State.LOGIN, 0x2, 0x3);
+        registerOutgoing(State.LOGIN, 0x3, 0x4);
 
         // Statistics
         registerOutgoing(State.PLAY, 0x07, 0x07, new PacketRemapper() {
@@ -406,6 +424,22 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         // New packet 0x53 - Tags
 
         // Incoming packets
+
+        // New packet 0x0 - Login Plugin Message
+        registerIncoming(State.LOGIN, -1, 0x0, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
+        registerIncoming(State.LOGIN, 0x0, 0x1);
+        registerIncoming(State.LOGIN, 0x1, 0x2);
+
         registerIncoming(State.PLAY, 0x2, 0x1);
         registerIncoming(State.PLAY, 0x3, 0x2);
         registerIncoming(State.PLAY, 0x4, 0x3);
@@ -441,8 +475,47 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
+        // New 0x0A - Edit book -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x0a, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item item = wrapper.read(Type.FLAT_ITEM);
+                        boolean isSigning = wrapper.read(Type.BOOLEAN);
+
+                        InventoryPackets.toServer(item);
+
+                        wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
+                        wrapper.write(Type.ITEM, item);
+                    }
+                });
+            }
+        });
+        registerIncoming(State.PLAY, 0x0b, 0x0c);
+        registerIncoming(State.PLAY, 0x0A, 0x0B);
+        registerIncoming(State.PLAY, 0x0c, 0x0d);
+        registerIncoming(State.PLAY, 0x0d, 0x0e);
+        registerIncoming(State.PLAY, 0x0e, 0x0f);
+        registerIncoming(State.PLAY, 0x0f, 0x10);
+        registerIncoming(State.PLAY, 0x10, 0x11);
+        registerIncoming(State.PLAY, 0x11, 0x12);
+        // New 0x13 - Pick Item -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x13, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|PickItem"); // Channel
+                    }
+                });
+            }
+        });
+
         // Craft recipe request
-        registerIncoming(State.PLAY, 0x12, 0x12, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x12, 0x14, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -455,8 +528,12 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
+        registerIncoming(State.PLAY, 0x13, 0x15);
+        registerIncoming(State.PLAY, 0x14, 0x16);
+        registerIncoming(State.PLAY, 0x15, 0x17);
+        registerIncoming(State.PLAY, 0x16, 0x18);
         // Recipe Book Data
-        registerIncoming(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x17, 0x19, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Type
@@ -476,6 +553,173 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
+
+
+        // New 0x1A - Name Item -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|ItemName"); // Channel
+                    }
+                });
+            }
+        });
+
+        registerIncoming(State.PLAY, 0x18, 0x1B);
+        registerIncoming(State.PLAY, 0x19, 0x1C);
+
+        // New 0x1D - Select Trade -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|TrSel"); // Channel
+                    }
+                });
+                map(Type.VAR_INT, Type.INT); // Slot
+            }
+        });
+        // New 0x1E - Set Beacon Effect -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1E, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|Beacon"); // Channel
+                    }
+                });
+                map(Type.VAR_INT, Type.INT); // Primary Effect
+                map(Type.VAR_INT, Type.INT); // Secondary Effect
+            }
+        });
+
+        registerIncoming(State.PLAY, 0x1A, 0x1F);
+
+        // New 0x20 - Update Command Block -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x20, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|AutoCmd");
+                    }
+                });
+                handler(POS_TO_3_INT);
+                map(Type.STRING); // Command
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int mode = wrapper.read(Type.VAR_INT);
+                        byte flags = wrapper.read(Type.BYTE);
+
+                        String stringMode = mode == 0 ? "SEQUENCE"
+                                : mode == 1 ? "AUTO"
+                                : "REDSTONE";
+
+                        wrapper.write(Type.BOOLEAN, (flags & 0x1) != 0); // Track output
+                        wrapper.write(Type.STRING, stringMode);
+                        wrapper.write(Type.BOOLEAN, (flags & 0x2) != 0); // Is conditional
+                        wrapper.write(Type.BOOLEAN, (flags & 0x4) != 0); // Automatic
+                    }
+                });
+            }
+        });
+        // New 0x21 - Update Command Block Minecart -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x21, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|AdvCmd");
+                    }
+                });
+                map(Type.VAR_INT, Type.INT); // Entity Id
+            }
+        });
+
+        // 0x1B -> 0x22 in InventoryPackets
+
+        // New 0x23 - Update Structure Block -> Message Channel
+        registerIncoming(State.PLAY, 0x09, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.STRING, "MC|Struct"); // Channel
+                    }
+                });
+                handler(POS_TO_3_INT);
+                map(Type.VAR_INT, new ValueTransformer<Integer, Byte>(Type.BYTE) { // Action
+                    @Override
+                    public Byte transform(PacketWrapper wrapper, Integer action) throws Exception {
+                        return (byte) (action + 1);
+                    }
+                }); // Action
+                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) {
+                    @Override
+                    public String transform(PacketWrapper wrapper, Integer mode) throws Exception {
+                        return mode == 0 ? "SAVE"
+                                : mode == 1 ? "LOAD"
+                                : mode == 2 ? "CORNER"
+                                : "DATA";
+                    }
+                });
+                map(Type.STRING); // Name
+                map(Type.BYTE, Type.INT); // Offset X
+                map(Type.BYTE, Type.INT); // Offset Y
+                map(Type.BYTE, Type.INT); // Offset Z
+                map(Type.BYTE, Type.INT); // Size X
+                map(Type.BYTE, Type.INT); // Size Y
+                map(Type.BYTE, Type.INT); // Size Z
+                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) { // Mirror
+                    @Override
+                    public String transform(PacketWrapper wrapper, Integer mirror) throws Exception {
+                        return mirror == 0 ? "NONE"
+                                : mirror == 1 ? "LEFT_RIGHT"
+                                : "FRONT_BACK";
+                    }
+                });
+                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) { // Rotation
+                    @Override
+                    public String transform(PacketWrapper wrapper, Integer rotation) throws Exception {
+                        return rotation == 0 ? "NONE"
+                                : rotation == 1 ? "CLOCKWISE_90"
+                                : rotation == 2 ? "CLOCKWISE_180"
+                                : "COUNTERCLOCKWISE_90";
+                    }
+                });
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        float integrity = wrapper.read(Type.FLOAT);
+                        long seed = wrapper.read(Type.VAR_LONG);
+                        byte flags = wrapper.read(Type.BYTE);
+
+                        wrapper.write(Type.BOOLEAN, (flags & 0x1) != 0); // Ignore Entities
+                        wrapper.write(Type.BOOLEAN, (flags & 0x2) != 0); // Show air
+                        wrapper.write(Type.BOOLEAN, (flags & 0x4) != 0); // Show bounding box
+                        wrapper.write(Type.FLOAT, integrity);
+                        wrapper.write(Type.VAR_LONG, seed);
+                    }
+                });
+            }
+        });
+
+        registerIncoming(State.PLAY, 0x1C, 0x24);
+        registerIncoming(State.PLAY, 0x1D, 0x25);
+        registerIncoming(State.PLAY, 0x1E, 0x26);
+        registerIncoming(State.PLAY, 0x1F, 0x27);
+        registerIncoming(State.PLAY, 0x20, 0x28);
     }
 
     @Override

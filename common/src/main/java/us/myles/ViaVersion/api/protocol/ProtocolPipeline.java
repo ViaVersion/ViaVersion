@@ -48,7 +48,7 @@ public class ProtocolPipeline extends Protocol {
 
     /**
      * Add a protocol to the current pipeline
-     * This will call the .init method.
+     * This will call the Protocol#init method.
      *
      * @param protocol The protocol to add to the end
      */
@@ -56,6 +56,9 @@ public class ProtocolPipeline extends Protocol {
         if (protocolList != null) {
             protocolList.add(protocol);
             protocol.init(userConnection);
+            // Move BaseProtocol to end, so the login packets can be modified by other protocols
+            protocolList.remove(ProtocolRegistry.BASE_PROTOCOL);
+            protocolList.add(ProtocolRegistry.BASE_PROTOCOL);
         } else {
             throw new NullPointerException("Tried to add protocol to early");
         }
@@ -71,19 +74,21 @@ public class ProtocolPipeline extends Protocol {
 
         // Apply protocols
         packetWrapper.apply(direction, state, 0, protocols);
-
         super.transform(direction, state, packetWrapper);
 
         if (Via.getManager().isDebug()) {
             // Debug packet
             String packet = "UNKNOWN";
 
-            // For 1.8/1.9 server version, eventually we'll probably get an API for this...
-            if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_8.getId() &&
-                    ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_9_3.getId()) {
 
+            int serverProtocol = userConnection.get(ProtocolInfo.class).getServerProtocolVersion();
+            int clientProtocol = userConnection.get(ProtocolInfo.class).getProtocolVersion();
+
+            // For 1.8/1.9 server version, eventually we'll probably get an API for this...
+            if (serverProtocol >= ProtocolVersion.v1_8.getId() &&
+                    serverProtocol <= ProtocolVersion.v1_9_3.getId()) {
                 PacketType type;
-                if (ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_8.getId()) {
+                if (serverProtocol <= ProtocolVersion.v1_8.getId()) {
                     if (direction == Direction.INCOMING) {
                         type = PacketType.findNewPacket(state, direction, originalID);
                     } else {
@@ -108,7 +113,7 @@ public class ProtocolPipeline extends Protocol {
                     packet = type.name();
                 }
             }
-            String name = packet + "[" + userConnection.get(ProtocolInfo.class).getProtocolVersion() + "]";
+            String name = packet + "[" + clientProtocol + "]";
             ViaPlatform platform = Via.getPlatform();
 
             String actualUsername = packetWrapper.user().get(ProtocolInfo.class).getUsername();

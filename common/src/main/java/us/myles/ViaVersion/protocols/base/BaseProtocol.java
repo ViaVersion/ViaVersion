@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+// TODO Make it work on 1.13 servers
 public class BaseProtocol extends Protocol {
 
     @Override
@@ -177,6 +178,7 @@ public class BaseProtocol extends Protocol {
                         }
                         // Choose the pipe
                         int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                        info.setServerProtocolVersion(protocol);
                         List<Pair<Integer, Protocol>> protocols = null;
 
                         // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
@@ -259,7 +261,7 @@ public class BaseProtocol extends Protocol {
     }
 
     public static String addDashes(String trimmedUUID) {
-        StringBuffer idBuff = new StringBuffer(trimmedUUID);
+        StringBuilder idBuff = new StringBuilder(trimmedUUID);
         idBuff.insert(20, '-');
         idBuff.insert(16, '-');
         idBuff.insert(12, '-');
