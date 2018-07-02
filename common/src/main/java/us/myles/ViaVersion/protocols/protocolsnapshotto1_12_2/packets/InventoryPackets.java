@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.*;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -14,7 +15,9 @@ import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
 import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SpawnEggRewriter;
 
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InventoryPackets {
     private static String NBT_TAG_NAME;
@@ -125,20 +128,29 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.INT); // Number of tools uses
                                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
                             }
-                        } else if (channel.equalsIgnoreCase("MC|Brand")) {
-                            channel = "minecraft:brand";
-                        } else if (channel.equalsIgnoreCase("MC|BOpen")) {
-                            channel = "minecraft:book_open";
-                        } else if (channel.equalsIgnoreCase("MC|DebugPath")) {
-                            channel = "minecraft:debug/paths";
-                        } else if (channel.equalsIgnoreCase("MC|DebugNeighborsUpdate")) {
-                            channel = "minecraft:debug/neighbors_update";
                         } else {
-                            wrapper.cancel(); // TODO REGISTER channel removed?
+                            String originalChannel = channel;
+                            channel = getNewPluginChannelId(channel).orNull();
+                            if (channel == null) {
+                                System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
+                                wrapper.cancel();
+                                return;
+                            } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
+                                String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                                List<String> rewrittenChannels = new ArrayList<>();
+                                for (int i = 0; i < channels.length; i++) {
+                                    String rewritten = getNewPluginChannelId(channels[i]).orNull();
+                                    if (rewritten != null)
+                                        rewrittenChannels.add(rewritten);
+                                    else
+                                        System.out.println("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                }
+                                wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                            }
                         }
-                        // TODO message channel to new packets rewriting
                         wrapper.set(Type.STRING, 0, channel);
                     }
+                    // TODO Fix trading GUI
                 });
             }
         });
@@ -208,6 +220,7 @@ public class InventoryPackets {
     }
 
     // TODO CLEANUP / SMARTER REWRITE SYSTEM
+    // TODO Rewrite identifiers
     public static void toClient(Item item) {
         if (item == null) return;
 
@@ -429,5 +442,23 @@ public class InventoryPackets {
                 || id == 398 // carrot on a stick
                 || id == 442 // shield
                 || id == 443; // elytra
+    }
+
+    public static Optional<String> getNewPluginChannelId(String old) {
+        if (old.equalsIgnoreCase("MC|TrList"))
+            return Optional.of("minecraft:trader_list");
+        if (old.equalsIgnoreCase("MC|Brand"))
+            return Optional.of("minecraft:brand");
+        if (old.equalsIgnoreCase("MC|BOpen"))
+            return Optional.of("minecraft:book_open");
+        if (old.equalsIgnoreCase("MC|DebugPath"))
+            return Optional.of("minecraft:debug/paths");
+        if (old.equalsIgnoreCase("MC|DebugNeighborsUpdate"))
+            return Optional.of("minecraft:debug/neighbors_update");
+        if (old.equalsIgnoreCase("REGISTER"))
+            return Optional.of("minecraft:register");
+        if (old.equalsIgnoreCase("UNREGISTER"))
+            return Optional.of("minecraft:unregister");
+        return Optional.absent();
     }
 }

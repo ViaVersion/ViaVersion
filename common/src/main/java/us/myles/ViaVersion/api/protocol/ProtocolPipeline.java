@@ -74,8 +74,6 @@ public class ProtocolPipeline extends Protocol {
 
         // Apply protocols
         packetWrapper.apply(direction, state, 0, protocols);
-        int transformedId = packetWrapper.getId();
-
         super.transform(direction, state, packetWrapper);
 
         if (Via.getManager().isDebug()) {
@@ -88,10 +86,7 @@ public class ProtocolPipeline extends Protocol {
 
             // For 1.8/1.9 server version, eventually we'll probably get an API for this...
             if (serverProtocol >= ProtocolVersion.v1_8.getId() &&
-                    serverProtocol <= ProtocolVersion.v1_9_3.getId()
-                    || clientProtocol >= ProtocolVersion.v1_8.getId() &&
-                    clientProtocol <= ProtocolVersion.v1_9_3.getId()) {
-
+                    serverProtocol <= ProtocolVersion.v1_9_3.getId()) {
                 PacketType type;
                 if (serverProtocol <= ProtocolVersion.v1_8.getId()) {
                     if (direction == Direction.INCOMING) {
@@ -99,16 +94,8 @@ public class ProtocolPipeline extends Protocol {
                     } else {
                         type = PacketType.findOldPacket(state, direction, originalID);
                     }
-                } else if (serverProtocol <= ProtocolVersion.v1_9_3.getId()) {
-                    type = PacketType.findNewPacket(state, direction, originalID);
-                } else if (clientProtocol <= ProtocolVersion.v1_8.getId()) {
-                    if (direction == Direction.INCOMING) {
-                        type = PacketType.findNewPacket(state, direction, transformedId);
-                    } else {
-                        type = PacketType.findOldPacket(state, direction, transformedId);
-                    }
                 } else {
-                    type = PacketType.findNewPacket(state, direction, transformedId);
+                    type = PacketType.findNewPacket(state, direction, originalID);
                 }
                 if (type != null) {
                     // Filter :) This would be not hard coded too, sorry :(
