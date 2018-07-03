@@ -58,9 +58,11 @@ public class ProtocolPipeline extends Protocol {
             protocol.init(userConnection);
             // Move base Protocols to the end, so the login packets can be modified by other protocols
             List<Protocol> toMove = new ArrayList<>();
-            for (Protocol p : protocolList)
-                if (ProtocolRegistry.isBaseProtocol(p))
+            for (Protocol p : protocolList) {
+                if (ProtocolRegistry.isBaseProtocol(p)) {
                     toMove.add(p);
+                }
+            }
             protocolList.removeAll(toMove);
             protocolList.addAll(toMove);
         } else {

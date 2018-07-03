@@ -225,16 +225,20 @@ public class ProtocolRegistry {
     }
 
     public static Protocol getBaseProtocol(int serverVersion) {
-        for (Pair<Range<Integer>, Protocol> rangeProtocol : Lists.reverse(baseProtocols))
-            if (rangeProtocol.getKey().contains(serverVersion))
+        for (Pair<Range<Integer>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
+            if (rangeProtocol.getKey().contains(serverVersion)) {
                 return rangeProtocol.getValue();
+            }
+        }
         throw new IllegalStateException("No Base Protocol for " + serverVersion);
     }
 
     public static boolean isBaseProtocol(Protocol protocol) {
-        for (Pair<Range<Integer>, Protocol> p : baseProtocols)
-            if (p.getValue() == protocol)
+        for (Pair<Range<Integer>, Protocol> p : baseProtocols) {
+            if (p.getValue() == protocol) {
                 return true;
+            }
+        }
         return false;
     }
 
