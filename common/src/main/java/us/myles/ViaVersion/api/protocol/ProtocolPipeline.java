@@ -54,11 +54,9 @@ public class ProtocolPipeline extends Protocol {
      */
     public void add(Protocol protocol) {
         if (protocolList != null) {
-            protocolList.add(protocol);
+            // Make BaseProtocol be in the last position, so the login packets can be modified by other protocols
+            protocolList.add(protocolList.size() - 1, protocol);
             protocol.init(userConnection);
-            // Move BaseProtocol to end, so the login packets can be modified by other protocols
-            protocolList.remove(ProtocolRegistry.BASE_PROTOCOL);
-            protocolList.add(ProtocolRegistry.BASE_PROTOCOL);
         } else {
             throw new NullPointerException("Tried to add protocol to early");
         }

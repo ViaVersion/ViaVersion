@@ -1,10 +1,13 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
+import us.myles.ViaVersion.protocols.base.BaseProtocol1_13;
+import us.myles.ViaVersion.protocols.base.BaseProtocol1_7;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_11_1to1_11.Protocol1_11_1To1_11;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
@@ -29,10 +32,14 @@ public class ProtocolRegistry {
     private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
     private static final List<Protocol> registerList = Lists.newCopyOnWriteArrayList();
     private static final Set<Integer> supportedVersions = Sets.newConcurrentHashSet();
+    private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
 
     static {
         // Base Protocol
-        registerProtocol(BASE_PROTOCOL, Collections.<Integer>emptyList(), -1);
+        registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
+        registerBaseProtocol(new BaseProtocol1_7(), Range.lessThan(ProtocolVersion.v1_13.getId()));
+        registerBaseProtocol(new BaseProtocol1_13(), Range.atLeast(ProtocolVersion.v1_13.getId()));
+
         // Register built in protocols
         registerProtocol(new Protocol1_9TO1_8(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_8.getId());
         registerProtocol(new Protocol1_9_1TO1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9.getId());
@@ -79,6 +86,25 @@ public class ProtocolRegistry {
             refreshVersions();
         } else {
             registerList.add(protocol);
+        }
+    }
+
+    /**
+     * Registers a base protocol.
+     * Base Protocols registered later have higher priority
+     * Only one base protocol will be added to pipeline
+     *
+     * @param baseProtocol Base Protocol to register
+     * @param supportedProtocols Versions that baseProtocol supports
+     */
+    public static void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
+        baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
+        if (Via.getPlatform().isPluginEnabled()) {
+            baseProtocol.registerListeners();
+            baseProtocol.register(Via.getManager().getProviders());
+            refreshVersions();
+        } else {
+            registerList.add(baseProtocol);
         }
     }
 
@@ -196,5 +222,12 @@ public class ProtocolRegistry {
             pathCache.put(protocolKey, outputPath);
         }
         return outputPath;
+    }
+
+    public static Protocol getBaseProtocol(int serverVersion) {
+        for (Pair<Range<Integer>, Protocol> rangeProtocol : Lists.reverse(baseProtocols))
+            if (rangeProtocol.getKey().contains(serverVersion))
+                return rangeProtocol.getValue();
+        throw new IllegalStateException("No Base Protocol for " + serverVersion);
     }
 }
