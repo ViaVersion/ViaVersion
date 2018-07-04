@@ -737,7 +737,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         providers.register(PaintingProvider.class, new PaintingProvider());
     }
 
-    // Generated with PAaaS
+    // TODO Generate this for 1.13-pre6
     private int getNewSoundID(final int oldID) {
         int newId = oldID;
         if (oldID >= 1)
