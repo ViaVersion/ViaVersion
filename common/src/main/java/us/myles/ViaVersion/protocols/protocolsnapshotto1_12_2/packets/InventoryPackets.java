@@ -200,6 +200,39 @@ public class InventoryPackets {
                 }
         );
 
+        // Plugin message
+        protocol.registerIncoming(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Channel
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.get(Type.STRING, 0);
+                        String originalChannel = channel;
+                        channel = getOldPluginChannelId(channel).orNull();
+                        if (channel == null) {
+                            System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
+                            wrapper.cancel();
+                            return;
+                        } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
+                            String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            List<String> rewrittenChannels = new ArrayList<>();
+                            for (int i = 0; i < channels.length; i++) {
+                                String rewritten = getOldPluginChannelId(channels[i]).orNull();
+                                if (rewritten != null)
+                                    rewrittenChannels.add(rewritten);
+                                else
+                                    System.out.println("Ignoring plugin channel in REGISTER: " + channels[i]);
+                            }
+                            wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                        }
+                        wrapper.set(Type.STRING, 0, channel);
+                    }
+                });
+            }
+        });
+
         // Creative Inventory Action
         protocol.registerIncoming(State.PLAY, 0x1B, 0x22, new PacketRemapper() {
                     @Override
@@ -460,5 +493,18 @@ public class InventoryPackets {
         if (old.equalsIgnoreCase("UNREGISTER"))
             return Optional.of("minecraft:unregister");
         return Optional.absent();
+    }
+
+    public static Optional<String> getOldPluginChannelId(String newId) {
+        switch (newId) {
+            case "minecraft:register":
+                return Optional.of("REGISTER");
+            case "minecraft:unregister":
+                return Optional.of("UNREGISTER");
+            case "minecraft:brand":
+                return Optional.of("MC|Brand");
+            default:
+                return Optional.absent();
+        }
     }
 }
