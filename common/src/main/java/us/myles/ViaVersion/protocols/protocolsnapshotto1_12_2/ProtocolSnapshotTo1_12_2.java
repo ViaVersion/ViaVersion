@@ -737,61 +737,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         providers.register(PaintingProvider.class, new PaintingProvider());
     }
 
-    // Generated with PAaaS
     private int getNewSoundID(final int oldID) {
-        int newId = oldID;
-        if (oldID >= 1)
-            newId += 6;
-        if (oldID >= 9)
-            newId += 4;
-        if (oldID >= 10)
-            newId += 5;
-        if (oldID >= 21)
-            newId += 5;
-        if (oldID >= 86)
-            newId += 1;
-        if (oldID >= 166)
-            newId += 4;
-        if (oldID >= 174)
-            newId += 10;
-        if (oldID >= 179)
-            newId += 9;
-        if (oldID >= 226)
-            newId += 1;
-        if (oldID >= 271)
-            newId += 1;
-        if (oldID >= 326)
-            newId += 1;
-        if (oldID >= 335)
-            newId += 1;
-        if (oldID >= 352)
-            newId += 6;
-        if (oldID >= 373)
-            newId += 1;
-        if (oldID >= 380)
-            newId += 7;
-        if (oldID >= 385)
-            newId += 4;
-        if (oldID >= 412)
-            newId += 5;
-        if (oldID >= 438)
-            newId += 1;
-        if (oldID >= 443)
-            newId += 16;
-        if (oldID >= 484)
-            newId += 1;
-        if (oldID >= 485)
-            newId += 1;
-        if (oldID >= 508)
-            newId += 2;
-        if (oldID >= 513)
-            newId += 1;
-        if (oldID >= 515)
-            newId += 1;
-        if (oldID >= 524)
-            newId += 8;
-        if (oldID >= 531)
-            newId += 1;
-        return newId;
+        return MappingData.oldToNewSounds.get(oldID);
     }
 }

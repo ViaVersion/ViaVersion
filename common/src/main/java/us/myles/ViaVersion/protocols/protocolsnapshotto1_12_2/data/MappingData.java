@@ -21,6 +21,7 @@ public class MappingData {
     public static Map<String, int[]> itemTags = new HashMap<>();
     public static Map<String, int[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
+    public static Map<Integer, Integer> oldToNewSounds = new HashMap<>();
 
     public static void init() {
         JsonObject mapping1_12 = loadData("mapping-1.12.json");
@@ -39,6 +40,8 @@ public class MappingData {
         loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
         System.out.println("Loading enchantments...");
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
+        System.out.println("Loading sound mapping...");
+        mapIdentifiers(oldToNewSounds, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
     }
 
     private static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
@@ -57,6 +60,28 @@ public class MappingData {
             String value = entry.getValue().getAsString();
             if (value.equals(needle)) {
                 return entry;
+            }
+        }
+        return null;
+    }
+
+    private static void mapIdentifiers(Map<Integer, Integer> output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
+        for (int i = 0; i < oldIdentifiers.size(); i++) {
+            JsonElement v = oldIdentifiers.get(i);
+            Integer index = findIndex(newIdentifiers, v.getAsString());
+            if (index == null) {
+                System.out.println("No key for " + v + " :( ");
+                continue;
+            }
+            output.put(i, index);
+        }
+    }
+
+    private static Integer findIndex(JsonArray array, String value) {
+        for (int i = 0; i < array.size(); i++) {
+            JsonElement v = array.get(i);
+            if (v.getAsString().equals(value)) {
+                return i;
             }
         }
         return null;
