@@ -194,7 +194,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         }).send(ProtocolSnapshotTo1_12_2.class);
 
                         // Send tags packet
-                        wrapper.create(0x54, new ValueCreator() {
+                        wrapper.create(0x55, new ValueCreator() {
                             @Override
                             public void write(PacketWrapper wrapper) throws Exception {
                                 wrapper.write(Type.VAR_INT, MappingData.blockTags.size()); // block tags
