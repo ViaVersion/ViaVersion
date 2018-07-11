@@ -131,7 +131,7 @@ public class WorldPackets {
         protocol.registerOutgoing(State.PLAY, 0x19, 0x1A);
 
         // Chunk Data
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x20, 0x22, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

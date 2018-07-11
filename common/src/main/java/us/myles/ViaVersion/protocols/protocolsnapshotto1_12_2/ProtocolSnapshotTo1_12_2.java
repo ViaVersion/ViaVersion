@@ -142,15 +142,16 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         registerOutgoing(State.PLAY, 0x1A, 0x1B);
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
-        registerOutgoing(State.PLAY, 0x1C, 0x1D);
-        registerOutgoing(State.PLAY, 0x1D, 0x1E);
-        registerOutgoing(State.PLAY, 0x1E, 0x1F);
-        registerOutgoing(State.PLAY, 0x1F, 0x20);
-
-        registerOutgoing(State.PLAY, 0x21, 0x22);
+        // New packet 0x1D - NBT Query
+        registerOutgoing(State.PLAY, 0x1C, 0x1E);
+        registerOutgoing(State.PLAY, 0x1D, 0x1F);
+        registerOutgoing(State.PLAY, 0x1E, 0x20);
+        registerOutgoing(State.PLAY, 0x1F, 0x21);
+        // WorldPackets 0x20 -> 0x22
+        registerOutgoing(State.PLAY, 0x21, 0x23);
 
         // Join (save dimension id)
-        registerOutgoing(State.PLAY, 0x23, 0x24, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x23, 0x25, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -227,7 +228,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         });
 
         // Map packet
-        registerOutgoing(State.PLAY, 0x24, 0x25, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x24, 0x26, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Map id
@@ -251,14 +252,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x25, 0x26);
-        registerOutgoing(State.PLAY, 0x26, 0x27);
-        registerOutgoing(State.PLAY, 0x27, 0x28);
-        registerOutgoing(State.PLAY, 0x28, 0x29);
-        registerOutgoing(State.PLAY, 0x29, 0x2A);
-        registerOutgoing(State.PLAY, 0x2A, 0x2B);
+        registerOutgoing(State.PLAY, 0x25, 0x27);
+        registerOutgoing(State.PLAY, 0x26, 0x28);
+        registerOutgoing(State.PLAY, 0x27, 0x29);
+        registerOutgoing(State.PLAY, 0x28, 0x2A);
+        registerOutgoing(State.PLAY, 0x29, 0x2B);
+        registerOutgoing(State.PLAY, 0x2A, 0x2C);
         // Craft recipe response
-        registerOutgoing(State.PLAY, 0x2B, 0x2C, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x2B, 0x2D, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -270,13 +271,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x2C, 0x2D);
+        registerOutgoing(State.PLAY, 0x2C, 0x2E);
         registerOutgoing(State.PLAY, 0x2D, 0x2E);
-        registerOutgoing(State.PLAY, 0x2E, 0x2F);
-        registerOutgoing(State.PLAY, 0x2F, 0x31);
-        registerOutgoing(State.PLAY, 0x30, 0x32);
+        registerOutgoing(State.PLAY, 0x2E, 0x30);
+        // New 0x31 - Face Player
+        registerOutgoing(State.PLAY, 0x2F, 0x32);
+        registerOutgoing(State.PLAY, 0x30, 0x33);
         // Recipe
-        registerOutgoing(State.PLAY, 0x31, 0x33, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x31, 0x34, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -289,11 +291,12 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x33, 0x35);
-        registerOutgoing(State.PLAY, 0x34, 0x36);
+        // EntityPackets 0x32 -> 0x35
+        registerOutgoing(State.PLAY, 0x33, 0x36);
+        registerOutgoing(State.PLAY, 0x34, 0x37);
 
         // Respawn (save dimension id)
-        registerOutgoing(State.PLAY, 0x35, 0x37, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x35, 0x38, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -308,20 +311,20 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x36, 0x38);
-        registerOutgoing(State.PLAY, 0x37, 0x39);
-        registerOutgoing(State.PLAY, 0x38, 0x3A);
-        registerOutgoing(State.PLAY, 0x39, 0x3B);
-        registerOutgoing(State.PLAY, 0x3A, 0x3C);
-        registerOutgoing(State.PLAY, 0x3B, 0x3D);
-
-        registerOutgoing(State.PLAY, 0x3D, 0x3F);
-        registerOutgoing(State.PLAY, 0x3E, 0x40);
-
-        registerOutgoing(State.PLAY, 0x40, 0x42);
-        registerOutgoing(State.PLAY, 0x41, 0x43);
+        registerOutgoing(State.PLAY, 0x36, 0x39);
+        registerOutgoing(State.PLAY, 0x37, 0x3A);
+        registerOutgoing(State.PLAY, 0x38, 0x3B);
+        registerOutgoing(State.PLAY, 0x39, 0x3C);
+        registerOutgoing(State.PLAY, 0x3A, 0x3D);
+        registerOutgoing(State.PLAY, 0x3B, 0x3E);
+        // EntityPackets 0x3C -> 0x3F
+        registerOutgoing(State.PLAY, 0x3D, 0x40);
+        registerOutgoing(State.PLAY, 0x3E, 0x41);
+        // EntityPackets 0x3F -> 0x42
+        registerOutgoing(State.PLAY, 0x40, 0x43);
+        registerOutgoing(State.PLAY, 0x41, 0x44);
         // Scoreboard Objective
-        registerOutgoing(State.PLAY, 0x42, 0x44, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x42, 0x45, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Objective name
@@ -342,9 +345,9 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x43, 0x45);
+        registerOutgoing(State.PLAY, 0x43, 0x46);
         // Team packet
-        registerOutgoing(State.PLAY, 0x44, 0x46, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x44, 0x47, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Team Name
@@ -382,13 +385,14 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
             }
         });
-        registerOutgoing(State.PLAY, 0x45, 0x47);
-        registerOutgoing(State.PLAY, 0x46, 0x48);
-        registerOutgoing(State.PLAY, 0x47, 0x49);
-        registerOutgoing(State.PLAY, 0x48, 0x4A);
+        registerOutgoing(State.PLAY, 0x45, 0x48);
+        registerOutgoing(State.PLAY, 0x46, 0x49);
+        registerOutgoing(State.PLAY, 0x47, 0x4A);
+        registerOutgoing(State.PLAY, 0x48, 0x4B);
+        // New 0x4C - Stop Sound
 
         // Sound Effect packet
-        registerOutgoing(State.PLAY, 0x49, 0x4C, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x49, 0x4D, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Sound ID
@@ -402,11 +406,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4A, 0x4D);
-        registerOutgoing(State.PLAY, 0x4B, 0x4E);
-        registerOutgoing(State.PLAY, 0x4C, 0x4F);
+        registerOutgoing(State.PLAY, 0x4A, 0x4E);
+        registerOutgoing(State.PLAY, 0x4B, 0x4F);
+        registerOutgoing(State.PLAY, 0x4C, 0x50);
         // Advancements
-        registerOutgoing(State.PLAY, 0x4D, 0x50, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x4D, 0x51, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -418,10 +422,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4E, 0x51);
-        registerOutgoing(State.PLAY, 0x4F, 0x52);
-        // New packet 0x52 - Declare Recipes
-        // New packet 0x53 - Tags
+        registerOutgoing(State.PLAY, 0x4E, 0x52);
+        registerOutgoing(State.PLAY, 0x4F, 0x53);
+        // New packet 0x54 - Declare Recipes
+        // New packet 0x55 - Tags
 
         // Incoming packets
 
@@ -440,9 +444,18 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerIncoming(State.LOGIN, 0x0, 0x1);
         registerIncoming(State.LOGIN, 0x1, 0x2);
 
-        registerIncoming(State.PLAY, 0x2, 0x1);
-        registerIncoming(State.PLAY, 0x3, 0x2);
-        registerIncoming(State.PLAY, 0x4, 0x3);
+        // New 0x01 - Query Block NBT
+        registerIncoming(State.PLAY, -1, 0x01, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
 
         // Tab-Complete
         registerIncoming(State.PLAY, 0x1, 0x4, new PacketRemapper() {
@@ -475,8 +488,9 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
+        // InventoryPackets 0x09 -> 0x0A
         // New 0x0A - Edit book -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x0a, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x09, 0x0B, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -493,16 +507,17 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        registerIncoming(State.PLAY, 0x0b, 0x0c);
-        registerIncoming(State.PLAY, 0x0A, 0x0B);
-        registerIncoming(State.PLAY, 0x0c, 0x0d);
-        registerIncoming(State.PLAY, 0x0d, 0x0e);
-        registerIncoming(State.PLAY, 0x0e, 0x0f);
-        registerIncoming(State.PLAY, 0x0f, 0x10);
-        registerIncoming(State.PLAY, 0x10, 0x11);
-        registerIncoming(State.PLAY, 0x11, 0x12);
-        // New 0x13 - Pick Item -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x13, new PacketRemapper() {
+        // New 0x0C - Query Entity NBT
+        registerIncoming(State.PLAY, 0x0A, 0x0D);
+        registerIncoming(State.PLAY, 0x0B, 0x0E);
+        registerIncoming(State.PLAY, 0x0C, 0x0F);
+        registerIncoming(State.PLAY, 0x0D, 0x10);
+        registerIncoming(State.PLAY, 0x0E, 0x11);
+        registerIncoming(State.PLAY, 0x0F, 0x12);
+        registerIncoming(State.PLAY, 0x10, 0x13);
+        registerIncoming(State.PLAY, 0x11, 0x14);
+        // New 0x15 - Pick Item -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x15, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -515,7 +530,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         });
 
         // Craft recipe request
-        registerIncoming(State.PLAY, 0x12, 0x14, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x12, 0x16, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -528,12 +543,12 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerIncoming(State.PLAY, 0x13, 0x15);
-        registerIncoming(State.PLAY, 0x14, 0x16);
-        registerIncoming(State.PLAY, 0x15, 0x17);
-        registerIncoming(State.PLAY, 0x16, 0x18);
+        registerIncoming(State.PLAY, 0x13, 0x17);
+        registerIncoming(State.PLAY, 0x14, 0x18);
+        registerIncoming(State.PLAY, 0x15, 0x19);
+        registerIncoming(State.PLAY, 0x16, 0x1A);
         // Recipe Book Data
-        registerIncoming(State.PLAY, 0x17, 0x19, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x17, 0x1B, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Type
@@ -554,9 +569,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-
-        // New 0x1A - Name Item -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x1A, new PacketRemapper() {
+        // New 0x1C - Name Item -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1C, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -568,11 +582,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerIncoming(State.PLAY, 0x18, 0x1B);
-        registerIncoming(State.PLAY, 0x19, 0x1C);
+        registerIncoming(State.PLAY, 0x18, 0x1D);
+        registerIncoming(State.PLAY, 0x19, 0x1E);
 
-        // New 0x1D - Select Trade -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x1D, new PacketRemapper() {
+        // New 0x1F - Select Trade -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x1F, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -584,8 +598,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 map(Type.VAR_INT, Type.INT); // Slot
             }
         });
-        // New 0x1E - Set Beacon Effect -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x1E, new PacketRemapper() {
+        // New 0x20 - Set Beacon Effect -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x20, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -599,10 +613,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerIncoming(State.PLAY, 0x1A, 0x1F);
+        registerIncoming(State.PLAY, 0x1A, 0x21);
 
-        // New 0x20 - Update Command Block -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x20, new PacketRemapper() {
+        // New 0x22 - Update Command Block -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x22, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -631,8 +645,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        // New 0x21 - Update Command Block Minecart -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x21, new PacketRemapper() {
+        // New 0x23 - Update Command Block Minecart -> Plugin Message
+        registerIncoming(State.PLAY, 0x09, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -645,10 +659,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        // 0x1B -> 0x22 in InventoryPackets
+        // 0x1B -> 0x24 in InventoryPackets
 
-        // New 0x23 - Update Structure Block -> Message Channel
-        registerIncoming(State.PLAY, 0x09, 0x23, new PacketRemapper() {
+        // New 0x25 - Update Structure Block -> Message Channel
+        registerIncoming(State.PLAY, 0x09, 0x25, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -715,11 +729,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
 
-        registerIncoming(State.PLAY, 0x1C, 0x24);
-        registerIncoming(State.PLAY, 0x1D, 0x25);
-        registerIncoming(State.PLAY, 0x1E, 0x26);
-        registerIncoming(State.PLAY, 0x1F, 0x27);
-        registerIncoming(State.PLAY, 0x20, 0x28);
+        registerIncoming(State.PLAY, 0x1C, 0x26);
+        registerIncoming(State.PLAY, 0x1D, 0x27);
+        registerIncoming(State.PLAY, 0x1E, 0x28);
+        registerIncoming(State.PLAY, 0x1F, 0x29);
+        registerIncoming(State.PLAY, 0x20, 0x2A);
     }
 
     @Override
