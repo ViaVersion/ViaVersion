@@ -273,7 +273,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
         registerOutgoing(State.PLAY, 0x2C, 0x2E);
-        registerOutgoing(State.PLAY, 0x2D, 0x2E);
+        registerOutgoing(State.PLAY, 0x2D, 0x2F);
         registerOutgoing(State.PLAY, 0x2E, 0x30);
         // New 0x31 - Face Player
         registerOutgoing(State.PLAY, 0x2F, 0x32);
@@ -459,7 +459,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         });
 
         // Tab-Complete
-        registerIncoming(State.PLAY, 0x1, 0x4, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x1, 0x5, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -509,6 +509,17 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
             }
         });
         // New 0x0C - Query Entity NBT
+        registerIncoming(State.PLAY, -1, 0x0C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.cancel();
+                    }
+                });
+            }
+        });
         registerIncoming(State.PLAY, 0x0A, 0x0D);
         registerIncoming(State.PLAY, 0x0B, 0x0E);
         registerIncoming(State.PLAY, 0x0C, 0x0F);
