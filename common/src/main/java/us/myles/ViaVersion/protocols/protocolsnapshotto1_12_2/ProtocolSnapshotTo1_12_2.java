@@ -88,6 +88,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         });
 
         registerOutgoing(State.PLAY, 0xF, 0xE);
+        // WorldPackets 0x10 -> 0x0F
 
         // Tab-Complete
         registerOutgoing(State.PLAY, 0xE, 0x10, new PacketRemapper() {
@@ -135,11 +136,11 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x11, 0x12);
         registerOutgoing(State.PLAY, 0x12, 0x13);
         registerOutgoing(State.PLAY, 0x13, 0x14);
-
+        // InventoryPackets 0x14 -> 0x15
         registerOutgoing(State.PLAY, 0x15, 0x16);
-
+        // InventoryPackets 0x16 -> 0x17
         registerOutgoing(State.PLAY, 0x17, 0x18);
-
+        // InventoryPackets 0x18 -> 0x19
         registerOutgoing(State.PLAY, 0x1A, 0x1B);
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
@@ -149,7 +150,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1F, 0x21);
         // WorldPackets 0x20 -> 0x22
         registerOutgoing(State.PLAY, 0x21, 0x23);
-
+        // WorldPackets 0x22 -> 0x24
         // Join (save dimension id)
         registerOutgoing(State.PLAY, 0x23, 0x25, new PacketRemapper() {
             @Override
@@ -320,7 +321,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         // EntityPackets 0x3C -> 0x3F
         registerOutgoing(State.PLAY, 0x3D, 0x40);
         registerOutgoing(State.PLAY, 0x3E, 0x41);
-        // EntityPackets 0x3F -> 0x42
+        // InventoryPackets 0x3F -> 0x42
         registerOutgoing(State.PLAY, 0x40, 0x43);
         registerOutgoing(State.PLAY, 0x41, 0x44);
         // Scoreboard Objective

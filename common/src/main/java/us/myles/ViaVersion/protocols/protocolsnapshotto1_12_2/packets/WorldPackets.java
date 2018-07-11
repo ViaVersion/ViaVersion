@@ -194,7 +194,7 @@ public class WorldPackets {
         });
 
         // Particle
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x23, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x22, 0x24, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID
