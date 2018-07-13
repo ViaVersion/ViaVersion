@@ -111,17 +111,20 @@ public class InventoryPackets {
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
                                 // Input Item
-                                Item input = wrapper.passthrough(Type.ITEM);
+                                Item input = wrapper.read(Type.ITEM);
                                 InventoryPackets.toClient(input);
+                                wrapper.write(Type.FLAT_ITEM, input);
                                 // Output Item
-                                Item output = wrapper.passthrough(Type.ITEM);
+                                Item output = wrapper.read(Type.ITEM);
                                 InventoryPackets.toClient(output);
+                                wrapper.write(Type.FLAT_ITEM, output);
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem) {
                                     // Second Item
-                                    Item second = wrapper.passthrough(Type.ITEM);
+                                    Item second = wrapper.read(Type.ITEM);
                                     InventoryPackets.toClient(second);
+                                    wrapper.write(Type.FLAT_ITEM, second);
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled

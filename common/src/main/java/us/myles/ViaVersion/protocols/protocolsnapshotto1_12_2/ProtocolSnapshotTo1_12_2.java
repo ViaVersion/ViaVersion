@@ -336,7 +336,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         byte mode = wrapper.get(Type.BYTE, 0);
                         // On create or update
                         if (mode == 0 || mode == 2) {
-                            wrapper.passthrough(Type.STRING); // Value
+                            String value = wrapper.read(Type.STRING); // Value
+                            value = legacyTextToJson(value);
+                            wrapper.write(Type.STRING, value);
+
                             String type = wrapper.read(Type.STRING);
                             // integer or hearts
                             wrapper.write(Type.VAR_INT, type.equals("integer") ? 0 : 1);
@@ -360,7 +363,9 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         byte action = wrapper.get(Type.BYTE, 0);
 
                         if (action == 0 || action == 2) {
-                            wrapper.passthrough(Type.STRING); // Display Name
+                            String displayName = wrapper.read(Type.STRING); // Display Name
+                            displayName = legacyTextToJson(displayName);
+                            wrapper.write(Type.STRING, displayName);
 
                             String prefix = wrapper.read(Type.STRING); // Prefix moved
                             String suffix = wrapper.read(Type.STRING); // Suffix moved
