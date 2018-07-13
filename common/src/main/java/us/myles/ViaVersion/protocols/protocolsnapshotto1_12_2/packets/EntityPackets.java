@@ -120,7 +120,7 @@ public class EntityPackets {
             }
         });
         // Destroy entities
-        protocol.registerOutgoing(State.PLAY, 0x32, 0x34, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x32, 0x35, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT_ARRAY); // 0 - Entity IDS
@@ -136,7 +136,7 @@ public class EntityPackets {
         });
 
         // Metadata packet
-        protocol.registerOutgoing(State.PLAY, 0x3C, 0x3E, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x3C, 0x3F, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID

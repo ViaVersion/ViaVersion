@@ -156,7 +156,7 @@ public class InventoryPackets {
         });
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x3F, 0x41, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x3F, 0x42, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -201,7 +201,7 @@ public class InventoryPackets {
         );
 
         // Plugin message
-        protocol.registerIncoming(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x09, 0x0A, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -234,7 +234,7 @@ public class InventoryPackets {
         });
 
         // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x1B, 0x22, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x1B, 0x24, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.SHORT); // 0 - Slot

@@ -27,7 +27,7 @@ public class SpongeCommandHandler extends ViaCommandHandler implements CommandCa
     }
 
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        String[] args = arguments.split(" "); // ViaCommandHandler handles empty String in array
+        String[] args = arguments.split(" ", -1); // ViaCommandHandler handles empty String in array. -1: do not discard empty strings
         return onTabComplete(new SpongeCommandSender(source), args);
     }
 
