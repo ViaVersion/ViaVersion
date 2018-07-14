@@ -496,10 +496,10 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         registerIncoming(State.PLAY, 0x05, 0x06);
         registerIncoming(State.PLAY, 0x06, 0x07);
-        registerIncoming(State.PLAY, 0x07, 0x08);
+        // InventoryPackets 0x07, 0x08
         registerIncoming(State.PLAY, 0x08, 0x09);
-
         // InventoryPackets 0x09 -> 0x0A
+
         // New 0x0A - Edit book -> Plugin Message
         registerIncoming(State.PLAY, 0x09, 0x0B, new PacketRemapper() {
             @Override
