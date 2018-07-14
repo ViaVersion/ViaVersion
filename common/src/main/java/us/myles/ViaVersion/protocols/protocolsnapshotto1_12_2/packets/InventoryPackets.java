@@ -182,7 +182,7 @@ public class InventoryPackets {
          */
 
         // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x07, 0x07, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x07, 0x08, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.UNSIGNED_BYTE); // 0 - Window ID

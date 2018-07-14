@@ -117,6 +117,10 @@ public class BungeeServerHandler implements Listener {
                         }
                     }
 
+                    info.setServerProtocolVersion(protocolId);
+                    // Add version-specific base Protocol
+                    pipeline.add(ProtocolRegistry.getBaseProtocol(protocolId));
+
                     user.put(info);
                     user.put(storage);
 

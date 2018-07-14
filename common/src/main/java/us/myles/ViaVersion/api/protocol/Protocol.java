@@ -72,6 +72,7 @@ public abstract class Protocol {
 
     /**
      * Initialise a user for this protocol setting up objects.
+     * /!\ WARNING - May be called more than once in a single {@link UserConnection}
      *
      * @param userConnection The user to initialise
      */
