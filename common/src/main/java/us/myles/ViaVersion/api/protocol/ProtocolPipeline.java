@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 public class ProtocolPipeline extends Protocol {
-    List<Protocol> protocolList;
+    private List<Protocol> protocolList;
     private UserConnection userConnection;
 
     public ProtocolPipeline(UserConnection userConnection) {
@@ -48,7 +48,7 @@ public class ProtocolPipeline extends Protocol {
 
     /**
      * Add a protocol to the current pipeline
-     * This will call the Protocol#init method.
+     * This will call the {@link Protocol#init(UserConnection)} method.
      *
      * @param protocol The protocol to add to the end
      */
@@ -174,6 +174,10 @@ public class ProtocolPipeline extends Protocol {
         return protocolList;
     }
 
+    /**
+     * Cleans the pipe and adds {@link us.myles.ViaVersion.protocols.base.BaseProtocol}
+     * /!\ WARNING - It doesn't add version-specific base Protocol
+     */
     public void cleanPipes() {
         pipes().clear();
         registerPackets();
