@@ -675,6 +675,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.STRING, "MC|AdvCmd");
+                        wrapper.write(Type.BYTE, (byte) 1); // Type 1 for Entity
                     }
                 });
                 map(Type.VAR_INT, Type.INT); // Entity Id
