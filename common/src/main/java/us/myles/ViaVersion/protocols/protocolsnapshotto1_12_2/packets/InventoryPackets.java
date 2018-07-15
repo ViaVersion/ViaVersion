@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.io.BaseEncoding;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -133,7 +134,7 @@ public class InventoryPackets {
                             }
                         } else {
                             String originalChannel = channel;
-                            channel = getNewPluginChannelId(channel).orNull();
+                            channel = getNewPluginChannelId(channel);
                             if (channel == null) {
                                 System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
                                 wrapper.cancel();
@@ -142,7 +143,8 @@ public class InventoryPackets {
                                 String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                                 List<String> rewrittenChannels = new ArrayList<>();
                                 for (int i = 0; i < channels.length; i++) {
-                                    String rewritten = getNewPluginChannelId(channels[i]).orNull();
+                                    String rewritten = getNewPluginChannelId(channels[i]);
+                                    System.out.println(channels[i] + " -> " + rewritten);
                                     if (rewritten != null)
                                         rewrittenChannels.add(rewritten);
                                     else
@@ -213,7 +215,8 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
                         String originalChannel = channel;
-                        channel = getOldPluginChannelId(channel).orNull();
+                        channel = getOldPluginChannelId(channel);
+                        System.out.println(originalChannel + " -> " + channel);
                         if (channel == null) {
                             System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
                             wrapper.cancel();
@@ -222,7 +225,8 @@ public class InventoryPackets {
                             String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                             List<String> rewrittenChannels = new ArrayList<>();
                             for (int i = 0; i < channels.length; i++) {
-                                String rewritten = getOldPluginChannelId(channels[i]).orNull();
+                                String rewritten = getOldPluginChannelId(channels[i]);
+                                System.out.println(channels[i] + " -> " + rewritten);
                                 if (rewritten != null)
                                     rewrittenChannels.add(rewritten);
                                 else
@@ -480,34 +484,47 @@ public class InventoryPackets {
                 || id == 443; // elytra
     }
 
-    public static Optional<String> getNewPluginChannelId(String old) {
-        if (old.equalsIgnoreCase("MC|TrList"))
-            return Optional.of("minecraft:trader_list");
-        if (old.equalsIgnoreCase("MC|Brand"))
-            return Optional.of("minecraft:brand");
-        if (old.equalsIgnoreCase("MC|BOpen"))
-            return Optional.of("minecraft:book_open");
-        if (old.equalsIgnoreCase("MC|DebugPath"))
-            return Optional.of("minecraft:debug/paths");
-        if (old.equalsIgnoreCase("MC|DebugNeighborsUpdate"))
-            return Optional.of("minecraft:debug/neighbors_update");
-        if (old.equalsIgnoreCase("REGISTER"))
-            return Optional.of("minecraft:register");
-        if (old.equalsIgnoreCase("UNREGISTER"))
-            return Optional.of("minecraft:unregister");
-        return Optional.absent();
+    public static String getNewPluginChannelId(String old) {
+        switch (old) {
+            case "MC|TrList":
+                return "minecraft:trader_list";
+            case "MC|Brand":
+                return "minecraft:brand";
+            case "MC|BOpen":
+                return "minecraft:book_open";
+            case "MC|DebugPath":
+                return "minecraft:debug/paths";
+            case "MC|DebugNeighborsUpdate":
+                return "minecraft:debug/neighbors_update";
+            case "REGISTER":
+                return "minecraft:register";
+            case "UNREGISTER":
+                return "minecraft:unregister";
+            case "BungeeCord":
+                return "bungeecord:main";
+            default:
+                return old.matches("[0-9a-z_-]+:[0-9a-z_/.-]+") // Identifier regex
+                        ? old
+                        : "viaversion:legacy/" + BaseEncoding.base32().lowerCase().withPadChar('-').encode(
+                        old.getBytes(StandardCharsets.UTF_8));
+        }
     }
 
-    public static Optional<String> getOldPluginChannelId(String newId) {
+    public static String getOldPluginChannelId(String newId) {
         switch (newId) {
             case "minecraft:register":
-                return Optional.of("REGISTER");
+                return "REGISTER";
             case "minecraft:unregister":
-                return Optional.of("UNREGISTER");
+                return "UNREGISTER";
             case "minecraft:brand":
-                return Optional.of("MC|Brand");
+                return "MC|Brand";
+            case "bungeecord:main":
+                return "BungeeCord";
             default:
-                return Optional.absent();
+                return newId.startsWith("viaversion:legacy/")
+                        ? new String(BaseEncoding.base32().lowerCase().withPadChar('-').decode(
+                        newId.substring(18)), StandardCharsets.UTF_8)
+                        : newId;
         }
     }
 }
