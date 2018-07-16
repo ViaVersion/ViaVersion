@@ -150,6 +150,7 @@ public class BaseProtocol1_7 extends Protocol {
         });
 
         registerOutgoing(State.LOGIN, 0x03, 0x03); // Login Set Compression Packet
+        registerIncoming(State.LOGIN, 0x04, 0x04); // Plugin Request (1.13)
 
         /* Incoming Packets */
 
@@ -185,6 +186,7 @@ public class BaseProtocol1_7 extends Protocol {
             }
         }); // Login Start Packet
         registerIncoming(State.LOGIN, 0x01, 0x01); // Encryption Response Packet
+        registerIncoming(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
     }
 
     @Override
