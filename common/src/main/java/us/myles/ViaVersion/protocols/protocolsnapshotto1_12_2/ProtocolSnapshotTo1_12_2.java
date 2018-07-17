@@ -422,7 +422,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         // Incoming packets
 
-        // New packet 0x0 - Login Plugin Message
+        // New packet 0x02 - Login Plugin Message
         registerIncoming(State.LOGIN, -1, 0x02, new PacketRemapper() {
             @Override
             public void registerMap() {
