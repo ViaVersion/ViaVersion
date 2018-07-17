@@ -204,7 +204,7 @@
     "476": "minecraft:sticky_piston[extended=true,facing=west]",
     "477": "minecraft:sticky_piston[extended=true,facing=east]",
     "480": "minecraft:cobweb",
-    //"496": "minecraft:dead_bush", RIP Dead Bush
+    "496": "minecraft:dead_bush",
     "497": "minecraft:grass",
     "498": "minecraft:fern",
     "512": "minecraft:dead_bush",
@@ -1743,7 +1743,7 @@
     "448": "minecraft:detector_rail",
     "464": "minecraft:sticky_piston",
     "480": "minecraft:cobweb",
-    "496": "minecraft:dead_bush",
+    //"496": "minecraft:dead_bush",
     "497": "minecraft:grass",
     "498": "minecraft:fern",
     "512": "minecraft:dead_bush",
