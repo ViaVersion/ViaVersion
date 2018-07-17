@@ -263,66 +263,63 @@ public class InventoryPackets {
     // TODO Rewrite identifiers
     public static void toClient(Item item) {
         if (item == null) return;
-
-        // create tag
         CompoundTag tag = item.getTag();
-        if (tag == null) {
-            item.setTag(tag = new CompoundTag("tag"));
-        }
 
         // Save original id
         int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
-        tag.put(new IntTag(NBT_TAG_NAME, originalId));
 
-        // NBT changes
+        // NBT Additions
         if (isDamageable(item.getId())) {
+            if (tag == null) item.setTag(tag = new CompoundTag("tag"));
             tag.put(new IntTag("Damage", item.getData()));
         }
-
         if (item.getId() == 358) { // map
+            if (tag == null) item.setTag(tag = new CompoundTag("tag"));
             tag.put(new IntTag("map", item.getData()));
         }
 
-        if (item.getId() == 442) { // shield
-            if (tag.get("BlockEntityTag") instanceof CompoundTag) {
-                CompoundTag blockEntityTag = tag.get("BlockEntityTag");
-                if (blockEntityTag.get("Base") instanceof IntTag) {
-                    IntTag base = blockEntityTag.get("Base");
-                    base.setValue(15 - base.getValue()); // invert color id
+        // NBT Changes
+        if (tag != null) {
+            // Invert shield color id
+            if (item.getId() == 442) {
+                if (tag.get("BlockEntityTag") instanceof CompoundTag) {
+                    CompoundTag blockEntityTag = tag.get("BlockEntityTag");
+                    if (blockEntityTag.get("Base") instanceof IntTag) {
+                        IntTag base = blockEntityTag.get("Base");
+                        base.setValue(15 - base.getValue());
+                    }
                 }
             }
-        }
-
-        // Display Name now uses JSON
-        if (tag.get("display") instanceof CompoundTag) {
-            if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
-                StringTag name = ((CompoundTag) tag.get("display")).get("Name");
-                name.setValue(
-                        ProtocolSnapshotTo1_12_2.legacyTextToJson(
-                                name.getValue()
-                        )
-                );
-            }
-        }
-
-        // ench is now Enchantments and now uses identifiers
-        if (tag.get("ench") instanceof ListTag) {
-            ListTag ench = tag.get("ench");
-            ListTag enchantments = new ListTag("Enchantments", CompoundTag.class);
-            for (Tag enchEntry : ench) {
-                if (enchEntry instanceof CompoundTag) {
-                    CompoundTag enchantmentEntry = new CompoundTag("");
-                    enchantmentEntry.put(new StringTag("id",
-                            MappingData.oldEnchantmentsIds.get(
-                                    (Short) ((CompoundTag) enchEntry).get("id").getValue()
+            // Display Name now uses JSON
+            if (tag.get("display") instanceof CompoundTag) {
+                if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
+                    StringTag name = ((CompoundTag) tag.get("display")).get("Name");
+                    name.setValue(
+                            ProtocolSnapshotTo1_12_2.legacyTextToJson(
+                                    name.getValue()
                             )
-                    ));
-                    enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
-                    enchantments.add(enchantmentEntry);
+                    );
                 }
             }
-            tag.remove("ench");
-            tag.put(enchantments);
+            // ench is now Enchantments and now uses identifiers
+            if (tag.get("ench") instanceof ListTag) {
+                ListTag ench = tag.get("ench");
+                ListTag enchantments = new ListTag("Enchantments", CompoundTag.class);
+                for (Tag enchEntry : ench) {
+                    if (enchEntry instanceof CompoundTag) {
+                        CompoundTag enchantmentEntry = new CompoundTag("");
+                        enchantmentEntry.put(new StringTag("id",
+                                MappingData.oldEnchantmentsIds.get(
+                                        (short) ((CompoundTag) enchEntry).get("id").getValue()
+                                )
+                        ));
+                        enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                        enchantments.add(enchantmentEntry);
+                    }
+                }
+                tag.remove("ench");
+                tag.put(enchantments);
+            }
         }
 
         int rawId = (item.getId() << 4 | item.getData() & 0xF);
@@ -345,7 +342,13 @@ public class InventoryPackets {
         }
 
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
-            if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
+            if (!isDamageable(item.getId()) && item.getId() != 358) { // Map
+                if (tag == null) item.setTag(tag = new CompoundTag("tag"));
+                tag.put(new IntTag(NBT_TAG_NAME, originalId)); // Data will be lost, saving original id
+            }
+            if (item.getId() == 31 && item.getData() == 0) { // Shrub was removed
+                rawId = MappingData.oldToNewItems.get(512); // Dead Bush
+            } else if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
                 rawId &= ~0xF; // Remove data
             } else {
                 System.out.println("FAILED TO GET 1.13 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
@@ -378,7 +381,7 @@ public class InventoryPackets {
         }
 
         if (rawId == null) {
-            Integer oldId = MappingData.newToOldItems.get((int) item.getId());
+            Integer oldId = MappingData.oldToNewItems.inverse().get((int) item.getId());
             if (oldId != null) {
                 // Handle spawn eggs
                 Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);

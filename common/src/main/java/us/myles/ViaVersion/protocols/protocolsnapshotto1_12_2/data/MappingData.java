@@ -15,8 +15,7 @@ import java.util.Map;
 
 public class MappingData {
     public static Map<Integer, Integer> oldToNewBlocks = new HashMap<>();
-    public static Map<Integer, Integer> oldToNewItems = new HashMap<>();
-    public static Map<Integer, Integer> newToOldItems = new HashMap<>();
+    public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Map<String, Integer[]> blockTags = new HashMap<>();
     public static Map<String, Integer[]> itemTags = new HashMap<>();
     public static Map<String, Integer[]> fluidTags = new HashMap<>();
@@ -32,8 +31,6 @@ public class MappingData {
         mapIdentifiers(oldToNewBlocks, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
         System.out.println("Loading item mapping...");
         mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
-        System.out.println("Loading new to old item mapping...");
-        mapIdentifiers(newToOldItems, mapping1_13.getAsJsonObject("items"), mapping1_12.getAsJsonObject("items"));
         System.out.println("Loading new tags...");
         loadTags(blockTags, mapping1_13.getAsJsonObject("block_tags"));
         loadTags(itemTags, mapping1_13.getAsJsonObject("item_tags"));
