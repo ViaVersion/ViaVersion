@@ -42,7 +42,7 @@ public class BlockEntityProvider implements Provider {
         String id = (String) tag.get("id").getValue();
 
         if (!handlers.containsKey(id)) {
-            System.out.println("Unhandled BlockEntity " + id + " full tag: " + tag);
+            //System.out.println("Unhandled BlockEntity " + id + " full tag: " + tag);
             return -1;
         }
 

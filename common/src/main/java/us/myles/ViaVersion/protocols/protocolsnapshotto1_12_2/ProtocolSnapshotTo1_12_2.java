@@ -49,6 +49,56 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
         }
     };
 
+    public static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS = new PacketHandler() { // *insert here a good name*
+        @Override
+        public void handle(PacketWrapper w) throws Exception {
+            // Send fake declare commands
+            w.create(0x11, new ValueCreator() {
+                @Override
+                public void write(PacketWrapper wrapper) {
+                    wrapper.write(Type.VAR_INT, 2); // Size
+                    // Write root node
+                    wrapper.write(Type.VAR_INT, 0); // Mark as command
+                    wrapper.write(Type.VAR_INT, 1); // 1 child
+                    wrapper.write(Type.VAR_INT, 1); // Child is at 1
+
+                    // Write arg node
+                    wrapper.write(Type.VAR_INT, 0x02 | 0x04 | 0x10); // Mark as command
+                    wrapper.write(Type.VAR_INT, 0); // No children
+                    // Extra data
+                    wrapper.write(Type.STRING, "args"); // Arg name
+                    wrapper.write(Type.STRING, "brigadier:string");
+                    wrapper.write(Type.VAR_INT, 2); // Greedy
+                    wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
+
+                    wrapper.write(Type.VAR_INT, 0); // Root node index
+                }
+            }).send(ProtocolSnapshotTo1_12_2.class);
+
+            // Send tags packet
+            w.create(0x55, new ValueCreator() {
+                @Override
+                public void write(PacketWrapper wrapper) throws Exception {
+                    wrapper.write(Type.VAR_INT, MappingData.blockTags.size()); // block tags
+                    for (Map.Entry<String, Integer[]> tag : MappingData.blockTags.entrySet()) {
+                        wrapper.write(Type.STRING, tag.getKey());
+                        wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
+                    }
+                    wrapper.write(Type.VAR_INT, MappingData.itemTags.size()); // item tags
+                    for (Map.Entry<String, Integer[]> tag : MappingData.itemTags.entrySet()) {
+                        wrapper.write(Type.STRING, tag.getKey());
+                        wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
+                    }
+                    wrapper.write(Type.VAR_INT, MappingData.fluidTags.size()); // fluid tags
+                    for (Map.Entry<String, Integer[]> tag : MappingData.fluidTags.entrySet()) {
+                        wrapper.write(Type.STRING, tag.getKey());
+                        wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
+                    }
+                }
+            }).send(ProtocolSnapshotTo1_12_2.class);
+        }
+    };
+
     static {
         MappingData.init();
     }
@@ -165,53 +215,9 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
                         clientChunks.setEnvironment(dimensionId);
-
-                        // Send fake declare commands
-                        wrapper.create(0x11, new ValueCreator() {
-                            @Override
-                            public void write(PacketWrapper wrapper) {
-                                wrapper.write(Type.VAR_INT, 2); // Size
-                                // Write root node
-                                wrapper.write(Type.VAR_INT, 0); // Mark as command
-                                wrapper.write(Type.VAR_INT, 1); // 1 child
-                                wrapper.write(Type.VAR_INT, 1); // Child is at 1
-
-                                // Write arg node
-                                wrapper.write(Type.VAR_INT, 0x02 | 0x04 | 0x10); // Mark as command
-                                wrapper.write(Type.VAR_INT, 0); // No children
-                                // Extra data
-                                wrapper.write(Type.STRING, "args"); // Arg name
-                                wrapper.write(Type.STRING, "brigadier:string");
-                                wrapper.write(Type.VAR_INT, 2); // Greedy
-                                wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
-
-                                wrapper.write(Type.VAR_INT, 0); // Root node index
-                            }
-                        }).send(ProtocolSnapshotTo1_12_2.class);
-
-                        // Send tags packet
-                        wrapper.create(0x55, new ValueCreator() {
-                            @Override
-                            public void write(PacketWrapper wrapper) throws Exception {
-                                wrapper.write(Type.VAR_INT, MappingData.blockTags.size()); // block tags
-                                for (Map.Entry<String, Integer[]> tag : MappingData.blockTags.entrySet()) {
-                                    wrapper.write(Type.STRING, tag.getKey());
-                                    wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
-                                }
-                                wrapper.write(Type.VAR_INT, MappingData.itemTags.size()); // item tags
-                                for (Map.Entry<String, Integer[]> tag : MappingData.itemTags.entrySet()) {
-                                    wrapper.write(Type.STRING, tag.getKey());
-                                    wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
-                                }
-                                wrapper.write(Type.VAR_INT, MappingData.fluidTags.size()); // fluid tags
-                                for (Map.Entry<String, Integer[]> tag : MappingData.fluidTags.entrySet()) {
-                                    wrapper.write(Type.STRING, tag.getKey());
-                                    wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
-                                }
-                            }
-                        }).send(ProtocolSnapshotTo1_12_2.class);
                     }
                 });
+                handler(SEND_DECLARE_COMMANDS_AND_TAGS);
             }
         });
 
@@ -296,6 +302,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                         clientWorld.setEnvironment(dimensionId);
                     }
                 });
+                handler(SEND_DECLARE_COMMANDS_AND_TAGS);
             }
         });
 
