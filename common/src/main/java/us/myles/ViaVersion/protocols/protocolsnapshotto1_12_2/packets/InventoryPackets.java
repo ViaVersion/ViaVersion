@@ -347,7 +347,7 @@ public class InventoryPackets {
                 tag.put(new IntTag(NBT_TAG_NAME, originalId)); // Data will be lost, saving original id
             }
             if (item.getId() == 31 && item.getData() == 0) { // Shrub was removed
-                rawId = MappingData.oldToNewItems.get(512); // Dead Bush
+                rawId = 32 << 16; // Dead Bush
             } else if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
                 rawId &= ~0xF; // Remove data
             } else {
