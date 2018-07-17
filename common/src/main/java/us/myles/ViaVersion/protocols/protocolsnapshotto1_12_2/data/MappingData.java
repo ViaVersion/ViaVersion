@@ -17,9 +17,9 @@ public class MappingData {
     public static Map<Integer, Integer> oldToNewBlocks = new HashMap<>();
     public static Map<Integer, Integer> oldToNewItems = new HashMap<>();
     public static Map<Integer, Integer> newToOldItems = new HashMap<>();
-    public static Map<String, int[]> blockTags = new HashMap<>();
-    public static Map<String, int[]> itemTags = new HashMap<>();
-    public static Map<String, int[]> fluidTags = new HashMap<>();
+    public static Map<String, Integer[]> blockTags = new HashMap<>();
+    public static Map<String, Integer[]> itemTags = new HashMap<>();
+    public static Map<String, Integer[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
     public static Map<Integer, Integer> oldToNewSounds = new HashMap<>();
 
@@ -87,10 +87,10 @@ public class MappingData {
         return null;
     }
 
-    private static void loadTags(Map<String, int[]> output, JsonObject newTags) {
+    private static void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
         for (Map.Entry<String, JsonElement> entry : newTags.entrySet()) {
             JsonArray ids = entry.getValue().getAsJsonArray();
-            int[] idsArray = new int[ids.size()];
+            Integer[] idsArray = new Integer[ids.size()];
             for (int i = 0; i < ids.size(); i++) {
                 idsArray[i] = ids.get(i).getAsInt();
             }

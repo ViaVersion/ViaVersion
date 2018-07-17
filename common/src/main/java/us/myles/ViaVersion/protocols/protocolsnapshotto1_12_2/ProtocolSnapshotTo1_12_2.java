@@ -66,11 +66,7 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         // Outgoing packets
 
-        // New packet 0x0 - Login Plugin Message
-        registerOutgoing(State.LOGIN, 0x0, 0x1);
-        registerOutgoing(State.LOGIN, 0x1, 0x2);
-        registerOutgoing(State.LOGIN, 0x2, 0x3);
-        registerOutgoing(State.LOGIN, 0x3, 0x4);
+        // New packet 0x04 - Login Plugin Message
 
         // Statistics
         registerOutgoing(State.PLAY, 0x07, 0x07, new PacketRemapper() {
@@ -198,28 +194,19 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                             @Override
                             public void write(PacketWrapper wrapper) throws Exception {
                                 wrapper.write(Type.VAR_INT, MappingData.blockTags.size()); // block tags
-                                for (Map.Entry<String, int[]> tag : MappingData.blockTags.entrySet()) {
+                                for (Map.Entry<String, Integer[]> tag : MappingData.blockTags.entrySet()) {
                                     wrapper.write(Type.STRING, tag.getKey());
-                                    wrapper.write(Type.VAR_INT, tag.getValue().length);
-                                    for (int id : tag.getValue()) {
-                                        wrapper.write(Type.VAR_INT, id);
-                                    }
+                                    wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
                                 }
                                 wrapper.write(Type.VAR_INT, MappingData.itemTags.size()); // item tags
-                                for (Map.Entry<String, int[]> tag : MappingData.itemTags.entrySet()) {
+                                for (Map.Entry<String, Integer[]> tag : MappingData.itemTags.entrySet()) {
                                     wrapper.write(Type.STRING, tag.getKey());
-                                    wrapper.write(Type.VAR_INT, tag.getValue().length);
-                                    for (int id : tag.getValue()) {
-                                        wrapper.write(Type.VAR_INT, id);
-                                    }
+                                    wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
                                 }
                                 wrapper.write(Type.VAR_INT, MappingData.fluidTags.size()); // fluid tags
-                                for (Map.Entry<String, int[]> tag : MappingData.fluidTags.entrySet()) {
+                                for (Map.Entry<String, Integer[]> tag : MappingData.fluidTags.entrySet()) {
                                     wrapper.write(Type.STRING, tag.getKey());
-                                    wrapper.write(Type.VAR_INT, tag.getValue().length);
-                                    for (int id : tag.getValue()) {
-                                        wrapper.write(Type.VAR_INT, id);
-                                    }
+                                    wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
                                 }
                             }
                         }).send(ProtocolSnapshotTo1_12_2.class);
@@ -435,8 +422,8 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
 
         // Incoming packets
 
-        // New packet 0x0 - Login Plugin Message
-        registerIncoming(State.LOGIN, -1, 0x0, new PacketRemapper() {
+        // New packet 0x02 - Login Plugin Message
+        registerIncoming(State.LOGIN, -1, 0x02, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -447,8 +434,6 @@ public class ProtocolSnapshotTo1_12_2 extends Protocol {
                 });
             }
         });
-        registerIncoming(State.LOGIN, 0x0, 0x1);
-        registerIncoming(State.LOGIN, 0x1, 0x2);
 
         // New 0x01 - Query Block NBT
         registerIncoming(State.PLAY, -1, 0x01, new PacketRemapper() {

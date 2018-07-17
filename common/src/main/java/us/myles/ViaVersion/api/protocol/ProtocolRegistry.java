@@ -6,7 +6,6 @@ import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
-import us.myles.ViaVersion.protocols.base.BaseProtocol1_13;
 import us.myles.ViaVersion.protocols.base.BaseProtocol1_7;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_11_1to1_11.Protocol1_11_1To1_11;
@@ -37,8 +36,7 @@ public class ProtocolRegistry {
     static {
         // Base Protocol
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
-        registerBaseProtocol(new BaseProtocol1_7(), Range.lessThan(ProtocolVersion.v1_13.getId()));
-        registerBaseProtocol(new BaseProtocol1_13(), Range.atLeast(ProtocolVersion.v1_13.getId()));
+        registerBaseProtocol(new BaseProtocol1_7(), Range.<Integer>all());
 
         // Register built in protocols
         registerProtocol(new Protocol1_9TO1_8(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_8.getId());
