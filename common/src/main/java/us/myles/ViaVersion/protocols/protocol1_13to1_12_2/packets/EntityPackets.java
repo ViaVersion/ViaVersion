@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -10,9 +10,9 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.EntityTypeRewriter;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 
 public class EntityPackets {
     public static void register(Protocol protocol) {

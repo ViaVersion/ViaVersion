@@ -1,8 +1,8 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.Particle;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 
 // TODO make future proof
 public class Particle1_13Type extends Type<Particle> {

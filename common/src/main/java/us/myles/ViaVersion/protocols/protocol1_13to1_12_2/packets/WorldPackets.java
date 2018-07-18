@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Optional;
@@ -16,13 +16,13 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.Particle;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.ParticleRewriter;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.PaintingProvider;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage.BlockStorage;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.types.Chunk1_13Type;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {

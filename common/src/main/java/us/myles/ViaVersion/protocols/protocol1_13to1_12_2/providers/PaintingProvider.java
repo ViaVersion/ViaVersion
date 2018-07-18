@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.platform.providers.Provider;

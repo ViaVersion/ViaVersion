@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.storage;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.data.StoredObject;

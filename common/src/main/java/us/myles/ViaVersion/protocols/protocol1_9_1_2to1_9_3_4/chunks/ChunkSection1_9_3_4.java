@@ -249,6 +249,49 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
         }
     }
 
+    @Override
+    public void writeBlocks1_13(ByteBuf output) throws Exception {
+        // Write bits per block
+        int bitsPerBlock = 4;
+        while (palette.size() > 1 << bitsPerBlock) {
+            bitsPerBlock++;
+        }
+        boolean directPalette = false;
+        if (bitsPerBlock > 9) {
+            bitsPerBlock = 14;
+            directPalette = true;
+        }
+        long maxEntryValue = (1L << bitsPerBlock) - 1;
+        output.writeByte(bitsPerBlock);
+
+        // Write pallet (or not)
+        if (!directPalette) {
+            Type.VAR_INT.write(output, palette.size());
+            for (int mappedId : palette) {
+                Type.VAR_INT.write(output, mappedId);
+            }
+        }
+
+        int length = (int) Math.ceil(SIZE * bitsPerBlock / 64.0);
+        Type.VAR_INT.write(output, length);
+        long[] data = new long[length];
+        for (int index = 0; index < blocks.length; index++) {
+            int value = directPalette ? palette.get(blocks[index]) : blocks[index];
+            int bitIndex = index * bitsPerBlock;
+            int startIndex = bitIndex / 64;
+            int endIndex = ((index + 1) * bitsPerBlock - 1) / 64;
+            int startBitSubIndex = bitIndex % 64;
+            data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
+            if (startIndex != endIndex) {
+                int endBitSubIndex = 64 - startBitSubIndex;
+                data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
+            }
+        }
+        for (long l : data) {
+            Type.LONG.write(output, l);
+        }
+    }
+
     /**
      * Write the block light to a buffer
      *

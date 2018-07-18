@@ -1,9 +1,9 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.BlockEntityProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,12 +1,12 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.util.Arrays;
 import java.util.LinkedList;

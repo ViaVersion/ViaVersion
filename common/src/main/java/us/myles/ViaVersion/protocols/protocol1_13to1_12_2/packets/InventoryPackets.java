@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.packets;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
@@ -11,10 +11,10 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.ProtocolSnapshotTo1_12_2;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SoundSource;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data.SpawnEggRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SoundSource;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -295,7 +295,7 @@ public class InventoryPackets {
                 if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
                     StringTag name = ((CompoundTag) tag.get("display")).get("Name");
                     name.setValue(
-                            ProtocolSnapshotTo1_12_2.legacyTextToJson(
+                            Protocol1_13To1_12_2.legacyTextToJson(
                                     name.getValue()
                             )
                     );
@@ -441,7 +441,7 @@ public class InventoryPackets {
                 if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
                     StringTag name = ((CompoundTag) tag.get("display")).get("Name");
                     name.setValue(
-                            ProtocolSnapshotTo1_12_2.jsonTextToLegacy(
+                            Protocol1_13To1_12_2.jsonTextToLegacy(
                                     name.getValue()
                             )
                     );

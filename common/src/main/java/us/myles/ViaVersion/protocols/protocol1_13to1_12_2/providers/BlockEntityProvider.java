@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -6,11 +6,11 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.ProtocolSnapshotTo1_12_2;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.BannerHandler;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.BedHandler;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.FlowerPotHandler;
-import us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.providers.blockentities.SkullHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.BannerHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.BedHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.FlowerPotHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.SkullHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,7 +63,7 @@ public class BlockEntityProvider implements Provider {
         wrapper.write(Type.POSITION, position);
         wrapper.write(Type.VAR_INT, blockId);
 
-        wrapper.send(ProtocolSnapshotTo1_12_2.class, true, true);
+        wrapper.send(Protocol1_13To1_12_2.class, true, true);
     }
 
 

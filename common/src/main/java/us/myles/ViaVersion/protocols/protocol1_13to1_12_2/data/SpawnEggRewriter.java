@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.data;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
