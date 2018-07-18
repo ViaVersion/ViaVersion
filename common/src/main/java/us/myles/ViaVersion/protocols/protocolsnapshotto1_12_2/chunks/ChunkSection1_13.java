@@ -1,15 +1,14 @@
-package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
+package us.myles.ViaVersion.protocols.protocolsnapshotto1_12_2.chunks;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.List;
 
-public class ChunkSection1_9_1_2 implements ChunkSection {
+public class ChunkSection1_13 implements ChunkSection {
     /**
      * Size (dimensions) of blocks in a chunks section.
      */
@@ -26,21 +25,12 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
     private final NibbleArray blockLight;
     private NibbleArray skyLight;
 
-    public ChunkSection1_9_1_2() {
+    public ChunkSection1_13() {
         this.blocks = new int[SIZE];
         this.blockLight = new NibbleArray(SIZE);
         palette.add(0); // AIR
     }
 
-    /**
-     * Set a block in the chunks
-     *
-     * @param x    Block X
-     * @param y    Block Y
-     * @param z    Block Z
-     * @param type The type of the block
-     * @param data The data value of the block
-     */
     public void setBlock(int x, int y, int z, int type, int data) {
         setBlock(index(x, y, z), type, data);
     }
@@ -116,14 +106,16 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      * </ul>
      *
      * @param input The buffer to read from.
-     * @throws Exception If it failed to read properly
+     * @throws Exception If it fails to read
      */
     public void readBlocks(ByteBuf input) throws Exception {
         palette.clear();
 
-        // Reaad bits per block
+        // Read bits per block
         int bitsPerBlock = input.readUnsignedByte();
         long maxEntryValue = (1L << bitsPerBlock) - 1;
+
+        boolean directPalette = false;
 
         if (bitsPerBlock == 0) {
             bitsPerBlock = 13;
@@ -131,17 +123,15 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
         if (bitsPerBlock < 4) {
             bitsPerBlock = 4;
         }
-        if (bitsPerBlock > 8) {
-            bitsPerBlock = 13;
+        if (bitsPerBlock > 9) {
+            directPalette = true;
+            bitsPerBlock = 14;
         }
-        int paletteLength = Type.VAR_INT.read(input);
+
+        int paletteLength = directPalette ? 0 : Type.VAR_INT.read(input);
         // Read palette
         for (int i = 0; i < paletteLength; i++) {
-            if (bitsPerBlock != 13) {
-                palette.add(Type.VAR_INT.read(input));
-            } else {
-                Type.VAR_INT.read(input);
-            }
+            palette.add(Type.VAR_INT.read(input));
         }
 
         // Read blocks
@@ -149,9 +139,9 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
         if (blockData.length > 0) {
             for (int i = 0; i < blocks.length; i++) {
                 int bitIndex = i * bitsPerBlock;
-                int startIndex = bitIndex / 64;
-                int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
-                int startBitSubIndex = bitIndex % 64;
+                int startIndex = bitIndex >> 6; // /64
+                int endIndex = ((i + 1) * bitsPerBlock - 1) >> 6; // /64
+                int startBitSubIndex = bitIndex & 0x3F; // % 64
                 int val;
                 if (startIndex == endIndex) {
                     val = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
@@ -160,7 +150,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
                     val = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
                 }
 
-                if (bitsPerBlock == 13) {
+                if (directPalette) {
                     int type = val >> 4;
                     int data = val & 0xF;
 
@@ -200,12 +190,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
         this.skyLight = new NibbleArray(handle);
     }
 
-    /**
-     * Write the blocks to a buffer.
-     *
-     * @param output The buffer to write to.
-     * @throws Exception Throws if it failed to write.
-     */
+
     public void writeBlocks(ByteBuf output) throws Exception {
         // Write bits per block
         int bitsPerBlock = 4;
@@ -289,6 +274,7 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      *
      * @param output The buffer to write to
      */
+    @Override
     public void writeBlockLight(ByteBuf output) {
         output.writeBytes(blockLight.getHandle());
     }
@@ -298,13 +284,9 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      *
      * @param output The buffer to write to
      */
+    @Override
     public void writeSkyLight(ByteBuf output) {
         output.writeBytes(skyLight.getHandle());
-    }
-
-    @Override
-    public List<Integer> getPalette() {
-        return palette;
     }
 
     /**
@@ -312,43 +294,13 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
      *
      * @return True if skylight is present
      */
+    @Override
     public boolean hasSkyLight() {
         return skyLight != null;
     }
 
-    /**
-     * Get expected size of this chunks section.
-     *
-     * @return Amount of bytes sent by this section
-     * @throws Exception If it failed to calculate bits properly
-     */
-    public int getExpectedSize() throws Exception {
-        int bitsPerBlock = palette.size() > 255 ? 16 : 8;
-        int bytes = 1; // bits per block
-        bytes += paletteBytes(); // palette
-        bytes += countBytes(bitsPerBlock == 16 ? SIZE * 2 : SIZE); // block data length
-        bytes += (palette.size() > 255 ? 2 : 1) * SIZE; // block data
-        bytes += LIGHT_LENGTH; // block light
-        bytes += hasSkyLight() ? LIGHT_LENGTH : 0; // sky light
-        return bytes;
-    }
-
-    private int paletteBytes() throws Exception {
-        // Count bytes used by pallet
-        int bytes = countBytes(palette.size());
-        for (int mappedId : palette) {
-            bytes += countBytes(mappedId);
-        }
-        return bytes;
-    }
-
-    private int countBytes(int value) throws Exception {
-        // Count amount of bytes that would be sent if the value were sent as a VarInt
-        ByteBuf buf = Unpooled.buffer();
-        Type.VAR_INT.write(buf, value);
-        buf.readerIndex(0);
-        int bitCount = buf.readableBytes();
-        buf.release();
-        return bitCount;
+    @Override
+    public List<Integer> getPalette() {
+        return palette;
     }
 }
