@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface ChunkSection {
     /**
-     * Gets a block state id (< 1.13: block_id << 4 | data & 0xF)
+     * Gets a block state id (&lt; 1.13: block_id &lt;&lt; 4 | data &amp; 0xF)
+     *
      * @param x Block X
      * @param y Block Y
      * @param z Block Z
@@ -28,9 +29,9 @@ public interface ChunkSection {
     /**
      * Set a block state in the chunk
      *
-     * @param x    Block X
-     * @param y    Block Y
-     * @param z    Block Z
+     * @param x          Block X
+     * @param y          Block Y
+     * @param z          Block Z
      * @param blockState The block state id
      */
     void setFlatBlock(int x, int y, int z, int blockState);
@@ -38,6 +39,7 @@ public interface ChunkSection {
     /**
      * Gets a block id (without data)
      * /!\ YOU SHOULD NOT USE THIS ON 1.13
+     *
      * @param x Block X
      * @param y Block Y
      * @param z Block Z
@@ -46,7 +48,7 @@ public interface ChunkSection {
     int getBlockId(int x, int y, int z);
 
     /**
-     * Write the blocks in < 1.13 format to a buffer.
+     * Write the blocks in &lt; 1.13 format to a buffer.
      *
      * @param output The buffer to write to.
      * @throws Exception Throws if it failed to write.
