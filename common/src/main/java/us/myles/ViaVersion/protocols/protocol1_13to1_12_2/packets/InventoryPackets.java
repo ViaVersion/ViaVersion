@@ -281,12 +281,20 @@ public class InventoryPackets {
         // NBT Changes
         if (tag != null) {
             // Invert shield color id
-            if (item.getId() == 442) {
+            if (item.getId() == 442 || item.getId() == 425) {
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
                         IntTag base = blockEntityTag.get("Base");
                         base.setValue(15 - base.getValue());
+                    }
+                    if (blockEntityTag.get("Patterns") instanceof ListTag) {
+                        for (Tag pattern : (ListTag) blockEntityTag.get("Patterns")) {
+                            if (pattern instanceof CompoundTag) {
+                                IntTag c = ((CompoundTag) pattern).get("Color");
+                                c.setValue(15 - c.getValue()); // Invert color id
+                            }
+                        }
                     }
                 }
             }
@@ -426,14 +434,23 @@ public class InventoryPackets {
                 }
             }
 
-            if (item.getId() == 442) { // shield
+            if (item.getId() == 442 || item.getId() == 425) { // shield / banner
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
                         IntTag base = blockEntityTag.get("Base");
                         base.setValue(15 - base.getValue()); // invert color id
                     }
+                    if (blockEntityTag.get("Patterns") instanceof ListTag) {
+                        for (Tag pattern : (ListTag) blockEntityTag.get("Patterns")) {
+                            if (pattern instanceof CompoundTag) {
+                                IntTag c = ((CompoundTag) pattern).get("Color");
+                                c.setValue(15 - c.getValue()); // Invert color id
+                            }
+                        }
+                    }
                 }
+
             }
 
             // Display Name now uses JSON
