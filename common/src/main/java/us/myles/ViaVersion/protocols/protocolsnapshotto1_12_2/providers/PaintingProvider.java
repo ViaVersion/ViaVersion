@@ -28,14 +28,14 @@ public class PaintingProvider implements Provider {
         add("bust");
         add("stage");
         add("void");
-        add("skull_and_roses");
+        add("skullandroses");
         add("wither");
         add("fighters");
         add("pointer");
         add("pigscene");
-        add("burning_skull");
+        add("burningskull");
         add("skeleton");
-        add("donkey_kong");
+        add("donkeykong");
     }
 
     private void add(String motive) {

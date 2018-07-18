@@ -23,7 +23,10 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         int id = storage.get(position).getOriginal();
 
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
-            id += (byte) tag.get("SkullType").getValue() * 20 + (byte) tag.get("Rot").getValue();
+            id += (byte) tag.get("SkullType").getValue() * 20;
+            if (tag.contains("Rot")) {
+                id += (byte) tag.get("Rot").getValue();
+            }
         } else {
             System.out.println("Why does this block have the skull block entity? :(" + tag);
             return -1;
