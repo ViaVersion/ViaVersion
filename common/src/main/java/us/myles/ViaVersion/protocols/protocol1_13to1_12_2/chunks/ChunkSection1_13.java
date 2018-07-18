@@ -118,7 +118,7 @@ public class ChunkSection1_13 implements ChunkSection {
         boolean directPalette = false;
 
         if (bitsPerBlock == 0) {
-            bitsPerBlock = 13;
+            bitsPerBlock = 14;
         }
         if (bitsPerBlock < 4) {
             bitsPerBlock = 4;
