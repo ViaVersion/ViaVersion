@@ -144,7 +144,6 @@ public class InventoryPackets {
                                 List<String> rewrittenChannels = new ArrayList<>();
                                 for (int i = 0; i < channels.length; i++) {
                                     String rewritten = getNewPluginChannelId(channels[i]);
-                                    System.out.println(channels[i] + " -> " + rewritten);
                                     if (rewritten != null)
                                         rewrittenChannels.add(rewritten);
                                     else
@@ -216,7 +215,6 @@ public class InventoryPackets {
                         String channel = wrapper.get(Type.STRING, 0);
                         String originalChannel = channel;
                         channel = getOldPluginChannelId(channel);
-                        System.out.println(originalChannel + " -> " + channel);
                         if (channel == null) {
                             System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
                             wrapper.cancel();
@@ -226,7 +224,6 @@ public class InventoryPackets {
                             List<String> rewrittenChannels = new ArrayList<>();
                             for (int i = 0; i < channels.length; i++) {
                                 String rewritten = getOldPluginChannelId(channels[i]);
-                                System.out.println(channels[i] + " -> " + rewritten);
                                 if (rewritten != null)
                                     rewrittenChannels.add(rewritten);
                                 else
