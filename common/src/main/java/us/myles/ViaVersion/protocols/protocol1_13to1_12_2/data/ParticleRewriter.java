@@ -61,7 +61,7 @@ public class ParticleRewriter {
         // Item	Slot	The item that will be used.
         add(3, blockHandler()); // (37->3) blockcrack_(id+(data<<12))   -> minecraft:block
         // BlockState	VarInt	The ID of the block state.
-        add(3, blockWithoutMetaHandler()); // (38->3) blockdust_(id)               -> minecraft:block
+        add(3, blockHandler()); // (38->3) blockdust_(id)               -> minecraft:block
         // BlockState	VarInt	The ID of the block state.
         add(36); // (39->36) droplet -> minecraft:rain
         add(-1); // (40->-1) take -> REMOVED (TODO REPLACENT/CLIENT_SIDED?)
@@ -70,7 +70,7 @@ public class ParticleRewriter {
         add(16); // (43->16) endrod -> minecraft:end_rod
         add(7); // (44->7) damageindicator -> minecraft:damage_indicator
         add(40); // (45->40) sweepattack -> minecraft:sweep_attack
-        add(20, blockWithoutMetaHandler()); // (46->20) fallingdust -> minecraft:falling_dust
+        add(20, blockHandler()); // (46->20) fallingdust -> minecraft:falling_dust
         // BlockState	VarInt	The ID of the block state.
         add(41); // (47->41) totem -> minecraft:totem_of_undying
         add(38); // (48->38) spit -> minecraft:spit
@@ -152,19 +152,6 @@ public class ParticleRewriter {
                 int newId = WorldPackets.toNewId(combined);
 
                 particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newId)); // BlockState	VarInt	The ID of the block state.
-                return particle;
-            }
-        };
-    }
-
-    // Handle single block ids
-    private static ParticleDataHandler blockWithoutMetaHandler() {
-        return new ParticleDataHandler() {
-            @Override
-            public Particle handler(Particle particle, Integer[] data) {
-                int blockId = data[0].shortValue() << 4;
-                int newBlockId = WorldPackets.toNewId(blockId);
-                particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newBlockId)); // BlockState	VarInt	The ID of the block state.
                 return particle;
             }
         };
