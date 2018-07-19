@@ -52,7 +52,10 @@ public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler 
                 ? new Pair<>(((Number) item).byteValue(), data)
                 : new Pair<>((String) item, data);
 
-        if (flowers.containsKey(pair)) {
+        // Return air on empty string
+        if (item instanceof String && ((String) item).isEmpty())
+            return 5265;
+        else if (flowers.containsKey(pair)) {
             return flowers.get(pair);
         } else if (flowersNumberId.containsKey(pair)) {
             return flowersNumberId.get(pair);
