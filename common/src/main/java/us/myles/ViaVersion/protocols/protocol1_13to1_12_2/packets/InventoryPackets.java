@@ -325,13 +325,31 @@ public class InventoryPackets {
                 tag.remove("ench");
                 tag.put(enchantments);
             }
+            if (tag.get("StoredEnchantments") instanceof ListTag) {
+                ListTag storedEnch = tag.get("StoredEnchantments");
+                ListTag newStoredEnch = new ListTag("StoredEnchantments", CompoundTag.class);
+                for (Tag enchEntry : storedEnch) {
+                    if (enchEntry instanceof CompoundTag) {
+                        CompoundTag enchantmentEntry = new CompoundTag("");
+                        enchantmentEntry.put(new StringTag("id",
+                                MappingData.oldEnchantmentsIds.get(
+                                        (short) ((CompoundTag) enchEntry).get("id").getValue()
+                                )
+                        ));
+                        enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                        newStoredEnch.add(enchantmentEntry);
+                    }
+                }
+                tag.remove("StoredEnchantments");
+                tag.put(newStoredEnch);
+            }
         }
 
         int rawId = (item.getId() << 4 | item.getData() & 0xF);
 
         // Handle SpawnEggs
         if (item.getId() == 383) {
-            if (tag.get("EntityTag") instanceof CompoundTag) {
+            if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
                 CompoundTag entityTag = tag.get("EntityTag");
                 if (entityTag.get("id") instanceof StringTag) {
                     StringTag identifier = entityTag.get("id");
@@ -447,7 +465,6 @@ public class InventoryPackets {
                         }
                     }
                 }
-
             }
 
             // Display Name now uses JSON
@@ -483,6 +500,27 @@ public class InventoryPackets {
                 }
                 tag.remove("Enchantment");
                 tag.put(ench);
+            }
+            if (tag.get("StoredEnchantments") instanceof ListTag) {
+                ListTag storedEnch = tag.get("StoredEnchantments");
+                ListTag newStoredEnch = new ListTag("StoredEnchantments", CompoundTag.class);
+                for (Tag enchantmentEntry : storedEnch) {
+                    if (enchantmentEntry instanceof CompoundTag) {
+                        CompoundTag enchEntry = new CompoundTag("");
+                        enchEntry.put(
+                                new ShortTag(
+                                        "id",
+                                        MappingData.oldEnchantmentsIds.inverse().get(
+                                                (String) ((CompoundTag) enchantmentEntry).get("id").getValue()
+                                        )
+                                )
+                        );
+                        enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                        newStoredEnch.add(enchEntry);
+                    }
+                }
+                tag.remove("StoredEnchantments");
+                tag.put(newStoredEnch);
             }
         }
     }
