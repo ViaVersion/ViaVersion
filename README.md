@@ -8,7 +8,7 @@ IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt fo
 
 Supported Versions:
 
-![Table (https://i.imgur.com/tqN5f65.png)](https://i.imgur.com/tqN5f65.png)
+![Table (https://i.imgur.com/YZNJhUv.png)](https://i.imgur.com/YZNJhUv.png)
 
 On Bukkit you may also use ProtocolSupport, but ensure you have the right build for your server version.
 
