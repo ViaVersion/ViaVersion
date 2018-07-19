@@ -40,12 +40,37 @@ public class EntityPackets {
                         byte type = wrapper.get(Type.BYTE, 0);
                         Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
 
-                        if (entType != null && entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
-                            int oldId = wrapper.get(Type.INT, 0);
-                            int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
-                            wrapper.set(Type.INT, 0, WorldPackets.toNewId(combined));
-                        }
+                        if (entType != null) {
+                            if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
+                                int oldId = wrapper.get(Type.INT, 0);
+                                int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
+                                wrapper.set(Type.INT, 0, WorldPackets.toNewId(combined));
+                            }
 
+                            // Fix ItemFrame hitbox
+                            if (entType.is(Entity1_13Types.EntityType.ITEM_FRAME)) {
+                                int data = wrapper.get(Type.INT, 0);
+
+                                switch (data) {
+                                    // South
+                                    case 0:
+                                        data = 3;
+                                        break;
+                                    // West
+                                    case 1:
+                                        data = 4;
+                                        break;
+                                    // North is the same
+                                    // East
+                                    case 3:
+                                        data = 5;
+                                        break;
+                                }
+
+                                wrapper.set(Type.INT, 0, data);
+                            }
+
+                        }
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                     }
