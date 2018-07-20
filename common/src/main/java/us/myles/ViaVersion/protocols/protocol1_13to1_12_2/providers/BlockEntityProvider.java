@@ -2,15 +2,13 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.BannerHandler;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.BedHandler;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.FlowerPotHandler;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.SkullHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.*;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +21,7 @@ public class BlockEntityProvider implements Provider {
         handlers.put("minecraft:bed", new BedHandler());
         handlers.put("minecraft:banner", new BannerHandler());
         handlers.put("minecraft:skull", new SkullHandler());
+        handlers.put("minecraft:mob_spawner", new SpawnerHandler());
     }
 
     /**
@@ -42,7 +41,8 @@ public class BlockEntityProvider implements Provider {
         String id = (String) tag.get("id").getValue();
 
         if (!handlers.containsKey(id)) {
-            //System.out.println("Unhandled BlockEntity " + id + " full tag: " + tag);
+            if (Via.getManager().isDebug())
+                System.out.println("Unhandled BlockEntity " + id + " full tag: " + tag);
             return -1;
         }
 
@@ -54,16 +54,16 @@ public class BlockEntityProvider implements Provider {
         return newBlock;
     }
 
-    public interface BlockEntityHandler {
-        int transform(UserConnection user, CompoundTag tag);
-    }
-
     private void sendBlockChange(UserConnection user, Position position, int blockId) throws Exception {
         PacketWrapper wrapper = new PacketWrapper(0x0B, null, user);
         wrapper.write(Type.POSITION, position);
         wrapper.write(Type.VAR_INT, blockId);
 
         wrapper.send(Protocol1_13To1_12_2.class, true, true);
+    }
+
+    public interface BlockEntityHandler {
+        int transform(UserConnection user, CompoundTag tag);
     }
 
 
