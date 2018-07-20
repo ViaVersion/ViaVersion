@@ -5,6 +5,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.IOException;
@@ -14,13 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static Map<Integer, Integer> oldToNewBlocks = new HashMap<>();
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Map<String, Integer[]> blockTags = new HashMap<>();
     public static Map<String, Integer[]> itemTags = new HashMap<>();
     public static Map<String, Integer[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
     public static Map<Integer, Integer> oldToNewSounds = new HashMap<>();
+    public static BlockMappings blockMappings;
 
     public static void init() {
         JsonObject mapping1_12 = loadData("mapping-1.12.json");
@@ -28,7 +30,13 @@ public class MappingData {
 
         // TODO: Remove how verbose this is
         System.out.println("Loading block mapping...");
-        mapIdentifiers(oldToNewBlocks, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+        try {
+            Class.forName("io.netty.util.collection.IntObjectMap");
+            blockMappings = new BMNettyCollections();
+        } catch (ClassNotFoundException e) {
+            blockMappings = new BMJDKCollections();
+        }
+        blockMappings.init(mapping1_12, mapping1_13);
         System.out.println("Loading item mapping...");
         mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
         System.out.println("Loading new tags...");
@@ -112,6 +120,50 @@ public class MappingData {
                 reader.close();
             } catch (IOException ignored) {
                 // Ignored
+            }
+        }
+    }
+
+    public interface BlockMappings {
+        void init(JsonObject mapping1_12, JsonObject mapping1_13);
+        Integer getNewBlock(int old);
+    }
+
+    private static class BMJDKCollections implements BlockMappings {
+        private Map<Integer, Integer> oldToNew = new HashMap<>();
+
+        @Override
+        public void init(JsonObject mapping1_12, JsonObject mapping1_13) {
+            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+        }
+
+        @Override
+        public Integer getNewBlock(int old) {
+            return oldToNew.get(old);
+        }
+    }
+
+    private static class BMNettyCollections implements BlockMappings {
+        private IntObjectMap<Integer> oldToNew = new IntObjectHashMap<>();
+
+        @Override
+        public void init(JsonObject mapping1_12, JsonObject mapping1_13) {
+            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+        }
+
+        @Override
+        public Integer getNewBlock(int old) {
+            return oldToNew.get(old);
+        }
+
+        private static void mapIdentifiers(IntObjectMap<Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+            for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
+                Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+                if (value == null) {
+                    System.out.println("No key for " + entry.getValue() + " :( ");
+                    continue;
+                }
+                output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
             }
         }
     }

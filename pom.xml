@@ -95,10 +95,12 @@
         </dependency>
 
         <!-- Netty (Network Library) -->
+        <!-- You should make this work with 4.0.20.Final -->
+        <!-- Using 4.0.23.Final to use Netty Collections -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.0.20.Final</version>
+            <version>4.0.23.Final</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

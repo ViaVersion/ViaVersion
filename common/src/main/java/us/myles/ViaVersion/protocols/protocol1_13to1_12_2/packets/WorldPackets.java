@@ -256,11 +256,11 @@ public class WorldPackets {
     }
 
     public static int toNewId(int oldId) {
-        Integer newId = MappingData.oldToNewBlocks.get(oldId);
+        Integer newId = MappingData.blockMappings.getNewBlock(oldId);
         if (newId != null) {
             return newId;
         }
-        newId = MappingData.oldToNewBlocks.get(oldId & ~0xF); // Remove data
+        newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
         if (newId != null) {
             System.out.println("Missing block " + oldId);
             return newId;
