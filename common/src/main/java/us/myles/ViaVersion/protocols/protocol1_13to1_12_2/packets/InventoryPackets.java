@@ -315,12 +315,13 @@ public class InventoryPackets {
                 for (Tag enchEntry : ench) {
                     if (enchEntry instanceof CompoundTag) {
                         CompoundTag enchantmentEntry = new CompoundTag("");
-                        enchantmentEntry.put(new StringTag("id",
-                                MappingData.oldEnchantmentsIds.get(
-                                        (short) ((CompoundTag) enchEntry).get("id").getValue()
-                                )
-                        ));
-                        enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                        short oldId = ((Number) ((CompoundTag) enchEntry).get("id").getValue()).shortValue();
+                        String newId = MappingData.oldEnchantmentsIds.get(oldId);
+                        if (newId == null){
+                            newId = "viaversion:legacy/"+oldId;
+                        }
+                        enchantmentEntry.put(new StringTag("id", newId));
+                        enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
                         enchantments.add(enchantmentEntry);
                     }
                 }
@@ -333,12 +334,15 @@ public class InventoryPackets {
                 for (Tag enchEntry : storedEnch) {
                     if (enchEntry instanceof CompoundTag) {
                         CompoundTag enchantmentEntry = new CompoundTag("");
+                        short oldId = ((Number) ((CompoundTag) enchEntry).get("id").getValue()).shortValue();
+                        String newId = MappingData.oldEnchantmentsIds.get(oldId);
+                        if (newId == null) {
+                            newId = "viaversion:legacy/"+oldId;
+                        }
                         enchantmentEntry.put(new StringTag("id",
-                                MappingData.oldEnchantmentsIds.get(
-                                        (short) ((CompoundTag) enchEntry).get("id").getValue()
-                                )
+                                newId
                         ));
-                        enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                        enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
                         newStoredEnch.add(enchantmentEntry);
                     }
                 }
@@ -495,12 +499,15 @@ public class InventoryPackets {
                 for (Tag enchantmentEntry : enchantments) {
                     if (enchantmentEntry instanceof CompoundTag) {
                         CompoundTag enchEntry = new CompoundTag("");
+                        String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
+                        Short oldId = MappingData.oldEnchantmentsIds.inverse().get(newId);
+                        if (oldId == null && newId.startsWith("viaversion:legacy/")){
+                            oldId = Short.valueOf(newId.substring(18));
+                        }
                         enchEntry.put(
                                 new ShortTag(
                                         "id",
-                                        MappingData.oldEnchantmentsIds.inverse().get(
-                                                (String) ((CompoundTag) enchantmentEntry).get("id").getValue()
-                                        )
+                                        oldId
                                 )
                         );
                         enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
@@ -515,13 +522,15 @@ public class InventoryPackets {
                 ListTag newStoredEnch = new ListTag("StoredEnchantments", CompoundTag.class);
                 for (Tag enchantmentEntry : storedEnch) {
                     if (enchantmentEntry instanceof CompoundTag) {
-                        CompoundTag enchEntry = new CompoundTag("");
+                        CompoundTag enchEntry = new CompoundTag("");String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
+                        Short oldId = MappingData.oldEnchantmentsIds.inverse().get(newId);
+                        if (oldId == null && newId.startsWith("viaversion:legacy/")){
+                            oldId = Short.valueOf(newId.substring(18));
+                        }
                         enchEntry.put(
                                 new ShortTag(
                                         "id",
-                                        MappingData.oldEnchantmentsIds.inverse().get(
-                                                (String) ((CompoundTag) enchantmentEntry).get("id").getValue()
-                                        )
+                                        oldId
                                 )
                         );
                         enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
