@@ -209,14 +209,21 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_12NBTArrayFix();
-    
+
     /**
      * Should we fix shift quick move action for 1.12 clients
      *
      * @return True if enabled
      */
     boolean is1_12QuickMoveActionFix();
-    
+
+    /**
+     * Should we fix Forge for 1.11 and 1.12 clients on 1.10/1.11 servers with server-only mods
+     *
+     * @return True if enabled
+     * */
+    boolean isForgeFix();
+
     /**
      * Get the blocked protocols
      *
