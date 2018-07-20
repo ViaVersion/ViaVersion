@@ -1,6 +1,5 @@
-# ViaVersion 1.3.0 - Spigot, Sponge, BungeeCord
+# ViaVersion 1.4.0 - Spigot, Sponge, BungeeCord
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
-[![Gitter](https://badges.gitter.im/MylesIsCool/ViaVersion.svg)](https://gitter.im/MylesIsCool/ViaVersion)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
 
 IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
@@ -9,7 +8,7 @@ IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt fo
 
 Supported Versions:
 
-![Table (http://i.imgur.com/jbrm2Ep.png)](http://i.imgur.com/jbrm2Ep.png)
+![Table (https://i.imgur.com/YZNJhUv.png)](https://i.imgur.com/YZNJhUv.png)
 
 On Bukkit you may also use ProtocolSupport, but ensure you have the right build for your server version.
 
