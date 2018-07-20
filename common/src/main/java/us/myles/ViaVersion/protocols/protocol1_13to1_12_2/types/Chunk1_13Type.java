@@ -101,7 +101,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         // Write biome data
         if (chunk.isBiomeData()) {
             for (byte value : chunk.getBiomeData()) {
-                output.writeInt(0); // This is a temporary workaround, we'll look into fixing this soon :)
+                output.writeInt(value & 0xFF); // This is a temporary workaround, we'll look into fixing this soon :)
             }
         }
 

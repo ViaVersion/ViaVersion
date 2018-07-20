@@ -265,6 +265,8 @@ public class InventoryPackets {
         // Save original id
         int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
 
+        int rawId = (item.getId() << 4 | item.getData() & 0xF);
+
         // NBT Additions
         if (isDamageable(item.getId())) {
             if (tag == null) item.setTag(tag = new CompoundTag("tag"));
@@ -343,24 +345,31 @@ public class InventoryPackets {
                 tag.remove("StoredEnchantments");
                 tag.put(newStoredEnch);
             }
-        }
-
-        int rawId = (item.getId() << 4 | item.getData() & 0xF);
-
-        // Handle SpawnEggs
-        if (item.getId() == 383) {
-            if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
-                CompoundTag entityTag = tag.get("EntityTag");
-                if (entityTag.get("id") instanceof StringTag) {
-                    StringTag identifier = entityTag.get("id");
-                    rawId = SpawnEggRewriter.getSpawnEggId(identifier.getValue());
+            // Handle SpawnEggs
+            if (item.getId() == 383) {
+                if (tag.get("EntityTag") instanceof CompoundTag) {
+                    CompoundTag entityTag = tag.get("EntityTag");
+                    if (entityTag.get("id") instanceof StringTag) {
+                        StringTag identifier = entityTag.get("id");
+                        rawId = SpawnEggRewriter.getSpawnEggId(identifier.getValue());
+                        if (rawId == -1) {
+                            rawId = 25100288; // Bat fallback
+                        } else {
+                            entityTag.remove("id");
+                            if (entityTag.isEmpty())
+                                tag.remove("EntityTag");
+                        }
+                    } else {
+                        // Fallback to bat
+                        rawId = 25100288;
+                    }
                 } else {
                     // Fallback to bat
                     rawId = 25100288;
                 }
-            } else {
-                // Fallback to bat
-                rawId = 25100288;
+            }
+            if (tag.isEmpty()) {
+                item.setTag(tag = null);
             }
         }
 
