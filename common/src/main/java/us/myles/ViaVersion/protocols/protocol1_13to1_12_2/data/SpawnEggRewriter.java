@@ -64,7 +64,8 @@ public class SpawnEggRewriter {
     public static int getSpawnEggId(String entityIdentifier) {
         // Fallback to bat
         if (!spawnEggs.containsKey(entityIdentifier))
-            return 25100288;
+            //return 25100288;
+            return -1;
         return (383 << 16 | (spawnEggs.get(entityIdentifier) & 0xFFFF));
     }
 
