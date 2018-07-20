@@ -144,7 +144,7 @@ public class ChunkSection1_9to1_8 implements ChunkSection {
             }
         }
         for (long l : data) {
-            Type.LONG.write(output, l);
+            output.writeLong(l);
         }
     }
 
@@ -187,7 +187,7 @@ public class ChunkSection1_9to1_8 implements ChunkSection {
             }
         }
         for (long l : data) {
-            Type.LONG.write(output, l);
+            output.writeLong(l);
         }
     }
 

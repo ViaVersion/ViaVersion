@@ -153,7 +153,11 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
         }
 
         // Read blocks
-        Long[] blockData = Type.LONG_ARRAY.read(input);
+        //Long[] blockData = Type.LONG_ARRAY.read(input);
+        long[] blockData = new long[Type.VAR_INT.read(input)];
+        for (int i = 0; i < blockData.length; i++) {
+            blockData[i] = input.readLong();
+        }
         if (blockData.length > 0) {
             for (int i = 0; i < blocks.length; i++) {
                 int bitIndex = i * bitsPerBlock;
@@ -245,7 +249,7 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
             }
         }
         for (long l : data) {
-            Type.LONG.write(output, l);
+            output.writeLong(l);
         }
     }
 
@@ -288,7 +292,7 @@ public class ChunkSection1_9_3_4 implements ChunkSection {
             }
         }
         for (long l : data) {
-            Type.LONG.write(output, l);
+            output.writeLong(l);
         }
     }
 

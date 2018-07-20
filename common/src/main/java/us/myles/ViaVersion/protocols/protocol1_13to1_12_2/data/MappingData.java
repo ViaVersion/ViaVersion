@@ -5,6 +5,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.IOException;
@@ -14,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static Map<Integer, Integer> oldToNewBlocks = new HashMap<>();
+    public static IntObjectMap<Integer> oldToNewBlocks = new IntObjectHashMap<>();
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Map<String, Integer[]> blockTags = new HashMap<>();
     public static Map<String, Integer[]> itemTags = new HashMap<>();
@@ -42,6 +44,17 @@ public class MappingData {
     }
 
     private static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
+            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+            if (value == null) {
+                System.out.println("No key for " + entry.getValue() + " :( ");
+                continue;
+            }
+            output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
+        }
+    }
+
+    private static void mapIdentifiers(IntObjectMap<Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
