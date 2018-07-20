@@ -321,7 +321,7 @@ public class InventoryPackets {
                             newId = "viaversion:legacy/"+oldId;
                         }
                         enchantmentEntry.put(new StringTag("id", newId));
-                        enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                        enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
                         enchantments.add(enchantmentEntry);
                     }
                 }
@@ -342,7 +342,7 @@ public class InventoryPackets {
                         enchantmentEntry.put(new StringTag("id",
                                 newId
                         ));
-                        enchantmentEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchEntry).get("lvl").getValue()));
+                        enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
                         newStoredEnch.add(enchantmentEntry);
                     }
                 }
