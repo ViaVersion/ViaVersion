@@ -171,6 +171,15 @@ public class WorldPackets {
                             }
                         }
 
+                        // Rewrite biome id 255 to plains
+                        if (chunk.isBiomeData()) {
+                            for (int i = 0; i < 256; i++) {
+                                int data = chunk.getBiomeData()[i] & 0xFF;
+                                if (data == 255)
+                                    chunk.getBiomeData()[i] = 1;
+                            }
+                        }
+
                         // Rewrite BlockEntities to normal blocks
                         BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
                         for (CompoundTag tag : chunk.getBlockEntities()) {
