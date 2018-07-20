@@ -31,8 +31,9 @@ public class MappingData {
         // TODO: Remove how verbose this is
         System.out.println("Loading block mapping...");
         try {
+            Class.forName("io.netty.util.collection.IntObjectMap");
             blockMappings = new BMNettyCollections();
-        } catch (NoClassDefFoundError e) {
+        } catch (ClassNotFoundException e) {
             blockMappings = new BMJDKCollections();
         }
         blockMappings.init(mapping1_12, mapping1_13);
