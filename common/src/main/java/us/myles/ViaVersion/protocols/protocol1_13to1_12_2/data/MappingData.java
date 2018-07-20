@@ -16,13 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static IntObjectMap<Integer> oldToNewBlocks = new IntObjectHashMap<>();
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Map<String, Integer[]> blockTags = new HashMap<>();
     public static Map<String, Integer[]> itemTags = new HashMap<>();
     public static Map<String, Integer[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
     public static Map<Integer, Integer> oldToNewSounds = new HashMap<>();
+    public static BlockMappings blockMappings;
 
     public static void init() {
         JsonObject mapping1_12 = loadData("mapping-1.12.json");
@@ -30,7 +30,12 @@ public class MappingData {
 
         // TODO: Remove how verbose this is
         System.out.println("Loading block mapping...");
-        mapIdentifiers(oldToNewBlocks, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+        try {
+            blockMappings = new BMNettyCollections();
+        } catch (NoClassDefFoundError e) {
+            blockMappings = new BMJDKCollections();
+        }
+        blockMappings.init(mapping1_12, mapping1_13);
         System.out.println("Loading item mapping...");
         mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
         System.out.println("Loading new tags...");
@@ -44,17 +49,6 @@ public class MappingData {
     }
 
     private static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                System.out.println("No key for " + entry.getValue() + " :( ");
-                continue;
-            }
-            output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
-        }
-    }
-
-    private static void mapIdentifiers(IntObjectMap<Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
@@ -125,6 +119,50 @@ public class MappingData {
                 reader.close();
             } catch (IOException ignored) {
                 // Ignored
+            }
+        }
+    }
+
+    public interface BlockMappings {
+        void init(JsonObject mapping1_12, JsonObject mapping1_13);
+        Integer getNewBlock(int old);
+    }
+
+    private static class BMJDKCollections implements BlockMappings {
+        private Map<Integer, Integer> oldToNew = new HashMap<>();
+
+        @Override
+        public void init(JsonObject mapping1_12, JsonObject mapping1_13) {
+            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+        }
+
+        @Override
+        public Integer getNewBlock(int old) {
+            return oldToNew.get(old);
+        }
+    }
+
+    private static class BMNettyCollections implements BlockMappings {
+        private IntObjectMap<Integer> oldToNew = new IntObjectHashMap<>();
+
+        @Override
+        public void init(JsonObject mapping1_12, JsonObject mapping1_13) {
+            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+        }
+
+        @Override
+        public Integer getNewBlock(int old) {
+            return oldToNew.get(old);
+        }
+
+        private static void mapIdentifiers(IntObjectMap<Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+            for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
+                Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+                if (value == null) {
+                    System.out.println("No key for " + entry.getValue() + " :( ");
+                    continue;
+                }
+                output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
             }
         }
     }
