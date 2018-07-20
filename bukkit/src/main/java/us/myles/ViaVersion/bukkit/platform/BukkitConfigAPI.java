@@ -199,4 +199,9 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     public List<String> getUnsupportedOptions() {
         return UNSUPPORTED;
     }
+
+    @Override
+    public boolean is1_13TeamColourFix() {
+        return getBoolean("team-colour-fix", true);
+    }
 }

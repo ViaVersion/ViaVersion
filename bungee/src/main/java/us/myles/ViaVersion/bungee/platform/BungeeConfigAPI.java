@@ -252,4 +252,9 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     public Map<String, Integer> getBungeeServerProtocols() {
         return get("bungee-servers", Map.class, new HashMap<>());
     }
+
+    @Override
+    public boolean is1_13TeamColourFix() {
+        return getBoolean("team-colour-fix", true);
+    }
 }

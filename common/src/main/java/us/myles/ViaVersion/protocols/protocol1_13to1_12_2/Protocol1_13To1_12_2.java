@@ -1,8 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -370,12 +372,16 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             wrapper.passthrough(Type.STRING); // Collision rule
 
                             // Handle new colors
-                            byte color = wrapper.read(Type.BYTE);
+                            int colour = wrapper.read(Type.BYTE).intValue();
+                            if (colour == -1) {
+                                colour = 21; // -1 changed to 21
+                            }
 
-                            if (color == -1) // -1 changed to 21
-                                wrapper.write(Type.VAR_INT, 21); // RESET
-                            else
-                                wrapper.write(Type.VAR_INT, (int) color);
+                            if (Via.getConfig().is1_13TeamColourFix()) {
+                                colour = getLastColor(prefix);
+                            }
+
+                            wrapper.write(Type.VAR_INT, colour);
 
                             wrapper.write(Type.STRING, legacyTextToJson(prefix)); // Prefix
                             wrapper.write(Type.STRING, legacyTextToJson(suffix)); // Suffix
@@ -768,5 +774,34 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
     private int getNewSoundID(final int oldID) {
         return MappingData.oldToNewSounds.get(oldID);
+    }
+
+    // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java
+    public int getLastColor(String input) {
+        int length = input.length();
+
+        for (int index = length - 1; index > -1; index--) {
+            char section = input.charAt(index);
+            if (section == ChatColor.COLOR_CHAR && index < length - 1) {
+                char c = input.charAt(index + 1);
+                ChatColor color = ChatColor.getByChar(c);
+
+                if (color != null) {
+                    switch (color) {
+                        case MAGIC:
+                        case BOLD:
+                        case STRIKETHROUGH:
+                        case UNDERLINE:
+                        case ITALIC:
+                        case RESET:
+                            break;
+                        default:
+                            return color.ordinal();
+                    }
+                }
+            }
+        }
+
+        return ChatColor.RESET.ordinal();
     }
 }

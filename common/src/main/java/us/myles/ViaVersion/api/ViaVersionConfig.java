@@ -209,6 +209,13 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_12NBTArrayFix();
+
+    /**
+     * Should we make team colours based on the last colour in team prefix
+     *
+     * @return True if enabled
+     */
+    boolean is1_13TeamColourFix();
     
     /**
      * Should we fix shift quick move action for 1.12 clients

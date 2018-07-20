@@ -205,4 +205,9 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     public String getReloadDisconnectMsg() {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
     }
+
+    @Override
+    public boolean is1_13TeamColourFix() {
+        return getBoolean("team-colour-fix", true);
+    }
 }
