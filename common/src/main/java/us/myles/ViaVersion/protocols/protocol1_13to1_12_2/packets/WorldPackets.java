@@ -24,6 +24,8 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProv
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 
+import java.util.List;
+
 public class WorldPackets {
     public static void register(Protocol protocol) {
         // Outgoing packets
@@ -240,6 +242,24 @@ public class WorldPackets {
                         if (particle == null || particle.getId() == -1) {
                             wrapper.cancel();
                             return;
+                        }
+
+                        //Handle reddust particle color
+                        ifStatement:
+                        if (particle.getId() == 11) {
+                            int count = wrapper.get(Type.INT, 1);
+                            float speed = wrapper.get(Type.FLOAT, 6);
+                            if (count != 0 || speed != 1) break ifStatement;
+
+                            wrapper.set(Type.INT, 1, 1);
+                            wrapper.set(Type.FLOAT, 6, 0f);
+
+                            List<Particle.ParticleData> arguments = particle.getArguments();
+                            for (int i = 0; i < 3; i++) {
+                                //RGB values are represented by the X/Y/Z offset
+                                arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
+                                wrapper.set(Type.FLOAT, i + 3, 0f);
+                            }
                         }
 
 //                        System.out.println("Old particle " + particleId + " " + Arrays.toString(data) +  " new Particle" + particle);
