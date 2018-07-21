@@ -305,9 +305,13 @@ public class InventoryPackets {
                 if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
                     StringTag name = ((CompoundTag) tag.get("display")).get("Name");
                     BaseComponent[] components = TextComponent.fromLegacyText(name.getValue());
-                    TextComponent root = new TextComponent(components);
-                    root.setItalic(false);
-                    name.setValue(ComponentSerializer.toString(root));
+                    if (name.getValue().startsWith("§")) {
+                        TextComponent root = new TextComponent(components);
+                        root.setItalic(false);
+                        name.setValue(ComponentSerializer.toString(root));
+                    } else {
+                        name.setValue(ComponentSerializer.toString(components));
+                    }
                 }
             }
             // ench is now Enchantments and now uses identifiers
