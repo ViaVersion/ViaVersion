@@ -4,6 +4,9 @@ import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.io.BaseEncoding;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -301,11 +304,10 @@ public class InventoryPackets {
             if (tag.get("display") instanceof CompoundTag) {
                 if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
                     StringTag name = ((CompoundTag) tag.get("display")).get("Name");
-                    name.setValue(
-                            Protocol1_13To1_12_2.legacyTextToJson(
-                                    name.getValue()
-                            )
-                    );
+                    BaseComponent[] components = TextComponent.fromLegacyText(name.getValue());
+                    TextComponent root = new TextComponent(components);
+                    root.setItalic(false);
+                    name.setValue(ComponentSerializer.toString(root));
                 }
             }
             // ench is now Enchantments and now uses identifiers
