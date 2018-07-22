@@ -14,6 +14,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
@@ -130,7 +131,19 @@ public class WorldPackets {
         });
 
         // Named Sound Effect TODO String -> Identifier? Check if identifier is present?
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A);
+        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String newSoundId = NamedSoundRewriter.getNewId(wrapper.get(Type.STRING, 0));
+                        wrapper.set(Type.STRING, 0, newSoundId);
+                    }
+                });
+            }
+        });
 
         // Chunk Data
         protocol.registerOutgoing(State.PLAY, 0x20, 0x22, new PacketRemapper() {

@@ -203,7 +203,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x15, 0x16);
         // InventoryPackets 0x16 -> 0x17
         registerOutgoing(State.PLAY, 0x17, 0x18);
-        // InventoryPackets 0x18 -> 0x19
+        // WorldPackets 0x18 -> 0x19
         registerOutgoing(State.PLAY, 0x1A, 0x1B);
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
@@ -212,7 +212,29 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1E, 0x20);
         registerOutgoing(State.PLAY, 0x1F, 0x21);
         // WorldPackets 0x20 -> 0x22
-        registerOutgoing(State.PLAY, 0x21, 0x23);
+
+        // Effect packet
+        registerOutgoing(State.PLAY, 0x21, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION); // Location
+                map(Type.INT); // Data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.INT, 0);
+                        int data = wrapper.get(Type.INT, 1);
+                        if (id == 1010) { // Play record
+                            wrapper.set(Type.INT, 1, data = MappingData.oldToNewItems.get(data << 4));
+                        } else if (id == 2001) { // Block break + block break sound
+                            wrapper.set(Type.INT, 1, data = WorldPackets.toNewId(data << 4));
+                        }
+                    }
+                });
+            }
+        });
+
         // WorldPackets 0x22 -> 0x24
         // Join (save dimension id)
         registerOutgoing(State.PLAY, 0x23, 0x25, new PacketRemapper() {
