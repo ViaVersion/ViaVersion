@@ -11,7 +11,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SoundSource;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
@@ -299,10 +299,12 @@ public class InventoryPackets {
             }
             // Display Name now uses JSON
             if (tag.get("display") instanceof CompoundTag) {
-                if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
-                    StringTag name = ((CompoundTag) tag.get("display")).get("Name");
+                CompoundTag display = tag.get("display");
+                if (display.get("Name") instanceof StringTag) {
+                    StringTag name = display.get("Name");
+                    display.put(new StringTag(NBT_TAG_NAME + "|Name", name.getValue()));
                     name.setValue(
-                            Protocol1_13To1_12_2.legacyTextToJson(
+                            ChatRewriter.legacyTextToJson(
                                     name.getValue()
                             )
                     );
@@ -482,13 +484,16 @@ public class InventoryPackets {
 
             // Display Name now uses JSON
             if (tag.get("display") instanceof CompoundTag) {
+                CompoundTag display = tag.get("display");
                 if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
-                    StringTag name = ((CompoundTag) tag.get("display")).get("Name");
+                    StringTag name = display.get("Name");
+                    StringTag via = display.get(NBT_TAG_NAME + "|Name");
                     name.setValue(
-                            Protocol1_13To1_12_2.jsonTextToLegacy(
+                            via != null ? via.getValue() : ChatRewriter.jsonTextToLegacy(
                                     name.getValue()
                             )
                     );
+                    display.remove(NBT_TAG_NAME + "|Name");
                 }
             }
 

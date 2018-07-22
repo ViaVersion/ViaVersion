@@ -38,12 +38,6 @@ import java.util.Map;
 public class Protocol1_13To1_12_2 extends Protocol {
     public static final Particle1_13Type PARTICLE_TYPE = new Particle1_13Type();
 
-    public static String legacyTextToJson(String legacyText) {
-        return ComponentSerializer.toString(
-                TextComponent.fromLegacyText(legacyText)
-        );
-    }
-
     public static final PacketHandler POS_TO_3_INT = new PacketHandler() {
         @Override
         public void handle(PacketWrapper wrapper) throws Exception {
@@ -106,10 +100,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
     static {
         MappingData.init();
-    }
-
-    public static String jsonTextToLegacy(String value) {
-        return TextComponent.toLegacyText(ComponentSerializer.parse(value));
     }
 
     @Override
@@ -358,7 +348,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         // On create or update
                         if (mode == 0 || mode == 2) {
                             String value = wrapper.read(Type.STRING); // Value
-                            value = legacyTextToJson(value);
+                            value = ChatRewriter.legacyTextToJson(value);
                             wrapper.write(Type.STRING, value);
 
                             String type = wrapper.read(Type.STRING);
@@ -385,7 +375,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
                         if (action == 0 || action == 2) {
                             String displayName = wrapper.read(Type.STRING); // Display Name
-                            displayName = legacyTextToJson(displayName);
+                            displayName = ChatRewriter.legacyTextToJson(displayName);
                             wrapper.write(Type.STRING, displayName);
 
                             String prefix = wrapper.read(Type.STRING); // Prefix moved
@@ -408,8 +398,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
                             wrapper.write(Type.VAR_INT, colour);
 
-                            wrapper.write(Type.STRING, legacyTextToJson(prefix)); // Prefix
-                            wrapper.write(Type.STRING, legacyTextToJson(suffix)); // Suffix
+                            wrapper.write(Type.STRING, ChatRewriter.legacyTextToJson(prefix)); // Prefix
+                            wrapper.write(Type.STRING, ChatRewriter.legacyTextToJson(suffix)); // Suffix
                         }
                     }
                 });
