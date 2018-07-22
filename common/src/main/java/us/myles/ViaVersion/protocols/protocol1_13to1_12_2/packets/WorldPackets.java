@@ -339,12 +339,12 @@ public class WorldPackets {
     }
 
     public static int toNewId(int oldId) {
-        Integer newId = MappingData.blockMappings.getNewBlock(oldId);
-        if (newId != null) {
+        short newId = MappingData.blockMappings.getNewBlock(oldId);
+        if (newId != -1) {
             return newId;
         }
         newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
-        if (newId != null) {
+        if (newId != -1) {
             System.out.println("Missing block " + oldId);
             return newId;
         }
