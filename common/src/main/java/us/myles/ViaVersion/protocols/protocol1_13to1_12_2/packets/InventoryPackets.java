@@ -575,6 +575,12 @@ public class InventoryPackets {
                 return "minecraft:unregister";
             case "BungeeCord":
                 return "bungeecord:main";
+            case "WDL|INIT":
+                return "wdl:init";
+            case "WDL|CONTROL":
+                return "wdl:init";
+            case "WDL|REQUEST":
+                return "wdl:request";
             default:
                 return old.matches("[0-9a-z_-]+:[0-9a-z_/.-]+") // Identifier regex
                         ? old
@@ -593,6 +599,12 @@ public class InventoryPackets {
                 return "MC|Brand";
             case "bungeecord:main":
                 return "BungeeCord";
+            case "wdl:init":
+                return "WDL|INIT";
+            case "wdl:control":
+                return "WDL|CONTROL";
+            case "wdl:request":
+                return "WDL|REQUEST";
             default:
                 return newId.startsWith("viaversion:legacy/")
                         ? new String(BaseEncoding.base32().lowerCase().withPadChar('-').decode(
