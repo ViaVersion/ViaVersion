@@ -3,8 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -437,8 +435,36 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        // TODO Temporary cancel advancements because of 'Non [a-z0-9/._-] character in path of location: minecraft:? https://fs.matsv.nl/media?id=auwje4z4lxw.png
-                        wrapper.cancel();
+                        wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+                        int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+
+                        for (int i = 0; i < size; i++) {
+                            wrapper.passthrough(Type.STRING); // Identifier
+
+                            // Parent
+                            if (wrapper.passthrough(Type.BOOLEAN))
+                                wrapper.passthrough(Type.STRING);
+
+                            // Display data
+                            if (wrapper.passthrough(Type.BOOLEAN)) {
+                                wrapper.passthrough(Type.STRING); // Title
+                                wrapper.passthrough(Type.STRING); // Description
+                                wrapper.write(Type.FLAT_ITEM, wrapper.read(Type.ITEM)); // Translate item to flat item
+                                wrapper.passthrough(Type.VAR_INT); // Frame type
+                                int flags = wrapper.passthrough(Type.INT); // Flags
+                                if ((flags & 1) != 0)
+                                    wrapper.passthrough(Type.STRING); // Background texture
+                                wrapper.passthrough(Type.FLOAT); // X
+                                wrapper.passthrough(Type.FLOAT); // Y
+                            }
+
+                            wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                            int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                            for (int array = 0; array < arrayLength; array++) {
+                                wrapper.passthrough(Type.STRING_ARRAY); // String array
+                            }
+                        }
                     }
                 });
             }
