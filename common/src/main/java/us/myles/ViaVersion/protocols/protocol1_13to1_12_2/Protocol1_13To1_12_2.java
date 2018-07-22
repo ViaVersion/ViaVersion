@@ -3,8 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -462,40 +460,35 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int mappingSize = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < mappingSize; i++) {
+                        wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+                        int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+
+                        for (int i = 0; i < size; i++) {
                             wrapper.passthrough(Type.STRING); // Identifier
-                            // Advancement start
-                            boolean hasParent = wrapper.passthrough(Type.BOOLEAN);
-                            if (hasParent) wrapper.passthrough(Type.STRING); // Parent id
-                            boolean hasDisplay = wrapper.passthrough(Type.BOOLEAN);
-                            if (hasDisplay) {
-                                // Display start
-                                wrapper.passthrough(Type.STRING); // Title - Chat
-                                wrapper.passthrough(Type.STRING); // Description - Chat
-                                Item icon = wrapper.read(Type.ITEM);
-                                wrapper.write(Type.FLAT_ITEM, icon);
-                                InventoryPackets.toClient(icon);
+
+                            // Parent
+                            if (wrapper.passthrough(Type.BOOLEAN))
+                                wrapper.passthrough(Type.STRING);
+
+                            // Display data
+                            if (wrapper.passthrough(Type.BOOLEAN)) {
+                                wrapper.passthrough(Type.STRING); // Title
+                                wrapper.passthrough(Type.STRING); // Description
+                                wrapper.write(Type.FLAT_ITEM, wrapper.read(Type.ITEM)); // Translate item to flat item
                                 wrapper.passthrough(Type.VAR_INT); // Frame type
                                 int flags = wrapper.passthrough(Type.INT); // Flags
-                                if ((flags & 1) != 0) wrapper.passthrough(Type.STRING); // Background texture
-                                wrapper.passthrough(Type.FLOAT); // X coord
-                                wrapper.passthrough(Type.FLOAT); // Y coord
-                                // Display end
+                                if ((flags & 1) != 0)
+                                    wrapper.passthrough(Type.STRING); // Background texture
+                                wrapper.passthrough(Type.FLOAT); // X
+                                wrapper.passthrough(Type.FLOAT); // Y
                             }
-                            int numberOfCriteria = wrapper.passthrough(Type.VAR_INT); // Number of criteria
-                            for (int x = 0; x < numberOfCriteria; x++) {
-                                wrapper.passthrough(Type.STRING); // Criteria identifier
-                                wrapper.passthrough(Type.NOTHING); // nothing
+
+                            wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                            int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                            for (int array = 0; array < arrayLength; array++) {
+                                wrapper.passthrough(Type.STRING_ARRAY); // String array
                             }
-                            int numberOfRequirements = wrapper.passthrough(Type.VAR_INT);
-                            for (int x = 0; x < numberOfRequirements; x++) {
-                                int criteriasLength = wrapper.passthrough(Type.VAR_INT);
-                                for (int z = 0; z < criteriasLength; z++) {
-                                    wrapper.passthrough(Type.STRING);
-                                }
-                            }
-                            // Advancement end
                         }
                     }
                 });
