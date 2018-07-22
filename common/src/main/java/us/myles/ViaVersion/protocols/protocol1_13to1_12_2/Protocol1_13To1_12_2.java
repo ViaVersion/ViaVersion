@@ -458,11 +458,45 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4D, 0x51, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.BOOLEAN); // Reset / clear
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        // TODO Temporary cancel advancements because of 'Non [a-z0-9/._-] character in path of location: minecraft:? https://fs.matsv.nl/media?id=auwje4z4lxw.png
-                        wrapper.cancel();
+                        int mappingSize = wrapper.passthrough(Type.VAR_INT);
+                        for (int i = 0; i < mappingSize; i++) {
+                            wrapper.passthrough(Type.STRING); // Identifier
+                            // Advancement start
+                            boolean hasParent = wrapper.passthrough(Type.BOOLEAN);
+                            if (hasParent) wrapper.passthrough(Type.STRING); // Parent id
+                            boolean hasDisplay = wrapper.passthrough(Type.BOOLEAN);
+                            if (hasDisplay) {
+                                // Display start
+                                wrapper.passthrough(Type.STRING); // Title - Chat
+                                wrapper.passthrough(Type.STRING); // Description - Chat
+                                Item icon = wrapper.read(Type.ITEM);
+                                wrapper.write(Type.FLAT_ITEM, icon);
+                                InventoryPackets.toClient(icon);
+                                wrapper.passthrough(Type.VAR_INT); // Frame type
+                                int flags = wrapper.passthrough(Type.INT); // Flags
+                                if ((flags & 1) != 0) wrapper.passthrough(Type.STRING); // Background texture
+                                wrapper.passthrough(Type.FLOAT); // X coord
+                                wrapper.passthrough(Type.FLOAT); // Y coord
+                                // Display end
+                            }
+                            int numberOfCriteria = wrapper.passthrough(Type.VAR_INT); // Number of criteria
+                            for (int x = 0; x < numberOfCriteria; x++) {
+                                wrapper.passthrough(Type.STRING); // Criteria identifier
+                                wrapper.passthrough(Type.NOTHING); // nothing
+                            }
+                            int numberOfRequirements = wrapper.passthrough(Type.VAR_INT);
+                            for (int x = 0; x < numberOfRequirements; x++) {
+                                int criteriasLength = wrapper.passthrough(Type.VAR_INT);
+                                for (int z = 0; z < criteriasLength; z++) {
+                                    wrapper.passthrough(Type.STRING);
+                                }
+                            }
+                            // Advancement end
+                        }
                     }
                 });
             }
