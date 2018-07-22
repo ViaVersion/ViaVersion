@@ -228,7 +228,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         if (id == 1010) { // Play record
                             wrapper.set(Type.INT, 1, data = MappingData.oldToNewItems.get(data << 4));
                         } else if (id == 2001) { // Block break + block break sound
-                            wrapper.set(Type.INT, 1, data = WorldPackets.toNewId(data << 4));
+                            int blockId = 12 & 0xFFF;
+                            int blockData = data >> 12;
+                            wrapper.set(Type.INT, 1, data = WorldPackets.toNewId(blockId << 4 | blockData));
                         }
                     }
                 });
