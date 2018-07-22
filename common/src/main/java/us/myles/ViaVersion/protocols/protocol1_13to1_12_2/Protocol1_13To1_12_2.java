@@ -456,7 +456,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4D, 0x51, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BOOLEAN); // Reset / clear
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
