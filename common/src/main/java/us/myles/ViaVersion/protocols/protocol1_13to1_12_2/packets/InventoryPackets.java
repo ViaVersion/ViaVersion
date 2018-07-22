@@ -84,7 +84,7 @@ public class InventoryPackets {
 
                             // Reset the packet
                             wrapper.clearPacket();
-                            wrapper.setId(0x4B);
+                            wrapper.setId(0x4C);
 
                             byte flags = 0;
                             wrapper.write(Type.BYTE, flags); // Placeholder
