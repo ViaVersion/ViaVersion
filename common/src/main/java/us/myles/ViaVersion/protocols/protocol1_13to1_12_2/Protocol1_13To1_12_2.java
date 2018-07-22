@@ -473,7 +473,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             if (wrapper.passthrough(Type.BOOLEAN)) {
                                 wrapper.passthrough(Type.STRING); // Title
                                 wrapper.passthrough(Type.STRING); // Description
-                                wrapper.write(Type.FLAT_ITEM, wrapper.read(Type.ITEM)); // Translate item to flat item
+                                Item icon = wrapper.read(Type.ITEM);
+                                InventoryPackets.toClient(icon);
+                                wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
                                 wrapper.passthrough(Type.VAR_INT); // Frame type
                                 int flags = wrapper.passthrough(Type.INT); // Flags
                                 if ((flags & 1) != 0)
