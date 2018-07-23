@@ -840,7 +840,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
     }
 
     private int getNewSoundID(final int oldID) {
-        return MappingData.oldToNewSounds.get(oldID);
+        return MappingData.blockMappings.getNewBlock(oldID);
     }
 
     // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java

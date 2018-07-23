@@ -339,7 +339,7 @@ public class WorldPackets {
     }
 
     public static int toNewId(int oldId) {
-        short newId = MappingData.blockMappings.getNewBlock(oldId);
+        int newId = MappingData.blockMappings.getNewBlock(oldId);
         if (newId != -1) {
             return newId;
         }

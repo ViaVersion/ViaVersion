@@ -20,7 +20,7 @@ public class MappingData {
     public static Map<String, Integer[]> itemTags = new HashMap<>();
     public static Map<String, Integer[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
-    public static Map<Integer, Integer> oldToNewSounds = new HashMap<>();
+    public static SoundMappings soundMappings;
     public static BlockMappings blockMappings;
 
     public static void init() {
@@ -29,7 +29,7 @@ public class MappingData {
 
         // TODO: Remove how verbose this is
         System.out.println("Loading block mapping...");
-        blockMappings = new BlockMappingsShortArray(mapping1_12, mapping1_13);
+        blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
         System.out.println("Loading item mapping...");
         mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
         System.out.println("Loading new tags...");
@@ -39,7 +39,7 @@ public class MappingData {
         System.out.println("Loading enchantments...");
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
         System.out.println("Loading sound mapping...");
-        mapIdentifiers(oldToNewSounds, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
+        soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
     }
 
     private static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
@@ -63,7 +63,7 @@ public class MappingData {
         return null;
     }
 
-    private static void mapIdentifiers(Map<Integer, Integer> output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
+    private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
         for (int i = 0; i < oldIdentifiers.size(); i++) {
             JsonElement v = oldIdentifiers.get(i);
             Integer index = findIndex(newIdentifiers, v.getAsString());
@@ -71,7 +71,7 @@ public class MappingData {
                 System.out.println("No key for " + v + " :( ");
                 continue;
             }
-            output.put(i, index);
+            output[i] = index.shortValue();
         }
     }
 
@@ -129,7 +129,7 @@ public class MappingData {
     }
 
     public interface BlockMappings {
-        short getNewBlock(int old);
+        int getNewBlock(int old);
     }
 
     private static class BlockMappingsShortArray implements BlockMappings {
@@ -137,11 +137,29 @@ public class MappingData {
 
         private BlockMappingsShortArray(JsonObject mapping1_12, JsonObject mapping1_13) {
             Arrays.fill(oldToNew, (short) -1);
-            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
+            mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
         }
 
         @Override
-        public short getNewBlock(int old) {
+        public int getNewBlock(int old) {
+            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
+        }
+    }
+
+    public interface SoundMappings {
+        int getNewSound(int old);
+    }
+
+    private static class SoundMappingShortArray implements SoundMappings {
+        private short[] oldToNew = new short[662];
+
+        private SoundMappingShortArray(JsonArray mapping1_12, JsonArray mapping1_13) {
+            Arrays.fill(oldToNew, (short) -1);
+            mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
+        }
+
+        @Override
+        public int getNewSound(int old) {
             return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
         }
     }
