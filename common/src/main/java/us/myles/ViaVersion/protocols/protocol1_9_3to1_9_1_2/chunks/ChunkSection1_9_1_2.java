@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
@@ -348,11 +347,14 @@ public class ChunkSection1_9_1_2 implements ChunkSection {
 
     private int countBytes(int value) throws Exception {
         // Count amount of bytes that would be sent if the value were sent as a VarInt
-        ByteBuf buf = Unpooled.buffer();
-        Type.VAR_INT.write(buf, value);
-        buf.readerIndex(0);
-        int bitCount = buf.readableBytes();
-        buf.release();
-        return bitCount;
+        if ((value & (~0 << 7)) == 0)
+            return 1;
+        if ((value & (~0 << 14)) == 0)
+            return 2;
+        if ((value & (~0 << 21)) == 0)
+            return 3;
+        if ((value & (~0 << 28)) == 0)
+            return 4;
+        return 5;
     }
 }
