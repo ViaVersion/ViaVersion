@@ -215,21 +215,21 @@ public class WorldPackets {
                             if (section == null)
                                 continue;
 
-                            // TODO improve performance
+                            for (int p = 0; p < section.getPalette().size(); p++) {
+                                int old = section.getPalette().get(p);
+                                section.getPalette().set(p, toNewId(old));
+                            }
+
                             for (int x = 0; x < 16; x++) {
                                 for (int y = 0; y < 16; y++) {
                                     for (int z = 0; z < 16; z++) {
                                         int block = section.getBlock(x, y, z);
-
-                                        int newId = toNewId(block);
-                                        section.setFlatBlock(x, y, z, newId);
-
-                                        if (storage.isWelcome(newId)) {
+                                        if (storage.isWelcome(block)) {
                                             storage.store(new Position(
                                                     (long) (x + (chunk.getX() << 4)),
                                                     (long) (y + (i << 4)),
                                                     (long) (z + (chunk.getZ() << 4))
-                                            ), newId);
+                                            ), block);
                                         }
                                     }
                                 }
