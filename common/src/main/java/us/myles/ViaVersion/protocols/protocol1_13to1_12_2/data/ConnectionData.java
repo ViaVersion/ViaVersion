@@ -2,11 +2,14 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
+import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,7 +39,7 @@ public class ConnectionData extends StoredObject  {
 	}
 
 	public int get(Position position) {
-		return blockStorage.containsKey(position) ? blockStorage.get(position) : 0;
+		return blockStorage.containsKey(position) ? blockStorage.get(position) : -1;
 	}
 
 	public void remove(Position position) {
@@ -62,6 +65,32 @@ public class ConnectionData extends StoredObject  {
 		);
 		store(position, blockState);
 		return blockState;
+	}
+
+	public void update(Position position) {
+		for (int x = -1; x <= 1; x++) {
+			for (int z = -1; z <= 1; z++) {
+				for (int y = -1; y <= 1; y++) {
+					if (Math.abs(x) + Math.abs(y) + Math.abs(z) != 1) continue;
+					Position pos = new Position(position.getX() + x, position.getY() + y, position.getZ() + z);
+					int blockState = get(pos);
+					if (!connects(blockState)) continue;
+					int newBlockState = connect(pos, blockState);
+					if (newBlockState == blockState) continue;
+					store(pos, newBlockState);
+
+
+					PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, getUser());
+					blockUpdatePacket.write(Type.POSITION, pos);
+					blockUpdatePacket.write(Type.VAR_INT, newBlockState);
+					try {
+						blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, false);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	public void connectBlocks(Chunk chunk) {
