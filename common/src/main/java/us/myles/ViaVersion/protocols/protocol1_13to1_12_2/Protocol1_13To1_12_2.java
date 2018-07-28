@@ -807,6 +807,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
         userConnection.put(new BlockStorage(userConnection));
+        userConnection.put(new ConnectionData(userConnection));
     }
 
     @Override

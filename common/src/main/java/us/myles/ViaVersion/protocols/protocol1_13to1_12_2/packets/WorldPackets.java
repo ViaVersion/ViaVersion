@@ -95,8 +95,16 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        ConnectionData connectionData = wrapper.user().get(ConnectionData.class);
+
                         Position position = wrapper.get(Type.POSITION, 0);
                         int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
+
+                        if (connectionData.isWelcome(newId)) {
+                            newId = connectionData.connect(position, newId);
+                        } else {
+                            connectionData.remove(position);
+                        }
 
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                     }
@@ -114,6 +122,8 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        ConnectionData connectionData = wrapper.user().get(ConnectionData.class);
+
                         int chunkX = wrapper.get(Type.INT, 0);
                         int chunkZ = wrapper.get(Type.INT, 1);
                         // Convert ids
@@ -123,6 +133,13 @@ public class WorldPackets {
                                     (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
                                     (long) record.getY(),
                                     (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+
+                            if (connectionData.isWelcome(newBlock)) {
+                                newBlock = connectionData.connect(position, newBlock);
+                            } else {
+                                connectionData.remove(position);
+                            }
+
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
                     }
@@ -142,6 +159,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         BlockStorage storage = wrapper.user().get(BlockStorage.class);
+                        ConnectionData connectionData = wrapper.user().get(ConnectionData.class);
 
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
@@ -169,31 +187,20 @@ public class WorldPackets {
                                                     (long) (z + (chunk.getZ() << 4))
                                             ), newId);
                                         }
-                                    }
-                                }
-                            }
 
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 16; y++) {
-                                    for (int z = 0; z < 16; z++) {
-                                        int block = section.getBlock(x, y, z);
-
-                                        if (ConnectionData.connects(block)) {
-                                            block = ConnectionData.connect(
-                                                    block,
-                                                    z == 0 ? 0 : section.getBlock(x, y, z - 1),
-                                                    x == 15 ? 0 : section.getBlock(x + 1, y, z),
-                                                    z == 15 ? 0 : section.getBlock(x, y, z + 1),
-                                                    x == 0 ? 0 : section.getBlock(x - 1, y, z),
-                                                    y == 15 ? 0 : section.getBlock(x, y + 1, z),
-                                                    y == 0 ? 0 : section.getBlock(x, y - 1, z)
-                                            );
-                                            section.setFlatBlock(x, y, z, block);
+                                        if (connectionData.isWelcome(newId)) {
+                                            connectionData.store(new Position(
+                                                    (long) (x + (chunk.getX() << 4)),
+                                                    (long) (y + (i << 4)),
+                                                    (long) (z + (chunk.getZ() << 4))
+                                            ), newId);
                                         }
                                     }
                                 }
                             }
                         }
+
+                        connectionData.connectBlocks(chunk);
 
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
