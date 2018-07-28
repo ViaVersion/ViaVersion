@@ -102,6 +102,17 @@ public class ConnectionData extends StoredObject  {
 							section.setFlatBlock(x, y, z, block);
 							store(xOff + x, yOff + y, zOff + z, block);
 						}
+
+						if (x == 0) {
+							update(new Position(xOff - 1, yOff + y, zOff + z));
+						} else if (x == 15) {
+							update(new Position(xOff + 16, yOff + y, zOff + z));
+						}
+						if (z == 0) {
+							update(new Position(xOff + x, yOff + y, zOff - 1));
+						} else if (z == 15) {
+							update(new Position(xOff + x, yOff + y, zOff + 16));
+						}
 					}
 				}
 			}
@@ -126,6 +137,7 @@ public class ConnectionData extends StoredObject  {
 
 		FenceConnectionHandler.init();
 		GlassConnectionHandler.init();
+		ChestConnectionHandler.init();
 	}
 
 	public static boolean isWelcome(int blockState) {
@@ -205,16 +217,13 @@ public class ConnectionData extends StoredObject  {
 			baseFences.add("minecraft:acacia_fence");
 			baseFences.add("minecraft:spruce_fence");
 
+			FenceConnectionHandler connectionHandler = new FenceConnectionHandler();
 			for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
 				String key = blockState.getKey().split("\\[")[0];
 				if (baseFences.contains(key)) {
 					fences.put(blockState.getValue(), key);
+					connectionHandlerMap.put(blockState.getValue(), connectionHandler);
 				}
-			}
-
-			FenceConnectionHandler connectionHandler = new FenceConnectionHandler();
-			for (Integer fence : fences.keySet()) {
-				connectionHandlerMap.put(fence, connectionHandler);
 			}
 		}
 
@@ -236,47 +245,44 @@ public class ConnectionData extends StoredObject  {
 	}
 
     private static class GlassConnectionHandler implements ConnectionHandler {
-        private static HashSet<String> baseGlass = new HashSet<>();
-        private static Map<Integer, String> glasses = new HashMap<>();
+        private static HashSet<String> basePanes = new HashSet<>();
+        private static Map<Integer, String> panes = new HashMap<>();
 
         private static void init() {
-            baseGlass.add("minecraft:white_stained_glass_pane");
-            baseGlass.add("minecraft:orange_stained_glass_pane");
-            baseGlass.add("minecraft:magenta_stained_glass_pane");
-            baseGlass.add("minecraft:light_blue_stained_glass_pane");
-            baseGlass.add("minecraft:yellow_stained_glass_pane");
-            baseGlass.add("minecraft:lime_stained_glass_pane");
+            basePanes.add("minecraft:white_stained_glass_pane");
+            basePanes.add("minecraft:orange_stained_glass_pane");
+            basePanes.add("minecraft:magenta_stained_glass_pane");
+            basePanes.add("minecraft:light_blue_stained_glass_pane");
+            basePanes.add("minecraft:yellow_stained_glass_pane");
+            basePanes.add("minecraft:lime_stained_glass_pane");
 
-            baseGlass.add("minecraft:pink_stained_glass_pane");
-            baseGlass.add("minecraft:gray_stained_glass_pane");
-            baseGlass.add("minecraft:light_gray_stained_glass_pane");
-            baseGlass.add("minecraft:cyan_stained_glass_pane");
-            baseGlass.add("minecraft:purple_stained_glass_pane");
-            baseGlass.add("minecraft:blue_stained_glass_pane");
+            basePanes.add("minecraft:pink_stained_glass_pane");
+            basePanes.add("minecraft:gray_stained_glass_pane");
+            basePanes.add("minecraft:light_gray_stained_glass_pane");
+            basePanes.add("minecraft:cyan_stained_glass_pane");
+            basePanes.add("minecraft:purple_stained_glass_pane");
+            basePanes.add("minecraft:blue_stained_glass_pane");
 
-            baseGlass.add("minecraft:brown_stained_glass_pane");
-            baseGlass.add("minecraft:green_stained_glass_pane");
-            baseGlass.add("minecraft:red_stained_glass_pane");
-            baseGlass.add("minecraft:black_stained_glass_pane");
-            baseGlass.add("minecraft:glass_pane");
-            baseGlass.add("minecraft:iron_bars");
+            basePanes.add("minecraft:brown_stained_glass_pane");
+            basePanes.add("minecraft:green_stained_glass_pane");
+            basePanes.add("minecraft:red_stained_glass_pane");
+            basePanes.add("minecraft:black_stained_glass_pane");
+            basePanes.add("minecraft:glass_pane");
+            basePanes.add("minecraft:iron_bars");
 
+	        GlassConnectionHandler connectionHandler = new GlassConnectionHandler();
             for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
                 String key = blockState.getKey().split("\\[")[0];
-                if (baseGlass.contains(key)) {
-                    glasses.put(blockState.getValue(), key);
+                if (basePanes.contains(key)) {
+                    panes.put(blockState.getValue(), key);
+	                connectionHandlerMap.put(blockState.getValue(), connectionHandler);
                 }
-            }
-
-            FenceConnectionHandler connectionHandler = new FenceConnectionHandler();
-            for (Integer fence : glasses.keySet()) {
-                connectionHandlerMap.put(fence, connectionHandler);
             }
         }
 
         @Override
         public int connect(Position position, int blockState, ConnectionData connectionData) {
-            String key = glasses.get(blockState) + '[' +
+            String key = panes.get(blockState) + '[' +
 		                         "east=" + connects(BlockFace.EAST, connectionData.get(getRelative(position, BlockFace.EAST))) + ',' +
 		                         "north=" + connects(BlockFace.NORTH, connectionData.get(getRelative(position, BlockFace.NORTH))) + ',' +
 		                         "south=" + connects(BlockFace.SOUTH, connectionData.get(getRelative(position, BlockFace.SOUTH))) + ',' +
@@ -287,7 +293,46 @@ public class ConnectionData extends StoredObject  {
         }
 
         private boolean connects(BlockFace side, int blockState) {
-            return glasses.containsKey(blockState) || solidBlocks.containsKey(blockState) && solidBlocks.get(blockState).contains(side.opposite());
+            return panes.containsKey(blockState) || solidBlocks.containsKey(blockState) && solidBlocks.get(blockState).contains(side.opposite());
+        }
+    }
+
+    private static class ChestConnectionHandler implements ConnectionHandler {
+        private static Map<Integer, BlockFace> chests = new HashMap<>();
+
+        private static void init() {
+	        ChestConnectionHandler connectionHandler = new ChestConnectionHandler();
+            for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
+                if (blockState.getKey().startsWith("minecraft:chest")) {
+                	String facing = blockState.getKey().substring(23);
+                	facing = facing.substring(0, facing.indexOf(','));
+                	facing = facing.toUpperCase();
+                    chests.put(blockState.getValue(), BlockFace.valueOf(facing));
+	                connectionHandlerMap.put(blockState.getValue(), connectionHandler);
+                }
+            }
+        }
+
+        @Override
+        public int connect(Position position, int blockState, ConnectionData connectionData) {
+        	BlockFace facing = chests.get(blockState);
+        	String type = "single";
+        	if (chests.containsKey(connectionData.get(getRelative(position, BlockFace.NORTH)))) {
+				type = facing == BlockFace.WEST ? "right" : "left";
+	        } else if (chests.containsKey(connectionData.get(getRelative(position, BlockFace.SOUTH)))) {
+		        type = facing == BlockFace.EAST ? "right" : "left";
+	        } else if (chests.containsKey(connectionData.get(getRelative(position, BlockFace.WEST)))) {
+		        type = facing == BlockFace.NORTH ? "right" : "left";
+	        } else if (chests.containsKey(connectionData.get(getRelative(position, BlockFace.EAST)))) {
+		        type = facing == BlockFace.SOUTH ? "right" : "left";
+	        }
+
+            String key = "minecraft:chest" + '[' +
+		                         "facing=" + facing.name().toLowerCase() + ',' +
+		                         "type=" + type + ',' +
+		                         "waterlogged=false" +
+		                         ']';
+            return getId(key);
         }
     }
 }

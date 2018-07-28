@@ -159,13 +159,6 @@ public class WorldPackets {
 			                    blockState = connectionData.connect(position, blockState);
 			                    record.setBlockId(blockState);
 		                    }
-	                    }
-
-                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-	                        Position position = new Position(
-			                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-			                        (long) record.getY(),
-			                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
 	                        connectionData.update(position);
 	                    }
