@@ -118,7 +118,7 @@ public class ConnectionData extends StoredObject  {
 	}
 
 	public static boolean isWelcome(int blockState) {
-		return connectionHandlerMap.containsKey(blockState);
+		return connectionHandlerMap.containsKey(blockState) || solidBlocks.containsKey(blockState);
 	}
 
 	public static boolean connects(int blockState) {
@@ -155,7 +155,6 @@ public class ConnectionData extends StoredObject  {
 
 		private static void init() {
 			baseFences.add("minecraft:oak_fence");
-			baseFences.add("minecraft:nether_brick_fence");
 			baseFences.add("minecraft:birch_fence");
 			baseFences.add("minecraft:jungle_fence");
 			baseFences.add("minecraft:dark_oak_fence");
