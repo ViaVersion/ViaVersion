@@ -14,6 +14,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
@@ -167,6 +168,27 @@ public class WorldPackets {
                                                     (long) (y + (i << 4)),
                                                     (long) (z + (chunk.getZ() << 4))
                                             ), newId);
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (int x = 0; x < 16; x++) {
+                                for (int y = 0; y < 16; y++) {
+                                    for (int z = 0; z < 16; z++) {
+                                        int block = section.getBlock(x, y, z);
+
+                                        if (ConnectionData.connects(block)) {
+                                            block = ConnectionData.connect(
+                                                    block,
+                                                    z == 0 ? 0 : section.getBlock(x, y, z - 1),
+                                                    x == 15 ? 0 : section.getBlock(x + 1, y, z),
+                                                    z == 15 ? 0 : section.getBlock(x, y, z + 1),
+                                                    x == 0 ? 0 : section.getBlock(x - 1, y, z),
+                                                    y == 15 ? 0 : section.getBlock(x, y + 1, z),
+                                                    y == 0 ? 0 : section.getBlock(x, y - 1, z)
+                                            );
+                                            section.setFlatBlock(x, y, z, block);
                                         }
                                     }
                                 }
