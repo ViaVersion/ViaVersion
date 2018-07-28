@@ -32,7 +32,6 @@ public class MetadataRewriter {
                         metadata.setValue(++data);
                     }
                 }
-                // TODO: Boat has changed
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
