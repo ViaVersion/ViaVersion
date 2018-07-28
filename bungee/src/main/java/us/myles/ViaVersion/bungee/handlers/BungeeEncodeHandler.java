@@ -69,9 +69,13 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         }
 
         if (needsCompress) {
+            ByteBuf old = bytebuf;
             bytebuf = BungeePipelineUtil.compress(ctx, bytebuf);
+            old.release();
+            out.add(bytebuf);
+        } else {
+            out.add(bytebuf.retain());
         }
-        out.add(bytebuf.retain());
     }
 
     @Override
