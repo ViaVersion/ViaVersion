@@ -229,6 +229,7 @@ public class ConnectionData extends StoredObject  {
             baseGlass.add("minecraft:green_stained_glass_pane");
             baseGlass.add("minecraft:red_stained_glass_pane");
             baseGlass.add("minecraft:black_stained_glass_pane");
+            baseGlass.add("minecraft:glass_pane");
 
             for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
                 String key = blockState.getKey().split("\\[")[0];
@@ -256,8 +257,62 @@ public class ConnectionData extends StoredObject  {
         }
 
         private boolean connects(BlockFace side, int blockState) {
-            //TODO solid blocks
-            return glasses.containsKey(blockState);
+            return glasses.containsKey(blockState) || solidBlocks.containsKey(blockState) && solidBlocks.get(blockState).contains(side.opposite());
+        }
+    }
+
+    private static class RedstoneConnectionHandler implements ConnectionHandler {
+        private static HashSet<String> baseGlass = new HashSet<>();
+        private static Map<Integer, String> glasses = new HashMap<>();
+
+        private static void init() {
+            baseGlass.add("minecraft:white_stained_glass_pane");
+            baseGlass.add("minecraft:orange_stained_glass_pane");
+            baseGlass.add("minecraft:magenta_stained_glass_pane");
+            baseGlass.add("minecraft:light_blue_stained_glass_pane");
+            baseGlass.add("minecraft:yellow_stained_glass_pane");
+            baseGlass.add("minecraft:lime_stained_glass_pane");
+
+            baseGlass.add("minecraft:pink_stained_glass_pane");
+            baseGlass.add("minecraft:gray_stained_glass_pane");
+            baseGlass.add("minecraft:light_gray_stained_glass_pane");
+            baseGlass.add("minecraft:cyan_stained_glass_pane");
+            baseGlass.add("minecraft:purple_stained_glass_pane");
+            baseGlass.add("minecraft:blue_stained_glass_pane");
+
+            baseGlass.add("minecraft:brown_stained_glass_pane");
+            baseGlass.add("minecraft:green_stained_glass_pane");
+            baseGlass.add("minecraft:red_stained_glass_pane");
+            baseGlass.add("minecraft:black_stained_glass_pane");
+            baseGlass.add("minecraft:glass_pane");
+
+            for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
+                String key = blockState.getKey().split("\\[")[0];
+                if (baseGlass.contains(key)) {
+                    glasses.put(blockState.getValue(), key);
+                }
+            }
+
+            FenceConnectionHandler connectionHandler = new FenceConnectionHandler();
+            for (Integer fence : glasses.keySet()) {
+                connectionHandlerMap.put(fence, connectionHandler);
+            }
+        }
+
+        @Override
+        public int connect(int blockState, int north, int east, int south, int west, int top, int bottom) {
+            String key = glasses.get(blockState) + '[' +
+                    "east=" + connects(BlockFace.EAST, east) + ',' +
+                    "north=" + connects(BlockFace.NORTH, north) + ',' +
+                    "south=" + connects(BlockFace.SOUTH, south) + ',' +
+                    "waterlogged=false," +
+                    "west=" + connects(BlockFace.WEST, west) +
+                    ']';
+            return getId(key);
+        }
+
+        private boolean connects(BlockFace side, int blockState) {
+            return glasses.containsKey(blockState) || solidBlocks.containsKey(blockState) && solidBlocks.get(blockState).contains(side.opposite());
         }
     }
 }
