@@ -51,18 +51,7 @@ public class ConnectionData extends StoredObject  {
 	}
 
 	public int connect(Position position, int blockState) {
-		long x = position.getX();
-		long y = position.getY();
-		long z = position.getZ();
-		blockState = ConnectionData.connect(
-				blockState,
-				get(x, y, z - 1),
-				get(x + 1, y, z),
-				get(x, y, z + 1),
-				get(x - 1, y, z),
-				get(x, y + 1, z),
-				get(x, y - 1, z)
-		);
+		blockState = ConnectionData.connect(position, blockState, this);
 		store(position, blockState);
 		return blockState;
 	}
@@ -109,15 +98,7 @@ public class ConnectionData extends StoredObject  {
 						int block = section.getBlock(x, y, z);
 
 						if (ConnectionData.connects(block)) {
-							block = ConnectionData.connect(
-									block,
-									get(xOff + x, yOff + y, zOff + z - 1),
-									get(xOff + x + 1, yOff + y, zOff + z),
-									get(xOff + x, yOff + y, zOff + z + 1),
-									get(xOff + x - 1, yOff + y, zOff + z),
-									get(xOff + x, yOff + y + 1, zOff + z),
-									get(xOff + x, yOff + y - 1, zOff + z)
-							);
+							block = ConnectionData.connect(new Position(xOff+ x, yOff + y, zOff + z), block, this);
 							section.setFlatBlock(x, y, z, block);
 							store(xOff + x, yOff + y, zOff + z, block);
 						}
@@ -155,9 +136,9 @@ public class ConnectionData extends StoredObject  {
 		return connectionHandlerMap.containsKey(blockState);
 	}
 
-	public static int connect(int blockState, int north, int east, int south, int west, int top, int bottom) {
+	public static int connect(Position position, int blockState, ConnectionData connectionData) {
 		if (connectionHandlerMap.containsKey(blockState)) {
-			return connectionHandlerMap.get(blockState).connect(blockState, north, east, south, west, top, bottom);
+			return connectionHandlerMap.get(blockState).connect(position, blockState, connectionData);
 		} else {
 			return blockState;
 		}
@@ -169,6 +150,25 @@ public class ConnectionData extends StoredObject  {
 
 	public static String getKey(int id) {
 		return idToKey.get(id);
+	}
+
+	private static Position getRelative(Position position, BlockFace face) {
+		switch (face) {
+			case NORTH:
+				return new Position(position.getX(), position.getY(), position.getZ() - 1);
+			case SOUTH:
+				return new Position(position.getX(), position.getY(), position.getZ() + 1);
+			case EAST:
+				return new Position(position.getX() + 1, position.getY(), position.getZ());
+			case WEST:
+				return new Position(position.getX() - 1, position.getY(), position.getZ());
+			case TOP:
+				return new Position(position.getX(), position.getY() + 1, position.getZ() - 1);
+			case BOTTOM:
+				return new Position(position.getX(), position.getY() - 1, position.getZ() - 1);
+			default:
+				return position;
+		}
 	}
 
 	private enum BlockFace {
@@ -190,7 +190,7 @@ public class ConnectionData extends StoredObject  {
 	}
 
 	private interface ConnectionHandler {
-		public int connect(int blockState, int north, int east, int south, int west, int top, int bottom);
+		public int connect(Position position, int blockState, ConnectionData connectionData);
 	}
 
 	private static class FenceConnectionHandler implements ConnectionHandler {
@@ -219,13 +219,13 @@ public class ConnectionData extends StoredObject  {
 		}
 
 		@Override
-		public int connect(int blockState, int north, int east, int south, int west, int top, int bottom) {
+		public int connect(Position position, int blockState, ConnectionData connectionData) {
 			String key = fences.get(blockState) + '[' +
-					             "east=" + connects(BlockFace.EAST, east) + ',' +
-					             "north=" + connects(BlockFace.NORTH, north) + ',' +
-					             "south=" + connects(BlockFace.SOUTH, south) + ',' +
+					             "east=" + connects(BlockFace.EAST, connectionData.get(getRelative(position, BlockFace.EAST))) + ',' +
+					             "north=" + connects(BlockFace.NORTH, connectionData.get(getRelative(position, BlockFace.NORTH))) + ',' +
+					             "south=" + connects(BlockFace.SOUTH, connectionData.get(getRelative(position, BlockFace.SOUTH))) + ',' +
 					             "waterlogged=false," +
-					             "west=" + connects(BlockFace.WEST, west) +
+					             "west=" + connects(BlockFace.WEST, connectionData.get(getRelative(position, BlockFace.WEST))) +
 					             ']';
 			return getId(key);
 		}
@@ -259,6 +259,7 @@ public class ConnectionData extends StoredObject  {
             baseGlass.add("minecraft:red_stained_glass_pane");
             baseGlass.add("minecraft:black_stained_glass_pane");
             baseGlass.add("minecraft:glass_pane");
+            baseGlass.add("minecraft:iron_bars");
 
             for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
                 String key = blockState.getKey().split("\\[")[0];
@@ -274,69 +275,14 @@ public class ConnectionData extends StoredObject  {
         }
 
         @Override
-        public int connect(int blockState, int north, int east, int south, int west, int top, int bottom) {
+        public int connect(Position position, int blockState, ConnectionData connectionData) {
             String key = glasses.get(blockState) + '[' +
-                    "east=" + connects(BlockFace.EAST, east) + ',' +
-                    "north=" + connects(BlockFace.NORTH, north) + ',' +
-                    "south=" + connects(BlockFace.SOUTH, south) + ',' +
-                    "waterlogged=false," +
-                    "west=" + connects(BlockFace.WEST, west) +
-                    ']';
-            return getId(key);
-        }
-
-        private boolean connects(BlockFace side, int blockState) {
-            return glasses.containsKey(blockState) || solidBlocks.containsKey(blockState) && solidBlocks.get(blockState).contains(side.opposite());
-        }
-    }
-
-    private static class RedstoneConnectionHandler implements ConnectionHandler {
-        private static HashSet<String> baseGlass = new HashSet<>();
-        private static Map<Integer, String> glasses = new HashMap<>();
-
-        private static void init() {
-            baseGlass.add("minecraft:white_stained_glass_pane");
-            baseGlass.add("minecraft:orange_stained_glass_pane");
-            baseGlass.add("minecraft:magenta_stained_glass_pane");
-            baseGlass.add("minecraft:light_blue_stained_glass_pane");
-            baseGlass.add("minecraft:yellow_stained_glass_pane");
-            baseGlass.add("minecraft:lime_stained_glass_pane");
-
-            baseGlass.add("minecraft:pink_stained_glass_pane");
-            baseGlass.add("minecraft:gray_stained_glass_pane");
-            baseGlass.add("minecraft:light_gray_stained_glass_pane");
-            baseGlass.add("minecraft:cyan_stained_glass_pane");
-            baseGlass.add("minecraft:purple_stained_glass_pane");
-            baseGlass.add("minecraft:blue_stained_glass_pane");
-
-            baseGlass.add("minecraft:brown_stained_glass_pane");
-            baseGlass.add("minecraft:green_stained_glass_pane");
-            baseGlass.add("minecraft:red_stained_glass_pane");
-            baseGlass.add("minecraft:black_stained_glass_pane");
-            baseGlass.add("minecraft:glass_pane");
-
-            for (Map.Entry<String, Integer> blockState : keyToId.entrySet()) {
-                String key = blockState.getKey().split("\\[")[0];
-                if (baseGlass.contains(key)) {
-                    glasses.put(blockState.getValue(), key);
-                }
-            }
-
-            FenceConnectionHandler connectionHandler = new FenceConnectionHandler();
-            for (Integer fence : glasses.keySet()) {
-                connectionHandlerMap.put(fence, connectionHandler);
-            }
-        }
-
-        @Override
-        public int connect(int blockState, int north, int east, int south, int west, int top, int bottom) {
-            String key = glasses.get(blockState) + '[' +
-                    "east=" + connects(BlockFace.EAST, east) + ',' +
-                    "north=" + connects(BlockFace.NORTH, north) + ',' +
-                    "south=" + connects(BlockFace.SOUTH, south) + ',' +
-                    "waterlogged=false," +
-                    "west=" + connects(BlockFace.WEST, west) +
-                    ']';
+		                         "east=" + connects(BlockFace.EAST, connectionData.get(getRelative(position, BlockFace.EAST))) + ',' +
+		                         "north=" + connects(BlockFace.NORTH, connectionData.get(getRelative(position, BlockFace.NORTH))) + ',' +
+		                         "south=" + connects(BlockFace.SOUTH, connectionData.get(getRelative(position, BlockFace.SOUTH))) + ',' +
+		                         "waterlogged=false," +
+		                         "west=" + connects(BlockFace.WEST, connectionData.get(getRelative(position, BlockFace.WEST))) +
+		                         ']';
             return getId(key);
         }
 
