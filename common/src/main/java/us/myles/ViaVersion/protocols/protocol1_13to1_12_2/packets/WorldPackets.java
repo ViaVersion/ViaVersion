@@ -100,8 +100,10 @@ public class WorldPackets {
                         Position position = wrapper.get(Type.POSITION, 0);
                         int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
-                        if (connectionData.isWelcome(newId)) {
+                        if (connectionData.connects(newId)) {
                             newId = connectionData.connect(position, newId);
+                        } else if (connectionData.isWelcome(newId)) {
+                            connectionData.store(position, newId);
                         } else {
                             connectionData.remove(position);
                         }
@@ -135,13 +137,27 @@ public class WorldPackets {
                                     (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
                             if (connectionData.isWelcome(newBlock)) {
-                                newBlock = connectionData.connect(position, newBlock);
+                            	connectionData.store(position, newBlock);
                             } else {
-                                connectionData.remove(position);
+	                            connectionData.remove(position);
                             }
 
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
+
+                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
+                        	int blockState = record.getBlockId();
+
+	                        Position position = new Position(
+			                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+			                        (long) record.getY(),
+			                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+
+		                    if (connectionData.connects(blockState)) {
+			                    blockState = connectionData.connect(position, blockState);
+			                    record.setBlockId(blockState);
+		                    }
+	                    }
                     }
                 });
             }

@@ -118,7 +118,7 @@ public class ConnectionData extends StoredObject  {
 	}
 
 	public static boolean isWelcome(int blockState) {
-		return connectionHandlerMap.containsKey(blockState) || solidBlocks.containsKey(blockState);
+		return solidBlocks.containsKey(blockState) || connectionHandlerMap.containsKey(blockState);
 	}
 
 	public static boolean connects(int blockState) {
@@ -143,6 +143,20 @@ public class ConnectionData extends StoredObject  {
 
 	private enum BlockFace {
 		NORTH, SOUTH, EAST, WEST, TOP, BOTTOM;
+
+		private static Map<BlockFace, BlockFace> opposites = new HashMap<>();
+		static {
+			opposites.put(BlockFace.NORTH, BlockFace.SOUTH);
+			opposites.put(BlockFace.SOUTH, BlockFace.NORTH);
+			opposites.put(BlockFace.EAST, BlockFace.WEST);
+			opposites.put(BlockFace.WEST, BlockFace.EAST);
+			opposites.put(BlockFace.TOP, BlockFace.BOTTOM);
+			opposites.put(BlockFace.BOTTOM, BlockFace.TOP);
+		}
+
+		public BlockFace opposite() {
+			return opposites.get(this);
+		}
 	}
 
 	private interface ConnectionHandler {
@@ -187,8 +201,7 @@ public class ConnectionData extends StoredObject  {
 		}
 
 		private boolean connects(BlockFace side, int blockState) {
-			//TODO solid blocks
-			return fences.containsKey(blockState);
+			return fences.containsKey(blockState) || solidBlocks.containsKey(blockState) && solidBlocks.get(blockState).contains(side.opposite());
 		}
 	}
 }
