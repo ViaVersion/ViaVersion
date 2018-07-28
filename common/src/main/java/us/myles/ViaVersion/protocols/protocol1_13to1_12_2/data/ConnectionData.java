@@ -27,7 +27,7 @@ public class ConnectionData extends StoredObject  {
 	}
 
 	public void store(Position position, int blockState) {
-		if (!connectionHandlerMap.containsKey(blockState)) return;
+		if (!isWelcome(blockState)) return;
 		blockStorage.put(position, blockState);
 	}
 
