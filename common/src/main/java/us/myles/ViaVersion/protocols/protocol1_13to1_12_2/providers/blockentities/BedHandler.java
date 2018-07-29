@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentiti
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
@@ -15,7 +16,7 @@ public class BedHandler implements BlockEntityProvider.BlockEntityHandler {
         Position position = new Position(getLong(tag.get("x")), getLong(tag.get("y")), getLong(tag.get("z")));
 
         if (!storage.contains(position)) {
-            System.out.println("Received an bed color update packet, but there is no bed! O_o " + tag);
+            Via.getPlatform().getLogger().warning("Received an bed color update packet, but there is no bed! O_o " + tag);
             return -1;
         }
 

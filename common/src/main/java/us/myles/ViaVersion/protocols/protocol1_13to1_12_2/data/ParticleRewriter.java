@@ -15,6 +15,7 @@ import java.util.Random;
 
 public class ParticleRewriter {
     private static List<NewParticle> particles = new LinkedList<>();
+    private static Random rand = new Random();
 
     static {
         add(34); // (0->34) explode -> minecraft:poof
@@ -102,10 +103,6 @@ public class ParticleRewriter {
         particles.add(new NewParticle(newId, dataHandler));
     }
 
-    interface ParticleDataHandler {
-        Particle handler(Particle particle, Integer[] data);
-    }
-
     // Randomized because the previous one was a lot of different colors at once! :)
     private static ParticleDataHandler reddustHandler() {
         return new ParticleDataHandler() {
@@ -118,6 +115,10 @@ public class ParticleRewriter {
                 return particle;
             }
         };
+    }
+
+    private static float randomFloat() {
+        return rand.nextFloat();
     }
 
     // Rewrite IconCrack items to new format :)
@@ -157,6 +158,9 @@ public class ParticleRewriter {
         };
     }
 
+    interface ParticleDataHandler {
+        Particle handler(Particle particle, Integer[] data);
+    }
 
     @Data
     @RequiredArgsConstructor
@@ -169,12 +173,6 @@ public class ParticleRewriter {
                 return handler.handler(particle, data);
             return particle;
         }
-    }
-
-    private static Random rand = new Random();
-
-    private static float randomFloat() {
-        return rand.nextFloat();
     }
 
 

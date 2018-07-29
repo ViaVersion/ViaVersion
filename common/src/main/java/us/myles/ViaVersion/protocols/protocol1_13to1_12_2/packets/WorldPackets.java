@@ -14,10 +14,13 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+<<<<<<< HEAD
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+=======
+>>>>>>> fc264d0b0f90b4115a583cbe7a58da15389a4721
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
@@ -25,6 +28,8 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityP
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.List;
 
@@ -47,9 +52,9 @@ public class WorldPackets {
 
                         Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                        if (!id.isPresent())
-                            System.out.println("Could not find painting motive: " + motive + " falling back to default (0)");
-
+                        if (!id.isPresent()) {
+                            Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
+                        }
                         wrapper.write(Type.VAR_INT, id.or(0));
                     }
                 });
@@ -316,25 +321,22 @@ public class WorldPackets {
                         }
 
                         //Handle reddust particle color
-                        ifStatement:
                         if (particle.getId() == 11) {
                             int count = wrapper.get(Type.INT, 1);
                             float speed = wrapper.get(Type.FLOAT, 6);
-                            if (count != 0 || speed != 1) break ifStatement;
+                            // Only handle for count = 0 & speed = 1
+                            if (count == 0 && speed == 1) {
+                                wrapper.set(Type.INT, 1, 1);
+                                wrapper.set(Type.FLOAT, 6, 0f);
 
-                            wrapper.set(Type.INT, 1, 1);
-                            wrapper.set(Type.FLOAT, 6, 0f);
-
-                            List<Particle.ParticleData> arguments = particle.getArguments();
-                            for (int i = 0; i < 3; i++) {
-                                //RGB values are represented by the X/Y/Z offset
-                                arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
-                                wrapper.set(Type.FLOAT, i + 3, 0f);
+                                List<Particle.ParticleData> arguments = particle.getArguments();
+                                for (int i = 0; i < 3; i++) {
+                                    //RGB values are represented by the X/Y/Z offset
+                                    arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
+                                    wrapper.set(Type.FLOAT, i + 3, 0f);
+                                }
                             }
                         }
-
-//                        System.out.println("Old particle " + particleId + " " + Arrays.toString(data) +  " new Particle" + particle);
-
 
                         wrapper.set(Type.INT, 0, particle.getId());
                         for (Particle.ParticleData particleData : particle.getArguments())
@@ -347,16 +349,19 @@ public class WorldPackets {
     }
 
     public static int toNewId(int oldId) {
+        if (oldId < 0) {
+            oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
+        }
         int newId = MappingData.blockMappings.getNewBlock(oldId);
         if (newId != -1) {
             return newId;
         }
         newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
         if (newId != -1) {
-            System.out.println("Missing block " + oldId);
+            Via.getPlatform().getLogger().warning("Missing block " + oldId);
             return newId;
         }
-        System.out.println("Missing block completely " + oldId);
+        Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
         // Default stone
         return 1;
     }
