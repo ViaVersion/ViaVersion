@@ -162,6 +162,7 @@ public class WorldPackets {
                             output.writeToBuffer(buffer);
                             PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
                             chunkPacket.send(Protocol1_9TO1_8.class, false, true);
+                            buffer.release();
                         }
                     }
                 });
