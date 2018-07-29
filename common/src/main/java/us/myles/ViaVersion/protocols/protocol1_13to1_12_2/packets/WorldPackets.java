@@ -45,9 +45,9 @@ public class WorldPackets {
 
                         Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                        if (!id.isPresent())
-                            System.out.println("Could not find painting motive: " + motive + " falling back to default (0)");
-
+                        if (!id.isPresent()) {
+                            Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
+                        }
                         wrapper.write(Type.VAR_INT, id.or(0));
                     }
                 });
@@ -245,25 +245,22 @@ public class WorldPackets {
                         }
 
                         //Handle reddust particle color
-                        ifStatement:
                         if (particle.getId() == 11) {
                             int count = wrapper.get(Type.INT, 1);
                             float speed = wrapper.get(Type.FLOAT, 6);
-                            if (count != 0 || speed != 1) break ifStatement;
+                            // Only handle for count = 0 & speed = 1
+                            if (count == 0 && speed == 1) {
+                                wrapper.set(Type.INT, 1, 1);
+                                wrapper.set(Type.FLOAT, 6, 0f);
 
-                            wrapper.set(Type.INT, 1, 1);
-                            wrapper.set(Type.FLOAT, 6, 0f);
-
-                            List<Particle.ParticleData> arguments = particle.getArguments();
-                            for (int i = 0; i < 3; i++) {
-                                //RGB values are represented by the X/Y/Z offset
-                                arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
-                                wrapper.set(Type.FLOAT, i + 3, 0f);
+                                List<Particle.ParticleData> arguments = particle.getArguments();
+                                for (int i = 0; i < 3; i++) {
+                                    //RGB values are represented by the X/Y/Z offset
+                                    arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
+                                    wrapper.set(Type.FLOAT, i + 3, 0f);
+                                }
                             }
                         }
-
-//                        System.out.println("Old particle " + particleId + " " + Arrays.toString(data) +  " new Particle" + particle);
-
 
                         wrapper.set(Type.INT, 0, particle.getId());
                         for (Particle.ParticleData particleData : particle.getArguments())
@@ -285,10 +282,10 @@ public class WorldPackets {
         }
         newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
         if (newId != null) {
-            System.out.println("Missing block " + oldId);
+            Via.getPlatform().getLogger().warning("Missing block " + oldId);
             return newId;
         }
-        System.out.println("Missing block completely " + oldId);
+        Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
         // Default stone
         return 1;
     }
