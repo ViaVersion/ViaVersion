@@ -5,14 +5,13 @@ import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.netty.util.collection.IntObjectHashMap;
-import io.netty.util.collection.IntObjectMap;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +21,7 @@ public class MappingData {
     public static Map<String, Integer[]> itemTags = new HashMap<>();
     public static Map<String, Integer[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
-    public static Map<Integer, Integer> oldToNewSounds = new HashMap<>();
+    public static SoundMappings soundMappings;
     public static BlockMappings blockMappings;
 
     public static void init() {
@@ -30,13 +29,7 @@ public class MappingData {
         JsonObject mapping1_13 = loadData("mapping-1.13.json");
 
         Via.getPlatform().getLogger().info("Loading block mapping...");
-        try {
-            Class.forName("io.netty.util.collection.IntObjectMap");
-            blockMappings = new BMNettyCollections();
-        } catch (ClassNotFoundException e) {
-            blockMappings = new BMJDKCollections();
-        }
-        blockMappings.init(mapping1_12, mapping1_13);
+        blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
         Via.getPlatform().getLogger().info("Loading item mapping...");
         mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading new tags...");
@@ -46,7 +39,7 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading enchantments...");
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
         Via.getPlatform().getLogger().info("Loading sound mapping...");
-        mapIdentifiers(oldToNewSounds, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
+        soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
     }
 
     public static JsonObject loadData(String name) {
@@ -125,47 +118,61 @@ public class MappingData {
     }
 
     public interface BlockMappings {
-        void init(JsonObject mapping1_12, JsonObject mapping1_13);
-
-        Integer getNewBlock(int old);
+        int getNewBlock(int old);
     }
 
-    private static class BMJDKCollections implements BlockMappings {
-        private Map<Integer, Integer> oldToNew = new HashMap<>();
-
-        @Override
-        public void init(JsonObject mapping1_12, JsonObject mapping1_13) {
-            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
-        }
-
-        @Override
-        public Integer getNewBlock(int old) {
-            return oldToNew.get(old);
-        }
-    }
-
-    private static class BMNettyCollections implements BlockMappings {
-        private IntObjectMap<Integer> oldToNew = new IntObjectHashMap<>();
-
-        @Override
-        public void init(JsonObject mapping1_12, JsonObject mapping1_13) {
-            mapIdentifiers(oldToNew, mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
-        }
-
-        @Override
-        public Integer getNewBlock(int old) {
-            return oldToNew.get(old);
-        }
-
-        private static void mapIdentifiers(IntObjectMap<Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-            for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-                Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-                if (value == null) {
-                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                    continue;
-                }
-                output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
+    private static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
+            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+            if (value == null) {
+                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                continue;
             }
+            output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
+        }
+    }
+
+    private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
+        for (int i = 0; i < oldIdentifiers.size(); i++) {
+            JsonElement v = oldIdentifiers.get(i);
+            Integer index = findIndex(newIdentifiers, v.getAsString());
+            if (index == null) {
+                Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
+                continue;
+            }
+            output[i] = index.shortValue();
+        }
+    }
+
+    private static class BlockMappingsShortArray implements BlockMappings {
+        private short[] oldToNew = new short[4084];
+
+        private BlockMappingsShortArray(JsonObject mapping1_12, JsonObject mapping1_13) {
+            Arrays.fill(oldToNew, (short) -1);
+            mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
+        }
+
+        @Override
+        public int getNewBlock(int old) {
+            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
+        }
+    }
+
+    public interface SoundMappings {
+        int getNewSound(int old);
+    }
+
+    private static class SoundMappingShortArray implements SoundMappings {
+        private short[] oldToNew = new short[662];
+
+        private SoundMappingShortArray(JsonArray mapping1_12, JsonArray mapping1_13) {
+            Arrays.fill(oldToNew, (short) -1);
+            mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
+        }
+
+        @Override
+        public int getNewSound(int old) {
+            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
         }
     }
 }

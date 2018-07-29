@@ -14,7 +14,9 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
@@ -85,6 +87,55 @@ public class WorldPackets {
             }
         });
 
+        // Block action
+        protocol.registerOutgoing(State.PLAY, 0xA, 0xA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // Location
+                map(Type.UNSIGNED_BYTE); // Action Id
+                map(Type.UNSIGNED_BYTE); // Action param
+                map(Type.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Position pos = wrapper.get(Type.POSITION, 0);
+                        short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        short param = wrapper.get(Type.UNSIGNED_BYTE, 1);
+                        int blockId = wrapper.get(Type.VAR_INT, 0);
+
+                        if (blockId == 25)
+                            blockId = 73;
+                        else if (blockId == 33)
+                            blockId = 99;
+                        else if (blockId == 29)
+                            blockId = 92;
+                        else if (blockId == 54)
+                            blockId = 142;
+                        else if (blockId == 146)
+                            blockId = 305;
+                        else if (blockId == 130)
+                            blockId = 249;
+                        else if (blockId == 138)
+                            blockId = 257;
+                        else if (blockId == 52)
+                            blockId = 140;
+                        else if (blockId == 209)
+                            blockId = 472;
+                        else if (blockId >= 219 && blockId <= 234)
+                            blockId = blockId - 219 + 483;
+
+                        if (blockId == 73) { // Note block
+                            PacketWrapper blockChange = wrapper.create(0x0B); // block change
+                            blockChange.write(Type.POSITION, new Position(pos.getX(), pos.getY(), pos.getZ())); // Clone because position is mutable
+                            blockChange.write(Type.VAR_INT, 248 + (action * 24 * 2) + (param * 2));
+                            blockChange.send(Protocol1_13To1_12_2.class, true, true);
+                        }
+                        wrapper.set(Type.VAR_INT, 0, blockId);
+                    }
+                });
+            }
+        });
+
         // Block Change
         protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
             @Override
@@ -130,7 +181,19 @@ public class WorldPackets {
         });
 
         // Named Sound Effect TODO String -> Identifier? Check if identifier is present?
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A);
+        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String newSoundId = NamedSoundRewriter.getNewId(wrapper.get(Type.STRING, 0));
+                        wrapper.set(Type.STRING, 0, newSoundId);
+                    }
+                });
+            }
+        });
 
         // Chunk Data
         protocol.registerOutgoing(State.PLAY, 0x20, 0x22, new PacketRemapper() {
@@ -152,21 +215,29 @@ public class WorldPackets {
                             if (section == null)
                                 continue;
 
-                            // TODO improve performance
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 16; y++) {
-                                    for (int z = 0; z < 16; z++) {
-                                        int block = section.getBlock(x, y, z);
+                            boolean willStoreAnyBlock = false;
 
-                                        int newId = toNewId(block);
-                                        section.setFlatBlock(x, y, z, newId);
+                            for (int p = 0; p < section.getPalette().size(); p++) {
+                                int old = section.getPalette().get(p);
+                                int newId = toNewId(old);
+                                if (storage.isWelcome(newId)) {
+                                    willStoreAnyBlock = true;
+                                }
+                                section.getPalette().set(p, newId);
+                            }
 
-                                        if (storage.isWelcome(newId)) {
-                                            storage.store(new Position(
-                                                    (long) (x + (chunk.getX() << 4)),
-                                                    (long) (y + (i << 4)),
-                                                    (long) (z + (chunk.getZ() << 4))
-                                            ), newId);
+                            if (willStoreAnyBlock) {
+                                for (int x = 0; x < 16; x++) {
+                                    for (int y = 0; y < 16; y++) {
+                                        for (int z = 0; z < 16; z++) {
+                                            int block = section.getBlock(x, y, z);
+                                            if (storage.isWelcome(block)) {
+                                                storage.store(new Position(
+                                                        (long) (x + (chunk.getX() << 4)),
+                                                        (long) (y + (i << 4)),
+                                                        (long) (z + (chunk.getZ() << 4))
+                                                ), block);
+                                            }
                                         }
                                     }
                                 }
@@ -276,12 +347,12 @@ public class WorldPackets {
         if (oldId < 0) {
             oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
         }
-        Integer newId = MappingData.blockMappings.getNewBlock(oldId);
-        if (newId != null) {
+        int newId = MappingData.blockMappings.getNewBlock(oldId);
+        if (newId != -1) {
             return newId;
         }
         newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
-        if (newId != null) {
+        if (newId != -1) {
             Via.getPlatform().getLogger().warning("Missing block " + oldId);
             return newId;
         }
