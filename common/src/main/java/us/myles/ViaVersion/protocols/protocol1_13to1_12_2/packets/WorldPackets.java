@@ -14,14 +14,9 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-<<<<<<< HEAD
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-=======
->>>>>>> fc264d0b0f90b4115a583cbe7a58da15389a4721
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;

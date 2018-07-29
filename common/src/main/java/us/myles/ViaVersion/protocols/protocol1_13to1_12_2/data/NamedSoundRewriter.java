@@ -147,6 +147,6 @@ public class NamedSoundRewriter {
 
     public static String getNewId(String old) {
         String newId = oldToNew.get(old);
-        return newId != null ? newId : old;
+        return newId != null ? newId : old.toLowerCase();
     }
 }
