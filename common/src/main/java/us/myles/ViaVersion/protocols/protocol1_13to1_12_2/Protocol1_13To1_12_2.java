@@ -415,7 +415,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             }
 
                             if (Via.getConfig().is1_13TeamColourFix()) {
-                                colour = getLastColor(prefix);
+                                colour = getLastColor(prefix).ordinal();
+                                suffix = getLastColor(prefix).toString() + suffix;
                             }
 
                             wrapper.write(Type.VAR_INT, colour);
@@ -844,7 +845,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
     }
 
     // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java
-    public int getLastColor(String input) {
+    public ChatColor getLastColor(String input) {
         int length = input.length();
 
         for (int index = length - 1; index > -1; index--) {
@@ -863,12 +864,12 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         case RESET:
                             break;
                         default:
-                            return color.ordinal();
+                            return color;
                     }
                 }
             }
         }
 
-        return ChatColor.RESET.ordinal();
+        return ChatColor.RESET;
     }
 }
