@@ -58,7 +58,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         if (groundUp) {
             for (int i = 0; i < 256; i++) {
                 // todo use int in Chunk?
-                biomeData[i] = 0;
+                biomeData[i] = (byte) input.readInt();
             }
         }
 
