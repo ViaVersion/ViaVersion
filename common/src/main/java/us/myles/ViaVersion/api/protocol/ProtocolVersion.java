@@ -34,8 +34,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_12_2;
     // v1_13 as name for better ViaBackwards compatibility.
     public static final ProtocolVersion v1_13;
-    public static final ProtocolVersion v18w30a;
-    public static final ProtocolVersion v18w30b;
+    public static final ProtocolVersion v18w31a;
     public static final ProtocolVersion unknown;
 
     private final int id;
@@ -65,8 +64,7 @@ public class ProtocolVersion {
         register(v1_12_1 = new ProtocolVersion(338, "1.12.1"));
         register(v1_12_2 = new ProtocolVersion(340, "1.12.2"));
         register(v1_13 = new ProtocolVersion(393, "1.13"));
-        register(v18w30a = new ProtocolVersion(394, "18w30a"));
-        register(v18w30b = new ProtocolVersion(395, "18w30b"));
+        register(v18w31a = new ProtocolVersion(396, "18w31a"));
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 

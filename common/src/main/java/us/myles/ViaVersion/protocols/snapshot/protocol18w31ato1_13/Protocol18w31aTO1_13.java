@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.snapshot.protocol18w30ato1_13;
+package us.myles.ViaVersion.protocols.snapshot.protocol18w31ato1_13;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -81,9 +81,7 @@ public class Protocol18w30aTO1_13 extends Protocol {
                                     for (int z = 0; z < 16; z++) {
                                         int block = section.getBlock(x, y, z);
 
-                                        if(block > 1126){
-                                            section.setFlatBlock(x, y, z, ++block);
-                                        }
+                                        section.setFlatBlock(x, y, z, getMapBlockId(block));
                                     }
                                 }
                             }
@@ -105,9 +103,7 @@ public class Protocol18w30aTO1_13 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
 
-                        if(id > 1126){
-                            wrapper.set(Type.VAR_INT, 0, ++id);
-                        }
+                        wrapper.set(Type.VAR_INT, 0, getMapBlockId(id));
                     }
                 });
             }
@@ -126,9 +122,7 @@ public class Protocol18w30aTO1_13 extends Protocol {
                         // Convert ids
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int id = record.getBlockId();
-                            if(id > 1126){
-                                record.setBlockId(++id);
-                            }
+                            record.setBlockId(getMapBlockId(id));
                         }
                     }
                 });
@@ -214,9 +208,7 @@ public class Protocol18w30aTO1_13 extends Protocol {
                         int id = wrapper.get(Type.INT, 0);
                         if(id == 3 || id == 20){
                             int data = wrapper.passthrough(Type.VAR_INT);
-                            if(data > 1126){
-                                wrapper.set(Type.VAR_INT, 0, ++data);
-                            }
+                            wrapper.set(Type.VAR_INT, 0, getMapBlockId(data));
                         }
                     }
                 });
@@ -248,9 +240,7 @@ public class Protocol18w30aTO1_13 extends Protocol {
                         if (entType != null) {
                             if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
                                 int data = wrapper.get(Type.INT, 0);
-                                if(data > 1126){
-                                    wrapper.set(Type.INT, 0, ++data);
-                                }
+                                wrapper.set(Type.INT, 0, getMapBlockId(data));
                             }
                         }
                         // Register Type ID
@@ -361,5 +351,15 @@ public class Protocol18w30aTO1_13 extends Protocol {
         userConnection.put(new EntityTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
+    }
+
+
+    public static int getMapBlockId(int blockId){
+        if(blockId > 8573){
+            return blockId +2;
+        }else if(blockId > 1126){
+            return blockId +1;
+        }
+        return blockId;
     }
 }
