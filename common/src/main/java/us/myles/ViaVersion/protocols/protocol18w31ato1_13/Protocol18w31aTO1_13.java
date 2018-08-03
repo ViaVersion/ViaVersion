@@ -18,9 +18,6 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-/**
- * Created by Marco Neuhaus on 28.07.2018 for the Project ViaVersion.
- */
 public class Protocol18w31aTO1_13 extends Protocol {
 
     @Override

@@ -9,9 +9,6 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Marco Neuhaus on 28.07.2018 for the Project ViaVersion.
- */
 public class MetadataRewriter {
 
     public static void handleMetadata(int entityId, Entity1_13Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
