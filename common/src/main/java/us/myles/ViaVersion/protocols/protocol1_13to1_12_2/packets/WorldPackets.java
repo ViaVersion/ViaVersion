@@ -26,9 +26,34 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WorldPackets {
+    private static final Set<Integer> validBiomes = new HashSet<>();
+
+    static {
+        // Client will crash if it receives a invalid biome id
+        for (int i = 0; i < 50; i++) {
+            validBiomes.add(i);
+        }
+        validBiomes.add(127);
+        for (int i = 129; i <= 134; i++) {
+            validBiomes.add(i);
+        }
+        validBiomes.add(140);
+        validBiomes.add(149);
+        validBiomes.add(151);
+        for (int i = 155; i <= 158; i++) {
+            validBiomes.add(i);
+        }
+        for (int i = 160; i <= 167; i++) {
+            validBiomes.add(i);
+        }
+    }
+
     public static void register(Protocol protocol) {
         // Outgoing packets
 
@@ -246,9 +271,17 @@ public class WorldPackets {
 
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
+                            int latestBiomeWarn = Integer.MIN_VALUE;
                             for (int i = 0; i < 256; i++) {
-                                if (chunk.getBiomeData()[i] == -1)
-                                    chunk.getBiomeData()[i] = 1;
+                                int biome = chunk.getBiomeData()[i] & 0xFF;
+                                if (!validBiomes.contains(biome)) {
+                                    if (biome != 255 // is it generated naturally? *shrug*
+                                            && latestBiomeWarn != biome) {
+                                        Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
+                                        latestBiomeWarn = biome;
+                                    }
+                                    chunk.getBiomeData()[i] = 1; // Plains
+                                }
                             }
                         }
 
