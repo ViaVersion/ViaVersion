@@ -7,7 +7,6 @@ import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -20,7 +19,6 @@ import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -31,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class BungeeServerHandler implements Listener {
-    //private static Method getPendingConnection;
     private static Method getHandshake;
     private static Method getRelayMessages;
     private static Method setProtocol;
@@ -42,7 +39,6 @@ public class BungeeServerHandler implements Listener {
 
     static {
         try {
-            //getPendingConnection = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getPendingConnection");
             getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
             getRelayMessages = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getRelayMessages");
             setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
