@@ -1,11 +1,13 @@
 package us.myles.ViaVersion.bungee.handlers;
 
+import com.google.common.base.Joiner;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import net.md_5.bungee.protocol.packet.PluginMessage;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
@@ -13,19 +15,22 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class BungeeServerHandler implements Listener {
-    private static Method getPendingConnection;
     private static Method getHandshake;
+    private static Method getRelayMessages;
     private static Method setProtocol;
     private static Method getEntityMap = null;
     private static Method setVersion = null;
@@ -34,8 +39,8 @@ public class BungeeServerHandler implements Listener {
 
     static {
         try {
-            getPendingConnection = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getPendingConnection");
             getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
+            getRelayMessages = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getRelayMessages");
             setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
             getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
             setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
@@ -62,8 +67,8 @@ public class BungeeServerHandler implements Listener {
 
         // Check if ViaVersion can support that version
         try {
-            Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
-            Object handshake = getHandshake.invoke(pendingConnection);
+            //Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
+            Object handshake = getHandshake.invoke(e.getPlayer().getPendingConnection());
             setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
         } catch (InvocationTargetException | IllegalAccessException e1) {
             e1.printStackTrace();
@@ -103,6 +108,8 @@ public class BungeeServerHandler implements Listener {
                     int protocolId = ProtocolDetectorService.getProtocolId(serverName);
 
                     ProtocolInfo info = user.get(ProtocolInfo.class);
+                    int previousServerProtocol = info.getServerProtocolVersion();
+
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
                     ProtocolPipeline pipeline = user.get(ProtocolInfo.class).getPipeline();
@@ -120,6 +127,45 @@ public class BungeeServerHandler implements Listener {
                     info.setServerProtocolVersion(protocolId);
                     // Add version-specific base Protocol
                     pipeline.add(ProtocolRegistry.getBaseProtocol(protocolId));
+
+                    // Workaround 1.13 server change
+                    Object relayMessages = getRelayMessages.invoke(e.getPlayer().getPendingConnection());
+                    if (relayMessages instanceof List) {
+                        for (Object message : (List) relayMessages) {
+                            if (message instanceof PluginMessage) {
+                                PluginMessage plMsg = (PluginMessage) message;
+                                String channel = plMsg.getTag();
+                                if (previousServerProtocol != -1) {
+                                    if (previousServerProtocol < ProtocolVersion.v1_13.getId()
+                                            && protocolId >= ProtocolVersion.v1_13.getId()) {
+                                        channel = InventoryPackets.getNewPluginChannelId(channel);
+                                        if (channel.equals("minecraft:register")) {
+                                            String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
+                                            for (int i = 0; i < channels.length; i++) {
+                                                channels[i] = InventoryPackets.getNewPluginChannelId(channels[i]);
+                                            }
+                                            plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
+                                        }
+                                    } else if (previousServerProtocol >= ProtocolVersion.v1_13.getId()
+                                            && protocolId < ProtocolVersion.v1_13.getId()) {
+                                        channel = InventoryPackets.getOldPluginChannelId(channel);
+                                        if (channel.equals("REGISTER")) {
+                                            String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
+                                            for (int i = 0; i < channels.length; i++) {
+                                                channels[i] = InventoryPackets.getOldPluginChannelId(channels[i]);
+                                            }
+                                            plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
+                                        }
+                                    }
+                                }
+                                plMsg.setTag(channel);
+                            } else {
+                                Via.getPlatform().getLogger().warning("relayMessages contains a element that isn't a Handshake " + message);
+                            }
+                        }
+                    } else {
+                        Via.getPlatform().getLogger().warning("relayMessages isn't a List! " + relayMessages);
+                    }
 
                     user.put(info);
                     user.put(storage);
