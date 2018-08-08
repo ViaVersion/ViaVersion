@@ -119,8 +119,6 @@ public class InventoryPackets {
         );
     }
 
-    // TODO CLEANUP / SMARTER REWRITE SYSTEM
-    // TODO Rewrite identifiers
     public static void toClient(Item item) {
         if (item == null) return;
         if(item.getId() >= 443){
