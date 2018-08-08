@@ -3,10 +3,11 @@ package us.myles.ViaVersion.protocols.protocol18w32ato1_13;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
+import us.myles.ViaVersion.api.entities.Entity1_13Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol18w32ato1_13.packets.InventoryPackets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,9 @@ public class MetadataRewriter {
                     // New block format
                     int data = (int) metadata.getValue();
                     metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
+                }
+                if(type.is(EntityType.ITEM)){
+
                 }
             } catch (Exception e) {
                 metadatas.remove(metadata);
