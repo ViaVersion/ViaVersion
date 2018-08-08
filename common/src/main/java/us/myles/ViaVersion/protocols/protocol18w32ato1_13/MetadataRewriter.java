@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol18w31ato1_13;
+package us.myles.ViaVersion.protocols.protocol18w32ato1_13;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -17,13 +17,13 @@ public class MetadataRewriter {
                 if (metadata.getMetaType() == MetaType1_13.BlockID) {
                     // Convert to new block id
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol18w31aTO1_13.getMapBlockId(data));
+                    metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
                 }
                 if(type == null) continue;
                 if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
                     // New block format
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol18w31aTO1_13.getMapBlockId(data));
+                    metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
                 }
             } catch (Exception e) {
                 metadatas.remove(metadata);

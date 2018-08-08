@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol18w31ato1_13;
+package us.myles.ViaVersion.protocols.protocol18w32ato1_13;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -18,7 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol18w31aTO1_13 extends Protocol {
+public class Protocol18w32aTO1_13 extends Protocol {
 
     @Override
     protected void registerPackets() {
@@ -351,12 +351,17 @@ public class Protocol18w31aTO1_13 extends Protocol {
     }
 
 
-    public static int getMapBlockId(int blockId){
-        if(blockId > 8573){
-            return blockId +2;
-        }else if(blockId > 1126){
-            return blockId +1;
+    public static int getMapBlockId(int blockId) {
+        if (blockId > 8573) {
+            blockId += 17;
+        } else if (blockId > 8463) {
+            blockId += 16;
+        } else if (blockId > 8458) {
+            blockId = 8470 + (blockId - 8459) * 2;
+        } else if (blockId > 1126) {
+            blockId += 1;
         }
+
         return blockId;
     }
 }
