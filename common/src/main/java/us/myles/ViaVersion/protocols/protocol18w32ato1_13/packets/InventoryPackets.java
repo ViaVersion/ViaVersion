@@ -8,9 +8,6 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
-/**
- * Created by Marco Neuhaus on 08.08.2018 for the Project ViaVersion2.
- */
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {

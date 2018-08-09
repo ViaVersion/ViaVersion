@@ -13,9 +13,6 @@ import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w32aTO1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-/**
- * Created by Marco Neuhaus on 08.08.2018 for the Project ViaVersion2.
- */
 public class WorldPackets {
 
     public static void register(Protocol protocol) {
@@ -34,7 +31,6 @@ public class WorldPackets {
                             if (section == null)
                                 continue;
 
-                            // TODO improve performance
                             for (int x = 0; x < 16; x++) {
                                 for (int y = 0; y < 16; y++) {
                                     for (int z = 0; z < 16; z++) {

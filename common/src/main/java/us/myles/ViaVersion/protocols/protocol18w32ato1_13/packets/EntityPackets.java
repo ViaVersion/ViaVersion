@@ -13,9 +13,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol18w32ato1_13.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w32aTO1_13;
-/**
- * Created by Marco Neuhaus on 08.08.2018 for the Project ViaVersion2.
- */
+
 public class EntityPackets {
 
     public static void register(Protocol protocol) {
