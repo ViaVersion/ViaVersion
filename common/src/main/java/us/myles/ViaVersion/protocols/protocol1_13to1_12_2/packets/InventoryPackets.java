@@ -596,9 +596,13 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             default:
-                return newId.startsWith("viaversion:legacy/")
+                return newId.startsWith("viaversion:legacy/") // Our format :)
                         ? new String(BaseEncoding.base32().lowerCase().withPadChar('-').decode(
                         newId.substring(18)), StandardCharsets.UTF_8)
+                        : newId.startsWith("legacy:")
+                        ? newId.substring(7) // Rewrite BungeeCord's format. It will only prevent kicks, plugins will still be broken because of case-sensitivity *plays sad violin*
+                        : newId.startsWith("bungeecord:legacy/")
+                        ? newId.substring(18)
                         : newId;
         }
     }
