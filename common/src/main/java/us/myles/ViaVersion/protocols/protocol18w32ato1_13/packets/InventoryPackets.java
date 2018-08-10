@@ -118,15 +118,25 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        if(item.getId() >= 443){
-            item.setId((short) (item.getId() + 5));
+        item.setId((short) getNewItemId(item.getId()));
+    }
+
+    public static int getNewItemId(int itemId) {
+        if (itemId >= 443) {
+            return itemId + 5;
         }
+        return itemId;
     }
 
     public static void toServer(Item item) {
         if (item == null) return;
-        if(item.getId() >= 448){
-            item.setId((short) (item.getId() - 5));
+        item.setId((short) getOldItemId(item.getId()));
+    }
+
+    public static int getOldItemId(int newId) {
+        if (newId >= 448) {
+            return newId - 5;
         }
+        return newId;
     }
 }

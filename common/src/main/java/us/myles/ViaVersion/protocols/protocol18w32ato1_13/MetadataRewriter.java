@@ -23,13 +23,13 @@ public class MetadataRewriter {
                 } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
                     // Convert to new block id
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
+                    metadata.setValue(Protocol18w32aTO1_13.getNewBlockStateId(data));
                 }
                 if (type == null) continue;
                 if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
                     // New block format
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
+                    metadata.setValue(Protocol18w32aTO1_13.getNewBlockStateId(data));
                 }
                 if(type.is(EntityType.ITEM)){
 
