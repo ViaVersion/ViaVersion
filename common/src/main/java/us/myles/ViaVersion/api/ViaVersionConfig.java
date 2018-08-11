@@ -245,4 +245,10 @@ public interface ViaVersionConfig {
      * @return Disconnect message
      */
     String getReloadDisconnectMsg();
+
+    /**
+     * Tries to minimize cooldown animation
+     * @return True if enabled
+     */
+    boolean isMinimizeCooldown();
 }

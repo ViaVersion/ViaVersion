@@ -186,6 +186,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isMinimizeCooldown() {
+        return getBoolean("minimize-cooldown", true);
+    }
+
+    @Override
     public URL getDefaultConfigURL() {
         return BukkitConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }

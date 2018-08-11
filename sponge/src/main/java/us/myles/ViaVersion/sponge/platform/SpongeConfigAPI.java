@@ -207,6 +207,11 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isMinimizeCooldown() {
+        return getBoolean("minimize-cooldown", true);
+    }
+
+    @Override
     public boolean is1_13TeamColourFix() {
         return getBoolean("team-colour-fix", true);
     }

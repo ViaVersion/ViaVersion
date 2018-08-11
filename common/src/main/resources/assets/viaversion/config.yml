@@ -124,3 +124,5 @@ replace-pistons: false
 replacement-piston-id: 0
 # Force the string -> json transform
 force-json-transform: false
+# Minimize the cooldown animation in 1.8 servers
+minimize-cooldown: true
