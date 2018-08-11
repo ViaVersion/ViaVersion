@@ -154,7 +154,7 @@
     "384": "minecraft:sandstone",
     "385": "minecraft:chiseled_sandstone",
     "386": "minecraft:cut_sandstone",
-    "400": "minecraft:note_block[instrument=harp,note=0,powered=true]",
+    "400": "minecraft:note_block[instrument=harp,note=0,powered=false]",
     "416": "minecraft:red_bed[facing=south,occupied=false,part=foot]",
     "417": "minecraft:red_bed[facing=west,occupied=false,part=foot]",
     "418": "minecraft:red_bed[facing=north,occupied=false,part=foot]",
