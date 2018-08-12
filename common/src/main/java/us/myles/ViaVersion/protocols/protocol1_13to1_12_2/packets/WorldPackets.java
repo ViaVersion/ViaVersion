@@ -152,7 +152,7 @@ public class WorldPackets {
                         if (blockId == 73) { // Note block
                             PacketWrapper blockChange = wrapper.create(0x0B); // block change
                             blockChange.write(Type.POSITION, new Position(pos.getX(), pos.getY(), pos.getZ())); // Clone because position is mutable
-                            blockChange.write(Type.VAR_INT, 248 + (action * 24 * 2) + (param * 2));
+                            blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                             blockChange.send(Protocol1_13To1_12_2.class, true, true);
                         }
                         wrapper.set(Type.VAR_INT, 0, blockId);

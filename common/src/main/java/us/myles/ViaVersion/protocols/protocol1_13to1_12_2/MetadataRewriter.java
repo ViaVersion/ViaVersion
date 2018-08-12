@@ -28,7 +28,7 @@ public class MetadataRewriter {
                 if (metadata.getId() == 2) {
                     metadata.setMetaType(MetaType1_13.OptChat);
                     if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                        metadata.setValue(Protocol1_9TO1_8.fixJson((String) metadata.getValue()));
+                        metadata.setValue(ChatRewriter.legacyTextToJson((String) metadata.getValue()));
                     } else {
                         metadata.setValue(null);
                     }

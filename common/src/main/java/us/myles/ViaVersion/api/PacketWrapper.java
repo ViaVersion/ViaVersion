@@ -2,7 +2,6 @@ package us.myles.ViaVersion.api;
 
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import lombok.Getter;
 import lombok.Setter;
@@ -331,7 +330,7 @@ public class PacketWrapper {
         // Apply other protocols
         apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
         // Send
-        ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         writeToBuffer(output);
 
         return output;
@@ -379,7 +378,7 @@ public class PacketWrapper {
     public void send() throws Exception {
         if (!isCancelled()) {
             // Send
-            ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+            ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
             writeToBuffer(output);
             user().sendRawPacket(output);
         }
@@ -474,7 +473,7 @@ public class PacketWrapper {
      */
     public void sendToServer() throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = inputBuffer == null ? Unpooled.buffer() : inputBuffer.alloc().buffer();
+            ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
             writeToBuffer(output);
 
             user().getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(output);
