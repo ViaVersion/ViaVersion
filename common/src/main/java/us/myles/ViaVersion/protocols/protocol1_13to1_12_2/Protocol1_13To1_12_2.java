@@ -198,7 +198,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x12, 0x13);
         registerOutgoing(State.PLAY, 0x13, 0x14);
         // InventoryPackets 0x14 -> 0x15
-        registerOutgoing(State.PLAY, 0x15, 0x16);
+        // InventoryPackets 0x15 -> 0x16
         // InventoryPackets 0x16 -> 0x17
         registerOutgoing(State.PLAY, 0x17, 0x18);
         // WorldPackets 0x18 -> 0x19

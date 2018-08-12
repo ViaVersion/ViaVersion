@@ -21,6 +21,7 @@ public class MappingData {
     public static Map<String, Integer[]> itemTags = new HashMap<>();
     public static Map<String, Integer[]> fluidTags = new HashMap<>();
     public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
+    public static EnchantmentMappings enchantmentMappings;
     public static SoundMappings soundMappings;
     public static BlockMappings blockMappings;
 
@@ -38,6 +39,7 @@ public class MappingData {
         loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
         Via.getPlatform().getLogger().info("Loading enchantments...");
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
+        enchantmentMappings = new EnchantmentMappingByteArray(mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
         Via.getPlatform().getLogger().info("Loading sound mapping...");
         soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
     }
@@ -68,6 +70,40 @@ public class MappingData {
         }
     }
 
+    private static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
+            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+            if (value == null) {
+                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                continue;
+            }
+            output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
+        }
+    }
+
+    private static void mapIdentifiers(byte[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
+            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+            if (value == null) {
+                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                continue;
+            }
+            output[Integer.parseInt(entry.getKey())] = Byte.parseByte(value.getKey());
+        }
+    }
+
+    private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
+        for (int i = 0; i < oldIdentifiers.size(); i++) {
+            JsonElement v = oldIdentifiers.get(i);
+            Integer index = findIndex(newIdentifiers, v.getAsString());
+            if (index == null) {
+                Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
+                continue;
+            }
+            output[i] = index.shortValue();
+        }
+    }
+
     private static void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
         for (Map.Entry<String, JsonElement> entry : newTags.entrySet()) {
             JsonArray ids = entry.getValue().getAsJsonArray();
@@ -79,21 +115,9 @@ public class MappingData {
         }
     }
 
-    public static void loadEnchantments(Map<Short, String> output, JsonObject enchantments) {
+    private static void loadEnchantments(Map<Short, String> output, JsonObject enchantments) {
         for (Map.Entry<String, JsonElement> enchantment : enchantments.entrySet()) {
             output.put(Short.parseShort(enchantment.getKey()), enchantment.getValue().getAsString());
-        }
-    }
-
-    private static void mapIdentifiers(Map<Integer, Integer> output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
-        for (int i = 0; i < oldIdentifiers.size(); i++) {
-            JsonElement v = oldIdentifiers.get(i);
-            Integer index = findIndex(newIdentifiers, v.getAsString());
-            if (index == null) {
-                Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
-                continue;
-            }
-            output.put(i, index);
         }
     }
 
@@ -119,29 +143,6 @@ public class MappingData {
 
     public interface BlockMappings {
         int getNewBlock(int old);
-    }
-
-    private static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                continue;
-            }
-            output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
-        }
-    }
-
-    private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
-        for (int i = 0; i < oldIdentifiers.size(); i++) {
-            JsonElement v = oldIdentifiers.get(i);
-            Integer index = findIndex(newIdentifiers, v.getAsString());
-            if (index == null) {
-                Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
-                continue;
-            }
-            output[i] = index.shortValue();
-        }
     }
 
     private static class BlockMappingsShortArray implements BlockMappings {
@@ -172,6 +173,24 @@ public class MappingData {
 
         @Override
         public int getNewSound(int old) {
+            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
+        }
+    }
+
+    public interface EnchantmentMappings {
+        int getNewEnchantment(int old);
+    }
+
+    private static class EnchantmentMappingByteArray implements EnchantmentMappings {
+        private byte[] oldToNew = new byte[72];
+
+        private EnchantmentMappingByteArray(JsonObject m1_12, JsonObject m1_13) {
+            Arrays.fill(oldToNew, (byte) -1);
+            mapIdentifiers(oldToNew, m1_12, m1_13);
+        }
+
+        @Override
+        public int getNewEnchantment(int old) {
             return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
         }
     }
