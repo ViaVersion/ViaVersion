@@ -67,6 +67,26 @@ public class InventoryPackets {
             }
         });
 
+        // Window property
+        protocol.registerOutgoing(State.PLAY, 0x15, 0x16, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(Type.SHORT); // Property
+                map(Type.SHORT); // Value
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        short property = wrapper.get(Type.SHORT, 0);
+                        if (property >= 4 && property <= 6) { // Enchantment id
+                            wrapper.set(Type.SHORT, 1, (short) MappingData.enchantmentMappings.getNewEnchantment(
+                                    wrapper.get(Type.SHORT, 1)
+                            ));
+                        }
+                    }
+                });
+            }
+        });
 
         // Plugin message Packet -> Trading
         protocol.registerOutgoing(State.PLAY, 0x18, 0x19, new PacketRemapper() {
