@@ -43,7 +43,7 @@ public class EntityPackets {
                         if (entType != null) {
                             if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
                                 int data = wrapper.get(Type.INT, 0);
-                                wrapper.set(Type.INT, 0, Protocol18w32aTO1_13.getMapBlockId(data));
+                                wrapper.set(Type.INT, 0, Protocol18w32aTO1_13.getNewBlockStateId(data));
                             }
                         }
                         // Register Type ID

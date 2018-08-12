@@ -26,22 +26,34 @@ public class WorldPackets {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
 
-                        for (int i = 0; i < chunk.getSections().length; i++) {
-                            ChunkSection section = chunk.getSections()[i];
-                            if (section == null)
-                                continue;
-
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 16; y++) {
-                                    for (int z = 0; z < 16; z++) {
-                                        int block = section.getBlock(x, y, z);
-
-                                        section.setFlatBlock(x, y, z, Protocol18w32aTO1_13.getMapBlockId(block));
-                                    }
+                        for (ChunkSection section : chunk.getSections()) {
+                            if (section != null) {
+                                for (int i = 0; i < section.getPalette().size(); i++) {
+                                    section.getPalette().set(
+                                            i,
+                                            Protocol18w32aTO1_13.getNewBlockStateId(section.getPalette().get(i))
+                                    );
                                 }
                             }
                         }
 
+                    }
+                });
+            }
+        });
+
+        // Block Action
+        protocol.registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // Location
+                map(Type.UNSIGNED_BYTE); // Action id
+                map(Type.UNSIGNED_BYTE); // Action param
+                map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
                     }
                 });
             }
@@ -58,7 +70,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
 
-                        wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getMapBlockId(id));
+                        wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getNewBlockStateId(id));
                     }
                 });
             }
@@ -77,7 +89,29 @@ public class WorldPackets {
                         // Convert ids
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int id = record.getBlockId();
-                            record.setBlockId(Protocol18w32aTO1_13.getMapBlockId(id));
+                            record.setBlockId(Protocol18w32aTO1_13.getNewBlockStateId(id));
+                        }
+                    }
+                });
+            }
+        });
+
+        // Effect packet
+        protocol.registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION); // Location
+                map(Type.INT); // Data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.INT, 0);
+                        int data = wrapper.get(Type.INT, 1);
+                        if (id == 1010) { // Play record
+                            wrapper.set(Type.INT, 1, data = InventoryPackets.getNewItemId(data));
+                        } else if (id == 2001) { // Block break + block break sound
+                            wrapper.set(Type.INT, 1, data = Protocol18w32aTO1_13.getNewBlockStateId(data));
                         }
                     }
                 });
@@ -140,7 +174,7 @@ public class WorldPackets {
                         int id = wrapper.get(Type.INT, 0);
                         if(id == 3 || id == 20){
                             int data = wrapper.passthrough(Type.VAR_INT);
-                            wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getMapBlockId(data));
+                            wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getNewBlockStateId(data));
                         }
                     }
                 });
