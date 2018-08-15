@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol18w32ato1_13.packets;
+package us.myles.ViaVersion.protocols.protocol18w33ato1_13.packets;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -12,7 +12,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol18w32ato1_13.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
-import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w32aTO1_13;
+import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w33aTO1_13;
 
 public class EntityPackets {
 
@@ -43,7 +43,7 @@ public class EntityPackets {
                         if (entType != null) {
                             if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
                                 int data = wrapper.get(Type.INT, 0);
-                                wrapper.set(Type.INT, 0, Protocol18w32aTO1_13.getMapBlockId(data));
+                                wrapper.set(Type.INT, 0, Protocol18w33aTO1_13.getMapBlockId(data));
                             }
                         }
                         // Register Type ID

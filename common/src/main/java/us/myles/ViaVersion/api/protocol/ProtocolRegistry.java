@@ -19,7 +19,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3TO1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9TO1_9_1;
-import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w32aTO1_13;
+import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w33aTO1_13;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +57,7 @@ public class ProtocolRegistry {
 
         // 1.13 support in development! (:
         registerProtocol(new Protocol1_13To1_12_2(), Collections.singletonList(ProtocolVersion.v1_13.getId()), ProtocolVersion.v1_12_2.getId());
-        registerProtocol(new Protocol18w32aTO1_13(),  Arrays.asList(ProtocolVersion.v18w32a.getId()), ProtocolVersion.v1_13.getId());
+        registerProtocol(new Protocol18w33aTO1_13(),  Arrays.asList(ProtocolVersion.v18w33a.getId()), ProtocolVersion.v1_13.getId());
     }
 
     /**

@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol18w32ato1_13.packets;
+package us.myles.ViaVersion.protocols.protocol18w33ato1_13.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w32aTO1_13;
+import us.myles.ViaVersion.protocols.protocol18w32ato1_13.Protocol18w33aTO1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -36,7 +36,7 @@ public class WorldPackets {
                                     for (int z = 0; z < 16; z++) {
                                         int block = section.getBlock(x, y, z);
 
-                                        section.setFlatBlock(x, y, z, Protocol18w32aTO1_13.getMapBlockId(block));
+                                        section.setFlatBlock(x, y, z, Protocol18w33aTO1_13.getMapBlockId(block));
                                     }
                                 }
                             }
@@ -58,7 +58,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
 
-                        wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getMapBlockId(id));
+                        wrapper.set(Type.VAR_INT, 0, Protocol18w33aTO1_13.getMapBlockId(id));
                     }
                 });
             }
@@ -77,7 +77,7 @@ public class WorldPackets {
                         // Convert ids
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int id = record.getBlockId();
-                            record.setBlockId(Protocol18w32aTO1_13.getMapBlockId(id));
+                            record.setBlockId(Protocol18w33aTO1_13.getMapBlockId(id));
                         }
                     }
                 });
@@ -140,7 +140,7 @@ public class WorldPackets {
                         int id = wrapper.get(Type.INT, 0);
                         if(id == 3 || id == 20){
                             int data = wrapper.passthrough(Type.VAR_INT);
-                            wrapper.set(Type.VAR_INT, 0, Protocol18w32aTO1_13.getMapBlockId(data));
+                            wrapper.set(Type.VAR_INT, 0, Protocol18w33aTO1_13.getMapBlockId(data));
                         }
                     }
                 });

@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.entities.Entity1_13Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
-import us.myles.ViaVersion.protocols.protocol18w32ato1_13.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol18w33ato1_13.packets.InventoryPackets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,13 @@ public class MetadataRewriter {
                 } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
                     // Convert to new block id
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
+                    metadata.setValue(Protocol18w33aTO1_13.getMapBlockId(data));
                 }
                 if (type == null) continue;
                 if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
                     // New block format
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol18w32aTO1_13.getMapBlockId(data));
+                    metadata.setValue(Protocol18w33aTO1_13.getMapBlockId(data));
                 }
                 if(type.is(EntityType.ITEM)){
 

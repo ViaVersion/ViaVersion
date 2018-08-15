@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol18w32ato1_13.packets;
+package us.myles.ViaVersion.protocols.protocol18w33ato1_13.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
