@@ -123,13 +123,16 @@ public class Protocol13_1_PRE1TO1_13 extends Protocol {
             }
         });
 
+
+
+        //Tags
         registerOutgoing(State.PLAY, 0x55, 0x55, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int blockTagsSize = wrapper.read(Type.VAR_INT); // block tags
+                        int blockTagsSize = wrapper.passthrough(Type.VAR_INT); // block tags
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             Integer[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY);
@@ -137,7 +140,7 @@ public class Protocol13_1_PRE1TO1_13 extends Protocol {
                                 blocks[j] = getNewBlockId(blocks[j]);
                             }
                         }
-                        int itemTagsSize = wrapper.read(Type.VAR_INT); // item tags
+                        int itemTagsSize = wrapper.passthrough(Type.VAR_INT); // item tags
                         for (int i = 0; i < itemTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             Integer[] items = wrapper.passthrough(Type.VAR_INT_ARRAY);
