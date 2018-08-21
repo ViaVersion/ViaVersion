@@ -245,4 +245,11 @@ public interface ViaVersionConfig {
      * @return Disconnect message
      */
     String getReloadDisconnectMsg();
+
+    /**
+     * Should we hide errors that occur when trying to converting to 1.13 data?
+     *
+     * @return True if enabled
+     */
+    boolean isSuppress1_13ConversionErrors();
 }

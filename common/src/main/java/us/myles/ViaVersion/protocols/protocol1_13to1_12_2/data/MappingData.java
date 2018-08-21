@@ -63,7 +63,9 @@ public class MappingData {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
-                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                }
                 continue;
             }
             output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
@@ -74,7 +76,9 @@ public class MappingData {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
-                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                }
                 continue;
             }
             output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
@@ -97,7 +101,9 @@ public class MappingData {
             JsonElement v = oldIdentifiers.get(i);
             Integer index = findIndex(newIdentifiers, v.getAsString());
             if (index == null) {
-                Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
+                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
+                }
                 continue;
             }
             output[i] = index.shortValue();

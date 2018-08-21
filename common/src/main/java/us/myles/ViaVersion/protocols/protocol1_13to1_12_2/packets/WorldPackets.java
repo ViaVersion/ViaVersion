@@ -28,7 +28,6 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class WorldPackets {
@@ -72,7 +71,7 @@ public class WorldPackets {
 
                         Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                        if (!id.isPresent()) {
+                        if (!id.isPresent() && (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug())) {
                             Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
                         }
                         wrapper.write(Type.VAR_INT, id.or(0));
@@ -277,7 +276,9 @@ public class WorldPackets {
                                 if (!validBiomes.contains(biome)) {
                                     if (biome != 255 // is it generated naturally? *shrug*
                                             && latestBiomeWarn != biome) {
-                                        Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
+                                        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                            Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
+                                        }
                                         latestBiomeWarn = biome;
                                     }
                                     chunk.getBiomeData()[i] = 1; // Plains
@@ -386,10 +387,14 @@ public class WorldPackets {
         }
         newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
         if (newId != -1) {
-            Via.getPlatform().getLogger().warning("Missing block " + oldId);
+            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Missing block " + oldId);
+            }
             return newId;
         }
-        Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
+        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+            Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
+        }
         // Default stone
         return 1;
     }
