@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.packets.EntityPackets;
@@ -27,13 +28,11 @@ public class Protocol13_1_PRE2TO1_13 extends Protocol {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
-                handler(new PacketHandler() {
+                map(Type.STRING, new ValueTransformer<String, String>(Type.STRING) {
                     @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        String s = wrapper.passthrough(Type.STRING);
-                        if (s.length() > 256) {
-                            wrapper.cancel();
-                        }
+                    public String transform(PacketWrapper wrapper, String inputValue) {
+                        // 1.13 starts sending slash at start, so we remove it for compatibility
+                        return inputValue.startsWith("/") ? inputValue.substring(1) : inputValue;
                     }
                 });
             }
@@ -51,6 +50,33 @@ public class Protocol13_1_PRE2TO1_13 extends Protocol {
                         int hand = wrapper.read(Type.VAR_INT);
                         if (hand == 1) {
                             wrapper.cancel();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Tab complete
+        registerOutgoing(State.PLAY, 0x10, 0x10, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Transaction id
+                map(Type.VAR_INT); // Start
+                map(Type.VAR_INT); // Length
+                map(Type.VAR_INT); // Count
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int start = wrapper.get(Type.VAR_INT, 1);
+                        wrapper.set(Type.VAR_INT, 1, start + 1); // Offset by +1 to take into account / at beginning
+                        // Passthrough suggestions
+                        int count = wrapper.get(Type.VAR_INT, 3);
+                        for (int i = 0; i < count; i++) {
+                            wrapper.passthrough(Type.STRING);
+                            boolean hasTooltip = wrapper.passthrough(Type.BOOLEAN);
+                            if (hasTooltip) {
+                                wrapper.passthrough(Type.STRING); // JSON Tooltip
+                            }
                         }
                     }
                 });
@@ -122,7 +148,6 @@ public class Protocol13_1_PRE2TO1_13 extends Protocol {
                 });
             }
         });
-
 
 
         //Tags
