@@ -88,6 +88,8 @@ chat-nbt-fix: true
 quick-move-action-fix: false
 # Should we use prefix for team colour on 1.13 and above clients
 team-colour-fix: true
+# We warn when there's a error converting from pre-1.13 to 1.13, should we suppress these? (Only suggested if spamming)
+suppress-1_13-conversion-errors: false
 #
 #----------------------------------------------------------#
 #         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #

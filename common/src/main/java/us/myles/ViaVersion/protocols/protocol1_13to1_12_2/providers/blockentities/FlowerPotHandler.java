@@ -61,7 +61,9 @@ public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler 
         } else if (flowersNumberId.containsKey(pair)) {
             return flowersNumberId.get(pair);
         } else {
-            Via.getPlatform().getLogger().warning("Could not find flowerpot content " + item + " for " + tag);
+            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Could not find flowerpot content " + item + " for " + tag);
+            }
         }
 
         return -1;

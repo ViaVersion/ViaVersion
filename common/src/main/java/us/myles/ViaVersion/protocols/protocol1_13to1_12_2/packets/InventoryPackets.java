@@ -113,8 +113,11 @@ public class InventoryPackets {
                                 flags |= 1;
                                 Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
                                 if (!finalSource.isPresent()) {
-                                    Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                                    if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                        Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                                    }
                                     finalSource = Optional.of(SoundSource.MASTER);
+
                                 }
 
                                 wrapper.write(Type.VAR_INT, finalSource.get().getId());
@@ -165,7 +168,7 @@ public class InventoryPackets {
                                     String rewritten = getNewPluginChannelId(channels[i]);
                                     if (rewritten != null) {
                                         rewrittenChannels.add(rewritten);
-                                    } else {
+                                    } else if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
                                         Via.getPlatform().getLogger().warning("Ignoring plugin channel in REGISTER: " + channels[i]);
                                     }
                                 }
@@ -244,7 +247,7 @@ public class InventoryPackets {
                                 String rewritten = getOldPluginChannelId(channels[i]);
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
-                                } else {
+                                } else if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
                                     Via.getPlatform().getLogger().warning("Ignoring plugin channel in REGISTER: " + channels[i]);
                                 }
                             }
@@ -408,7 +411,9 @@ public class InventoryPackets {
             } else if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
                 rawId &= ~0xF; // Remove data
             } else {
-                Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.getId());
+                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.getId());
+                }
                 rawId = 16; // Stone
             }
         }
@@ -489,7 +494,9 @@ public class InventoryPackets {
         }
 
         if (rawId == null) {
-            Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.getId());
+            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.getId());
+            }
             rawId = 0x10000; // Stone
         }
 
