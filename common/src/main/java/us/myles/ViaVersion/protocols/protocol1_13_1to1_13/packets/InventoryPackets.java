@@ -120,7 +120,7 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.STRING); // Group
                                 int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
                                 for (int i1 = 0; i1 < ingredientsNo; i1++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY);
+                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
                                     for (int i2 = 0; i2 < items.length; i2++) {
                                         InventoryPackets.toClient(items[i2]);
                                     }
@@ -130,7 +130,7 @@ public class InventoryPackets {
                                 int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
                                 wrapper.passthrough(Type.STRING); // Group
                                 for (int i1 = 0; i1 < ingredientsNo; i1++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY);
+                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
                                     for (int i2 = 0; i2 < items.length; i2++) {
                                         InventoryPackets.toClient(items[i2]);
                                     }
@@ -139,7 +139,7 @@ public class InventoryPackets {
                             } else if (type.equals("smelting")) {
                                 wrapper.passthrough(Type.STRING); // Group
                                 // Ingredient start
-                                Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY);
+                                Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
                                 for (int i2 = 0; i2 < items.length; i2++) {
                                     InventoryPackets.toClient(items[i2]);
                                 }
