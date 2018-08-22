@@ -52,6 +52,41 @@ public class InventoryPackets {
             }
         });
 
+        // Plugin message
+        protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Channel
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String channel = wrapper.get(Type.STRING, 0);
+                        if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                            wrapper.passthrough(Type.INT); // Passthrough Window ID
+
+                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                            for (int i = 0; i < size; i++) {
+                                // Input Item
+                                toClient(wrapper.passthrough(Type.FLAT_ITEM));
+                                // Output Item
+                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
+
+                                boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                                if (secondItem) {
+                                    // Second Item
+                                    InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
+                                }
+
+                                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                                wrapper.passthrough(Type.INT); // Number of tools uses
+                                wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         // Entity Equipment Packet
         protocol.registerOutgoing(State.PLAY, 0x42, 0x42, new PacketRemapper() {
             @Override
@@ -65,6 +100,55 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.FLAT_ITEM, 0);
                         toClient(stack);
+                    }
+                });
+            }
+        });
+
+        // Declare Recipes
+        protocol.registerOutgoing(State.PLAY, 0x54, 0x54, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int recipesNo = wrapper.passthrough(Type.VAR_INT);
+                        for (int i = 0; i < recipesNo; i++) {
+                            wrapper.passthrough(Type.STRING); // Id
+                            String type = wrapper.passthrough(Type.STRING);
+                            if (type.equals("crafting_shapeless")) {
+                                wrapper.passthrough(Type.STRING); // Group
+                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
+                                for (int i1 = 0; i1 < ingredientsNo; i1++) {
+                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
+                                    for (int i2 = 0; i2 < items.length; i2++) {
+                                        InventoryPackets.toClient(items[i2]);
+                                    }
+                                }
+                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
+                            } else if (type.equals("crafting_shaped")) {
+                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
+                                wrapper.passthrough(Type.STRING); // Group
+                                for (int i1 = 0; i1 < ingredientsNo; i1++) {
+                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
+                                    for (int i2 = 0; i2 < items.length; i2++) {
+                                        InventoryPackets.toClient(items[i2]);
+                                    }
+                                }
+                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
+                            } else if (type.equals("smelting")) {
+                                wrapper.passthrough(Type.STRING); // Group
+                                // Ingredient start
+                                Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
+                                for (int i2 = 0; i2 < items.length; i2++) {
+                                    InventoryPackets.toClient(items[i2]);
+                                }
+                                // Ingredient end
+                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
+                                wrapper.passthrough(Type.FLOAT); // EXP
+                                wrapper.passthrough(Type.VAR_INT); // Cooking time
+                            }
+                        }
                     }
                 });
             }

@@ -77,6 +77,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* 1.13 Flat Item (no data) */
     public static final Type<Item> FLAT_ITEM = new FlatItemType();
     public static final Type<Item[]> FLAT_ITEM_ARRAY = new FlatItemArrayType();
+    public static final Type<Item[]> FLAT_ITEM_ARRAY_VAR_INT = new ArrayType<>(FLAT_ITEM);
 
     /* Actual Class */
 
