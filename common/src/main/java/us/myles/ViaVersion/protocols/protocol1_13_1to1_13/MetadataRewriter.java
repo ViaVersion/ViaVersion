@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13;
+package us.myles.ViaVersion.protocols.protocol1_13_1to1_13;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.entities.Entity1_13Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
-import us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,13 @@ public class MetadataRewriter {
                 } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
                     // Convert to new block id
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol13_1_PRE2TO1_13.getNewBlockStateId(data));
+                    metadata.setValue(Protocol1_13_1To1_13.getNewBlockStateId(data));
                 }
                 if (type == null) continue;
                 if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
                     // New block format
                     int data = (int) metadata.getValue();
-                    metadata.setValue(Protocol13_1_PRE2TO1_13.getNewBlockStateId(data));
+                    metadata.setValue(Protocol1_13_1To1_13.getNewBlockStateId(data));
                 }
                 if(type.is(EntityType.ITEM)){
 

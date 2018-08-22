@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.packets;
+package us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.Protocol13_1_PRE2TO1_13;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -31,7 +31,7 @@ public class WorldPackets {
                                 for (int i = 0; i < section.getPalette().size(); i++) {
                                     section.getPalette().set(
                                             i,
-                                            Protocol13_1_PRE2TO1_13.getNewBlockStateId(section.getPalette().get(i))
+                                            Protocol1_13_1To1_13.getNewBlockStateId(section.getPalette().get(i))
                                     );
                                 }
                             }
@@ -53,7 +53,7 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0, Protocol13_1_PRE2TO1_13.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
+                        wrapper.set(Type.VAR_INT, 0, Protocol1_13_1To1_13.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
                     }
                 });
             }
@@ -70,7 +70,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
 
-                        wrapper.set(Type.VAR_INT, 0, Protocol13_1_PRE2TO1_13.getNewBlockStateId(id));
+                        wrapper.set(Type.VAR_INT, 0, Protocol1_13_1To1_13.getNewBlockStateId(id));
                     }
                 });
             }
@@ -89,7 +89,7 @@ public class WorldPackets {
                         // Convert ids
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int id = record.getBlockId();
-                            record.setBlockId(Protocol13_1_PRE2TO1_13.getNewBlockStateId(id));
+                            record.setBlockId(Protocol1_13_1To1_13.getNewBlockStateId(id));
                         }
                     }
                 });
@@ -111,7 +111,7 @@ public class WorldPackets {
                         if (id == 1010) { // Play record
                             wrapper.set(Type.INT, 1, data = InventoryPackets.getNewItemId(data));
                         } else if (id == 2001) { // Block break + block break sound
-                            wrapper.set(Type.INT, 1, data = Protocol13_1_PRE2TO1_13.getNewBlockStateId(data));
+                            wrapper.set(Type.INT, 1, data = Protocol1_13_1To1_13.getNewBlockStateId(data));
                         }
                     }
                 });
@@ -174,7 +174,7 @@ public class WorldPackets {
                         int id = wrapper.get(Type.INT, 0);
                         if(id == 3 || id == 20){
                             int data = wrapper.passthrough(Type.VAR_INT);
-                            wrapper.set(Type.VAR_INT, 0, Protocol13_1_PRE2TO1_13.getNewBlockStateId(data));
+                            wrapper.set(Type.VAR_INT, 0, Protocol1_13_1To1_13.getNewBlockStateId(data));
                         }
                     }
                 });

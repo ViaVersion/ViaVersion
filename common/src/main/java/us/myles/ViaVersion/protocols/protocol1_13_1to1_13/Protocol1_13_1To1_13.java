@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13;
+package us.myles.ViaVersion.protocols.protocol1_13_1to1_13;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -9,13 +9,13 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_13_1_pre2to1_13.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol13_1_PRE2TO1_13 extends Protocol {
+public class Protocol1_13_1To1_13 extends Protocol {
 
     @Override
     protected void registerPackets() {
