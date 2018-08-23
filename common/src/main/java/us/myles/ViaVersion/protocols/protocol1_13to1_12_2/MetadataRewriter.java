@@ -79,6 +79,11 @@ public class MetadataRewriter {
                     if (metadata.getId() >= 9)
                         metadatas.remove(metadata); // Remove
                 }
+
+                if (metadata.getId() == 0) {
+                    metadata.setValue((byte) ((byte) metadata.getValue() & ~0x10)); // Previously unused, now swimming
+                }
+
                 // TODO: Boat has changed
             } catch (Exception e) {
                 metadatas.remove(metadata);

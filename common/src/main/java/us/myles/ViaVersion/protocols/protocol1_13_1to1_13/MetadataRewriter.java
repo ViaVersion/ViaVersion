@@ -31,8 +31,8 @@ public class MetadataRewriter {
                     int data = (int) metadata.getValue();
                     metadata.setValue(Protocol1_13_1To1_13.getNewBlockStateId(data));
                 }
-                if(type.is(EntityType.ITEM)){
-
+                if (type.isOrHasParent(EntityType.ABSTRACT_ARROW) && metadata.getId() >= 7) {
+                    metadata.setId(metadata.getId() + 1); // New shooter UUID
                 }
             } catch (Exception e) {
                 metadatas.remove(metadata);
