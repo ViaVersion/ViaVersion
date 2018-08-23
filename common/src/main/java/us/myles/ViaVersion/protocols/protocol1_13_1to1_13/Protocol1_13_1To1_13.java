@@ -83,7 +83,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        //boss bar
+        // Boss bar
         registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -97,7 +97,8 @@ public class Protocol1_13_1To1_13 extends Protocol {
                             wrapper.passthrough(Type.STRING);
                             wrapper.passthrough(Type.FLOAT);
                             wrapper.passthrough(Type.VAR_INT);
-                            short flags = wrapper.read(Type.UNSIGNED_BYTE);
+                            wrapper.passthrough(Type.VAR_INT);
+                            short flags = wrapper.read(Type.BYTE);
                             if ((flags & 0x02) != 0) flags |= 0x04;
                             wrapper.write(Type.UNSIGNED_BYTE, flags);
                         }
