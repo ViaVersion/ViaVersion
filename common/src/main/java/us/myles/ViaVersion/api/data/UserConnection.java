@@ -6,9 +6,12 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.util.Map;
 import java.util.UUID;
@@ -128,7 +131,7 @@ public class UserConnection {
      */
     public boolean incrementReceived() {
         // handle stats
-        Long diff = System.currentTimeMillis() - startTime;
+        long diff = System.currentTimeMillis() - startTime;
         if (diff >= 1000) {
             packetsPerSecond = intervalPackets;
             startTime = System.currentTimeMillis();
@@ -147,7 +150,7 @@ public class UserConnection {
         // Max PPS Checker
         if (conf.getMaxPPS() > 0) {
             if (getPacketsPerSecond() >= conf.getMaxPPS()) {
-                disconnect(conf.getMaxPPSKickMessage().replace("%pps", ((Long) getPacketsPerSecond()).intValue() + ""));
+                disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(getPacketsPerSecond())));
                 return true; // don't send current packet
             }
         }
@@ -165,7 +168,7 @@ public class UserConnection {
                 }
 
                 if (getWarnings() >= conf.getMaxWarnings()) {
-                    disconnect(conf.getMaxWarningsKickMessage().replace("%pps", ((Long) getPacketsPerSecond()).intValue() + ""));
+                    disconnect(conf.getMaxWarningsKickMessage().replace("%pps", Long.toString(getPacketsPerSecond())));
                     return true; // don't send current packet
                 }
             }
@@ -195,4 +198,28 @@ public class UserConnection {
         }
 
     }
+
+    public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
+        final ByteBuf buf = packet.alloc().buffer();
+        try {
+            Type.VAR_INT.write(buf, PacketWrapper.PASSTHROUGH_ID);
+        } catch (Exception e) {
+            // Should not happen
+            Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
+        }
+        buf.writeBytes(packet);
+        packet.release();
+        if (currentThread) {
+            PipelineUtil.getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline()).fireChannelRead(buf);
+        } else {
+            channel.eventLoop().submit(new Runnable() {
+                @Override
+                public void run() {
+                    PipelineUtil.getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline()).fireChannelRead(buf);
+                }
+            });
+        }
+    }
+
+    public void sendRawPacketToServer(ByteBuf packet) { sendRawPacketToServer(packet, false); }
 }

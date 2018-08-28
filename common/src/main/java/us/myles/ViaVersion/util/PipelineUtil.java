@@ -100,4 +100,15 @@ public class PipelineUtil {
         }
         return null;
     }
+
+    public static ChannelHandlerContext getPreviousContext(String name, ChannelPipeline pipeline) {
+        String previous = null;
+        for (String entry : pipeline.toMap().keySet()) {
+            if (entry.equals(name)) {
+                return pipeline.context(previous);
+            }
+            previous = entry;
+        }
+        return null;
+    }
 }
