@@ -536,6 +536,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        // Disable auto-complete if configured
+                        if (Via.getConfig().isDisable1_13AutoComplete()) {
+                            wrapper.cancel();
+                        }
                         int tid = wrapper.read(Type.VAR_INT);
                         // Save transaction id
                         wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);

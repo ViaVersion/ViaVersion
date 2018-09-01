@@ -90,6 +90,8 @@ quick-move-action-fix: false
 team-colour-fix: true
 # We warn when there's a error converting from pre-1.13 to 1.13, should we suppress these? (Only suggested if spamming)
 suppress-1_13-conversion-errors: false
+# 1.13 introduced new auto complete which can trigger "Kicked for spamming" for servers older than 1.13, the following option will disable it completely.
+disable-1_13-auto-complete: false
 #
 #----------------------------------------------------------#
 #         1.9 & 1.10 CLIENTS ON 1.8 SERVERS OPTIONS        #
