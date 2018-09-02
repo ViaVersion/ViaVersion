@@ -172,9 +172,11 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.INT, 0);
-                        if(id == 3 || id == 20){
+                        if (id == 3 || id == 20) {
                             int data = wrapper.passthrough(Type.VAR_INT);
                             wrapper.set(Type.VAR_INT, 0, Protocol1_13_1To1_13.getNewBlockStateId(data));
+                        } else if (id == 27) {
+                            InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
                         }
                     }
                 });
