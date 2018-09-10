@@ -18,6 +18,7 @@ import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.*;
 import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
+import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
@@ -56,6 +57,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
+
+        // Add ProtocolSupport ConnectListener if necessary.
+        ClassGenerator.registerPSConnectListener(plugin);
 
         registerListener(new Listener() {
             @EventHandler
