@@ -38,20 +38,17 @@ public class ClassGenerator {
                 }
 
                 if (ViaVersion.getInstance().isCompatSpigotBuild()) {
-                	Bukkit.broadcastMessage("COMPAT SPIGOT");
                     Class decodeSuper = NMSUtil.nms("PacketDecoder");
                     Class encodeSuper = NMSUtil.nms("PacketEncoder");
                     // Generate the classes
                     addSpigotCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
                     addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 } else {
-                	Bukkit.broadcastMessage("COMPAT PROTOCOLSUPPORT");
                     // ProtocolSupport compatibility
                     Class encodeSuper;
                     Class decodeSuper;
                     if (isMultiplatformPS()) {
-                    	Bukkit.broadcastMessage("NEW PROTOCOLSUPPORT!");
-                    	psConnectListener = makePSConnectListener(pool);
+                        psConnectListener = makePSConnectListener(pool);
                         return;
                     } else {
                         String psPackage = getOldPSPackage();
@@ -182,14 +179,13 @@ public class ClassGenerator {
     }
 
     private static Class makePSConnectListener(ClassPool pool) {
-    	try {
-    		// Reference classes
-    		CtClass toExtend = pool.get("protocolsupport.api.Connection$PacketListener");
+        try {
+            // Reference classes
+            CtClass toExtend = pool.get("protocolsupport.api.Connection$PacketListener");
             CtClass connectListenerClazz = pool.makeClass("us.myles.ViaVersion.classgenerator.generated.ProtocolSupportConnectListener");
             connectListenerClazz.setSuperclass(toExtend);
             // Import packages
             pool.importPackage("java.util.Arrays");
-            pool.importPackage("org.bukkit.Bukkit");
             pool.importPackage("us.myles.ViaVersion.api.protocol.ProtocolRegistry");
             pool.importPackage("protocolsupport.api.ProtocolVersion");
             pool.importPackage("protocolsupport.api.ProtocolType");
@@ -202,38 +198,38 @@ public class ClassGenerator {
             connectListenerClazz.addField(CtField.make("private ConnectionImpl connection;", connectListenerClazz));
             // Bake constructor
             connectListenerClazz.addConstructor(CtNewConstructor.make(
-            		"public ProtocolSupportConnectListener (ConnectionImpl connection) {\n"
-            	  + "    this.connection = connection;\n"
-            	  + "}", connectListenerClazz));
+                    "public ProtocolSupportConnectListener (ConnectionImpl connection) {\n"
+                  + "    this.connection = connection;\n"
+                  + "}", connectListenerClazz));
             // Add the listening method
             connectListenerClazz.addMethod(CtNewMethod.make(
-            	    // On packet receive
-            		"public void onPacketReceiving(protocolsupport.api.Connection.PacketListener.PacketEvent event) {\n"
-            		// Check if we are getting handshake packet.
-            	  + "    if (event.getPacket() instanceof PacketHandshakingInSetProtocol) {\n"
-            	    // Get protocol version.
-            	  + "        int protoVersion = ((PacketHandshakingInSetProtocol) event.getPacket()).getProtocolVersion();\n"
-          	        // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
-            	    // If via has put the protoVersion to the server we can spoof ProtocolSupport's version. 
-          	      + "        if (protoVersion == us.myles.ViaVersion.api.protocol.ProtocolRegistry.SERVER_PROTOCOL) {\n"
-          	      + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
-          	      + "        }\n"
-            	  + "    }\n"
-          	        // Id version is not serverversion viaversion will not spoof. ProtocolSupport will handle the rest.
-            	    // In any case, remove the packet listener and wrap up.
-            	  + "    connection.removePacketListener(this);\n"
-            	  + "}", connectListenerClazz));
+                    // On packet receive
+                    "public void onPacketReceiving(protocolsupport.api.Connection.PacketListener.PacketEvent event) {\n"
+                    // Check if we are getting handshake packet.
+                  + "    if (event.getPacket() instanceof PacketHandshakingInSetProtocol) {\n"
+                    // Get protocol version.
+                  + "        int protoVersion = ((PacketHandshakingInSetProtocol) event.getPacket()).getProtocolVersion();\n"
+                      // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
+                    // If via has put the protoVersion to the server we can spoof ProtocolSupport's version. 
+                  + "        if (protoVersion == us.myles.ViaVersion.api.protocol.ProtocolRegistry.SERVER_PROTOCOL) {\n"
+                  + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
+                  + "        }\n"
+                  + "    }\n"
+                    // Id version is not serverversion viaversion will not spoof. ProtocolSupport will handle the rest.
+                    // In any case, remove the packet listener and wrap up.
+                  + "    connection.removePacketListener(this);\n"
+                  + "}", connectListenerClazz));
             return connectListenerClazz.toClass(HandlerConstructor.class.getClassLoader());
-    	} catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    	return null;
+        return null;
     }
     
     public static void registerPSConnectListener(ViaVersionPlugin plugin) {
         if (getPSConnectListener() != null) {
-        	try {
-            	Class<? extends Event> connectionOpenEvent = (Class<? extends Event>) Class.forName("protocolsupport.api.events.ConnectionOpenEvent");
+            try {
+                Class<? extends Event> connectionOpenEvent = (Class<? extends Event>) Class.forName("protocolsupport.api.events.ConnectionOpenEvent");
                 Bukkit.getPluginManager().registerEvent(connectionOpenEvent, new Listener() { }, EventPriority.HIGH, new EventExecutor() {
                     @Override
                     public void execute(Listener listener, Event event) throws EventException {
@@ -243,18 +239,18 @@ public class ClassGenerator {
                             Method addConnectListener = connection.getClass().getMethod("addPacketListener", Class.forName("protocolsupport.api.Connection$PacketListener"));
                             addConnectListener.invoke(connection, connectListener);
                         } catch (Exception e) {
-                    	    e.printStackTrace();
+                            e.printStackTrace();
                         }
                     }
                 }, plugin);
-        	} catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
     public static Class getPSConnectListener() {
-    	return psConnectListener;
+        return psConnectListener;
     }
 
     public static String getOldPSPackage() {
