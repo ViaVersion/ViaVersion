@@ -48,7 +48,7 @@ public class ClassGenerator {
                     Class encodeSuper;
                     Class decodeSuper;
                     if (isMultiplatformPS()) {
-                        psConnectListener = makePSConnectListener(pool);
+                        psConnectListener = makePSConnectListener(pool, shouldUseNewHandshakeVersionMethod());
                         return;
                     } else {
                         String psPackage = getOldPSPackage();
@@ -178,7 +178,7 @@ public class ClassGenerator {
         return null;
     }
 
-    private static Class makePSConnectListener(ClassPool pool) {
+    private static Class makePSConnectListener(ClassPool pool, boolean newVersionMethod) {
         try {
             // Reference classes
             CtClass toExtend = pool.get("protocolsupport.api.Connection$PacketListener");
@@ -208,10 +208,15 @@ public class ClassGenerator {
                     // Check if we are getting handshake packet.
                   + "    if (event.getPacket() instanceof PacketHandshakingInSetProtocol) {\n"
                     // Get protocol version.
-                  + "        int protoVersion = ((PacketHandshakingInSetProtocol) event.getPacket()).getProtocolVersion();\n"
-                      // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
+                  + "        PacketHandshakingInSetProtocol packet = (PacketHandshakingInSetProtocol) event.getPacket();\n"
+                  + (newVersionMethod ? (
+                    "        int protoVersion = packet.getProtocolVersion();\n"
+                  ) : (
+                    "        int protoVersion = packet.b();\n"
+                  ))
+                    // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
                     // If via has put the protoVersion to the server we can spoof ProtocolSupport's version. 
-                  + "        if (protoVersion == us.myles.ViaVersion.api.protocol.ProtocolRegistry.SERVER_PROTOCOL) {\n"
+                  + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == us.myles.ViaVersion.api.protocol.ProtocolRegistry.SERVER_PROTOCOL) {\n"
                   + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
                   + "        }\n"
                   + "    }\n"
@@ -275,6 +280,15 @@ public class ClassGenerator {
             Class.forName("protocolsupport.zplatform.impl.spigot.network.pipeline.SpigotPacketEncoder");
             return true;
         } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    public static boolean shouldUseNewHandshakeVersionMethod() {
+        try {
+            NMSUtil.nms("PacketHandshakingInSetProtocol").getMethod("getProtocolVersion");
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
