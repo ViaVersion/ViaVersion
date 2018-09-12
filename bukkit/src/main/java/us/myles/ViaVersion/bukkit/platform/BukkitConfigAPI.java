@@ -209,4 +209,9 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     public boolean isSuppress1_13ConversionErrors() {
         return getBoolean("suppress-1_13-conversion-errors", false);
     }
+
+    @Override
+    public boolean isDisable1_13AutoComplete() {
+        return getBoolean("disable-1_13-auto-complete", false);
+    }
 }
