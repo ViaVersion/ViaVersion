@@ -483,6 +483,14 @@ public class PacketWrapper {
         }
     }
 
+    /**
+     * Send this packet to the server.
+     *
+     * @param packetProtocol - The protocol version of the packet.
+     * @param skipCurrentPipeline - Skip the current pipeline
+     * @param currentThread - Run in the same thread
+     * @throws Exception if it fails to write
+     */
     public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
             ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.INCOMING);

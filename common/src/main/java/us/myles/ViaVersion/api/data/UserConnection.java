@@ -3,8 +3,10 @@ package us.myles.ViaVersion.api.data;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
+import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -19,6 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 public class UserConnection {
+    /**
+     * The channel of the user.
+     * /!\ In some unofficial platforms this is a client channel
+     *
+     * TODO - Weak this field to {@link io.netty.channel.Channel}?
+     */
+    @NonNull
     private final SocketChannel channel;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
     private boolean active = true;
@@ -199,6 +208,12 @@ public class UserConnection {
 
     }
 
+    /**
+     * Sends a raw packet to the server
+     *
+     * @param packet Raw packet to be sent
+     * @param currentThread If {@code true} executes immediately, {@code false} submits a task to EventLoop
+     */
     public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
         final ByteBuf buf = packet.alloc().buffer();
         try {
@@ -209,17 +224,31 @@ public class UserConnection {
         }
         buf.writeBytes(packet);
         packet.release();
+        final ChannelHandlerContext context = PipelineUtil.getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline());
         if (currentThread) {
-            PipelineUtil.getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline()).fireChannelRead(buf);
+            if (context != null) {
+                context.fireChannelRead(buf);
+            } else {
+                getChannel().pipeline().fireChannelRead(buf);
+            }
         } else {
             channel.eventLoop().submit(new Runnable() {
                 @Override
                 public void run() {
-                    PipelineUtil.getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline()).fireChannelRead(buf);
+                    if (context != null) {
+                        context.fireChannelRead(buf);
+                    } else {
+                        getChannel().pipeline().fireChannelRead(buf);
+                    }
                 }
             });
         }
     }
 
+    /**
+     * Sends a raw packet to the server. It will submit a task to EventLoop
+     *
+     * @param packet Raw packet to be sent
+     */
     public void sendRawPacketToServer(ByteBuf packet) { sendRawPacketToServer(packet, false); }
 }
