@@ -12,7 +12,7 @@ class ChestConnectionHandler implements ConnectionHandler {
 	static void init() {
 		ChestConnectionHandler connectionHandler = new ChestConnectionHandler();
 		for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-			if (blockState.getKey().startsWith("minecraft:chest")) {
+			if (blockState.getKey().startsWith("minecraft:chest") || blockState.getKey().startsWith("minecraft:trapped_chest")) {
 				String facing = blockState.getKey().substring(23);
 				facing = facing.substring(0, facing.indexOf(','));
 				facing = facing.toUpperCase();
