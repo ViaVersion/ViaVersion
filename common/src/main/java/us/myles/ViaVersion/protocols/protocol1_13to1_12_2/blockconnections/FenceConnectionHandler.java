@@ -76,7 +76,8 @@ class FenceConnectionHandler implements ConnectionHandler {
     }
 
     private boolean isWall(int id){
-	    return fences.get(id).endsWith("_wall");
+	    if(fences.containsKey(id)) return fences.get(id).endsWith("_wall");
+	    return false;
     }
 
 }
