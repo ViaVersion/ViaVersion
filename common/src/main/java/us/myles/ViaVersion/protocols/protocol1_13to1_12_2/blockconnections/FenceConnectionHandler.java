@@ -54,6 +54,7 @@ class FenceConnectionHandler implements ConnectionHandler {
 	}
 
 	public boolean up(Position position, ConnectionData data){
+	    if(isWall(data.get(position.getRelative(BlockFace.BOTTOM))) || isWall(data.get(position.getRelative(BlockFace.TOP))))return true;
 	    List<BlockFace> list = getBlockFaces(position, data);
 	    if(list.isEmpty()) return true;
 	    if(list.size() >= 4) return true;
