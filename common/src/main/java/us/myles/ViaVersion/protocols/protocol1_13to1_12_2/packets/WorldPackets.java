@@ -283,7 +283,7 @@ public class WorldPackets {
                             for (int p = 0; p < section.getPalette().size(); p++) {
                                 int old = section.getPalette().get(p);
                                 int newId = toNewId(old);
-                                if (storage.isWelcome(newId)) {
+                                if (storage.isWelcome(newId) || connectionData.isWelcome(newId)) {
                                     willStoreAnyBlock = true;
                                 }
                                 section.getPalette().set(p, newId);

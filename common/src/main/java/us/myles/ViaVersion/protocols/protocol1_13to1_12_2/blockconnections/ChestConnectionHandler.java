@@ -27,9 +27,9 @@ class ChestConnectionHandler implements ConnectionHandler {
 		BlockFace facing = chests.get(blockState);
 		String type = "single";
 		if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.NORTH)))) {
-			type = facing == BlockFace.WEST ? "right" : "left";
+			type = facing == BlockFace.WEST ? "left" : "right";
 		} else if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.SOUTH)))) {
-			type = facing == BlockFace.EAST ? "right" : "left";
+			type = facing == BlockFace.EAST ? "left" : "right";
 		} else if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.WEST)))) {
 			type = facing == BlockFace.NORTH ? "right" : "left";
 		} else if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.EAST)))) {
