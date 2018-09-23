@@ -200,10 +200,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x12, 0x13);
         registerOutgoing(State.PLAY, 0x13, 0x14);
         // InventoryPackets 0x14 -> 0x15
-        registerOutgoing(State.PLAY, 0x15, 0x16);
+        // InventoryPackets 0x15 -> 0x16
         // InventoryPackets 0x16 -> 0x17
         registerOutgoing(State.PLAY, 0x17, 0x18);
-        // InventoryPackets 0x18 -> 0x19
+        // WorldPackets 0x18 -> 0x19
         registerOutgoing(State.PLAY, 0x1A, 0x1B);
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
@@ -212,7 +212,31 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1E, 0x20);
         registerOutgoing(State.PLAY, 0x1F, 0x21);
         // WorldPackets 0x20 -> 0x22
-        registerOutgoing(State.PLAY, 0x21, 0x23);
+
+        // Effect packet
+        registerOutgoing(State.PLAY, 0x21, 0x23, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION); // Location
+                map(Type.INT); // Data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.INT, 0);
+                        int data = wrapper.get(Type.INT, 1);
+                        if (id == 1010) { // Play record
+                            wrapper.set(Type.INT, 1, data = MappingData.oldToNewItems.get(data << 4));
+                        } else if (id == 2001) { // Block break + block break sound
+                            int blockId = data & 0xFFF;
+                            int blockData = data >> 12;
+                            wrapper.set(Type.INT, 1, data = WorldPackets.toNewId(blockId << 4 | blockData));
+                        }
+                    }
+                });
+            }
+        });
+
         // WorldPackets 0x22 -> 0x24
         // Join (save dimension id)
         registerOutgoing(State.PLAY, 0x23, 0x25, new PacketRemapper() {
@@ -393,7 +417,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             }
 
                             if (Via.getConfig().is1_13TeamColourFix()) {
-                                colour = getLastColor(prefix);
+                                colour = getLastColor(prefix).ordinal();
+                                suffix = getLastColor(prefix).toString() + suffix;
                             }
 
                             wrapper.write(Type.VAR_INT, colour);
@@ -451,7 +476,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             if (wrapper.passthrough(Type.BOOLEAN)) {
                                 wrapper.passthrough(Type.STRING); // Title
                                 wrapper.passthrough(Type.STRING); // Description
-                                wrapper.write(Type.FLAT_ITEM, wrapper.read(Type.ITEM)); // Translate item to flat item
+                                Item icon = wrapper.read(Type.ITEM);
+                                InventoryPackets.toClient(icon);
+                                wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
                                 wrapper.passthrough(Type.VAR_INT); // Frame type
                                 int flags = wrapper.passthrough(Type.INT); // Flags
                                 if ((flags & 1) != 0)
@@ -511,6 +538,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        // Disable auto-complete if configured
+                        if (Via.getConfig().isDisable1_13AutoComplete()) {
+                            wrapper.cancel();
+                        }
                         int tid = wrapper.read(Type.VAR_INT);
                         // Save transaction id
                         wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);
@@ -817,11 +848,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
     }
 
     private int getNewSoundID(final int oldID) {
-        return MappingData.oldToNewSounds.get(oldID);
+        return MappingData.soundMappings.getNewSound(oldID);
     }
 
     // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java
-    public int getLastColor(String input) {
+    public ChatColor getLastColor(String input) {
         int length = input.length();
 
         for (int index = length - 1; index > -1; index--) {
@@ -840,12 +871,12 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         case RESET:
                             break;
                         default:
-                            return color.ordinal();
+                            return color;
                     }
                 }
             }
         }
 
-        return ChatColor.RESET.ordinal();
+        return ChatColor.RESET;
     }
 }

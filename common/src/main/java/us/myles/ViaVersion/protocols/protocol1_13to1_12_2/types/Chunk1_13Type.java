@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -10,9 +9,9 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks.Chunk1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks.ChunkSection1_13;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,9 +55,9 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
 
         byte[] biomeData = groundUp ? new byte[256] : null;
         if (groundUp) {
-            for (int i = 0; i < 256; i++){
+            for (int i = 0; i < 256; i++) {
                 // todo use int in Chunk?
-                biomeData[i] = 0;
+                biomeData[i] = (byte) input.readInt();;
             }
         }
 
@@ -67,8 +66,9 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         // Read all the remaining bytes (workaround for #681)
         if (input.readableBytes() > 0) {
             byte[] array = Type.REMAINING_BYTES.read(input);
-            if (Via.getManager().isDebug())
-                System.out.println("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
+            }
         }
 
         return new Chunk1_13(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
@@ -82,7 +82,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         output.writeBoolean(chunk.isGroundUp());
         Type.VAR_INT.write(output, chunk.getBitmask());
 
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = output.alloc().buffer();
         for (int i = 0; i < 16; i++) {
             ChunkSection section = chunk.getSections()[i];
             if (section == null) continue; // Section not set

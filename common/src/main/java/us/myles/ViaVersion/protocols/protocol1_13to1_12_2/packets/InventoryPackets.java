@@ -5,6 +5,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.io.BaseEncoding;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -66,6 +67,26 @@ public class InventoryPackets {
             }
         });
 
+        // Window property
+        protocol.registerOutgoing(State.PLAY, 0x15, 0x16, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(Type.SHORT); // Property
+                map(Type.SHORT); // Value
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        short property = wrapper.get(Type.SHORT, 0);
+                        if (property >= 4 && property <= 6) { // Enchantment id
+                            wrapper.set(Type.SHORT, 1, (short) MappingData.enchantmentMappings.getNewEnchantment(
+                                    wrapper.get(Type.SHORT, 1)
+                            ));
+                        }
+                    }
+                });
+            }
+        });
 
         // Plugin message Packet -> Trading
         protocol.registerOutgoing(State.PLAY, 0x18, 0x19, new PacketRemapper() {
@@ -92,8 +113,11 @@ public class InventoryPackets {
                                 flags |= 1;
                                 Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
                                 if (!finalSource.isPresent()) {
-                                    System.out.println("Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                                    if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                        Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                                    }
                                     finalSource = Optional.of(SoundSource.MASTER);
+
                                 }
 
                                 wrapper.write(Type.VAR_INT, finalSource.get().getId());
@@ -133,10 +157,8 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
                             }
                         } else {
-                            String originalChannel = channel;
                             channel = getNewPluginChannelId(channel);
                             if (channel == null) {
-                                System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
                                 wrapper.cancel();
                                 return;
                             } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
@@ -144,10 +166,11 @@ public class InventoryPackets {
                                 List<String> rewrittenChannels = new ArrayList<>();
                                 for (int i = 0; i < channels.length; i++) {
                                     String rewritten = getNewPluginChannelId(channels[i]);
-                                    if (rewritten != null)
+                                    if (rewritten != null) {
                                         rewrittenChannels.add(rewritten);
-                                    else
-                                        System.out.println("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                    } else if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                        Via.getPlatform().getLogger().warning("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                    }
                                 }
                                 wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
                             }
@@ -213,10 +236,8 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
-                        String originalChannel = channel;
                         channel = getOldPluginChannelId(channel);
                         if (channel == null) {
-                            System.out.println("Plugin message cancelled " + originalChannel); // TODO remove this debug
                             wrapper.cancel();
                             return;
                         } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
@@ -224,10 +245,11 @@ public class InventoryPackets {
                             List<String> rewrittenChannels = new ArrayList<>();
                             for (int i = 0; i < channels.length; i++) {
                                 String rewritten = getOldPluginChannelId(channels[i]);
-                                if (rewritten != null)
+                                if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
-                                else
-                                    System.out.println("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                } else if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                }
                             }
                             wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
                         }
@@ -319,8 +341,8 @@ public class InventoryPackets {
                         CompoundTag enchantmentEntry = new CompoundTag("");
                         short oldId = ((Number) ((CompoundTag) enchEntry).get("id").getValue()).shortValue();
                         String newId = MappingData.oldEnchantmentsIds.get(oldId);
-                        if (newId == null){
-                            newId = "viaversion:legacy/"+oldId;
+                        if (newId == null) {
+                            newId = "viaversion:legacy/" + oldId;
                         }
                         enchantmentEntry.put(new StringTag("id", newId));
                         enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
@@ -339,7 +361,7 @@ public class InventoryPackets {
                         short oldId = ((Number) ((CompoundTag) enchEntry).get("id").getValue()).shortValue();
                         String newId = MappingData.oldEnchantmentsIds.get(oldId);
                         if (newId == null) {
-                            newId = "viaversion:legacy/"+oldId;
+                            newId = "viaversion:legacy/" + oldId;
                         }
                         enchantmentEntry.put(new StringTag("id",
                                 newId
@@ -389,7 +411,9 @@ public class InventoryPackets {
             } else if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
                 rawId &= ~0xF; // Remove data
             } else {
-                System.out.println("FAILED TO GET 1.13 ITEM FOR " + item.getId()); // TODO: Make this nicer etc, perhaps fix issues with mapping :T
+                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.getId());
+                }
                 rawId = 16; // Stone
             }
         }
@@ -398,7 +422,38 @@ public class InventoryPackets {
         item.setData((short) 0);
     }
 
-    // TODO cleanup / smarter rewrite system
+    public static String getNewPluginChannelId(String old) {
+        switch (old) {
+            case "MC|TrList":
+                return "minecraft:trader_list";
+            case "MC|Brand":
+                return "minecraft:brand";
+            case "MC|BOpen":
+                return "minecraft:book_open";
+            case "MC|DebugPath":
+                return "minecraft:debug/paths";
+            case "MC|DebugNeighborsUpdate":
+                return "minecraft:debug/neighbors_update";
+            case "REGISTER":
+                return "minecraft:register";
+            case "UNREGISTER":
+                return "minecraft:unregister";
+            case "BungeeCord":
+                return "bungeecord:main";
+            case "WDL|INIT":
+                return "wdl:init";
+            case "WDL|CONTROL":
+                return "wdl:init";
+            case "WDL|REQUEST":
+                return "wdl:request";
+            default:
+                return old.matches("[0-9a-z_-]+:[0-9a-z_/.-]+") // Identifier regex
+                        ? old
+                        : "viaversion:legacy/" + BaseEncoding.base32().lowerCase().withPadChar('-').encode(
+                        old.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
     public static void toServer(Item item) {
         if (item == null) return;
 
@@ -439,7 +494,9 @@ public class InventoryPackets {
         }
 
         if (rawId == null) {
-            System.out.println("FAILED TO GET 1.12 ITEM FOR " + item.getId());
+            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.getId());
+            }
             rawId = 0x10000; // Stone
         }
 
@@ -506,7 +563,7 @@ public class InventoryPackets {
                         CompoundTag enchEntry = new CompoundTag("");
                         String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
                         Short oldId = MappingData.oldEnchantmentsIds.inverse().get(newId);
-                        if (oldId == null && newId.startsWith("viaversion:legacy/")){
+                        if (oldId == null && newId.startsWith("viaversion:legacy/")) {
                             oldId = Short.valueOf(newId.substring(18));
                         }
                         enchEntry.put(
@@ -527,9 +584,10 @@ public class InventoryPackets {
                 ListTag newStoredEnch = new ListTag("StoredEnchantments", CompoundTag.class);
                 for (Tag enchantmentEntry : storedEnch) {
                     if (enchantmentEntry instanceof CompoundTag) {
-                        CompoundTag enchEntry = new CompoundTag("");String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
+                        CompoundTag enchEntry = new CompoundTag("");
+                        String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
                         Short oldId = MappingData.oldEnchantmentsIds.inverse().get(newId);
-                        if (oldId == null && newId.startsWith("viaversion:legacy/")){
+                        if (oldId == null && newId.startsWith("viaversion:legacy/")) {
                             oldId = Short.valueOf(newId.substring(18));
                         }
                         enchEntry.put(
@@ -545,52 +603,6 @@ public class InventoryPackets {
                 tag.remove("StoredEnchantments");
                 tag.put(newStoredEnch);
             }
-        }
-    }
-
-    public static boolean isDamageable(int id) {
-        return id >= 256 && id <= 259 // iron shovel, pickaxe, axe, flint and steel
-                || id == 261 // bow
-                || id >= 267 && id <= 279 // iron sword, wooden+stone+diamond swords, shovels, pickaxes, axes
-                || id >= 283 && id <= 286 // gold sword, shovel, pickaxe, axe
-                || id >= 290 && id <= 294 // hoes
-                || id >= 298 && id <= 317 // armors
-                || id == 346 // fishing rod
-                || id == 359 // shears
-                || id == 398 // carrot on a stick
-                || id == 442 // shield
-                || id == 443; // elytra
-    }
-
-    public static String getNewPluginChannelId(String old) {
-        switch (old) {
-            case "MC|TrList":
-                return "minecraft:trader_list";
-            case "MC|Brand":
-                return "minecraft:brand";
-            case "MC|BOpen":
-                return "minecraft:book_open";
-            case "MC|DebugPath":
-                return "minecraft:debug/paths";
-            case "MC|DebugNeighborsUpdate":
-                return "minecraft:debug/neighbors_update";
-            case "REGISTER":
-                return "minecraft:register";
-            case "UNREGISTER":
-                return "minecraft:unregister";
-            case "BungeeCord":
-                return "bungeecord:main";
-            case "WDL|INIT":
-                return "wdl:init";
-            case "WDL|CONTROL":
-                return "wdl:init";
-            case "WDL|REQUEST":
-                return "wdl:request";
-            default:
-                return old.matches("[0-9a-z_-]+:[0-9a-z_/.-]+") // Identifier regex
-                        ? old
-                        : "viaversion:legacy/" + BaseEncoding.base32().lowerCase().withPadChar('-').encode(
-                        old.getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -611,10 +623,28 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             default:
-                return newId.startsWith("viaversion:legacy/")
+                return newId.startsWith("viaversion:legacy/") // Our format :)
                         ? new String(BaseEncoding.base32().lowerCase().withPadChar('-').decode(
                         newId.substring(18)), StandardCharsets.UTF_8)
+                        : newId.startsWith("legacy:")
+                        ? newId.substring(7) // Rewrite BungeeCord's format. It will only prevent kicks, plugins will still be broken because of case-sensitivity *plays sad violin*
+                        : newId.startsWith("bungeecord:legacy/")
+                        ? newId.substring(18)
                         : newId;
         }
+    }
+
+    public static boolean isDamageable(int id) {
+        return id >= 256 && id <= 259 // iron shovel, pickaxe, axe, flint and steel
+                || id == 261 // bow
+                || id >= 267 && id <= 279 // iron sword, wooden+stone+diamond swords, shovels, pickaxes, axes
+                || id >= 283 && id <= 286 // gold sword, shovel, pickaxe, axe
+                || id >= 290 && id <= 294 // hoes
+                || id >= 298 && id <= 317 // armors
+                || id == 346 // fishing rod
+                || id == 359 // shears
+                || id == 398 // carrot on a stick
+                || id == 442 // shield
+                || id == 443; // elytra
     }
 }

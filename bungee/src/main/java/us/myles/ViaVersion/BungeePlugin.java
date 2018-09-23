@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
@@ -167,6 +168,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
-        Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+        UserConnection userConnection = Via.getManager().getPortedPlayers().get(e.getPlayer().getUniqueId());
+        if (userConnection != null) {
+            // Only remove if the connection is disconnected (eg. relogin)
+            if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
+                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+            }
+        }
+
     }
 }

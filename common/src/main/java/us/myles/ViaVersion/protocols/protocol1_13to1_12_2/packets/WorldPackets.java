@@ -14,20 +14,48 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WorldPackets {
+    private static final Set<Integer> validBiomes = new HashSet<>();
+
+    static {
+        // Client will crash if it receives a invalid biome id
+        for (int i = 0; i < 50; i++) {
+            validBiomes.add(i);
+        }
+        validBiomes.add(127);
+        for (int i = 129; i <= 134; i++) {
+            validBiomes.add(i);
+        }
+        validBiomes.add(140);
+        validBiomes.add(149);
+        validBiomes.add(151);
+        for (int i = 155; i <= 158; i++) {
+            validBiomes.add(i);
+        }
+        for (int i = 160; i <= 167; i++) {
+            validBiomes.add(i);
+        }
+    }
+
     public static void register(Protocol protocol) {
         // Outgoing packets
 
@@ -46,9 +74,9 @@ public class WorldPackets {
 
                         Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                        if (!id.isPresent())
-                            System.out.println("Could not find painting motive: " + motive + " falling back to default (0)");
-
+                        if (!id.isPresent() && (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug())) {
+                            Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
+                        }
                         wrapper.write(Type.VAR_INT, id.or(0));
                     }
                 });
@@ -81,6 +109,55 @@ public class WorldPackets {
 
                         if (action == 5) // Set type of flower in flower pot
                             wrapper.cancel(); // Removed
+                    }
+                });
+            }
+        });
+
+        // Block action
+        protocol.registerOutgoing(State.PLAY, 0xA, 0xA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION); // Location
+                map(Type.UNSIGNED_BYTE); // Action Id
+                map(Type.UNSIGNED_BYTE); // Action param
+                map(Type.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Position pos = wrapper.get(Type.POSITION, 0);
+                        short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        short param = wrapper.get(Type.UNSIGNED_BYTE, 1);
+                        int blockId = wrapper.get(Type.VAR_INT, 0);
+
+                        if (blockId == 25)
+                            blockId = 73;
+                        else if (blockId == 33)
+                            blockId = 99;
+                        else if (blockId == 29)
+                            blockId = 92;
+                        else if (blockId == 54)
+                            blockId = 142;
+                        else if (blockId == 146)
+                            blockId = 305;
+                        else if (blockId == 130)
+                            blockId = 249;
+                        else if (blockId == 138)
+                            blockId = 257;
+                        else if (blockId == 52)
+                            blockId = 140;
+                        else if (blockId == 209)
+                            blockId = 472;
+                        else if (blockId >= 219 && blockId <= 234)
+                            blockId = blockId - 219 + 483;
+
+                        if (blockId == 73) { // Note block
+                            PacketWrapper blockChange = wrapper.create(0x0B); // block change
+                            blockChange.write(Type.POSITION, new Position(pos.getX(), pos.getY(), pos.getZ())); // Clone because position is mutable
+                            blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
+                            blockChange.send(Protocol1_13To1_12_2.class, true, true);
+                        }
+                        wrapper.set(Type.VAR_INT, 0, blockId);
                     }
                 });
             }
@@ -164,7 +241,19 @@ public class WorldPackets {
         });
 
         // Named Sound Effect TODO String -> Identifier? Check if identifier is present?
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A);
+        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String newSoundId = NamedSoundRewriter.getNewId(wrapper.get(Type.STRING, 0));
+                        wrapper.set(Type.STRING, 0, newSoundId);
+                    }
+                });
+            }
+        });
 
         // Chunk Data
         protocol.registerOutgoing(State.PLAY, 0x20, 0x22, new PacketRemapper() {
@@ -187,29 +276,36 @@ public class WorldPackets {
                             if (section == null)
                                 continue;
 
-                            // TODO improve performance
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 16; y++) {
-                                    for (int z = 0; z < 16; z++) {
-                                        int block = section.getBlock(x, y, z);
+                            boolean willStoreAnyBlock = false;
 
-                                        int newId = toNewId(block);
-                                        section.setFlatBlock(x, y, z, newId);
+                            for (int p = 0; p < section.getPalette().size(); p++) {
+                                int old = section.getPalette().get(p);
+                                int newId = toNewId(old);
+                                if (storage.isWelcome(newId)) {
+                                    willStoreAnyBlock = true;
+                                }
+                                section.getPalette().set(p, newId);
+                            }
 
-                                        if (storage.isWelcome(newId)) {
-                                            storage.store(new Position(
-                                                    (long) (x + (chunk.getX() << 4)),
-                                                    (long) (y + (i << 4)),
-                                                    (long) (z + (chunk.getZ() << 4))
-                                            ), newId);
-                                        }
-
-                                        if (connectionData.isWelcome(newId)) {
-                                            connectionData.store(new Position(
-                                                    (long) (x + (chunk.getX() << 4)),
-                                                    (long) (y + (i << 4)),
-                                                    (long) (z + (chunk.getZ() << 4))
-                                            ), newId);
+                            if (willStoreAnyBlock) {
+                                for (int x = 0; x < 16; x++) {
+                                    for (int y = 0; y < 16; y++) {
+                                        for (int z = 0; z < 16; z++) {
+                                            int block = section.getBlock(x, y, z);
+                                            if (storage.isWelcome(block)) {
+                                                storage.store(new Position(
+                                                        (long) (x + (chunk.getX() << 4)),
+                                                        (long) (y + (i << 4)),
+                                                        (long) (z + (chunk.getZ() << 4))
+                                                ), block);
+                                            }
+                                            if (connectionData.isWelcome(newId)) {
+                                                connectionData.store(new Position(
+                                                        (long) (x + (chunk.getX() << 4)),
+                                                        (long) (y + (i << 4)),
+                                                        (long) (z + (chunk.getZ() << 4))
+                                                ), newId);
+                                            }
                                         }
                                     }
                                 }
@@ -220,9 +316,19 @@ public class WorldPackets {
 
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
+                            int latestBiomeWarn = Integer.MIN_VALUE;
                             for (int i = 0; i < 256; i++) {
-                                if (chunk.getBiomeData()[i] == -1)
-                                    chunk.getBiomeData()[i] = 1;
+                                int biome = chunk.getBiomeData()[i] & 0xFF;
+                                if (!validBiomes.contains(biome)) {
+                                    if (biome != 255 // is it generated naturally? *shrug*
+                                            && latestBiomeWarn != biome) {
+                                        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                            Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
+                                        }
+                                        latestBiomeWarn = biome;
+                                    }
+                                    chunk.getBiomeData()[i] = 1; // Plains
+                                }
                             }
                         }
 
@@ -290,25 +396,22 @@ public class WorldPackets {
                         }
 
                         //Handle reddust particle color
-                        ifStatement:
                         if (particle.getId() == 11) {
                             int count = wrapper.get(Type.INT, 1);
                             float speed = wrapper.get(Type.FLOAT, 6);
-                            if (count != 0 || speed != 1) break ifStatement;
+                            // Only handle for count = 0 & speed = 1
+                            if (count == 0 && speed == 1) {
+                                wrapper.set(Type.INT, 1, 1);
+                                wrapper.set(Type.FLOAT, 6, 0f);
 
-                            wrapper.set(Type.INT, 1, 1);
-                            wrapper.set(Type.FLOAT, 6, 0f);
-
-                            List<Particle.ParticleData> arguments = particle.getArguments();
-                            for (int i = 0; i < 3; i++) {
-                                //RGB values are represented by the X/Y/Z offset
-                                arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
-                                wrapper.set(Type.FLOAT, i + 3, 0f);
+                                List<Particle.ParticleData> arguments = particle.getArguments();
+                                for (int i = 0; i < 3; i++) {
+                                    //RGB values are represented by the X/Y/Z offset
+                                    arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
+                                    wrapper.set(Type.FLOAT, i + 3, 0f);
+                                }
                             }
                         }
-
-//                        System.out.println("Old particle " + particleId + " " + Arrays.toString(data) +  " new Particle" + particle);
-
 
                         wrapper.set(Type.INT, 0, particle.getId());
                         for (Particle.ParticleData particleData : particle.getArguments())
@@ -321,16 +424,23 @@ public class WorldPackets {
     }
 
     public static int toNewId(int oldId) {
-        Integer newId = MappingData.blockMappings.getNewBlock(oldId);
-        if (newId != null) {
+        if (oldId < 0) {
+            oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
+        }
+        int newId = MappingData.blockMappings.getNewBlock(oldId);
+        if (newId != -1) {
             return newId;
         }
         newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
-        if (newId != null) {
-            System.out.println("Missing block " + oldId);
+        if (newId != -1) {
+            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Missing block " + oldId);
+            }
             return newId;
         }
-        System.out.println("Missing block completely " + oldId);
+        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+            Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
+        }
         // Default stone
         return 1;
     }

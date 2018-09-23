@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -158,11 +157,12 @@ public class WorldPackets {
                                 throw new IOException("transformMapChunkBulk returned the wrong object type");
 
                             PacketWrapper output = (PacketWrapper) obj;
-                            ByteBuf buffer = Unpooled.buffer();
+                            ByteBuf buffer = wrapper.user().getChannel().alloc().buffer();
                             output.setId(-1); // -1 for no writing of id
                             output.writeToBuffer(buffer);
                             PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
                             chunkPacket.send(Protocol1_9TO1_8.class, false, true);
+                            buffer.release();
                         }
                     }
                 });

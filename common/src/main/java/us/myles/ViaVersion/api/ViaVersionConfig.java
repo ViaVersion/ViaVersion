@@ -216,14 +216,14 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_13TeamColourFix();
-    
+
     /**
      * Should we fix shift quick move action for 1.12 clients
      *
      * @return True if enabled
      */
     boolean is1_12QuickMoveActionFix();
-    
+
     /**
      * Get the blocked protocols
      *
@@ -245,4 +245,18 @@ public interface ViaVersionConfig {
      * @return Disconnect message
      */
     String getReloadDisconnectMsg();
+
+    /**
+     * Should we hide errors that occur when trying to converting to 1.13 data?
+     *
+     * @return True if enabled
+     */
+    boolean isSuppress1_13ConversionErrors();
+
+    /**
+     * Should we disable the 1.13 auto-complete feature to stop spam kicks? (for any server lower than 1.13)
+     *
+     * @return True if enabled
+     */
+    boolean isDisable1_13AutoComplete();
 }

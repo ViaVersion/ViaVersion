@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
@@ -22,7 +23,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
         Position position = new Position(getLong(tag.get("x")), getLong(tag.get("y")), getLong(tag.get("z")));
 
         if (!storage.contains(position)) {
-            System.out.println("Received an banner color update packet, but there is no banner! O_o " + tag);
+            Via.getPlatform().getLogger().warning("Received an banner color update packet, but there is no banner! O_o " + tag);
             return -1;
         }
 
@@ -30,13 +31,14 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
 
         int color = (int) tag.get("Base").getValue();
         // Standing banner
-        if (blockId >= BANNER_START && blockId <= BANNER_STOP)
+        if (blockId >= BANNER_START && blockId <= BANNER_STOP) {
             blockId += ((15 - color) * 16);
             // Wall banner
-        else if (blockId >= WALL_BANNER_START && blockId <= WALL_BANNER_STOP)
+        } else if (blockId >= WALL_BANNER_START && blockId <= WALL_BANNER_STOP) {
             blockId += ((15 - color) * 4);
-        else
-            System.out.println("Why does this block have the banner block entity? :(" + tag);
+        } else {
+            Via.getPlatform().getLogger().warning("Why does this block have the banner block entity? :(" + tag);
+        }
 
         if (tag.get("Patterns") instanceof ListTag) {
             for (Tag pattern : (ListTag) tag.get("Patterns")) {

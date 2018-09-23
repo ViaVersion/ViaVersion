@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.type.PartialType;
@@ -154,7 +153,7 @@ public class ChunkType extends PartialType<Chunk, ClientChunks> {
         output.writeByte(chunk.isGroundUp() ? 0x01 : 0x00);
         Type.VAR_INT.write(output, chunk.getPrimaryBitmask());
 
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = output.alloc().buffer();
         for (int i = 0; i < SECTION_COUNT; i++) {
             ChunkSection1_9to1_8 section = chunk.getSections()[i];
             if (section == null) continue; // Section not set

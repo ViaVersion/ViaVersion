@@ -6,7 +6,6 @@ import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
@@ -28,7 +27,7 @@ public class MetadataRewriter {
                 if (metadata.getId() == 2) {
                     metadata.setMetaType(MetaType1_13.OptChat);
                     if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                        metadata.setValue(Protocol1_9TO1_8.fixJson((String) metadata.getValue()));
+                        metadata.setValue(ChatRewriter.legacyTextToJson((String) metadata.getValue()));
                     } else {
                         metadata.setValue(null);
                     }
@@ -80,6 +79,11 @@ public class MetadataRewriter {
                     if (metadata.getId() >= 9)
                         metadatas.remove(metadata); // Remove
                 }
+
+                if (metadata.getId() == 0) {
+                    metadata.setValue((byte) ((byte) metadata.getValue() & ~0x10)); // Previously unused, now swimming
+                }
+
                 // TODO: Boat has changed
             } catch (Exception e) {
                 metadatas.remove(metadata);
