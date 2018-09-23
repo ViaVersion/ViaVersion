@@ -15,7 +15,7 @@ class ChestConnectionHandler implements ConnectionHandler {
 		for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
 		    String key = blockState.getKey().split("\\[")[0];
 			if (key.equals("minecraft:chest") || key.equals("minecraft:trapped_chest")) {
-				String facing = blockState.getKey().substring(key.endsWith("minecraft:trapped_chest") ? 31 :  23 );
+				String facing = blockState.getKey().substring(key.equals("minecraft:trapped_chest") ? 31 :  23 );
 				facing = facing.substring(0, facing.indexOf(','));
 				facing = facing.toUpperCase();
 				chests.put(blockState.getValue(), BlockFace.valueOf(facing));
