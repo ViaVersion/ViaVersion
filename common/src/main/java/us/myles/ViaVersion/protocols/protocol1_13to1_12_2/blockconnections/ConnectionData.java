@@ -132,6 +132,7 @@ public class ConnectionData extends StoredObject  {
 		FenceConnectionHandler.init();
 		GlassConnectionHandler.init();
 		ChestConnectionHandler.init();
+		DoorConnectionHandler.init();
 	}
 
 	public static boolean isWelcome(int blockState) {
