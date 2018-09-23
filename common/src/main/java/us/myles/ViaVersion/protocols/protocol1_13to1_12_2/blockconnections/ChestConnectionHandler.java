@@ -8,15 +8,18 @@ import java.util.Map;
 
 class ChestConnectionHandler implements ConnectionHandler {
 	private static Map<Integer, BlockFace> chests = new HashMap<>();
+	private static Map<Integer, String> chestType = new HashMap<>();
 
 	static void init() {
 		ChestConnectionHandler connectionHandler = new ChestConnectionHandler();
 		for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-			if (blockState.getKey().startsWith("minecraft:chest") || blockState.getKey().startsWith("minecraft:trapped_chest")) {
-				String facing = blockState.getKey().substring(blockState.getKey().startsWith("minecraft:trapped_chest") ? 31 :  23 );
+		    String key = blockState.getKey().split("\\[")[0];
+			if (key.equals("minecraft:chest") || key.equals("minecraft:trapped_chest")) {
+				String facing = blockState.getKey().substring(key.endsWith("minecraft:trapped_chest") ? 31 :  23 );
 				facing = facing.substring(0, facing.indexOf(','));
 				facing = facing.toUpperCase();
 				chests.put(blockState.getValue(), BlockFace.valueOf(facing));
+				chestType.put(blockState.getValue(), key);
 				ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
 			}
 		}
@@ -36,7 +39,7 @@ class ChestConnectionHandler implements ConnectionHandler {
 			type = facing == BlockFace.SOUTH ? "right" : "left";
 		}
 
-		String key = "minecraft:chest" + '[' + "facing=" + facing.name().toLowerCase() + ',' + "type=" + type + ',' + "waterlogged=false" + ']';
+		String key = chestType.get(blockState) + '[' + "facing=" + facing.name().toLowerCase() + ',' + "type=" + type + ',' + "waterlogged=false" + ']';
 		return ConnectionData.getId(key);
 	}
 }
