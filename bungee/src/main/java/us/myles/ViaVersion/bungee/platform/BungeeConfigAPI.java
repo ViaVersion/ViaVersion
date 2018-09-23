@@ -224,6 +224,11 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
         return getString("reload-disconnect-msg", "Server reload, please rejoin!");
     }
 
+    @Override
+    public boolean isMinimizeCooldown() {
+        return getBoolean("minimize-cooldown", true);
+    }
+
     /**
      * What is the interval for checking servers via ping
      * -1 for disabled

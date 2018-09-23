@@ -259,4 +259,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isDisable1_13AutoComplete();
+
+    /**
+     * Tries to minimize cooldown animation.
+     *
+     * @return True if enabled
+     */
+    boolean isMinimizeCooldown();
 }
