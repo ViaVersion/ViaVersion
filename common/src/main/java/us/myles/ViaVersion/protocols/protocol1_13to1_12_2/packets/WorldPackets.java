@@ -14,8 +14,10 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ConnectionData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
@@ -25,6 +27,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -298,12 +301,12 @@ public class WorldPackets {
                                                         (long) (z + (chunk.getZ() << 4))
                                                 ), block);
                                             }
-                                            if (connectionData.isWelcome(newId)) {
+                                            if (connectionData.isWelcome(block)) {
                                                 connectionData.store(new Position(
                                                         (long) (x + (chunk.getX() << 4)),
                                                         (long) (y + (i << 4)),
                                                         (long) (z + (chunk.getZ() << 4))
-                                                ), newId);
+                                                ), block);
                                             }
                                         }
                                     }
