@@ -18,6 +18,8 @@ class FenceConnectionHandler implements ConnectionHandler {
 		baseFences.add("minecraft:dark_oak_fence");
 		baseFences.add("minecraft:acacia_fence");
 		baseFences.add("minecraft:spruce_fence");
+		baseFences.add("minecraft:cobblestone_wall");
+		baseFences.add("minecraft:mossy_cobblestone_wall");
 
 		FenceConnectionHandler connectionHandler = new FenceConnectionHandler();
 		for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
@@ -31,14 +33,20 @@ class FenceConnectionHandler implements ConnectionHandler {
 
 	@Override
 	public int connect(Position position, int blockState, ConnectionData connectionData) {
-		String key = fences.get(blockState) + '[' +
+	    String key = fences.get(blockState);
+	    String extraData = "";
+	    if(key.endsWith("_wall")){
+	        extraData = "up=" + key.equals(fences.get(connectionData.get(position.getRelative(BlockFace.TOP)))) + ",";
+        }
+		String data = key + '[' +
 				             "east=" + connects(BlockFace.EAST, connectionData.get(position.getRelative(BlockFace.EAST))) + ',' +
 				             "north=" + connects(BlockFace.NORTH, connectionData.get(position.getRelative(BlockFace.NORTH))) + ',' +
 				             "south=" + connects(BlockFace.SOUTH, connectionData.get(position.getRelative(BlockFace.SOUTH))) + ',' +
+                             extraData +
 				             "waterlogged=false," +
 				             "west=" + connects(BlockFace.WEST, connectionData.get(position.getRelative(BlockFace.WEST))) +
 				             ']';
-		return ConnectionData.getId(key);
+		return ConnectionData.getId(data);
 	}
 
 	private boolean connects(BlockFace side, int blockState) {
