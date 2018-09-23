@@ -1,10 +1,10 @@
 package us.myles.ViaVersion.api.data;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
@@ -21,14 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 public class UserConnection {
-    /**
-     * The channel of the user.
-     * /!\ In some unofficial platforms this is a client channel
-     *
-     * TODO - Weak this field to {@link io.netty.channel.Channel}?
-     */
     @NonNull
-    private final SocketChannel channel;
+    private final Channel channel;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
     private boolean active = true;
     private boolean pendingDisconnect = false;
@@ -44,8 +38,8 @@ public class UserConnection {
     private int warnings = 0;
 
 
-    public UserConnection(SocketChannel socketChannel) {
-        this.channel = socketChannel;
+    public UserConnection(Channel channel) {
+        this.channel = channel;
     }
 
     /**
