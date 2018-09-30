@@ -39,15 +39,15 @@ public class BlockEntityProvider implements Provider {
             return -1;
 
         String id = (String) tag.get("id").getValue();
-
-        if (!handlers.containsKey(id)) {
+        BlockEntityHandler handler = handlers.get(id);
+        if (handler == null) {
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Unhandled BlockEntity " + id + " full tag: " + tag);
             }
             return -1;
         }
 
-        int newBlock = handlers.get(id).transform(user, tag);
+        int newBlock = handler.transform(user, tag);
 
         if (sendUpdate && newBlock != -1)
             sendBlockChange(user, position, newBlock);

@@ -165,13 +165,14 @@ public class ProtocolRegistry {
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
-        if (!registryMap.containsKey(clientVersion)) {
+        Map<Integer, Protocol> inputMap = registryMap.get(clientVersion);
+        if (inputMap == null) {
             return null; // Not supported
         }
         // Next check there isn't an obvious path
-        Map<Integer, Protocol> inputMap = registryMap.get(clientVersion);
-        if (inputMap.containsKey(serverVersion)) {
-            current.add(new Pair<>(serverVersion, inputMap.get(serverVersion)));
+        Protocol protocol = inputMap.get(serverVersion);
+        if (protocol != null) {
+            current.add(new Pair<>(serverVersion, protocol));
             return current; // Easy solution
         }
         // There might be a more advanced solution... So we'll see if any of the others can get us there
@@ -211,8 +212,9 @@ public class ProtocolRegistry {
     public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
         Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
         // Check cache
-        if (pathCache.containsKey(protocolKey)) {
-            return pathCache.get(protocolKey);
+        List<Pair<Integer, Protocol>> protocolList = pathCache.get(protocolKey);
+        if (protocolList != null) {
+            return protocolList;
         }
         // Generate path
         List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);

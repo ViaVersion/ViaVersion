@@ -214,8 +214,9 @@ public class SpawnPackets {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        if (tracker.getClientEntityTypes().containsKey(entityID)) {
-                            MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+                        Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityID);
+                        if (type != null) {
+                            MetadataRewriter.transform(type, metadataList);
                         } else {
                             Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityID);
                             metadataList.clear();
@@ -319,8 +320,9 @@ public class SpawnPackets {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        if (tracker.getClientEntityTypes().containsKey(entityID)) {
-                            MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+                        Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityID);
+                        if (type != null) {
+                            MetadataRewriter.transform(type, metadataList);
                         } else {
                             Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityID);
                             metadataList.clear();

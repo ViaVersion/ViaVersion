@@ -90,8 +90,9 @@ public class EntityIdRewriter {
     public static void toClient(CompoundTag tag) {
         if (tag.get("id") instanceof StringTag) {
             StringTag id = tag.get("id");
-            if (oldToNewNames.containsKey(id.getValue())) {
-                id.setValue(oldToNewNames.get(id.getValue()));
+            String newName = oldToNewNames.get(id.getValue());
+            if (newName != null) {
+                id.setValue(newName);
             }
         }
     }
@@ -117,8 +118,9 @@ public class EntityIdRewriter {
             CompoundTag entityTag = item.getTag().get("EntityTag");
             if (entityTag.get("id") instanceof StringTag) {
                 StringTag id = entityTag.get("id");
-                if (oldToNewNames.inverse().containsKey(id.getValue())) {
-                    id.setValue(oldToNewNames.inverse().get(id.getValue()));
+                String newName = oldToNewNames.inverse().get(id.getValue());
+                if (newName != null) {
+                    id.setValue(newName);
                 }
             }
         }

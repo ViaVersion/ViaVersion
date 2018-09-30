@@ -47,8 +47,10 @@ public class PaintingProvider implements Provider {
         if (!motive.startsWith("minecraft:"))
             motive = "minecraft:" + motive.toLowerCase();
 
-        if (paintings.containsKey(motive))
-            return Optional.of(paintings.get(motive));
+        Integer index = paintings.get(motive);
+        if (index != null) {
+            return Optional.of(index);
+        }
 
         return Optional.absent();
     }

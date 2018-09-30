@@ -25,8 +25,7 @@ public class CommandBlockStorage extends StoredObject {
 
     public void unloadChunk(int x, int z) {
         Pair<Integer, Integer> chunkPos = new Pair<>(x, z);
-        if (storedCommandBlocks.containsKey(chunkPos))
-            storedCommandBlocks.remove(chunkPos);
+        storedCommandBlocks.remove(chunkPos);
     }
 
     public void addOrUpdateBlock(Position position, CompoundTag tag) {
@@ -54,12 +53,8 @@ public class CommandBlockStorage extends StoredObject {
     public Optional<CompoundTag> getCommandBlock(Position position) {
         Pair<Integer, Integer> chunkCoords = getChunkCoords(position);
 
-        if (!storedCommandBlocks.containsKey(chunkCoords))
-            return Optional.absent();
-
         Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkCoords);
-
-        if (!blocks.containsKey(position))
+        if (blocks == null)
             return Optional.absent();
 
         CompoundTag tag = blocks.get(position).clone();

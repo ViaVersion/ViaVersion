@@ -173,8 +173,9 @@ public enum MetaIndex {
 
     private static Optional<MetaIndex> getIndex(Entity1_10Types.EntityType type, int index) {
         Pair pair = new Pair<>(type, index);
-        if (metadataRewrites.containsKey(pair)) {
-            return Optional.of(metadataRewrites.get(pair));
+        MetaIndex metaIndex = metadataRewrites.get(pair);
+        if (metaIndex != null) {
+            return Optional.of(metaIndex);
         }
 
         return Optional.absent();
