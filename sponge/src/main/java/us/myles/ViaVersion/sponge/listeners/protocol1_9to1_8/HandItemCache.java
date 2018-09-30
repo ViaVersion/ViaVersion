@@ -33,8 +33,6 @@ public class HandItemCache implements Runnable {
     }
 
     public static Item getHandItem(UUID player) {
-        if (!handCache.containsKey(player))
-            return null;
         return handCache.get(player);
     }
 
