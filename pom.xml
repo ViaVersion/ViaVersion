@@ -21,6 +21,7 @@
         <module>bungee</module>
         <module>sponge</module>
         <module>sponge-legacy</module>
+        <module>velocity</module>
         <module>jar</module>
     </modules>
 

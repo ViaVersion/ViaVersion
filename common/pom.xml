@@ -17,7 +17,7 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.18</version>
-            <scope>provided</scope>
+            <scope>compile</scope> <!-- Velocity doesn't have snakeyaml -->
         </dependency>
     </dependencies>
 </project>

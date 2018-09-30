@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SpongeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "quick-move-action-fix");
+    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "quick-move-action-fix");
     private final PluginContainer pluginContainer;
 
     public SpongeConfigAPI(PluginContainer pluginContainer, File configFile) {

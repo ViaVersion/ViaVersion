@@ -74,7 +74,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
         //SubCommands tabcomplete
         if (args.length == 1) {
-            if (!args[0].equals("")) {
+            if (!args[0].isEmpty()) {
                 for (ViaSubCommand sub : allowed)
                     if (sub.name().toLowerCase().startsWith(args[0].toLowerCase()))
                         output.add(sub.name());

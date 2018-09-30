@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BukkitConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers");
+    private static List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
 
     public BukkitConfigAPI() {
         super(new File(((ViaVersionPlugin) Via.getPlatform()).getDataFolder(), "config.yml"));

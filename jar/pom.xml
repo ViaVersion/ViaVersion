@@ -57,6 +57,10 @@
                             <pattern>org.javassist</pattern>
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.yaml.snakeyaml</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.snakeyaml</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -90,6 +94,11 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-sponge</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-velocity</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

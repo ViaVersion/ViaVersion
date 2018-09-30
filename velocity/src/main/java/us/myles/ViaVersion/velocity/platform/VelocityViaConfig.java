@@ -1,18 +1,18 @@
-package us.myles.ViaVersion.bungee.platform;
+package us.myles.ViaVersion.velocity.platform;
 
 import us.myles.ViaVersion.api.ViaVersionConfig;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-public class BungeeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
+public class VelocityViaConfig extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "bungee-ping-interval", "bungee-ping-save", "bungee-servers");
 
-    public BungeeConfigAPI(File configFile) {
+    public VelocityViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
         // Load config
         reloadConfig();
@@ -20,17 +20,17 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public URL getDefaultConfigURL() {
-        return BungeeConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
+        return getClass().getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override
     protected void handleConfig(Map<String, Object> config) {
         // Parse servers
         Map<String, Object> servers;
-        if (!(config.get("bungee-servers") instanceof Map)) {
+        if (!(config.get("velocity-servers") instanceof Map)) {
             servers = new HashMap<>();
         } else {
-            servers = (Map) config.get("bungee-servers");
+            servers = (Map) config.get("velocity-servers");
         }
         // Convert any bad Protocol Ids
         for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
@@ -49,10 +49,10 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
         }
         // Ensure default exists
         if (!servers.containsKey("default")) {
-            servers.put("default", BungeeVersionProvider.getLowestSupportedVersion());
+            servers.put("default", ProtocolRegistry.SERVER_PROTOCOL);
         }
         // Put back
-        config.put("bungee-servers", servers);
+        config.put("velocity-servers", servers);
     }
 
     @Override
@@ -203,7 +203,7 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     public boolean is1_12NBTArrayFix() {
         return getBoolean("chat-nbt-fix", true);
     }
-    
+
     @Override
     public boolean is1_12QuickMoveActionFix() {
         return false;
@@ -235,17 +235,17 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
      *
      * @return Ping interval in seconds
      */
-    public int getBungeePingInterval() {
-        return getInt("bungee-ping-interval", 60);
+    public int getVelocityPingInterval() {
+        return getInt("velocity-ping-interval", 60);
     }
 
     /**
-     * Should the bungee ping be saved to the config on change.
+     * Should the velocity ping be saved to the config on change.
      *
      * @return True if it should save
      */
-    public boolean isBungeePingSave() {
-        return getBoolean("bungee-ping-save", true);
+    public boolean isVelocityPingSave() {
+        return getBoolean("velocity-ping-save", true);
     }
 
     /**
@@ -254,8 +254,8 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
      *
      * @return Map of String, Integer
      */
-    public Map<String, Integer> getBungeeServerProtocols() {
-        return get("bungee-servers", Map.class, new HashMap<>());
+    public Map<String, Integer> getVelocityServerProtocols() {
+        return get("velocity-servers", Map.class, new HashMap<>());
     }
 
     @Override

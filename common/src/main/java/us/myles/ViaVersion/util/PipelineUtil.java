@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,6 +16,7 @@ import java.util.List;
 public class PipelineUtil {
     private static Method DECODE_METHOD;
     private static Method ENCODE_METHOD;
+    private static Method MTM_DECODE;
 
     static {
         try {
@@ -25,6 +28,12 @@ public class PipelineUtil {
         try {
             ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        try {
+            MTM_DECODE = MessageToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
+            MTM_DECODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -64,6 +73,16 @@ public class PipelineUtil {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, Object msg) throws InvocationTargetException {
+        List<Object> output = new ArrayList<>();
+        try {
+            MTM_DECODE.invoke(decoder, ctx, msg, output);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 
     /**
