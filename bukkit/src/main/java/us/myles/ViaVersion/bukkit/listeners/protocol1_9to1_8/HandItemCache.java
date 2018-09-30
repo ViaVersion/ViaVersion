@@ -14,8 +14,6 @@ public class HandItemCache extends BukkitRunnable {
     private static Map<UUID, Item> handCache = new ConcurrentHashMap<>();
 
     public static Item getHandItem(UUID player) {
-        if (!handCache.containsKey(player))
-            return null;
         return handCache.get(player);
     }
 
