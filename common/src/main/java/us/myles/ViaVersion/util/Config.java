@@ -183,7 +183,7 @@ public abstract class Config implements ConfigurationProvider {
     public List<Integer> getIntegerList(String key) {
         Object o = this.config.get(key);
         if (o != null) {
-            return (List<Integer>) this.config.get(key);
+            return (List<Integer>) o;
         } else {
             return new ArrayList<>();
         }

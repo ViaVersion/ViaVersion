@@ -57,11 +57,14 @@ public class CommandBlockStorage extends StoredObject {
         if (blocks == null)
             return Optional.absent();
 
-        CompoundTag tag = blocks.get(position).clone();
+        CompoundTag tag = blocks.get(position);
+        if (tag == null)
+            return Optional.absent();
+
+        tag = tag.clone();
         tag.put(new ByteTag("powered", (byte) 0));
         tag.put(new ByteTag("auto", (byte) 0));
         tag.put(new ByteTag("conditionMet", (byte) 0));
-
         return Optional.of(tag);
     }
 
