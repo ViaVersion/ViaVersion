@@ -42,8 +42,10 @@ public class BlockEntityRewriter {
     }
 
     public static String toNewIdentifier(String oldId) {
-        if (oldToNewNames.containsKey(oldId))
-            return oldToNewNames.get(oldId);
+        String newName = oldToNewNames.get(oldId);
+        if (newName != null) {
+            return newName;
+        }
         return oldId;
     }
 }

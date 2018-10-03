@@ -57,8 +57,9 @@ public class FakeTileEntity {
     }
 
     public static CompoundTag getFromBlock(int x, int y, int z, int block) {
-        if (tileEntities.containsKey(block)) {
-            CompoundTag tag = tileEntities.get(block).clone();
+        CompoundTag originalTag = tileEntities.get(block);
+        if (originalTag != null) {
+            CompoundTag tag = originalTag.clone();
             tag.put(new IntTag("x", x));
             tag.put(new IntTag("y", y));
             tag.put(new IntTag("z", z));

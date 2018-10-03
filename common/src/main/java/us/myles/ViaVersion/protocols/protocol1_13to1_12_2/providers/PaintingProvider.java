@@ -46,10 +46,6 @@ public class PaintingProvider implements Provider {
         // Handle older versions
         if (!motive.startsWith("minecraft:"))
             motive = "minecraft:" + motive.toLowerCase();
-
-        if (paintings.containsKey(motive))
-            return Optional.of(paintings.get(motive));
-
-        return Optional.absent();
+        return Optional.fromNullable(paintings.get(motive));
     }
 }

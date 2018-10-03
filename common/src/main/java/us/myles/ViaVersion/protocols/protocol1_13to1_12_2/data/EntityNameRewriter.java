@@ -46,11 +46,14 @@ public class EntityNameRewriter {
     }
 
     public static String rewrite(String entName) {
-        if (entityNames.containsKey(entName))
-            return entityNames.get(entName);
-        if (entityNames.containsKey("minecraft:" + entName))
-            return entityNames.get("minecraft:" + entName);
-        else
+        String entityName = entityNames.get(entName);
+        if (entityName != null) {
+            return entityName;
+        }
+        entityName = entityNames.get("minecraft:" + entName);
+        if (entityName != null) {
+            return entityName;
+        } else
             return entName;
     }
 }

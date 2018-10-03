@@ -137,10 +137,8 @@ public abstract class Protocol {
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
         Pair<State, Integer> statePacket = new Pair<>(state, packetWrapper.getId());
         Map<Pair<State, Integer>, ProtocolPacket> packetMap = (direction == Direction.OUTGOING ? outgoing : incoming);
-        ProtocolPacket protocolPacket;
-        if (packetMap.containsKey(statePacket)) {
-            protocolPacket = packetMap.get(statePacket);
-        } else {
+        ProtocolPacket protocolPacket = packetMap.get(statePacket);
+        if (protocolPacket == null) {
             return;
         }
         // write packet id
