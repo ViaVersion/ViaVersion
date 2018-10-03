@@ -39,7 +39,7 @@ public class ProtocolDetectorService implements Runnable {
         // Step 3. Use Default
         Integer defaultProtocol = servers.get("default");
         if (defaultProtocol != null) {
-            return detectedProtocol;
+            return defaultProtocol;
         }
         // Step 4: Use bungee lowest supported... *cries*
         return BungeeVersionProvider.getLowestSupportedVersion();
