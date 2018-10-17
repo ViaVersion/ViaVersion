@@ -330,7 +330,7 @@ public class PacketWrapper {
         resetReader();
 
         // Apply other protocols
-        apply(Direction.OUTGOING, user().get(ProtocolInfo.class).getState(), index, protocols);
+        apply(direction, user().get(ProtocolInfo.class).getState(), index, protocols);
         // Send
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         writeToBuffer(output);
