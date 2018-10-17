@@ -8,9 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by Marco Neuhaus on 23.09.2018 for the Project ViaVersionGerry.
- */
 public class DoorConnectionHandler implements ConnectionHandler{
 
     private static Set<String> baseDoors = new HashSet<>();
@@ -29,7 +26,7 @@ public class DoorConnectionHandler implements ConnectionHandler{
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
             if (baseDoors.contains(key)) {
-                doors.put(blockState.getValue(), blockState.getKey());
+                doors.put(blockState.getValue(), key);
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
             }
         }
@@ -38,12 +35,51 @@ public class DoorConnectionHandler implements ConnectionHandler{
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
         int blockId = connectionData.get(position.getRelative(BlockFace.BOTTOM));
-        String data;
-        if(doors.containsKey(blockId)){
-            data = doors.get(blockId).replace("half=lower", "half=upper");
-        }else{
-            data = doors.get(blockState);
+        WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+        if(doors.containsKey(blockState) && blockdata.getValue("half").equals("lower")){
+            blockdata.set("hinge", "left");
+            if(isDoor(position, BlockFace.SOUTH, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("west") ? "right" : "left");
+            }
+            if(isDoor(position, BlockFace.EAST, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("south") ? "right" : "left");
+            }
+            if(isDoor(position, BlockFace.WEST, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("north") ? "right" : "left");
+            }
+            if(isDoor(position, BlockFace.NORTH, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("east") ? "right" : "left");
+            }
+            return blockdata.getBlockStateId();
         }
-        return ConnectionData.getId(data);
+        if(doors.containsKey(blockId)) {
+            blockdata = WrappedBlockdata.fromStateId(blockId);
+            blockdata.set("half", "upper");
+            blockdata.set("hinge", "left");
+            if(isDoor(position, BlockFace.SOUTH, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("west") ? "right" : "left");
+            }
+            if(isDoor(position, BlockFace.EAST, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("south") ? "right" : "left");
+            }
+            if(isDoor(position, BlockFace.WEST, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("north") ? "right" : "left");
+            }
+            if(isDoor(position, BlockFace.NORTH, connectionData)){
+                blockdata.set("hinge", blockdata.getValue("facing").equals("east") ? "right" : "left");
+            }
+            return blockdata.getBlockStateId();
+        }else{
+            return blockState;
+        }
+    }
+
+    private boolean isDoor(Position position, BlockFace blockFace, ConnectionData connectionData){
+        int blockState = connectionData.get(position.getRelative(blockFace));
+        if(doors.containsKey(blockState)){
+            int current = connectionData.get(position);
+            return doors.get(blockState).equals(doors.get(current));
+        }
+        return false;
     }
 }

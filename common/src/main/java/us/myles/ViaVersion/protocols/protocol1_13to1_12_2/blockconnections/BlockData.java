@@ -2,26 +2,19 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 
-public class BlockData {
-	//TODO store in a map?
-	private boolean[] connectsToFences = new boolean[6];
-	private boolean[] connectsToNetherFences = new boolean[6];
-	private boolean[] connectsToPanes = new boolean[6];
-	private boolean[] connectsToWalls = new boolean[6];
+import java.util.HashMap;
+import java.util.Map;
 
-	public boolean connectsToFences(BlockFace face) {
-		return connectsToFences[face.ordinal()];
-	}
-	
-	public void setConnectsToFences(BlockFace face, boolean connects) {
-		connectsToFences[face.ordinal()] = connects;
-	}
-	
-	public boolean connectsToPanes(BlockFace face) {
-		return connectsToPanes[face.ordinal()];
-	}
-	
-	public void setConnectsToPanes(BlockFace face, boolean connects) {
-		connectsToPanes[face.ordinal()] = connects;
-	}
+public class BlockData {
+
+    private Map<String, Boolean[]> connectData = new HashMap<>();
+
+    public void put(String key, Boolean[] booleans){
+        connectData.put(key, booleans);
+    }
+
+    public boolean connectTo(String blockConnection, BlockFace face){
+        if(!connectData.containsKey(blockConnection)) return false;
+        return connectData.get(blockConnection)[face.ordinal()];
+    }
 }

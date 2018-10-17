@@ -25,7 +25,7 @@ public interface ConfigurationProvider {
     /**
      * Get all the configuration values
      *
-     * @return Map with key-values
+     * @return Map with minecraftKey-values
      */
     Map<String, Object> getValues();
 }

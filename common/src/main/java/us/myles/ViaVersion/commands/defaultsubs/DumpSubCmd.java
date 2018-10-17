@@ -82,10 +82,10 @@ public class DumpSubCmd extends ViaSubCommand {
 
                     JsonObject output = GsonUtil.getGson().fromJson(rawOutput, JsonObject.class);
 
-                    if (!output.has("key"))
+                    if (!output.has("minecraftKey"))
                         throw new InvalidObjectException("Key is not given in Hastebin output");
 
-                    sender.sendMessage(ChatColor.GREEN + "We've made a dump with useful information, report your issue and provide this url: " + getUrl(output.get("key").getAsString()));
+                    sender.sendMessage(ChatColor.GREEN + "We've made a dump with useful information, report your issue and provide this url: " + getUrl(output.get("minecraftKey").getAsString()));
                 } catch (Exception e) {
                     sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
                     Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);

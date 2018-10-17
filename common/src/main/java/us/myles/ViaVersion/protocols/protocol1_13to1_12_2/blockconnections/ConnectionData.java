@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
@@ -12,19 +13,47 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class ConnectionData extends StoredObject  {
 	static Map<Integer, String> idToKey = new HashMap<>();
 	static Map<String, Integer> keyToId = new HashMap<>();
 	static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
 	static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
+	static Map<Class, Set<Long>> timings = new HashMap<>();
 
 	private Map<Position, Integer> blockStorage = new HashMap<>();
 
 	public ConnectionData(UserConnection user) {
 		super(user);
+		new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    synchronized (timings){
+                        for (Entry<Class, Set<Long>> entry : timings.entrySet()) {
+                            if(entry.getValue().isEmpty()){
+                                System.out.println(entry.getKey().getName() + " " + 0 + " inv. " + 0);
+                                continue;
+                            }
+                            long sum = 0;
+                            for (Long t : entry.getValue()) {
+                                sum = sum +t;
+                            }
+                            long avg = sum / entry.getValue().size();
+                            System.out.println(entry.getKey().getName() + " " + avg + " inv. " + entry.getValue().size());
+                            entry.getValue().clear();
+                        }
+                    }
+                    try {
+                        Thread.sleep(1000*15);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
 	}
 
 	public void store(Position position, int blockState) {
@@ -127,12 +156,40 @@ public class ConnectionData extends StoredObject  {
 			keyToId.put(key, id);
 		}
 
-		//TODO load blockConnectionData
+        JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
+        for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
+            int id = keyToId.get(entry.getKey());
+            BlockData blockData = new BlockData();
+            for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
+                String name = type.getKey();
+                JsonObject object = type.getValue().getAsJsonObject();
+                Boolean[] data = new Boolean[6];
+                for (BlockFace value : BlockFace.values()) {
+                    String face = value.toString().toLowerCase();
+                    if(object.has(face)){
+                        data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
+                    }else{
+                        data[value.ordinal()] = false;
+                    }
+                }
+                blockData.put(name, data);
+            }
+            blockConnectionData.put(id, blockData);
+        }
 
-		FenceConnectionHandler.init();
-		GlassConnectionHandler.init();
+//		FenceConnectionHandler.init();
+//		GlassConnectionHandler.init();
+        PumpkinConnectionHandler.init();
+        MelonConnectionHandler.init();
+        BasicFenceConnectionHandler.init();
+        NetherFenceConnectionHandler.init();
+        WallConnectionHandler.init();
+        MelonConnectionHandler.init();
+        GlassConnectionHandler.init();
 		ChestConnectionHandler.init();
 		DoorConnectionHandler.init();
+		RedstoneConnectionHandler.init();
+		StairConnectionHandler.init();
 	}
 
 	public static boolean isWelcome(int blockState) {
@@ -145,7 +202,17 @@ public class ConnectionData extends StoredObject  {
 
 	private static int connect(Position position, int blockState, ConnectionData connectionData) {
 		if (connectionHandlerMap.containsKey(blockState)) {
-			return connectionHandlerMap.get(blockState).connect(position, blockState, connectionData);
+		    ConnectionHandler handler = connectionHandlerMap.get(blockState);
+		    long time = System.nanoTime();
+		    int newState = handler.connect(position, blockState, connectionData);
+			long diff = System.nanoTime() - time;
+			synchronized (timings){
+                Set<Long> set = timings.get(handler.getClass());
+                if(set == null) set = new HashSet<>();
+                set.add(diff);
+			    timings.put(handler.getClass(), set);
+            }
+            return newState;
 		} else {
 			return blockState;
 		}
