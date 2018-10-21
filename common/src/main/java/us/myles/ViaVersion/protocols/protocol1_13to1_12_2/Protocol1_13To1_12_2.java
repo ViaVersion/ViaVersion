@@ -932,11 +932,17 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // It also overwrites for ANY colour in name but most plugins
         // will just send colour as 'invisible' character
         if (ChatColor.stripColor(name).length() == 0) {
-            ChatColor color = ChatColor.getByChar(name.charAt(1));
-            String newName = SCOREBOARD_TEAM_NAME_REWRITE.get(color);
-            if (newName != null) { // just in case
-                name = newName;
+            StringBuilder newName = new StringBuilder();
+            for (int i = 0; i < name.length() / 2; i++) {
+                ChatColor color = ChatColor.getByChar(name.charAt(i * 2 + 1));
+                String rewrite = SCOREBOARD_TEAM_NAME_REWRITE.get(color);
+                if (rewrite != null) { // just in case, should never happen
+                    newName.append(rewrite);
+                } else {
+                    newName.append(name);
+                }
             }
+            name = newName.toString();
         }
         return name;
     }
