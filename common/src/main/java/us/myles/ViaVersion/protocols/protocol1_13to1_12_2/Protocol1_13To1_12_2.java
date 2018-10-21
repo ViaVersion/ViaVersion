@@ -449,8 +449,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         }
 
                         if (action == 0 || action == 3 || action == 4) {
-                            wrapper.passthrough(Type.INT); // Entity Count
-
                             String[] names = wrapper.read(Type.STRING_ARRAY); // Entities
                             for (int i = 0; i < names.length; i++) {
                                 names[i] = rewriteTeamMemberName(names[i]);
