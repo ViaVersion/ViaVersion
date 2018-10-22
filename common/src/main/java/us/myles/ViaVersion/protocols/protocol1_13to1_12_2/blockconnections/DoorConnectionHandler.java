@@ -37,10 +37,19 @@ public class DoorConnectionHandler implements ConnectionHandler{
 
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
-        int blockId = connectionData.get(position.getRelative(BlockFace.BOTTOM));
+        int blockBelow = connectionData.get(position.getRelative(BlockFace.BOTTOM));
+        int blockAbove = connectionData.get(position.getRelative(BlockFace.TOP));
         String data;
-        if(doors.containsKey(blockId)){
-            data = doors.get(blockId).replace("half=lower", "half=upper");
+        if(doors.containsKey(blockBelow)){
+            String hinge = doors.get(blockState);
+            hinge = hinge.split("hinge=")[1];
+            hinge = hinge.substring(0, hinge.indexOf(','));
+            data = doors.get(blockBelow).replace("half=lower", "half=upper").replace("hinge=right", "hinge="+hinge);
+        }else if(doors.containsKey(blockAbove)){
+            String hinge = doors.get(blockAbove);
+            hinge = hinge.split("hinge=")[1];
+            hinge = hinge.substring(0, hinge.indexOf(','));
+            data = doors.get(blockState).replace("hinge=right", "hinge="+hinge);
         }else{
             data = doors.get(blockState);
         }
