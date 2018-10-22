@@ -18,15 +18,14 @@ public class ViaProviders {
     }
 
     public <T extends Provider> void use(Class<T> provider, T value) {
-        if (lonelyProviders.contains(provider)) {
-            lonelyProviders.remove(provider);
-        }
+        lonelyProviders.remove(provider);
         providers.put(provider, value);
     }
 
     public <T extends Provider> T get(Class<T> provider) {
-        if (providers.containsKey(provider)) {
-            return (T) providers.get(provider);
+        Provider rawProvider = providers.get(provider);
+        if (rawProvider != null) {
+            return (T) rawProvider;
         } else {
             if (lonelyProviders.contains(provider)) {
                 throw new IllegalStateException("There was no provider for " + provider + ", one is required!");

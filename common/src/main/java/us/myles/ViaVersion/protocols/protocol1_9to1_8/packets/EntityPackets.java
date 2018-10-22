@@ -1,7 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
+import com.google.common.collect.ImmutableList;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.api.Triple;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -17,7 +21,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
-import java.util.List;
+import java.util.*;
 
 public class EntityPackets {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
@@ -181,8 +185,9 @@ public class EntityPackets {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        if (tracker.getClientEntityTypes().containsKey(entityID)) {
-                            MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+                        Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityID);
+                        if (type != null) {
+                            MetadataRewriter.transform(type, metadataList);
                         } else {
                             // Buffer
                             tracker.addMetadataToBuffer(entityID, metadataList);
@@ -269,9 +274,64 @@ public class EntityPackets {
             }
         });
 
-        /* Packets which do not have any field remapping or handlers */
+        // Entity Properties Packet
+        protocol.registerOutgoing(State.PLAY, 0x20, 0x4B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (!Via.getConfig().isMinimizeCooldown()) return;
+                        if (wrapper.get(Type.VAR_INT, 0) != wrapper.user().get(EntityTracker.class).getEntityID()) {
+                            return;
+                        }
+                        int propertiesToRead = wrapper.read(Type.INT);
+                        Map<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> properties = new HashMap<>(propertiesToRead);
+                        for (int i = 0; i < propertiesToRead; i++) {
+                            String key = wrapper.read(Type.STRING);
+                            Double value = wrapper.read(Type.DOUBLE);
+                            int modifiersToRead = wrapper.read(Type.VAR_INT);
+                            List<Triple<UUID, Double, Byte>> modifiers = new ArrayList<>(modifiersToRead);
+                            for (int j = 0; j < modifiersToRead; j++) {
+                                modifiers.add(
+                                        new Triple<>(
+                                                wrapper.read(Type.UUID),
+                                                wrapper.read(Type.DOUBLE), // Amount
+                                                wrapper.read(Type.BYTE) // Operation
+                                        )
+                                );
+                            }
+                            properties.put(key, new Pair<>(value, modifiers));
+                        }
 
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x4B); // Entity Properties Packet
+                        // == Why 15.9? ==
+                        // Higher values hides the cooldown but it bugs visual animation on hand
+                        // when removing item from hand with inventory gui
+                        properties.put("generic.attackSpeed", new Pair<Double, List<Triple<UUID, Double, Byte>>>(15.9, ImmutableList.of( // Neutralize modifiers
+                                new Triple<>(UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), 0.0, (byte) 0), // Tool and weapon modifier
+                                new Triple<>(UUID.fromString("AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3"), 0.0, (byte) 2), // Dig speed
+                                new Triple<>(UUID.fromString("55FCED67-E92A-486E-9800-B47F202C4386"), 0.0, (byte) 2) // Dig slow down
+                        )));
+
+                        wrapper.write(Type.INT, properties.size());
+                        for (Map.Entry<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> entry : properties.entrySet()) {
+                            wrapper.write(Type.STRING, entry.getKey()); // Key
+                            wrapper.write(Type.DOUBLE, entry.getValue().getKey()); // Value
+                            wrapper.write(Type.VAR_INT, entry.getValue().getValue().size());
+                            for (Triple<UUID, Double, Byte> modifier : entry.getValue().getValue()) {
+                                wrapper.write(Type.UUID, modifier.getFirst());
+                                wrapper.write(Type.DOUBLE, modifier.getSecond()); // Amount
+                                wrapper.write(Type.BYTE, modifier.getThird()); // Operation
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+
+        /* Packets which do not have any field remapping or handlers */
 
         protocol.registerOutgoing(State.PLAY, 0x1A, 0x1B); // Entity Status Packet
         protocol.registerOutgoing(State.PLAY, 0x16, 0x27); // Entity Look Packet

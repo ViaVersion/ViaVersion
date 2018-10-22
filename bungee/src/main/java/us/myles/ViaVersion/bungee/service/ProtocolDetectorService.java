@@ -27,16 +27,19 @@ public class ProtocolDetectorService implements Runnable {
     public static Integer getProtocolId(String serverName) {
         // Step 1. Check Config
         Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
-        if (servers.containsKey(serverName)) {
-            return servers.get(serverName);
+        Integer protocol = servers.get(serverName);
+        if (protocol != null) {
+            return protocol;
         }
         // Step 2. Check Detected
-        if (detectedProtocolIds.containsKey(serverName)) {
-            return detectedProtocolIds.get(serverName);
+        Integer detectedProtocol = detectedProtocolIds.get(serverName);
+        if (detectedProtocol != null) {
+            return detectedProtocol;
         }
         // Step 3. Use Default
-        if (servers.containsKey("default")) {
-            return servers.get("default");
+        Integer defaultProtocol = servers.get("default");
+        if (defaultProtocol != null) {
+            return defaultProtocol;
         }
         // Step 4: Use bungee lowest supported... *cries*
         return BungeeVersionProvider.getLowestSupportedVersion();
@@ -58,10 +61,9 @@ public class ProtocolDetectorService implements Runnable {
                     detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
                     if (((BungeeConfigAPI) Via.getConfig()).isBungeePingSave()) {
                         Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
-                        if (servers.containsKey(key)) {
-                            if (servers.get(key) == serverPing.getVersion().getProtocol()) {
-                                return;
-                            }
+                        Integer protocol = servers.get(key);
+                        if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
+                            return;
                         }
                         // Ensure we're the only ones writing to the config
                         synchronized (Via.getPlatform().getConfigurationProvider()) {

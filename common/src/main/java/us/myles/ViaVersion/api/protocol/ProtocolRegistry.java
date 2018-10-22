@@ -13,6 +13,7 @@ import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.Protocol1_12_1TO1_12;
 import us.myles.ViaVersion.protocols.protocol1_12_2to1_12_1.Protocol1_12_2TO1_12_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.Protocol1_13_2To1_13_1;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2TO1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1TO1_9;
@@ -57,6 +58,7 @@ public class ProtocolRegistry {
 
         registerProtocol(new Protocol1_13To1_12_2(), Collections.singletonList(ProtocolVersion.v1_13.getId()), ProtocolVersion.v1_12_2.getId());
         registerProtocol(new Protocol1_13_1To1_13(),  Arrays.asList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
+        registerProtocol(new Protocol1_13_2To1_13_1(),  Arrays.asList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
     }
 
     /**
@@ -165,13 +167,14 @@ public class ProtocolRegistry {
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
-        if (!registryMap.containsKey(clientVersion)) {
+        Map<Integer, Protocol> inputMap = registryMap.get(clientVersion);
+        if (inputMap == null) {
             return null; // Not supported
         }
         // Next check there isn't an obvious path
-        Map<Integer, Protocol> inputMap = registryMap.get(clientVersion);
-        if (inputMap.containsKey(serverVersion)) {
-            current.add(new Pair<>(serverVersion, inputMap.get(serverVersion)));
+        Protocol protocol = inputMap.get(serverVersion);
+        if (protocol != null) {
+            current.add(new Pair<>(serverVersion, protocol));
             return current; // Easy solution
         }
         // There might be a more advanced solution... So we'll see if any of the others can get us there
@@ -211,8 +214,9 @@ public class ProtocolRegistry {
     public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
         Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
         // Check cache
-        if (pathCache.containsKey(protocolKey)) {
-            return pathCache.get(protocolKey);
+        List<Pair<Integer, Protocol>> protocolList = pathCache.get(protocolKey);
+        if (protocolList != null) {
+            return protocolList;
         }
         // Generate path
         List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);

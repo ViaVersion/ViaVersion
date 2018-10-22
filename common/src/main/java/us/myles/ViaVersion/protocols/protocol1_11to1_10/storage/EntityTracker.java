@@ -33,9 +33,7 @@ public class EntityTracker extends StoredObject {
     }
 
     public Optional<Entity1_11Types.EntityType> get(int id) {
-        if (!has(id))
-            return Optional.absent();
-        return Optional.of(clientEntityTypes.get(id));
+        return Optional.fromNullable(clientEntityTypes.get(id));
     }
 
     public void addHologram(int entId) {

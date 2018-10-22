@@ -284,9 +284,7 @@ public enum SoundEffect {
 
     public static SoundEffect getByName(String name) {
         name = name.toLowerCase();
-        if (effects.containsKey(name))
-            return effects.get(name);
-        return null;
+        return effects.get(name);
     }
 
 }
