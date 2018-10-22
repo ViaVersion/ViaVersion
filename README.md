@@ -1,4 +1,4 @@
-# ViaVersion 1.5.2 - Spigot, Sponge, BungeeCord
+# ViaVersion 1.6.0 - Spigot, Sponge, BungeeCord
 [![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
 
