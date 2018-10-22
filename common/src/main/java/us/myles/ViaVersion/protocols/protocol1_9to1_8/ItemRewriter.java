@@ -230,8 +230,9 @@ public class ItemRewriter {
                     tag = new CompoundTag("tag");
                 }
                 CompoundTag entityTag = new CompoundTag("EntityTag");
-                if (ENTTIY_ID_TO_NAME.containsKey((int) item.getData())) {
-                    StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get((int) item.getData()));
+                String entityName = ENTTIY_ID_TO_NAME.get((int) item.getData());
+                if (entityName != null) {
+                    StringTag id = new StringTag("id", entityName);
                     entityTag.put(id);
                     tag.put(entityTag);
                 }
@@ -379,12 +380,14 @@ public class ItemRewriter {
         if (oldID >= 16384) {
             oldID -= 8192;
         }
-        if (POTION_INDEX.containsKey(oldID)) {
-            return POTION_INDEX.get(oldID);
+
+        Integer index = POTION_INDEX.get(oldID);
+        if (index != null) {
+            return index;
         }
 
         oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short) oldID));
-        return POTION_INDEX.containsKey(oldID) ? POTION_INDEX.get(oldID) : 0;
+        return (index = POTION_INDEX.get(oldID)) != null ? index : 0;
     }
 
     private static void registerEntity(Integer id, String name) {

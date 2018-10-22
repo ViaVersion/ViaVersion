@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public abstract class Config implements ConfigurationProvider {
-    private static ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() {
+    private static final ThreadLocal<Yaml> YAML = new ThreadLocal<Yaml>() {
         @Override
         protected Yaml initialValue() {
             DumperOptions options = new DumperOptions();
@@ -58,7 +58,7 @@ public abstract class Config implements ConfigurationProvider {
         Map<String, Object> config = null;
         if (location.exists()) {
             try (FileInputStream input = new FileInputStream(location)) {
-                config = (Map<String, Object>) yaml.get().load(input);
+                config = (Map<String, Object>) YAML.get().load(input);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -71,7 +71,7 @@ public abstract class Config implements ConfigurationProvider {
 
         Map<String, Object> defaults = config;
         try (InputStream stream = jarConfigFile.openStream()) {
-            defaults = (Map<String, Object>) yaml.get().load(stream);
+            defaults = (Map<String, Object>) YAML.get().load(stream);
             for (String option : unsupported) {
                 defaults.remove(option);
             }
@@ -97,7 +97,7 @@ public abstract class Config implements ConfigurationProvider {
 
     public synchronized void saveConfig(File location, Map<String, Object> config) {
         try {
-            commentStore.writeComments(yaml.get().dump(config), location);
+            commentStore.writeComments(YAML.get().dump(config), location);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -128,33 +128,37 @@ public abstract class Config implements ConfigurationProvider {
     }
 
     public <T> T get(String key, Class<T> clazz, T def) {
-        if (this.config.containsKey(key)) {
-            return (T) this.config.get(key);
+        Object o = this.config.get(key);
+        if (o != null) {
+            return (T) o;
         } else {
             return def;
         }
     }
 
     public boolean getBoolean(String key, boolean def) {
-        if (this.config.containsKey(key)) {
-            return (boolean) this.config.get(key);
+        Object o = this.config.get(key);
+        if (o != null) {
+            return (boolean) o;
         } else {
             return def;
         }
     }
 
     public String getString(String key, String def) {
-        if (this.config.containsKey(key)) {
-            return (String) this.config.get(key);
+        final Object o = this.config.get(key);
+        if (o != null) {
+            return (String) o;
         } else {
             return def;
         }
     }
 
     public int getInt(String key, int def) {
-        if (this.config.containsKey(key)) {
-            if (this.config.get(key) instanceof Number) {
-                return ((Number) this.config.get(key)).intValue();
+        Object o = this.config.get(key);
+        if (o != null) {
+            if (o instanceof Number) {
+                return ((Number) o).intValue();
             } else {
                 return def;
             }
@@ -164,9 +168,10 @@ public abstract class Config implements ConfigurationProvider {
     }
 
     public double getDouble(String key, double def) {
-        if (this.config.containsKey(key)) {
-            if (this.config.get(key) instanceof Number) {
-                return ((Number) this.config.get(key)).doubleValue();
+        Object o = this.config.get(key);
+        if (o != null) {
+            if (o instanceof Number) {
+                return ((Number) o).doubleValue();
             } else {
                 return def;
             }
@@ -176,8 +181,9 @@ public abstract class Config implements ConfigurationProvider {
     }
 
     public List<Integer> getIntegerList(String key) {
-        if (this.config.containsKey(key)) {
-            return (List<Integer>) this.config.get(key);
+        Object o = this.config.get(key);
+        if (o != null) {
+            return (List<Integer>) o;
         } else {
             return new ArrayList<>();
         }

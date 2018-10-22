@@ -8,9 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by Marco Neuhaus on 23.09.2018 for the Project ViaVersionGerry.
- */
 public class DoorConnectionHandler implements ConnectionHandler{
 
     private static Set<String> baseDoors = new HashSet<>();
@@ -29,7 +26,7 @@ public class DoorConnectionHandler implements ConnectionHandler{
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
             if (baseDoors.contains(key)) {
-                doors.put(blockState.getValue(), blockState.getKey());
+                doors.put(blockState.getValue(), key);
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
             }
         }
@@ -37,22 +34,24 @@ public class DoorConnectionHandler implements ConnectionHandler{
 
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
-        int blockBelow = connectionData.get(position.getRelative(BlockFace.BOTTOM));
-        int blockAbove = connectionData.get(position.getRelative(BlockFace.TOP));
-        String data;
-        if(doors.containsKey(blockBelow)){
-            String hinge = doors.get(blockState);
-            hinge = hinge.split("hinge=")[1];
-            hinge = hinge.substring(0, hinge.indexOf(','));
-            data = doors.get(blockBelow).replace("half=lower", "half=upper").replace("hinge=right", "hinge="+hinge);
-        }else if(doors.containsKey(blockAbove)){
-            String hinge = doors.get(blockAbove);
-            hinge = hinge.split("hinge=")[1];
-            hinge = hinge.substring(0, hinge.indexOf(','));
-            data = doors.get(blockState).replace("hinge=right", "hinge="+hinge);
-        }else{
-            data = doors.get(blockState);
+        int blockBelowId = connectionData.get(position.getRelative(BlockFace.BOTTOM));
+        int blockAboveId = connectionData.get(position.getRelative(BlockFace.TOP));
+        WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+        if(doors.containsKey(blockState)){
+            if (blockdata.getValue("half").equals("lower")){
+                if(doors.containsKey(blockAboveId)){
+                    WrappedBlockdata blockAboveData = WrappedBlockdata.fromStateId(blockAboveId);
+                    blockdata.set("hinge", blockAboveData.getValue("hinge"));
+                    blockdata.set("powered", blockAboveData.getValue("powered"));
+                }
+            }else{
+                if(doors.containsKey(blockBelowId)){
+                    WrappedBlockdata blockBelowData = WrappedBlockdata.fromStateId(blockBelowId);
+                    blockdata.set("open", blockBelowData.getValue("open"));
+                    blockdata.set("facing", blockBelowData.getValue("facing"));
+                }
+            }
         }
-        return ConnectionData.getId(data);
+        return blockdata.getBlockStateId();
     }
 }
