@@ -258,8 +258,7 @@ public class EntityTracker extends StoredObject {
             } else {
                 wrapper.write(Type.BYTE, (byte) 3);
             }
-            wrapper.write(Type.VAR_INT, 1); // player count
-            wrapper.write(Type.STRING, getUser().get(ProtocolInfo.class).getUsername());
+            wrapper.write(Type.STRING_ARRAY, new String[] {getUser().get(ProtocolInfo.class).getUsername()});
         } else {
             wrapper.write(Type.BYTE, (byte) 1); // remove team
         }
