@@ -94,13 +94,13 @@ public class CommentStore {
 
             int indents = indent / this.indents;
             if (indents <= currentIndents) {
-                // Remove last section of minecraftKey
+                // Remove last section of key
                 String[] array = key.split(Pattern.quote(pathSeparator));
                 int backspace = currentIndents - indents + 1;
                 key = join(array, this.pathSeperator, 0, array.length - backspace);
             }
 
-            // Add new section to minecraftKey
+            // Add new section to key
             String separator = key.length() > 0 ? pathSeparator : "";
             String lineKey = line.contains(":") ? line.split(Pattern.quote(":"))[0] : line;
             key += separator + lineKey.substring(indent);
@@ -133,13 +133,13 @@ public class CommentStore {
             int indents = indent / indentLength;
             String indentText = indent > 0 ? line.substring(0, indent) : "";
             if (indents <= currentIndents) {
-                // Remove last section of minecraftKey
+                // Remove last section of key
                 String[] array = key.split(Pattern.quote(pathSeparator));
                 int backspace = currentIndents - indents + 1;
                 key = join(array, this.pathSeperator, 0, array.length - backspace);
             }
 
-            // Add new section to minecraftKey
+            // Add new section to key
             String separator = key.length() > 0 ? pathSeparator : "";
             String lineKey = line.contains(":") ? line.split(Pattern.quote(":"))[0] : line;
             key += separator + lineKey.substring(indent);

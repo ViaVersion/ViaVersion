@@ -64,7 +64,7 @@ public class MappingData {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
                 if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No minecraftKey for " + entry.getValue() + " :( ");
+                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                 }
                 continue;
             }
@@ -77,7 +77,7 @@ public class MappingData {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
                 if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No minecraftKey for " + entry.getValue() + " :( ");
+                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                 }
                 continue;
             }
@@ -89,7 +89,7 @@ public class MappingData {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
-                Via.getPlatform().getLogger().warning("No minecraftKey for " + entry.getValue() + " :( ");
+                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                 continue;
             }
             output[Integer.parseInt(entry.getKey())] = Byte.parseByte(value.getKey());
@@ -102,7 +102,7 @@ public class MappingData {
             Integer index = findIndex(newIdentifiers, v.getAsString());
             if (index == null) {
                 if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No minecraftKey for " + v + " :( ");
+                    Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
                 }
                 continue;
             }

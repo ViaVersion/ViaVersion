@@ -33,7 +33,7 @@ public class BlockEntity {
         for (CompoundTag tag : tags) {
             try {
                 if (!tag.contains("id"))
-                    throw new Exception("NBT tag not handled because the id minecraftKey is missing");
+                    throw new Exception("NBT tag not handled because the id key is missing");
 
                 String id = (String) tag.get("id").getValue();
                 if (!types.containsKey(id))

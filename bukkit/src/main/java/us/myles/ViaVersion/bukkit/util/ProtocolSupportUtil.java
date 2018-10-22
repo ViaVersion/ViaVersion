@@ -12,7 +12,7 @@ public class ProtocolSupportUtil {
     static {
         try {
             protocolVersionMethod = Class.forName("protocolsupport.api.ProtocolSupportAPI").getMethod("getProtocolVersion", Player.class);
-            getIdMethod = Class.forName("protocolsupport.api.ProtocolVersion").getMethod("getBlockStateId");
+            getIdMethod = Class.forName("protocolsupport.api.ProtocolVersion").getMethod("getId");
         } catch (Exception e) {
             // ProtocolSupport not installed.
         }
