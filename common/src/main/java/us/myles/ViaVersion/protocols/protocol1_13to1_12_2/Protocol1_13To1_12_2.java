@@ -30,6 +30,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Particle1_13Type
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.GsonUtil;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 // Development of 1.13 support!
@@ -95,6 +96,28 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }).send(Protocol1_13To1_12_2.class);
         }
     };
+
+    // @formatter:off
+    // These are arbitrary rewrite values, it just needs an invalid color code character.
+    protected static EnumMap<ChatColor, String> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<ChatColor, String>(ChatColor.class) {{
+        put(ChatColor.BLACK,        ChatColor.COLOR_CHAR + "g");
+        put(ChatColor.DARK_BLUE,    ChatColor.COLOR_CHAR + "h");
+        put(ChatColor.DARK_GREEN,   ChatColor.COLOR_CHAR + "i");
+        put(ChatColor.DARK_AQUA,    ChatColor.COLOR_CHAR + "j");
+        put(ChatColor.DARK_RED,     ChatColor.COLOR_CHAR + "p");
+        put(ChatColor.DARK_PURPLE,  ChatColor.COLOR_CHAR + "q");
+        put(ChatColor.GOLD,         ChatColor.COLOR_CHAR + "s");
+        put(ChatColor.GRAY,         ChatColor.COLOR_CHAR + "t");
+        put(ChatColor.DARK_GRAY,    ChatColor.COLOR_CHAR + "u");
+        put(ChatColor.BLUE,         ChatColor.COLOR_CHAR + "v");
+        put(ChatColor.GREEN,        ChatColor.COLOR_CHAR + "w");
+        put(ChatColor.AQUA,         ChatColor.COLOR_CHAR + "x");
+        put(ChatColor.RED,          ChatColor.COLOR_CHAR + "y");
+        put(ChatColor.LIGHT_PURPLE, ChatColor.COLOR_CHAR + "z");
+        put(ChatColor.YELLOW,       ChatColor.COLOR_CHAR + "!");
+        put(ChatColor.WHITE,        ChatColor.COLOR_CHAR + "?");
+    }};
+    // @formatter:on
 
     static {
         MappingData.init();
@@ -424,12 +447,39 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             wrapper.write(Type.STRING, ChatRewriter.legacyTextToJson(prefix)); // Prefix
                             wrapper.write(Type.STRING, ChatRewriter.legacyTextToJson(suffix)); // Suffix
                         }
+
+                        if (action == 0 || action == 3 || action == 4) {
+                            String[] names = wrapper.read(Type.STRING_ARRAY); // Entities
+                            for (int i = 0; i < names.length; i++) {
+                                names[i] = rewriteTeamMemberName(names[i]);
+                            }
+                            wrapper.write(Type.STRING_ARRAY, names);
+                        }
                     }
                 });
 
             }
         });
-        registerOutgoing(State.PLAY, 0x45, 0x48);
+        registerOutgoing(State.PLAY, 0x45, 0x48, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        String displayName = wrapper.read(Type.STRING); // Display Name
+                        displayName = rewriteTeamMemberName(displayName);
+                        wrapper.write(Type.STRING, displayName);
+
+                        byte action = wrapper.read(Type.BYTE);
+                        wrapper.write(Type.BYTE, action);
+                        wrapper.passthrough(Type.STRING); // Objective Name
+                        if (action != 1) {
+                            wrapper.passthrough(Type.VAR_INT); // Value
+                        }
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x46, 0x49);
         registerOutgoing(State.PLAY, 0x47, 0x4A);
         registerOutgoing(State.PLAY, 0x48, 0x4B);
@@ -875,5 +925,25 @@ public class Protocol1_13To1_12_2 extends Protocol {
         }
 
         return ChatColor.RESET;
+    }
+
+    protected String rewriteTeamMemberName(String name) {
+        // The Display Name is just colours which overwrites the suffix
+        // It also overwrites for ANY colour in name but most plugins
+        // will just send colour as 'invisible' character
+        if (ChatColor.stripColor(name).length() == 0) {
+            StringBuilder newName = new StringBuilder();
+            for (int i = 0; i < name.length() / 2; i++) {
+                ChatColor color = ChatColor.getByChar(name.charAt(i * 2 + 1));
+                String rewrite = SCOREBOARD_TEAM_NAME_REWRITE.get(color);
+                if (rewrite != null) { // just in case, should never happen
+                    newName.append(rewrite);
+                } else {
+                    newName.append(name);
+                }
+            }
+            name = newName.toString();
+        }
+        return name;
     }
 }

@@ -47,6 +47,13 @@ public class Protocol1_13_1To1_13 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        Item item = wrapper.get(Type.FLAT_ITEM, 0);
+                        InventoryPackets.toServer(item);
+                    }
+                });
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int hand = wrapper.read(Type.VAR_INT);
                         if (hand == 1) {
                             wrapper.cancel();
