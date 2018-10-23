@@ -34,52 +34,24 @@ public class DoorConnectionHandler implements ConnectionHandler{
 
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
-        int blockId = connectionData.get(position.getRelative(BlockFace.BOTTOM));
+        int blockBelowId = connectionData.get(position.getRelative(BlockFace.BOTTOM));
+        int blockAboveId = connectionData.get(position.getRelative(BlockFace.TOP));
         WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
-        if(doors.containsKey(blockState) && blockdata.getValue("half").equals("lower")){
-            blockdata.set("hinge", "left");
-            if(isDoor(position, BlockFace.SOUTH, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("west") ? "right" : "left");
-            }
-            if(isDoor(position, BlockFace.EAST, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("south") ? "right" : "left");
-            }
-            if(isDoor(position, BlockFace.WEST, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("north") ? "right" : "left");
-            }
-            if(isDoor(position, BlockFace.NORTH, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("east") ? "right" : "left");
-            }
-            return blockdata.getBlockStateId();
-        }
-        if(doors.containsKey(blockId)) {
-            blockdata = WrappedBlockdata.fromStateId(blockId);
-            blockdata.set("half", "upper");
-            blockdata.set("hinge", "left");
-            if(isDoor(position, BlockFace.SOUTH, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("west") ? "right" : "left");
-            }
-            if(isDoor(position, BlockFace.EAST, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("south") ? "right" : "left");
-            }
-            if(isDoor(position, BlockFace.WEST, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("north") ? "right" : "left");
-            }
-            if(isDoor(position, BlockFace.NORTH, connectionData)){
-                blockdata.set("hinge", blockdata.getValue("facing").equals("east") ? "right" : "left");
-            }
-            return blockdata.getBlockStateId();
-        }else{
-            return blockState;
-        }
-    }
-
-    private boolean isDoor(Position position, BlockFace blockFace, ConnectionData connectionData){
-        int blockState = connectionData.get(position.getRelative(blockFace));
         if(doors.containsKey(blockState)){
-            int current = connectionData.get(position);
-            return doors.get(blockState).equals(doors.get(current));
+            if (blockdata.getValue("half").equals("lower")){
+                if(doors.containsKey(blockAboveId)){
+                    WrappedBlockdata blockAboveData = WrappedBlockdata.fromStateId(blockAboveId);
+                    blockdata.set("hinge", blockAboveData.getValue("hinge"));
+                    blockdata.set("powered", blockAboveData.getValue("powered"));
+                }
+            }else{
+                if(doors.containsKey(blockBelowId)){
+                    WrappedBlockdata blockBelowData = WrappedBlockdata.fromStateId(blockBelowId);
+                    blockdata.set("open", blockBelowData.getValue("open"));
+                    blockdata.set("facing", blockBelowData.getValue("facing"));
+                }
+            }
         }
-        return false;
+        return blockdata.getBlockStateId();
     }
 }
