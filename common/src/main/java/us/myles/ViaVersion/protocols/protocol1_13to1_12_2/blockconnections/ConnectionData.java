@@ -21,39 +21,11 @@ public class ConnectionData extends StoredObject  {
 	static Map<String, Integer> keyToId = new HashMap<>();
 	static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
 	static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
-	static Map<Class, Set<Long>> timings = new HashMap<>();
 
 	private Map<Position, Integer> blockStorage = new HashMap<>();
 
 	public ConnectionData(UserConnection user) {
 		super(user);
-		new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true){
-                    synchronized (timings){
-                        for (Entry<Class, Set<Long>> entry : timings.entrySet()) {
-                            if(entry.getValue().isEmpty()){
-                                System.out.println(entry.getKey().getName() + " " + 0 + " inv. " + 0);
-                                continue;
-                            }
-                            long sum = 0;
-                            for (Long t : entry.getValue()) {
-                                sum = sum +t;
-                            }
-                            long avg = sum / entry.getValue().size();
-                            System.out.println(entry.getKey().getName() + " " + avg + " inv. " + entry.getValue().size());
-                            entry.getValue().clear();
-                        }
-                    }
-                    try {
-                        Thread.sleep(1000*15);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
 	}
 
 	public void store(Position position, int blockState) {
@@ -203,16 +175,7 @@ public class ConnectionData extends StoredObject  {
 	private static int connect(Position position, int blockState, ConnectionData connectionData) {
 		if (connectionHandlerMap.containsKey(blockState)) {
 		    ConnectionHandler handler = connectionHandlerMap.get(blockState);
-		    long time = System.nanoTime();
-		    int newState = handler.connect(position, blockState, connectionData);
-			long diff = System.nanoTime() - time;
-			synchronized (timings){
-                Set<Long> set = timings.get(handler.getClass());
-                if(set == null) set = new HashSet<>();
-                set.add(diff);
-			    timings.put(handler.getClass(), set);
-            }
-            return newState;
+			return handler.connect(position, blockState, connectionData);
 		} else {
 			return blockState;
 		}
