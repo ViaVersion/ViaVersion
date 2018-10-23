@@ -11,21 +11,26 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler{
     private static final BlockFace[] blockFaceList = { BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST };
 
     static void init() {
-        List<String> baseFences = new ArrayList<>();
-        baseFences.add("minecraft:cobblestone_wall");
-        baseFences.add("minecraft:mossy_cobblestone_wall");
-
-        new WallConnectionHandler("cobbleWallConnections", baseFences);
+        new WallConnectionHandler("cobbleWallConnections", "minecraft:cobblestone_wall");
+        new WallConnectionHandler("cobbleWallConnections", "minecraft:mossy_cobblestone_wall");
     }
 
 
-    public WallConnectionHandler(String blockConnections, List<String> keyList) {
-        super(blockConnections, keyList);
+    public WallConnectionHandler(String blockConnections, String key) {
+        super(blockConnections, key);
     }
 
     @Override
-    public void onConnect(Position position, int blockState, ConnectionData connectionData, WrappedBlockdata blockdata) {
-        blockdata.set("up", up(position, connectionData));
+    protected Byte getStates(WrappedBlockData blockData) {
+        byte states = super.getStates(blockData);
+        if (blockData.getValue("up").equals("true")) states |= 32;
+        return states;
+    }
+
+    protected Byte getStates(Position position, int blockState, ConnectionData connectionData) {
+        byte states = super.getStates(position, blockState, connectionData);
+        if (up(position, connectionData)) states |= 32;
+        return states;
     }
 
     public boolean up(Position position, ConnectionData data){

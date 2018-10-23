@@ -4,46 +4,55 @@ import lombok.Getter;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractFenceConnectionHandler implements ConnectionHandler{
-
-    @Getter
-    private List<String> keyList;
-    private String blockConnections;
+public abstract class AbstractFenceConnectionHandler implements ConnectionHandler {
+    private final String blockConnections;
     @Getter
     private HashSet<Integer> blockStates = new HashSet<>();
+    private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
 
-    public AbstractFenceConnectionHandler(String blockConnections, List<String> keyList){
+    public AbstractFenceConnectionHandler(String blockConnections, String key){
         this.blockConnections = blockConnections;
-        this.keyList = keyList;
 
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            String key = blockState.getKey().split("\\[")[0];
-            if (keyList.contains(key)) {
+            if (key.equals(blockState.getKey().split("\\[")[0])) {
                 blockStates.add(blockState.getValue());
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), this);
+                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
+                connectedBlockStates.put(getStates(blockData), blockState.getValue());
             }
         }
     }
 
-    @Override
-    public int connect(Position position, int blockState, ConnectionData connectionData) {
-        WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
-        onConnect(position, blockState, connectionData, blockdata);
-        blockdata.set("east", connects(BlockFace.EAST, connectionData.get(position.getRelative(BlockFace.EAST))));
-        blockdata.set("north", connects(BlockFace.NORTH, connectionData.get(position.getRelative(BlockFace.NORTH))));
-        blockdata.set("south", connects(BlockFace.SOUTH, connectionData.get(position.getRelative(BlockFace.SOUTH))));
-        blockdata.set("west", connects(BlockFace.WEST, connectionData.get(position.getRelative(BlockFace.WEST))));
-        return blockdata.getBlockStateId();
+    protected Byte getStates(WrappedBlockData blockData) {
+        byte states = 0;
+        if (blockData.getValue("east").equals("true")) states |= 1;
+        if (blockData.getValue("north").equals("true")) states |= 2;
+        if (blockData.getValue("south").equals("true")) states |= 4;
+        if (blockData.getValue("west").equals("true")) states |= 8;
+        if (blockData.getValue("waterlogged").equals("true")) states |= 16;
+        return states;
     }
 
-    public abstract void onConnect(Position position, int blockState, ConnectionData connectionData, WrappedBlockdata blockdata);
+    protected Byte getStates(Position position, int blockState, ConnectionData connectionData) {
+        byte states = 0;
+        if (connects(BlockFace.EAST, connectionData.get(position.getRelative(BlockFace.EAST)))) states |= 1;
+        if (connects(BlockFace.NORTH, connectionData.get(position.getRelative(BlockFace.NORTH)))) states |= 2;
+        if (connects(BlockFace.SOUTH, connectionData.get(position.getRelative(BlockFace.SOUTH)))) states |= 4;
+        if (connects(BlockFace.WEST, connectionData.get(position.getRelative(BlockFace.WEST)))) states |= 8;
+        return states;
+    }
 
+    @Override
+    public int connect(Position position, int blockState, ConnectionData connectionData) {
+        final Integer newBlockState = connectedBlockStates.get(getStates(position, blockState, connectionData));
+        return newBlockState == null ? blockState : newBlockState;
+    }
 
-    private boolean connects(BlockFace side, int blockState) {
+    protected boolean connects(BlockFace side, int blockState) {
         return blockStates.contains(blockState) || ConnectionData.blockConnectionData.containsKey(blockState) && ConnectionData.blockConnectionData.get(blockState).connectTo(blockConnections, side.opposite());
     }
 }

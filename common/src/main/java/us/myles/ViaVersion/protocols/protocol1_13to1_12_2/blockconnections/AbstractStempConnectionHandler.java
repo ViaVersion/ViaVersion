@@ -33,7 +33,7 @@ public class AbstractStempConnectionHandler implements ConnectionHandler{
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
         if(isStem(blockState)){
-            WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+            WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
             for (BlockFace blockFace : blockFaceList) {
                 if(blockId.contains(connectionData.get(position.getRelative(blockFace)))){
                     blockdata.setMinecraftKey(toKey);

@@ -29,7 +29,7 @@ public class RedstoneConnectionHandler implements ConnectionHandler {
 
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
-        WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+        WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
         blockdata.set("east", connects(position, BlockFace.EAST, connectionData));
         blockdata.set("north", connects(position, BlockFace.NORTH, connectionData));
         blockdata.set("south", connects(position, BlockFace.SOUTH, connectionData));

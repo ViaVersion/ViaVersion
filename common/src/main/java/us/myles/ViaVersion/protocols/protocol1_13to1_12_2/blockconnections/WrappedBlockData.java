@@ -6,14 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 @Data
-public class WrappedBlockdata {
+public class WrappedBlockData {
     private String minecraftKey;
     private LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
 
-    public static WrappedBlockdata fromString(String s){
+    public static WrappedBlockData fromString(String s){
         String[] array = s.split("\\[");
         String key = array[0];
-        WrappedBlockdata wrappedBlockdata = new WrappedBlockdata(key);
+        WrappedBlockData wrappedBlockdata = new WrappedBlockData(key);
         String blockData = array[1];
         blockData = blockData.replace("]", "");
         String[] data = blockData.split(",");
@@ -24,11 +24,11 @@ public class WrappedBlockdata {
         return wrappedBlockdata;
     }
 
-    public static WrappedBlockdata fromStateId(int id){
+    public static WrappedBlockData fromStateId(int id){
         return fromString(ConnectionData.getKey(id));
     }
 
-    public WrappedBlockdata(String s){
+    public WrappedBlockData(String s){
         minecraftKey = s;
     }
 
@@ -44,7 +44,7 @@ public class WrappedBlockdata {
         return ConnectionData.getId(toString());
     }
 
-    public WrappedBlockdata set(String data, Object value){
+    public WrappedBlockData set(String data, Object value){
         if(!hasData(data)) throw new UnsupportedOperationException("No blockdata found for " + data + " at " + minecraftKey);
         blockData.put(data, value.toString());
         return this;

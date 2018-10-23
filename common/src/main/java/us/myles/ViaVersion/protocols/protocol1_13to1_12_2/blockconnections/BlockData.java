@@ -14,7 +14,7 @@ public class BlockData {
     }
 
     public boolean connectTo(String blockConnection, BlockFace face){
-        if(!connectData.containsKey(blockConnection)) return false;
-        return connectData.get(blockConnection)[face.ordinal()];
+        final Boolean[] booleans = connectData.get(blockConnection);
+        return booleans != null && booleans[face.ordinal()];
     }
 }

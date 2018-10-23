@@ -11,7 +11,7 @@ public class StairConnectionHandler implements ConnectionHandler{
     private static final List<BlockFace> blockFaces = Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
     private static HashSet<String> baseStairs = new HashSet<>();
 
-    private static Map<Integer, WrappedBlockdata> blockData = new HashMap<>();
+    private static Map<Integer, WrappedBlockData> blockData = new HashMap<>();
     private static Map<Pair<BlockFace, BlockFace>, String> shapeMappings = new HashMap<>();
 
     static void init() {
@@ -31,7 +31,7 @@ public class StairConnectionHandler implements ConnectionHandler{
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
             if (baseStairs.contains(key)) {
-                blockData.put(blockState.getValue(), WrappedBlockdata.fromString(blockState.getKey()));
+                blockData.put(blockState.getValue(), WrappedBlockData.fromString(blockState.getKey()));
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
             }
         }
@@ -39,7 +39,7 @@ public class StairConnectionHandler implements ConnectionHandler{
 
     @Override
     public int connect(Position position, int blockState, ConnectionData connectionData) {
-        WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+        WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
         blockdata.set("shape", getShape(position, connectionData, blockdata));
         return blockdata.getBlockStateId();
     }
@@ -56,7 +56,7 @@ public class StairConnectionHandler implements ConnectionHandler{
         for (BlockFace blockFace : blockFaces) {
             int blockState = connectionData.get(position.getRelative(blockFace));
             if(blockData.containsKey(blockState)){
-                WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+                WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
                 if(blockdata.getValue("facing").equals(face)){
                     return blockFace;
                 }
@@ -66,7 +66,7 @@ public class StairConnectionHandler implements ConnectionHandler{
         return null;
     }
 
-    private String getShape(Position position, ConnectionData connectionData, WrappedBlockdata blockdata){
+    private String getShape(Position position, ConnectionData connectionData, WrappedBlockData blockdata){
         BlockFace blockFace = getFacing(position, connectionData, blockdata.getValue("facing"));
         if(blockFace != null){
             int index = blockFaces.indexOf(blockFace);
@@ -86,7 +86,7 @@ public class StairConnectionHandler implements ConnectionHandler{
     private String connect(Position position, ConnectionData connectionData, BlockFace main, BlockFace off, BlockFace facing){
         int blockState = connectionData.get(position.getRelative(off));
         if(blockData.containsKey(blockState)){
-            WrappedBlockdata blockdata = WrappedBlockdata.fromStateId(blockState);
+            WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
             BlockFace blockFace = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
             if( blockdata.getValue("shape").equals("straight")){
                 return getType(position.getRelative(main).getRelative(facing), position.getRelative(off).getRelative(blockFace)) + "_" +  shapeMappings.get(new Pair(facing, blockFace));
