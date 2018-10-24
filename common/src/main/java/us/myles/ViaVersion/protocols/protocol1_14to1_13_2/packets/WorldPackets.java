@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.Arrays;
@@ -26,7 +27,8 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
 						ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-						Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
+						Chunk chunk = wrapper.read(new Chunk1_13Type(clientWorld));
+						wrapper.write(new Chunk1_14Type(clientWorld), chunk);
 
 						for (ChunkSection section : chunk.getSections()) {
 							if (section != null) {
@@ -37,7 +39,7 @@ public class WorldPackets {
 						}
 
 						if (chunk.isBiomeData()) {
-							Arrays.fill(chunk.getBiomeData(), (byte) 1);
+							Arrays.fill(chunk.getBiomeData(), (byte) 0);  //TODO map biome ids
 						}
 					}
 				});
