@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
+import com.google.common.primitives.Bytes;
+import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -13,8 +15,6 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-
-import java.util.Arrays;
 
 public class WorldPackets {
 
@@ -38,9 +38,40 @@ public class WorldPackets {
 							}
 						}
 
-						if (chunk.isBiomeData()) {
-							Arrays.fill(chunk.getBiomeData(), (byte) 0);  //TODO map biome ids
+						PacketWrapper lightPacket = wrapper.create(0x57);
+						lightPacket.write(Type.VAR_INT, chunk.getX());
+						lightPacket.write(Type.VAR_INT, chunk.getZ());
+						int skyLightMask = 0;
+						int blockLightMask = 0;
+						for (int i = 0; i < chunk.getSections().length; i++) {
+							ChunkSection sec = chunk.getSections()[i];
+							if (sec == null) continue;
+							if (sec.hasSkyLight()) {
+								skyLightMask |= (1 << (i + 1));
+							}
+							blockLightMask |= (1 << (i + 1));
 						}
+						lightPacket.write(Type.VAR_INT, blockLightMask);
+						lightPacket.write(Type.VAR_INT, skyLightMask);
+						for (ChunkSection section : chunk.getSections()) {
+							if (section == null) continue;
+							ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
+							section.writeBlockLight(buf);
+							byte[] data = new byte[buf.readableBytes()];
+							buf.readBytes(data);
+							buf.release();
+							lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
+						}
+						for (ChunkSection section : chunk.getSections()) {
+							if (section == null || !section.hasSkyLight()) continue;
+							ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
+							section.writeSkyLight(buf);
+							byte[] data = new byte[buf.readableBytes()];
+							buf.readBytes(data);
+							buf.release();
+							lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
+						}
+						lightPacket.send(Protocol1_14To1_13_2.class);
 					}
 				});
 			}
