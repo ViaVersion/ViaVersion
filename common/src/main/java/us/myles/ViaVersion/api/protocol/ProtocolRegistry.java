@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.base.BaseProtocol1_7;
+import us.myles.ViaVersion.protocols.protocol18w43bto1_13_2.Protocol18w43bTo1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_11_1to1_11.Protocol1_11_1To1_11;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
@@ -59,6 +60,7 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_13To1_12_2(), Collections.singletonList(ProtocolVersion.v1_13.getId()), ProtocolVersion.v1_12_2.getId());
         registerProtocol(new Protocol1_13_1To1_13(),  Arrays.asList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
         registerProtocol(new Protocol1_13_2To1_13_1(),  Arrays.asList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
+        registerProtocol(new Protocol18w43bTo1_13_2(),  Arrays.asList(ProtocolVersion.v18w43b.getId()), ProtocolVersion.v18w43b.getId());
     }
 
     /**
