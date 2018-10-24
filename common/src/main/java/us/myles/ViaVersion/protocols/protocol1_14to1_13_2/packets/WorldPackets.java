@@ -51,21 +51,21 @@ public class WorldPackets {
 							}
 							blockLightMask |= (1 << (i + 1));
 						}
-						lightPacket.write(Type.VAR_INT, blockLightMask);
 						lightPacket.write(Type.VAR_INT, skyLightMask);
+						lightPacket.write(Type.VAR_INT, blockLightMask);
 						for (ChunkSection section : chunk.getSections()) {
-							if (section == null) continue;
+							if (section == null || !section.hasSkyLight()) continue;
 							ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
-							section.writeBlockLight(buf);
+							section.writeSkyLight(buf);
 							byte[] data = new byte[buf.readableBytes()];
 							buf.readBytes(data);
 							buf.release();
 							lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
 						}
 						for (ChunkSection section : chunk.getSections()) {
-							if (section == null || !section.hasSkyLight()) continue;
+							if (section == null) continue;
 							ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
-							section.writeSkyLight(buf);
+							section.writeBlockLight(buf);
 							byte[] data = new byte[buf.readableBytes()];
 							buf.readBytes(data);
 							buf.release();
