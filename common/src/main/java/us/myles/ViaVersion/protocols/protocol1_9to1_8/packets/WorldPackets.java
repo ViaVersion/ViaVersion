@@ -24,7 +24,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.ChunkType;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 
 import java.io.IOException;
 import java.util.List;
@@ -121,7 +121,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.passthrough(new ChunkType(clientChunks));
+                        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.passthrough(new Chunk1_9to1_8Type(clientChunks));
                         if (chunk.isUnloadPacket()) {
                             wrapper.setId(0x1D);
 
