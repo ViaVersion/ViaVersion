@@ -8,8 +8,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks.Chunk1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks.ChunkSection1_13;
+import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 		Type.VAR_INT.read(input);
 
 		BitSet usedSections = new BitSet(16);
-		ChunkSection1_13[] sections = new ChunkSection1_13[16];
+		ChunkSection[] sections = new ChunkSection[16];
 		// Calculate section count from bitmask
 		for (int i = 0; i < 16; i++) {
 			if ((primaryBitmask & (1 << i)) != 0) {
@@ -44,10 +43,8 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 		// Read sections
 		for (int i = 0; i < 16; i++) {
 			if (!usedSections.get(i)) continue; // Section not set
-			ChunkSection1_13 section = new ChunkSection1_13();
-			sections[i] = section;
-			input.readShort();  //TODO unknown short
-			section.readBlocks(input);
+			input.readShort(); // Number of non-air blocks
+			sections[i] = Types1_13.CHUNK_SECTION.read(input);
 		}
 
 		byte[] biomeData = groundUp ? new byte[256] : null;
@@ -67,7 +64,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 			}
 		}
 
-		return new Chunk1_13(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
+		return new Chunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
 	}
 
 	@Override
@@ -83,7 +80,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 			ChunkSection section = chunk.getSections()[i];
 			if (section == null) continue; // Section not set
 			buf.writeShort(4096);  //TODO find out what this short does (number of air blocks, important?)
-			section.writeBlocks1_13(buf);
+			Types1_13.CHUNK_SECTION.write(buf, section);
 		}
 		buf.readerIndex(0);
 		Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 * 4 : 0));

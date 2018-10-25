@@ -1,19 +1,32 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
+import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
-public interface ChunkSection {
+public class ChunkSection {
     /**
-     * Gets a block state id (&lt; 1.13: block_id &lt;&lt; 4 | data &amp; 0xF)
-     *
-     * @param x Block X
-     * @param y Block Y
-     * @param z Block Z
-     * @return Block raw id
+     * Size (dimensions) of blocks in a chunks section.
      */
-    int getBlock(int x, int y, int z);
+    public static final int SIZE = 16 * 16 * 16; // width * depth * height
+    /**
+     * Length of the sky and block light nibble arrays.
+     */
+    public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
+    /**
+     * Length of the block data array.
+     */
+    private final List<Integer> palette = Lists.newArrayList();
+    private final int[] blocks;
+    private NibbleArray blockLight;
+    private NibbleArray skyLight;
+
+    public ChunkSection() {
+        this.blocks = new int[SIZE];
+        this.blockLight = new NibbleArray(SIZE);
+        palette.add(0); // AIR
+    }
 
     /**
      * Set a block in the chunks
@@ -21,53 +34,149 @@ public interface ChunkSection {
      * @param x    Block X
      * @param y    Block Y
      * @param z    Block Z
-     * @param type The block id
+     * @param type The type of the block
      * @param data The data value of the block
      */
-    void setBlock(int x, int y, int z, int type, int data);
+    public void setBlock(int x, int y, int z, int type, int data) {
+        setFlatBlock(index(x, y, z), type << 4 | (data & 0xF));
+    }
+
+    public void setFlatBlock(int x, int y, int z, int type) {
+        setFlatBlock(index(x, y, z), type);
+    }
+
+    public int getBlockId(int x, int y, int z) {
+        return getFlatBlock(x, y, z) >> 4;
+    }
+
+    public int getBlockData(int x, int y, int z) {
+        return getFlatBlock(x, y, z) & 0xF;
+    }
+
+    public int getFlatBlock(int x, int y, int z) {
+        int index = blocks[index(x, y, z)];
+        return palette.get(index);
+    }
+
+    public int getFlatBlock(int idx) {
+        int index = blocks[idx];
+        return palette.get(index);
+    }
+
+    public void setBlock(int idx, int type, int data) {
+        setFlatBlock(idx, type << 4 | (data & 0xF));
+    }
+
+    public void setPaletteIndex(int idx, int index) {
+    	blocks[idx] = index;
+    }
+
+    public int getPaletteIndex(int idx) {
+    	return blocks[idx];
+    }
 
     /**
-     * Set a block state in the chunk
+     * Set a block in the chunks based on the index
      *
-     * @param x          Block X
-     * @param y          Block Y
-     * @param z          Block Z
-     * @param blockState The block state id
+     * @param idx  Index
+     * @param id The raw or flat id of the block
      */
-    void setFlatBlock(int x, int y, int z, int blockState);
+    public void setFlatBlock(int idx, int id) {
+        int index = palette.indexOf(id);
+        if (index == -1) {
+            index = palette.size();
+            palette.add(id);
+        }
+
+        blocks[idx] = index;
+    }
 
     /**
-     * Gets a block id (without data)
-     * /!\ YOU SHOULD NOT USE THIS ON 1.13
+     * Set the block light array
      *
-     * @param x Block X
-     * @param y Block Y
-     * @param z Block Z
-     * @return Block id (without data)
+     * @param data The value to set the block light to
      */
-    int getBlockId(int x, int y, int z);
+    public void setBlockLight(byte[] data) {
+        if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
+        if (this.blockLight == null) {
+            this.blockLight = new NibbleArray(data);
+        } else {
+            this.blockLight.setHandle(data);
+        }
+    }
 
     /**
-     * Write the blocks in &lt; 1.13 format to a buffer.
+     * Set the sky light array
      *
-     * @param output The buffer to write to.
-     * @throws Exception Throws if it failed to write.
+     * @param data The value to set the sky light to
      */
-    void writeBlocks(ByteBuf output) throws Exception;
+    public void setSkyLight(byte[] data) {
+        if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
+        if (this.skyLight == null) {
+            this.skyLight = new NibbleArray(data);
+        } else {
+            this.skyLight.setHandle(data);
+        }
+    }
+
+    public byte[] getBlockLight() {
+        return blockLight == null ? null : blockLight.getHandle();
+    }
+
+    public byte[] getSkyLight() {
+        return skyLight == null ? null : skyLight.getHandle();
+    }
+
+    public void readBlockLight(ByteBuf input) {
+        if (this.blockLight == null) {
+            this.blockLight = new NibbleArray(LIGHT_LENGTH * 2);
+        }
+        input.readBytes(this.blockLight.getHandle());
+    }
+
+    public void readSkyLight(ByteBuf input) {
+        if (this.skyLight == null) {
+            this.skyLight = new NibbleArray(LIGHT_LENGTH * 2);
+        }
+        input.readBytes(this.skyLight.getHandle());
+    }
+
+    private static int index(int x, int y, int z) {
+        return y << 8 | z << 4 | x;
+    }
 
     /**
-     * Write the blocks in 1.13 format to a buffer.
+     * Write the block light to a buffer
      *
-     * @param output The buffer to write to.
-     * @throws Exception Throws if it failed to write.
+     * @param output The buffer to write to
      */
-    void writeBlocks1_13(ByteBuf output) throws Exception;
+    public void writeBlockLight(ByteBuf output) {
+        output.writeBytes(blockLight.getHandle());
+    }
 
-    void writeBlockLight(ByteBuf output) throws Exception;
+    /**
+     * Write the sky light to a buffer
+     *
+     * @param output The buffer to write to
+     */
+    public void writeSkyLight(ByteBuf output) {
+        output.writeBytes(skyLight.getHandle());
+    }
 
-    boolean hasSkyLight();
+    public List<Integer> getPalette() {
+        return palette;
+    }
 
-    void writeSkyLight(ByteBuf output) throws Exception;
+    /**
+     * Check if sky light is present
+     *
+     * @return True if skylight is present
+     */
+    public boolean hasSkyLight() {
+        return skyLight != null;
+    }
 
-    List<Integer> getPalette();
+    public boolean hasBlockLight() {
+        return blockLight != null;
+    }
 }

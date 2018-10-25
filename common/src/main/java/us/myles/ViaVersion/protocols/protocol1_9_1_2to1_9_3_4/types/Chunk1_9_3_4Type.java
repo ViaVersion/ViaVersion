@@ -9,8 +9,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.Chunk1_9_3_4;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.ChunkSection1_9_3_4;
+import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
         Type.VAR_INT.read(input);
 
         BitSet usedSections = new BitSet(16);
-        ChunkSection1_9_3_4[] sections = new ChunkSection1_9_3_4[16];
+        ChunkSection[] sections = new ChunkSection[16];
         // Calculate section count from bitmask
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) != 0) {
@@ -45,9 +44,8 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
         // Read sections
         for (int i = 0; i < 16; i++) {
             if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection1_9_3_4 section = new ChunkSection1_9_3_4();
+            ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
             sections[i] = section;
-            section.readBlocks(input);
             section.readBlockLight(input);
             if (world.getEnvironment() == Environment.NORMAL) {
                 section.readSkyLight(input);
@@ -69,7 +67,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new Chunk1_9_3_4(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
+        return new Chunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
     }
 
     @Override
@@ -84,7 +82,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
         for (int i = 0; i < 16; i++) {
             ChunkSection section = chunk.getSections()[i];
             if (section == null) continue; // Section not set
-            section.writeBlocks(buf);
+            Types1_9.CHUNK_SECTION.write(buf, section);
             section.writeBlockLight(buf);
 
             if (!section.hasSkyLight()) continue; // No sky light, we're done here.
