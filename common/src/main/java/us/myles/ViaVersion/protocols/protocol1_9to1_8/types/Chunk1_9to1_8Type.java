@@ -12,7 +12,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         if (sectionCount == 0 && groundUp && !isBulkPacket && param.getLoadedChunks().contains(chunkHash)) {
             // This is a chunks unload packet
             param.getLoadedChunks().remove(chunkHash);
-            return new Chunk1_9to1_8(chunkX, chunkZ);
+            return new Chunk1_8(chunkX, chunkZ);
         }
 
         int startIndex = input.readerIndex();
@@ -123,14 +123,14 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         }
 
         // Return chunks
-        return new Chunk1_9to1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData, new ArrayList<CompoundTag>());
+        return new Chunk1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData, new ArrayList<CompoundTag>());
     }
 
     @Override
     public void write(ByteBuf output, ClientChunks param, Chunk input) throws Exception {
-        if (!(input instanceof Chunk1_9to1_8)) throw new Exception("Incompatible chunk, " + input.getClass());
+        if (!(input instanceof Chunk1_8)) throw new Exception("Incompatible chunk, " + input.getClass());
 
-        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) input;
+        Chunk1_8 chunk = (Chunk1_8) input;
         // Write primary info
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());

@@ -14,9 +14,6 @@ public class ChunkSection {
      * Length of the sky and block light nibble arrays.
      */
     public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
-    /**
-     * Length of the block data array.
-     */
     private final List<Integer> palette = Lists.newArrayList();
     private final int[] blocks;
     private NibbleArray blockLight;
