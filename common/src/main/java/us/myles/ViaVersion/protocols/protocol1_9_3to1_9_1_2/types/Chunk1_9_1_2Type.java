@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Environment;
+import us.myles.ViaVersion.api.minecraft.chunks.BaseChunk;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
@@ -65,7 +66,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             input.readBytes(biomeData);
         }
 
-        return new Chunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, new ArrayList<CompoundTag>());
+        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, new ArrayList<CompoundTag>());
     }
 
     @Override
