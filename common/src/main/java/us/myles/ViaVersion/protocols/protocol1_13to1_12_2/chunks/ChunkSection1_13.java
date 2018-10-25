@@ -2,6 +2,8 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
+import lombok.Setter;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.type.Type;
@@ -9,6 +11,9 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.List;
 
 public class ChunkSection1_13 implements ChunkSection {
+    @Getter
+    @Setter
+    private int nonAirBlocksCount;
     /**
      * Size (dimensions) of blocks in a chunks section.
      */

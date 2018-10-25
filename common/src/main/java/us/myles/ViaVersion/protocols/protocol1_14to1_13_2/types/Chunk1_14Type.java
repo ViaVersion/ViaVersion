@@ -46,7 +46,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 			if (!usedSections.get(i)) continue; // Section not set
 			ChunkSection1_13 section = new ChunkSection1_13();
 			sections[i] = section;
-			input.readShort();  //TODO unknown short
+			section.setNonAirBlocksCount(input.readShort());
 			section.readBlocks(input);
 		}
 
@@ -82,7 +82,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 		for (int i = 0; i < 16; i++) {
 			ChunkSection section = chunk.getSections()[i];
 			if (section == null) continue; // Section not set
-			buf.writeShort(4096);  //TODO find out what this short does (number of air blocks, important?)
+			buf.writeShort(section.getNonAirBlocksCount());  //TODO find out what this short does (number of air blocks, important?)
 			section.writeBlocks1_13(buf);
 		}
 		buf.readerIndex(0);
