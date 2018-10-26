@@ -8,9 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by Marco Neuhaus on 26.10.2018 for the Project ViaVersionGerry.
- */
+
 public class FlowerConnectionHandler extends ConnectionHandler{
 
     private static Set<String> baseFlower = new HashSet<>();

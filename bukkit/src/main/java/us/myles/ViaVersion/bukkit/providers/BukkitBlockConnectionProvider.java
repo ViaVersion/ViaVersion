@@ -17,6 +17,8 @@ import java.util.UUID;
  */
 public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
 
+    private Chunk chunk;
+
     @Override
     public int getWorldBlockData(UserConnection user, Position position) {
         UUID uuid = user.get(ProtocolInfo.class).getUuid();
@@ -26,11 +28,18 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
             int x = (int) (position.getX() >> 4);
             int z = (int) (position.getZ() >> 4);
             if(world.isChunkLoaded(x, z)){
-                Chunk c = world.getChunkAt(x, z);
+                Chunk c = getChunk(world, x, z);
                 Block b = c.getBlock(position.getX().intValue() , position.getY().intValue(), position.getZ().intValue());
                 return b.getTypeId() << 4 | b.getData();
             }
         }
         return -1;
+    }
+
+    public Chunk getChunk(World world, int x, int z){
+        if(chunk != null && chunk.getX() == x && chunk.getZ() == z){
+            return chunk;
+        }
+        return chunk = world.getChunkAt(x, z);
     }
 }
