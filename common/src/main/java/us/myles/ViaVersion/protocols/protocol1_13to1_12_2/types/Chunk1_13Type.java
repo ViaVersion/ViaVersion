@@ -4,13 +4,13 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Environment;
+import us.myles.ViaVersion.api.minecraft.chunks.BaseChunk;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks.Chunk1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.chunks.ChunkSection1_13;
+import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         Type.VAR_INT.read(input);
 
         BitSet usedSections = new BitSet(16);
-        ChunkSection1_13[] sections = new ChunkSection1_13[16];
+        ChunkSection[] sections = new ChunkSection[16];
         // Calculate section count from bitmask
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) != 0) {
@@ -44,9 +44,8 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         // Read sections
         for (int i = 0; i < 16; i++) {
             if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection1_13 section = new ChunkSection1_13();
+            ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
             sections[i] = section;
-            section.readBlocks(input);
             section.readBlockLight(input);
             if (world.getEnvironment() == Environment.NORMAL) {
                 section.readSkyLight(input);
@@ -71,7 +70,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new Chunk1_13(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
+        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         for (int i = 0; i < 16; i++) {
             ChunkSection section = chunk.getSections()[i];
             if (section == null) continue; // Section not set
-            section.writeBlocks1_13(buf);
+            Types1_13.CHUNK_SECTION.write(buf, section);
             section.writeBlockLight(buf);
 
             if (!section.hasSkyLight()) continue; // No sky light, we're done here.
