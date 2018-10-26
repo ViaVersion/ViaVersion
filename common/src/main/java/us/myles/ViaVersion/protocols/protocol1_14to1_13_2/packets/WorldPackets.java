@@ -19,6 +19,78 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 public class WorldPackets {
 
 	public static void register(Protocol protocol) {
+
+		// Block break animation
+		protocol.registerOutgoing(State.PLAY, 0x08, 0x08, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.POSITION, Type.POSITION1_14);
+				map(Type.BYTE);
+			}
+		});
+
+		// Update block entity
+		protocol.registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.POSITION, Type.POSITION1_14);
+			}
+		});
+
+		// Block Action
+		protocol.registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.POSITION, Type.POSITION1_14); // Location
+				map(Type.UNSIGNED_BYTE); // Action id
+				map(Type.UNSIGNED_BYTE); // Action param
+				map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper wrapper) throws Exception {
+						wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
+					}
+				});
+			}
+		});
+
+		// Block Change
+		protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.POSITION, Type.POSITION1_14);
+				map(Type.VAR_INT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper wrapper) throws Exception {
+						int id = wrapper.get(Type.VAR_INT, 0);
+
+						wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(id));
+					}
+				});
+			}
+		});
+
+		// Multi Block Change
+		protocol.registerOutgoing(State.PLAY, 0xF, 0xF, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.INT); // 0 - Chunk X
+				map(Type.INT); // 1 - Chunk Z
+				map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper wrapper) throws Exception {
+						// Convert ids
+						for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
+							int id = record.getBlockId();
+							record.setBlockId(Protocol1_14To1_13_2.getNewBlockStateId(id));
+						}
+					}
+				});
+			}
+		});
 		//Chunk
 		protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
 			@Override
@@ -98,66 +170,12 @@ public class WorldPackets {
 			}
 		});
 
-		// Block Action
-		protocol.registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.POSITION); // Location
-				map(Type.UNSIGNED_BYTE); // Action id
-				map(Type.UNSIGNED_BYTE); // Action param
-				map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
-					}
-				});
-			}
-		});
-
-		// Block Change
-		protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.POSITION);
-				map(Type.VAR_INT);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						int id = wrapper.get(Type.VAR_INT, 0);
-
-						wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(id));
-					}
-				});
-			}
-		});
-
-		// Multi Block Change
-		protocol.registerOutgoing(State.PLAY, 0xF, 0xF, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.INT); // 0 - Chunk X
-				map(Type.INT); // 1 - Chunk Z
-				map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						// Convert ids
-						for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-							int id = record.getBlockId();
-							record.setBlockId(Protocol1_14To1_13_2.getNewBlockStateId(id));
-						}
-					}
-				});
-			}
-		});
-
 		// Effect packet
 		protocol.registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT); // Effect Id
-				map(Type.POSITION); // Location
+				map(Type.POSITION, Type.POSITION1_14); // Location
 				map(Type.INT); // Data
 				handler(new PacketHandler() {
 					@Override
@@ -168,6 +186,35 @@ public class WorldPackets {
 							wrapper.set(Type.INT, 1, data = InventoryPackets.getNewItemId(data));
 						} else if (id == 2001) { // Block break + block break sound
 							wrapper.set(Type.INT, 1, data = Protocol1_14To1_13_2.getNewBlockStateId(data));
+						}
+					}
+				});
+			}
+		});
+
+		//spawn particle
+		protocol.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.INT); // 0 - Particle ID
+				map(Type.BOOLEAN); // 1 - Long Distance
+				map(Type.FLOAT); // 2 - X
+				map(Type.FLOAT); // 3 - Y
+				map(Type.FLOAT); // 4 - Z
+				map(Type.FLOAT); // 5 - Offset X
+				map(Type.FLOAT); // 6 - Offset Y
+				map(Type.FLOAT); // 7 - Offset Z
+				map(Type.FLOAT); // 8 - Particle Data
+				map(Type.INT); // 9 - Particle Count
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper wrapper) throws Exception {
+						int id = wrapper.get(Type.INT, 0);
+						if (id == 3 || id == 20) {
+							int data = wrapper.passthrough(Type.VAR_INT);
+							wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
+						} else if (id == 27) {
+							InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
 						}
 					}
 				});
@@ -210,32 +257,11 @@ public class WorldPackets {
 			}
 		});
 
-		//spawn particle
-		protocol.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
+		// Spawn position
+		protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.INT); // 0 - Particle ID
-				map(Type.BOOLEAN); // 1 - Long Distance
-				map(Type.FLOAT); // 2 - X
-				map(Type.FLOAT); // 3 - Y
-				map(Type.FLOAT); // 4 - Z
-				map(Type.FLOAT); // 5 - Offset X
-				map(Type.FLOAT); // 6 - Offset Y
-				map(Type.FLOAT); // 7 - Offset Z
-				map(Type.FLOAT); // 8 - Particle Data
-				map(Type.INT); // 9 - Particle Count
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						int id = wrapper.get(Type.INT, 0);
-						if (id == 3 || id == 20) {
-							int data = wrapper.passthrough(Type.VAR_INT);
-							wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
-						} else if (id == 27) {
-							InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-						}
-					}
-				});
+				map(Type.POSITION, Type.POSITION1_14);
 			}
 		});
 	}

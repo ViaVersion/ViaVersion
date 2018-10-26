@@ -92,6 +92,18 @@ public class EntityPackets {
 			}
 		});
 
+		// Spawn painting
+		protocol.registerOutgoing(State.PLAY, 0x04, 0x04, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.UUID);
+				map(Type.VAR_INT);
+				map(Type.POSITION, Type.POSITION1_14);
+				map(Type.BYTE);
+			}
+		});
+
 		// Spawn player packet
 		protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
 			@Override
@@ -116,6 +128,15 @@ public class EntityPackets {
 						MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_13_2.METADATA_LIST, 0), wrapper.user());
 					}
 				});
+			}
+		});
+
+		// Use bed
+		protocol.registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.POSITION, Type.POSITION1_14);
 			}
 		});
 

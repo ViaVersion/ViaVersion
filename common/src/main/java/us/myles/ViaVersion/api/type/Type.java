@@ -59,6 +59,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Void> NOTHING = new VoidType(); // This is purely used for remapping.
     /* MC Types */
     public static final Type<Position> POSITION = new PositionType();
+    public static final Type<Position> POSITION1_14 = new Position1_14Type();
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<CompoundTag> NBT = new NBTType();

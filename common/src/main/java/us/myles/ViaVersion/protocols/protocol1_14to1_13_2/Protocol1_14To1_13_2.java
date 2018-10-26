@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -19,6 +20,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
 		InventoryPackets.register(this);
 		EntityPackets.register(this);
 		WorldPackets.register(this);
+		PlayerPackets.register(this);
 
 		// Sound Effect
 		registerOutgoing(State.PLAY, 0x4D, 0x4D, new PacketRemapper() {

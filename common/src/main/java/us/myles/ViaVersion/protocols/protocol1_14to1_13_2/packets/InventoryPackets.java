@@ -27,8 +27,7 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
-						Item stack = wrapper.get(Type.FLAT_VAR_INT_ITEM, 0);
-						toClient(stack);
+						toClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
 					}
 				});
 			}
@@ -45,8 +44,7 @@ public class InventoryPackets {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
 						Item[] stacks = wrapper.get(Type.FLAT_VAR_INT_ITEM_ARRAY, 0);
-						for (Item stack : stacks)
-							toClient(stack);
+						for (Item stack : stacks) toClient(stack);
 					}
 				});
 			}
@@ -69,12 +67,12 @@ public class InventoryPackets {
 								// Input Item
 								toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
 								// Output Item
-								InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+								toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
 
 								boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
 								if (secondItem) {
 									// Second Item
-									InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+									toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
 								}
 
 								wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -98,8 +96,7 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
-						Item stack = wrapper.get(Type.FLAT_VAR_INT_ITEM, 0);
-						toClient(stack);
+						toClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
 					}
 				});
 			}
@@ -129,19 +126,22 @@ public class InventoryPackets {
 								int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
 								for (int j = 0; j < ingredientsNo; j++) {
 									Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+									for (Item item : items) toClient(item);
 								}
-								wrapper.passthrough(Type.FLAT_VAR_INT_ITEM); // Result
+								toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
 							} else if (type.equals("crafting_shaped")) {
 								int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
 								wrapper.passthrough(Type.STRING); // Group
 								for (int j = 0; j < ingredientsNo; j++) {
-									wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+									Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+									for (Item item : items) toClient(item);
 								}
-								wrapper.passthrough(Type.FLAT_VAR_INT_ITEM); // Result
+								toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
 							} else if (type.equals("smelting")) {
 								wrapper.passthrough(Type.STRING); // Group
-								wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-								wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+								Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+								for (Item item : items) toClient(item);
+								toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
 								wrapper.passthrough(Type.FLOAT); // EXP
 								wrapper.passthrough(Type.VAR_INT); // Cooking time
 							}
@@ -171,8 +171,7 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
-						Item item = wrapper.get(Type.FLAT_VAR_INT_ITEM, 0);
-						toServer(item);
+						toServer(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
 					}
 				});
 			}
@@ -188,8 +187,7 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
-						Item item = wrapper.get(Type.FLAT_VAR_INT_ITEM, 0);
-						toServer(item);
+						toServer(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
 					}
 				});
 			}
