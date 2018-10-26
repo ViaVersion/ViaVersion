@@ -32,8 +32,28 @@ public class WorldPackets {
 
 						for (ChunkSection section : chunk.getSections()) {
 							if (section != null) {
+								boolean hasBlock = false;
 								for (int i = 0; i < section.getPalette().size(); i++) {
-									section.getPalette().set(i, Protocol1_14To1_13_2.getNewBlockStateId(section.getPalette().get(i)));
+									int old = section.getPalette().get(i);
+									if (!hasBlock && !(old == 0 || old == 8591 || old == 8592)) { // air, void_air, cave_air
+										hasBlock = true;
+									}
+									int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
+									section.getPalette().set(i, newId);
+								}
+								if (hasBlock) {
+									int nonAirBlockCount = 0;
+									for (int x = 0; x < 16; x++) {
+										for (int y = 0; y < 16; y++) {
+											for (int z = 0; z < 16; z++) {
+												int id = section.getBlock(x, y, z);
+												if (id == 0 || id == 8591 || id == 8592) {
+													nonAirBlockCount++;
+												}
+											}
+										}
+									}
+									section.setNonAirBlocksCount(nonAirBlockCount);
 								}
 							}
 						}
@@ -88,7 +108,7 @@ public class WorldPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
-						//wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));  //TODO block ids
+						wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
 					}
 				});
 			}

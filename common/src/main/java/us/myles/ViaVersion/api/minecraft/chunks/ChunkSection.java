@@ -17,6 +17,7 @@ public interface ChunkSection {
 
     /**
      * Set a block in the chunks
+     * This method will not update non-air blocks count
      *
      * @param x    Block X
      * @param y    Block Y
@@ -28,6 +29,7 @@ public interface ChunkSection {
 
     /**
      * Set a block state in the chunk
+     * This method will not update non-air blocks count
      *
      * @param x          Block X
      * @param y          Block Y
@@ -70,4 +72,13 @@ public interface ChunkSection {
     void writeSkyLight(ByteBuf output) throws Exception;
 
     List<Integer> getPalette();
+
+    /**
+     * Gets the non-air(air, cave_air, void_air) blocks count
+     *
+     * @return number or non-air blocks
+     */
+    int getNonAirBlocksCount();
+
+    void setNonAirBlocksCount(int count);
 }
