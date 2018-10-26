@@ -173,11 +173,13 @@ public class WorldPackets {
                         Position position = wrapper.get(Type.POSITION, 0);
                         int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
-                        if (ConnectionData.connects(newId)) {
-                            newId = ConnectionData.connect(wrapper.user(), position, newId);
-                        }
+                        if(Via.getConfig().isServersideBlockConnection()){
+                            if (ConnectionData.connects(newId)) {
+                                newId = ConnectionData.connect(wrapper.user(), position, newId);
+                            }
 
-	                    ConnectionData.update(wrapper.user(), position);
+                            ConnectionData.update(wrapper.user(), position);
+                        }
 
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                     }
@@ -216,12 +218,14 @@ public class WorldPackets {
 			                        (long) record.getY(),
 			                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
-		                    if (ConnectionData.connects(blockState)) {
-			                    blockState = ConnectionData.connect(wrapper.user(), position, blockState);
-			                    record.setBlockId(blockState);
-		                    }
+	                        if(Via.getConfig().isServersideBlockConnection()){
+                                if (ConnectionData.connects(blockState)) {
+                                    blockState = ConnectionData.connect(wrapper.user(), position, blockState);
+                                    record.setBlockId(blockState);
+                                }
 
-	                        ConnectionData.update(wrapper.user(), position);
+                                ConnectionData.update(wrapper.user(), position);
+                            }
 	                    }
                     }
                 });
@@ -292,7 +296,9 @@ public class WorldPackets {
                             }
                         }
 
-                        ConnectionData.connectBlocks(wrapper.user(), chunk);
+                        if(Via.getConfig().isServersideBlockConnection()){
+                            ConnectionData.connectBlocks(wrapper.user(), chunk);
+                        }
 
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
