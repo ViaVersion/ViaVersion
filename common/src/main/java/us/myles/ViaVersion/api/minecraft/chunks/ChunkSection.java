@@ -2,6 +2,8 @@ package us.myles.ViaVersion.api.minecraft.chunks;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -14,10 +16,14 @@ public class ChunkSection {
      * Length of the sky and block light nibble arrays.
      */
     public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
-    private final List<Integer> palette = Lists.newArrayList();
+    @Getter
+	private final List<Integer> palette = Lists.newArrayList();
     private final int[] blocks;
     private NibbleArray blockLight;
     private NibbleArray skyLight;
+    @Getter
+    @Setter
+    private int nonAirBlocksCount;
 
     public ChunkSection() {
         this.blocks = new int[SIZE];
@@ -162,10 +168,6 @@ public class ChunkSection {
         output.writeBytes(skyLight.getHandle());
     }
 
-    public List<Integer> getPalette() {
-        return palette;
-    }
-
     /**
      * Check if sky light is present
      *
@@ -177,13 +179,5 @@ public class ChunkSection {
 
     public boolean hasBlockLight() {
         return blockLight != null;
-    }
-
-    public int getNonAirBlocksCount() {
-    	return this.nonAirBlocksCount;
-    }
-
-    public void setNonAirBlocksCount(int nonAirBlocksCount) {
-    	this.nonAirBlocksCount = nonAirBlocksCount;
     }
 }
