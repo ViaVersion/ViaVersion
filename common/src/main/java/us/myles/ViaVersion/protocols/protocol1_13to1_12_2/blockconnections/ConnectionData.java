@@ -3,7 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.StoredObject;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -11,64 +11,32 @@ import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
-public class ConnectionData extends StoredObject  {
+public class ConnectionData{
 	static Map<Integer, String> idToKey = new HashMap<>();
 	static Map<String, Integer> keyToId = new HashMap<>();
 	static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
 	static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
 
-	private Map<Position, Integer> blockStorage = new HashMap<>();
-
-	public ConnectionData(UserConnection user) {
-		super(user);
-	}
-
-	public void store(Position position, int blockState) {
-		if (!isWelcome(blockState)) return;
-		blockStorage.put(position, blockState);
-	}
-
-	public void store(long x, long y, long z, int blockState) {
-		store(new Position(x, y, z), blockState);
-	}
-
-	public int get(Position position) {
-		return blockStorage.containsKey(position) ? blockStorage.get(position) : -1;
-	}
-
-	public void remove(Position position) {
-		blockStorage.remove(position);
-	}
-
-	public int get(long x, long y, long z) {
-		return get(new Position(x, y, z));
-	}
-
-	public int connect(Position position, int blockState) {
-		blockState = ConnectionData.connect(position, blockState, this);
-		store(position, blockState);
-		return blockState;
-	}
-
-	public void update(Position position) {
+	public static void update(UserConnection user, Position position) {
 		for (int x = -1; x <= 1; x++) {
 			for (int z = -1; z <= 1; z++) {
 				for (int y = -1; y <= 1; y++) {
 					if (Math.abs(x) + Math.abs(y) + Math.abs(z) != 1) continue;
 					Position pos = new Position(position.getX() + x, position.getY() + y, position.getZ() + z);
-					int blockState = get(pos);
+					int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
 					if (!connects(blockState)) continue;
-					int newBlockState = connect(pos, blockState);
+					int newBlockState = connect(user, pos, blockState);
 					if (newBlockState == blockState) continue;
-					store(pos, newBlockState);
 
 
-					PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, getUser());
+					PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
 					blockUpdatePacket.write(Type.POSITION, pos);
 					blockUpdatePacket.write(Type.VAR_INT, newBlockState);
 					try {
@@ -81,7 +49,7 @@ public class ConnectionData extends StoredObject  {
 		}
 	}
 
-	public void connectBlocks(Chunk chunk) {
+	public static void connectBlocks(UserConnection user, Chunk chunk) {
 		long xOff = chunk.getX() << 4;
 		long zOff = chunk.getZ() << 4;
 
@@ -97,20 +65,19 @@ public class ConnectionData extends StoredObject  {
 						int block = section.getBlock(x, y, z);
 
 						if (ConnectionData.connects(block)) {
-							block = ConnectionData.connect(new Position(xOff+ x, yOff + y, zOff + z), block, this);
+							block = ConnectionData.connect(user, new Position(xOff+ x, yOff + y, zOff + z), block);
 							section.setFlatBlock(x, y, z, block);
-							store(xOff + x, yOff + y, zOff + z, block);
 						}
 
 						if (x == 0) {
-							update(new Position(xOff - 1, yOff + y, zOff + z));
+							update(user, new Position(xOff - 1, yOff + y, zOff + z));
 						} else if (x == 15) {
-							update(new Position(xOff + 16, yOff + y, zOff + z));
+							update(user, new Position(xOff + 16, yOff + y, zOff + z));
 						}
 						if (z == 0) {
-							update(new Position(xOff + x, yOff + y, zOff - 1));
+							update(user, new Position(xOff + x, yOff + y, zOff - 1));
 						} else if (z == 15) {
-							update(new Position(xOff + x, yOff + y, zOff + 16));
+							update(user, new Position(xOff + x, yOff + y, zOff + 16));
 						}
 					}
 				}
@@ -172,10 +139,10 @@ public class ConnectionData extends StoredObject  {
 		return connectionHandlerMap.containsKey(blockState);
 	}
 
-	private static int connect(Position position, int blockState, ConnectionData connectionData) {
+	public static int connect(UserConnection user, Position position, int blockState) {
 		if (connectionHandlerMap.containsKey(blockState)) {
 		    ConnectionHandler handler = connectionHandlerMap.get(blockState);
-			return handler.connect(position, blockState, connectionData);
+			return handler.connect(user, position, blockState);
 		} else {
 			return blockState;
 		}

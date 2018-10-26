@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
@@ -27,15 +28,15 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler{
         return states;
     }
 
-    protected Byte getStates(Position position, int blockState, ConnectionData connectionData) {
-        byte states = super.getStates(position, blockState, connectionData);
-        if (up(position, connectionData)) states |= 32;
+    protected Byte getStates(UserConnection user, Position position, int blockState) {
+        byte states = super.getStates(user, position, blockState);
+        if (up(user, position)) states |= 32;
         return states;
     }
 
-    public boolean up(Position position, ConnectionData data){
-        if(isWall(data.get(position.getRelative(BlockFace.BOTTOM))) || isWall(data.get(position.getRelative(BlockFace.TOP))))return true;
-        List<BlockFace> list = getBlockFaces(position, data);
+    public boolean up(UserConnection user, Position position){
+        if(isWall(getBlockData(user, position.getRelative(BlockFace.BOTTOM))) || isWall(getBlockData(user, position.getRelative(BlockFace.TOP))))return true;
+        List<BlockFace> list = getBlockFaces(user, position);
         if(list.isEmpty()) return true;
         if(list.size() >= 4) return true;
         for (BlockFace blockFace : list) {
@@ -46,10 +47,10 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler{
         return false;
     }
 
-    private List<BlockFace> getBlockFaces(Position position, ConnectionData data){
+    private List<BlockFace> getBlockFaces(UserConnection user, Position position){
         List<BlockFace> blockFaces = new ArrayList<>();
         for (BlockFace face : blockFaceList) {
-            if(isWall(data.get(position.getRelative(face)))){
+            if(isWall(getBlockData(user, position.getRelative(face)))){
                 blockFaces.add(face);
             }
         }

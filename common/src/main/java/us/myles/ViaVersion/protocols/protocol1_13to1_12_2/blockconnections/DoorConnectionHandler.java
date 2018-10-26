@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
@@ -8,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class DoorConnectionHandler implements ConnectionHandler{
+public class DoorConnectionHandler extends ConnectionHandler{
 
     private static Set<String> baseDoors = new HashSet<>();
     private static Map<Integer, String> doors = new HashMap<>();
@@ -33,9 +34,9 @@ public class DoorConnectionHandler implements ConnectionHandler{
     }
 
     @Override
-    public int connect(Position position, int blockState, ConnectionData connectionData) {
-        int blockBelowId = connectionData.get(position.getRelative(BlockFace.BOTTOM));
-        int blockAboveId = connectionData.get(position.getRelative(BlockFace.TOP));
+    public int connect(UserConnection user, Position position, int blockState) {
+        int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
+        int blockAboveId = getBlockData(user, position.getRelative(BlockFace.TOP));
         WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
         if(doors.containsKey(blockState)){
             if (blockdata.getValue("half").equals("lower")){

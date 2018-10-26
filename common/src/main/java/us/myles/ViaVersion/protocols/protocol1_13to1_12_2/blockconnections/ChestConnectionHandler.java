@@ -1,12 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class ChestConnectionHandler implements ConnectionHandler {
+class ChestConnectionHandler extends ConnectionHandler {
 	private static Map<Integer, BlockFace> chests = new HashMap<>();
 	private static Map<Integer, String> chestType = new HashMap<>();
 
@@ -26,17 +27,17 @@ class ChestConnectionHandler implements ConnectionHandler {
 	}
 
 	@Override
-	public int connect(Position position, int blockState, ConnectionData connectionData) {
+	public int connect(UserConnection user, Position position, int blockState) {
 		BlockFace facing = chests.get(blockState);
 		WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
 		String type = "single";
-		if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.NORTH))) && chestType.get(blockState).equals(chestType.get(connectionData.get(position.getRelative(BlockFace.NORTH))))) {
+		if (chests.containsKey(getBlockData(user, position.getRelative(BlockFace.NORTH))) && chestType.get(blockState).equals(chestType.get(getBlockData(user, position.getRelative(BlockFace.NORTH))))) {
 			type = facing == BlockFace.WEST ? "left" : "right";
-		} else if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.SOUTH))) && chestType.get(blockState).equals(chestType.get(connectionData.get(position.getRelative(BlockFace.SOUTH))))) {
+		} else if (chests.containsKey(getBlockData(user, position.getRelative(BlockFace.SOUTH))) && chestType.get(blockState).equals(chestType.get(getBlockData(user, position.getRelative(BlockFace.SOUTH))))) {
 			type = facing == BlockFace.EAST ? "left" : "right";
-		} else if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.WEST))) && chestType.get(blockState).equals(chestType.get(connectionData.get(position.getRelative(BlockFace.WEST))))) {
+		} else if (chests.containsKey(getBlockData(user, position.getRelative(BlockFace.WEST))) && chestType.get(blockState).equals(chestType.get(getBlockData(user, position.getRelative(BlockFace.WEST))))) {
 			type = facing == BlockFace.NORTH ? "right" : "left";
-		} else if (chests.containsKey(connectionData.get(position.getRelative(BlockFace.EAST))) && chestType.get(blockState).equals(chestType.get(connectionData.get(position.getRelative(BlockFace.EAST))))) {
+		} else if (chests.containsKey(getBlockData(user, position.getRelative(BlockFace.EAST))) && chestType.get(blockState).equals(chestType.get(getBlockData(user, position.getRelative(BlockFace.EAST))))) {
 			type = facing == BlockFace.SOUTH ? "right" : "left";
 		}
         blockdata.set("type", type);

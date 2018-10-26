@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
@@ -7,7 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AbstractStempConnectionHandler implements ConnectionHandler{
+public class AbstractStempConnectionHandler extends ConnectionHandler{
 
     private static final BlockFace[] blockFaceList = { BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST };
 
@@ -31,11 +32,11 @@ public class AbstractStempConnectionHandler implements ConnectionHandler{
     }
 
     @Override
-    public int connect(Position position, int blockState, ConnectionData connectionData) {
+    public int connect(UserConnection user, Position position, int blockState) {
         if(isStem(blockState)){
             WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
             for (BlockFace blockFace : blockFaceList) {
-                if(blockId.contains(connectionData.get(position.getRelative(blockFace)))){
+                if(blockId.contains(getBlockData(user, position.getRelative(blockFace)))){
                     blockdata.setMinecraftKey(toKey);
                     blockdata.getBlockData().clear();
                     blockdata.getBlockData().put("facing", blockFace.toString().toLowerCase());

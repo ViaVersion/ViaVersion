@@ -1,12 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.*;
 
-public class StairConnectionHandler implements ConnectionHandler{
+public class StairConnectionHandler extends ConnectionHandler{
 
     private static final List<BlockFace> blockFaces = Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
     private static HashSet<String> baseStairs = new HashSet<>();
@@ -38,23 +39,23 @@ public class StairConnectionHandler implements ConnectionHandler{
     }
 
     @Override
-    public int connect(Position position, int blockState, ConnectionData connectionData) {
+    public int connect(UserConnection user, Position position, int blockState) {
         WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
-        blockdata.set("shape", getShape(position, connectionData, blockdata));
+        blockdata.set("shape", getShape(user, position, blockdata));
         return blockdata.getBlockStateId();
     }
 
-    public boolean isStair(Position position, BlockFace blockFace, ConnectionData connectionData){
-        int blockState = connectionData.get(position.getRelative(blockFace));
+    public boolean isStair(UserConnection user, Position position, BlockFace blockFace){
+        int blockState = getBlockData(user, position.getRelative(blockFace));
         if(blockData.containsKey(blockState)){
             return true;
         }
         return false;
     }
 
-    public BlockFace getFacing(Position position, ConnectionData connectionData, String face){
+    public BlockFace getFacing(UserConnection user, Position position, String face){
         for (BlockFace blockFace : blockFaces) {
-            int blockState = connectionData.get(position.getRelative(blockFace));
+            int blockState = getBlockData(user, position.getRelative(blockFace));
             if(blockData.containsKey(blockState)){
                 WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
                 if(blockdata.getValue("facing").equals(face)){
@@ -66,16 +67,16 @@ public class StairConnectionHandler implements ConnectionHandler{
         return null;
     }
 
-    private String getShape(Position position, ConnectionData connectionData, WrappedBlockData blockdata){
-        BlockFace blockFace = getFacing(position, connectionData, blockdata.getValue("facing"));
+    private String getShape(UserConnection user, Position position, WrappedBlockData blockdata){
+        BlockFace blockFace = getFacing(user, position, blockdata.getValue("facing"));
         if(blockFace != null){
             int index = blockFaces.indexOf(blockFace);
             BlockFace facing = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
-            String off = connect(position, connectionData, blockFace, getNextBlockFace(index - 1), facing);
+            String off = connect(user, position, blockFace, getNextBlockFace(index - 1), facing);
             if(off != null){
                 return off;
             }
-            String on = connect(position, connectionData, blockFace, getNextBlockFace(index + 1), facing);
+            String on = connect(user, position, blockFace, getNextBlockFace(index + 1), facing);
             if(on != null){
                 return on;
             }
@@ -83,8 +84,8 @@ public class StairConnectionHandler implements ConnectionHandler{
         return "straight";
     }
 
-    private String connect(Position position, ConnectionData connectionData, BlockFace main, BlockFace off, BlockFace facing){
-        int blockState = connectionData.get(position.getRelative(off));
+    private String connect(UserConnection user, Position position, BlockFace main, BlockFace off, BlockFace facing){
+        int blockState = getBlockData(user, position.getRelative(off));
         if(blockData.containsKey(blockState)){
             WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
             BlockFace blockFace = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
