@@ -52,12 +52,6 @@ public class SpongeBlockConnectionProvider extends BlockConnectionProvider {
                         return id;
                     }
                 }
-//            for (Chunk loadedChunk : world.getLoadedChunks()) {
-//                if(loadedChunk.getX() == x && loadedChunk.getZ() == z){
-//                    Block b = loadedChunk.getBlock(position.getX().intValue() , position.getY().intValue(), position.getZ().intValue());
-//                    return b.getTypeId() << 4 | b.getData();
-//                }
-//            }
             }
         }
         return -1;

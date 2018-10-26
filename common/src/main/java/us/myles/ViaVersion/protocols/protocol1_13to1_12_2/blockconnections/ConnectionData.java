@@ -57,31 +57,43 @@ public class ConnectionData{
 			ChunkSection section = chunk.getSections()[i];
 			if (section == null) continue;
 
-			long yOff = i << 4;
+			boolean willConnect = false;
 
-			for (int x = 0; x < 16; x++) {
-				for (int y = 0; y < 16; y++) {
-					for (int z = 0; z < 16; z++) {
-						int block = section.getBlock(x, y, z);
+            for (int p = 0; p < section.getPalette().size(); p++) {
+                int id = section.getPalette().get(p);
+                if(ConnectionData.connects(id)){
+                    willConnect = true;
+                    break;
+                }
+            }
 
-						if (ConnectionData.connects(block)) {
-							block = ConnectionData.connect(user, new Position(xOff+ x, yOff + y, zOff + z), block);
-							section.setFlatBlock(x, y, z, block);
-						}
+            if(willConnect){
+                long yOff = i << 4;
 
-						if (x == 0) {
-							update(user, new Position(xOff - 1, yOff + y, zOff + z));
-						} else if (x == 15) {
-							update(user, new Position(xOff + 16, yOff + y, zOff + z));
-						}
-						if (z == 0) {
-							update(user, new Position(xOff + x, yOff + y, zOff - 1));
-						} else if (z == 15) {
-							update(user, new Position(xOff + x, yOff + y, zOff + 16));
-						}
-					}
-				}
-			}
+                for (int x = 0; x < 16; x++) {
+                    for (int y = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            int block = section.getBlock(x, y, z);
+
+                            if (ConnectionData.connects(block)) {
+                                block = ConnectionData.connect(user, new Position(xOff+ x, yOff + y, zOff + z), block);
+                                section.setFlatBlock(x, y, z, block);
+                            }
+
+                            if (x == 0) {
+                                update(user, new Position(xOff - 1, yOff + y, zOff + z));
+                            } else if (x == 15) {
+                                update(user, new Position(xOff + 16, yOff + y, zOff + z));
+                            }
+                            if (z == 0) {
+                                update(user, new Position(xOff + x, yOff + y, zOff - 1));
+                            } else if (z == 15) {
+                                update(user, new Position(xOff + x, yOff + y, zOff + 16));
+                            }
+                        }
+                    }
+                }
+            }
 		}
 	}
 
