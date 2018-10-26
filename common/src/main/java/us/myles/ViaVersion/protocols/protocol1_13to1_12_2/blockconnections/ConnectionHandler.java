@@ -11,4 +11,9 @@ public abstract class ConnectionHandler {
 	public int getBlockData(UserConnection connection, Position position){
 	    return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(connection, position);
     }
+
+    public boolean canConnect(int id){
+	    ConnectionHandler handler = ConnectionData.connectionHandlerMap.get(id);
+	    return handler != null && handler == this;
+    }
 }

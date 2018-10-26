@@ -140,6 +140,7 @@ public class ConnectionData {
         DoorConnectionHandler.init();
         RedstoneConnectionHandler.init();
         StairConnectionHandler.init();
+        FlowerConnectionHandler.init();
     }
 
     public static boolean isWelcome(int blockState) {
