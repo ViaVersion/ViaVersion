@@ -23,19 +23,13 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
         Player player = Bukkit.getPlayer(uuid);
         if(player != null){
             World world = player.getWorld();
-            int x = (int) (position.getX()/16);
-            int z = (int) (position.getZ()/16);
+            int x = (int) (position.getX() >> 4);
+            int z = (int) (position.getZ() >> 4);
             if(world.isChunkLoaded(x, z)){
                 Chunk c = world.getChunkAt(x, z);
                 Block b = c.getBlock(position.getX().intValue() , position.getY().intValue(), position.getZ().intValue());
                 return b.getTypeId() << 4 | b.getData();
             }
-//            for (Chunk loadedChunk : world.getLoadedChunks()) {
-//                if(loadedChunk.getX() == x && loadedChunk.getZ() == z){
-//                    Block b = loadedChunk.getBlock(position.getX().intValue() , position.getY().intValue(), position.getZ().intValue());
-//                    return b.getTypeId() << 4 | b.getData();
-//                }
-//            }
         }
         return -1;
     }
