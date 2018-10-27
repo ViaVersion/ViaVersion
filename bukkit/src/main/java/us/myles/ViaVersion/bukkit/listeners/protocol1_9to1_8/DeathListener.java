@@ -38,7 +38,7 @@ public class DeathListener extends ViaBukkitListener {
             @Override
             public void run() {
                 // If online
-                if(getUserConnection(p) != null) {
+                if (getUserConnection(p) != null) {
                     PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p));
                     try {
                         wrapper.write(Type.VAR_INT, 2); // Event - Entity dead

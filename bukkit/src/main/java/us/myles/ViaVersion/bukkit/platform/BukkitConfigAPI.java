@@ -164,7 +164,7 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     public boolean is1_12NBTArrayFix() {
         return getBoolean("chat-nbt-fix", true);
     }
-    
+
     @Override
     public boolean is1_12QuickMoveActionFix() {
         return getBoolean("quick-move-action-fix", false);

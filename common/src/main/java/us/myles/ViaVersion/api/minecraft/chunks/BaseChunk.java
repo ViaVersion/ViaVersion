@@ -9,16 +9,16 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class BaseChunk implements Chunk {
-	protected int x;
-	protected int z;
-	protected boolean groundUp;
-	protected int bitmask;
-	protected ChunkSection[] sections;
-	protected byte[] biomeData;
-	protected List<CompoundTag> blockEntities;
+    protected int x;
+    protected int z;
+    protected boolean groundUp;
+    protected int bitmask;
+    protected ChunkSection[] sections;
+    protected byte[] biomeData;
+    protected List<CompoundTag> blockEntities;
 
-	@Override
-	public boolean isBiomeData() {
-		return biomeData != null;
-	}
+    @Override
+    public boolean isBiomeData() {
+        return biomeData != null;
+    }
 }

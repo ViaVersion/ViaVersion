@@ -278,8 +278,8 @@ public class PacketWrapper {
      * Be careful not to send packets twice.
      * (Sends it after current)
      *
-     * @param packetProtocol      - The protocol version of the packet.
-     * @param skipCurrentPipeline - Skip the current pipeline
+     * @param packetProtocol      The protocol version of the packet.
+     * @param skipCurrentPipeline Skip the current pipeline
      * @throws Exception if it fails to write
      */
     public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
@@ -291,9 +291,9 @@ public class PacketWrapper {
      * Be careful not to send packets twice.
      * (Sends it after current)
      *
-     * @param packetProtocol      - The protocol version of the packet.
-     * @param skipCurrentPipeline - Skip the current pipeline
-     * @param currentThread       - Run in the same thread
+     * @param packetProtocol      The protocol version of the packet.
+     * @param skipCurrentPipeline Skip the current pipeline
+     * @param currentThread       Run in the same thread
      * @throws Exception if it fails to write
      */
     public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
@@ -306,8 +306,8 @@ public class PacketWrapper {
     /**
      * Let the packet go through the protocol pipes and write it to ByteBuf
      *
-     * @param packetProtocol      - The protocol version of the packet.
-     * @param skipCurrentPipeline - Skip the current pipeline
+     * @param packetProtocol      The protocol version of the packet.
+     * @param skipCurrentPipeline Skip the current pipeline
      * @return Packet buffer
      * @throws Exception if it fails to write
      */
@@ -343,7 +343,7 @@ public class PacketWrapper {
      * Be careful not to send packets twice.
      * (Sends it after current)
      *
-     * @param packetProtocol - The protocol version of the packet.
+     * @param packetProtocol The protocol version of the packet.
      * @throws Exception if it fails to write
      */
     public void send(Class<? extends Protocol> packetProtocol) throws Exception {
@@ -356,7 +356,7 @@ public class PacketWrapper {
      * (Sends it after current)
      * Also returns the packets ChannelFuture
      *
-     * @param packetProtocol - The protocol version of the packet.
+     * @param packetProtocol The protocol version of the packet.
      * @return The packets ChannelFuture
      * @throws Exception if it fails to write
      */
@@ -486,9 +486,9 @@ public class PacketWrapper {
     /**
      * Send this packet to the server.
      *
-     * @param packetProtocol - The protocol version of the packet.
-     * @param skipCurrentPipeline - Skip the current pipeline
-     * @param currentThread - Run in the same thread
+     * @param packetProtocol      The protocol version of the packet.
+     * @param skipCurrentPipeline Skip the current pipeline
+     * @param currentThread       Run in the same thread
      * @throws Exception if it fails to write
      */
     public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {

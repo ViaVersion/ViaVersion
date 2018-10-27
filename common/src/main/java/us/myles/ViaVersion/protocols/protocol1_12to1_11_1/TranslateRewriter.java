@@ -8,8 +8,8 @@ public class TranslateRewriter {
     public static boolean toClient(JsonElement element, UserConnection user) {
         if (element instanceof JsonObject) {
             JsonObject obj = (JsonObject) element;
-            if(obj.has("translate")) {
-                if(obj.get("translate").getAsString().equals("chat.type.achievement")) {
+            if (obj.has("translate")) {
+                if (obj.get("translate").getAsString().equals("chat.type.achievement")) {
                     return false;
                 }
             }

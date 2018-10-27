@@ -1,15 +1,14 @@
 package us.myles.ViaVersion.bukkit.tasks.protocol1_12to1_11_1;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
 
 public class BukkitInventoryUpdateTask implements Runnable {
 

@@ -42,7 +42,8 @@
                 <configuration>
                     <!-- We only run lombok and not sponge in-built mcmod.info generator due to issues with multiversion -->
                     <annotationProcessors>
-                        <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
+                        <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+                        </annotationProcessor>
                     </annotationProcessors>
                 </configuration>
             </plugin>

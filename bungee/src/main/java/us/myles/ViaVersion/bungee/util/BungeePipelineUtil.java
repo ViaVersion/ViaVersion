@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import us.myles.ViaVersion.api.Via;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -16,7 +17,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
@@ -307,7 +307,7 @@ public class WorldPackets {
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                            
+
                             if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
