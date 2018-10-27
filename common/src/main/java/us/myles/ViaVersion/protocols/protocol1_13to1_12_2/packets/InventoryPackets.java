@@ -285,16 +285,16 @@ public class InventoryPackets {
         CompoundTag tag = item.getTag();
 
         // Save original id
-        int originalId = (item.getId() << 16 | item.getData() & 0xFFFF);
+        int originalId = (item.getIdentifier() << 16 | item.getData() & 0xFFFF);
 
-        int rawId = (item.getId() << 4 | item.getData() & 0xF);
+        int rawId = (item.getIdentifier() << 4 | item.getData() & 0xF);
 
         // NBT Additions
-        if (isDamageable(item.getId())) {
+        if (isDamageable(item.getIdentifier())) {
             if (tag == null) item.setTag(tag = new CompoundTag("tag"));
             tag.put(new IntTag("Damage", item.getData()));
         }
-        if (item.getId() == 358) { // map
+        if (item.getIdentifier() == 358) { // map
             if (tag == null) item.setTag(tag = new CompoundTag("tag"));
             tag.put(new IntTag("map", item.getData()));
         }
@@ -302,7 +302,7 @@ public class InventoryPackets {
         // NBT Changes
         if (tag != null) {
             // Invert shield color id
-            if (item.getId() == 442 || item.getId() == 425) {
+            if (item.getIdentifier() == 442 || item.getIdentifier() == 425) {
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
@@ -374,7 +374,7 @@ public class InventoryPackets {
                 tag.put(newStoredEnch);
             }
             // Handle SpawnEggs
-            if (item.getId() == 383) {
+            if (item.getIdentifier() == 383) {
                 if (tag.get("EntityTag") instanceof CompoundTag) {
                     CompoundTag entityTag = tag.get("EntityTag");
                     if (entityTag.get("id") instanceof StringTag) {
@@ -402,23 +402,23 @@ public class InventoryPackets {
         }
 
         if (!MappingData.oldToNewItems.containsKey(rawId)) {
-            if (!isDamageable(item.getId()) && item.getId() != 358) { // Map
+            if (!isDamageable(item.getIdentifier()) && item.getIdentifier() != 358) { // Map
                 if (tag == null) item.setTag(tag = new CompoundTag("tag"));
                 tag.put(new IntTag(NBT_TAG_NAME, originalId)); // Data will be lost, saving original id
             }
-            if (item.getId() == 31 && item.getData() == 0) { // Shrub was removed
+            if (item.getIdentifier() == 31 && item.getData() == 0) { // Shrub was removed
                 rawId = 32 << 4; // Dead Bush
             } else if (MappingData.oldToNewItems.containsKey(rawId & ~0xF)) {
                 rawId &= ~0xF; // Remove data
             } else {
                 if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.getId());
+                    Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.getIdentifier());
                 }
                 rawId = 16; // Stone
             }
         }
 
-        item.setId(MappingData.oldToNewItems.get(rawId).shortValue());
+        item.setIdentifier(MappingData.oldToNewItems.get(rawId).shortValue());
         item.setData((short) 0);
     }
 
@@ -474,7 +474,7 @@ public class InventoryPackets {
         }
 
         if (rawId == null) {
-            Integer oldId = MappingData.oldToNewItems.inverse().get((int) item.getId());
+            Integer oldId = MappingData.oldToNewItems.inverse().get(item.getIdentifier());
             if (oldId != null) {
                 // Handle spawn eggs
                 Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
@@ -495,17 +495,17 @@ public class InventoryPackets {
 
         if (rawId == null) {
             if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.getId());
+                Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.getIdentifier());
             }
             rawId = 0x10000; // Stone
         }
 
-        item.setId((short) (rawId >> 16));
+        item.setIdentifier((short) (rawId >> 16));
         item.setData((short) (rawId & 0xFFFF));
 
         // NBT changes
         if (tag != null) {
-            if (isDamageable(item.getId())) {
+            if (isDamageable(item.getIdentifier())) {
                 if (tag.get("Damage") instanceof IntTag) {
                     if (!gotRawIdFromTag)
                         item.setData((short) (int) tag.get("Damage").getValue());
@@ -513,7 +513,7 @@ public class InventoryPackets {
                 }
             }
 
-            if (item.getId() == 358) { // map
+            if (item.getIdentifier() == 358) { // map
                 if (tag.get("map") instanceof IntTag) {
                     if (!gotRawIdFromTag)
                         item.setData((short) (int) tag.get("map").getValue());
@@ -521,7 +521,7 @@ public class InventoryPackets {
                 }
             }
 
-            if (item.getId() == 442 || item.getId() == 425) { // shield / banner
+            if (item.getIdentifier() == 442 || item.getIdentifier() == 425) { // shield / banner
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {

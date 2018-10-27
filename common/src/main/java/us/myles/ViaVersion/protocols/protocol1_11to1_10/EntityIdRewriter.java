@@ -127,7 +127,7 @@ public class EntityIdRewriter {
     }
 
     private static boolean hasEntityTag(Item item) {
-        if (item != null && item.getId() == 383) { // Monster Egg
+        if (item != null && item.getIdentifier() == 383) { // Monster Egg
             CompoundTag tag = item.getTag();
             if (tag != null && tag.contains("EntityTag") && tag.get("EntityTag") instanceof CompoundTag) {
                 if (((CompoundTag) tag.get("EntityTag")).get("id") instanceof StringTag) {

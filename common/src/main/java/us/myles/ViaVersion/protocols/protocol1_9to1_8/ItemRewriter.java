@@ -139,7 +139,7 @@ public class ItemRewriter {
 
     public static void toServer(Item item) {
         if (item != null) {
-            if (item.getId() == 383 && item.getData() == 0) { // Monster Egg
+            if (item.getIdentifier() == 383 && item.getData() == 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
                 int data = 0;
                 if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
@@ -154,7 +154,7 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) data);
             }
-            if (item.getId() == 373) { // Potion
+            if (item.getIdentifier() == 373) { // Potion
                 CompoundTag tag = item.getTag();
                 int data = 0;
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
@@ -169,10 +169,10 @@ public class ItemRewriter {
                 item.setData((short) data);
             }
             // Splash potion
-            if (item.getId() == 438) {
+            if (item.getIdentifier() == 438) {
                 CompoundTag tag = item.getTag();
                 int data = 0;
-                item.setId((short) 373); // Potion
+                item.setIdentifier(373); // Potion
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
                     StringTag potion = tag.get("Potion");
                     String potionName = potion.getValue().replace("minecraft:", "");
@@ -188,7 +188,7 @@ public class ItemRewriter {
     }
 
     public static void rewriteBookToServer(Item item) {
-        short id = item.getId();
+        int id = item.getIdentifier();
         if (id != 387) {
             return;
         }
@@ -224,7 +224,7 @@ public class ItemRewriter {
 
     public static void toClient(Item item) {
         if (item != null) {
-            if (item.getId() == 383 && item.getData() != 0) { // Monster Egg
+            if (item.getIdentifier() == 383 && item.getData() != 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
                     tag = new CompoundTag("tag");
@@ -239,13 +239,13 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) 0);
             }
-            if (item.getId() == 373) { // Potion
+            if (item.getIdentifier() == 373) { // Potion
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
                     tag = new CompoundTag("tag");
                 }
                 if (item.getData() >= 16384) {
-                    item.setId((short) 438); // splash id
+                    item.setIdentifier(438); // splash id
                     item.setData((short) (item.getData() - 8192));
                 }
                 String name = potionNameFromDamage(item.getData());
@@ -254,7 +254,7 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) 0);
             }
-            if (item.getId() == 387) { // WRITTEN_BOOK
+            if (item.getIdentifier() == 387) { // WRITTEN_BOOK
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
                     tag = new CompoundTag("tag");

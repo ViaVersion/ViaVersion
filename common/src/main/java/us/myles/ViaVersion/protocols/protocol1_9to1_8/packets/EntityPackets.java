@@ -162,7 +162,7 @@ public class EntityPackets {
                         Item stack = wrapper.get(Type.ITEM, 0);
 
                         if (stack != null) {
-                            if (Protocol1_9TO1_8.isSword(stack.getId())) {
+                            if (Protocol1_9TO1_8.isSword(stack.getIdentifier())) {
                                 entityTracker.getValidBlocking().add(entityID);
                                 return;
                             }

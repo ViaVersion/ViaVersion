@@ -308,7 +308,7 @@ public class WorldPackets {
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-                            if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
+                            if (item != null && Protocol1_9TO1_8.isSword(item.getIdentifier())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);

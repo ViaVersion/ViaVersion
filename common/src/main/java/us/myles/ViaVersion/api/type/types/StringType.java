@@ -6,6 +6,10 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.type.Type;
 
 public class StringType extends Type<String> {
+    // String#length() (used to limit the string in Minecraft source code) uses char[]#length
+    private static final int maxJavaCharUtf8Length = Character.toString(Character.MAX_VALUE)
+            .getBytes(Charsets.UTF_8).length;
+
     public StringType() {
         super(String.class);
     }
@@ -13,12 +17,17 @@ public class StringType extends Type<String> {
     @Override
     public String read(ByteBuf buffer) throws Exception {
         int len = Type.VAR_INT.read(buffer);
-        Preconditions.checkArgument(len <= Short.MAX_VALUE, "Cannot receive string longer than Short.MAX_VALUE (got %s characters)", len);
+
+        Preconditions.checkArgument(len <= Short.MAX_VALUE * maxJavaCharUtf8Length,
+                "Cannot receive string longer than Short.MAX_VALUE * "  + maxJavaCharUtf8Length + " bytes (got %s bytes)", len);
 
         byte[] b = new byte[len];
         buffer.readBytes(b);
+        String string = new String(b, Charsets.UTF_8);
+        Preconditions.checkArgument(string.length() <= Short.MAX_VALUE,
+                "Cannot receive string longer than Short.MAX_VALUE characters (got %s bytes)", string.length());
 
-        return new String(b, Charsets.UTF_8);
+        return string;
     }
 
     @Override

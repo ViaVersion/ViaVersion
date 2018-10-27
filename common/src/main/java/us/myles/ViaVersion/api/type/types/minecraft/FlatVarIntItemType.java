@@ -16,7 +16,7 @@ public class FlatVarIntItemType extends BaseItemType {
             return null;
         } else {
             Item item = new Item();
-            item.setId(Type.VAR_INT.read(buffer).shortValue());  //TODO Maybe we should consider changing id field type to int
+            item.setIdentifier(Type.VAR_INT.read(buffer));
             item.setAmount(buffer.readByte());
             item.setTag(Type.NBT.read(buffer));
             return item;
@@ -29,7 +29,7 @@ public class FlatVarIntItemType extends BaseItemType {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            Type.VAR_INT.write(buffer, (int) object.getId());
+            Type.VAR_INT.write(buffer, object.getIdentifier());
             buffer.writeByte(object.getAmount());
             Type.NBT.write(buffer, object.getTag());
         }
