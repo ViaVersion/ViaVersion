@@ -4,6 +4,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,8 @@ public class AbstractStempConnectionHandler extends ConnectionHandler{
     private int baseStateId;
     private Set<Integer> blockId = new HashSet<>();
     private String toKey;
+
+    private Map<BlockFace, Integer> stemps = new HashMap<>();
 
     public AbstractStempConnectionHandler(String baseStateId, String blockId, String toKey) {
         this.toKey = toKey;
@@ -28,22 +31,23 @@ public class AbstractStempConnectionHandler extends ConnectionHandler{
                 }
                 ConnectionData.connectionHandlerMap.put(entry.getValue(), this);
             }
+            if(key.equals(toKey)){
+                WrappedBlockData data = WrappedBlockData.fromString(entry.getKey());
+                String facing = data.getValue("facing").toUpperCase();
+                stemps.put(BlockFace.valueOf(facing), entry.getValue());
+            }
         }
     }
 
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         if(isStem(blockState)){
-            WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
             for (BlockFace blockFace : blockFaceList) {
                 if(blockId.contains(getBlockData(user, position.getRelative(blockFace)))){
-                    blockdata.setMinecraftKey(toKey);
-                    blockdata.getBlockData().clear();
-                    blockdata.getBlockData().put("facing", blockFace.toString().toLowerCase());
-                    break;
+                    return stemps.get(blockFace);
                 }
             }
-            return blockdata.getBlockStateId();
+            return baseStateId;
         }
         return blockState;
     }

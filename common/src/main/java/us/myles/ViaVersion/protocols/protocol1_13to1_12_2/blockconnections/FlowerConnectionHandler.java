@@ -4,6 +4,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.Set;
 public class FlowerConnectionHandler extends ConnectionHandler{
 
     private static Set<String> baseFlower = new HashSet<>();
+    private static Map<Integer, Integer> flowers = new HashMap<>();
 
     static void init(){
         baseFlower.add("minecraft:rose_bush");
@@ -25,9 +27,13 @@ public class FlowerConnectionHandler extends ConnectionHandler{
         FlowerConnectionHandler handler = new FlowerConnectionHandler();
 
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            String key = blockState.getKey().split("\\[")[0];
-            if (baseFlower.contains(key)) {
+            WrappedBlockData data = WrappedBlockData.fromString(blockState.getKey());
+            if (baseFlower.contains(data.getMinecraftKey())) {
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), handler);
+                if(data.getValue("half").equals("lower")){
+                    data.set("half", "upper");
+                    flowers.put(blockState.getValue(), data.getBlockStateId());
+                }
             }
         }
     }
@@ -35,10 +41,8 @@ public class FlowerConnectionHandler extends ConnectionHandler{
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
-        if(canConnect(blockBelowId)){
-            WrappedBlockData blockData = WrappedBlockData.fromStateId(blockBelowId);
-            blockData.set("half", "upper");
-            return blockData.getBlockStateId();
+        if(flowers.containsKey(blockBelowId)){
+            return flowers.get(blockBelowId);
         }
         return blockState;
     }

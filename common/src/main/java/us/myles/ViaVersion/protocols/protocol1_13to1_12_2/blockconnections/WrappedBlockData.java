@@ -14,12 +14,14 @@ public class WrappedBlockData {
         String[] array = s.split("\\[");
         String key = array[0];
         WrappedBlockData wrappedBlockdata = new WrappedBlockData(key);
-        String blockData = array[1];
-        blockData = blockData.replace("]", "");
-        String[] data = blockData.split(",");
-        for (String d : data) {
-            String[] a = d.split("=");
-            wrappedBlockdata.blockData.put(a[0], a[1]);
+        if(array.length > 1){
+            String blockData = array[1];
+            blockData = blockData.replace("]", "");
+            String[] data = blockData.split(",");
+            for (String d : data) {
+                String[] a = d.split("=");
+                wrappedBlockdata.blockData.put(a[0], a[1]);
+            }
         }
         return wrappedBlockdata;
     }
