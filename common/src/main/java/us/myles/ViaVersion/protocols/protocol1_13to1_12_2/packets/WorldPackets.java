@@ -15,6 +15,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
@@ -172,6 +173,14 @@ public class WorldPackets {
                         Position position = wrapper.get(Type.POSITION, 0);
                         int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
+                        if(Via.getConfig().isServersideBlockConnection()){
+                            if (ConnectionData.connects(newId)) {
+                                newId = ConnectionData.connect(wrapper.user(), position, newId);
+                            }
+
+                            ConnectionData.update(wrapper.user(), position);
+                        }
+
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                     }
                 });
@@ -197,8 +206,27 @@ public class WorldPackets {
                                     (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
                                     (long) record.getY(),
                                     (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
+
+                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
+                        	int blockState = record.getBlockId();
+
+	                        Position position = new Position(
+			                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+			                        (long) record.getY(),
+			                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+
+	                        if(Via.getConfig().isServersideBlockConnection()){
+                                if (ConnectionData.connects(blockState)) {
+                                    blockState = ConnectionData.connect(wrapper.user(), position, blockState);
+                                    record.setBlockId(blockState);
+                                }
+
+                                ConnectionData.update(wrapper.user(), position);
+                            }
+	                    }
                     }
                 });
             }
@@ -266,6 +294,10 @@ public class WorldPackets {
                                     }
                                 }
                             }
+                        }
+
+                        if(Via.getConfig().isServersideBlockConnection()){
+                            ConnectionData.connectBlocks(wrapper.user(), chunk);
                         }
 
                         // Rewrite biome id 255 to plains

@@ -191,6 +191,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isServersideBlockConnection() {
+        return getBoolean("serverside-blockconnection", false);
+    }
+
+    @Override
     public URL getDefaultConfigURL() {
         return BukkitConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }

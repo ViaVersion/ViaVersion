@@ -212,6 +212,11 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isServersideBlockConnection() {
+        return getBoolean("serverside-blockconnection", false);
+    }
+
+    @Override
     public boolean is1_13TeamColourFix() {
         return getBoolean("team-colour-fix", true);
     }

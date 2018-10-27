@@ -266,4 +266,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isMinimizeCooldown();
+
+    /**
+     * Enable the serverside blockconnection for 1.13+ clients
+     *
+     * @return True if enabled
+     */
+    boolean isServersideBlockConnection();
 }
