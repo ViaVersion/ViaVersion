@@ -5,7 +5,7 @@ about: Create a bug report so we can fix it
 ---
 
 **Describe the bug, provide any errors**
-A clear and concise description of what the bug is. Can you http://hastebin the error?
+A clear and concise description of what the bug is. Can you https://hastebin.com the error?
 
 **How can we reproduce it?**
 Steps to reproduce the behavior:
