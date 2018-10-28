@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -9,11 +8,9 @@ import java.util.*;
 
 public class StairConnectionHandler extends ConnectionHandler{
 
-    private static final List<BlockFace> blockFaces = Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
     private static HashSet<String> baseStairs = new HashSet<>();
 
     private static Map<Integer, WrappedBlockData> blockData = new HashMap<>();
-    private static Map<Pair<BlockFace, BlockFace>, String> shapeMappings = new HashMap<>();
 
     static void init() {
         baseStairs.add("minecraft:oak_stairs");
@@ -34,16 +31,6 @@ public class StairConnectionHandler extends ConnectionHandler{
         baseStairs.add("minecraft:prismarine_brick_stairs");
         baseStairs.add("minecraft:dark_prismarine_stairs");
 
-        shapeMappings.put(new Pair(BlockFace.NORTH, BlockFace.EAST), "right");
-        shapeMappings.put(new Pair(BlockFace.EAST, BlockFace.SOUTH), "right");
-        shapeMappings.put(new Pair(BlockFace.SOUTH, BlockFace.WEST), "right");
-        shapeMappings.put(new Pair(BlockFace.WEST, BlockFace.NORTH), "right");
-
-        shapeMappings.put(new Pair(BlockFace.NORTH, BlockFace.WEST), "left");
-        shapeMappings.put(new Pair(BlockFace.EAST, BlockFace.NORTH), "left");
-        shapeMappings.put(new Pair(BlockFace.SOUTH, BlockFace.EAST), "left");
-        shapeMappings.put(new Pair(BlockFace.WEST, BlockFace.SOUTH), "left");
-
         StairConnectionHandler connectionHandler = new StairConnectionHandler();
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
@@ -61,73 +48,58 @@ public class StairConnectionHandler extends ConnectionHandler{
         return blockdata.getBlockStateId();
     }
 
-    public boolean isStair(UserConnection user, Position position, BlockFace blockFace){
-        int blockState = getBlockData(user, position.getRelative(blockFace));
-        if(blockData.containsKey(blockState)){
-            return true;
-        }
-        return false;
-    }
-
-    public BlockFace getFacing(UserConnection user, Position position, String face){
-        for (BlockFace blockFace : blockFaces) {
-            int blockState = getBlockData(user, position.getRelative(blockFace));
-            if(blockData.containsKey(blockState)){
-                WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
-                if(blockdata.getValue("facing").equals(face)){
-                    return blockFace;
-                }
-            }
-        }
-
-        return null;
-    }
-
     private String getShape(UserConnection user, Position position, WrappedBlockData blockdata){
-        BlockFace blockFace = getFacing(user, position, blockdata.getValue("facing"));
-        if(blockFace != null){
-            int index = blockFaces.indexOf(blockFace);
-            BlockFace facing = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
-            String off = connect(user, position, blockFace, getNextBlockFace(index - 1), facing);
-            if(off != null){
-                return off;
+        BlockFace blockFace = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
+        WrappedBlockData blockData2 = WrappedBlockData.fromStateId(getBlockData(user, position.getRelative(blockFace)));
+        if(isStair(blockData2.getMinecraftKey()) && blockdata.getValue("half").equals(blockData2.getValue("half"))){
+            BlockFace blockFace2 = BlockFace.valueOf(blockData2.getValue("facing").toUpperCase());
+            if(!isSameAxis(blockFace, blockFace2) && checkOpposite(user, blockdata, position, blockFace2.opposite())){
+                if(blockFace2 == fixBlockFace(blockFace)){
+                    return "outer_left";
+                }
+                return "outer_right";
             }
-            String on = connect(user, position, blockFace, getNextBlockFace(index + 1), facing);
-            if(on != null){
-                return on;
+        }
+
+        WrappedBlockData blockData3 = WrappedBlockData.fromStateId(getBlockData(user, position.getRelative(blockFace.opposite())));
+        if(isStair(blockData3.getMinecraftKey()) && blockdata.getValue("half").equals(blockData3.getValue("half"))){
+            BlockFace blockFace3 = BlockFace.valueOf(blockData3.getValue("facing").toUpperCase());
+            if(!isSameAxis(blockFace, blockFace3) && checkOpposite(user, blockdata, position, blockFace3)){
+                if(blockFace3 == fixBlockFace(blockFace)){
+                    return "inner_left";
+                }
+                return "inner_right";
             }
         }
         return "straight";
     }
 
-    private String connect(UserConnection user, Position position, BlockFace main, BlockFace off, BlockFace facing){
-        int blockState = getBlockData(user, position.getRelative(off));
-        if(blockData.containsKey(blockState)){
-            WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
-            BlockFace blockFace = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
-            if( blockdata.getValue("shape").equals("straight")){
-                return getType(position.getRelative(main).getRelative(facing), position.getRelative(off).getRelative(blockFace)) + "_" +  shapeMappings.get(new Pair(facing, blockFace));
-            }
-            return null;
-        }
-        return null;
+    private boolean isSameAxis(BlockFace face1, BlockFace face2){
+        return Math.abs(face1.getModX()) == Math.abs(face2.getModX()) && Math.abs(face1.getModY()) == Math.abs(face2.getModY()) && Math.abs(face1.getModZ()) == Math.abs(face2.getModZ());
     }
 
-    public BlockFace getNextBlockFace(int i){
-        if(i < 0){
-            i = blockFaces.size() + i;
-        }
-        if(i >= blockFaces.size()){
-            i = i - blockFaces.size();
-        }
-        return blockFaces.get(i);
+    private boolean checkOpposite(UserConnection user, WrappedBlockData blockdata1, Position position, BlockFace face){
+        WrappedBlockData data = WrappedBlockData.fromStateId(getBlockData(user, position.getRelative(face)));
+        return !isStair(data.getMinecraftKey()) || !data.getValue("facing").equals(blockdata1.getValue("facing")) || !data.getValue("half").equals(blockdata1.getValue("half"));
     }
 
-    public String getType(Position position, Position position2){
-        return position.equals(position2) ? "outer" : "inner";
+    private boolean isStair(String key){
+        return baseStairs.contains(key);
     }
 
-
-
+    private BlockFace fixBlockFace(BlockFace face) {
+        switch (face.ordinal()) {
+            case 0:
+                return BlockFace.WEST;
+            case 1:
+                return BlockFace.EAST;
+            case 2:
+                return BlockFace.NORTH;
+            case 3:
+                return BlockFace.SOUTH;
+            default:
+                return BlockFace.NORTH;
+        }
+    }
 
 }
