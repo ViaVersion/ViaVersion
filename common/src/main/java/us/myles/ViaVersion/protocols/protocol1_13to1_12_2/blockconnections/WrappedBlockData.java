@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import lombok.Data;
+import us.myles.ViaVersion.api.Via;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -27,7 +28,12 @@ public class WrappedBlockData {
     }
 
     public static WrappedBlockData fromStateId(int id){
-        return fromString(ConnectionData.getKey(id));
+        String blockData = ConnectionData.getKey(id);
+        if(blockData != null){
+            return fromString(blockData);
+        }
+        Via.getPlatform().getLogger().info("Unable to get blockdata from " + id);
+        return fromString("minecraft:air");
     }
 
     public WrappedBlockData(String s){

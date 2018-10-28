@@ -54,6 +54,6 @@ public class SpongeBlockConnectionProvider extends BlockConnectionProvider {
                 }
             }
         }
-        return -1;
+        return 0;
     }
 }
