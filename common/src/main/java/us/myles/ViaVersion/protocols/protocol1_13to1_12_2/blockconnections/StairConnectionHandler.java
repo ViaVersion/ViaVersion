@@ -17,6 +17,22 @@ public class StairConnectionHandler extends ConnectionHandler{
 
     static void init() {
         baseStairs.add("minecraft:oak_stairs");
+        baseStairs.add("minecraft:cobblestone_stairs");
+        baseStairs.add("minecraft:brick_stairs");
+        baseStairs.add("minecraft:stone_brick_stairs");
+        baseStairs.add("minecraft:nether_brick_stairs");
+        baseStairs.add("minecraft:sandstone_stairs");
+        baseStairs.add("minecraft:spruce_stairs");
+        baseStairs.add("minecraft:birch_stairs");
+        baseStairs.add("minecraft:jungle_stairs");
+        baseStairs.add("minecraft:quartz_stairs");
+        baseStairs.add("minecraft:acacia_stairs");
+        baseStairs.add("minecraft:dark_oak_stairs");
+        baseStairs.add("minecraft:red_sandstone_stairs");
+        baseStairs.add("minecraft:purpur_stairs");
+        baseStairs.add("minecraft:prismarine_stairs");
+        baseStairs.add("minecraft:prismarine_brick_stairs");
+        baseStairs.add("minecraft:dark_prismarine_stairs");
 
         shapeMappings.put(new Pair(BlockFace.NORTH, BlockFace.EAST), "right");
         shapeMappings.put(new Pair(BlockFace.EAST, BlockFace.SOUTH), "right");
