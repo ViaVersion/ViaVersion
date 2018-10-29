@@ -5,8 +5,8 @@ jdk: oraclejdk8
 
 cache:
   directories:
-    - '$HOME/.m2/repository'
+  - '$HOME/.m2/repository'
 
 script:
-  - mvn dependency:purge-local-repository -DactTransitively=false -DreResolve=false
-  - mvn clean install -B -U
+- mvn dependency:purge-local-repository -DactTransitively=false -DreResolve=false
+- mvn clean install -B -U

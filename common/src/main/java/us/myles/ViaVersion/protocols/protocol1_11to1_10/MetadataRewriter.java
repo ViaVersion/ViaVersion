@@ -100,7 +100,7 @@ public class MetadataRewriter {
     public static void handleMetadata(int entityId, EntityType type, List<Metadata> metadatas, UserConnection connection) {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
-                if(metadata.getValue() instanceof Item) {
+                if (metadata.getValue() instanceof Item) {
                     // Apply rewrite
                     EntityIdRewriter.toClientItem((Item) metadata.getValue());
                 }

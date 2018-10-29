@@ -17,7 +17,7 @@ public class ChunkSection {
      */
     public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
     @Getter
-	private final List<Integer> palette = Lists.newArrayList();
+    private final List<Integer> palette = Lists.newArrayList();
     private final int[] blocks;
     private NibbleArray blockLight;
     private NibbleArray skyLight;
@@ -72,19 +72,19 @@ public class ChunkSection {
     }
 
     public void setPaletteIndex(int idx, int index) {
-    	blocks[idx] = index;
+        blocks[idx] = index;
     }
 
     public int getPaletteIndex(int idx) {
-    	return blocks[idx];
+        return blocks[idx];
     }
 
     /**
      * Set a block state in the chunk
      * This method will not update non-air blocks count
      *
-     * @param idx  Index
-     * @param id The raw or flat id of the block
+     * @param idx Index
+     * @param id  The raw or flat id of the block
      */
     public void setFlatBlock(int idx, int id) {
         int index = palette.indexOf(id);

@@ -8,12 +8,7 @@ import us.myles.ViaVersion.api.Via;
 
 public class Entity1_14Types {
     public static EntityType getTypeFromId(int typeID, boolean isObject) {
-        Optional<EntityType> type;
-
-        if (isObject)
-            type = ObjectTypes.getPCEntity(typeID);
-        else
-            type = EntityType.findById(typeID);
+        Optional<EntityType> type = isObject ? ObjectTypes.getPCEntity(typeID) : EntityType.findById(typeID);
 
         if (!type.isPresent()) {
             Via.getPlatform().getLogger().severe("Could not find type id " + typeID + " isObject=" + isObject);

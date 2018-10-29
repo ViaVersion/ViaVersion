@@ -97,27 +97,25 @@ public class Protocol1_13To1_12_2 extends Protocol {
         }
     };
 
-    // @formatter:off
     // These are arbitrary rewrite values, it just needs an invalid color code character.
     protected static EnumMap<ChatColor, String> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<ChatColor, String>(ChatColor.class) {{
-        put(ChatColor.BLACK,        ChatColor.COLOR_CHAR + "g");
-        put(ChatColor.DARK_BLUE,    ChatColor.COLOR_CHAR + "h");
-        put(ChatColor.DARK_GREEN,   ChatColor.COLOR_CHAR + "i");
-        put(ChatColor.DARK_AQUA,    ChatColor.COLOR_CHAR + "j");
-        put(ChatColor.DARK_RED,     ChatColor.COLOR_CHAR + "p");
-        put(ChatColor.DARK_PURPLE,  ChatColor.COLOR_CHAR + "q");
-        put(ChatColor.GOLD,         ChatColor.COLOR_CHAR + "s");
-        put(ChatColor.GRAY,         ChatColor.COLOR_CHAR + "t");
-        put(ChatColor.DARK_GRAY,    ChatColor.COLOR_CHAR + "u");
-        put(ChatColor.BLUE,         ChatColor.COLOR_CHAR + "v");
-        put(ChatColor.GREEN,        ChatColor.COLOR_CHAR + "w");
-        put(ChatColor.AQUA,         ChatColor.COLOR_CHAR + "x");
-        put(ChatColor.RED,          ChatColor.COLOR_CHAR + "y");
+        put(ChatColor.BLACK, ChatColor.COLOR_CHAR + "g");
+        put(ChatColor.DARK_BLUE, ChatColor.COLOR_CHAR + "h");
+        put(ChatColor.DARK_GREEN, ChatColor.COLOR_CHAR + "i");
+        put(ChatColor.DARK_AQUA, ChatColor.COLOR_CHAR + "j");
+        put(ChatColor.DARK_RED, ChatColor.COLOR_CHAR + "p");
+        put(ChatColor.DARK_PURPLE, ChatColor.COLOR_CHAR + "q");
+        put(ChatColor.GOLD, ChatColor.COLOR_CHAR + "s");
+        put(ChatColor.GRAY, ChatColor.COLOR_CHAR + "t");
+        put(ChatColor.DARK_GRAY, ChatColor.COLOR_CHAR + "u");
+        put(ChatColor.BLUE, ChatColor.COLOR_CHAR + "v");
+        put(ChatColor.GREEN, ChatColor.COLOR_CHAR + "w");
+        put(ChatColor.AQUA, ChatColor.COLOR_CHAR + "x");
+        put(ChatColor.RED, ChatColor.COLOR_CHAR + "y");
         put(ChatColor.LIGHT_PURPLE, ChatColor.COLOR_CHAR + "z");
-        put(ChatColor.YELLOW,       ChatColor.COLOR_CHAR + "!");
-        put(ChatColor.WHITE,        ChatColor.COLOR_CHAR + "?");
+        put(ChatColor.YELLOW, ChatColor.COLOR_CHAR + "!");
+        put(ChatColor.WHITE, ChatColor.COLOR_CHAR + "?");
     }};
-    // @formatter:on
 
     static {
         MappingData.init();

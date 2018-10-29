@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.api.type.types.minecraft;
 
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
 

@@ -9,25 +9,25 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject {
-	private final Map<Integer, Entity1_14Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    private final Map<Integer, Entity1_14Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 
-	public EntityTracker(UserConnection user) {
-		super(user);
-	}
+    public EntityTracker(UserConnection user) {
+        super(user);
+    }
 
-	public void removeEntity(int entityId) {
-		clientEntityTypes.remove(entityId);
-	}
+    public void removeEntity(int entityId) {
+        clientEntityTypes.remove(entityId);
+    }
 
-	public void addEntity(int entityId, Entity1_14Types.EntityType type) {
-		clientEntityTypes.put(entityId, type);
-	}
+    public void addEntity(int entityId, Entity1_14Types.EntityType type) {
+        clientEntityTypes.put(entityId, type);
+    }
 
-	public boolean has(int entityId) {
-		return clientEntityTypes.containsKey(entityId);
-	}
+    public boolean has(int entityId) {
+        return clientEntityTypes.containsKey(entityId);
+    }
 
-	public Optional<Entity1_14Types.EntityType> get(int id) {
-		return Optional.fromNullable(clientEntityTypes.get(id));
-	}
+    public Optional<Entity1_14Types.EntityType> get(int id) {
+        return Optional.fromNullable(clientEntityTypes.get(id));
+    }
 }

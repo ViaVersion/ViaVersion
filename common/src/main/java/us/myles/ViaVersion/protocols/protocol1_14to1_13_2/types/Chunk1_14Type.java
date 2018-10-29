@@ -19,90 +19,90 @@ import java.util.List;
 
 public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 
-	public Chunk1_14Type(ClientWorld param) {
-		super(param, Chunk.class);
-	}
+    public Chunk1_14Type(ClientWorld param) {
+        super(param, Chunk.class);
+    }
 
-	@Override
-	public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
-		int chunkX = input.readInt();
-		int chunkZ = input.readInt();
+    @Override
+    public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
+        int chunkX = input.readInt();
+        int chunkZ = input.readInt();
 
-		boolean groundUp = input.readBoolean();
-		int primaryBitmask = Type.VAR_INT.read(input);
-		Type.VAR_INT.read(input);
+        boolean groundUp = input.readBoolean();
+        int primaryBitmask = Type.VAR_INT.read(input);
+        Type.VAR_INT.read(input);
 
-		BitSet usedSections = new BitSet(16);
-		ChunkSection[] sections = new ChunkSection[16];
-		// Calculate section count from bitmask
-		for (int i = 0; i < 16; i++) {
-			if ((primaryBitmask & (1 << i)) != 0) {
-				usedSections.set(i);
-			}
-		}
+        BitSet usedSections = new BitSet(16);
+        ChunkSection[] sections = new ChunkSection[16];
+        // Calculate section count from bitmask
+        for (int i = 0; i < 16; i++) {
+            if ((primaryBitmask & (1 << i)) != 0) {
+                usedSections.set(i);
+            }
+        }
 
-		// Read sections
-		for (int i = 0; i < 16; i++) {
-			if (!usedSections.get(i)) continue; // Section not set
-			short nonAirBlocksCount = input.readShort();
-			ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
-			section.setNonAirBlocksCount(nonAirBlocksCount);
-			sections[i] = section;
-		}
+        // Read sections
+        for (int i = 0; i < 16; i++) {
+            if (!usedSections.get(i)) continue; // Section not set
+            short nonAirBlocksCount = input.readShort();
+            ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
+            section.setNonAirBlocksCount(nonAirBlocksCount);
+            sections[i] = section;
+        }
 
-		byte[] biomeData = groundUp ? new byte[256] : null;
-		if (groundUp) {
-			for (int i = 0; i < 256; i++) {
-				biomeData[i] = (byte) input.readInt();
-			}
-		}
+        byte[] biomeData = groundUp ? new byte[256] : null;
+        if (groundUp) {
+            for (int i = 0; i < 256; i++) {
+                biomeData[i] = (byte) input.readInt();
+            }
+        }
 
-		List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
 
-		// Read all the remaining bytes (workaround for #681)
-		if (input.readableBytes() > 0) {
-			byte[] array = Type.REMAINING_BYTES.read(input);
-			if (Via.getManager().isDebug()) {
-				Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
-			}
-		}
+        // Read all the remaining bytes (workaround for #681)
+        if (input.readableBytes() > 0) {
+            byte[] array = Type.REMAINING_BYTES.read(input);
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
+            }
+        }
 
-		return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
-	}
+        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
+    }
 
-	@Override
-	public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
-		output.writeInt(chunk.getX());
-		output.writeInt(chunk.getZ());
+    @Override
+    public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
+        output.writeInt(chunk.getX());
+        output.writeInt(chunk.getZ());
 
-		output.writeBoolean(chunk.isGroundUp());
-		Type.VAR_INT.write(output, chunk.getBitmask());
+        output.writeBoolean(chunk.isGroundUp());
+        Type.VAR_INT.write(output, chunk.getBitmask());
 
-		ByteBuf buf = output.alloc().buffer();
-		for (int i = 0; i < 16; i++) {
-			ChunkSection section = chunk.getSections()[i];
-			if (section == null) continue; // Section not set
-			buf.writeShort(section.getNonAirBlocksCount());
-			Types1_13.CHUNK_SECTION.write(buf, section);
-		}
-		buf.readerIndex(0);
-		Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 * 4 : 0));
-		output.writeBytes(buf);
-		buf.release(); // release buffer
+        ByteBuf buf = output.alloc().buffer();
+        for (int i = 0; i < 16; i++) {
+            ChunkSection section = chunk.getSections()[i];
+            if (section == null) continue; // Section not set
+            buf.writeShort(section.getNonAirBlocksCount());
+            Types1_13.CHUNK_SECTION.write(buf, section);
+        }
+        buf.readerIndex(0);
+        Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 * 4 : 0));
+        output.writeBytes(buf);
+        buf.release(); // release buffer
 
-		// Write biome data
-		if (chunk.isBiomeData()) {
-			for (byte value : chunk.getBiomeData()) {
-				output.writeInt(value & 0xFF); // This is a temporary workaround, we'll look into fixing this soon :)
-			}
-		}
+        // Write biome data
+        if (chunk.isBiomeData()) {
+            for (byte value : chunk.getBiomeData()) {
+                output.writeInt(value & 0xFF); // This is a temporary workaround, we'll look into fixing this soon :)
+            }
+        }
 
-		// Write Block Entities
-		Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
-	}
+        // Write Block Entities
+        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
+    }
 
-	@Override
-	public Class<? extends Type> getBaseClass() {
-		return BaseChunkType.class;
-	}
+    @Override
+    public Class<? extends Type> getBaseClass() {
+        return BaseChunkType.class;
+    }
 }

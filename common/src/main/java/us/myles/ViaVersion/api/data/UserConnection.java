@@ -205,7 +205,7 @@ public class UserConnection {
     /**
      * Sends a raw packet to the server
      *
-     * @param packet Raw packet to be sent
+     * @param packet        Raw packet to be sent
      * @param currentThread If {@code true} executes immediately, {@code false} submits a task to EventLoop
      */
     public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
@@ -244,5 +244,7 @@ public class UserConnection {
      *
      * @param packet Raw packet to be sent
      */
-    public void sendRawPacketToServer(ByteBuf packet) { sendRawPacketToServer(packet, false); }
+    public void sendRawPacketToServer(ByteBuf packet) {
+        sendRawPacketToServer(packet, false);
+    }
 }
