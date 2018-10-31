@@ -207,10 +207,11 @@ public class InventoryPackets {
         else if (id < 542) return id + 43;
         else if (id < 561) return id + 48;
         else if (id < 593) return id + 49;
-        else if (id < 657) return id + 53;
-        else if (id < 662) return id + 54;
-        else if (id < 665) return id + 55;
-        else return id + 56;
+        else if (id < 641) return id + 53;
+        else if (id < 657) return id + 54;
+        else if (id < 662) return id + 55;
+        else if (id < 665) return id + 56;
+        else return id + 57;
     }
 
     public static void toServer(Item item) {
@@ -231,13 +232,15 @@ public class InventoryPackets {
         else if (id < 610) return 1;
         else if (id < 642) return id - 49;
         else if (id < 646) return 1;
-        else if (id < 710) return id - 53;
-        else if (id < 711) return 1;
-        else if (id < 716) return id - 54;
-        else if (id < 717) return 1;
-        else if (id < 720) return id - 55;
-        else if (id < 721) return 1;
-        else if (id < 846) return id - 56;
+        else if (id < 694) return id - 53;
+        else if (id < 695) return 1;
+        else if (id < 711) return id - 54;
+        else if (id < 712) return 1;
+        else if (id < 717) return id - 55;
+        else if (id < 718) return 1;
+        else if (id < 721) return id - 56;
+        else if (id < 722) return 1;
+        else if (id < 847) return id - 57;
         else return 1;
     }
 }

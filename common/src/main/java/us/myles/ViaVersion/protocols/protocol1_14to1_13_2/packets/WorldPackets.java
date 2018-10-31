@@ -91,6 +91,7 @@ public class WorldPackets {
                 });
             }
         });
+
         //Chunk
         protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
             @Override
@@ -146,6 +147,8 @@ public class WorldPackets {
                         }
                         lightPacket.write(Type.VAR_INT, skyLightMask);
                         lightPacket.write(Type.VAR_INT, blockLightMask);
+                        lightPacket.write(Type.VAR_INT, 0);  //TODO find out what these two bitmasks mean
+                        lightPacket.write(Type.VAR_INT, 0);  //TODO
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) continue;
                             ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
