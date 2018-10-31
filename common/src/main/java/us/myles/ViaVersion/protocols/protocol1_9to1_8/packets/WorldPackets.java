@@ -260,7 +260,7 @@ public class WorldPackets {
         protocol.registerIncoming(State.PLAY, 0x07, 0x13, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Status
+                map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 0 - Status
                 map(Type.POSITION); // 1 - Position
                 map(Type.UNSIGNED_BYTE); // 2 - Face
                 handler(new PacketHandler() {
