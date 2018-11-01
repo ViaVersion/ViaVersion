@@ -17,6 +17,9 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class WorldPackets {
+    private static final int AIR = 0;
+    private static final int VOID_AIR = 8817;
+    private static final int CAVE_AIR = 8818;
 
     public static void register(Protocol protocol) {
 
@@ -108,10 +111,10 @@ public class WorldPackets {
                             boolean hasBlock = false;
                             for (int i = 0; i < section.getPalette().size(); i++) {
                                 int old = section.getPalette().get(i);
-                                if (!hasBlock && !(old == 0 || old == 8591 || old == 8592)) { // air, void_air, cave_air
+                                int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
+                                if (!hasBlock && newId != AIR && newId != VOID_AIR && newId != CAVE_AIR) { // air, void_air, cave_air
                                     hasBlock = true;
                                 }
-                                int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
                                 section.getPalette().set(i, newId);
                             }
                             if (!hasBlock) {
@@ -123,7 +126,7 @@ public class WorldPackets {
                                 for (int y = 0; y < 16; y++) {
                                     for (int z = 0; z < 16; z++) {
                                         int id = section.getFlatBlock(x, y, z);
-                                        if (id == 0 || id == 8591 || id == 8592) {
+                                        if (id != AIR && id != VOID_AIR && id != CAVE_AIR) {
                                             nonAirBlockCount++;
                                         }
                                     }
