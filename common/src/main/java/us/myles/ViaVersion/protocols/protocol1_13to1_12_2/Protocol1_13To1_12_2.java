@@ -939,7 +939,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 if (rewrite == null) {
                     rewrite = colorChar;
                 }
-                newName.append('§').append(rewrite);
+                newName.append(ChatColor.COLOR_CHAR).append(rewrite);
             }
             name = newName.toString();
         }
