@@ -1,6 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-public class GlassConnectionHandler extends AbstractFenceConnectionHandler{
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+
+public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
 
     static void init() {
         new GlassConnectionHandler("paneConnections", "minecraft:white_stained_glass_pane");
@@ -25,5 +29,11 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler{
 
     public GlassConnectionHandler(String blockConnections, String key) {
         super(blockConnections, key);
+    }
+
+    @Override
+    protected Byte getStates(UserConnection user, Position position, int blockState) {
+        final Byte states = super.getStates(user, position, blockState);
+        return states == 0 && (ProtocolRegistry.SERVER_PROTOCOL <= 47 && ProtocolRegistry.SERVER_PROTOCOL != -1) ? 0xF : states;
     }
 }
