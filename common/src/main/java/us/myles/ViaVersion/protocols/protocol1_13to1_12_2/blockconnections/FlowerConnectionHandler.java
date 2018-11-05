@@ -10,12 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class FlowerConnectionHandler extends ConnectionHandler{
+public class FlowerConnectionHandler extends ConnectionHandler {
 
     private static Set<String> baseFlower = new HashSet<>();
     private static Map<Integer, Integer> flowers = new HashMap<>();
 
-    static void init(){
+    static void init() {
         baseFlower.add("minecraft:rose_bush");
         baseFlower.add("minecraft:sunflower");
         baseFlower.add("minecraft:peony");
@@ -30,7 +30,7 @@ public class FlowerConnectionHandler extends ConnectionHandler{
             WrappedBlockData data = WrappedBlockData.fromString(blockState.getKey());
             if (baseFlower.contains(data.getMinecraftKey())) {
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), handler);
-                if(data.getValue("half").equals("lower")){
+                if (data.getValue("half").equals("lower")) {
                     data.set("half", "upper");
                     flowers.put(blockState.getValue(), data.getBlockStateId());
                 }
@@ -41,7 +41,7 @@ public class FlowerConnectionHandler extends ConnectionHandler{
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
-        if(flowers.containsKey(blockBelowId)){
+        if (flowers.containsKey(blockBelowId) && !flowers.containsKey(getBlockData(user, position.getRelative(BlockFace.TOP)))) {
             return flowers.get(blockBelowId);
         }
         return blockState;
