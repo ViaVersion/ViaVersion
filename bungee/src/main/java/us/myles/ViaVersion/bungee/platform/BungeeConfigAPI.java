@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.*;
 
 public class BungeeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "serverside-blockconnection");
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "blockconnection-methode");
 
     public BungeeConfigAPI(File configFile) {
         super(new File(configFile, "config.yml"));
@@ -232,6 +232,11 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public boolean isServersideBlockConnection() {
         return getBoolean("serverside-blockconnection", false);
+    }
+
+    @Override
+    public String getBlockConnectionType() {
+        return "packet";
     }
 
     /**

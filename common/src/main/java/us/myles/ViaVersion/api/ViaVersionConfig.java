@@ -273,4 +273,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isServersideBlockConnection();
+
+    /**
+     * Get the Type of BlockConnection Provider which should be used
+     *
+     * @return True if enabled
+     */
+    String getBlockConnectionType();
 }

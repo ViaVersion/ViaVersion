@@ -217,6 +217,11 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public String getBlockConnectionType() {
+        return getString("blockconnection-methode", "world");
+    }
+
+    @Override
     public boolean is1_13TeamColourFix() {
         return getBoolean("team-colour-fix", true);
     }

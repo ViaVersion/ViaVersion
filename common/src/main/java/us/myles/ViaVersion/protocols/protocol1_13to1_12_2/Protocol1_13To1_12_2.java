@@ -19,12 +19,14 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
@@ -232,7 +234,20 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
         registerOutgoing(State.PLAY, 0x1C, 0x1E);
-        registerOutgoing(State.PLAY, 0x1D, 0x1F);
+        // Unload chunk packet
+        registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int x = wrapper.passthrough(Type.INT);
+                        int z = wrapper.passthrough(Type.INT);
+                        ConnectionData.getProvider().unloadChunk(wrapper.user(), x, z);
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x1E, 0x20);
         registerOutgoing(State.PLAY, 0x1F, 0x21);
         // WorldPackets 0x20 -> 0x22
@@ -365,6 +380,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
+
+                        ConnectionData.clearBlockStorage(wrapper.user());
                     }
                 });
                 handler(SEND_DECLARE_COMMANDS_AND_TAGS);
@@ -889,13 +906,15 @@ public class Protocol1_13To1_12_2 extends Protocol {
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
         userConnection.put(new BlockStorage(userConnection));
+        if(Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider){
+            userConnection.put(new BlockConnectionStorage(userConnection));
+        }
     }
 
     @Override
     protected void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
-        providers.register(BlockConnectionProvider.class, new BlockConnectionProvider());
     }
 
     private int getNewSoundID(final int oldID) {

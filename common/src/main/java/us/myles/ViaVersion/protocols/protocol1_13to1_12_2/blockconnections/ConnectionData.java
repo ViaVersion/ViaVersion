@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
 import java.util.HashMap;
@@ -47,6 +48,28 @@ public class ConnectionData {
                 }
             }
         }
+    }
+
+    public static BlockConnectionProvider getProvider(){
+        return Via.getManager().getProviders().get(BlockConnectionProvider.class);
+    }
+
+    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState){
+        if(!needStoreBlocks()) return;
+        if (ConnectionData.isWelcome(blockState)) {
+            ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
+        }else{
+            ConnectionData.getProvider().removeBlock(userConnection, position);
+        }
+    }
+
+    public static void clearBlockStorage(UserConnection connection){
+        if(!needStoreBlocks()) return;
+        getProvider().clearStorage(connection);
+    }
+
+    public static boolean needStoreBlocks(){
+        return getProvider().needBlockStore();
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
@@ -142,6 +165,10 @@ public class ConnectionData {
         RedstoneConnectionHandler.init();
         StairConnectionHandler.init();
         FlowerConnectionHandler.init();
+
+        if(Via.getConfig().getBlockConnectionType().equalsIgnoreCase("packet")){
+            Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
+        }
     }
 
     public static boolean isWelcome(int blockState) {
