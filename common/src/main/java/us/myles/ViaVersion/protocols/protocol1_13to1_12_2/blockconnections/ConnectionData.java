@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
 import java.util.HashMap;
@@ -164,6 +165,10 @@ public class ConnectionData {
         RedstoneConnectionHandler.init();
         StairConnectionHandler.init();
         FlowerConnectionHandler.init();
+
+        if(Via.getConfig().getBlockConnectionType().equalsIgnoreCase("packet")){
+            Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
+        }
     }
 
     public static boolean isWelcome(int blockState) {

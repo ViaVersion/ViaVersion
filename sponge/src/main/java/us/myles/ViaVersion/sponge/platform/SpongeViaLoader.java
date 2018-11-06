@@ -80,7 +80,9 @@ public class SpongeViaLoader implements ViaPlatformLoader {
                 }
             }
         });
-        Via.getManager().getProviders().use(BlockConnectionProvider.class, new SpongeBlockConnectionProvider());
+        if(Via.getConfig().getBlockConnectionType().equalsIgnoreCase("world")){
+            Via.getManager().getProviders().use(BlockConnectionProvider.class, new SpongeBlockConnectionProvider());
+        }
     }
 
     public void unload() {

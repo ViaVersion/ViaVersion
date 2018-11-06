@@ -13,6 +13,7 @@ import us.myles.ViaVersion.bungee.listeners.UpdateListener;
 import us.myles.ViaVersion.bungee.providers.*;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
@@ -50,7 +51,6 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(VersionProvider.class, new BungeeVersionProvider());
         Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
         Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
-        Via.getManager().getProviders().use(BungeeBlockConnectionProvider.class, new BungeeBlockConnectionProvider());
 
         if (plugin.getConf().getBungeePingInterval() > 0) {
             tasks.add(plugin.getProxy().getScheduler().schedule(

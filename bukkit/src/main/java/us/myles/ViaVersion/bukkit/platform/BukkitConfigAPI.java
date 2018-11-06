@@ -196,6 +196,11 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public String getBlockConnectionType() {
+        return getString("blockconnection-methode", "world");
+    }
+
+    @Override
     public URL getDefaultConfigURL() {
         return BukkitConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }

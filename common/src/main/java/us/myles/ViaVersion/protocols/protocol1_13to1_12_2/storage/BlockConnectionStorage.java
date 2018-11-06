@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.bungee.storage;
+package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.StoredObject;
@@ -8,10 +8,10 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BungeeBlockConnectionData extends StoredObject {
+public class BlockConnectionStorage extends StoredObject {
     private Map<Pair<Integer, Integer>, Map<Position, Integer>> blockStorage = new HashMap<>();
 
-    public BungeeBlockConnectionData(UserConnection user) {
+    public BlockConnectionStorage(UserConnection user) {
         super(user);
     }
 

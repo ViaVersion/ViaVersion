@@ -17,7 +17,6 @@ import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
-import us.myles.ViaVersion.bungee.storage.BungeeBlockConnectionData;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
@@ -61,10 +60,6 @@ public class BungeeServerHandler implements Listener {
         if (user == null) return;
         if (!user.has(BungeeStorage.class)) {
             user.put(new BungeeStorage(user, e.getPlayer()));
-        }
-
-        if(!user.has(BungeeBlockConnectionData.class)){
-            user.put(new BungeeBlockConnectionData(user));
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
