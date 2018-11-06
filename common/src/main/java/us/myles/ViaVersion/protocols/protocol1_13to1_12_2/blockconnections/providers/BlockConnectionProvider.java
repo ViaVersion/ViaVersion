@@ -18,4 +18,12 @@ public class BlockConnectionProvider implements Provider {
     public int getWorldBlockData(UserConnection connection, Position position){
         return -1;
     }
+
+    public void storeBlock(UserConnection connection, Position position, int blockState){};
+
+    public void removeBlock(UserConnection connection, Position position){};
+
+    public void storeBlock(UserConnection connection, long x, long y, long z, int blockState){
+        storeBlock(connection, new Position(x, y, z), blockState);
+    }
 }

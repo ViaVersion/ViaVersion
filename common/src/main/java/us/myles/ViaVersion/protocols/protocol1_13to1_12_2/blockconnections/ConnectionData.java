@@ -49,6 +49,18 @@ public class ConnectionData {
         }
     }
 
+    public static BlockConnectionProvider getProvider(){
+        return Via.getManager().getProviders().get(BlockConnectionProvider.class);
+    }
+
+    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState){
+        if (ConnectionData.isWelcome(blockState)) {
+            ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
+        }else{
+            ConnectionData.getProvider().removeBlock(userConnection, position);
+        }
+    }
+
     public static void connectBlocks(UserConnection user, Chunk chunk) {
         long xOff = chunk.getX() << 4;
         long zOff = chunk.getZ() << 4;
