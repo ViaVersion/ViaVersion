@@ -48,6 +48,7 @@ public class BlockConnectionStorage extends StoredObject {
         Map<Position, Integer> map = blockStorage.get(pair);
         if(map == null){
             map = new HashMap<>();
+            blockStorage.put(pair, map);
         }
         return map;
     }
