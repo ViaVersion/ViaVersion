@@ -54,11 +54,21 @@ public class ConnectionData {
     }
 
     public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState){
+        if(!needStoreBlocks()) return;
         if (ConnectionData.isWelcome(blockState)) {
             ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
         }else{
             ConnectionData.getProvider().removeBlock(userConnection, position);
         }
+    }
+
+    public static void clearBlockStorage(UserConnection connection){
+        if(!needStoreBlocks()) return;
+        getProvider().clearStorage(connection);
+    }
+
+    public static boolean needStoreBlocks(){
+        return getProvider().needBlockStore();
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {

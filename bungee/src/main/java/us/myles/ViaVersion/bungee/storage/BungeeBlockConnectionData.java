@@ -36,6 +36,14 @@ public class BungeeBlockConnectionData extends StoredObject {
         }
     }
 
+    public void clear(){
+        blockStorage.clear();
+    }
+
+    public void unloadChunk(int x, int z){
+        blockStorage.remove(new Pair<Integer, Integer>(x, z));
+    }
+
     private Map<Position, Integer> getChunkMap(Pair pair){
         Map<Position, Integer> map = blockStorage.get(pair);
         if(map == null){

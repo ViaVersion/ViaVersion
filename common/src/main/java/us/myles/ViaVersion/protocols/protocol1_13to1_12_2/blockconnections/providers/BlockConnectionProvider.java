@@ -27,6 +27,10 @@ public class BlockConnectionProvider implements Provider {
         storeBlock(connection, new Position(x, y, z), blockState);
     }
 
+    public void clearStorage(UserConnection connection){};
+
+    public void unloadChunk(UserConnection connection, int x, int z){};
+
     public boolean needBlockStore(){
         return false;
     }

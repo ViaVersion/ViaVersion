@@ -23,6 +23,16 @@ public class BungeeBlockConnectionProvider extends BlockConnectionProvider {
     }
 
     @Override
+    public void clearStorage(UserConnection connection) {
+        connection.get(BungeeBlockConnectionData.class).clear();
+    }
+
+    @Override
+    public void unloadChunk(UserConnection connection, int x, int z) {
+        connection.get(BungeeBlockConnectionData.class).unloadChunk(x, z);
+    }
+
+    @Override
     public boolean needBlockStore() {
         return true;
     }

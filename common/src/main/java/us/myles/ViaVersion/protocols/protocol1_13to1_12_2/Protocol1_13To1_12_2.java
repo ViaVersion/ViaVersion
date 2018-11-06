@@ -232,7 +232,20 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
         registerOutgoing(State.PLAY, 0x1C, 0x1E);
-        registerOutgoing(State.PLAY, 0x1D, 0x1F);
+        // Unload chunk packet
+        registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int x = wrapper.passthrough(Type.INT);
+                        int z = wrapper.passthrough(Type.INT);
+                        ConnectionData.getProvider().unloadChunk(wrapper.user(), x, z);
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x1E, 0x20);
         registerOutgoing(State.PLAY, 0x1F, 0x21);
         // WorldPackets 0x20 -> 0x22
@@ -365,6 +378,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
+
+                        ConnectionData.clearBlockStorage(wrapper.user());
                     }
                 });
                 handler(SEND_DECLARE_COMMANDS_AND_TAGS);
