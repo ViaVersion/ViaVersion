@@ -915,7 +915,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
     protected void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
-        providers.register(BlockConnectionProvider.class, new BlockConnectionProvider());
     }
 
     private int getNewSoundID(final int oldID) {
