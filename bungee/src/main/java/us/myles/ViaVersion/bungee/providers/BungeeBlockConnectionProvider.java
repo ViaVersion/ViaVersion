@@ -21,4 +21,9 @@ public class BungeeBlockConnectionProvider extends BlockConnectionProvider {
     public int getBlockdata(UserConnection connection, Position position) {
         return connection.get(BungeeBlockConnectionData.class).get(position);
     }
+
+    @Override
+    public boolean needBlockStore() {
+        return true;
+    }
 }

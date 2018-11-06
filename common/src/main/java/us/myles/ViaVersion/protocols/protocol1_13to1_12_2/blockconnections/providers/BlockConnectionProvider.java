@@ -26,4 +26,8 @@ public class BlockConnectionProvider implements Provider {
     public void storeBlock(UserConnection connection, long x, long y, long z, int blockState){
         storeBlock(connection, new Position(x, y, z), blockState);
     }
+
+    public boolean needBlockStore(){
+        return false;
+    }
 }
