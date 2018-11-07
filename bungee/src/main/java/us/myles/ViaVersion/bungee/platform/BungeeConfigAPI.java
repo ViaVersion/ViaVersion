@@ -235,8 +235,13 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
-    public String getBlockConnectionType() {
+    public String getBlockConnectionMethod() {
         return "packet";
+    }
+
+    @Override
+    public boolean isRedueMemoryFromBlockStorage() {
+        return getBoolean("reducememory-blockstorage", false);
     }
 
     /**

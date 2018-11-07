@@ -94,7 +94,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if (plugin.getConf().is1_12QuickMoveActionFix()) {
             Via.getManager().getProviders().use(InventoryQuickMoveProvider.class, new BukkitInventoryQuickMoveProvider());
         }
-        if(Via.getConfig().getBlockConnectionType().equalsIgnoreCase("world")){
+        if(Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")){
             Via.getManager().getProviders().use(BlockConnectionProvider.class, new BukkitBlockConnectionProvider());
         }
         Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
