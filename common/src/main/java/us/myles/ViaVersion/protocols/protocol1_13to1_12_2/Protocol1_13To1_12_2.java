@@ -238,14 +238,16 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int x = wrapper.passthrough(Type.INT);
-                        int z = wrapper.passthrough(Type.INT);
-                        ConnectionData.getProvider().unloadChunk(wrapper.user(), x, z);
-                    }
-                });
+                if(Via.getConfig().isServersideBlockConnection()){
+                    handler(new PacketHandler() {
+                        @Override
+                        public void handle(PacketWrapper wrapper) throws Exception {
+                            int x = wrapper.passthrough(Type.INT);
+                            int z = wrapper.passthrough(Type.INT);
+                            ConnectionData.getProvider().unloadChunk(wrapper.user(), x, z);
+                        }
+                    });
+                }
             }
         });
         registerOutgoing(State.PLAY, 0x1E, 0x20);
@@ -381,7 +383,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
 
-                        ConnectionData.clearBlockStorage(wrapper.user());
+                        if(Via.getConfig().isServersideBlockConnection()) {
+                            ConnectionData.clearBlockStorage(wrapper.user());
+                        }
                     }
                 });
                 handler(SEND_DECLARE_COMMANDS_AND_TAGS);
@@ -906,8 +910,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
         userConnection.put(new BlockStorage(userConnection));
-        if(Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider){
-            userConnection.put(new BlockConnectionStorage(userConnection));
+        if(Via.getConfig().isServersideBlockConnection()){
+            if(Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider){
+                userConnection.put(new BlockConnectionStorage(userConnection));
+            }
         }
     }
 
