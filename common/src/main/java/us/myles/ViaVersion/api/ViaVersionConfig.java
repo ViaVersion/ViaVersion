@@ -277,7 +277,14 @@ public interface ViaVersionConfig {
     /**
      * Get the Type of BlockConnection Provider which should be used
      *
+     * @return String world for world-level or packet for packet-level
+     */
+    String getBlockConnectionMethod();
+
+    /**
+     * When activated, only the most important blocks are saved in the BlockStorage.
+     *
      * @return True if enabled
      */
-    String getBlockConnectionType();
+    boolean isRedueMemoryFromBlockStorage();
 }

@@ -131,25 +131,27 @@ public class ConnectionData {
             keyToId.put(key, id);
         }
 
-        JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
-        for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
-            int id = keyToId.get(entry.getKey());
-            BlockData blockData = new BlockData();
-            for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
-                String name = type.getKey();
-                JsonObject object = type.getValue().getAsJsonObject();
-                Boolean[] data = new Boolean[6];
-                for (BlockFace value : BlockFace.values()) {
-                    String face = value.toString().toLowerCase();
-                    if (object.has(face)) {
-                        data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
-                    } else {
-                        data[value.ordinal()] = false;
+        if(!Via.getConfig().isRedueMemoryFromBlockStorage()){
+            JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
+            for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
+                int id = keyToId.get(entry.getKey());
+                BlockData blockData = new BlockData();
+                for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
+                    String name = type.getKey();
+                    JsonObject object = type.getValue().getAsJsonObject();
+                    Boolean[] data = new Boolean[6];
+                    for (BlockFace value : BlockFace.values()) {
+                        String face = value.toString().toLowerCase();
+                        if (object.has(face)) {
+                            data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
+                        } else {
+                            data[value.ordinal()] = false;
+                        }
                     }
+                    blockData.put(name, data);
                 }
-                blockData.put(name, data);
+                blockConnectionData.put(id, blockData);
             }
-            blockConnectionData.put(id, blockData);
         }
 
 //		FenceConnectionHandler.init();
@@ -167,7 +169,7 @@ public class ConnectionData {
         StairConnectionHandler.init();
         FlowerConnectionHandler.init();
 
-        if(Via.getConfig().getBlockConnectionType().equalsIgnoreCase("packet")){
+        if(Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")){
             Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
         }
     }
