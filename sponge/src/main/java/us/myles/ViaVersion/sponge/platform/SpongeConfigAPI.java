@@ -218,7 +218,7 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public String getBlockConnectionType() {
-        return getString("blockconnection-methode", "world");
+        return getString("blockconnection-method", "world");
     }
 
     @Override

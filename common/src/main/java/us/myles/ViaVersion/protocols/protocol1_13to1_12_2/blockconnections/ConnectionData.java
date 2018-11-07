@@ -121,6 +121,7 @@ public class ConnectionData {
 
     public static void init() {
         if(!Via.getConfig().isServersideBlockConnection()) return;
+        Via.getPlatform().getLogger().info("Loading block connection mappings ...");
         JsonObject mapping1_13 = MappingData.loadData("mapping-1.13.json");
         JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
         for (Map.Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {

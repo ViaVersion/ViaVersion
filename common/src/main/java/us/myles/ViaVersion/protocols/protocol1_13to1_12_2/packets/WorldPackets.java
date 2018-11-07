@@ -211,7 +211,9 @@ public class WorldPackets {
                                     (long) record.getY(),
                                     (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
-                            ConnectionData.updateBlockStorage(userConnection, position, newBlock);
+                            if(Via.getConfig().isServersideBlockConnection()){
+                                ConnectionData.updateBlockStorage(userConnection, position, newBlock);
+                            }
                             record.setBlockId(checkStorage(userConnection, position, newBlock));
                         }
 
@@ -277,7 +279,7 @@ public class WorldPackets {
                             for (int p = 0; p < section.getPalette().size(); p++) {
                                 int old = section.getPalette().get(p);
                                 int newId = toNewId(old);
-                                if (storage.isWelcome(newId) || (ConnectionData.isWelcome(newId) && ConnectionData.needStoreBlocks())) {
+                                if (storage.isWelcome(newId) || (Via.getConfig().isServersideBlockConnection() && ConnectionData.needStoreBlocks() && ConnectionData.isWelcome(newId))) {
                                     willStoreAnyBlock = true;
                                 }
                                 section.getPalette().set(p, newId);
@@ -295,7 +297,7 @@ public class WorldPackets {
                                                         (long) (z + (chunk.getZ() << 4))
                                                 ), block);
                                             }
-                                            if(ConnectionData.isWelcome(block)){
+                                            if(Via.getConfig().isServersideBlockConnection() && ConnectionData.isWelcome(block)){
                                                 ConnectionData.getProvider().storeBlock(wrapper.user(), (long) (x + (chunk.getX() << 4)),
                                                         (long) (y + (i << 4)),
                                                         (long) (z + (chunk.getZ() << 4)),

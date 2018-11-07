@@ -447,7 +447,7 @@ public class InventoryPackets {
             case "WDL|REQUEST":
                 return "wdl:request";
             default:
-                return old.matches("[0-9a-z_-]+:[0-9a-z_/.-]+") // Identifier regex
+                return old.matches("([0-9a-z_-]*:)?[0-9a-z_/.-]*") // Identifier regex
                         ? old
                         : "viaversion:legacy/" + BaseEncoding.base32().lowerCase().withPadChar('-').encode(
                         old.getBytes(StandardCharsets.UTF_8));
