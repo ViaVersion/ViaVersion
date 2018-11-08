@@ -1128,6 +1128,7 @@
     "minecraft:structure_block[mode=save]",
     "minecraft:structure_block[mode=load]",
     "minecraft:structure_block[mode=corner]",
-    "minecraft:structure_block[mode=data]"
+    "minecraft:structure_block[mode=data]",
+    "minecraft:glowstone"
   ]
 }

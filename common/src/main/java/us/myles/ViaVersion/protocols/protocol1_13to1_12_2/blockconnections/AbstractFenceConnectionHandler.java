@@ -8,11 +8,12 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     private final String blockConnections;
     @Getter
-    private HashSet<Integer> blockStates = new HashSet<>();
+    private Set<Integer> blockStates = new HashSet<>();
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
 
     public AbstractFenceConnectionHandler(String blockConnections, String key){

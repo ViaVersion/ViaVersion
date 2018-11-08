@@ -10,16 +10,14 @@ import java.util.Set;
 
 public class RedstoneConnectionHandler extends ConnectionHandler {
 
-    private static Set<String> baseRedstone = new HashSet<>();
     private static Set<Integer> redstone = new HashSet<>();
 
     static void init() {
-        baseRedstone.add("minecraft:redstone_wire");
-
         RedstoneConnectionHandler connectionHandler = new RedstoneConnectionHandler();
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
-            if (baseRedstone.contains(key)) {
+            final String redstoneKey = "minecraft:redstone_wire";
+            if (redstoneKey.equals(key)) {
                 redstone.add(blockState.getValue());
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
             }

@@ -8,8 +8,7 @@ import java.util.*;
 
 public class StairConnectionHandler extends ConnectionHandler{
 
-    private static HashSet<String> baseStairs = new HashSet<>();
-
+    private static Set<String> baseStairs = new HashSet<>();
     private static Map<Integer, WrappedBlockData> blockData = new HashMap<>();
 
     static void init() {
