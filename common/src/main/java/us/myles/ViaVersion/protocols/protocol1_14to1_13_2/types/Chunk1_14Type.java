@@ -77,6 +77,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 
         output.writeBoolean(chunk.isGroundUp());
         Type.VAR_INT.write(output, chunk.getBitmask());
+        Type.NBT.write(output, new CompoundTag(""));  //TODO unknown compound tag
 
         ByteBuf buf = output.alloc().buffer();
         for (int i = 0; i < 16; i++) {
