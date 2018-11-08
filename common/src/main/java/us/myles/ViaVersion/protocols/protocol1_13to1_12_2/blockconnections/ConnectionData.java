@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
 import java.util.HashMap;
@@ -51,6 +52,28 @@ public class ConnectionData {
                 }
             }
         }
+    }
+
+    public static BlockConnectionProvider getProvider(){
+        return Via.getManager().getProviders().get(BlockConnectionProvider.class);
+    }
+
+    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState){
+        if(!needStoreBlocks()) return;
+        if (ConnectionData.isWelcome(blockState)) {
+            ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
+        }else{
+            ConnectionData.getProvider().removeBlock(userConnection, position);
+        }
+    }
+
+    public static void clearBlockStorage(UserConnection connection){
+        if(!needStoreBlocks()) return;
+        getProvider().clearStorage(connection);
+    }
+
+    public static boolean needStoreBlocks(){
+        return getProvider().needBlockStore();
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
@@ -101,7 +124,8 @@ public class ConnectionData {
     }
 
     public static void init() {
-        if (!Via.getConfig().isServersideBlockConnection()) return;
+        if(!Via.getConfig().isServersideBlockConnection()) return;
+        Via.getPlatform().getLogger().info("Loading block connection mappings ...");
         JsonObject mapping1_13 = MappingData.loadData("mapping-1.13.json");
         JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
         for (Map.Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {
@@ -111,25 +135,27 @@ public class ConnectionData {
             keyToId.put(key, id);
         }
 
-        JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
-        for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
-            int id = keyToId.get(entry.getKey());
-            BlockData blockData = new BlockData();
-            for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
-                String name = type.getKey();
-                JsonObject object = type.getValue().getAsJsonObject();
-                Boolean[] data = new Boolean[6];
-                for (BlockFace value : BlockFace.values()) {
-                    String face = value.toString().toLowerCase();
-                    if (object.has(face)) {
-                        data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
-                    } else {
-                        data[value.ordinal()] = false;
+        if(!Via.getConfig().isRedueMemoryFromBlockStorage()){
+            JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
+            for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
+                int id = keyToId.get(entry.getKey());
+                BlockData blockData = new BlockData();
+                for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
+                    String name = type.getKey();
+                    JsonObject object = type.getValue().getAsJsonObject();
+                    Boolean[] data = new Boolean[6];
+                    for (BlockFace value : BlockFace.values()) {
+                        String face = value.toString().toLowerCase();
+                        if (object.has(face)) {
+                            data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
+                        } else {
+                            data[value.ordinal()] = false;
+                        }
                     }
+                    blockData.put(name, data);
                 }
-                blockData.put(name, data);
+                blockConnectionData.put(id, blockData);
             }
-            blockConnectionData.put(id, blockData);
         }
 
         JsonObject blockData = MappingData.loadData("blockData.json");
@@ -150,6 +176,10 @@ public class ConnectionData {
         RedstoneConnectionHandler.init();
         StairConnectionHandler.init();
         FlowerConnectionHandler.init();
+
+        if(Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")){
+            Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
+        }
     }
 
     public static boolean isWelcome(int blockState) {

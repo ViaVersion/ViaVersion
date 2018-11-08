@@ -16,9 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Created by Marco Neuhaus on 26.10.2018 for the Project ViaVersionGerry.
- */
 public class SpongeBlockConnectionProvider extends BlockConnectionProvider {
     private static Class block;
     private static Map<Object, Integer> blockStateIds;

@@ -12,9 +12,6 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.provi
 
 import java.util.UUID;
 
-/**
- * Created by Marco Neuhaus on 26.10.2018 for the Project ViaVersionGerry.
- */
 public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
 
     private Chunk chunk;

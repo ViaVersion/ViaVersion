@@ -132,3 +132,7 @@ force-json-transform: false
 minimize-cooldown: true
 # Enable the serverside blockconnections at 1.13+ clients
 serverside-blockconnection: false
+# Sets the method for the block connections (world for world-level or packet for packet-level)
+blockconnection-method: world
+# When activated, only the most important blocks are saved in the BlockStorage. (Blocks only connect with the same blocks)
+reducememory-blockstorage: false

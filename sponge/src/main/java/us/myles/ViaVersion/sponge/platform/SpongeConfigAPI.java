@@ -217,6 +217,16 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public String getBlockConnectionMethod() {
+        return getString("blockconnection-method", "world");
+    }
+
+    @Override
+    public boolean isRedueMemoryFromBlockStorage() {
+        return getBoolean("reducememory-blockstorage", false);
+    }
+
+    @Override
     public boolean is1_13TeamColourFix() {
         return getBoolean("team-colour-fix", true);
     }

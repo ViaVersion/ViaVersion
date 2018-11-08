@@ -58,19 +58,22 @@ public class ProtocolDetectorService implements Runnable {
             @Override
             public void done(ServerPing serverPing, Throwable throwable) {
                 if (throwable == null && serverPing != null && serverPing.getVersion() != null) {
-                    detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
-                    if (((BungeeConfigAPI) Via.getConfig()).isBungeePingSave()) {
-                        Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
-                        Integer protocol = servers.get(key);
-                        if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
-                            return;
+                    // Ensure protocol is positive, some services will return -1
+                    if (serverPing.getVersion().getProtocol() > 0) {
+                        detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
+                        if (((BungeeConfigAPI) Via.getConfig()).isBungeePingSave()) {
+                            Map<String, Integer> servers = ((BungeeConfigAPI) Via.getConfig()).getBungeeServerProtocols();
+                            Integer protocol = servers.get(key);
+                            if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
+                                return;
+                            }
+                            // Ensure we're the only ones writing to the config
+                            synchronized (Via.getPlatform().getConfigurationProvider()) {
+                                servers.put(key, serverPing.getVersion().getProtocol());
+                            }
+                            // Save
+                            Via.getPlatform().getConfigurationProvider().saveConfig();
                         }
-                        // Ensure we're the only ones writing to the config
-                        synchronized (Via.getPlatform().getConfigurationProvider()) {
-                            servers.put(key, serverPing.getVersion().getProtocol());
-                        }
-                        // Save
-                        Via.getPlatform().getConfigurationProvider().saveConfig();
                     }
                 }
             }

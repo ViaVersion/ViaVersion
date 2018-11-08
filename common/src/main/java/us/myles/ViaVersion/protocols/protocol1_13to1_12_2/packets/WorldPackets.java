@@ -174,11 +174,14 @@ public class WorldPackets {
                         int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
                         if(Via.getConfig().isServersideBlockConnection()){
+                            UserConnection userConnection = wrapper.user();
                             if (ConnectionData.connects(newId)) {
-                                newId = ConnectionData.connect(wrapper.user(), position, newId);
+                                newId = ConnectionData.connect(userConnection, position, newId);
                             }
 
-                            ConnectionData.update(wrapper.user(), position);
+                            ConnectionData.updateBlockStorage(userConnection, position, newId);
+
+                            ConnectionData.update(userConnection, position);
                         }
 
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
@@ -199,6 +202,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int chunkX = wrapper.get(Type.INT, 0);
                         int chunkZ = wrapper.get(Type.INT, 1);
+                        UserConnection userConnection = wrapper.user();
                         // Convert ids
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int newBlock = toNewId(record.getBlockId());
@@ -207,7 +211,10 @@ public class WorldPackets {
                                     (long) record.getY(),
                                     (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
-                            record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
+                            if(Via.getConfig().isServersideBlockConnection()){
+                                ConnectionData.updateBlockStorage(userConnection, position, newBlock);
+                            }
+                            record.setBlockId(checkStorage(userConnection, position, newBlock));
                         }
 
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
@@ -220,11 +227,11 @@ public class WorldPackets {
 
 	                        if(Via.getConfig().isServersideBlockConnection()){
                                 if (ConnectionData.connects(blockState)) {
-                                    blockState = ConnectionData.connect(wrapper.user(), position, blockState);
+                                    blockState = ConnectionData.connect(userConnection, position, blockState);
                                     record.setBlockId(blockState);
                                 }
 
-                                ConnectionData.update(wrapper.user(), position);
+                                ConnectionData.update(userConnection, position);
                             }
 	                    }
                     }
@@ -272,7 +279,7 @@ public class WorldPackets {
                             for (int p = 0; p < section.getPalette().size(); p++) {
                                 int old = section.getPalette().get(p);
                                 int newId = toNewId(old);
-                                if (storage.isWelcome(newId)) {
+                                if (storage.isWelcome(newId) || (Via.getConfig().isServersideBlockConnection() && ConnectionData.needStoreBlocks() && ConnectionData.isWelcome(newId))) {
                                     willStoreAnyBlock = true;
                                 }
                                 section.getPalette().set(p, newId);
@@ -290,6 +297,13 @@ public class WorldPackets {
                                                         (long) (z + (chunk.getZ() << 4))
                                                 ), block);
                                             }
+                                            if(Via.getConfig().isServersideBlockConnection() && ConnectionData.isWelcome(block)){
+                                                ConnectionData.getProvider().storeBlock(wrapper.user(), (long) (x + (chunk.getX() << 4)),
+                                                        (long) (y + (i << 4)),
+                                                        (long) (z + (chunk.getZ() << 4)),
+                                                        block);
+                                            }
+
                                         }
                                     }
                                 }
