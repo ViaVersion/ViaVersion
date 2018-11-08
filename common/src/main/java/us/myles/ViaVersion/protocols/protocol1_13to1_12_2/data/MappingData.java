@@ -29,18 +29,18 @@ public class MappingData {
         JsonObject mapping1_12 = loadData("mapping-1.12.json");
         JsonObject mapping1_13 = loadData("mapping-1.13.json");
 
-        Via.getPlatform().getLogger().info("Loading block mapping...");
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 block mapping...");
         blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
-        Via.getPlatform().getLogger().info("Loading item mapping...");
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 item mapping...");
         mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
-        Via.getPlatform().getLogger().info("Loading new tags...");
+        Via.getPlatform().getLogger().info("Loading new 1.13 tags...");
         loadTags(blockTags, mapping1_13.getAsJsonObject("block_tags"));
         loadTags(itemTags, mapping1_13.getAsJsonObject("item_tags"));
         loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
-        Via.getPlatform().getLogger().info("Loading enchantments...");
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 enchantment mapping...");
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
         enchantmentMappings = new EnchantmentMappingByteArray(mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
-        Via.getPlatform().getLogger().info("Loading sound mapping...");
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 sound mapping...");
         soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
     }
 

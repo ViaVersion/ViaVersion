@@ -1,12 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
@@ -15,6 +17,11 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_14To1_13_2 extends Protocol {
+
+    static {
+        MappingData.init();
+    }
+
     @Override
     protected void registerPackets() {
         InventoryPackets.register(this);
@@ -247,17 +254,12 @@ public class Protocol1_14To1_13_2 extends Protocol {
     }
 
     public static int getNewBlockStateId(int id) {
-        if (id < 1121) return id;
-        else if (id < 3108) return id + 3;
-        else if (id < 3278) return id + 163;
-        else if (id < 3978) return id + 203;
-        else if (id < 3984) return id + 207;
-        else if (id < 3988) return id + 197;
-        else if (id < 5284) return id + 203;
-        else if (id < 7300) return id + 206;
-        else if (id < 8591) return id + 212;
-        else if (id < 8595) return id + 226;
-        else return id + 2192;
+        int newId = MappingData.blockMappings.getNewBlock(id);
+        if (newId == -1) {
+            Via.getPlatform().getLogger().warning("Missing 1.14 blockstate for 1.13.2 blockstate " + id);
+            return 0;
+        }
+        return newId;
     }
 
     public static int getNewBlockId(int id) {
