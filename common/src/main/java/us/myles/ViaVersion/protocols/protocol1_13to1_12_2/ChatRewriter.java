@@ -139,8 +139,10 @@ public class ChatRewriter {
             if (newTranslate != null) {
                 ((TranslatableComponent) component).setTranslate(newTranslate);
             }
-            for (BaseComponent baseComponent : ((TranslatableComponent) component).getWith()) {
-                processTranslate(baseComponent);
+            if (((TranslatableComponent) component).getWith() != null) {
+                for (BaseComponent baseComponent : ((TranslatableComponent) component).getWith()) {
+                    processTranslate(baseComponent);
+                }
             }
         }
         if (component.getHoverEvent() != null) {
@@ -148,8 +150,10 @@ public class ChatRewriter {
                 processTranslate(baseComponent);
             }
         }
-        for (BaseComponent baseComponent : component.getExtra()) {
-            processTranslate(baseComponent);
+        if (component.getExtra() != null) {
+            for (BaseComponent baseComponent : component.getExtra()) {
+                processTranslate(baseComponent);
+            }
         }
     }
 }
