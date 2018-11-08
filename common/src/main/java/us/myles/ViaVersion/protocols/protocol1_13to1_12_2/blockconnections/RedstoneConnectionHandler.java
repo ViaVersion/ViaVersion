@@ -10,9 +10,8 @@ import java.util.Set;
 
 public class RedstoneConnectionHandler extends ConnectionHandler {
 
-    private static HashSet<String> baseRedstone = new HashSet<>();
+    private static Set<String> baseRedstone = new HashSet<>();
     private static Set<Integer> redstone = new HashSet<>();
-
 
     static void init() {
         baseRedstone.add("minecraft:redstone_wire");
@@ -39,18 +38,24 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
     }
 
     private String connects(UserConnection user, Position position, BlockFace side) {
-        int blockState = getBlockData(user, position.getRelative(side));
-        if(redstone.contains(blockState)){
+        final Position relative = position.getRelative(side);
+        int blockState = getBlockData(user, relative);
+        if (connects(side, blockState)) {
             return "side";
         }
-        int up = getBlockData(user, position.getRelative(side).getRelative(BlockFace.TOP));
-        if(redstone.contains(up)){
+        int up = getBlockData(user, relative.getRelative(BlockFace.TOP));
+        if (redstone.contains(up) && !ConnectionData.occludingStates.contains(getBlockData(user, position.getRelative(BlockFace.TOP)))) {
             return "up";
         }
-        int down = getBlockData(user, position.getRelative(side).getRelative(BlockFace.BOTTOM));
-        if(redstone.contains(down)){
+        int down = getBlockData(user, relative.getRelative(BlockFace.BOTTOM));
+        if (redstone.contains(down) && !ConnectionData.occludingStates.contains(getBlockData(user, relative))) {
             return "side";
         }
         return "none";
+    }
+
+    private boolean connects(BlockFace side, int blockState) {
+        final BlockData blockData = ConnectionData.blockConnectionData.get(blockState);
+        return blockData != null && blockData.connectTo("redstoneConnections", side.opposite());
     }
 }
