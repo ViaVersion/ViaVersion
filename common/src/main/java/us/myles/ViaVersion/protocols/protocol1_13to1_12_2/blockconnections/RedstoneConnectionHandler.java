@@ -14,9 +14,9 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
 
     static void init() {
         RedstoneConnectionHandler connectionHandler = new RedstoneConnectionHandler();
+        String redstoneKey = "minecraft:redstone_wire";
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
-            final String redstoneKey = "minecraft:redstone_wire";
             if (redstoneKey.equals(key)) {
                 redstone.add(blockState.getValue());
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
