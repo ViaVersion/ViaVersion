@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -15,8 +16,10 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.provi
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class ConnectionData {
 
@@ -24,6 +27,7 @@ public class ConnectionData {
     static Map<String, Integer> keyToId = new HashMap<>();
     static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
     static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
+    static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {
         for (int x = -1; x <= 1; x++) {
@@ -97,7 +101,7 @@ public class ConnectionData {
     }
 
     public static void init() {
-        if(!Via.getConfig().isServersideBlockConnection()) return;
+        if (!Via.getConfig().isServersideBlockConnection()) return;
         JsonObject mapping1_13 = MappingData.loadData("mapping-1.13.json");
         JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
         for (Map.Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {
@@ -128,8 +132,12 @@ public class ConnectionData {
             blockConnectionData.put(id, blockData);
         }
 
-//		FenceConnectionHandler.init();
-//		GlassConnectionHandler.init();
+        JsonObject blockData = MappingData.loadData("blockData.json");
+        JsonArray occluding = blockData.getAsJsonArray("occluding");
+        for (JsonElement jsonElement : occluding) {
+            occludingStates.add(keyToId.get(jsonElement.getAsString()));
+        }
+
         PumpkinConnectionHandler.init();
         MelonConnectionHandler.init();
         BasicFenceConnectionHandler.init();
