@@ -18,9 +18,9 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class WorldPackets {
-    private static final int AIR = MappingData.blockMappings.getNewBlock(0);
-    private static final int VOID_AIR = MappingData.blockMappings.getNewBlock(8591);
-    private static final int CAVE_AIR = MappingData.blockMappings.getNewBlock(8592);
+    private static final int AIR = MappingData.blockStateMappings.getNewBlock(0);
+    private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
+    private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
 
     public static void register(Protocol protocol) {
 
