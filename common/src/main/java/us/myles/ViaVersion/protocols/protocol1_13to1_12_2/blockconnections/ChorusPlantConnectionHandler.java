@@ -26,7 +26,7 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
 
     @Override
     protected Byte getStates(WrappedBlockData blockData) {
-        byte states = getStates(blockData, false);
+        byte states = super.getStates(blockData);
         if (blockData.getValue("up").equals("true")) states |= 16;
         if (blockData.getValue("down").equals("true")) states |= 32;
         return states;
