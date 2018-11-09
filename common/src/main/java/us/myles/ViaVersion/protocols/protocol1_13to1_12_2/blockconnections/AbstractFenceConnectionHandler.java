@@ -29,14 +29,18 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         }
     }
 
-    protected Byte getStates(WrappedBlockData blockData) {
+    protected Byte getStates(WrappedBlockData blockData, boolean waterloggable) {
         byte states = 0;
         if (blockData.getValue("east").equals("true")) states |= 1;
         if (blockData.getValue("north").equals("true")) states |= 2;
         if (blockData.getValue("south").equals("true")) states |= 4;
         if (blockData.getValue("west").equals("true")) states |= 8;
-        if (blockData.getValue("waterlogged").equals("true")) states |= 16;
+        if (waterloggable && blockData.getValue("waterlogged").equals("true")) states |= 16;
         return states;
+    }
+
+    protected Byte getStates(WrappedBlockData blockData) {
+        return this.getStates(blockData, true);
     }
 
     protected Byte getStates(UserConnection user, Position position, int blockState) {
