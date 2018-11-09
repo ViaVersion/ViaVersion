@@ -10,9 +10,8 @@ import java.util.Set;
 
 public class DoorConnectionHandler extends ConnectionHandler{
 
-    private static Set<String> baseDoors = new HashSet<>();
-
     static void init() {
+        Set<String> baseDoors = new HashSet<>();
         baseDoors.add("minecraft:oak_door");
         baseDoors.add("minecraft:birch_door");
         baseDoors.add("minecraft:jungle_door");

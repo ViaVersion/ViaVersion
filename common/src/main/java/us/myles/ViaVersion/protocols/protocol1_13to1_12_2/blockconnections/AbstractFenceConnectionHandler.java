@@ -8,11 +8,12 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     private final String blockConnections;
     @Getter
-    private HashSet<Integer> blockStates = new HashSet<>();
+    private Set<Integer> blockStates = new HashSet<>();
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
 
     public AbstractFenceConnectionHandler(String blockConnections, String key){
@@ -34,7 +35,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         if (blockData.getValue("north").equals("true")) states |= 2;
         if (blockData.getValue("south").equals("true")) states |= 4;
         if (blockData.getValue("west").equals("true")) states |= 8;
-        if (blockData.getValue("waterlogged").equals("true")) states |= 16;
+        if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) states |= 16;
         return states;
     }
 

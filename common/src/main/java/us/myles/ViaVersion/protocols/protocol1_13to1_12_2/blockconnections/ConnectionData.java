@@ -176,6 +176,7 @@ public class ConnectionData {
         RedstoneConnectionHandler.init();
         StairConnectionHandler.init();
         FlowerConnectionHandler.init();
+        ChorusPlantConnectionHandler.init();
 
         if(Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")){
             Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
