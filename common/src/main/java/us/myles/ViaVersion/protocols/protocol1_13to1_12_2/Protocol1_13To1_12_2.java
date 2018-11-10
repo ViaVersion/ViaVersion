@@ -223,7 +223,45 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // InventoryPackets 0x14 -> 0x15
         // InventoryPackets 0x15 -> 0x16
         // InventoryPackets 0x16 -> 0x17
-        registerOutgoing(State.PLAY, 0x17, 0x18);
+        // Set cooldown
+        registerOutgoing(State.PLAY, 0x17, 0x18, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int item = wrapper.read(Type.VAR_INT);
+                        int ticks = wrapper.read(Type.VAR_INT);
+                        wrapper.cancel();
+                        if (item == 383) { // Spawn egg
+                            for (int i = 0; i < 44; i++) {
+                                Integer newItem = MappingData.oldToNewItems.get(item << 16 | i);
+                                if (newItem != null) {
+                                    PacketWrapper packet = wrapper.create(0x18);
+                                    packet.write(Type.VAR_INT, newItem);
+                                    packet.write(Type.VAR_INT, ticks);
+                                    packet.send(Protocol1_13To1_12_2.class);
+                                } else {
+                                    break;
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < 16; i++) {
+                                Integer newItem = MappingData.oldToNewItems.get(item << 4 | i);
+                                if (newItem != null) {
+                                    PacketWrapper packet = wrapper.create(0x18);
+                                    packet.write(Type.VAR_INT, newItem);
+                                    packet.write(Type.VAR_INT, ticks);
+                                    packet.send(Protocol1_13To1_12_2.class);
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
         // WorldPackets 0x18 -> 0x19
         registerOutgoing(State.PLAY, 0x1A, 0x1B);
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
