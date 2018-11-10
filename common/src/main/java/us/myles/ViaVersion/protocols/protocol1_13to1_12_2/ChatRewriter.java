@@ -4,7 +4,9 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -114,5 +116,44 @@ public class ChatRewriter {
 
     public static String jsonTextToLegacy(String value) {
         return TextComponent.toLegacyText(ComponentSerializer.parse(value));
+    }
+
+    public static String processTranslate(String value) {
+        BaseComponent[] components = ComponentSerializer.parse(value);
+        for (BaseComponent component : components) {
+            processTranslate(component);
+        }
+        if (components.length == 1) {
+            return ComponentSerializer.toString(components[0]);
+        } else {
+            return ComponentSerializer.toString(components);
+        }
+    }
+
+    private static void processTranslate(BaseComponent component) {
+        if (component instanceof TranslatableComponent) {
+            String oldTranslate = ((TranslatableComponent) component).getTranslate();
+            String newTranslate;
+            newTranslate = MappingData.translateMapping.get(oldTranslate);
+            if (newTranslate == null) MappingData.mojangTranslation.get(oldTranslate);
+            if (newTranslate != null) {
+                ((TranslatableComponent) component).setTranslate(newTranslate);
+            }
+            if (((TranslatableComponent) component).getWith() != null) {
+                for (BaseComponent baseComponent : ((TranslatableComponent) component).getWith()) {
+                    processTranslate(baseComponent);
+                }
+            }
+        }
+        if (component.getHoverEvent() != null) {
+            for (BaseComponent baseComponent : component.getHoverEvent().getValue()) {
+                processTranslate(baseComponent);
+            }
+        }
+        if (component.getExtra() != null) {
+            for (BaseComponent baseComponent : component.getExtra()) {
+                processTranslate(baseComponent);
+            }
+        }
     }
 }
