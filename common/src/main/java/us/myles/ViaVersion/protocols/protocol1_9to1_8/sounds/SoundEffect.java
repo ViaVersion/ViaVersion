@@ -214,7 +214,7 @@ public enum SoundEffect {
     MOB_GHAST_MOAN("mob.ghast.moan", "entity.ghast.ambient", SoundCategory.HOSTILE),
     MOB_GUARDIAN_CURSE("mob.guardian.curse", "entity.elder_guardian.curse", SoundCategory.HOSTILE),
     GAME_POTION_SMASH("game.potion.smash", "block.glass.break", SoundCategory.NEUTRAL),
-    NOTE_BASSATTACK("note.bassattack", "block.note.bass", SoundCategory.RECORD),
+    NOTE_BASSATTACK("note.bassattack", "block.note.guitar", SoundCategory.RECORD),
     GUI_BUTTON_PRESS("gui.button.press", "block.wood_pressureplate.click_on", SoundCategory.MASTER),
     RANDOM_ORB("random.orb", "entity.experience_orb.pickup", SoundCategory.PLAYER),
     MOB_ZOMBIE_WOODBREAK("mob.zombie.woodbreak", "entity.zombie.break_door_wood", SoundCategory.HOSTILE),
