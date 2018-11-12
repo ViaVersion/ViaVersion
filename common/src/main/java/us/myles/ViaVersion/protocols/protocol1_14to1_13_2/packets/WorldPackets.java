@@ -111,14 +111,13 @@ public class WorldPackets {
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
                             boolean hasBlock = false;
-                            BiMap<Integer, Integer> inverse = section.getPalette().inverse();
-                            for (int i = 0; i < inverse.size(); i++) {
-                                int old = inverse.get(i);
+                            for (int i = 0; i < section.getPaletteSize(); i++) {
+                                int old = section.getPaletteEntry(i);
                                 int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
                                 if (!hasBlock && newId != AIR && newId != VOID_AIR && newId != CAVE_AIR) { // air, void_air, cave_air
                                     hasBlock = true;
                                 }
-                                inverse.put(i, newId);
+                                section.setPaletteEntry(i, newId);
                             }
                             if (!hasBlock) {
                                 section.setNonAirBlocksCount(0);

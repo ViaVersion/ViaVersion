@@ -78,6 +78,24 @@ public class ChunkSection {
         return blocks[idx];
     }
 
+    public int getPaletteSize() {
+        return palette.size();
+    }
+
+    public int getPaletteEntry(int index) {
+        if (index < 0 || index >= palette.size()) throw new IndexOutOfBoundsException();
+        return palette.inverse().get(index);
+    }
+
+    public void setPaletteEntry(int index, int id) {
+        if (index < 0 || index >= palette.size()) throw new IndexOutOfBoundsException();
+        palette.forcePut(id, index);
+    }
+
+    public void replacePaletteEntry(int oldId, int newId) {
+        if (palette.containsKey(oldId)) palette.put(newId, palette.remove(oldId));
+    }
+
     /**
      * Set a block state in the chunk
      * This method will not update non-air blocks count

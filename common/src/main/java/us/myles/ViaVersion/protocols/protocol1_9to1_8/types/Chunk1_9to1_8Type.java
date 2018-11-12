@@ -89,8 +89,8 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
             ChunkSection section = Types1_8.CHUNK_SECTION.read(input);
             sections[i] = section;
 
-            if (replacePistons && section.getPalette().containsKey(36)) {
-                section.getPalette().put(replacementId, section.getPalette().remove(36));
+            if (replacePistons) {
+                section.replacePaletteEntry(36, replacementId);
             }
         }
 
