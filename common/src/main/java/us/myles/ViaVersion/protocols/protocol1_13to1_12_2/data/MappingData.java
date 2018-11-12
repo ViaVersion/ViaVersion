@@ -49,7 +49,8 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading sound mapping...");
         soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
         Via.getPlatform().getLogger().info("Loading translation mappping");
-        translateMapping = GsonUtil.getGson().fromJson(
+        translateMapping = new HashMap<>();
+        Map<String, String> translateData = GsonUtil.getGson().fromJson(
                 new InputStreamReader(
                         MappingData.class.getClassLoader()
                                 .getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")
@@ -65,8 +66,15 @@ public class MappingData {
                 if (line.isEmpty()) continue;
                 String[] keyAndTranslation = line.split("=", 2);
                 if (keyAndTranslation.length != 2) continue;
-                if (!translateMapping.containsKey(keyAndTranslation[0])) {
-                    translateMapping.put(keyAndTranslation[0], keyAndTranslation[1]);
+                String key = keyAndTranslation[0];
+                String translation = keyAndTranslation[1];
+                if (!translateData.containsKey(key)) {
+                    translateMapping.put(key, translation);
+                } else {
+                    String dataValue = translateData.get(keyAndTranslation[0]);
+                    if (dataValue != null) {
+                        translateMapping.put(key, dataValue);
+                    }
                 }
             }
         } catch (IOException e) {
