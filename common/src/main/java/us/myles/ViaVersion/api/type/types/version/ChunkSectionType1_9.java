@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.api.type.types.version;
 
+import com.google.common.collect.BiMap;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
-
-import java.util.List;
 
 public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
@@ -15,7 +14,7 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        List<Integer> palette = chunkSection.getPalette();
+        BiMap<Integer, Integer> palette = chunkSection.getPalette();
         palette.clear();
 
         // Reaad bits per block
@@ -35,7 +34,7 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
         // Read palette
         for (int i = 0; i < paletteLength; i++) {
             if (bitsPerBlock != 13) {
-                palette.add(Type.VAR_INT.read(buffer));
+                palette.put(Type.VAR_INT.read(buffer), palette.size());
             } else {
                 Type.VAR_INT.read(buffer);
             }
@@ -73,7 +72,7 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        List<Integer> palette = chunkSection.getPalette();
+        BiMap<Integer, Integer> palette = chunkSection.getPalette();
 
         int bitsPerBlock = 4;
         while (palette.size() > 1 << bitsPerBlock) {
@@ -84,8 +83,8 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
         // Write pallet
         Type.VAR_INT.write(buffer, palette.size());
-        for (int mappedId : palette) {
-            Type.VAR_INT.write(buffer, mappedId);
+        for (int i = 0; i < palette.size(); i++) {
+            Type.VAR_INT.write(buffer, palette.inverse().get(i));
         }
 
         int length = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);

@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
+import com.google.common.collect.BiMap;
 import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -110,13 +111,14 @@ public class WorldPackets {
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
                             boolean hasBlock = false;
-                            for (int i = 0; i < section.getPalette().size(); i++) {
-                                int old = section.getPalette().get(i);
+                            BiMap<Integer, Integer> inverse = section.getPalette().inverse();
+                            for (int i = 0; i < inverse.size(); i++) {
+                                int old = inverse.get(i);
                                 int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
                                 if (!hasBlock && newId != AIR && newId != VOID_AIR && newId != CAVE_AIR) { // air, void_air, cave_air
                                     hasBlock = true;
                                 }
-                                section.getPalette().set(i, newId);
+                                inverse.put(i, newId);
                             }
                             if (!hasBlock) {
                                 section.setNonAirBlocksCount(0);

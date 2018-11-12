@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets;
 
+import com.google.common.collect.BiMap;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -27,16 +28,12 @@ public class WorldPackets {
                         Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
 
                         for (ChunkSection section : chunk.getSections()) {
-                            if (section != null) {
-                                for (int i = 0; i < section.getPalette().size(); i++) {
-                                    section.getPalette().set(
-                                            i,
-                                            Protocol1_13_1To1_13.getNewBlockStateId(section.getPalette().get(i))
-                                    );
-                                }
+                            if (section == null) continue;
+                            BiMap<Integer, Integer> inverse = section.getPalette().inverse();
+                            for (int i = 0; i < inverse.size(); i++) {
+                                inverse.put(i, Protocol1_13_1To1_13.getNewBlockStateId(inverse.get(i)));
                             }
                         }
-
                     }
                 });
             }
