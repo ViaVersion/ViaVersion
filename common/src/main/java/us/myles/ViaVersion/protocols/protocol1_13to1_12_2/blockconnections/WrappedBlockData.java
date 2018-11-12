@@ -36,7 +36,7 @@ public class WrappedBlockData {
         return fromString("minecraft:air");
     }
 
-    public WrappedBlockData(String s){
+    private WrappedBlockData(String s){
         minecraftKey = s;
     }
 
