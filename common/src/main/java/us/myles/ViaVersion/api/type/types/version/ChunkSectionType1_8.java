@@ -17,7 +17,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        chunkSection.getPalette().clear();
+        chunkSection.clearPalette();
 
         byte[] blockData = new byte[ChunkSection.SIZE * 2];
         buffer.readBytes(blockData);

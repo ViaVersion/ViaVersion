@@ -14,8 +14,6 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        BiMap<Integer, Integer> palette = chunkSection.getPalette();
-        palette.clear();
 
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
@@ -32,9 +30,10 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
         }
         int paletteLength = Type.VAR_INT.read(buffer);
         // Read palette
+        chunkSection.clearPalette();
         for (int i = 0; i < paletteLength; i++) {
             if (bitsPerBlock != 13) {
-                palette.put(Type.VAR_INT.read(buffer), palette.size());
+                chunkSection.addPaletteEntry(Type.VAR_INT.read(buffer));
             } else {
                 Type.VAR_INT.read(buffer);
             }
@@ -72,19 +71,17 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        BiMap<Integer, Integer> palette = chunkSection.getPalette();
-
         int bitsPerBlock = 4;
-        while (palette.size() > 1 << bitsPerBlock) {
+        while (chunkSection.getPaletteSize() > 1 << bitsPerBlock) {
             bitsPerBlock += 1;
         }
         long maxEntryValue = (1L << bitsPerBlock) - 1;
         buffer.writeByte(bitsPerBlock);
 
         // Write pallet
-        Type.VAR_INT.write(buffer, palette.size());
-        for (int i = 0; i < palette.size(); i++) {
-            Type.VAR_INT.write(buffer, palette.inverse().get(i));
+        Type.VAR_INT.write(buffer, chunkSection.getPaletteSize());
+        for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
+            Type.VAR_INT.write(buffer, chunkSection.getPaletteEntry(i));
         }
 
         int length = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);

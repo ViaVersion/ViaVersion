@@ -1,10 +1,13 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChunkSection {
     /**
@@ -15,8 +18,8 @@ public class ChunkSection {
      * Length of the sky and block light nibble arrays.
      */
     public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
-    @Getter
-    private BiMap<Integer, Integer> palette = HashBiMap.create();
+    private List<Integer> palette = new ArrayList<>();
+    private Map<Integer, Integer> inversePalette = new HashMap<>();
     private final int[] blocks;
     private NibbleArray blockLight;
     private NibbleArray skyLight;
@@ -27,7 +30,8 @@ public class ChunkSection {
     public ChunkSection() {
         this.blocks = new int[SIZE];
         this.blockLight = new NibbleArray(SIZE);
-        palette.put(0, 0);
+        palette.add(0);
+        inversePalette.put(0, 0);
     }
 
     /**
@@ -58,12 +62,12 @@ public class ChunkSection {
 
     public int getFlatBlock(int x, int y, int z) {
         int index = blocks[index(x, y, z)];
-        return palette.inverse().get(index);
+        return palette.get(index);
     }
 
     public int getFlatBlock(int idx) {
         int index = blocks[idx];
-        return palette.inverse().get(index);
+        return palette.get(index);
     }
 
     public void setBlock(int idx, int type, int data) {
@@ -84,16 +88,32 @@ public class ChunkSection {
 
     public int getPaletteEntry(int index) {
         if (index < 0 || index >= palette.size()) throw new IndexOutOfBoundsException();
-        return palette.inverse().get(index);
+        return palette.get(index);
     }
 
     public void setPaletteEntry(int index, int id) {
         if (index < 0 || index >= palette.size()) throw new IndexOutOfBoundsException();
-        palette.forcePut(id, index);
+        palette.set(index, id);
+        inversePalette.put(id, index);
     }
 
     public void replacePaletteEntry(int oldId, int newId) {
-        if (palette.containsKey(oldId)) palette.put(newId, palette.remove(oldId));
+    	Integer index = inversePalette.remove(oldId);
+    	if (index == null) return;
+    	inversePalette.put(newId, index);
+	    for (int i = 0; i < palette.size(); i++) {
+		    if (palette.get(i) == oldId) palette.set(i, newId);
+	    }
+    }
+
+    public void addPaletteEntry(int id) {
+    	inversePalette.put(id, palette.size());
+    	palette.add(id);
+    }
+
+    public void clearPalette() {
+    	palette.clear();
+    	inversePalette.clear();
     }
 
     /**
@@ -104,12 +124,14 @@ public class ChunkSection {
      * @param id  The raw or flat id of the block
      */
     public void setFlatBlock(int idx, int id) {
-        Integer index = palette.get(id);
-        if (index == null) {
-            palette.put(id, index = palette.size());
-        }
+	    Integer index = inversePalette.get(id);
+	    if (index == null) {
+		    index = palette.size();
+		    palette.add(id);
+		    inversePalette.put(id, index);
+	    }
 
-        blocks[idx] = index;
+	    blocks[idx] = index;
     }
 
     /**
