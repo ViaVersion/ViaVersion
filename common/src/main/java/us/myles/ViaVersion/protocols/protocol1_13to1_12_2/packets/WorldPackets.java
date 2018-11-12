@@ -242,14 +242,13 @@ public class WorldPackets {
 
                             boolean willStoreAnyBlock = false;
 
-                            BiMap<Integer, Integer> inverse = section.getPalette().inverse();
-                            for (int p = 0; p < inverse.size(); p++) {
-                                int old = inverse.get(p);
+                            for (int p = 0; p < section.getPaletteSize(); p++) {
+                                int old = section.getPaletteEntry(p);
                                 int newId = toNewId(old);
                                 if (storage.isWelcome(newId)) {
                                     willStoreAnyBlock = true;
                                 }
-                                inverse.put(p, newId);
+                                section.setPaletteEntry(p, newId);
                             }
 
                             if (willStoreAnyBlock) {
