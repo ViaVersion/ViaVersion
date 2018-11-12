@@ -87,12 +87,14 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Override
     public String getPlatformName() {
-        return "Velocity";
+        String proxyImpl = ProxyServer.class.getPackage().getImplementationTitle();
+        return (proxyImpl != null) ? proxyImpl : "Velocity";
     }
 
     @Override
     public String getPlatformVersion() {
-        return ProxyServer.class.getPackage().getImplementationVersion();
+        String version = ProxyServer.class.getPackage().getImplementationVersion();
+        return (version != null) ? version : "Unknown";
     }
 
     @Override

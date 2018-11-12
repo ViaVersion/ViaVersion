@@ -27,15 +27,17 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(VersionProvider.class, new VelocityVersionProvider());
         // We probably don't need a EntityIdProvider because velocity sends a Join packet on server change
 
-        VelocityPlugin.PROXY.getEventManager().register(
-                plugin,
-                new UpdateListener());
-        Via.getPlatform().runRepeatingSync(
-                new ProtocolDetectorService(),
-                ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval() * 50L);
+        VelocityPlugin.PROXY.getEventManager().register(plugin, new UpdateListener());
         VelocityPlugin.PROXY.getEventManager().register(plugin, new VelocityServerHandler());
         VelocityPlugin.PROXY.getEventManager().register(plugin, new MainHandPatch());
         VelocityPlugin.PROXY.getEventManager().register(plugin, new ElytraPatch());
+
+        int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
+        if (pingInterval > 0) {
+            Via.getPlatform().runRepeatingSync(
+                    new ProtocolDetectorService(),
+                    pingInterval * 20L);
+        }
     }
 
     @Override
