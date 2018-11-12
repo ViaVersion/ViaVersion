@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 
-import java.util.List;
-
 public class ChunkSectionType1_13 extends Type<ChunkSection> {
 
     public ChunkSectionType1_13() {
@@ -15,8 +13,6 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        List<Integer> palette = chunkSection.getPalette();
-        palette.clear();
 
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
@@ -33,8 +29,9 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
         }
         int paletteLength = bitsPerBlock == 14 ? 0 : Type.VAR_INT.read(buffer);
         // Read palette
+        chunkSection.clearPalette();
         for (int i = 0; i < paletteLength; i++) {
-            palette.add(Type.VAR_INT.read(buffer));
+            chunkSection.addPaletteEntry(Type.VAR_INT.read(buffer));
         }
 
         // Read blocks
@@ -69,10 +66,8 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        List<Integer> palette = chunkSection.getPalette();
-
         int bitsPerBlock = 4;
-        while (palette.size() > 1 << bitsPerBlock) {
+        while (chunkSection.getPaletteSize() > 1 << bitsPerBlock) {
             bitsPerBlock += 1;
         }
 
@@ -86,9 +81,9 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
 
         // Write pallet (or not)
         if (bitsPerBlock != 14) {
-            Type.VAR_INT.write(buffer, palette.size());
-            for (int mappedId : palette) {
-                Type.VAR_INT.write(buffer, mappedId);
+            Type.VAR_INT.write(buffer, chunkSection.getPaletteSize());
+            for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
+                Type.VAR_INT.write(buffer, chunkSection.getPaletteEntry(i));
             }
         }
 

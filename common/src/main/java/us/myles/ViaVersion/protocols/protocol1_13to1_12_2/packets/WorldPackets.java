@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Optional;
+import com.google.common.collect.BiMap;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -276,13 +277,13 @@ public class WorldPackets {
 
                             boolean willStoreAnyBlock = false;
 
-                            for (int p = 0; p < section.getPalette().size(); p++) {
-                                int old = section.getPalette().get(p);
+                            for (int p = 0; p < section.getPaletteSize(); p++) {
+                                int old = section.getPaletteEntry(p);
                                 int newId = toNewId(old);
                                 if (storage.isWelcome(newId) || (Via.getConfig().isServersideBlockConnection() && ConnectionData.needStoreBlocks() && ConnectionData.isWelcome(newId))) {
                                     willStoreAnyBlock = true;
                                 }
-                                section.getPalette().set(p, newId);
+                                section.setPaletteEntry(p, newId);
                             }
 
                             if (willStoreAnyBlock) {

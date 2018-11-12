@@ -55,9 +55,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
                 section.readSkyLight(input);
             }
             if (replacePistons) {
-                if (section.getPalette().contains(36)) {
-                    section.getPalette().set(section.getPalette().indexOf(36), replacementId);
-                }
+                section.replacePaletteEntry(36, replacementId);
             }
         }
 
