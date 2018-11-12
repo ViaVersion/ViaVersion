@@ -289,7 +289,7 @@ public class WorldPackets {
                                 for (int x = 0; x < 16; x++) {
                                     for (int y = 0; y < 16; y++) {
                                         for (int z = 0; z < 16; z++) {
-                                            int block = section.getBlock(x, y, z);
+                                            int block = section.getFlatBlock(x, y, z);
                                             if (storage.isWelcome(block)) {
                                                 storage.store(new Position(
                                                         (long) (x + (chunk.getX() << 4)),

@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.type.types.version;
 
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 
@@ -15,4 +16,6 @@ public class Types1_8 {
      * Metadata type for 1.8
      */
     public static final Type<Metadata> METADATA = new Metadata1_8Type();
+
+    public static final Type<ChunkSection> CHUNK_SECTION = new ChunkSectionType1_8();
 }

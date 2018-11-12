@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -16,7 +17,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
@@ -24,7 +24,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.ChunkType;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 
 import java.io.IOException;
 import java.util.List;
@@ -121,8 +121,7 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        ChunkType type = new ChunkType(clientChunks);
-                        Chunk1_9to1_8 chunk = (Chunk1_9to1_8) wrapper.read(type);
+                        Chunk1_8 chunk = (Chunk1_8) wrapper.passthrough(new Chunk1_9to1_8Type(clientChunks));
                         if (chunk.isUnloadPacket()) {
                             wrapper.setId(0x1D);
 
@@ -131,11 +130,11 @@ public class WorldPackets {
                             // Remove commandBlocks on chunk unload
                             CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                             provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
-                        }else{
-                            wrapper.write(type, chunk);
-                            // eat any other data (Usually happens with unload packets)
+                        }else {
+	                        wrapper.write(type, chunk);
                         }
-                        wrapper.read(Type.REMAINING_BYTES);
+                        // eat any other data (Usually happens with unload packets)
+	                    wrapper.read(Type.REMAINING_BYTES);
                     }
                 });
             }
@@ -311,7 +310,7 @@ public class WorldPackets {
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                            
+
                             if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {

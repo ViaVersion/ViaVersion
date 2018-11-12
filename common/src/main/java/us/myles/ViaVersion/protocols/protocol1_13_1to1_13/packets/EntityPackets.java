@@ -11,8 +11,8 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 
 public class EntityPackets {
 

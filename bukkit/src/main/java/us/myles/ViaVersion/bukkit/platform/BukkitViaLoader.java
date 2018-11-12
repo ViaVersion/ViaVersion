@@ -13,13 +13,13 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.listeners.UpdateListener;
 import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.*;
 import us.myles.ViaVersion.bukkit.providers.BukkitBlockConnectionProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
-import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
@@ -79,7 +79,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if ((Bukkit.getVersion().toLowerCase().contains("paper")
                 || Bukkit.getVersion().toLowerCase().contains("taco")
                 || Bukkit.getVersion().toLowerCase().contains("torch"))
-				&& ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
+                && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
             plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();
         }
