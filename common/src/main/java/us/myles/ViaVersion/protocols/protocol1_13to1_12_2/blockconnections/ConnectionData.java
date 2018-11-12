@@ -86,8 +86,8 @@ public class ConnectionData {
 
             boolean willConnect = false;
 
-            for (int p = 0; p < section.getPalette().size(); p++) {
-                int id = section.getPalette().get(p);
+            for (int p = 0; p < section.getPaletteSize(); p++) {
+                int id = section.getPaletteEntry(p);
                 if (ConnectionData.connects(id)) {
                     willConnect = true;
                     break;
