@@ -1,110 +1,109 @@
 package us.myles.ViaVersion.api.type.types.version;
 
+import com.google.common.collect.BiMap;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 
-import java.util.List;
-
 public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
-	public ChunkSectionType1_9() {
-		super("Chunk Section Type", ChunkSection.class);
-	}
+    public ChunkSectionType1_9() {
+        super("Chunk Section Type", ChunkSection.class);
+    }
 
-	@Override
-	public ChunkSection read(ByteBuf buffer) throws Exception {
-		ChunkSection chunkSection = new ChunkSection();
-		List<Integer> palette = chunkSection.getPalette();
-		palette.clear();
+    @Override
+    public ChunkSection read(ByteBuf buffer) throws Exception {
+        ChunkSection chunkSection = new ChunkSection();
+        BiMap<Integer, Integer> palette = chunkSection.getPalette();
+        palette.clear();
 
-		// Reaad bits per block
-		int bitsPerBlock = buffer.readUnsignedByte();
-		long maxEntryValue = (1L << bitsPerBlock) - 1;
+        // Reaad bits per block
+        int bitsPerBlock = buffer.readUnsignedByte();
+        long maxEntryValue = (1L << bitsPerBlock) - 1;
 
-		if (bitsPerBlock == 0) {
-			bitsPerBlock = 13;
-		}
-		if (bitsPerBlock < 4) {
-			bitsPerBlock = 4;
-		}
-		if (bitsPerBlock > 8) {
-			bitsPerBlock = 13;
-		}
-		int paletteLength = Type.VAR_INT.read(buffer);
-		// Read palette
-		for (int i = 0; i < paletteLength; i++) {
-			if (bitsPerBlock != 13) {
-				palette.add(Type.VAR_INT.read(buffer));
-			} else {
-				Type.VAR_INT.read(buffer);
-			}
-		}
+        if (bitsPerBlock == 0) {
+            bitsPerBlock = 13;
+        }
+        if (bitsPerBlock < 4) {
+            bitsPerBlock = 4;
+        }
+        if (bitsPerBlock > 8) {
+            bitsPerBlock = 13;
+        }
+        int paletteLength = Type.VAR_INT.read(buffer);
+        // Read palette
+        for (int i = 0; i < paletteLength; i++) {
+            if (bitsPerBlock != 13) {
+                palette.put(Type.VAR_INT.read(buffer), palette.size());
+            } else {
+                Type.VAR_INT.read(buffer);
+            }
+        }
 
-		// Read blocks
-		long[] blockData = new long[Type.VAR_INT.read(buffer)];
-		if (blockData.length > 0) {
-			for (int i = 0; i < blockData.length; i++) {
-				blockData[i] = buffer.readLong();
-			}
-			for (int i = 0; i < ChunkSection.SIZE; i++) {
-				int bitIndex = i * bitsPerBlock;
-				int startIndex = bitIndex / 64;
-				int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
-				int startBitSubIndex = bitIndex % 64;
-				int val;
-				if (startIndex == endIndex) {
-					val = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
-				} else {
-					int endBitSubIndex = 64 - startBitSubIndex;
-					val = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
-				}
+        // Read blocks
+        long[] blockData = new long[Type.VAR_INT.read(buffer)];
+        if (blockData.length > 0) {
+            for (int i = 0; i < blockData.length; i++) {
+                blockData[i] = buffer.readLong();
+            }
+            for (int i = 0; i < ChunkSection.SIZE; i++) {
+                int bitIndex = i * bitsPerBlock;
+                int startIndex = bitIndex / 64;
+                int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
+                int startBitSubIndex = bitIndex % 64;
+                int val;
+                if (startIndex == endIndex) {
+                    val = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
+                } else {
+                    int endBitSubIndex = 64 - startBitSubIndex;
+                    val = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
+                }
 
-				if (bitsPerBlock == 13) {
-					chunkSection.setBlock(i, val >> 4, val & 0xF);
-				} else {
-					chunkSection.setPaletteIndex(i, val);
-				}
-			}
-		}
+                if (bitsPerBlock == 13) {
+                    chunkSection.setBlock(i, val >> 4, val & 0xF);
+                } else {
+                    chunkSection.setPaletteIndex(i, val);
+                }
+            }
+        }
 
-		return chunkSection;
-	}
+        return chunkSection;
+    }
 
-	@Override
-	public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-		List<Integer> palette = chunkSection.getPalette();
+    @Override
+    public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
+        BiMap<Integer, Integer> palette = chunkSection.getPalette();
 
-		int bitsPerBlock = 4;
-		while (palette.size() > 1 << bitsPerBlock) {
-			bitsPerBlock += 1;
-		}
-		long maxEntryValue = (1L << bitsPerBlock) - 1;
-		buffer.writeByte(bitsPerBlock);
+        int bitsPerBlock = 4;
+        while (palette.size() > 1 << bitsPerBlock) {
+            bitsPerBlock += 1;
+        }
+        long maxEntryValue = (1L << bitsPerBlock) - 1;
+        buffer.writeByte(bitsPerBlock);
 
-		// Write pallet
-		Type.VAR_INT.write(buffer, palette.size());
-		for (int mappedId : palette) {
-			Type.VAR_INT.write(buffer, mappedId);
-		}
+        // Write pallet
+        Type.VAR_INT.write(buffer, palette.size());
+        for (int i = 0; i < palette.size(); i++) {
+            Type.VAR_INT.write(buffer, palette.inverse().get(i));
+        }
 
-		int length = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
-		Type.VAR_INT.write(buffer, length);
-		long[] data = new long[length];
-		for (int index = 0; index < ChunkSection.SIZE; index++) {
-			int value = chunkSection.getPaletteIndex(index);
-			int bitIndex = index * bitsPerBlock;
-			int startIndex = bitIndex / 64;
-			int endIndex = ((index + 1) * bitsPerBlock - 1) / 64;
-			int startBitSubIndex = bitIndex % 64;
-			data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
-			if (startIndex != endIndex) {
-				int endBitSubIndex = 64 - startBitSubIndex;
-				data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
-			}
-		}
-		for (long l : data) {
-			buffer.writeLong(l);
-		}
-	}
+        int length = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
+        Type.VAR_INT.write(buffer, length);
+        long[] data = new long[length];
+        for (int index = 0; index < ChunkSection.SIZE; index++) {
+            int value = chunkSection.getPaletteIndex(index);
+            int bitIndex = index * bitsPerBlock;
+            int startIndex = bitIndex / 64;
+            int endIndex = ((index + 1) * bitsPerBlock - 1) / 64;
+            int startBitSubIndex = bitIndex % 64;
+            data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
+            if (startIndex != endIndex) {
+                int endBitSubIndex = 64 - startBitSubIndex;
+                data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
+            }
+        }
+        for (long l : data) {
+            buffer.writeLong(l);
+        }
+    }
 }

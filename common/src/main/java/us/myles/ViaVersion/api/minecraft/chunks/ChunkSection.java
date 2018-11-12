@@ -1,11 +1,10 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 public class ChunkSection {
     /**
@@ -17,7 +16,7 @@ public class ChunkSection {
      */
     public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
     @Getter
-	private final List<Integer> palette = Lists.newArrayList();
+    private BiMap<Integer, Integer> palette = HashBiMap.create();
     private final int[] blocks;
     private NibbleArray blockLight;
     private NibbleArray skyLight;
@@ -28,11 +27,12 @@ public class ChunkSection {
     public ChunkSection() {
         this.blocks = new int[SIZE];
         this.blockLight = new NibbleArray(SIZE);
-        palette.add(0); // AIR
+        palette.put(0, 0);
     }
 
     /**
      * Set a block in the chunks
+     * This method will not update non-air blocks count
      *
      * @param x    Block X
      * @param y    Block Y
@@ -58,12 +58,12 @@ public class ChunkSection {
 
     public int getFlatBlock(int x, int y, int z) {
         int index = blocks[index(x, y, z)];
-        return palette.get(index);
+        return palette.inverse().get(index);
     }
 
     public int getFlatBlock(int idx) {
         int index = blocks[idx];
-        return palette.get(index);
+        return palette.inverse().get(index);
     }
 
     public void setBlock(int idx, int type, int data) {
@@ -71,24 +71,24 @@ public class ChunkSection {
     }
 
     public void setPaletteIndex(int idx, int index) {
-    	blocks[idx] = index;
+        blocks[idx] = index;
     }
 
     public int getPaletteIndex(int idx) {
-    	return blocks[idx];
+        return blocks[idx];
     }
 
     /**
-     * Set a block in the chunks based on the index
+     * Set a block state in the chunk
+     * This method will not update non-air blocks count
      *
-     * @param idx  Index
-     * @param id The raw or flat id of the block
+     * @param idx Index
+     * @param id  The raw or flat id of the block
      */
     public void setFlatBlock(int idx, int id) {
-        int index = palette.indexOf(id);
-        if (index == -1) {
-            index = palette.size();
-            palette.add(id);
+        Integer index = palette.get(id);
+        if (index == null) {
+            palette.put(id, index = palette.size());
         }
 
         blocks[idx] = index;
