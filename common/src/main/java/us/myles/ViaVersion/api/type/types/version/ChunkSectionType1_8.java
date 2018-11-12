@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.api.type.types.version;
 
 import io.netty.buffer.ByteBuf;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 
@@ -38,6 +37,6 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

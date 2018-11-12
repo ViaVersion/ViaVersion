@@ -1,12 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 
 public class InventoryPackets {
 
@@ -201,16 +203,12 @@ public class InventoryPackets {
     }
 
     public static int getNewItemId(int id) {
-        if (id < 108) return id;
-        else if (id < 119) return id + 3;
-        else if (id < 460) return id + 4;
-        else if (id < 542) return id + 43;
-        else if (id < 561) return id + 48;
-        else if (id < 593) return id + 49;
-        else if (id < 657) return id + 53;
-        else if (id < 662) return id + 54;
-        else if (id < 665) return id + 55;
-        else return id + 56;
+        Integer newId = MappingData.oldToNewItems.get(id);
+        if (newId == null) {
+            Via.getPlatform().getLogger().warning("Missing 1.14 item for 1.13.2 item " + id);
+            return 1;
+        }
+        return newId;
     }
 
     public static void toServer(Item item) {
@@ -219,25 +217,7 @@ public class InventoryPackets {
     }
 
     public static int getOldItemId(int id) {
-        if (id < 108) return id;
-        else if (id < 111) return 1;
-        else if (id < 122) return id - 3;
-        else if (id < 123) return 1;
-        else if (id < 464) return id - 4;
-        else if (id < 503) return 1;
-        else if (id < 585) return id - 43;
-        else if (id < 590) return 1;
-        else if (id < 609) return id - 48;
-        else if (id < 610) return 1;
-        else if (id < 642) return id - 49;
-        else if (id < 646) return 1;
-        else if (id < 710) return id - 53;
-        else if (id < 711) return 1;
-        else if (id < 716) return id - 54;
-        else if (id < 717) return 1;
-        else if (id < 720) return id - 55;
-        else if (id < 721) return 1;
-        else if (id < 846) return id - 56;
-        else return 1;
+        Integer oldId = MappingData.oldToNewItems.inverse().get(id);
+        return oldId != null ? oldId : 1;
     }
 }
