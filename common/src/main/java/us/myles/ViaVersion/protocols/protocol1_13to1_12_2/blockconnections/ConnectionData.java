@@ -100,7 +100,7 @@ public class ConnectionData {
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
-                        int block = section.getBlock(x, y, z);
+                        int block = section.getFlatBlock(x, y, z);
 
                         if (ConnectionData.connects(block)) {
                             block = ConnectionData.connect(user, new Position(xOff + x, yOff + y, zOff + z), block);
