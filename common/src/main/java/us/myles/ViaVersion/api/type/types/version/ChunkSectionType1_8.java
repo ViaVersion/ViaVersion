@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.type.Type;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
-import java.util.List;
 
 public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
@@ -18,8 +17,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        List<Integer> palette = chunkSection.getPalette();
-        palette.clear();
+        chunkSection.clearPalette();
 
         byte[] blockData = new byte[ChunkSection.SIZE * 2];
         buffer.readBytes(blockData);

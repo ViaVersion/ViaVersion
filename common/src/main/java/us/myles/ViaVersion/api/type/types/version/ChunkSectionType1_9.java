@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.api.type.types.version;
 
+import com.google.common.collect.BiMap;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
-
-import java.util.List;
 
 public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
@@ -15,8 +14,6 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        List<Integer> palette = chunkSection.getPalette();
-        palette.clear();
 
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
@@ -33,9 +30,10 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
         }
         int paletteLength = Type.VAR_INT.read(buffer);
         // Read palette
+        chunkSection.clearPalette();
         for (int i = 0; i < paletteLength; i++) {
             if (bitsPerBlock != 13) {
-                palette.add(Type.VAR_INT.read(buffer));
+                chunkSection.addPaletteEntry(Type.VAR_INT.read(buffer));
             } else {
                 Type.VAR_INT.read(buffer);
             }
@@ -73,19 +71,17 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        List<Integer> palette = chunkSection.getPalette();
-
         int bitsPerBlock = 4;
-        while (palette.size() > 1 << bitsPerBlock) {
+        while (chunkSection.getPaletteSize() > 1 << bitsPerBlock) {
             bitsPerBlock += 1;
         }
         long maxEntryValue = (1L << bitsPerBlock) - 1;
         buffer.writeByte(bitsPerBlock);
 
         // Write pallet
-        Type.VAR_INT.write(buffer, palette.size());
-        for (int mappedId : palette) {
-            Type.VAR_INT.write(buffer, mappedId);
+        Type.VAR_INT.write(buffer, chunkSection.getPaletteSize());
+        for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
+            Type.VAR_INT.write(buffer, chunkSection.getPaletteEntry(i));
         }
 
         int length = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
