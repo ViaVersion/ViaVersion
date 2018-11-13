@@ -22,14 +22,13 @@ public class Protocol1_13_2To1_13_1 extends Protocol {
         WorldPackets.register(this);
         EntityPackets.register(this);
 
-        //Edit Book
-        registerIncoming(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.FLAT_ITEM, Type.FLAT_VAR_INT_ITEM);
-                map(Type.BOOLEAN);
-            }
-        });
+		//Edit Book
+		registerIncoming(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM);
+			}
+		});
 
         // Advancements
         registerOutgoing(State.PLAY, 0x51, 0x51, new PacketRemapper() {

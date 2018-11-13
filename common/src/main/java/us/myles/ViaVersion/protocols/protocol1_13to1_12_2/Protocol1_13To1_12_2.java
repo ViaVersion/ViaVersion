@@ -136,6 +136,19 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
         // Outgoing packets
 
+        registerOutgoing(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
+                    }
+                });
+            }
+        });
+
         registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -175,7 +188,36 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0xF, 0xE);
+        // Boss bar
+        registerOutgoing(State.PLAY, 0xC, 0xC, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UUID);
+                map(Type.VAR_INT);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int action = wrapper.get(Type.VAR_INT, 0);
+                        if (action == 0 || action == 3) {
+                            wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING)));
+                        }
+                    }
+                });
+            }
+        });
+        // Chat message
+        registerOutgoing(State.PLAY, 0xF, 0xE, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
+                    }
+                });
+            }
+        });
         // WorldPackets 0x10 -> 0x0F
 
         // Tab-Complete
@@ -223,13 +265,77 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // New packet 0x11, declare commands
         registerOutgoing(State.PLAY, 0x11, 0x12);
         registerOutgoing(State.PLAY, 0x12, 0x13);
-        registerOutgoing(State.PLAY, 0x13, 0x14);
+        // Open window
+        registerOutgoing(State.PLAY, 0x13, 0x14, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Id
+                map(Type.STRING); // Window type
+                map(Type.STRING); // Title
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.set(Type.STRING, 1, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 1)));
+                    }
+                });
+            }
+        });
         // InventoryPackets 0x14 -> 0x15
         // InventoryPackets 0x15 -> 0x16
         // InventoryPackets 0x16 -> 0x17
-        registerOutgoing(State.PLAY, 0x17, 0x18);
+        // Set cooldown
+        registerOutgoing(State.PLAY, 0x17, 0x18, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int item = wrapper.read(Type.VAR_INT);
+                        int ticks = wrapper.read(Type.VAR_INT);
+                        wrapper.cancel();
+                        if (item == 383) { // Spawn egg
+                            for (int i = 0; i < 44; i++) {
+                                Integer newItem = MappingData.oldToNewItems.get(item << 16 | i);
+                                if (newItem != null) {
+                                    PacketWrapper packet = wrapper.create(0x18);
+                                    packet.write(Type.VAR_INT, newItem);
+                                    packet.write(Type.VAR_INT, ticks);
+                                    packet.send(Protocol1_13To1_12_2.class);
+                                } else {
+                                    break;
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < 16; i++) {
+                                Integer newItem = MappingData.oldToNewItems.get(item << 4 | i);
+                                if (newItem != null) {
+                                    PacketWrapper packet = wrapper.create(0x18);
+                                    packet.write(Type.VAR_INT, newItem);
+                                    packet.write(Type.VAR_INT, ticks);
+                                    packet.send(Protocol1_13To1_12_2.class);
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
         // WorldPackets 0x18 -> 0x19
-        registerOutgoing(State.PLAY, 0x1A, 0x1B);
+        // Disconnect
+        registerOutgoing(State.PLAY, 0x1A, 0x1B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
         registerOutgoing(State.PLAY, 0x1C, 0x1E);
@@ -347,7 +453,23 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
         registerOutgoing(State.PLAY, 0x2C, 0x2E);
-        registerOutgoing(State.PLAY, 0x2D, 0x2F);
+        // Combat event
+        registerOutgoing(State.PLAY, 0x2D, 0x2F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Event
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (wrapper.get(Type.VAR_INT, 0) == 2) { // Entity dead
+                            wrapper.passthrough(Type.VAR_INT); // Player id
+                            wrapper.passthrough(Type.INT); // Entity id
+                            wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING)));
+                        }
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x2E, 0x30);
         // New 0x31 - Face Player
         registerOutgoing(State.PLAY, 0x2F, 0x32);
@@ -505,7 +627,22 @@ public class Protocol1_13To1_12_2 extends Protocol {
         });
         registerOutgoing(State.PLAY, 0x46, 0x49);
         registerOutgoing(State.PLAY, 0x47, 0x4A);
-        registerOutgoing(State.PLAY, 0x48, 0x4B);
+        // Title
+        registerOutgoing(State.PLAY, 0x48, 0x4B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Action
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int action = wrapper.get(Type.VAR_INT, 0);
+                        if (action >= 0 && action <= 2) {
+                            wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING)));
+                        }
+                    }
+                });
+            }
+        });
         // New 0x4C - Stop Sound
 
         // Sound Effect packet
@@ -523,7 +660,21 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4A, 0x4E);
+        // Player list header and footer
+        registerOutgoing(State.PLAY, 0x4A, 0x4E, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                map(Type.STRING);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
+                        wrapper.set(Type.STRING, 1, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 1)));
+                    }
+                });
+            }
+        });
         registerOutgoing(State.PLAY, 0x4B, 0x4F);
         registerOutgoing(State.PLAY, 0x4C, 0x50);
         // Advancements
@@ -545,8 +696,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
                             // Display data
                             if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.STRING); // Title
-                                wrapper.passthrough(Type.STRING); // Description
+                                wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING))); // Title
+                                wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING))); // Description
                                 Item icon = wrapper.read(Type.ITEM);
                                 InventoryPackets.toClient(icon);
                                 wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
