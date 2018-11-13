@@ -123,7 +123,7 @@ public class WorldPackets {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
 
                         Chunk1_9to1_8Type type = new Chunk1_9to1_8Type(clientChunks);
-                        Chunk1_8 chunk = (Chunk1_8) wrapper.passthrough(type);
+                        Chunk1_8 chunk = (Chunk1_8) wrapper.read(type);
                         if (chunk.isUnloadPacket()) {
                             wrapper.setId(0x1D);
 
