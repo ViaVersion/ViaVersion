@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class ConnectionData {
-
     static Map<Integer, String> idToKey = new HashMap<>();
     static Map<String, Integer> keyToId = new HashMap<>();
     static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
@@ -54,26 +53,26 @@ public class ConnectionData {
         }
     }
 
-    public static BlockConnectionProvider getProvider(){
+    public static BlockConnectionProvider getProvider() {
         return Via.getManager().getProviders().get(BlockConnectionProvider.class);
     }
 
-    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState){
-        if(!needStoreBlocks()) return;
+    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState) {
+        if (!needStoreBlocks()) return;
         if (ConnectionData.isWelcome(blockState)) {
             ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
-        }else{
+        } else {
             ConnectionData.getProvider().removeBlock(userConnection, position);
         }
     }
 
-    public static void clearBlockStorage(UserConnection connection){
-        if(!needStoreBlocks()) return;
+    public static void clearBlockStorage(UserConnection connection) {
+        if (!needStoreBlocks()) return;
         getProvider().clearStorage(connection);
     }
 
     public static boolean needStoreBlocks(){
-        return getProvider().needBlockStore();
+        return getProvider().storesBlocks();
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
@@ -135,7 +134,7 @@ public class ConnectionData {
             keyToId.put(key, id);
         }
 
-        if(!Via.getConfig().isRedueMemoryFromBlockStorage()){
+        if (!Via.getConfig().isRedueMemoryFromBlockStorage()) {
             JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());
@@ -178,7 +177,7 @@ public class ConnectionData {
         FlowerConnectionHandler.init();
         ChorusPlantConnectionHandler.init();
 
-        if(Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")){
+        if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")) {
             Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
         }
     }

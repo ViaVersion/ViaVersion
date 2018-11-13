@@ -1,17 +1,20 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.*;
 
-public class StairConnectionHandler extends ConnectionHandler{
-
-    private static Set<String> baseStairs = new HashSet<>();
-    private static Map<Integer, WrappedBlockData> blockData = new HashMap<>();
+public class StairConnectionHandler extends ConnectionHandler {
+    private static Map<Integer, StairData> stairDataMap = new HashMap<>();
+    private static Map<Short, Integer> connectedBlocks = new HashMap<>();
 
     static void init() {
+        List<String> baseStairs = new LinkedList<>();
         baseStairs.add("minecraft:oak_stairs");
         baseStairs.add("minecraft:cobblestone_stairs");
         baseStairs.add("minecraft:brick_stairs");
@@ -33,72 +36,107 @@ public class StairConnectionHandler extends ConnectionHandler{
         StairConnectionHandler connectionHandler = new StairConnectionHandler();
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
-            if (baseStairs.contains(key)) {
-                blockData.put(blockState.getValue(), WrappedBlockData.fromString(blockState.getKey()));
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
+            int type = baseStairs.indexOf(key);
+            if (type == -1) continue;
+
+            WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
+            if (blockData.getValue("waterlogged").equals("true")) continue;
+
+            byte shape;
+            switch (blockData.getValue("shape")) {
+                case "straight": shape = 0; break;
+                case "inner_left": shape = 1; break;
+                case "inner_right": shape = 2; break;
+                case "outer_left": shape = 3; break;
+                case "outer_right": shape = 4; break;
+                default: continue;
             }
+
+            StairData stairData = new StairData(
+                    blockData.getValue("half").equals("bottom"),
+                    shape, (byte) type,
+                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase())
+            );
+
+            stairDataMap.put(blockState.getValue(), stairData);
+            connectedBlocks.put(getStates(stairData), blockState.getValue());
+
+            ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
         }
+    }
+
+    private static short getStates(StairData stairData) {
+        short s = 0;
+        if (stairData.isBottom()) s |= 1;
+        s |= stairData.getShape() << 1;
+        s |= stairData.getType() << 4;
+        s |= stairData.getFacing().ordinal() << 9;
+        return s;
     }
 
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
-        WrappedBlockData blockdata = WrappedBlockData.fromStateId(blockState);
-        blockdata.set("shape", getShape(user, position, blockdata));
-        return blockdata.getBlockStateId();
+        StairData stairData = stairDataMap.get(blockState);
+        if (stairData == null) return blockState;
+
+        short s = 0;
+        if (stairData.isBottom()) s |= 1;
+        s |= getShape(user, position, stairData) << 1;
+        s |= stairData.getType() << 4;
+        s |= stairData.getFacing().ordinal() << 9;
+
+        Integer newBlockState = connectedBlocks.get(s);
+        return newBlockState == null ? blockState : newBlockState;
     }
 
-    private String getShape(UserConnection user, Position position, WrappedBlockData blockdata){
-        BlockFace blockFace = BlockFace.valueOf(blockdata.getValue("facing").toUpperCase());
-        WrappedBlockData blockData2 = WrappedBlockData.fromStateId(getBlockData(user, position.getRelative(blockFace)));
-        if(isStair(blockData2.getMinecraftKey()) && blockdata.getValue("half").equals(blockData2.getValue("half"))){
-            BlockFace blockFace2 = BlockFace.valueOf(blockData2.getValue("facing").toUpperCase());
-            if(!isSameAxis(blockFace, blockFace2) && checkOpposite(user, blockdata, position, blockFace2.opposite())){
-                if(blockFace2 == fixBlockFace(blockFace)){
-                    return "outer_left";
-                }
-                return "outer_right";
+    private int getShape(UserConnection user, Position position, StairData stair) {
+        BlockFace facing = stair.getFacing();
+
+        StairData relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing)));
+        if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
+            BlockFace facing2 = relativeStair.getFacing();
+            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2.opposite())){
+                return facing2 == rotateAntiClockwise(facing) ? 3 : 4; // outer_left : outer_right
             }
         }
 
-        WrappedBlockData blockData3 = WrappedBlockData.fromStateId(getBlockData(user, position.getRelative(blockFace.opposite())));
-        if(isStair(blockData3.getMinecraftKey()) && blockdata.getValue("half").equals(blockData3.getValue("half"))){
-            BlockFace blockFace3 = BlockFace.valueOf(blockData3.getValue("facing").toUpperCase());
-            if(!isSameAxis(blockFace, blockFace3) && checkOpposite(user, blockdata, position, blockFace3)){
-                if(blockFace3 == fixBlockFace(blockFace)){
-                    return "inner_left";
-                }
-                return "inner_right";
+        relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing.opposite())));
+        if(relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
+            BlockFace facing2 = relativeStair.getFacing();
+            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2)){
+                return facing2 == rotateAntiClockwise(facing) ? 1 : 2; // inner_left : inner_right
             }
         }
-        return "straight";
+
+        return 0; // straight
     }
 
-    private boolean isSameAxis(BlockFace face1, BlockFace face2){
-        return Math.abs(face1.getModX()) == Math.abs(face2.getModX()) && Math.abs(face1.getModY()) == Math.abs(face2.getModY()) && Math.abs(face1.getModZ()) == Math.abs(face2.getModZ());
+    private boolean checkOpposite(UserConnection user, StairData stair, Position position, BlockFace face) {
+        StairData relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(face)));
+        return relativeStair == null || relativeStair.getFacing() != stair.getFacing() || relativeStair.isBottom() != stair.isBottom();
     }
 
-    private boolean checkOpposite(UserConnection user, WrappedBlockData blockdata1, Position position, BlockFace face){
-        WrappedBlockData data = WrappedBlockData.fromStateId(getBlockData(user, position.getRelative(face)));
-        return !isStair(data.getMinecraftKey()) || !data.getValue("facing").equals(blockdata1.getValue("facing")) || !data.getValue("half").equals(blockdata1.getValue("half"));
-    }
-
-    private boolean isStair(String key){
-        return baseStairs.contains(key);
-    }
-
-    private BlockFace fixBlockFace(BlockFace face) {
-        switch (face.ordinal()) {
-            case 0:
+    private BlockFace rotateAntiClockwise(BlockFace face) {
+        switch (face) {
+            case NORTH:
                 return BlockFace.WEST;
-            case 1:
+            case SOUTH:
                 return BlockFace.EAST;
-            case 2:
+            case EAST:
                 return BlockFace.NORTH;
-            case 3:
+            case WEST:
                 return BlockFace.SOUTH;
             default:
-                return BlockFace.NORTH;
+                return face;
         }
     }
 
+    @AllArgsConstructor
+    @Getter
+    @ToString
+    private static class StairData {
+        private final boolean bottom;
+        private final byte shape, type;
+        private final BlockFace facing;
+    }
 }

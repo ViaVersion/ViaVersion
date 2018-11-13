@@ -32,7 +32,7 @@ public class PacketBlockConnectionProvider extends BlockConnectionProvider {
     }
 
     @Override
-    public boolean needBlockStore() {
+    public boolean storesBlocks() {
         return true;
     }
 }

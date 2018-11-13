@@ -10,9 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class RedstoneConnectionHandler extends ConnectionHandler {
-
     private static Set<Integer> redstone = new HashSet<>();
-
     private static Map<Short, Integer> connectedBlockStates = new HashMap<>();
     private static Map<Integer, Integer> powerMappings = new HashMap<>();
 
@@ -21,17 +19,16 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
         String redstoneKey = "minecraft:redstone_wire";
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             String key = blockState.getKey().split("\\[")[0];
-            if (redstoneKey.equals(key)) {
-                redstone.add(blockState.getValue());
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
-                WrappedBlockData blockData = WrappedBlockData.fromStateId(blockState.getValue());
-                connectedBlockStates.put(getStates(blockData), blockData.getBlockStateId());
-                powerMappings.put(blockData.getBlockStateId(), Integer.valueOf(blockData.getValue("power")));
-            }
+            if (!redstoneKey.equals(key)) continue;
+            redstone.add(blockState.getValue());
+            ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
+            WrappedBlockData blockData = WrappedBlockData.fromStateId(blockState.getValue());
+            connectedBlockStates.put(getStates(blockData), blockData.getBlockStateId());
+            powerMappings.put(blockData.getBlockStateId(), Integer.valueOf(blockData.getValue("power")));
         }
     }
 
-    private static short getStates(WrappedBlockData data){
+    private static short getStates(WrappedBlockData data) {
         short b = 0;
         b |= getState(data.getValue("east"));
         b |= getState(data.getValue("north")) << 2;
@@ -41,8 +38,7 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
         return b;
     }
 
-    private static int getState(String value)
-    {
+    private static int getState(String value) {
         switch (value){
             case "none": return 0;
             case "side" : return 1;
@@ -82,6 +78,6 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
 
     private boolean connects(BlockFace side, int blockState) {
         final BlockData blockData = ConnectionData.blockConnectionData.get(blockState);
-        return blockData != null && blockData.connectTo("redstoneConnections", side.opposite());
+        return blockData != null && blockData.connectsTo("redstoneConnections", side.opposite());
     }
 }

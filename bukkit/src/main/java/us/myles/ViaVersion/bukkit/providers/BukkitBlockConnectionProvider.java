@@ -13,14 +13,13 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.provi
 import java.util.UUID;
 
 public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
-
-    private Chunk chunk;
+    private Chunk lastChunk;
 
     @Override
     public int getWorldBlockData(UserConnection user, Position position) {
         UUID uuid = user.get(ProtocolInfo.class).getUuid();
         Player player = Bukkit.getPlayer(uuid);
-        if(player != null) {
+        if (player != null) {
             World world = player.getWorld();
             int x = (int) (position.getX() >> 4);
             int z = (int) (position.getZ() >> 4);
@@ -33,10 +32,10 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
         return 0;
     }
 
-    public Chunk getChunk(World world, int x, int z){
-        if(chunk != null && chunk.getX() == x && chunk.getZ() == z){
-            return chunk;
+    public Chunk getChunk(World world, int x, int z) {
+        if (lastChunk != null && lastChunk.getX() == x && lastChunk.getZ() == z) {
+            return lastChunk;
         }
-        return chunk = world.getChunkAt(x, z);
+        return lastChunk = world.getChunkAt(x, z);
     }
 }

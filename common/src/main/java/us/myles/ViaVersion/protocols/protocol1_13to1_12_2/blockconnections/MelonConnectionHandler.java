@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-public class MelonConnectionHandler extends AbstractStempConnectionHandler{
+public class MelonConnectionHandler extends AbstractStempConnectionHandler {
 
     public MelonConnectionHandler(String baseStateId, String blockId, String toKey) {
         super(baseStateId, blockId, toKey);

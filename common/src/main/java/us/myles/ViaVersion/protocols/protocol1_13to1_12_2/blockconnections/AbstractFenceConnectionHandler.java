@@ -29,7 +29,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         }
     }
 
-    protected Byte getStates(WrappedBlockData blockData) {
+    protected byte getStates(WrappedBlockData blockData) {
         byte states = 0;
         if (blockData.getValue("east").equals("true")) states |= 1;
         if (blockData.getValue("north").equals("true")) states |= 2;
@@ -39,7 +39,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         return states;
     }
 
-    protected Byte getStates(UserConnection user, Position position, int blockState) {
+    protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = 0;
         if (connects(BlockFace.EAST, getBlockData(user, position.getRelative(BlockFace.EAST)))) states |= 1;
         if (connects(BlockFace.NORTH, getBlockData(user, position.getRelative(BlockFace.NORTH)))) states |= 2;
@@ -55,6 +55,6 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     }
 
     protected boolean connects(BlockFace side, int blockState) {
-        return blockStates.contains(blockState) || ConnectionData.blockConnectionData.containsKey(blockState) && ConnectionData.blockConnectionData.get(blockState).connectTo(blockConnections, side.opposite());
+        return blockStates.contains(blockState) || blockConnections != null && ConnectionData.blockConnectionData.containsKey(blockState) && ConnectionData.blockConnectionData.get(blockState).connectsTo(blockConnections, side.opposite());
     }
 }

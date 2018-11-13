@@ -4,12 +4,9 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class WallConnectionHandler extends AbstractFenceConnectionHandler{
-
-    private static final BlockFace[] blockFaceList = { BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST };
+public class WallConnectionHandler extends AbstractFenceConnectionHandler {
+    private static final BlockFace[] BLOCK_FACES = { BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST };
+    private static final int[] OPPOSITES = { 3, 2, 1, 0 };
 
     static void init() {
         new WallConnectionHandler("cobbleWallConnections", "minecraft:cobblestone_wall");
@@ -22,36 +19,33 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler{
     }
 
     @Override
-    protected Byte getStates(WrappedBlockData blockData) {
+    protected byte getStates(WrappedBlockData blockData) {
         byte states = super.getStates(blockData);
         if (blockData.getValue("up").equals("true")) states |= 32;
         return states;
     }
 
-    protected Byte getStates(UserConnection user, Position position, int blockState) {
+    protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
         if (up(user, position)) states |= 32;
         return states;
     }
 
-    public boolean up(UserConnection user, Position position){
+    public boolean up(UserConnection user, Position position) {
         if(isWall(getBlockData(user, position.getRelative(BlockFace.BOTTOM))) || isWall(getBlockData(user, position.getRelative(BlockFace.TOP))))return true;
-        List<BlockFace> list = getBlockFaces(user, position);
-        if(list.isEmpty()) return true;
-        if(list.size() >= 4) return true;
-        for (BlockFace blockFace : list) {
-            if(!list.contains(blockFace.opposite())){
-                return true;
-            }
+        int blockFaces = getBlockFaces(user, position);
+        if (blockFaces == 0 || blockFaces == 0xF) return true;
+        for (int i = 0; i < BLOCK_FACES.length; i++) {
+            if ((blockFaces & (1 << i)) != 0 && (blockFaces & (1 << OPPOSITES[i])) == 0) return true;
         }
         return false;
     }
 
-    private List<BlockFace> getBlockFaces(UserConnection user, Position position){
-        List<BlockFace> blockFaces = new ArrayList<>();
-        for (BlockFace face : blockFaceList) {
-            if(isWall(getBlockData(user, position.getRelative(face)))){
-                blockFaces.add(face);
+    private int getBlockFaces(UserConnection user, Position position) {
+        int blockFaces = 0;
+        for (int i = 0; i < BLOCK_FACES.length; i++) {
+            if (isWall(getBlockData(user, position.getRelative(BLOCK_FACES[i])))) {
+                blockFaces |= 1 << i;
             }
         }
         return blockFaces;

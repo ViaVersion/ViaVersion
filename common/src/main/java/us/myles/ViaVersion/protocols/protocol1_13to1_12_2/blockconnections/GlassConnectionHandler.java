@@ -32,8 +32,8 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
     }
 
     @Override
-    protected Byte getStates(UserConnection user, Position position, int blockState) {
-        final Byte states = super.getStates(user, position, blockState);
+    protected byte getStates(UserConnection user, Position position, int blockState) {
+        byte states = super.getStates(user, position, blockState);
         return states == 0 && (ProtocolRegistry.SERVER_PROTOCOL <= 47 && ProtocolRegistry.SERVER_PROTOCOL != -1) ? 0xF : states;
     }
 }

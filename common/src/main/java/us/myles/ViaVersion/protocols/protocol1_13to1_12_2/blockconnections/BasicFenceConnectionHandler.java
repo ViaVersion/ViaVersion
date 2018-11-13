@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-public class BasicFenceConnectionHandler extends AbstractFenceConnectionHandler{
+public class BasicFenceConnectionHandler extends AbstractFenceConnectionHandler {
 
     static void init() {
         new BasicFenceConnectionHandler("fenceConnections", "minecraft:oak_fence");
