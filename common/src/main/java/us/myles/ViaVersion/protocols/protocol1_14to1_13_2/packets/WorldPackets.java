@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
-import com.google.common.collect.BiMap;
 import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
