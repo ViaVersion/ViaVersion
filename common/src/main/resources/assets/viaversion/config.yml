@@ -152,3 +152,9 @@ replacement-piston-id: 0
 force-json-transform: false
 # Minimize the cooldown animation in 1.8 servers
 minimize-cooldown: true
+# Enable serverside block-connections for 1.13+ clients
+serverside-blockconnections: false
+# Sets the method for the block connections (world for world-level or packet for packet-level)
+blockconnection-method: world
+# When activated, only the most important blocks are stored in the blockstorage. (fences, glass panes etc. won't connect to solid blocks)
+reduce-blockstorage-memory: false

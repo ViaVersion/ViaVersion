@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.*;
 
 public class BungeeViaConfig extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method");
 
     public BungeeViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
@@ -271,5 +271,20 @@ public class BungeeViaConfig extends Config implements ViaVersionConfig {
     @Override
     public boolean isDisable1_13AutoComplete() {
         return getBoolean("disable-1_13-auto-complete", false);
+    }
+
+    @Override
+    public boolean isServersideBlockConnections() {
+        return getBoolean("serverside-blockconnections", false);
+    }
+
+    @Override
+    public String getBlockConnectionMethod() {
+        return "packet";
+    }
+
+    @Override
+    public boolean isRedueBlockStorageMemory() {
+        return getBoolean("reduce-blockstorage-memory", false);
     }
 }
