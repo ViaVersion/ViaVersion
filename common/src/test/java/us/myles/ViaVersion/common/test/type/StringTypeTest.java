@@ -31,6 +31,7 @@ public class StringTypeTest {
         Assertions.assertEquals(Type.STRING.read(buf), new String(new char[Short.MAX_VALUE / 2]).replace("\0", "\uD83E\uDDFD"));
     }
 
+    @Test
     public void testStringReadOverflowException() throws Exception {
         // Read exception
         final ByteBuf buf = Unpooled.buffer();
