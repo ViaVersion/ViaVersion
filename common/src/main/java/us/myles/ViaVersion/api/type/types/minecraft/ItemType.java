@@ -16,7 +16,7 @@ public class ItemType extends BaseItemType {
             return null;
         } else {
             Item item = new Item();
-            item.setId(id);
+            item.setIdentifier(id);
             item.setAmount(buffer.readByte());
             item.setData(buffer.readShort());
             item.setTag(Type.NBT.read(buffer));
@@ -29,7 +29,7 @@ public class ItemType extends BaseItemType {
         if (object == null) {
             buffer.writeShort(-1);
         } else {
-            buffer.writeShort(object.getId());
+            buffer.writeShort(object.getIdentifier());
             buffer.writeByte(object.getAmount());
             buffer.writeShort(object.getData());
             Type.NBT.write(buffer, object.getTag());

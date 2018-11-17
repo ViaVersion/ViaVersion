@@ -501,7 +501,7 @@ public class PlayerPackets {
                         if (name.equalsIgnoreCase("MC|BSign")) {
                             Item item = wrapper.passthrough(Type.ITEM);
                             if (item != null) {
-                                item.setId((short) 387); // Written Book
+                                item.setIdentifier(387); // Written Book
                                 ItemRewriter.rewriteBookToServer(item);
                             }
                         }

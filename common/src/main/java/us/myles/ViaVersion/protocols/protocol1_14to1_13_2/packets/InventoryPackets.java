@@ -199,7 +199,7 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        item.setId((short) getNewItemId(item.getId()));
+        item.setIdentifier(getNewItemId(item.getIdentifier()));
     }
 
     public static int getNewItemId(int id) {
@@ -213,7 +213,7 @@ public class InventoryPackets {
 
     public static void toServer(Item item) {
         if (item == null) return;
-        item.setId((short) getOldItemId(item.getId()));
+        item.setIdentifier(getOldItemId(item.getIdentifier()));
     }
 
     public static int getOldItemId(int id) {

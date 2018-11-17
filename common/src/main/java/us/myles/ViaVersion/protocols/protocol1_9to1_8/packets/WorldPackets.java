@@ -260,7 +260,7 @@ public class WorldPackets {
         protocol.registerIncoming(State.PLAY, 0x07, 0x13, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Status
+                map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 0 - Status
                 map(Type.POSITION); // 1 - Position
                 map(Type.UNSIGNED_BYTE); // 2 - Face
                 handler(new PacketHandler() {
@@ -308,7 +308,7 @@ public class WorldPackets {
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-                            if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
+                            if (item != null && Protocol1_9TO1_8.isSword(item.getIdentifier())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
