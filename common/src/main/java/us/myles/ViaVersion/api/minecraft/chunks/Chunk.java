@@ -9,15 +9,15 @@ public interface Chunk {
 
     int getZ();
 
-    ChunkSection[] getSections();
-
-    boolean isGroundUp();
-
     boolean isBiomeData();
-
-    byte[] getBiomeData();
 
     int getBitmask();
 
+    ChunkSection[] getSections();
+
+    byte[] getBiomeData();
+
     List<CompoundTag> getBlockEntities();
+
+    boolean isGroundUp();
 }

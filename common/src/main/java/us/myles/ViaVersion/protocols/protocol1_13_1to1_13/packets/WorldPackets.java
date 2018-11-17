@@ -27,16 +27,11 @@ public class WorldPackets {
                         Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
 
                         for (ChunkSection section : chunk.getSections()) {
-                            if (section != null) {
-                                for (int i = 0; i < section.getPalette().size(); i++) {
-                                    section.getPalette().set(
-                                            i,
-                                            Protocol1_13_1To1_13.getNewBlockStateId(section.getPalette().get(i))
-                                    );
-                                }
+                            if (section == null) continue;
+                            for (int i = 0; i < section.getPaletteSize(); i++) {
+                                section.setPaletteEntry(i, Protocol1_13_1To1_13.getNewBlockStateId(section.getPaletteEntry(i)));
                             }
                         }
-
                     }
                 });
             }
