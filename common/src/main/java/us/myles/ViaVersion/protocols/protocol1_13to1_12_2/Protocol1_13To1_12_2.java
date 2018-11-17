@@ -122,6 +122,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.YELLOW, '!');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.WHITE, '?');
         MappingData.init();
+        ConnectionData.init();
     }
 
     @Override
