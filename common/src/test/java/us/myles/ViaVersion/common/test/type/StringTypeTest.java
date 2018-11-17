@@ -10,14 +10,17 @@ import us.myles.ViaVersion.api.type.Type;
 
 public class StringTypeTest {
     @Test
-    public void test() throws Exception {
+    public void testStringWrite() throws Exception {
         // Write
         final ByteBuf buf = Unpooled.buffer();
         Type.STRING.write(buf, "\uD83E\uDDFD"); // Sponge Emoji
         Assertions.assertEquals(ByteBufUtil.hexDump(buf), "04f09fa7bd");
-        buf.clear();
+    }
 
-        // Read Write
+    @Test
+    public void testStringRead() throws Exception {
+        // Write
+        final ByteBuf buf = Unpooled.buffer();
         Type.STRING.write(buf, new String(new char[Short.MAX_VALUE]));
         Assertions.assertEquals(Type.STRING.read(buf), new String(new char[Short.MAX_VALUE]));
 
@@ -26,8 +29,11 @@ public class StringTypeTest {
 
         Type.STRING.write(buf, new String(new char[Short.MAX_VALUE / 2]).replace("\0", "\uD83E\uDDFD"));
         Assertions.assertEquals(Type.STRING.read(buf), new String(new char[Short.MAX_VALUE / 2]).replace("\0", "\uD83E\uDDFD"));
+    }
 
+    public void testStringReadOverflowException() throws Exception {
         // Read exception
+        final ByteBuf buf = Unpooled.buffer();
         Type.VAR_INT.write(buf, (Short.MAX_VALUE + 1) * 4);
         for (int i = 0; i < Short.MAX_VALUE / 2 + 1; i++) {
             buf.writeBytes(new byte[]{0x04, (byte) 0xf0, (byte) 0x9f, (byte) 0xa7, (byte) 0xbd}); // Sponge emoji
@@ -38,8 +44,12 @@ public class StringTypeTest {
                 Type.STRING.read(buf);
             }
         });
+    }
 
+    @Test
+    public void testStringWriteOverflowException() {
         // Write exceptions
+        final ByteBuf buf = Unpooled.buffer();
         Assertions.assertThrows(IllegalArgumentException.class, new Executable() {
             @Override
             public void execute() throws Throwable {

@@ -9,13 +9,15 @@ import us.myles.ViaVersion.api.type.Type;
 
 public class ItemTypeTest {
     @Test
-    public void test() throws Exception {
-        ByteBuf buf = Unpooled.buffer();
-
+    public void testEmptyItemRead() throws Exception {
         // Test empty item read
         Assertions.assertNull(Type.ITEM.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
         Assertions.assertNull(Type.FLAT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
         Assertions.assertNull(Type.FLAT_VAR_INT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{0})));
+    }
+
+    @Test
+    public void testNormalItemRead() throws Exception {
 
         // Test item read
         Assertions.assertEquals(
@@ -44,6 +46,11 @@ public class ItemTypeTest {
                         0
                 }))
         );
+    }
+
+    @Test
+    public void testEmptyItemWrite() throws Exception {
+        ByteBuf buf = Unpooled.buffer();
 
         // Test item empty write
         Type.ITEM.write(buf, null);
@@ -52,6 +59,11 @@ public class ItemTypeTest {
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{-1, -1});
         Type.FLAT_VAR_INT_ITEM.write(buf, null);
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{0});
+    }
+
+    @Test
+    public void testNormalItemWrite() throws Exception {
+        ByteBuf buf = Unpooled.buffer();
 
         // Test item write
         Type.ITEM.write(buf, new Item((int) Short.MAX_VALUE, (byte) -128, (short) 257, null));
