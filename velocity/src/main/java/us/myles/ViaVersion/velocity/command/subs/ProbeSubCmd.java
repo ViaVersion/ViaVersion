@@ -1,10 +1,10 @@
-package us.myles.ViaVersion.bungee.commands.subs;
+package us.myles.ViaVersion.velocity.command.subs;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
-import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
+import us.myles.ViaVersion.velocity.platform.VelocityViaConfig;
+import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 
 public class ProbeSubCmd extends ViaSubCommand {
     @Override
@@ -15,7 +15,7 @@ public class ProbeSubCmd extends ViaSubCommand {
     @Override
     public String description() {
         return "Forces ViaVersion to scan server protocol versions " +
-                (((BungeeViaConfig) Via.getConfig()).getBungeePingInterval() == -1 ?
+                (((VelocityViaConfig) Via.getConfig()).getVelocityPingInterval() == -1 ?
                         "" : "(Also happens at an interval)");
     }
 
