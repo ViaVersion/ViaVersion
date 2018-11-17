@@ -56,7 +56,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Inject
     @DataDirectory
     private Path configDir;
-    private VelocityViaAPI api = new VelocityViaAPI();
+    private VelocityViaAPI api;
     private VelocityViaConfig conf;
 
     @Subscribe
@@ -64,6 +64,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         PROXY = proxy;
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
         PROXY.getCommandManager().register(commandHandler, "viaver", "vvvelocity", "viaversion");
+        api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
         Via.init(ViaManager.builder()

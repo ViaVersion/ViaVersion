@@ -26,6 +26,10 @@ public class VelocityViaInjector implements ViaInjector {
 
     @Override
     public int getServerProtocolVersion() throws Exception {
+        return getLowestSupportedProtocolVersion();
+    }
+
+    public static int getLowestSupportedProtocolVersion() throws Exception {
         return ReflectionUtil.getStatic(Class.forName("com.velocitypowered.proxy.protocol.ProtocolConstants"), "MINIMUM_GENERIC_VERSION", int.class);
     }
 

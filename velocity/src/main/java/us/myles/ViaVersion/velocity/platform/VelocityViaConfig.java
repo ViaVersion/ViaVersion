@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.velocity.platform;
 
 import us.myles.ViaVersion.api.ViaVersionConfig;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.util.Config;
 
@@ -49,7 +48,13 @@ public class VelocityViaConfig extends Config implements ViaVersionConfig {
         }
         // Ensure default exists
         if (!servers.containsKey("default")) {
-            servers.put("default", ProtocolRegistry.SERVER_PROTOCOL);
+            // Side note: This doesn't use ProtocolRegistry as it doesn't know the protocol version at boot.
+            try {
+                servers.put("default", VelocityViaInjector.getLowestSupportedProtocolVersion());
+            } catch (Exception e) {
+                // Something went very wrong
+                e.printStackTrace();
+            }
         }
         // Put back
         config.put("velocity-servers", servers);
