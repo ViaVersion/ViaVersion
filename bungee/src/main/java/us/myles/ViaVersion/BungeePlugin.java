@@ -31,13 +31,13 @@ import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     private BungeeViaAPI api;
-    private BungeeConfigAPI config;
+    private BungeeViaConfig config;
     private BungeeCommandHandler commandHandler;
 
     @Override
     public void onLoad() {
         api = new BungeeViaAPI();
-        config = new BungeeConfigAPI(getDataFolder());
+        config = new BungeeViaConfig(getDataFolder());
         commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
         // Init platform
@@ -134,7 +134,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     }
 
     @Override
-    public BungeeConfigAPI getConf() {
+    public BungeeViaConfig getConf() {
         return config;
     }
 

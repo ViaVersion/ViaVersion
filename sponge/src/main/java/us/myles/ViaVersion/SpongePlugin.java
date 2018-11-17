@@ -55,7 +55,7 @@ public class SpongePlugin implements ViaPlatform {
     @Getter
     private SpongeViaAPI api = new SpongeViaAPI();
     @Getter
-    private SpongeConfigAPI conf;
+    private SpongeViaConfig conf;
 
     @Getter
     private Logger logger;
@@ -65,7 +65,7 @@ public class SpongePlugin implements ViaPlatform {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
-        conf = new SpongeConfigAPI(container, defaultConfig.getParentFile());
+        conf = new SpongeViaConfig(container, defaultConfig.getParentFile());
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
         getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded!");

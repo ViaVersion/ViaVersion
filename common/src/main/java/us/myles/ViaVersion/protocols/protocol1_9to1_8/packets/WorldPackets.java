@@ -17,6 +17,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
@@ -121,16 +122,20 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        Chunk1_8 chunk = (Chunk1_8) wrapper.passthrough(new Chunk1_9to1_8Type(clientChunks));
+	                    Chunk1_9to1_8Type type = new Chunk1_9to1_8Type(clientChunks);
+	                    Chunk1_8 chunk = (Chunk1_8) wrapper.read(type);
                         if (chunk.isUnloadPacket()) {
                             wrapper.setId(0x1D);
 
+                            wrapper.write(Type.INT, chunk.getX());
+                            wrapper.write(Type.INT, chunk.getZ());
                             // Remove commandBlocks on chunk unload
                             CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                             provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
+                        } else {
+                            wrapper.write(type, chunk);
+                            // eat any other data (Usually happens with unload packets)
                         }
-
-                        // eat any other data (Usually happens with unload packets)
                         wrapper.read(Type.REMAINING_BYTES);
                     }
                 });

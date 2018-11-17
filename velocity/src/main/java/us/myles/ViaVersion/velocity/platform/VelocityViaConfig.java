@@ -1,40 +1,63 @@
-package us.myles.ViaVersion.sponge.platform;
+package us.myles.ViaVersion.velocity.platform;
 
-import org.spongepowered.api.asset.Asset;
-import org.spongepowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.api.ViaVersionConfig;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-public class SpongeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "quick-move-action-fix");
-    private final PluginContainer pluginContainer;
+public class VelocityViaConfig extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "bungee-ping-interval", "bungee-ping-save", "bungee-servers");
 
-    public SpongeConfigAPI(PluginContainer pluginContainer, File configFile) {
+    public VelocityViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
-        this.pluginContainer = pluginContainer;
         // Load config
         reloadConfig();
     }
 
     @Override
     public URL getDefaultConfigURL() {
-        Optional<Asset> config = pluginContainer.getAsset("config.yml");
-        if (!config.isPresent()) {
-            throw new IllegalArgumentException("Default config is missing from jar");
-        }
-        return config.get().getUrl();
+        return getClass().getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override
     protected void handleConfig(Map<String, Object> config) {
-        // Nothing Currently
+        // Parse servers
+        Map<String, Object> servers;
+        if (!(config.get("velocity-servers") instanceof Map)) {
+            servers = new HashMap<>();
+        } else {
+            servers = (Map) config.get("velocity-servers");
+        }
+        // Convert any bad Protocol Ids
+        for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
+            if (!(entry.getValue() instanceof Integer)) {
+                if (entry.getValue() instanceof String) {
+                    ProtocolVersion found = ProtocolVersion.getClosest((String) entry.getValue());
+                    if (found != null) {
+                        servers.put(entry.getKey(), found.getId());
+                    } else {
+                        servers.remove(entry.getKey()); // Remove!
+                    }
+                } else {
+                    servers.remove(entry.getKey()); // Remove!
+                }
+            }
+        }
+        // Ensure default exists
+        if (!servers.containsKey("default")) {
+            // Side note: This doesn't use ProtocolRegistry as it doesn't know the protocol version at boot.
+            try {
+                servers.put("default", VelocityViaInjector.getLowestSupportedProtocolVersion());
+            } catch (Exception e) {
+                // Something went very wrong
+                e.printStackTrace();
+            }
+        }
+        // Put back
+        config.put("velocity-servers", servers);
     }
 
     @Override
@@ -153,12 +176,12 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isItemCache() {
-        return getBoolean("item-cache", true);
+        return false;
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return getBoolean("nms-player-ticking", true);
+        return false;
     }
 
     @Override
@@ -209,6 +232,35 @@ public class SpongeConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public boolean isMinimizeCooldown() {
         return getBoolean("minimize-cooldown", true);
+    }
+
+    /**
+     * What is the interval for checking servers via ping
+     * -1 for disabled
+     *
+     * @return Ping interval in seconds
+     */
+    public int getVelocityPingInterval() {
+        return getInt("velocity-ping-interval", 60);
+    }
+
+    /**
+     * Should the velocity ping be saved to the config on change.
+     *
+     * @return True if it should save
+     */
+    public boolean isVelocityPingSave() {
+        return getBoolean("velocity-ping-save", true);
+    }
+
+    /**
+     * Get the listed server protocols in the config.
+     * default will be listed as default.
+     *
+     * @return Map of String, Integer
+     */
+    public Map<String, Integer> getVelocityServerProtocols() {
+        return get("velocity-servers", Map.class, new HashMap<>());
     }
 
     @Override

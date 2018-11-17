@@ -9,10 +9,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-public class BungeeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix");
+public class BungeeViaConfig extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
 
-    public BungeeConfigAPI(File configFile) {
+    public BungeeViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
         // Load config
         reloadConfig();
@@ -20,7 +20,7 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public URL getDefaultConfigURL() {
-        return BungeeConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
+        return BungeeViaConfig.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override

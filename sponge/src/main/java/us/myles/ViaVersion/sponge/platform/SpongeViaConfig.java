@@ -1,7 +1,7 @@
-package us.myles.ViaVersion.bukkit.platform;
+package us.myles.ViaVersion.sponge.platform;
 
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.Via;
+import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Config;
 
@@ -10,17 +10,38 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public class BukkitConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers");
+public class SpongeViaConfig extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "quick-move-action-fix");
+    private final PluginContainer pluginContainer;
 
-    public BukkitConfigAPI() {
-        super(new File(((ViaVersionPlugin) Via.getPlatform()).getDataFolder(), "config.yml"));
+    public SpongeViaConfig(PluginContainer pluginContainer, File configFile) {
+        super(new File(configFile, "config.yml"));
+        this.pluginContainer = pluginContainer;
         // Load config
         reloadConfig();
     }
 
     @Override
+    public URL getDefaultConfigURL() {
+        Optional<Asset> config = pluginContainer.getAsset("config.yml");
+        if (!config.isPresent()) {
+            throw new IllegalArgumentException("Default config is missing from jar");
+        }
+        return config.get().getUrl();
+    }
+
+    @Override
+    protected void handleConfig(Map<String, Object> config) {
+        // Nothing Currently
+    }
+
+    @Override
+    public List<String> getUnsupportedOptions() {
+        return UNSUPPORTED;
+    }
+
     public boolean isCheckForUpdates() {
         return getBoolean("checkforupdates", true);
     }
@@ -117,7 +138,7 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isAntiXRay() {
-        return getBoolean("anti-xray-patch", true);
+        return false;
     }
 
     @Override
@@ -167,7 +188,7 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean is1_12QuickMoveActionFix() {
-        return getBoolean("quick-move-action-fix", false);
+        return false;
     }
 
     @Override
@@ -188,21 +209,6 @@ public class BukkitConfigAPI extends Config implements ViaVersionConfig {
     @Override
     public boolean isMinimizeCooldown() {
         return getBoolean("minimize-cooldown", true);
-    }
-
-    @Override
-    public URL getDefaultConfigURL() {
-        return BukkitConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
-    }
-
-    @Override
-    protected void handleConfig(Map<String, Object> config) {
-        // Nothing currently
-    }
-
-    @Override
-    public List<String> getUnsupportedOptions() {
-        return UNSUPPORTED;
     }
 
     @Override
