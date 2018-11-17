@@ -3,7 +3,7 @@ package us.myles.ViaVersion.bungee.commands.subs;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.bungee.platform.BungeeConfigAPI;
+import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 
 public class ProbeSubCmd extends ViaSubCommand {
@@ -15,7 +15,7 @@ public class ProbeSubCmd extends ViaSubCommand {
     @Override
     public String description() {
         return "Forces ViaVersion to scan server protocol versions " +
-                (((BungeeConfigAPI) Via.getConfig()).getBungeePingInterval() == -1 ?
+                (((BungeeViaConfig) Via.getConfig()).getBungeePingInterval() == -1 ?
                         "" : "(Also happens at an interval)");
     }
 

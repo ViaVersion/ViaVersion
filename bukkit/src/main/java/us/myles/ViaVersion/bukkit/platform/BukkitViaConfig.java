@@ -1,65 +1,26 @@
-package us.myles.ViaVersion.bungee.platform;
+package us.myles.ViaVersion.bukkit.platform;
 
+import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-public class BungeeConfigAPI extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
+public class BukkitViaConfig extends Config implements ViaVersionConfig {
+    private static List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
 
-    public BungeeConfigAPI(File configFile) {
-        super(new File(configFile, "config.yml"));
+    public BukkitViaConfig() {
+        super(new File(((ViaVersionPlugin) Via.getPlatform()).getDataFolder(), "config.yml"));
         // Load config
         reloadConfig();
     }
 
     @Override
-    public URL getDefaultConfigURL() {
-        return BungeeConfigAPI.class.getClassLoader().getResource("assets/viaversion/config.yml");
-    }
-
-    @Override
-    protected void handleConfig(Map<String, Object> config) {
-        // Parse servers
-        Map<String, Object> servers;
-        if (!(config.get("bungee-servers") instanceof Map)) {
-            servers = new HashMap<>();
-        } else {
-            servers = (Map) config.get("bungee-servers");
-        }
-        // Convert any bad Protocol Ids
-        for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
-            if (!(entry.getValue() instanceof Integer)) {
-                if (entry.getValue() instanceof String) {
-                    ProtocolVersion found = ProtocolVersion.getClosest((String) entry.getValue());
-                    if (found != null) {
-                        servers.put(entry.getKey(), found.getId());
-                    } else {
-                        servers.remove(entry.getKey()); // Remove!
-                    }
-                } else {
-                    servers.remove(entry.getKey()); // Remove!
-                }
-            }
-        }
-        // Ensure default exists
-        if (!servers.containsKey("default")) {
-            servers.put("default", BungeeVersionProvider.getLowestSupportedVersion());
-        }
-        // Put back
-        config.put("bungee-servers", servers);
-    }
-
-    @Override
-    public List<String> getUnsupportedOptions() {
-        return UNSUPPORTED;
-    }
-
     public boolean isCheckForUpdates() {
         return getBoolean("checkforupdates", true);
     }
@@ -156,7 +117,7 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isAntiXRay() {
-        return false;
+        return getBoolean("anti-xray-patch", true);
     }
 
     @Override
@@ -171,12 +132,12 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
 
     @Override
     public boolean isItemCache() {
-        return false;
+        return getBoolean("item-cache", true);
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return false;
+        return getBoolean("nms-player-ticking", true);
     }
 
     @Override
@@ -206,7 +167,7 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
     
     @Override
     public boolean is1_12QuickMoveActionFix() {
-        return false;
+        return getBoolean("quick-move-action-fix", false);
     }
 
     @Override
@@ -229,33 +190,19 @@ public class BungeeConfigAPI extends Config implements ViaVersionConfig {
         return getBoolean("minimize-cooldown", true);
     }
 
-    /**
-     * What is the interval for checking servers via ping
-     * -1 for disabled
-     *
-     * @return Ping interval in seconds
-     */
-    public int getBungeePingInterval() {
-        return getInt("bungee-ping-interval", 60);
+    @Override
+    public URL getDefaultConfigURL() {
+        return BukkitViaConfig.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
-    /**
-     * Should the bungee ping be saved to the config on change.
-     *
-     * @return True if it should save
-     */
-    public boolean isBungeePingSave() {
-        return getBoolean("bungee-ping-save", true);
+    @Override
+    protected void handleConfig(Map<String, Object> config) {
+        // Nothing currently
     }
 
-    /**
-     * Get the listed server protocols in the config.
-     * default will be listed as default.
-     *
-     * @return Map of String, Integer
-     */
-    public Map<String, Integer> getBungeeServerProtocols() {
-        return get("bungee-servers", Map.class, new HashMap<>());
+    @Override
+    public List<String> getUnsupportedOptions() {
+        return UNSUPPORTED;
     }
 
     @Override
