@@ -176,6 +176,7 @@ public class ConnectionData {
 		StairConnectionHandler.init();
 		FlowerConnectionHandler.init();
 		ChorusPlantConnectionHandler.init();
+		TripwireConnectionHandler.init();
 
 		if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")) {
 			Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());

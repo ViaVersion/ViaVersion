@@ -6,10 +6,10 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 
 public abstract class ConnectionHandler {
-    public abstract int connect(UserConnection connection, Position position, int blockState);
+    public abstract int connect(UserConnection user, Position position, int blockState);
 
-	public int getBlockData(UserConnection connection, Position position) {
-	    return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(connection, position);
+	public int getBlockData(UserConnection user, Position position) {
+	    return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, position);
     }
 
     public boolean canConnect(int id) {
