@@ -12244,6 +12244,8 @@
     "entity.rabbit.death",
     "entity.rabbit.hurt",
     "entity.rabbit.jump",
+    "event.raid.horn_local",
+    "event.raid.horn_distant",
     "music_disc.11",
     "music_disc.13",
     "music_disc.blocks",
