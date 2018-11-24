@@ -134,7 +134,7 @@ public class ConnectionData {
 			keyToId.put(key, id);
 		}
 
-		if (!Via.getConfig().isRedueBlockStorageMemory()) {
+		if (!Via.getConfig().isReduceBlockStorageMemory()) {
 			JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
 			for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
 				int id = keyToId.get(entry.getKey());

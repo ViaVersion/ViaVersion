@@ -237,7 +237,7 @@ public class SpongeViaConfig extends Config implements ViaVersionConfig {
     }
 
     @Override
-    public boolean isRedueBlockStorageMemory() {
+    public boolean isReduceBlockStorageMemory() {
         return getBoolean("reduce-blockstorage-memory", false);
     }
 }

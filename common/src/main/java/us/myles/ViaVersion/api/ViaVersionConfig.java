@@ -286,5 +286,5 @@ public interface ViaVersionConfig {
      *
      * @return True if enabled
      */
-    boolean isRedueBlockStorageMemory();
+    boolean isReduceBlockStorageMemory();
 }
