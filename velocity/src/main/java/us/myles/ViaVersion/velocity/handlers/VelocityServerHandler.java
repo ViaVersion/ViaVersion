@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.network.ProtocolVersion;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
@@ -28,8 +29,10 @@ public class VelocityServerHandler {
 
     static {
         try {
-            setProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection").getDeclaredMethod("setProtocolVersion", int.class);
-            setNextProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection").getDeclaredMethod("setNextProtocolVersion", int.class);
+            setProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection")
+                    .getDeclaredMethod("setProtocolVersion", ProtocolVersion.class);
+            setNextProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection")
+                    .getDeclaredMethod("setNextProtocolVersion", ProtocolVersion.class);
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -49,7 +52,9 @@ public class VelocityServerHandler {
 
             // Check if ViaVersion can support that version
             Object connection = ReflectionUtil.invoke(e.getPlayer(), "getConnection");
-            setNextProtocolVersion.invoke(connection, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
+            setNextProtocolVersion.invoke(connection, ProtocolVersion.getProtocolVersion(protocols == null
+                            ? user.get(ProtocolInfo.class).getProtocolVersion()
+                            : protocolId));
 
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
             e1.printStackTrace();
@@ -128,8 +133,8 @@ public class VelocityServerHandler {
                     }
 
                     Object connection = ReflectionUtil.invoke(e.getPlayer(), "getConnection");
-                    int version = (int) ReflectionUtil.invoke(connection,"getNextProtocolVersion");
-                    setProtocolVersion.invoke(ReflectionUtil.invoke(e.getPlayer(), "getConnection"), version);
+                    ProtocolVersion version = (ProtocolVersion) ReflectionUtil.invoke(connection,"getNextProtocolVersion");
+                    setProtocolVersion.invoke(connection, version);
                 }
             }
             user.getVelocityLock().writeLock().unlock();
