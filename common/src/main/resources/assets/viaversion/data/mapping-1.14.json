@@ -12015,6 +12015,7 @@
     "block.gravel.hit",
     "block.gravel.place",
     "block.gravel.step",
+    "block.grindstone.use",
     "entity.guardian.ambient",
     "entity.guardian.ambient_land",
     "entity.guardian.attack",
