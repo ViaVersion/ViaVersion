@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
+import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -10,7 +11,10 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 
+import java.util.Set;
+
 public class InventoryPackets {
+    private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
 
     public static void register(Protocol protocol) {
 
@@ -116,7 +120,7 @@ public class InventoryPackets {
                         for (int i = 0; i < size; i++) {
                             String id = wrapper.read(Type.STRING); // Recipe Identifier
                             String type = wrapper.read(Type.STRING);
-                            if (type.equals("crafting_special_banneraddpattern")) {
+                            if (REMOVED_RECIPE_TYPES.contains(type)) {
                                 deleted++;
                                 continue;
                             }
