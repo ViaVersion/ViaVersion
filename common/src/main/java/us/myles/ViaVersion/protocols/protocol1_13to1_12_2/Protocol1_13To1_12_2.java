@@ -17,6 +17,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
@@ -121,6 +122,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.YELLOW, '!');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.WHITE, '?');
         MappingData.init();
+        ConnectionData.init();
     }
 
     @Override
@@ -484,6 +486,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
+
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            ConnectionData.clearBlockStorage(wrapper.user());
+                        }
                     }
                 });
                 handler(SEND_DECLARE_COMMANDS_AND_TAGS);

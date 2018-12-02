@@ -219,4 +219,19 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
     public boolean isDisable1_13AutoComplete() {
         return getBoolean("disable-1_13-auto-complete", false);
     }
+
+    @Override
+    public boolean isServersideBlockConnections() {
+        return getBoolean("serverside-blockconnections", false);
+    }
+
+    @Override
+    public String getBlockConnectionMethod() {
+        return getString("blockconnection-method", "world");
+    }
+
+    @Override
+    public boolean isReduceBlockStorageMemory() {
+        return getBoolean("reduce-blockstorage-memory", false);
+    }
 }
