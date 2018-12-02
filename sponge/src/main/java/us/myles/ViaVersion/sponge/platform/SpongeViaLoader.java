@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
@@ -18,6 +19,7 @@ import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.DeathListener;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.HandItemCache;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
 import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
+import us.myles.ViaVersion.sponge.providers.SpongeBlockConnectionProvider;
 import us.myles.ViaVersion.sponge.providers.SpongeViaBulkChunkTranslator;
 import us.myles.ViaVersion.sponge.providers.SpongeViaMovementTransmitter;
 
@@ -78,6 +80,9 @@ public class SpongeViaLoader implements ViaPlatformLoader {
                 }
             }
         });
+        if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")) {
+            Via.getManager().getProviders().use(BlockConnectionProvider.class, new SpongeBlockConnectionProvider());
+        }
     }
 
     public void unload() {
