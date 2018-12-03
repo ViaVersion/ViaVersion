@@ -18,12 +18,15 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
@@ -1043,6 +1046,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
         userConnection.put(new BlockStorage(userConnection));
+        if (Via.getConfig().isServersideBlockConnections()) {
+            if (Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
+                userConnection.put(new BlockConnectionStorage(userConnection));
+            }
+        }
     }
 
     @Override
