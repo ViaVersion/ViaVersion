@@ -53,8 +53,8 @@ public class VelocityServerHandler {
             // Check if ViaVersion can support that version
             Object connection = ReflectionUtil.invoke(e.getPlayer(), "getConnection");
             setNextProtocolVersion.invoke(connection, ProtocolVersion.getProtocolVersion(protocols == null
-                            ? user.get(ProtocolInfo.class).getProtocolVersion()
-                            : protocolId));
+                    ? user.get(ProtocolInfo.class).getProtocolVersion()
+                    : protocolId));
 
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
             e1.printStackTrace();
@@ -133,7 +133,7 @@ public class VelocityServerHandler {
                     }
 
                     Object connection = ReflectionUtil.invoke(e.getPlayer(), "getConnection");
-                    ProtocolVersion version = (ProtocolVersion) ReflectionUtil.invoke(connection,"getNextProtocolVersion");
+                    ProtocolVersion version = (ProtocolVersion) ReflectionUtil.invoke(connection, "getNextProtocolVersion");
                     setProtocolVersion.invoke(connection, version);
                 }
             }

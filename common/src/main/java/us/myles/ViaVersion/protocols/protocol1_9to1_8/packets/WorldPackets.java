@@ -121,8 +121,8 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-	                    Chunk1_9to1_8Type type = new Chunk1_9to1_8Type(clientChunks);
-	                    Chunk1_8 chunk = (Chunk1_8) wrapper.read(type);
+                        Chunk1_9to1_8Type type = new Chunk1_9to1_8Type(clientChunks);
+                        Chunk1_8 chunk = (Chunk1_8) wrapper.read(type);
                         if (chunk.isUnloadPacket()) {
                             wrapper.setId(0x1D);
 
@@ -311,7 +311,7 @@ public class WorldPackets {
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                            
+
                             if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {

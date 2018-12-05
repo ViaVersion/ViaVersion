@@ -56,21 +56,21 @@ public class ProtocolDetectorService implements Runnable {
     public static void probeServer(final RegisteredServer serverInfo) {
         final String key = serverInfo.getServerInfo().getName();
         serverInfo.ping().thenAccept((serverPing) -> {
-                if (serverPing != null && serverPing.getVersion() != null) {
-                    detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
-                    if (((VelocityViaConfig) Via.getConfig()).isVelocityPingSave()) {
-                        Map<String, Integer> servers = ((VelocityViaConfig) Via.getConfig()).getVelocityServerProtocols();
-                        Integer protocol = servers.get(key);
-                        if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
-                            return;
-                        }
-                        // Ensure we're the only ones writing to the config
-                        synchronized (Via.getPlatform().getConfigurationProvider()) {
-                            servers.put(key, serverPing.getVersion().getProtocol());
-                        }
-                        // Save
-                        Via.getPlatform().getConfigurationProvider().saveConfig();
+            if (serverPing != null && serverPing.getVersion() != null) {
+                detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
+                if (((VelocityViaConfig) Via.getConfig()).isVelocityPingSave()) {
+                    Map<String, Integer> servers = ((VelocityViaConfig) Via.getConfig()).getVelocityServerProtocols();
+                    Integer protocol = servers.get(key);
+                    if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
+                        return;
                     }
+                    // Ensure we're the only ones writing to the config
+                    synchronized (Via.getPlatform().getConfigurationProvider()) {
+                        servers.put(key, serverPing.getVersion().getProtocol());
+                    }
+                    // Save
+                    Via.getPlatform().getConfigurationProvider().saveConfig();
+                }
             }
         });
     }

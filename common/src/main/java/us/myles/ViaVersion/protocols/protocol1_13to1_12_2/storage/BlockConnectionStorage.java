@@ -34,29 +34,29 @@ public class BlockConnectionStorage extends StoredObject {
         Pair pair = getPair(position);
         Map<BlockPositon, Integer> map = getChunkMap(pair);
         map.remove(new BlockPositon(position));
-        if(map.isEmpty()){
+        if (map.isEmpty()) {
             blockStorage.remove(pair);
         }
     }
 
-    public void clear(){
+    public void clear() {
         blockStorage.clear();
     }
 
-    public void unloadChunk(int x, int z){
+    public void unloadChunk(int x, int z) {
         blockStorage.remove(new Pair<>(x, z));
     }
 
-    private Map<BlockPositon, Integer> getChunkMap(Pair pair){
+    private Map<BlockPositon, Integer> getChunkMap(Pair pair) {
         Map<BlockPositon, Integer> map = blockStorage.get(pair);
-        if(map == null){
+        if (map == null) {
             map = new HashMap<>();
             blockStorage.put(pair, map);
         }
         return map;
     }
 
-    private Pair<Integer, Integer> getPair(Position position){
+    private Pair<Integer, Integer> getPair(Position position) {
         int chunkX = (int) (position.getX() >> 4);
         int chunkZ = (int) (position.getZ() >> 4);
         return new Pair<>(chunkX, chunkZ);
@@ -65,8 +65,9 @@ public class BlockConnectionStorage extends StoredObject {
     @EqualsAndHashCode
     @Data
     private class BlockPositon {
-        int x,y,z;
-        public BlockPositon(Position position){
+        int x, y, z;
+
+        public BlockPositon(Position position) {
             x = position.getX().intValue();
             y = position.getY().intValue();
             z = position.getZ().intValue();

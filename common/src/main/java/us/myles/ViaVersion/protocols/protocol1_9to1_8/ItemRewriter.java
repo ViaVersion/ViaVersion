@@ -186,7 +186,7 @@ public class ItemRewriter {
             }
         }
     }
-    
+
     public static void rewriteBookToServer(Item item) {
         short id = item.getId();
         if (id != 387) {
@@ -212,7 +212,7 @@ public class ItemRewriter {
             stag.setValue(value);
         }
     }
-    
+
     private static String fixBookSpaceChars(String str) {
         if (!str.startsWith(" ")) {
             return str;

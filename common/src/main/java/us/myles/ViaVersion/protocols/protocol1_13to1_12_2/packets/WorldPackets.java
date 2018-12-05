@@ -243,7 +243,7 @@ public class WorldPackets {
         protocol.registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
             @Override
             public void registerMap() {
-                if(Via.getConfig().isServersideBlockConnections()){
+                if (Via.getConfig().isServersideBlockConnections()) {
                     handler(new PacketHandler() {
                         @Override
                         public void handle(PacketWrapper wrapper) throws Exception {

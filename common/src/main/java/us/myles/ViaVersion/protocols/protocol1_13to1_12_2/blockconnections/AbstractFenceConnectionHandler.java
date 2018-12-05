@@ -16,7 +16,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     private Set<Integer> blockStates = new HashSet<>();
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
 
-    public AbstractFenceConnectionHandler(String blockConnections, String key){
+    public AbstractFenceConnectionHandler(String blockConnections, String key) {
         this.blockConnections = blockConnections;
 
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {

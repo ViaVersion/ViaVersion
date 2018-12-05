@@ -9,26 +9,27 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum BlockFace {
-	NORTH(0, 0, -1, EnumAxis.Z), SOUTH(0, 0, 1, EnumAxis.Z), EAST(1, 0, 0, EnumAxis.X), WEST(-1, 0, 0, EnumAxis.X), TOP(0, 1, 0, EnumAxis.Y), BOTTOM(0, -1, 0, EnumAxis.Y);
+    NORTH(0, 0, -1, EnumAxis.Z), SOUTH(0, 0, 1, EnumAxis.Z), EAST(1, 0, 0, EnumAxis.X), WEST(-1, 0, 0, EnumAxis.X), TOP(0, 1, 0, EnumAxis.Y), BOTTOM(0, -1, 0, EnumAxis.Y);
 
-	private static Map<BlockFace, BlockFace> opposites = new HashMap<>();
-	static {
-		opposites.put(BlockFace.NORTH, BlockFace.SOUTH);
-		opposites.put(BlockFace.SOUTH, BlockFace.NORTH);
-		opposites.put(BlockFace.EAST, BlockFace.WEST);
-		opposites.put(BlockFace.WEST, BlockFace.EAST);
-		opposites.put(BlockFace.TOP, BlockFace.BOTTOM);
-		opposites.put(BlockFace.BOTTOM, BlockFace.TOP);
-	}
+    private static Map<BlockFace, BlockFace> opposites = new HashMap<>();
 
-	private int modX, modY, modZ;
-	private EnumAxis axis;
+    static {
+        opposites.put(BlockFace.NORTH, BlockFace.SOUTH);
+        opposites.put(BlockFace.SOUTH, BlockFace.NORTH);
+        opposites.put(BlockFace.EAST, BlockFace.WEST);
+        opposites.put(BlockFace.WEST, BlockFace.EAST);
+        opposites.put(BlockFace.TOP, BlockFace.BOTTOM);
+        opposites.put(BlockFace.BOTTOM, BlockFace.TOP);
+    }
 
-	public BlockFace opposite() {
-		return opposites.get(this);
-	}
+    private int modX, modY, modZ;
+    private EnumAxis axis;
 
-	public enum EnumAxis {
-		X, Y, Z;
-	}
+    public BlockFace opposite() {
+        return opposites.get(this);
+    }
+
+    public enum EnumAxis {
+        X, Y, Z;
+    }
 }

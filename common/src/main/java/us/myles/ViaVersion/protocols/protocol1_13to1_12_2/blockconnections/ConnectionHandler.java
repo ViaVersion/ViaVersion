@@ -8,12 +8,12 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.provi
 public abstract class ConnectionHandler {
     public abstract int connect(UserConnection user, Position position, int blockState);
 
-	public int getBlockData(UserConnection user, Position position) {
-	    return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, position);
+    public int getBlockData(UserConnection user, Position position) {
+        return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, position);
     }
 
     public boolean canConnect(int id) {
-	    ConnectionHandler handler = ConnectionData.connectionHandlerMap.get(id);
-	    return handler != null && handler == this;
+        ConnectionHandler handler = ConnectionData.connectionHandlerMap.get(id);
+        return handler != null && handler == this;
     }
 }

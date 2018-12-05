@@ -57,8 +57,8 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_12_2TO1_12_1(), Collections.singletonList(ProtocolVersion.v1_12_2.getId()), ProtocolVersion.v1_12_1.getId());
 
         registerProtocol(new Protocol1_13To1_12_2(), Collections.singletonList(ProtocolVersion.v1_13.getId()), ProtocolVersion.v1_12_2.getId());
-        registerProtocol(new Protocol1_13_1To1_13(),  Arrays.asList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
-        registerProtocol(new Protocol1_13_2To1_13_1(),  Arrays.asList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
+        registerProtocol(new Protocol1_13_1To1_13(), Arrays.asList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
+        registerProtocol(new Protocol1_13_2To1_13_1(), Arrays.asList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
     }
 
     /**
@@ -95,7 +95,7 @@ public class ProtocolRegistry {
      * Base Protocols registered later have higher priority
      * Only one base protocol will be added to pipeline
      *
-     * @param baseProtocol Base Protocol to register
+     * @param baseProtocol       Base Protocol to register
      * @param supportedProtocols Versions that baseProtocol supports
      */
     public static void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {

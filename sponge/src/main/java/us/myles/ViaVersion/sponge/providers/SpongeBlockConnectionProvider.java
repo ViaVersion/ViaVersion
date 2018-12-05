@@ -24,7 +24,7 @@ public class SpongeBlockConnectionProvider extends BlockConnectionProvider {
         try {
             block = Class.forName("net.minecraft.block.Block");
             blockStateIds = ReflectionUtil.get(
-		            ReflectionUtil.getStatic(block, "field_176229_d", Object.class),
+                    ReflectionUtil.getStatic(block, "field_176229_d", Object.class),
                     "field_148749_a", Map.class);
         } catch (ClassNotFoundException e) {
             Via.getPlatform().getLogger().warning("net.minecraft.block.Block not found! Are you using Lantern?");
