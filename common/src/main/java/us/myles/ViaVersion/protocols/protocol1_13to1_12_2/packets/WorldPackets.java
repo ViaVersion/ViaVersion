@@ -334,7 +334,7 @@ public class WorldPackets {
                         if (chunk.isBiomeData()) {
                             int latestBiomeWarn = Integer.MIN_VALUE;
                             for (int i = 0; i < 256; i++) {
-                                int biome = chunk.getBiomeData()[i] & 0xFF;
+                                int biome = chunk.getBiomeData()[i];
                                 if (!validBiomes.contains(biome)) {
                                     if (biome != 255 // is it generated naturally? *shrug*
                                             && latestBiomeWarn != biome) {

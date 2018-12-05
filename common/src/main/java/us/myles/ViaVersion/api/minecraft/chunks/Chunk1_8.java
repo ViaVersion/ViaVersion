@@ -10,7 +10,7 @@ public class Chunk1_8 extends BaseChunk {
     @Getter
     private boolean unloadPacket = false;
 
-    public Chunk1_8(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, byte[] biomeData, List<CompoundTag> blockEntities) {
+    public Chunk1_8(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
         super(x, z, groundUp, bitmask, sections, biomeData, blockEntities);
     }
 

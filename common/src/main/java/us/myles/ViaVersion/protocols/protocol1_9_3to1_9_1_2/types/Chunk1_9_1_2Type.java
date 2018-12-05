@@ -59,9 +59,11 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        byte[] biomeData = groundUp ? new byte[256] : null;
+        int[] biomeData = groundUp ? new int[256] : null;
         if (groundUp) {
-            input.readBytes(biomeData);
+            for (int i = 0; i < 256; i++) {
+                biomeData[i] = input.readByte() & 0xFF;
+            }
         }
 
         return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, new ArrayList<CompoundTag>());
@@ -93,7 +95,9 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
         // Write biome data
         if (chunk.isBiomeData()) {
-            output.writeBytes(chunk.getBiomeData());
+            for (int biome : chunk.getBiomeData()) {
+                output.writeByte((byte) biome);
+            }
         }
     }
 
