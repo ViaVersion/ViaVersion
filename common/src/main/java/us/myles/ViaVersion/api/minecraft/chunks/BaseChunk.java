@@ -14,7 +14,7 @@ public class BaseChunk implements Chunk {
 	protected boolean groundUp;
 	protected int bitmask;
 	protected ChunkSection[] sections;
-	protected byte[] biomeData;
+	protected int[] biomeData;
 	protected List<CompoundTag> blockEntities;
 
 	@Override

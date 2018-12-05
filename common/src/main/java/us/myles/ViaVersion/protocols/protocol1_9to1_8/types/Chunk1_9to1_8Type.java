@@ -61,7 +61,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         // Data to be read
         BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
-        byte[] biomeData = null;
+        int[] biomeData = null;
 
         // Calculate section count from bitmask
         for (int i = 0; i < 16; i++) {
@@ -112,8 +112,10 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
 
         // Read biome data
         if (bytesLeft >= BIOME_DATA_LENGTH) {
-            biomeData = new byte[BIOME_DATA_LENGTH];
-            input.readBytes(biomeData);
+            biomeData = new int[BIOME_DATA_LENGTH];
+            for (int i = 0; i < BIOME_DATA_LENGTH; i++){
+                biomeData[i] = input.readByte() & 0xFF;
+            }
             bytesLeft -= BIOME_DATA_LENGTH;
         }
 
@@ -156,7 +158,9 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
 
         // Write biome data
         if (chunk.hasBiomeData()) {
-            output.writeBytes(chunk.getBiomeData());
+            for (int biome : chunk.getBiomeData()) {
+                buf.writeByte((byte) biome);
+            }
         }
     }
 }
