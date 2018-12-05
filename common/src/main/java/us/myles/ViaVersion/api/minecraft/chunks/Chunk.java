@@ -15,7 +15,7 @@ public interface Chunk {
 
     ChunkSection[] getSections();
 
-    byte[] getBiomeData();
+    int[] getBiomeData();
 
     List<CompoundTag> getBlockEntities();
 
