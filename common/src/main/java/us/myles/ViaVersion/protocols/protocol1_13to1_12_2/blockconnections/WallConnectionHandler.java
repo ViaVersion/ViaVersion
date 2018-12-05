@@ -5,8 +5,8 @@ import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 public class WallConnectionHandler extends AbstractFenceConnectionHandler {
-    private static final BlockFace[] BLOCK_FACES = { BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST };
-    private static final int[] OPPOSITES = { 3, 2, 1, 0 };
+    private static final BlockFace[] BLOCK_FACES = {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
+    private static final int[] OPPOSITES = {3, 2, 1, 0};
 
     static void init() {
         new WallConnectionHandler("cobbleWallConnections", "minecraft:cobblestone_wall");
@@ -32,7 +32,8 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
     }
 
     public boolean up(UserConnection user, Position position) {
-        if(isWall(getBlockData(user, position.getRelative(BlockFace.BOTTOM))) || isWall(getBlockData(user, position.getRelative(BlockFace.TOP))))return true;
+        if (isWall(getBlockData(user, position.getRelative(BlockFace.BOTTOM))) || isWall(getBlockData(user, position.getRelative(BlockFace.TOP))))
+            return true;
         int blockFaces = getBlockFaces(user, position);
         if (blockFaces == 0 || blockFaces == 0xF) return true;
         for (int i = 0; i < BLOCK_FACES.length; i++) {
@@ -51,7 +52,7 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
         return blockFaces;
     }
 
-    private boolean isWall(int id){
+    private boolean isWall(int id) {
         return getBlockStates().contains(id);
     }
 }

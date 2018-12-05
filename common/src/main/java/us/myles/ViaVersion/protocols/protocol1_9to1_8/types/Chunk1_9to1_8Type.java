@@ -113,7 +113,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         // Read biome data
         if (bytesLeft >= BIOME_DATA_LENGTH) {
             biomeData = new int[BIOME_DATA_LENGTH];
-            for (int i = 0; i < BIOME_DATA_LENGTH; i++){
+            for (int i = 0; i < BIOME_DATA_LENGTH; i++) {
                 biomeData[i] = input.readByte() & 0xFF;
             }
             bytesLeft -= BIOME_DATA_LENGTH;

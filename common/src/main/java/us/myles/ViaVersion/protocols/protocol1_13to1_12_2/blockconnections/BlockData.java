@@ -8,11 +8,11 @@ import java.util.Map;
 public class BlockData {
     private Map<String, Boolean[]> connectData = new HashMap<>();
 
-    public void put(String key, Boolean[] booleans){
+    public void put(String key, Boolean[] booleans) {
         connectData.put(key, booleans);
     }
 
-    public boolean connectsTo(String blockConnection, BlockFace face){
+    public boolean connectsTo(String blockConnection, BlockFace face) {
         final Boolean[] booleans = connectData.get(blockConnection);
         return booleans != null && booleans[face.ordinal()];
     }

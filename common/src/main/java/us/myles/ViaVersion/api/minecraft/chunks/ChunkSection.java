@@ -98,22 +98,22 @@ public class ChunkSection {
     }
 
     public void replacePaletteEntry(int oldId, int newId) {
-    	Integer index = inversePalette.remove(oldId);
-    	if (index == null) return;
-    	inversePalette.put(newId, index);
-	    for (int i = 0; i < palette.size(); i++) {
-		    if (palette.get(i) == oldId) palette.set(i, newId);
-	    }
+        Integer index = inversePalette.remove(oldId);
+        if (index == null) return;
+        inversePalette.put(newId, index);
+        for (int i = 0; i < palette.size(); i++) {
+            if (palette.get(i) == oldId) palette.set(i, newId);
+        }
     }
 
     public void addPaletteEntry(int id) {
-    	inversePalette.put(id, palette.size());
-    	palette.add(id);
+        inversePalette.put(id, palette.size());
+        palette.add(id);
     }
 
     public void clearPalette() {
-    	palette.clear();
-    	inversePalette.clear();
+        palette.clear();
+        inversePalette.clear();
     }
 
     /**
@@ -124,14 +124,14 @@ public class ChunkSection {
      * @param id  The raw or flat id of the block
      */
     public void setFlatBlock(int idx, int id) {
-	    Integer index = inversePalette.get(id);
-	    if (index == null) {
-		    index = palette.size();
-		    palette.add(id);
-		    inversePalette.put(id, index);
-	    }
+        Integer index = inversePalette.get(id);
+        if (index == null) {
+            index = palette.size();
+            palette.add(id);
+            inversePalette.put(id, index);
+        }
 
-	    blocks[idx] = index;
+        blocks[idx] = index;
     }
 
     /**
