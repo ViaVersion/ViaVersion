@@ -50,10 +50,10 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
             sections[i] = section;
         }
 
-        byte[] biomeData = groundUp ? new byte[256] : null;
+        int[] biomeData = groundUp ? new int[256] : null;
         if (groundUp) {
             for (int i = 0; i < 256; i++) {
-                biomeData[i] = (byte) input.readInt();
+                biomeData[i] = input.readInt();
             }
         }
 
@@ -93,7 +93,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 
         // Write biome data
         if (chunk.isBiomeData()) {
-            for (byte value : chunk.getBiomeData()) {
+            for (int value : chunk.getBiomeData()) {
                 output.writeInt(value & 0xFF); // This is a temporary workaround, we'll look into fixing this soon :)
             }
         }
