@@ -10879,16 +10879,20 @@
     "10876": "minecraft:bell[face=ceiling,facing=east]",
     "10877": "minecraft:lantern[hanging=true]",
     "10878": "minecraft:lantern[hanging=false]",
-    "10879": "minecraft:structure_block[mode=save]",
-    "10880": "minecraft:structure_block[mode=load]",
-    "10881": "minecraft:structure_block[mode=corner]",
-    "10882": "minecraft:structure_block[mode=data]",
-    "10883": "minecraft:jigsaw[facing=north]",
-    "10884": "minecraft:jigsaw[facing=east]",
-    "10885": "minecraft:jigsaw[facing=south]",
-    "10886": "minecraft:jigsaw[facing=west]",
-    "10887": "minecraft:jigsaw[facing=up]",
-    "10888": "minecraft:jigsaw[facing=down]"
+    "10879": "minecraft:sweet_berry_bush[age=0]",
+    "10880": "minecraft:sweet_berry_bush[age=1]",
+    "10881": "minecraft:sweet_berry_bush[age=2]",
+    "10882": "minecraft:sweet_berry_bush[age=3]",
+    "10883": "minecraft:structure_block[mode=save]",
+    "10884": "minecraft:structure_block[mode=load]",
+    "10885": "minecraft:structure_block[mode=corner]",
+    "10886": "minecraft:structure_block[mode=data]",
+    "10887": "minecraft:jigsaw[facing=north]",
+    "10888": "minecraft:jigsaw[facing=east]",
+    "10889": "minecraft:jigsaw[facing=south]",
+    "10890": "minecraft:jigsaw[facing=west]",
+    "10891": "minecraft:jigsaw[facing=up]",
+    "10892": "minecraft:jigsaw[facing=down]"
   },
   "items": {
     "0": "minecraft:air",
@@ -11757,7 +11761,8 @@
     "863": "minecraft:smithing_table",
     "864": "minecraft:stonecutter",
     "865": "minecraft:bell",
-    "866": "minecraft:lantern"
+    "866": "minecraft:lantern",
+    "867": "minecraft:sweet_berries"
   },
   "sounds": [
     "ambient.cave",
@@ -13146,7 +13151,8 @@
     "666": "stonecutter",
     "667": "bell",
     "668": "lantern",
-    "669": "structure_block",
-    "670": "jigsaw"
+    "669": "sweet_berry_bush",
+    "670": "structure_block",
+    "671": "jigsaw"
   }
 }
