@@ -100,7 +100,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
         // Write biome data
         if (chunk.isBiomeData()) {
             for (int biome : chunk.getBiomeData()) {
-                buf.writeByte((byte) biome);
+                output.writeByte((byte) biome);
             }
         }
 
