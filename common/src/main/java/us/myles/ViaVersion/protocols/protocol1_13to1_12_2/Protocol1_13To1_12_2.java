@@ -100,70 +100,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             }
                         }
                     }).send(Protocol1_13To1_12_2.class);
-
-                    w.create(0x54, new ValueCreator() { // Declare recipes
-                        @Override
-                        public void write(PacketWrapper wrapper) throws Exception {
-                            wrapper.write(Type.VAR_INT, RecipeData.recipes.size());
-                            for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
-                                wrapper.write(Type.STRING, entry.getKey()); // Id
-                                wrapper.write(Type.STRING, entry.getValue().getType());
-                                switch (entry.getValue().getType()) {
-                                    case "crafting_shapeless": {
-                                        wrapper.write(Type.STRING, entry.getValue().getGroup());
-                                        wrapper.write(Type.VAR_INT, entry.getValue().getIngredients().length);
-                                        for (Item[] ingredient : entry.getValue().getIngredients()) {
-                                            Item[] clone = ingredient.clone(); // Clone because array and item is mutable
-                                            for (int i = 0; i < clone.length; i++) {
-                                                if (clone[i] == null) continue;
-                                                clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
-                                                        (short) 0, null);
-                                            }
-                                            wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                        }
-                                        wrapper.write(Type.FLAT_ITEM, new Item(
-                                                entry.getValue().getResult().getId(),
-                                                entry.getValue().getResult().getAmount(), (short) 0, null));
-                                        break;
-                                    }
-                                    case "crafting_shaped": {
-                                        wrapper.write(Type.VAR_INT, entry.getValue().getWidth());
-                                        wrapper.write(Type.VAR_INT, entry.getValue().getHeight());
-                                        wrapper.write(Type.STRING, entry.getValue().getGroup());
-                                        for (Item[] ingredient : entry.getValue().getIngredients()) {
-                                            Item[] clone = ingredient.clone(); // Clone because array and item is mutable
-                                            for (int i = 0; i < clone.length; i++) {
-                                                if (clone[i] == null) continue;
-                                                clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
-                                                        (short) 0, null);
-                                            }
-                                            wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                        }
-                                        wrapper.write(Type.FLAT_ITEM, new Item(
-                                                entry.getValue().getResult().getId(),
-                                                entry.getValue().getResult().getAmount(), (short) 0, null));
-                                        break;
-                                    }
-                                    case "smelting": {
-                                        wrapper.write(Type.STRING, entry.getValue().getGroup());
-                                        Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
-                                        for (int i = 0; i < clone.length; i++) {
-                                            if (clone[i] == null) continue;
-                                            clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
-                                                    (short) 0, null);
-                                        }
-                                        wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                        wrapper.write(Type.FLAT_ITEM, new Item(
-                                                entry.getValue().getResult().getId(),
-                                                entry.getValue().getResult().getAmount(), (short) 0, null));
-                                        wrapper.write(Type.FLOAT, entry.getValue().getExperience());
-                                        wrapper.write(Type.VAR_INT, entry.getValue().getCookingTime());
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }).send(Protocol1_13To1_12_2.class);
                 }
             };
 
@@ -552,6 +488,71 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             }
                             wrapper.write(Type.STRING_ARRAY, stringIds);
                         }
+                        if (action == 0) {
+                            wrapper.create(0x54, new ValueCreator() { // Declare recipes
+                                @Override
+                                public void write(PacketWrapper wrapper) throws Exception {
+                                    wrapper.write(Type.VAR_INT, RecipeData.recipes.size());
+                                    for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
+                                        wrapper.write(Type.STRING, entry.getKey()); // Id
+                                        wrapper.write(Type.STRING, entry.getValue().getType());
+                                        switch (entry.getValue().getType()) {
+                                            case "crafting_shapeless": {
+                                                wrapper.write(Type.STRING, entry.getValue().getGroup());
+                                                wrapper.write(Type.VAR_INT, entry.getValue().getIngredients().length);
+                                                for (Item[] ingredient : entry.getValue().getIngredients()) {
+                                                    Item[] clone = ingredient.clone(); // Clone because array and item is mutable
+                                                    for (int i = 0; i < clone.length; i++) {
+                                                        if (clone[i] == null) continue;
+                                                        clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
+                                                                (short) 0, null);
+                                                    }
+                                                    wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                                }
+                                                wrapper.write(Type.FLAT_ITEM, new Item(
+                                                        entry.getValue().getResult().getId(),
+                                                        entry.getValue().getResult().getAmount(), (short) 0, null));
+                                                break;
+                                            }
+                                            case "crafting_shaped": {
+                                                wrapper.write(Type.VAR_INT, entry.getValue().getWidth());
+                                                wrapper.write(Type.VAR_INT, entry.getValue().getHeight());
+                                                wrapper.write(Type.STRING, entry.getValue().getGroup());
+                                                for (Item[] ingredient : entry.getValue().getIngredients()) {
+                                                    Item[] clone = ingredient.clone(); // Clone because array and item is mutable
+                                                    for (int i = 0; i < clone.length; i++) {
+                                                        if (clone[i] == null) continue;
+                                                        clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
+                                                                (short) 0, null);
+                                                    }
+                                                    wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                                }
+                                                wrapper.write(Type.FLAT_ITEM, new Item(
+                                                        entry.getValue().getResult().getId(),
+                                                        entry.getValue().getResult().getAmount(), (short) 0, null));
+                                                break;
+                                            }
+                                            case "smelting": {
+                                                wrapper.write(Type.STRING, entry.getValue().getGroup());
+                                                Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
+                                                for (int i = 0; i < clone.length; i++) {
+                                                    if (clone[i] == null) continue;
+                                                    clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
+                                                            (short) 0, null);
+                                                }
+                                                wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                                wrapper.write(Type.FLAT_ITEM, new Item(
+                                                        entry.getValue().getResult().getId(),
+                                                        entry.getValue().getResult().getAmount(), (short) 0, null));
+                                                wrapper.write(Type.FLOAT, entry.getValue().getExperience());
+                                                wrapper.write(Type.VAR_INT, entry.getValue().getCookingTime());
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }).send(Protocol1_13To1_12_2.class, true, true);
+                        }
                     }
                 });
             }
@@ -922,10 +923,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         map(Type.BYTE); // Window id
-                        map(Type.STRING, new ValueTransformer<String, Integer>(Type.VAR_INT) {
+                        handler(new PacketHandler() {
                             @Override
-                            public Integer transform(PacketWrapper wrapper, String inputValue) throws Exception {
-                                return Integer.parseInt(inputValue.substring(18));
+                            public void handle(PacketWrapper wrapper) throws Exception {
+                                wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
                             }
                         });
                     }
@@ -949,7 +950,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         int type = wrapper.get(Type.VAR_INT, 0);
 
                         if (type == 0) {
-                            wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
+                            wrapper.write(Type.INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
                         } if (type == 1) {
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
