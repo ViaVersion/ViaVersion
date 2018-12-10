@@ -33,12 +33,6 @@ public class RecipeData {
         }
     }
 
-    // todo remove this debug
-    public static void main(String[] args) {
-        init();
-        System.out.println(recipes);
-    }
-
     @Data
     public static class Recipe {
         @NonNull
