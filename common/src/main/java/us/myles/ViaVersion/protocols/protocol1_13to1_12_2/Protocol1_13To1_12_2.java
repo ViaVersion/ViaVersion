@@ -919,16 +919,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerIncoming(State.PLAY, 0x12, 0x16, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.BYTE); // Window id
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        map(Type.BYTE); // Window id
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
-                            }
-                        });
+                        wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
                     }
                 });
             }
@@ -951,7 +946,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
                         if (type == 0) {
                             wrapper.write(Type.INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
-                        } if (type == 1) {
+                        }
+                        if (type == 1) {
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
                             wrapper.read(Type.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
