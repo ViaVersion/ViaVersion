@@ -43,7 +43,7 @@ public class RecipeData {
     public static class Recipe {
         @NonNull
         private String type;
-        private String group = "";
+        private String group;
         private int width;
         private int height;
         private float experience;

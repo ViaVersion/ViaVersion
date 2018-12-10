@@ -115,6 +115,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                         for (Item[] ingredient : entry.getValue().getIngredients()) {
                                             Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                             for (int i = 0; i < clone.length; i++) {
+                                                if (clone[i] == null) continue;
                                                 clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
                                                         (short) 0, null);
                                             }
@@ -132,6 +133,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                         for (Item[] ingredient : entry.getValue().getIngredients()) {
                                             Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                             for (int i = 0; i < clone.length; i++) {
+                                                if (clone[i] == null) continue;
                                                 clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
                                                         (short) 0, null);
                                             }
@@ -146,6 +148,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                         wrapper.write(Type.STRING, entry.getValue().getGroup());
                                         Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
                                         for (int i = 0; i < clone.length; i++) {
+                                            if (clone[i] == null) continue;
                                             clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
                                                     (short) 0, null);
                                         }
@@ -523,7 +526,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // New 0x31 - Face Player
         registerOutgoing(State.PLAY, 0x2F, 0x32);
         registerOutgoing(State.PLAY, 0x30, 0x33);
-        // Recipe
+        // Unlock recipes
         registerOutgoing(State.PLAY, 0x31, 0x34, new PacketRemapper() {
             @Override
             public void registerMap() {
