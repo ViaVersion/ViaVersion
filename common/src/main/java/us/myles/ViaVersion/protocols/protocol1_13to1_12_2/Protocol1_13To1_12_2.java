@@ -21,6 +21,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.Conne
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
@@ -99,6 +100,67 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             }
                         }
                     }).send(Protocol1_13To1_12_2.class);
+
+                    w.create(0x54, new ValueCreator() { // Declare recipes
+                        @Override
+                        public void write(PacketWrapper wrapper) throws Exception {
+                            wrapper.write(Type.VAR_INT, RecipeData.recipes.size());
+                            for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
+                                wrapper.write(Type.STRING, entry.getKey()); // Id
+                                wrapper.write(Type.STRING, entry.getValue().getType());
+                                switch (entry.getValue().getType()) {
+                                    case "crafting_shapeless": {
+                                        wrapper.write(Type.STRING, entry.getValue().getGroup());
+                                        wrapper.write(Type.VAR_INT, entry.getValue().getIngredients().length);
+                                        for (Item[] ingredient : entry.getValue().getIngredients()) {
+                                            Item[] clone = ingredient.clone(); // Clone because array and item is mutable
+                                            for (int i = 0; i < clone.length; i++) {
+                                                clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
+                                                        (short) 0, null);
+                                            }
+                                            wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                        }
+                                        wrapper.write(Type.FLAT_ITEM, new Item(
+                                                entry.getValue().getResult().getId(),
+                                                entry.getValue().getResult().getAmount(), (short) 0, null));
+                                        break;
+                                    }
+                                    case "crafting_shaped": {
+                                        wrapper.write(Type.VAR_INT, entry.getValue().getWidth());
+                                        wrapper.write(Type.VAR_INT, entry.getValue().getHeight());
+                                        wrapper.write(Type.STRING, entry.getValue().getGroup());
+                                        for (Item[] ingredient : entry.getValue().getIngredients()) {
+                                            Item[] clone = ingredient.clone(); // Clone because array and item is mutable
+                                            for (int i = 0; i < clone.length; i++) {
+                                                clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
+                                                        (short) 0, null);
+                                            }
+                                            wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                        }
+                                        wrapper.write(Type.FLAT_ITEM, new Item(
+                                                entry.getValue().getResult().getId(),
+                                                entry.getValue().getResult().getAmount(), (short) 0, null));
+                                        break;
+                                    }
+                                    case "smelting": {
+                                        wrapper.write(Type.STRING, entry.getValue().getGroup());
+                                        Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
+                                        for (int i = 0; i < clone.length; i++) {
+                                            clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
+                                                    (short) 0, null);
+                                        }
+                                        wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                        wrapper.write(Type.FLAT_ITEM, new Item(
+                                                entry.getValue().getResult().getId(),
+                                                entry.getValue().getResult().getAmount(), (short) 0, null));
+                                        wrapper.write(Type.FLOAT, entry.getValue().getExperience());
+                                        wrapper.write(Type.VAR_INT, entry.getValue().getCookingTime());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }).send(Protocol1_13To1_12_2.class);
                 }
             };
 
@@ -126,6 +188,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.WHITE, '?');
         MappingData.init();
         ConnectionData.init();
+        RecipeData.init();
     }
 
     @Override
@@ -429,11 +492,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x2B, 0x2D, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.BYTE);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        // TODO This packet changed
-                        wrapper.cancel();
+                        wrapper.write(Type.STRING, "viaversion:legacy/" + wrapper.read(Type.VAR_INT));
                     }
                 });
             }
@@ -464,11 +527,28 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x31, 0x34, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.VAR_INT); // action
+                map(Type.BOOLEAN); // crafting book open
+                map(Type.BOOLEAN); // crafting filter active
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.BOOLEAN, false); // smelting book open
+                        wrapper.write(Type.BOOLEAN, false); // smelting filter active
+                    }
+                });
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        // TODO: This has changed >.>
-                        wrapper.cancel();
+                        int action = wrapper.get(Type.VAR_INT, 0);
+                        for (int i = 0; i < (action == 0 ? 2 : 1); i++) {
+                            Integer[] ids = wrapper.read(Type.VAR_INT_ARRAY);
+                            String[] stringIds = new String[ids.length];
+                            for (int j = 0; j < ids.length; j++) {
+                                stringIds[j] = "viaversion:legacy/" + ids[j];
+                            }
+                            wrapper.write(Type.STRING_ARRAY, stringIds);
+                        }
                     }
                 });
             }
@@ -838,8 +918,13 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        // TODO: This has changed >.>
-                        wrapper.cancel();
+                        map(Type.BYTE); // Window id
+                        map(Type.STRING, new ValueTransformer<String, Integer>(Type.VAR_INT) {
+                            @Override
+                            public Integer transform(PacketWrapper wrapper, String inputValue) throws Exception {
+                                return Integer.parseInt(inputValue.substring(18));
+                            }
+                        });
                     }
                 });
             }
@@ -860,7 +945,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int type = wrapper.get(Type.VAR_INT, 0);
 
-                        if (type == 1) {
+                        if (type == 0) {
+                            wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
+                        } if (type == 1) {
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
                             wrapper.read(Type.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
