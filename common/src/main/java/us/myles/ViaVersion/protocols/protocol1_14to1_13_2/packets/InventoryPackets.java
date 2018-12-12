@@ -92,7 +92,7 @@ public class InventoryPackets {
         });
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x42, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x42, 0x43, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -109,7 +109,7 @@ public class InventoryPackets {
         });
 
         // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x55, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x54, 0x56, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
