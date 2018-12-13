@@ -18,7 +18,8 @@ public class VelocityVersionProvider extends VersionProvider {
     public int getServerProtocol(UserConnection user) throws Exception {
         // TODO Have one constant list forever until restart? (Might limit plugins if they change this)
         List<Integer> sorted = new ArrayList<>(com.velocitypowered.api.network.ProtocolVersion.ID_TO_PROTOCOL_CONSTANT.keySet());
-        sorted.remove(Integer.valueOf(-1)); // Unknown/legacy
+        sorted.remove(Integer.valueOf(-1)); // Unknown
+        sorted.remove(Integer.valueOf(-2)); // Legacy
         Collections.sort(sorted);
 
         int playerVersion = user.get(ProtocolInfo.class).getProtocolVersion();
