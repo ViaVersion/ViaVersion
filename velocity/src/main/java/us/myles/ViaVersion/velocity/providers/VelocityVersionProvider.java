@@ -8,28 +8,24 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class VelocityVersionProvider extends VersionProvider {
+    private static final List<Integer> VELOCITY_PROTOCOLS = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()
+            .map(com.velocitypowered.api.network.ProtocolVersion::getProtocol)
+            .collect(Collectors.toList());
 
     @Override
     public int getServerProtocol(UserConnection user) throws Exception {
-        // TODO Have one constant list forever until restart? (Might limit plugins if they change this)
-        List<Integer> sorted = new ArrayList<>(com.velocitypowered.api.network.ProtocolVersion.ID_TO_PROTOCOL_CONSTANT.keySet());
-        sorted.remove(Integer.valueOf(-1)); // Unknown
-        sorted.remove(Integer.valueOf(-2)); // Legacy
-        Collections.sort(sorted);
-
         int playerVersion = user.get(ProtocolInfo.class).getProtocolVersion();
 
         // Bungee supports it
-        if (sorted.contains(playerVersion))
+        if (Collections.binarySearch(VELOCITY_PROTOCOLS, playerVersion) >= 0)
             return playerVersion;
 
         // Older than bungee supports, get the lowest version
-        if (playerVersion < sorted.get(0)) {
+        if (playerVersion < VELOCITY_PROTOCOLS.get(0)) {
             return VelocityViaInjector.getLowestSupportedProtocolVersion();
         }
 
@@ -37,7 +33,7 @@ public class VelocityVersionProvider extends VersionProvider {
 
         // TODO: This needs a better fix, i.e checking ProtocolRegistry to see if it would work.
         // This is more of a workaround for snapshot support by bungee.
-        for (Integer protocol : Lists.reverse(sorted)) {
+        for (Integer protocol : Lists.reverse(VELOCITY_PROTOCOLS)) {
             if (playerVersion > protocol && ProtocolVersion.isRegistered(protocol))
                 return protocol;
         }
