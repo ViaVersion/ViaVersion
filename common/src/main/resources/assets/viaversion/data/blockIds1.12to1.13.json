@@ -1,0 +1,753 @@
+// Data from https://minecraft.gamepedia.com/1.13/Flattening
+{
+  "wooden_slab": [
+    "oak_slab",
+    "spruce_slab",
+    "birch_slab",
+    "jungle_slab",
+    "acacia_slab",
+    "dark_oak_slab"
+  ],
+  "red_sandstone": [
+    "red_sandstone",
+    "chiseled_red_sandstone",
+    "cut_red_sandstone"
+  ],
+  "lit_pumpkin": [
+    "jack_o_lantern"
+  ],
+  "magma": [
+    "magma_block"
+  ],
+  "silver_glazed_terracotta": [
+    "light_gray_glazed_terracotta"
+  ],
+  "double_stone_slab2": [
+    "red_sandstone_slab",
+    "smooth_red_sandstone"
+  ],
+  "standing_sign": [
+    "sign"
+  ],
+  "stained_glass_pane": [
+    "white_stained_glass_pane",
+    "orange_stained_glass_pane",
+    "magenta_stained_glass_pane",
+    "light_blue_stained_glass_pane",
+    "yellow_stained_glass_pane",
+    "lime_stained_glass_pane",
+    "pink_stained_glass_pane",
+    "gray_stained_glass_pane",
+    "light_gray_stained_glass_pane",
+    "cyan_stained_glass_pane",
+    "purple_stained_glass_pane",
+    "blue_stained_glass_pane",
+    "brown_stained_glass_pane",
+    "green_stained_glass_pane",
+    "red_stained_glass_pane",
+    "black_stained_glass_pane"
+  ],
+  "hardened_clay": [
+    "terracotta"
+  ],
+  "portal": [
+    "nether_portal"
+  ],
+  "leaves2": [
+    "acacia_leaves",
+    "dark_oak_leaves"
+  ],
+  "piston_extension": [
+    "moving_piston"
+  ],
+  "concrete_powder": [
+    "white_concrete_powder",
+    "orange_concrete_powder",
+    "magenta_concrete_powder",
+    "light_blue_concrete_powder",
+    "yellow_concrete_powder",
+    "lime_concrete_powder",
+    "pink_concrete_powder",
+    "gray_concrete_powder",
+    "light_gray_concrete_powder",
+    "cyan_concrete_powder",
+    "purple_concrete_powder",
+    "blue_concrete_powder",
+    "brown_concrete_powder",
+    "green_concrete_powder",
+    "red_concrete_powder",
+    "black_concrete_powder"
+  ],
+  "powered_repeater": [
+    "repeater"
+  ],
+  "record_wait": [
+    "music_disc_wait"
+  ],
+  "waterlily": [
+    "lily_pad"
+  ],
+  "record_chirp": [
+    "music_disc_chirp"
+  ],
+  "nether_brick": [
+    "nether_bricks"
+  ],
+  "record_ward": [
+    "music_disc_ward"
+  ],
+  "flowing_lava": [
+    "lava"
+  ],
+  "trapdoor": [
+    "oak_trapdoor"
+  ],
+  "stone_slab2": [
+    "red_sandstone_slab",
+    "smooth_red_sandstone"
+  ],
+  "record_cat": [
+    "music_disc_cat"
+  ],
+  "mob_spawner": [
+    "spawner"
+  ],
+  "sponge": [
+    "sponge",
+    "wet_sponge"
+  ],
+  "log": [
+    "oak_log",
+    "spruce_log",
+    "birch_log",
+    "jungle_log",
+    "oak_wood",
+    "spruce_wood",
+    "birch_wood",
+    "jungle_wood"
+  ],
+  "anvil": [
+    "anvil",
+    "chipped_anvil",
+    "damaged_anvil"
+  ],
+  "daylight_detector": [
+    "daylight_detector"
+  ],
+  "cooked_fish": [
+    "cooked_cod",
+    "cooked_salmon"
+  ],
+  "lit_redstone_lamp": [
+    "redstone_lamp"
+  ],
+  "daylight_detector_inverted": [
+    "daylight_detector"
+  ],
+  "deadbush": [
+    "dead_bush"
+  ],
+  "fireworks": [
+    "firework_rocket"
+  ],
+  "sandstone": [
+    "sandstone",
+    "chiseled_sandstone",
+    "cut_sandstone"
+  ],
+  "end_bricks": [
+    "end_stone_bricks"
+  ],
+  "slime": [
+    "slime_block"
+  ],
+  "web": [
+    "cobweb"
+  ],
+  "grass": [
+    "grass_block"
+  ],
+  "unpowered_repeater": [
+    "repeater"
+  ],
+  "quartz_block": [
+    "quartz_block",
+    "chiseled_quartz_block",
+    "quartz_pillar"
+  ],
+  "brick_block": [
+    "bricks"
+  ],
+  "netherbrick": [
+    "nether_brick"
+  ],
+  "log2": [
+    "acacia_log",
+    "dark_oak_log",
+    "acacia_wood",
+    "dark_oak_wood"
+  ],
+  "double_stone_slab": [
+    "stone_slab",
+    "sandstone_slab",
+    "petrified_oak_slab",
+    "cobblestone_slab",
+    "brick_slab",
+    "stone_brick_slab",
+    "nether_brick_slab",
+    "quartz_slab",
+    "smooth_stone",
+    "smooth_sandstone",
+    "smooth_quartz"
+  ],
+  "quartz_ore": [
+    "nether_quartz_ore"
+  ],
+  "golden_apple": [
+    "golden_apple",
+    "enchanted_golden_apple"
+  ],
+  "pumpkin_stem": [
+    "pumpkin_stem",
+    "attached_pumpkin_stem"
+  ],
+  "stained_glass": [
+    "white_stained_glass",
+    "orange_stained_glass",
+    "magenta_stained_glass",
+    "light_blue_stained_glass",
+    "yellow_stained_glass",
+    "lime_stained_glass",
+    "pink_stained_glass",
+    "gray_stained_glass",
+    "light_gray_stained_glass",
+    "cyan_stained_glass",
+    "purple_stained_glass",
+    "blue_stained_glass",
+    "brown_stained_glass",
+    "green_stained_glass",
+    "red_stained_glass",
+    "black_stained_glass"
+  ],
+  "double_wooden_slab": [
+    "oak_slab",
+    "spruce_slab",
+    "birch_slab",
+    "jungle_slab",
+    "acacia_slab",
+    "dark_oak_slab"
+  ],
+  "torch": [
+    "wall_torch",
+    "torch"
+  ],
+  "cobblestone_wall": [
+    "cobblestone_wall",
+    "mossy_cobblestone_wall"
+  ],
+  "boat": [
+    "oak_boat"
+  ],
+  "planks": [
+    "oak_planks",
+    "spruce_planks",
+    "birch_planks",
+    "jungle_planks",
+    "acacia_planks",
+    "dark_oak_planks"
+  ],
+  "comparator": [
+    "comparator"
+  ],
+  "dye": [
+    "bone_meal",
+    "orange_dye",
+    "magenta_dye",
+    "light_blue_dye",
+    "dandelion_yellow",
+    "lime_dye",
+    "pink_dye",
+    "gray_dye",
+    "light_gray_dye",
+    "cyan_dye",
+    "purple_dye",
+    "lapis_lazuli",
+    "cocoa_beans",
+    "cactus_green",
+    "rose_red",
+    "ink_sac"
+  ],
+  "speckled_melon": [
+    "glistering_melon_slice"
+  ],
+  "red_mushroom_block": [
+    "brown_mushroom_block",
+    "mushroom_stem",
+    "red_mushroom_block"
+  ],
+  "firework_charge": [
+    "firework_star"
+  ],
+  "fish": [
+    "cod",
+    "salmon",
+    "tropical_fish",
+    "pufferfish"
+  ],
+  "wall_banner": [
+    "white_wall_banner",
+    "orange_wall_banner",
+    "magenta_wall_banner",
+    "light_blue_wall_banner",
+    "yellow_wall_banner",
+    "lime_wall_banner",
+    "pink_wall_banner",
+    "gray_wall_banner",
+    "light_gray_wall_banner",
+    "cyan_wall_banner",
+    "purple_wall_banner",
+    "blue_wall_banner",
+    "brown_wall_banner",
+    "green_wall_banner",
+    "red_wall_banner",
+    "black_wall_banner"
+  ],
+  "record_mellohi": [
+    "music_disc_mellohi"
+  ],
+  "melon_block": [
+    "melon"
+  ],
+  "stonebrick": [
+    "stone_bricks",
+    "mossy_stone_bricks",
+    "cracked_stone_bricks",
+    "chiseled_stone_bricks"
+  ],
+  "repeater": [
+    "repeater"
+  ],
+  "silver_shulker_box": [
+    "light_gray_shulker_box"
+  ],
+  "bed": [
+    "white_bed",
+    "orange_bed",
+    "magenta_bed",
+    "light_blue_bed",
+    "yellow_bed",
+    "lime_bed",
+    "pink_bed",
+    "gray_bed",
+    "light_gray_bed",
+    "cyan_bed",
+    "purple_bed",
+    "blue_bed",
+    "brown_bed",
+    "green_bed",
+    "red_bed",
+    "black_bed"
+  ],
+  "prismarine": [
+    "prismarine",
+    "prismarine_bricks",
+    "dark_prismarine"
+  ],
+  "wool": [
+    "white_wool",
+    "orange_wool",
+    "magenta_wool",
+    "light_blue_wool",
+    "yellow_wool",
+    "lime_wool",
+    "pink_wool",
+    "gray_wool",
+    "light_gray_wool",
+    "cyan_wool",
+    "purple_wool",
+    "blue_wool",
+    "brown_wool",
+    "green_wool",
+    "red_wool",
+    "black_wool"
+  ],
+  "double_purpur_slab": [
+    "purpur_slab"
+  ],
+  "furnace": [
+    "furnace"
+  ],
+  "redstone_ore": [
+    "redstone_ore"
+  ],
+  "red_flower": [
+    "poppy",
+    "blue_orchid",
+    "allium",
+    "azure_bluet",
+    "red_tulip",
+    "orange_tulip",
+    "white_tulip",
+    "pink_tulip",
+    "oxeye_daisy"
+  ],
+  "lit_redstone_ore": [
+    "redstone_ore"
+  ],
+  "tallgrass": [
+    "dead_bush",
+    "grass",
+    "fern"
+  ],
+  "sign": [
+    "sign"
+  ],
+  "spawn_egg": [
+    "bat_spawn_egg",
+    "blaze_spawn_egg",
+    "cave_spider_spawn_egg",
+    "chicken_spawn_egg",
+    "cow_spawn_egg",
+    "creeper_spawn_egg",
+    "donkey_spawn_egg",
+    "elder_guardian_spawn_egg",
+    "enderman_spawn_egg",
+    "endermite_spawn_egg",
+    "evoker_spawn_egg",
+    "ghast_spawn_egg",
+    "guardian_spawn_egg",
+    "horse_spawn_egg",
+    "husk_spawn_egg",
+    "llama_spawn_egg",
+    "magma_cube_spawn_egg",
+    "mooshroom_spawn_egg",
+    "mule_spawn_egg",
+    "ocelot_spawn_egg",
+    "parrot_spawn_egg",
+    "pig_spawn_egg",
+    "polar_bear_spawn_egg",
+    "rabbit_spawn_egg",
+    "sheep_spawn_egg",
+    "shulker_spawn_egg",
+    "silverfish_spawn_egg",
+    "skeleton_spawn_egg",
+    "skeleton_horse_spawn_egg",
+    "slime_spawn_egg",
+    "spider_spawn_egg",
+    "squid_spawn_egg",
+    "stray_spawn_egg",
+    "vex_spawn_egg",
+    "villager_spawn_egg",
+    "vindicator_spawn_egg",
+    "witch_spawn_egg",
+    "wither_skeleton_spawn_egg",
+    "wolf_spawn_egg",
+    "zombie_spawn_egg",
+    "zombie_horse_spawn_egg",
+    "zombie_pigman_spawn_egg",
+    "zombie_villager_spawn_egg"
+  ],
+  "wooden_door": [
+    "oak_door"
+  ],
+  "stone_slab": [
+    "stone_slab",
+    "sandstone_slab",
+    "petrified_oak_slab",
+    "cobblestone_slab",
+    "brick_slab",
+    "stone_brick_slab",
+    "nether_brick_slab",
+    "quartz_slab",
+    "smooth_stone",
+    "smooth_sandstone",
+    "smooth_quartz"
+  ],
+  "unpowered_comparator": [
+    "comparator"
+  ],
+  "leaves": [
+    "oak_leaves",
+    "spruce_leaves",
+    "birch_leaves",
+    "jungle_leaves"
+  ],
+  "noteblock": [
+    "note_block"
+  ],
+  "sapling": [
+    "oak_sapling",
+    "spruce_sapling",
+    "birch_sapling",
+    "jungle_sapling",
+    "acacia_sapling",
+    "dark_oak_sapling"
+  ],
+  "melon": [
+    "melon_slice"
+  ],
+  "wooden_button": [
+    "oak_button"
+  ],
+  "golden_rail": [
+    "powered_rail"
+  ],
+  "redstone_torch": [
+    "redstone_wall_torch",
+    "redstone_torch"
+  ],
+  "stone_stairs": [
+    "cobblestone_stairs"
+  ],
+  "dirt": [
+    "dirt",
+    "coarse_dirt",
+    "podzol"
+  ],
+  "wooden_pressure_plate": [
+    "oak_pressure_plate"
+  ],
+  "powered_comparator": [
+    "comparator"
+  ],
+  "water": [
+    "water"
+  ],
+  "sand": [
+    "sand",
+    "red_sand"
+  ],
+  "flowing_water": [
+    "water"
+  ],
+  "snow": [
+    "snow_block"
+  ],
+  "carpet": [
+    "white_carpet",
+    "orange_carpet",
+    "magenta_carpet",
+    "light_blue_carpet",
+    "yellow_carpet",
+    "lime_carpet",
+    "pink_carpet",
+    "gray_carpet",
+    "light_gray_carpet",
+    "cyan_carpet",
+    "purple_carpet",
+    "blue_carpet",
+    "brown_carpet",
+    "green_carpet",
+    "red_carpet",
+    "black_carpet"
+  ],
+  "lit_furnace": [
+    "furnace"
+  ],
+  "coal": [
+    "coal",
+    "charcoal"
+  ],
+  "concrete": [
+    "white_concrete",
+    "orange_concrete",
+    "magenta_concrete",
+    "light_blue_concrete",
+    "yellow_concrete",
+    "lime_concrete",
+    "pink_concrete",
+    "gray_concrete",
+    "light_gray_concrete",
+    "cyan_concrete",
+    "purple_concrete",
+    "blue_concrete",
+    "brown_concrete",
+    "green_concrete",
+    "red_concrete",
+    "black_concrete"
+  ],
+  "record_mall": [
+    "music_disc_mall"
+  ],
+  "monster_egg": [
+    "infested_stone",
+    "infested_cobblestone",
+    "infested_stone_bricks",
+    "infested_mossy_stone_bricks",
+    "infested_cracked_stone_bricks",
+    "infested_chiseled_stone_bricks"
+  ],
+  "fence_gate": [
+    "oak_fence_gate"
+  ],
+  "standing_banner": [
+    "white_banner",
+    "orange_banner",
+    "magenta_banner",
+    "light_blue_banner",
+    "yellow_banner",
+    "lime_banner",
+    "pink_banner",
+    "gray_banner",
+    "light_gray_banner",
+    "cyan_banner",
+    "purple_banner",
+    "blue_banner",
+    "brown_banner",
+    "green_banner",
+    "red_banner",
+    "black_banner"
+  ],
+  "record_blocks": [
+    "music_disc_blocks"
+  ],
+  "unlit_redstone_torch": [
+    "redstone_wall_torch",
+    "redstone_torch"
+  ],
+  "lava": [
+    "lava"
+  ],
+  "reeds": [
+    "sugar_cane"
+  ],
+  "chorus_fruit_popped": [
+    "popped_chorus_fruit"
+  ],
+  "redstone_lamp": [
+    "redstone_lamp"
+  ],
+  "skull": [
+    "skeleton_skull",
+    "skeleton_wall_skull",
+    "wither_skeleton_skull",
+    "wither_skeleton_wall_skull",
+    "zombie_head",
+    "zombie_wall_head",
+    "player_head",
+    "player_wall_head",
+    "creeper_head",
+    "creeper_wall_head",
+    "dragon_head",
+    "dragon_wall_head"
+  ],
+  "snow_layer": [
+    "snow"
+  ],
+  "stained_hardened_clay": [
+    "white_terracotta",
+    "orange_terracotta",
+    "magenta_terracotta",
+    "light_blue_terracotta",
+    "yellow_terracotta",
+    "lime_terracotta",
+    "pink_terracotta",
+    "gray_terracotta",
+    "light_gray_terracotta",
+    "cyan_terracotta",
+    "purple_terracotta",
+    "blue_terracotta",
+    "brown_terracotta",
+    "green_terracotta",
+    "red_terracotta",
+    "black_terracotta"
+  ],
+  "double_plant": [
+    "sunflower",
+    "lilac",
+    "tall_grass",
+    "large_fern",
+    "rose_bush",
+    "peony"
+  ],
+  "record_strad": [
+    "music_disc_strad"
+  ],
+  "brown_mushroom_block": [
+    "brown_mushroom_block",
+    "mushroom_stem",
+    "red_mushroom_block"
+  ],
+  "flower_pot": [
+    "flower_pot",
+    "potted_poppy",
+    "potted_dandelion",
+    "potted_oak_sapling",
+    "potted_spruce_sapling",
+    "potted_birch_sapling",
+    "potted_jungle_sapling",
+    "potted_red_mushroom",
+    "potted_brown_mushroom",
+    "potted_cactus",
+    "potted_dead_bush",
+    "potted_fern",
+    "potted_acacia_sapling",
+    "potted_dark_oak_sapling",
+    "potted_blue_orchid",
+    "potted_allium",
+    "potted_azure_bluet",
+    "potted_red_tulip",
+    "potted_orange_tulip",
+    "potted_white_tulip",
+    "potted_pink_tulip",
+    "potted_oxeye_daisy"
+  ],
+  "melon_stem": [
+    "melon_stem",
+    "attached_melon_stem"
+  ],
+  "record_13": [
+    "music_disc_13"
+  ],
+  "banner": [
+    "white_banner",
+    "orange_banner",
+    "magenta_banner",
+    "light_blue_banner",
+    "yellow_banner",
+    "lime_banner",
+    "pink_banner",
+    "gray_banner",
+    "light_gray_banner",
+    "cyan_banner",
+    "purple_banner",
+    "blue_banner",
+    "brown_banner",
+    "green_banner",
+    "red_banner",
+    "black_banner"
+  ],
+  "stone": [
+    "stone",
+    "granite",
+    "polished_granite",
+    "diorite",
+    "polished_diorite",
+    "andesite",
+    "polished_andesite"
+  ],
+  "yellow_flower": [
+    "dandelion"
+  ],
+  "record_11": [
+    "music_disc_11"
+  ],
+  "purpur_slab": [
+    "purpur_slab"
+  ],
+  "red_nether_brick": [
+    "red_nether_bricks"
+  ],
+  "record_far": [
+    "music_disc_far"
+  ],
+  "record_stal": [
+    "music_disc_stal"
+  ],
+  "fence": [
+    "oak_fence"
+  ],
+  "pumpkin": [
+    "carved_pumpkin"
+  ]
+}
