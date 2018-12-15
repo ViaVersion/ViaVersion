@@ -28,6 +28,19 @@ public class PlayerPackets {
             }
         });
 
+        // Edit Book
+        protocol.registerIncoming(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                    }
+                });
+            }
+        });
+
         // Player Digging
         protocol.registerIncoming(State.PLAY, 0x18, 0x18, new PacketRemapper() {
             @Override
