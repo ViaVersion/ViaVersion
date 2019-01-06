@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
+import com.github.steveice10.opennbt.conversion.ConverterRegistry;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -9,15 +14,17 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 
 import java.util.Set;
 
 public class InventoryPackets {
+    private static String NBT_TAG_NAME;
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
 
     public static void register(Protocol protocol) {
-
+        NBT_TAG_NAME = "ViaVersion|" + protocol.getClass().getSimpleName();
         /*
             Outgoing packets
          */
@@ -209,6 +216,27 @@ public class InventoryPackets {
     public static void toClient(Item item) {
         if (item == null) return;
         item.setIdentifier(getNewItemId(item.getIdentifier()));
+
+        CompoundTag tag;
+        if ((tag = item.getTag()) != null) {
+            // Display Lore now uses JSON
+            if (tag.get("display") instanceof CompoundTag) {
+                CompoundTag display = tag.get("display");
+                if (display.get("Lore") instanceof ListTag) {
+                    ListTag lore = display.get("Lore");
+                    display.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|Lore", ConverterRegistry.convertToValue(lore)));
+                    for (Tag loreEntry : lore) {
+                        if (loreEntry instanceof StringTag) {
+                            ((StringTag) loreEntry).setValue(
+                                    ChatRewriter.legacyTextToJson(
+                                            ((StringTag) loreEntry).getValue()
+                                    )
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static int getNewItemId(int id) {
@@ -223,6 +251,32 @@ public class InventoryPackets {
     public static void toServer(Item item) {
         if (item == null) return;
         item.setIdentifier(getOldItemId(item.getIdentifier()));
+
+        CompoundTag tag;
+        if ((tag = item.getTag()) != null) {
+            // Display Name now uses JSON
+            if (tag.get("display") instanceof CompoundTag) {
+                CompoundTag display = tag.get("display");
+                if (((CompoundTag) tag.get("display")).get("Lore") instanceof ListTag) {
+                    ListTag lore = display.get("Lore");
+                    ListTag via = display.get(NBT_TAG_NAME + "|Lore");
+                    if (via != null) {
+                        display.put(ConverterRegistry.convertToTag("Lore", ConverterRegistry.convertToValue(via)));
+                    } else {
+                        for (Tag loreEntry : lore) {
+                            if (loreEntry instanceof StringTag) {
+                                ((StringTag) loreEntry).setValue(
+                                        ChatRewriter.jsonTextToLegacy(
+                                                ((StringTag) loreEntry).getValue()
+                                        )
+                                );
+                            }
+                        }
+                    }
+                    display.remove(NBT_TAG_NAME + "|Lore");
+                }
+            }
+        }
     }
 
     public static int getOldItemId(int id) {
