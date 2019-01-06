@@ -267,7 +267,7 @@ public class WorldPackets {
             public void registerMap() {
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 0 - Status
                 map(Type.POSITION); // 1 - Position
-                map(Type.UNSIGNED_BYTE); // 2 - Face
+                map(Type.BYTE); // 2 - Face
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
