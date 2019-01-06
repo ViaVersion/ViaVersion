@@ -119,7 +119,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
                 });
             }
         });
-        
+
         registerOutgoing(State.PLAY, 0x52, 0x54);
         registerOutgoing(State.PLAY, 0x53, 0x55);
 
@@ -129,7 +129,8 @@ public class Protocol1_14To1_13_2 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int blockTagsSize = wrapper.passthrough(Type.VAR_INT); // block tags
+                        int blockTagsSize = wrapper.read(Type.VAR_INT);
+                        wrapper.write(Type.VAR_INT, blockTagsSize + 3); // block tags
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             Integer[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
@@ -137,7 +138,21 @@ public class Protocol1_14To1_13_2 extends Protocol {
                                 blockIds[j] = getNewBlockId(blockIds[j]);
                             }
                         }
-                        int itemTagsSize = wrapper.passthrough(Type.VAR_INT); // item tags
+                        // Minecraft crashes if we not send signs tags
+                        wrapper.write(Type.STRING, "minecraft:signs");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                getNewBlockId(150), getNewBlockId(155)
+                        });
+                        wrapper.write(Type.STRING, "minecraft:wall_signs");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                getNewBlockId(155)
+                        });
+                        wrapper.write(Type.STRING, "minecraft:standing_signs");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                getNewBlockId(150)
+                        });
+                        int itemTagsSize = wrapper.read(Type.VAR_INT);
+                        wrapper.write(Type.VAR_INT, itemTagsSize + 1); // item tags
                         for (int i = 0; i < itemTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             Integer[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
@@ -145,12 +160,17 @@ public class Protocol1_14To1_13_2 extends Protocol {
                                 itemIds[j] = InventoryPackets.getNewItemId(itemIds[j]);
                             }
                         }
+                        // Should fix fuel shift clicking
+                        wrapper.write(Type.STRING, "minecraft:signs");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                InventoryPackets.getNewItemId(541)
+                        });
                         int fluidTagsSize = wrapper.passthrough(Type.VAR_INT); // fluid tags
                         for (int i = 0; i < fluidTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             wrapper.passthrough(Type.VAR_INT_ARRAY);
                         }
-                        wrapper.write(Type.VAR_INT, 0);  // new unknown tags
+                        wrapper.write(Type.VAR_INT, 0);  // new entity tags - do we need to send this?
                     }
                 });
             }
