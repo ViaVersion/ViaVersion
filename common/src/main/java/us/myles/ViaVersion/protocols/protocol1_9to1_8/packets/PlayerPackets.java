@@ -208,11 +208,13 @@ public class PlayerPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         if (Via.getConfig().isAutoTeam()) {
-                            EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             entityTracker.setAutoTeam(true);
                             entityTracker.sendTeamPacket(true, false);
                             entityTracker.setCurrentTeam("viaversion");
+                        } else {
+                            entityTracker.setAutoTeam(false);
                         }
                     }
                 });
