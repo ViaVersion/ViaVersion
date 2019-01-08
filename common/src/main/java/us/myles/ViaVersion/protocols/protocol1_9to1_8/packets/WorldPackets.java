@@ -211,23 +211,6 @@ public class WorldPackets {
             }
         });
 
-        // Server Difficulty Packet
-        protocol.registerOutgoing(State.PLAY, 0x41, 0x0D, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (Via.getConfig().isAutoTeam()) {
-                            EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                            entityTracker.setAutoTeam(true);
-                            entityTracker.sendTeamPacket(true, true);
-                        }
-                    }
-                });
-            }
-        });
-
         // Block Change Packet
         protocol.registerOutgoing(State.PLAY, 0x23, 0x0B, new PacketRemapper() {
             @Override
@@ -240,6 +223,7 @@ public class WorldPackets {
 
         protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
         protocol.registerOutgoing(State.PLAY, 0x24, 0x0A); // Block Action Packet
+        protocol.registerOutgoing(State.PLAY, 0x41, 0x0D); // Server Difficulty Packet
         protocol.registerOutgoing(State.PLAY, 0x22, 0x10); // Multi Block Change Packet
         protocol.registerOutgoing(State.PLAY, 0x27, 0x1C); // Explosion Packet
         protocol.registerOutgoing(State.PLAY, 0x2A, 0x22); // Particle Packet
