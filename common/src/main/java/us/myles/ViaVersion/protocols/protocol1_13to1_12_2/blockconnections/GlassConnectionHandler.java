@@ -2,7 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
 
@@ -34,6 +34,8 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
     @Override
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
-        return states == 0 && (ProtocolRegistry.SERVER_PROTOCOL <= 47 && ProtocolRegistry.SERVER_PROTOCOL != -1) ? 0xF : states;
+        return states == 0
+                && user.get(ProtocolInfo.class).getServerProtocolVersion() <= 47
+                && user.get(ProtocolInfo.class).getServerProtocolVersion() != -1 ? 0xF : states;
     }
 }
