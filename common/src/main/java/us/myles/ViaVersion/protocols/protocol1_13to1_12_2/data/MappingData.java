@@ -195,6 +195,10 @@ public class MappingData {
         private BlockMappingsShortArray(JsonObject mapping1_12, JsonObject mapping1_13) {
             Arrays.fill(oldToNew, (short) -1);
             mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
+            // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
+            if (Via.getConfig().isSnowCollisionFix()) {
+                oldToNew[1248] = 3416;
+            }
         }
 
         @Override
