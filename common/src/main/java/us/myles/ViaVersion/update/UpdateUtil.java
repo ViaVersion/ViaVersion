@@ -17,7 +17,7 @@ import java.util.UUID;
 public class UpdateUtil {
 
     public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
-    private final static String URL = "http://api.spiget.org/v2/resources/";
+    private final static String URL = "https://api.spiget.org/v2/resources/";
     private final static int PLUGIN = 19254;
     private final static String LATEST_VERSION = "/versions/latest";
 
