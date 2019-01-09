@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.*;
 
 public class VelocityViaConfig extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "bungee-ping-interval", "bungee-ping-save", "bungee-servers");
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "blockconnection-method");
 
     public VelocityViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));

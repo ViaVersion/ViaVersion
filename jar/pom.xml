@@ -54,7 +54,7 @@
                             <shadedPattern>us.myles.viaversion.libs.gson</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>org.javassist</pattern>
+                            <pattern>javassist</pattern>
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
                         </relocation>
                         <relocation>

@@ -53,6 +53,8 @@ public class EntityTracker extends StoredObject {
     private GameMode gameMode;
     @Setter
     private int mainHand;
+    @Setter
+    private String currentTeam;
 
     public EntityTracker(UserConnection user) {
         super(user);
