@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
@@ -243,6 +244,22 @@ public class WorldPackets {
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
                         clientChunks.setEnvironment(dimensionId);
+                    }
+                });
+            }
+        });
+
+        //Map Data
+        protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT);
+                map(Type.BYTE);
+                map(Type.BOOLEAN);
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.BOOLEAN, false);  // new value, probably if the map is locked (added in 19w02a), old maps are not locked
                     }
                 });
             }

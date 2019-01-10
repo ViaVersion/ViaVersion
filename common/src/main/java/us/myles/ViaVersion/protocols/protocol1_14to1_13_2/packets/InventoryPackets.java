@@ -29,18 +29,80 @@ public class InventoryPackets {
             Outgoing packets
          */
 
-        // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x14, -1, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.FLAT_VAR_INT_ITEM); // 2 - Slot Value
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        toClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
+                        Short windowsId = wrapper.read(Type.UNSIGNED_BYTE);
+                        String type = wrapper.read(Type.STRING);
+                        String title = wrapper.read(Type.STRING);
+                        Short slots = wrapper.read(Type.UNSIGNED_BYTE);
+
+                        if (type.equals("EntityHorse")) {
+                            wrapper.setId(0x14);
+                            int entityId = wrapper.read(Type.INT);
+                            wrapper.write(Type.UNSIGNED_BYTE, windowsId);
+                            wrapper.write(Type.VAR_INT, slots.intValue());
+                            wrapper.write(Type.INT, entityId);
+                        } else {
+                            wrapper.setId(0x59);
+                            wrapper.write(Type.VAR_INT, windowsId.intValue());
+
+                            int typeId = -1;
+                            switch (type) {
+                                case "minecraft:container":
+                                case "minecraft:chest":
+                                    switch (slots) {
+                                        case 27:
+                                            typeId = 0;
+                                            break;
+                                        case 54:
+                                            typeId = 1;
+                                            break;
+                                    }
+                                    break;
+                                case "minecraft:crafting_table":
+                                    typeId = 7;
+                                    break;
+                                case "minecraft:furnace":
+                                    typeId = 9;
+                                    break;
+                                case "minecraft:dropper":
+                                case "minecraft:dispenser":
+                                    typeId = 2;
+                                    break;
+                                case "minecraft:enchanting_table":
+                                    typeId = 8;
+                                    break;
+                                case "minecraft:brewing_stand":
+                                    typeId = 6;
+                                    break;
+                                case "minecraft:villager":
+                                    typeId = 14;
+                                    break;
+                                case "minecraft:beacon":
+                                    typeId = 4;
+                                    break;
+                                case "minecraft:anvil":
+                                    typeId = 3;
+                                    break;
+                                case "minecraft:hopper":
+                                    typeId = 11;
+                                    break;
+                                case "minecraft:shulker_box":
+                                    typeId = 15;
+                                    break;
+                            }
+
+                            if (typeId == -1) {
+                                Via.getPlatform().getLogger().warning("Can't open inventory for 1.14 player! Type: " + type + " Size: " + slots);
+                            }
+
+                            wrapper.write(Type.VAR_INT, typeId);
+                            wrapper.write(Type.STRING, title);
+                        }
                     }
                 });
             }
@@ -63,6 +125,23 @@ public class InventoryPackets {
             }
         });
 
+        // Set slot packet
+        protocol.registerOutgoing(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.BYTE); // 0 - Window ID
+                map(Type.SHORT); // 1 - Slot ID
+                map(Type.FLAT_VAR_INT_ITEM); // 2 - Slot Value
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        toClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
+                    }
+                });
+            }
+        });
+
         // Plugin message
         protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
             @Override
@@ -73,7 +152,12 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
                         if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
-                            wrapper.passthrough(Type.INT); // Passthrough Window ID
+                            wrapper.setId(0x5A);
+                            wrapper.resetReader();
+                            wrapper.read(Type.STRING); // Remove channel
+
+                            int windowId = wrapper.read(Type.INT);
+                            wrapper.write(Type.VAR_INT, windowId);
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
