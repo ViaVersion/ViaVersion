@@ -287,4 +287,19 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isReduceBlockStorageMemory();
+
+    /**
+     * When activated with serverside-blockconnections, flower parts with blocks above will be sent as stems.
+     * Useful for lobbyservers where users can't build and those stems are used decoratively.
+     *
+     * @return True if enabled
+     */
+    boolean isStemWhenBlockAbove();
+
+    /**
+     * When activated, the 1-layer snow will be sent as 2-layer snow to 1.13+ clients to have collision.
+     *
+     * @return True if enabled
+     */
+    boolean isSnowCollisionFix();
 }
