@@ -292,4 +292,14 @@ public class VelocityViaConfig extends Config implements ViaVersionConfig {
     public boolean isReduceBlockStorageMemory() {
         return getBoolean("reduce-blockstorage-memory", false);
     }
+
+    @Override
+    public boolean isStemWhenBlockAbove() {
+        return getBoolean("flowerstem-when-block-above", false);
+    }
+
+    @Override
+    public boolean isSnowCollisionFix() {
+        return getBoolean("fix-low-snow-collision", false);
+    }
 }

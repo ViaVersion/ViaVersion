@@ -14,7 +14,6 @@ import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
-import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.storage.VelocityStorage;
 
@@ -26,6 +25,8 @@ import java.util.concurrent.Semaphore;
 public class VelocityServerHandler {
     private static Method setProtocolVersion;
     private static Method setNextProtocolVersion;
+    private static Method getMinecraftConnection;
+    private static Method getNextProtocolVersion;
 
     static {
         try {
@@ -33,6 +34,10 @@ public class VelocityServerHandler {
                     .getDeclaredMethod("setProtocolVersion", ProtocolVersion.class);
             setNextProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection")
                     .getDeclaredMethod("setNextProtocolVersion", ProtocolVersion.class);
+            getMinecraftConnection = Class.forName("com.velocitypowered.proxy.connection.client.ConnectedPlayer")
+                    .getDeclaredMethod("getMinecraftConnection");
+            getNextProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection")
+                    .getDeclaredMethod("getNextProtocolVersion");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -51,12 +56,12 @@ public class VelocityServerHandler {
             List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
 
             // Check if ViaVersion can support that version
-            Object connection = ReflectionUtil.invoke(e.getPlayer(), "getConnection");
+            Object connection = getMinecraftConnection.invoke(e.getPlayer());
             setNextProtocolVersion.invoke(connection, ProtocolVersion.getProtocolVersion(protocols == null
                     ? user.get(ProtocolInfo.class).getProtocolVersion()
                     : protocolId));
 
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
+        } catch (IllegalAccessException | InvocationTargetException e1) {
             e1.printStackTrace();
         }
     }
@@ -132,8 +137,8 @@ public class VelocityServerHandler {
                         protocol.init(user);
                     }
 
-                    Object connection = ReflectionUtil.invoke(e.getPlayer(), "getConnection");
-                    ProtocolVersion version = (ProtocolVersion) ReflectionUtil.invoke(connection, "getNextProtocolVersion");
+                    Object connection = getMinecraftConnection.invoke(e.getPlayer());
+                    ProtocolVersion version = (ProtocolVersion) getNextProtocolVersion.invoke(connection);
                     setProtocolVersion.invoke(connection, version);
                 }
             }
