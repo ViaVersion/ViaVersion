@@ -45,7 +45,8 @@ public class BlockConnectionStorage extends StoredObject {
 
     public void remove(Position position) {
         long pair = getChunkSectionIndex(position);
-        short[] map = getChunkSection(pair);
+        short[] map = blockStorage.get(pair);
+        if (map == null) return;
         map[encodeBlockPos(position)] = 0;
         if (Arrays.equals(short4096, map)) {
             blockStorage.remove(pair);
