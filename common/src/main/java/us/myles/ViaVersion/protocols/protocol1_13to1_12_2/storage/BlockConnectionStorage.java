@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private Map<Long, Map<Long, Short>> blockStorage = createLongObjectMap();
+    private Map<Long, Map<Short, Short>> blockStorage = createLongObjectMap();
 
     private static Class<?> fastUtilLongObjectHashMap;
-    private static Class<?> fastUtilLongShortHashMap;
+    private static Class<?> fastUtilShortShortHashMap;
     private static Class<?> nettyLongObjectHashMap;
 
     static {
@@ -21,18 +21,16 @@ public class BlockConnectionStorage extends StoredObject {
             fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap");
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
         } catch (ClassNotFoundException ignored) {
-        }
-        try {
-            fastUtilLongShortHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ShortOpenHashMap");
-            Via.getPlatform().getLogger().info("Using FastUtil Long2ShortOpenHashMap for block connections");
-        } catch (ClassNotFoundException ignored) {
-        }
-        if (fastUtilLongShortHashMap == null && fastUtilLongObjectHashMap == null) {
             try {
                 nettyLongObjectHashMap = Class.forName("io.netty.util.collection.LongObjectHashMap");
                 Via.getPlatform().getLogger().info("Using Netty LongObjectHashMap for block connections");
-            } catch (ClassNotFoundException ignored) {
+            } catch (ClassNotFoundException ignored2) {
             }
+        }
+        try {
+            fastUtilShortShortHashMap = Class.forName("it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap");
+            Via.getPlatform().getLogger().info("Using FastUtil Short2ShortOpenHashMap for block connections");
+        } catch (ClassNotFoundException ignored) {
         }
     }
 
@@ -42,20 +40,20 @@ public class BlockConnectionStorage extends StoredObject {
 
     public void store(Position position, int blockState) {
         long pair = getChunkIndex(position);
-        Map<Long, Short> map = getChunkMap(pair);
+        Map<Short, Short> map = getChunkMap(pair);
         map.put(encodeBlockPos(position), (short) blockState);
     }
 
     public int get(Position position) {
         long pair = getChunkIndex(position);
-        Map<Long, Short> map = getChunkMap(pair);
-        long blockPositon = encodeBlockPos(position);
-        return map.containsKey(blockPositon) ? map.get(blockPositon) : 0;
+        Map<Short, Short> map = getChunkMap(pair);
+        short blockPosition = encodeBlockPos(position);
+        return map.containsKey(blockPosition) ? map.get(blockPosition) : 0;
     }
 
     public void remove(Position position) {
         long pair = getChunkIndex(position);
-        Map<Long, Short> map = getChunkMap(pair);
+        Map<Short, Short> map = getChunkMap(pair);
         map.remove(encodeBlockPos(position));
         if (map.isEmpty()) {
             blockStorage.remove(pair);
@@ -70,10 +68,10 @@ public class BlockConnectionStorage extends StoredObject {
         blockStorage.remove(getChunkIndex(x, z));
     }
 
-    private Map<Long, Short> getChunkMap(long index) {
-        Map<Long, Short> map = blockStorage.get(index);
+    private Map<Short, Short> getChunkMap(long index) {
+        Map<Short, Short> map = blockStorage.get(index);
         if (map == null) {
-            map = createLongShortMap();
+            map = createShortShortMap();
             blockStorage.put(index, map);
         }
         return map;
@@ -87,11 +85,11 @@ public class BlockConnectionStorage extends StoredObject {
         return getChunkIndex(position.getX().intValue(), position.getZ().intValue());
     }
 
-    private long encodeBlockPos(int x, int y, int z) {
-        return (((long) x & 0x3FFFFFF) << 38) | ((y & 0xFFF) << 26) | (z & 0x3FFFFFF);
+    private short encodeBlockPos(int x, int y, int z) {
+        return (short) (y << 8 | x & 0xF << 4 | z & 0xF);
     }
 
-    private long encodeBlockPos(Position pos) {
+    private short encodeBlockPos(Position pos) {
         return encodeBlockPos(pos.getX().intValue(), pos.getY().intValue(), pos.getZ().intValue());
     }
 
@@ -113,24 +111,10 @@ public class BlockConnectionStorage extends StoredObject {
         return new HashMap<>();
     }
 
-    private Map<Long, Short> createLongShortMap() {
-        if (fastUtilLongShortHashMap != null) {
+    private Map<Short, Short> createShortShortMap() {
+        if (fastUtilShortShortHashMap != null) {
             try {
-                return (Map<Long, Short>) fastUtilLongShortHashMap.getConstructor().newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        if (fastUtilLongObjectHashMap != null) {
-            try {
-                return (Map<Long, Short>) fastUtilLongObjectHashMap.getConstructor().newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        if (nettyLongObjectHashMap != null) {
-            try {
-                return (Map<Long, Short>) nettyLongObjectHashMap.getConstructor().newInstance();
+                return (Map<Short, Short>) fastUtilShortShortHashMap.getConstructor().newInstance();
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
