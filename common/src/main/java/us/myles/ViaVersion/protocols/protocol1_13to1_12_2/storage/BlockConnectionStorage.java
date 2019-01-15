@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,20 +13,20 @@ import java.util.Map;
 public class BlockConnectionStorage extends StoredObject {
     private Map<Long, Map<Short, Short>> blockStorage = createLongObjectMap();
 
-    private static Class<?> fastUtilLongObjectHashMap;
-    private static Class<?> fastUtilShortShortHashMap;
+    private static Constructor<?> fastUtilLongObjectHashMap;
+    private static Constructor<?> fastUtilShortShortHashMap;
 
     static {
         try {
-            fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap");
+            fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
 
         }
         try {
-            fastUtilShortShortHashMap = Class.forName("it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap");
+            fastUtilShortShortHashMap = Class.forName("it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap").getConstructor();
             Via.getPlatform().getLogger().info("Using FastUtil Short2ShortOpenHashMap for block connections");
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
     }
 
@@ -91,8 +92,8 @@ public class BlockConnectionStorage extends StoredObject {
     private <T> Map<Long, T> createLongObjectMap() {
         if (fastUtilLongObjectHashMap != null) {
             try {
-                return (Map<Long, T>) fastUtilLongObjectHashMap.getConstructor().newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+                return (Map<Long, T>) fastUtilLongObjectHashMap.newInstance();
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
@@ -102,8 +103,8 @@ public class BlockConnectionStorage extends StoredObject {
     private Map<Short, Short> createShortShortMap() {
         if (fastUtilShortShortHashMap != null) {
             try {
-                return (Map<Short, Short>) fastUtilShortShortHashMap.getConstructor().newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+                return (Map<Short, Short>) fastUtilShortShortHashMap.newInstance();
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
