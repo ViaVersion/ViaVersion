@@ -14,18 +14,13 @@ public class BlockConnectionStorage extends StoredObject {
 
     private static Class<?> fastUtilLongObjectHashMap;
     private static Class<?> fastUtilShortShortHashMap;
-    private static Class<?> nettyLongObjectHashMap;
 
     static {
         try {
             fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap");
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
         } catch (ClassNotFoundException ignored) {
-            try {
-                nettyLongObjectHashMap = Class.forName("io.netty.util.collection.LongObjectHashMap");
-                Via.getPlatform().getLogger().info("Using Netty LongObjectHashMap for block connections");
-            } catch (ClassNotFoundException ignored2) {
-            }
+
         }
         try {
             fastUtilShortShortHashMap = Class.forName("it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap");
@@ -97,13 +92,6 @@ public class BlockConnectionStorage extends StoredObject {
         if (fastUtilLongObjectHashMap != null) {
             try {
                 return (Map<Long, T>) fastUtilLongObjectHashMap.getConstructor().newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        if (nettyLongObjectHashMap != null) {
-            try {
-                return (Map<Long, T>) nettyLongObjectHashMap.getConstructor().newInstance();
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
