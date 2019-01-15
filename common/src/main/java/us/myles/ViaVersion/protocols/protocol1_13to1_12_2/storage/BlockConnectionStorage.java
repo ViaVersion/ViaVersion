@@ -7,25 +7,20 @@ import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private Map<Long, Map<Short, Short>> blockStorage = createLongObjectMap();
+    private Map<Long, short[]> blockStorage = createLongObjectMap();
+    private static short[] short4096 = new short[4096];
 
     private static Constructor<?> fastUtilLongObjectHashMap;
-    private static Constructor<?> fastUtilShortShortHashMap;
 
     static {
         try {
             fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
-        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
-
-        }
-        try {
-            fastUtilShortShortHashMap = Class.forName("it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap").getConstructor();
-            Via.getPlatform().getLogger().info("Using FastUtil Short2ShortOpenHashMap for block connections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
     }
@@ -35,23 +30,24 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     public void store(Position position, int blockState) {
-        long pair = getChunkIndex(position);
-        Map<Short, Short> map = getChunkMap(pair);
-        map.put(encodeBlockPos(position), (short) blockState);
+        long pair = getChunkSectionIndex(position);
+        short[] map = getChunkSection(pair);
+        map[encodeBlockPos(position)] = (short) blockState;
     }
 
     public int get(Position position) {
-        long pair = getChunkIndex(position);
-        Map<Short, Short> map = getChunkMap(pair);
+        long pair = getChunkSectionIndex(position);
+        short[] map = blockStorage.get(pair);
+        if (map == null) return 0;
         short blockPosition = encodeBlockPos(position);
-        return map.containsKey(blockPosition) ? map.get(blockPosition) : 0;
+        return map[blockPosition];
     }
 
     public void remove(Position position) {
-        long pair = getChunkIndex(position);
-        Map<Short, Short> map = getChunkMap(pair);
-        map.remove(encodeBlockPos(position));
-        if (map.isEmpty()) {
+        long pair = getChunkSectionIndex(position);
+        short[] map = getChunkSection(pair);
+        map[encodeBlockPos(position)] = 0;
+        if (Arrays.equals(short4096, map)) {
             blockStorage.remove(pair);
         }
     }
@@ -61,28 +57,30 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     public void unloadChunk(int x, int z) {
-        blockStorage.remove(getChunkIndex(x, z));
+        for (int y = 0; y < 256; y += 16) {
+            blockStorage.remove(getChunkSectionIndex(x, y, z));
+        }
     }
 
-    private Map<Short, Short> getChunkMap(long index) {
-        Map<Short, Short> map = blockStorage.get(index);
+    private short[] getChunkSection(long index) {
+        short[] map = blockStorage.get(index);
         if (map == null) {
-            map = createShortShortMap();
+            map = new short[4096];
             blockStorage.put(index, map);
         }
         return map;
     }
 
-    private long getChunkIndex(int x, int z) {
-        return (long) x << 32 | (z & 0xFFFFFFFFL);
+    private long getChunkSectionIndex(int x, int y, int z) {
+        return (((x >> 4) & 0x3FFFFFFL) << 38) | (((y >> 4) & 0xFFFL) << 26) | ((z >> 4) & 0x3FFFFFFL);
     }
 
-    private long getChunkIndex(Position position) {
-        return getChunkIndex(position.getX().intValue(), position.getZ().intValue());
+    private long getChunkSectionIndex(Position position) {
+        return getChunkSectionIndex(position.getX().intValue(), position.getY().intValue(), position.getZ().intValue());
     }
 
     private short encodeBlockPos(int x, int y, int z) {
-        return (short) (y << 8 | x & 0xF << 4 | z & 0xF);
+        return (short) (((y & 0xF) << 8) | ((x & 0xF) << 4) | (z & 0xF));
     }
 
     private short encodeBlockPos(Position pos) {
@@ -93,17 +91,6 @@ public class BlockConnectionStorage extends StoredObject {
         if (fastUtilLongObjectHashMap != null) {
             try {
                 return (Map<Long, T>) fastUtilLongObjectHashMap.newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return new HashMap<>();
-    }
-
-    private Map<Short, Short> createShortShortMap() {
-        if (fastUtilShortShortHashMap != null) {
-            try {
-                return (Map<Short, Short>) fastUtilShortShortHashMap.newInstance();
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
             }
