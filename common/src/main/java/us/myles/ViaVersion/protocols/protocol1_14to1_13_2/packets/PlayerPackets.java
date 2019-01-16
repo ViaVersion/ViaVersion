@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -107,7 +108,25 @@ public class PlayerPackets {
         protocol.registerIncoming(State.PLAY, 0x29, 0x29, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.POSITION1_14, Type.POSITION);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int hand = wrapper.read(Type.VAR_INT);
+                        Position position = wrapper.read(Type.POSITION1_14);
+                        int face = wrapper.read(Type.VAR_INT);
+                        float x = wrapper.read(Type.FLOAT);
+                        float y = wrapper.read(Type.FLOAT);
+                        float z = wrapper.read(Type.FLOAT);
+                        wrapper.read(Type.BOOLEAN);  // new unknown boolean
+
+                        wrapper.write(Type.POSITION, position);
+                        wrapper.write(Type.VAR_INT, face);
+                        wrapper.write(Type.VAR_INT, hand);
+                        wrapper.write(Type.FLOAT, x);
+                        wrapper.write(Type.FLOAT, y);
+                        wrapper.write(Type.FLOAT, z);
+                    }
+                });
             }
         });
     }

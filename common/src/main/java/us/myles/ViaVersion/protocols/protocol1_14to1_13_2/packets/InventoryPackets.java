@@ -220,8 +220,8 @@ public class InventoryPackets {
                                 deleted++;
                                 continue;
                             }
-                            wrapper.write(Type.STRING, id);
                             wrapper.write(Type.STRING, type);
+                            wrapper.write(Type.STRING, id);
 
                             if (type.equals("crafting_shapeless")) {
                                 wrapper.passthrough(Type.STRING); // Group
