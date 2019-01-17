@@ -21,13 +21,13 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
     @Override
     protected byte getStates(WrappedBlockData blockData) {
         byte states = super.getStates(blockData);
-        if (blockData.getValue("up").equals("true")) states |= 32;
+        if (blockData.getValue("up").equals("true")) states |= 16;
         return states;
     }
 
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
-        if (up(user, position)) states |= 32;
+        if (up(user, position)) states |= 16;
         return states;
     }
 

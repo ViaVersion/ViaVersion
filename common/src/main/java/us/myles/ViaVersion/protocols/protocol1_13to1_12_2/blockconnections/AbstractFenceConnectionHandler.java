@@ -15,15 +15,17 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     @Getter
     private Set<Integer> blockStates = new HashSet<>();
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
+    private static final StairConnectionHandler STAIR_CONNECTION_HANDLER = new StairConnectionHandler();
 
     public AbstractFenceConnectionHandler(String blockConnections, String key) {
         this.blockConnections = blockConnections;
 
         for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
             if (key.equals(blockState.getKey().split("\\[")[0])) {
+                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
+                if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) continue;
                 blockStates.add(blockState.getValue());
                 ConnectionData.connectionHandlerMap.put(blockState.getValue(), this);
-                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
                 connectedBlockStates.put(getStates(blockData), blockState.getValue());
             }
         }
@@ -35,7 +37,6 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         if (blockData.getValue("north").equals("true")) states |= 2;
         if (blockData.getValue("south").equals("true")) states |= 4;
         if (blockData.getValue("west").equals("true")) states |= 8;
-        if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) states |= 16;
         return states;
     }
 
@@ -46,6 +47,11 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         if (connects(BlockFace.SOUTH, getBlockData(user, position.getRelative(BlockFace.SOUTH)))) states |= 4;
         if (connects(BlockFace.WEST, getBlockData(user, position.getRelative(BlockFace.WEST)))) states |= 8;
         return states;
+    }
+
+    @Override
+    public int getBlockData(UserConnection user, Position position) {
+        return STAIR_CONNECTION_HANDLER.connect(user, position, super.getBlockData(user, position));
     }
 
     @Override
