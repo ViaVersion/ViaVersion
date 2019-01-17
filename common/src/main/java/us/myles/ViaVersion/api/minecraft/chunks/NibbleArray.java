@@ -67,11 +67,12 @@ public class NibbleArray {
      * @param value The desired value
      */
     public void set(int index, int value) {
-        index /= 2;
         if (index % 2 == 0) {
-            handle[index] = (byte) (handle[index] & 0xF0 | value & 0xF);
+            index /= 2;
+            handle[index] = (byte) ((handle[index] & 0xF0) | (value & 0xF));
         } else {
-            handle[index] = (byte) (handle[index] & 0xF | (value & 0xF) << 4);
+            index /= 2;
+            handle[index] = (byte) ((handle[index] & 0xF) | ((value & 0xF) << 4));
         }
     }
 

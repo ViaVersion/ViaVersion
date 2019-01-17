@@ -175,11 +175,12 @@ public class WorldPackets {
 
                         if (Via.getConfig().isServersideBlockConnections()) {
                             UserConnection userConnection = wrapper.user();
+
+                            ConnectionData.updateBlockStorage(userConnection, position, newId);
+
                             if (ConnectionData.connects(newId)) {
                                 newId = ConnectionData.connect(userConnection, position, newId);
                             }
-
-                            ConnectionData.updateBlockStorage(userConnection, position, newId);
 
                             ConnectionData.update(userConnection, position);
                         }
