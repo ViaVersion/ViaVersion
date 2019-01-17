@@ -167,11 +167,4 @@ public abstract class BossBar<T> {
      * @return visibility changable with show() and hide()
      */
     public abstract boolean isVisible();
-
-    /**
-     * Get the UUID of this bossbar
-     *
-     * @return Unique Id for this bossbar
-     */
-    public abstract UUID getId();
 }
