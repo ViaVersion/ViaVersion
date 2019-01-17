@@ -7,13 +7,11 @@ import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
     private Map<Long, short[]> blockStorage = createLongObjectMap();
-    private static short[] short4096 = new short[4096];
 
     private static Constructor<?> fastUtilLongObjectHashMap;
 
@@ -48,9 +46,10 @@ public class BlockConnectionStorage extends StoredObject {
         short[] map = blockStorage.get(pair);
         if (map == null) return;
         map[encodeBlockPos(position)] = 0;
-        if (Arrays.equals(short4096, map)) {
-            blockStorage.remove(pair);
+        for (short entry : map) {
+            if (entry != 0) return;
         }
+        blockStorage.remove(pair);
     }
 
     public void clear() {
