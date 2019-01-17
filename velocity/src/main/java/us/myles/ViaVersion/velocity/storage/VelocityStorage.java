@@ -14,7 +14,6 @@ import java.util.UUID;
 public class VelocityStorage extends StoredObject {
     private Player player;
     private String currentServer;
-    private Set<UUID> bossbar;
 
     public VelocityStorage(UserConnection user, Player player) {
         super(user);
