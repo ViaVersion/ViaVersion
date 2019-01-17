@@ -20,18 +20,5 @@ public class VelocityStorage extends StoredObject {
         super(user);
         this.player = player;
         this.currentServer = "";
-
-        // Get bossbar list if it's supported
-        /* TODO make this work - do we need this?
-        try {
-            Object connection = ReflectionUtil.invoke(player, "getConnection");
-            Object sessionHandler = ReflectionUtil.invoke(connection, "getSessionHandler");
-            if (sessionHandler.getClass().getSimpleName().contains("Play")) {
-               bossbar = (Set<UUID>) ReflectionUtil.invoke(sessionHandler, "getServerBossBars");
-            }
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        */
     }
 }

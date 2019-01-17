@@ -141,6 +141,11 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         return visible;
     }
 
+    @Override
+    public UUID getId() {
+        return uuid;
+    }
+
     private void setVisible(boolean value) {
         if (visible != value) {
             visible = value;
