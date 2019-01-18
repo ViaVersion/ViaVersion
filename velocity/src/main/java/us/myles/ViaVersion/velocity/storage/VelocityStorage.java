@@ -5,8 +5,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -14,24 +16,24 @@ import java.util.UUID;
 public class VelocityStorage extends StoredObject {
     private Player player;
     private String currentServer;
-    private Set<UUID> bossbar;
+    private List<UUID> bossbar;
 
     public VelocityStorage(UserConnection user, Player player) {
         super(user);
         this.player = player;
         this.currentServer = "";
+    }
 
+    public void saveServerBossBars() {
         // Get bossbar list if it's supported
-        /* TODO make this work - do we need this?
         try {
-            Object connection = ReflectionUtil.invoke(player, "getConnection");
+            Object connection = ReflectionUtil.invoke(player, "getMinecraftConnection");
             Object sessionHandler = ReflectionUtil.invoke(connection, "getSessionHandler");
             if (sessionHandler.getClass().getSimpleName().contains("Play")) {
-               bossbar = (Set<UUID>) ReflectionUtil.invoke(sessionHandler, "getServerBossBars");
+                bossbar = (List<UUID>) ReflectionUtil.invoke(sessionHandler, "getServerBossBars");
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        */
     }
 }
