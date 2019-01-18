@@ -87,15 +87,6 @@ public class VelocityServerHandler {
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
-        // Manually hide ViaVersion-created BossBars if the childserver was version 1.8.x (#666)
-        // Will be cleared by code below or by Velocity's handleBackendJoinGame
-        /*if (user.has(EntityTracker.class)) {
-            EntityTracker tracker = user.get(EntityTracker.class);
-
-            if (tracker.getBossBarMap() != null)
-                for (BossBar bar : tracker.getBossBarMap().values())
-                    bar.hide();
-        }*/
         // Handle server/version change
         if (user.has(VelocityStorage.class)) {
             // Wait all the scheduled packets be sent
