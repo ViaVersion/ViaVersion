@@ -16,8 +16,8 @@ public class DoorConnectionHandler extends ConnectionHandler {
     private static Map<Integer, DoorData> doorDataMap = new HashMap<>();
     private static Map<Short, Integer> connectedStates = new HashMap<>();
 
-    static void init() {
-        List<String> baseDoors = new LinkedList<>();
+    static ConnectionData.ConnectorInitAction init() {
+        final List<String> baseDoors = new LinkedList<>();
         baseDoors.add("minecraft:oak_door");
         baseDoors.add("minecraft:birch_door");
         baseDoors.add("minecraft:jungle_door");
@@ -26,30 +26,31 @@ public class DoorConnectionHandler extends ConnectionHandler {
         baseDoors.add("minecraft:spruce_door");
         baseDoors.add("minecraft:iron_door");
 
-        DoorConnectionHandler connectionHandler = new DoorConnectionHandler();
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            String key = blockState.getKey().split("\\[")[0];
-            int type = baseDoors.indexOf(key);
-            if (type == -1) continue;
+        final DoorConnectionHandler connectionHandler = new DoorConnectionHandler();
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                int type = baseDoors.indexOf(blockData.getMinecraftKey());
+                if (type == -1) return;
 
-            WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-            int id = blockState.getValue();
+                int id = blockData.getSavedBlockStateId();
 
-            DoorData doorData = new DoorData(
-                    blockData.getValue("half").equals("lower"),
-                    blockData.getValue("hinge").equals("right"),
-                    blockData.getValue("powered").equals("true"),
-                    blockData.getValue("open").equals("true"),
-                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase()),
-                    type
-            );
+                DoorData doorData = new DoorData(
+                        blockData.getValue("half").equals("lower"),
+                        blockData.getValue("hinge").equals("right"),
+                        blockData.getValue("powered").equals("true"),
+                        blockData.getValue("open").equals("true"),
+                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase()),
+                        type
+                );
 
-            doorDataMap.put(id, doorData);
+                doorDataMap.put(id, doorData);
 
-            connectedStates.put(getStates(doorData), id);
+                connectedStates.put(getStates(doorData), id);
 
-            ConnectionData.connectionHandlerMap.put(id, connectionHandler);
-        }
+                ConnectionData.connectionHandlerMap.put(id, connectionHandler);
+            }
+        };
     }
 
     private static short getStates(DoorData doorData) {

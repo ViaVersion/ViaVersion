@@ -2,11 +2,11 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
 public class MelonConnectionHandler extends AbstractStempConnectionHandler {
 
-    public MelonConnectionHandler(String baseStateId, String blockId, String toKey) {
-        super(baseStateId, blockId, toKey);
+    public MelonConnectionHandler(String baseStateId) {
+        super(baseStateId);
     }
 
-    static void init() {
-        new MelonConnectionHandler("minecraft:melon_stem[age=7]", "minecraft:melon", "minecraft:attached_melon_stem");
+    static ConnectionData.ConnectorInitAction init() {
+        return new MelonConnectionHandler("minecraft:melon_stem[age=7]").getInitAction("minecraft:melon", "minecraft:attached_melon_stem");
     }
 }

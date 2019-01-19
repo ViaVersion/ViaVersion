@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 public class WrappedBlockData {
     @Getter
     private String minecraftKey;
+    @Getter
+    private int savedBlockStateId;
     private LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
 
     public static WrappedBlockData fromString(String s) {
@@ -36,8 +38,8 @@ public class WrappedBlockData {
         return fromString("minecraft:air");
     }
 
-    private WrappedBlockData(String key) {
-        minecraftKey = key;
+    private WrappedBlockData(String minecraftKey) {
+        this.minecraftKey = minecraftKey;
     }
 
     public String toString() {
