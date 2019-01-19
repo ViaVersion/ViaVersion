@@ -8,25 +8,27 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import net.md_5.bungee.protocol.packet.PluginMessage;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 
 public class BungeeServerHandler implements Listener {
     private static Method getHandshake;
@@ -86,14 +88,6 @@ public class BungeeServerHandler implements Listener {
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
-        // Manually hide ViaVersion-created BossBars if the childserver was version 1.8.x (#666)
-        if (user.has(EntityTracker.class)) {
-            EntityTracker tracker = user.get(EntityTracker.class);
-
-            if (tracker.getBossBarMap() != null)
-                for (BossBar bar : tracker.getBossBarMap().values())
-                    bar.hide();
-        }
         // Handle server/version change
         if (user.has(BungeeStorage.class)) {
             BungeeStorage storage = user.get(BungeeStorage.class);
@@ -106,6 +100,18 @@ public class BungeeServerHandler implements Listener {
                     storage.setCurrentServer(serverName);
 
                     int protocolId = ProtocolDetectorService.getProtocolId(serverName);
+
+                    if (protocolId <= ProtocolVersion.v1_8.getId()) { // 1.8 doesn't have BossBar packet
+                        if (storage.getBossbar() != null) {
+                            for (UUID uuid : storage.getBossbar()) {
+                                PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
+                                wrapper.write(Type.UUID, uuid);
+                                wrapper.write(Type.VAR_INT, 1); // remove
+                                wrapper.send(Protocol1_9TO1_8.class, true, true);
+                            }
+                            storage.getBossbar().clear();
+                        }
+                    }
 
                     ProtocolInfo info = user.get(ProtocolInfo.class);
                     int previousServerProtocol = info.getServerProtocolVersion();
@@ -130,41 +136,32 @@ public class BungeeServerHandler implements Listener {
 
                     // Workaround 1.13 server change
                     Object relayMessages = getRelayMessages.invoke(e.getPlayer().getPendingConnection());
-                    if (relayMessages instanceof List) {
-                        for (Object message : (List) relayMessages) {
-                            if (message instanceof PluginMessage) {
-                                PluginMessage plMsg = (PluginMessage) message;
-                                String channel = plMsg.getTag();
-                                if (previousServerProtocol != -1) {
-                                    if (previousServerProtocol < ProtocolVersion.v1_13.getId()
-                                            && protocolId >= ProtocolVersion.v1_13.getId()) {
-                                        channel = InventoryPackets.getNewPluginChannelId(channel);
-                                        if (channel.equals("minecraft:register")) {
-                                            String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
-                                            for (int i = 0; i < channels.length; i++) {
-                                                channels[i] = InventoryPackets.getNewPluginChannelId(channels[i]);
-                                            }
-                                            plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
-                                        }
-                                    } else if (previousServerProtocol >= ProtocolVersion.v1_13.getId()
-                                            && protocolId < ProtocolVersion.v1_13.getId()) {
-                                        channel = InventoryPackets.getOldPluginChannelId(channel);
-                                        if (channel.equals("REGISTER")) {
-                                            String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
-                                            for (int i = 0; i < channels.length; i++) {
-                                                channels[i] = InventoryPackets.getOldPluginChannelId(channels[i]);
-                                            }
-                                            plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
-                                        }
+                    for (Object message : (List) relayMessages) {
+                        PluginMessage plMsg = (PluginMessage) message;
+                        String channel = plMsg.getTag();
+                        int id1_13 = ProtocolVersion.v1_13.getId();
+                        if (previousServerProtocol != -1) {
+                            if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
+                                channel = InventoryPackets.getNewPluginChannelId(channel);
+                                if (channel.equals("minecraft:register")) {
+                                    String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
+                                    for (int i = 0; i < channels.length; i++) {
+                                        channels[i] = InventoryPackets.getNewPluginChannelId(channels[i]);
                                     }
+                                    plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
                                 }
-                                plMsg.setTag(channel);
-                            } else {
-                                Via.getPlatform().getLogger().warning("relayMessages contains a element that isn't a Handshake " + message);
+                            } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
+                                channel = InventoryPackets.getOldPluginChannelId(channel);
+                                if (channel.equals("REGISTER")) {
+                                    String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
+                                    for (int i = 0; i < channels.length; i++) {
+                                        channels[i] = InventoryPackets.getOldPluginChannelId(channels[i]);
+                                    }
+                                    plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
+                                }
                             }
                         }
-                    } else {
-                        Via.getPlatform().getLogger().warning("relayMessages isn't a List! " + relayMessages);
+                        plMsg.setTag(channel);
                     }
 
                     user.put(info);
