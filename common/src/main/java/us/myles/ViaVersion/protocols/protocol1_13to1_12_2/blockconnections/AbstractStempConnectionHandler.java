@@ -17,23 +17,28 @@ public class AbstractStempConnectionHandler extends ConnectionHandler {
 
     private Map<BlockFace, Integer> stemps = new HashMap<>();
 
-    public AbstractStempConnectionHandler(String baseStateId, String blockId, String toKey) {
+    public AbstractStempConnectionHandler(String baseStateId) {
         this.baseStateId = ConnectionData.getId(baseStateId);
+    }
 
-        for (Map.Entry<String, Integer> entry : ConnectionData.keyToId.entrySet()) {
-            String key = entry.getKey().split("\\[")[0];
-            if (entry.getValue() == this.baseStateId || blockId.equals(key)) {
-                if (entry.getValue() != this.baseStateId) {
-                    this.blockId.add(entry.getValue());
+    public ConnectionData.ConnectorInitAction getInitAction(final String blockId, final String toKey) {
+        final AbstractStempConnectionHandler handler = this;
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (blockData.getBlockStateId() == baseStateId || blockId.equals(blockData.getMinecraftKey())) {
+                    if (blockData.getBlockStateId() != baseStateId) {
+                        handler.blockId.add(blockData.getBlockStateId());
+                    }
+                    ConnectionData.connectionHandlerMap.put(blockData.getBlockStateId(), handler);
                 }
-                ConnectionData.connectionHandlerMap.put(entry.getValue(), this);
+                if (blockData.getMinecraftKey().equals(toKey)) {
+                    WrappedBlockData data = WrappedBlockData.fromString(blockData.getMinecraftKey());
+                    String facing = data.getValue("facing").toUpperCase();
+                    stemps.put(BlockFace.valueOf(facing), blockData.getBlockStateId());
+                }
             }
-            if (key.equals(toKey)) {
-                WrappedBlockData data = WrappedBlockData.fromString(entry.getKey());
-                String facing = data.getValue("facing").toUpperCase();
-                stemps.put(BlockFace.valueOf(facing), entry.getValue());
-            }
-        }
+        };
     }
 
     @Override

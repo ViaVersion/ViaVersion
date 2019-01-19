@@ -16,11 +16,8 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.provi
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class ConnectionData {
 	static Map<Integer, String> idToKey = new HashMap<>();
@@ -163,13 +160,14 @@ public class ConnectionData {
 			occludingStates.add(keyToId.get(jsonElement.getAsString()));
 		}
 
-		PumpkinConnectionHandler.init();
-		MelonConnectionHandler.init();
+		List<ConnectorInitAction> initActions = new ArrayList<>();
+		initActions.add(PumpkinConnectionHandler.init());
+		initActions.add(MelonConnectionHandler.init());
 		BasicFenceConnectionHandler.init();
 		NetherFenceConnectionHandler.init();
 		WallConnectionHandler.init();
 		MelonConnectionHandler.init();
-		GlassConnectionHandler.init();
+		initActions.addAll(GlassConnectionHandler.init());
 		ChestConnectionHandler.init();
 		DoorConnectionHandler.init();
 		RedstoneConnectionHandler.init();
@@ -177,6 +175,12 @@ public class ConnectionData {
 		FlowerConnectionHandler.init();
 		ChorusPlantConnectionHandler.init();
 		TripwireConnectionHandler.init();
+        for (Entry<String, Integer> entry : keyToId.entrySet()) {
+            WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(entry.getKey());
+            for (ConnectorInitAction action : initActions) {
+                action.check(wrappedBlockData);
+            }
+        }
 
 		if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")) {
 			Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
@@ -207,4 +211,9 @@ public class ConnectionData {
 	public static String getKey(int id) {
 		return idToKey.get(id);
 	}
+
+    interface ConnectorInitAction {
+
+        void check(WrappedBlockData blockData);
+    }
 }

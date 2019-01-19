@@ -8,13 +8,17 @@ import java.util.Map.Entry;
 
 public class WrappedBlockData {
     @Getter
+    private String blockDataKey;
+    @Getter
     private String minecraftKey;
+    @Getter
+    private int blockStateId;
     private LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
 
     public static WrappedBlockData fromString(String s) {
         String[] array = s.split("\\[");
         String key = array[0];
-        WrappedBlockData wrappedBlockdata = new WrappedBlockData(key);
+        WrappedBlockData wrappedBlockdata = new WrappedBlockData(s, key, ConnectionData.getId(s));
         if (array.length > 1) {
             String blockData = array[1];
             blockData = blockData.replace("]", "");
@@ -36,8 +40,10 @@ public class WrappedBlockData {
         return fromString("minecraft:air");
     }
 
-    private WrappedBlockData(String key) {
-        minecraftKey = key;
+    private WrappedBlockData(String blockDataKey, String minecraftKey, int id) {
+        this.blockDataKey = blockDataKey;
+        this.minecraftKey = minecraftKey;
+        blockStateId = id;
     }
 
     public String toString() {
@@ -46,10 +52,6 @@ public class WrappedBlockData {
             sb.append(entry.getKey()).append('=').append(entry.getValue()).append(',');
         }
         return sb.substring(0, sb.length()-1) + "]";
-    }
-
-    public int getBlockStateId() {
-        return ConnectionData.getId(toString());
     }
 
     public WrappedBlockData set(String data, Object value) {

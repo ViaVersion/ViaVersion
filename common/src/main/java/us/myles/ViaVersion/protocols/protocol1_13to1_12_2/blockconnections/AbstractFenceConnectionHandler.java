@@ -16,17 +16,22 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     private Set<Integer> blockStates = new HashSet<>();
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
 
-    public AbstractFenceConnectionHandler(String blockConnections, String key) {
+    public AbstractFenceConnectionHandler(String blockConnections) {
         this.blockConnections = blockConnections;
+    }
 
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            if (key.equals(blockState.getKey().split("\\[")[0])) {
-                blockStates.add(blockState.getValue());
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), this);
-                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-                connectedBlockStates.put(getStates(blockData), blockState.getValue());
+    public ConnectionData.ConnectorInitAction getInitAction(final String key) {
+        final AbstractFenceConnectionHandler handler = this;
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (key.equals(blockData.getMinecraftKey())) {
+                    blockStates.add(blockData.getBlockStateId());
+                    ConnectionData.connectionHandlerMap.put(blockData.getBlockStateId(), handler);
+                    connectedBlockStates.put(getStates(blockData), blockData.getBlockStateId());
+                }
             }
-        }
+        };
     }
 
     protected byte getStates(WrappedBlockData blockData) {
