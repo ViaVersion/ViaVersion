@@ -15,29 +15,27 @@ public class TripwireConnectionHandler extends ConnectionHandler {
     private static Map<Byte, Integer> connectedBlocks = new HashMap<>();
     private static Map<Integer, BlockFace> tripwireHooks = new HashMap<>();
 
-    static void init() {
-        TripwireConnectionHandler connectionHandler = new TripwireConnectionHandler();
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            String key = blockState.getKey().split("\\[")[0];
+    static ConnectionData.ConnectorInitAction init() {
+        final TripwireConnectionHandler connectionHandler = new TripwireConnectionHandler();
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (blockData.getMinecraftKey().equals("minecraft:tripwire_hook")) {
+                    tripwireHooks.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase()));
+                } else if (blockData.getMinecraftKey().equals("minecraft:tripwire")) {
+                    TripwireData tripwireData = new TripwireData(
+                            blockData.getValue("attached").equals("true"),
+                            blockData.getValue("disarmed").equals("true"),
+                            blockData.getValue("powered").equals("true")
+                    );
 
-            if (key.equals("minecraft:tripwire_hook")) {
-                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-                tripwireHooks.put(blockState.getValue(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase()));
-            } else if (key.equals("minecraft:tripwire")) {
-                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
+                    tripwireDataMap.put(blockData.getSavedBlockStateId(), tripwireData);
+                    connectedBlocks.put(getStates(blockData), blockData.getSavedBlockStateId());
 
-                TripwireData tripwireData = new TripwireData(
-                        blockData.getValue("attached").equals("true"),
-                        blockData.getValue("disarmed").equals("true"),
-                        blockData.getValue("powered").equals("true")
-                );
-
-                tripwireDataMap.put(blockState.getValue(), tripwireData);
-                connectedBlocks.put(getStates(blockData), blockState.getValue());
-
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
+                }
             }
-        }
+        };
     }
 
     private static byte getStates(WrappedBlockData blockData) {

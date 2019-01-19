@@ -10,7 +10,7 @@ import java.util.List;
 public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
 
     static List<ConnectionData.ConnectorInitAction> init() {
-        List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>();
+        List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(18);
         actions.add(new GlassConnectionHandler("paneConnections").getInitAction("minecraft:white_stained_glass_pane"));
         actions.add(new GlassConnectionHandler("paneConnections").getInitAction("minecraft:orange_stained_glass_pane"));
         actions.add(new GlassConnectionHandler("paneConnections").getInitAction("minecraft:magenta_stained_glass_pane"));

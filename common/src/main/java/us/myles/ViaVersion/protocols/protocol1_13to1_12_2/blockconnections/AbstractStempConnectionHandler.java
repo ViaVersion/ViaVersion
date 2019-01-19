@@ -26,16 +26,15 @@ public class AbstractStempConnectionHandler extends ConnectionHandler {
         return new ConnectionData.ConnectorInitAction() {
             @Override
             public void check(WrappedBlockData blockData) {
-                if (blockData.getBlockStateId() == baseStateId || blockId.equals(blockData.getMinecraftKey())) {
-                    if (blockData.getBlockStateId() != baseStateId) {
-                        handler.blockId.add(blockData.getBlockStateId());
+                if (blockData.getSavedBlockStateId() == baseStateId || blockId.equals(blockData.getMinecraftKey())) {
+                    if (blockData.getSavedBlockStateId() != baseStateId) {
+                        handler.blockId.add(blockData.getSavedBlockStateId());
                     }
-                    ConnectionData.connectionHandlerMap.put(blockData.getBlockStateId(), handler);
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
                 }
                 if (blockData.getMinecraftKey().equals(toKey)) {
-                    WrappedBlockData data = WrappedBlockData.fromString(blockData.getMinecraftKey());
-                    String facing = data.getValue("facing").toUpperCase();
-                    stemps.put(BlockFace.valueOf(facing), blockData.getBlockStateId());
+                    String facing = blockData.getValue("facing").toUpperCase();
+                    stemps.put(BlockFace.valueOf(facing), blockData.getSavedBlockStateId());
                 }
             }
         };
