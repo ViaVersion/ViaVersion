@@ -175,8 +175,8 @@ public class ConnectionData {
         initActions.add(FlowerConnectionHandler.init());
         initActions.addAll(ChorusPlantConnectionHandler.init());
         initActions.add(TripwireConnectionHandler.init());
-        for (Entry<String, Integer> entry : keyToId.entrySet()) {
-            WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(entry.getKey());
+        for (String key : keyToId.keySet()) {
+            WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(key);
             for (ConnectorInitAction action : initActions) {
                 action.check(wrappedBlockData);
             }
