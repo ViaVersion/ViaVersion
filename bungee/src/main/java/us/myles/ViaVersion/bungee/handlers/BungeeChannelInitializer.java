@@ -30,6 +30,9 @@ public class BungeeChannelInitializer extends ChannelInitializer<SocketChannel> 
         new ProtocolPipeline(info);
         // Add originals
         this.method.invoke(this.original, socketChannel);
+
+        if (socketChannel.pipeline().get("packet-encoder") == null) return; // Don't inject if no packet-encoder
+        if (socketChannel.pipeline().get("packet-decoder") == null) return; // Don't inject if no packet-decoder
         // Add our transformers
         BungeeEncodeHandler encoder = new BungeeEncodeHandler(info);
         BungeeDecodeHandler decoder = new BungeeDecodeHandler(info);
