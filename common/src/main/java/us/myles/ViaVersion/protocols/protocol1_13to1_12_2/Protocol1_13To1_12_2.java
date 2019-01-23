@@ -852,9 +852,33 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 // Fake the end of the packet
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.BOOLEAN, false);
                         wrapper.write(Type.OPTIONAL_POSITION, null);
+                        if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
+                            TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
+                            if (tracker.getLastTabCompleteTask() != null) {
+                                Via.getPlatform().cancelTask(tracker.getLastTabCompleteTask());
+                            }
+                            wrapper.cancel();
+                            wrapper.resetReader();
+                            final PacketWrapper delayedPacket = wrapper.create(0x1);
+                            delayedPacket.write(Type.STRING, wrapper.read(Type.STRING));
+                            delayedPacket.write(Type.BOOLEAN, false);
+                            delayedPacket.write(Type.OPTIONAL_POSITION, null);
+                            tracker.setLastTabCompleteTask(
+                                    Via.getPlatform().runSync(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                delayedPacket.sendToServer(Protocol1_13To1_12_2.class);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }, (long) Via.getConfig().get1_13TabCompleteDelay())
+                            );
+                        }
                     }
                 });
             }

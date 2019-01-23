@@ -114,6 +114,8 @@ team-colour-fix: true
 suppress-1_13-conversion-errors: false
 # 1.13 introduced new auto complete which can trigger "Kicked for spamming" for servers older than 1.13, the following option will disable it completely.
 disable-1_13-auto-complete: false
+# The following option will delay the tab complete request in x ticks if greater than 0, if other tab-complete is received, the previous is cancelled
+1_13-tab-complete-delay: 0
 # For 1.13 clients the smallest (1 layer) snow doesn't have collision, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
 fix-low-snow-collision: false
 #
