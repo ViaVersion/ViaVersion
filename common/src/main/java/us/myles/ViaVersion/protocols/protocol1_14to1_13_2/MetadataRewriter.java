@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13_2;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class MetadataRewriter {
     public static void handleMetadata(int entityId, Entity1_14Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
+                EntityTracker tracker = connection.get(EntityTracker.class);
                 // 1.13 changed item to flat item (no data)
                 if (metadata.getMetaType() == MetaType1_13_2.Slot) {
                     InventoryPackets.toClient((Item) metadata.getValue());
@@ -26,7 +28,9 @@ public class MetadataRewriter {
                     int data = (int) metadata.getValue();
                     metadata.setValue(Protocol1_14To1_13_2.getNewBlockStateId(data));
                 }
+
                 if (type == null) continue;
+
                 if (type.isOrHasParent(Entity1_14Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
                     // New block format
                     int data = (int) metadata.getValue();
@@ -44,6 +48,19 @@ public class MetadataRewriter {
                         // plains
                         metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                         metadata.setMetaType(MetaType1_14.VillagerData);
+                    }
+                }
+
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ARROW)) {
+                    if (metadata.getId() >= 8) {
+                        metadata.setId(metadata.getId() + 1);
+                    }
+                }
+
+                if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
+                    if (metadata.getId() == 7) {
+                        metadata.setValue(tracker.getUUID(((Number) metadata.getValue()).intValue()).orNull());
+                        metadata.setMetaType(MetaType1_14.OptUUID);
                     }
                 }
             } catch (Exception e) {
