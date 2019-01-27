@@ -50,7 +50,7 @@ public class EntityTypeRewriter {
         regEnt(45, 46); // tnt_minecart
         regEnt(46, 47); // mule
         regEnt(47, 48); // mooshroom
-        regEnt(48, 49); // ocelot
+        regEnt(48, 6); // ocelot -> cat TODO Remap untamed ocelot to ocelot?
         regEnt(49, 50); // painting
         regEnt(50, 52); // parrot
         regEnt(51, 53); // pig

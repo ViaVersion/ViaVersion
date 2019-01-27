@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
@@ -12,9 +13,11 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -244,6 +247,12 @@ public class WorldPackets {
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
                         clientChunks.setEnvironment(dimensionId);
+
+                        int entityId = wrapper.get(Type.INT, 0);
+
+                        Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
+                        // Register Type ID
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, wrapper.user().get(ProtocolInfo.class).getUuid(), entType);
                     }
                 });
             }
