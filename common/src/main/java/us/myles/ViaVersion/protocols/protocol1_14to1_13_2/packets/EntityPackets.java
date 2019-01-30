@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -41,21 +42,22 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         UUID uuid = wrapper.get(Type.UUID, 0);
-                        int type = wrapper.get(Type.VAR_INT, 1);
-                        Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type, true);
+                        int typeId = wrapper.get(Type.VAR_INT, 1);
 
-                        if (entType != null) {
-                            if (entType.is(Entity1_14Types.EntityType.FALLING_BLOCK)) {
+                        Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
+                        typeId = EntityTypeRewriter.getNewId(type1_13.getId()).or(type1_13.getId());
+                        Entity1_14Types.EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
+
+                        if (type1_14 != null) {
+                            if (type1_14.is(Entity1_14Types.EntityType.FALLING_BLOCK)) {
                                 int data = wrapper.get(Type.INT, 0);
                                 wrapper.set(Type.INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
                             }
-
-                            type = entType.getId();
                         }
 
-                        wrapper.set(Type.VAR_INT, 1, type);
+                        wrapper.set(Type.VAR_INT, 1, typeId);
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, uuid, entType);
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, uuid, type1_14);
                     }
                 });
             }
@@ -88,7 +90,7 @@ public class EntityPackets {
 
                         type = EntityTypeRewriter.getNewId(type).or(type);
 
-                        Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type, false);
+                        Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type);
 
                         wrapper.set(Type.VAR_INT, 1, type);
 

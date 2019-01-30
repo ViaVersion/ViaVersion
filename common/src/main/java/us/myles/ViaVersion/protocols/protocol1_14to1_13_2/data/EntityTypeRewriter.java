@@ -74,29 +74,29 @@ public class EntityTypeRewriter {
         regEnt(69, 71); // spider
         regEnt(70, 72); // squid
         regEnt(71, 73); // stray
-        regEnt(72, 74); // tropical_fish
-        regEnt(73, 75); // turtle
-        regEnt(74, 76); // egg
-        regEnt(75, 77); // ender_pearl
-        regEnt(76, 78); // experience_bottle
-        regEnt(77, 79); // potion
-        regEnt(78, 80); // vex
-        regEnt(79, 81); // villager
-        regEnt(80, 82); // iron_golem
-        regEnt(81, 83); // vindicator
-        regEnt(82, 85); // witch
-        regEnt(83, 86); // wither
-        regEnt(84, 87); // wither_skeleton
-        regEnt(85, 88); // wither_skull
-        regEnt(86, 89); // wolf
-        regEnt(87, 90); // zombie
-        regEnt(88, 91); // zombie_horse
-        regEnt(89, 92); // zombie_villager
-        regEnt(90, 93); // phantom
-        regEnt(91, 95); // lightning_bolt
-        regEnt(92, 96); // player
-        regEnt(93, 97); // fishing_bobber
-        regEnt(94, 98); // trident
+        regEnt(72, 75); // tropical_fish
+        regEnt(73, 76); // turtle
+        regEnt(74, 77); // egg
+        regEnt(75, 78); // ender_pearl
+        regEnt(76, 79); // experience_bottle
+        regEnt(77, 80); // potion
+        regEnt(78, 82); // vex
+        regEnt(79, 83); // villager
+        regEnt(80, 84); // iron_golem
+        regEnt(81, 85); // vindicator
+        regEnt(82, 88); // witch
+        regEnt(83, 89); // wither
+        regEnt(84, 90); // wither_skeleton
+        regEnt(85, 91); // wither_skull
+        regEnt(86, 92); // wolf
+        regEnt(87, 93); // zombie
+        regEnt(88, 94); // zombie_horse
+        regEnt(89, 95); // zombie_villager
+        regEnt(90, 96); // phantom
+        regEnt(91, 98); // lightning_bolt
+        regEnt(92, 99); // player
+        regEnt(93, 100); // fishing_bobber
+        regEnt(94, 81); // trident
     }
 
     private static void regEnt(int type1_13, int type1_14) {
