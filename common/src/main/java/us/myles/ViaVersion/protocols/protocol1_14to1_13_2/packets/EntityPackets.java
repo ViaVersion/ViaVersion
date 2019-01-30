@@ -27,7 +27,7 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - UUID
-                map(Type.BYTE); // 2 - Type
+                map(Type.BYTE, Type.VAR_INT); // 2 - Type
                 map(Type.DOUBLE); // 3 - X
                 map(Type.DOUBLE); // 4 - Y
                 map(Type.DOUBLE); // 5 - Z
@@ -41,7 +41,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         UUID uuid = wrapper.get(Type.UUID, 0);
-                        byte type = wrapper.get(Type.BYTE, 0);
+                        int type = wrapper.get(Type.VAR_INT, 1);
                         Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type, true);
 
                         if (entType != null) {
@@ -49,7 +49,11 @@ public class EntityPackets {
                                 int data = wrapper.get(Type.INT, 0);
                                 wrapper.set(Type.INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
                             }
+
+                            type = entType.getId();
                         }
+
+                        wrapper.set(Type.VAR_INT, 1, type);
                         // Register Type ID
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, uuid, entType);
                     }
