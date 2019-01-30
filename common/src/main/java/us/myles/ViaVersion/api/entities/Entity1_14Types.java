@@ -7,11 +7,11 @@ import us.myles.ViaVersion.api.Via;
 
 
 public class Entity1_14Types {
-    public static EntityType getTypeFromId(int typeID, boolean isObject) {
-        Optional<EntityType> type = isObject ? ObjectTypes.getPCEntity(typeID) : EntityType.findById(typeID);
+    public static EntityType getTypeFromId(int typeID) {
+        Optional<EntityType> type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID + " isObject=" + isObject);
+            Via.getPlatform().getLogger().severe("Could not find type id " + typeID);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
@@ -236,61 +236,6 @@ public class Entity1_14Types {
             } while (parent != null);
 
             return false;
-        }
-    }
-
-    @AllArgsConstructor
-    @Getter
-    public enum ObjectTypes {
-        BOAT(1, EntityType.BOAT),
-        ITEM(2, EntityType.ITEM),
-        AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
-        MINECART(10, EntityType.MINECART_ABSTRACT),
-        TNT_PRIMED(50, EntityType.TNT),
-        ENDER_CRYSTAL(51, EntityType.ENDER_CRYSTAL),
-        TIPPED_ARROW(60, EntityType.ARROW),
-        SNOWBALL(61, EntityType.SNOWBALL),
-        EGG(62, EntityType.EGG),
-        FIREBALL(63, EntityType.FIREBALL),
-        SMALL_FIREBALL(64, EntityType.SMALL_FIREBALL),
-        ENDER_PEARL(65, EntityType.ENDER_PEARL),
-        WITHER_SKULL(66, EntityType.WITHER_SKULL),
-        SHULKER_BULLET(67, EntityType.SHULKER_BULLET),
-        LIAMA_SPIT(68, EntityType.LLAMA_SPIT),
-        FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
-        ITEM_FRAME(71, EntityType.ITEM_FRAME),
-        ENDER_SIGNAL(72, EntityType.EYE_OF_ENDER_SIGNAL),
-        POTION(73, EntityType.POTION),
-        THROWN_EXP_BOTTLE(75, EntityType.XP_BOTTLE),
-        FIREWORK(76, EntityType.FIREWORKS_ROCKET),
-        LEASH(77, EntityType.LEASH_KNOT),
-        ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        EVOCATION_FANGS(79, EntityType.EVOCATION_FANGS),
-        FISHIHNG_HOOK(90, EntityType.FISHING_BOBBER),
-        SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
-        DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL),
-        ;
-
-        private final int id;
-        private final EntityType type;
-
-        public static Optional<ObjectTypes> findById(int id) {
-            if (id == -1)
-                return Optional.absent();
-
-            for (ObjectTypes ent : ObjectTypes.values())
-                if (ent.getId() == id)
-                    return Optional.of(ent);
-
-            return Optional.absent();
-        }
-
-        public static Optional<EntityType> getPCEntity(int id) {
-            Optional<ObjectTypes> output = findById(id);
-
-            if (!output.isPresent())
-                return Optional.absent();
-            return Optional.of(output.get().getType());
         }
     }
 }
