@@ -98,7 +98,9 @@ public class MetadataRewriter {
         // Handle AreaEffectCloud outside the loop
         if (type != null && type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) && particleId != -1) {
             Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
-            metadatas.add(new Metadata(9, MetaType1_13.PARTICLE, particle));
+            if (particle != null && particle.getId() != -1) {
+                metadatas.add(new Metadata(9, MetaType1_13.PARTICLE, particle));
+            }
         }
     }
 }
