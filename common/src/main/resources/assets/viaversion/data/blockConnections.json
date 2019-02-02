@@ -2529,6 +2529,58 @@
       "east": false
     }
   },
+  "minecraft:oak_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:oak_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:oak_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -2555,6 +2607,58 @@
       "east": false
     }
   },
+  "minecraft:oak_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:oak_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:oak_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -2578,6 +2682,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:oak_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:oak_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -2607,6 +2763,58 @@
       "east": false
     }
   },
+  "minecraft:oak_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:oak_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:oak_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -2628,6 +2836,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:oak_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:oak_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -2659,6 +2919,58 @@
       "east": false
     }
   },
+  "minecraft:oak_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:oak_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:oak_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -2685,6 +2997,58 @@
       "east": true
     }
   },
+  "minecraft:oak_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:oak_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:oak_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -2707,6 +3071,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:oak_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:oak_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -3151,6 +3567,58 @@
       "east": false
     }
   },
+  "minecraft:cobblestone_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:cobblestone_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -3177,6 +3645,58 @@
       "east": false
     }
   },
+  "minecraft:cobblestone_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:cobblestone_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -3200,6 +3720,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -3229,6 +3801,58 @@
       "east": false
     }
   },
+  "minecraft:cobblestone_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:cobblestone_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -3250,6 +3874,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -3281,6 +3957,58 @@
       "east": false
     }
   },
+  "minecraft:cobblestone_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:cobblestone_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -3303,6 +4031,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -3333,6 +4113,58 @@
       "east": true
     }
   },
+  "minecraft:cobblestone_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:cobblestone_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:lever[face=floor,facing=north,powered=true]": {
     "redstoneConnections": {
       "north": true,
@@ -3349,7 +4181,7 @@
       "east": true
     }
   },
-  "minecraft:lever[face=floor,facing=west,powered=false]": {
+  "minecraft:lever[face=floor,facing=west,powered=true]": {
     "redstoneConnections": {
       "north": true,
       "south": true,
@@ -3357,7 +4189,7 @@
       "east": true
     }
   },
-  "minecraft:lever[face=floor,facing=east,powered=true]": {
+  "minecraft:lever[face=floor,facing=west,powered=false]": {
     "redstoneConnections": {
       "north": true,
       "south": true,
@@ -5515,6 +6347,58 @@
       "east": false
     }
   },
+  "minecraft:brick_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:brick_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:brick_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -5541,6 +6425,58 @@
       "east": false
     }
   },
+  "minecraft:brick_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:brick_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:brick_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5564,6 +6500,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:brick_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:brick_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -5593,6 +6581,58 @@
       "east": false
     }
   },
+  "minecraft:brick_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:brick_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:brick_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5614,6 +6654,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:brick_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:brick_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -5645,6 +6737,58 @@
       "east": false
     }
   },
+  "minecraft:brick_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:brick_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5667,6 +6811,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:brick_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:brick_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -5697,6 +6893,58 @@
       "east": true
     }
   },
+  "minecraft:brick_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:brick_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:stone_brick_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -5721,6 +6969,58 @@
       "south": false,
       "west": false,
       "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
     }
   },
   "minecraft:stone_brick_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
@@ -5749,6 +7049,58 @@
       "east": false
     }
   },
+  "minecraft:stone_brick_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:stone_brick_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5772,6 +7124,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -5801,6 +7205,58 @@
       "east": false
     }
   },
+  "minecraft:stone_brick_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:stone_brick_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5822,6 +7278,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -5853,6 +7361,58 @@
       "east": false
     }
   },
+  "minecraft:stone_brick_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:stone_brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5879,6 +7439,58 @@
       "east": true
     }
   },
+  "minecraft:stone_brick_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -5901,6 +7513,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -5991,6 +7655,58 @@
       "east": false
     }
   },
+  "minecraft:nether_brick_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:nether_brick_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -6017,6 +7733,58 @@
       "east": false
     }
   },
+  "minecraft:nether_brick_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:nether_brick_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6040,6 +7808,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -6069,6 +7889,58 @@
       "east": false
     }
   },
+  "minecraft:nether_brick_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:nether_brick_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6090,6 +7962,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -6121,6 +8045,58 @@
       "east": false
     }
   },
+  "minecraft:nether_brick_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:nether_brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6147,6 +8123,58 @@
       "east": true
     }
   },
+  "minecraft:nether_brick_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:nether_brick_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6169,6 +8197,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:nether_brick_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -6277,6 +8357,58 @@
       "east": false
     }
   },
+  "minecraft:sandstone_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:sandstone_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:sandstone_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -6303,6 +8435,58 @@
       "east": false
     }
   },
+  "minecraft:sandstone_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:sandstone_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:sandstone_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6326,6 +8510,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:sandstone_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:sandstone_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -6355,6 +8591,58 @@
       "east": false
     }
   },
+  "minecraft:sandstone_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:sandstone_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:sandstone_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6376,6 +8664,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:sandstone_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:sandstone_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -6407,6 +8747,58 @@
       "east": false
     }
   },
+  "minecraft:sandstone_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:sandstone_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:sandstone_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6433,6 +8825,58 @@
       "east": true
     }
   },
+  "minecraft:sandstone_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:sandstone_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:sandstone_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6455,6 +8899,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:sandstone_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:sandstone_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -6665,6 +9161,58 @@
       "east": false
     }
   },
+  "minecraft:spruce_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:spruce_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:spruce_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -6691,6 +9239,58 @@
       "east": false
     }
   },
+  "minecraft:spruce_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:spruce_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:spruce_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6714,6 +9314,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:spruce_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:spruce_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -6743,6 +9395,58 @@
       "east": false
     }
   },
+  "minecraft:spruce_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:spruce_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:spruce_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6764,6 +9468,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:spruce_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:spruce_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -6795,6 +9551,58 @@
       "east": false
     }
   },
+  "minecraft:spruce_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:spruce_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:spruce_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6817,6 +9625,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:spruce_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:spruce_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -6847,6 +9707,58 @@
       "east": true
     }
   },
+  "minecraft:spruce_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:spruce_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:birch_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -6871,6 +9783,58 @@
       "south": false,
       "west": false,
       "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
     }
   },
   "minecraft:birch_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
@@ -6899,6 +9863,58 @@
       "east": false
     }
   },
+  "minecraft:birch_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:birch_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6922,6 +9938,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:birch_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -6951,6 +10019,58 @@
       "east": false
     }
   },
+  "minecraft:birch_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:birch_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:birch_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -6972,6 +10092,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -7003,6 +10175,58 @@
       "east": false
     }
   },
+  "minecraft:birch_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:birch_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:birch_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -7025,6 +10249,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:birch_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:birch_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -7055,6 +10331,58 @@
       "east": true
     }
   },
+  "minecraft:birch_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:birch_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:jungle_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -7079,6 +10407,58 @@
       "south": false,
       "west": false,
       "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
     }
   },
   "minecraft:jungle_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
@@ -7107,6 +10487,58 @@
       "east": false
     }
   },
+  "minecraft:jungle_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:jungle_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -7130,6 +10562,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:jungle_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -7159,6 +10643,58 @@
       "east": false
     }
   },
+  "minecraft:jungle_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:jungle_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:jungle_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -7180,6 +10716,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -7211,6 +10799,58 @@
       "east": false
     }
   },
+  "minecraft:jungle_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:jungle_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:jungle_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -7237,6 +10877,58 @@
       "east": true
     }
   },
+  "minecraft:jungle_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:jungle_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:jungle_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -7259,6 +10951,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:jungle_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:jungle_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -8573,6 +12317,58 @@
       "east": false
     }
   },
+  "minecraft:quartz_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:quartz_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:quartz_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -8599,6 +12395,58 @@
       "east": false
     }
   },
+  "minecraft:quartz_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:quartz_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:quartz_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -8622,6 +12470,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:quartz_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:quartz_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -8651,6 +12551,58 @@
       "east": false
     }
   },
+  "minecraft:quartz_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:quartz_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:quartz_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -8672,6 +12624,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:quartz_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:quartz_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -8703,6 +12707,58 @@
       "east": false
     }
   },
+  "minecraft:quartz_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:quartz_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:quartz_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -8729,6 +12785,58 @@
       "east": true
     }
   },
+  "minecraft:quartz_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:quartz_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:quartz_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -8751,6 +12859,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:quartz_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:quartz_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -9637,6 +13797,58 @@
       "east": false
     }
   },
+  "minecraft:acacia_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:acacia_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:acacia_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -9663,6 +13875,58 @@
       "east": false
     }
   },
+  "minecraft:acacia_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:acacia_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:acacia_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -9686,6 +13950,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:acacia_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:acacia_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -9715,6 +14031,58 @@
       "east": false
     }
   },
+  "minecraft:acacia_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:acacia_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:acacia_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -9736,6 +14104,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:acacia_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:acacia_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -9767,6 +14187,58 @@
       "east": false
     }
   },
+  "minecraft:acacia_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:acacia_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:acacia_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -9789,6 +14261,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:acacia_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:acacia_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -9819,6 +14343,58 @@
       "east": true
     }
   },
+  "minecraft:acacia_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:acacia_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:dark_oak_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -9843,6 +14419,58 @@
       "south": false,
       "west": false,
       "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
     }
   },
   "minecraft:dark_oak_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
@@ -9871,6 +14499,58 @@
       "east": false
     }
   },
+  "minecraft:dark_oak_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:dark_oak_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -9894,6 +14574,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -9923,6 +14655,58 @@
       "east": false
     }
   },
+  "minecraft:dark_oak_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:dark_oak_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -9944,6 +14728,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -9975,6 +14811,58 @@
       "east": false
     }
   },
+  "minecraft:dark_oak_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:dark_oak_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -10001,6 +14889,58 @@
       "east": true
     }
   },
+  "minecraft:dark_oak_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:dark_oak_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -10023,6 +14963,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_oak_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -10128,6 +15120,1878 @@
       "north": true,
       "south": true,
       "west": true,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:prismarine_brick_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=north,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:dark_prismarine_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
       "east": true
     }
   },
@@ -10391,6 +17255,58 @@
       "east": false
     }
   },
+  "minecraft:red_sandstone_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:red_sandstone_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -10417,6 +17333,58 @@
       "east": false
     }
   },
+  "minecraft:red_sandstone_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:red_sandstone_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -10440,6 +17408,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -10469,6 +17489,58 @@
       "east": false
     }
   },
+  "minecraft:red_sandstone_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:red_sandstone_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -10490,6 +17562,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -10521,6 +17645,58 @@
       "east": false
     }
   },
+  "minecraft:red_sandstone_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:red_sandstone_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -10547,6 +17723,58 @@
       "east": true
     }
   },
+  "minecraft:red_sandstone_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:red_sandstone_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -10569,6 +17797,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:red_sandstone_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
@@ -12863,6 +20143,58 @@
       "east": false
     }
   },
+  "minecraft:purpur_stairs[facing=north,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:purpur_stairs[facing=north,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:purpur_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": true,
@@ -12889,6 +20221,58 @@
       "east": false
     }
   },
+  "minecraft:purpur_stairs[facing=north,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:purpur_stairs[facing=north,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:purpur_stairs[facing=south,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -12912,6 +20296,58 @@
       "north": false,
       "south": true,
       "west": false,
+      "east": false
+    }
+  },
+  "minecraft:purpur_stairs[facing=south,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:purpur_stairs[facing=south,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
       "east": false
     }
   },
@@ -12941,6 +20377,58 @@
       "east": false
     }
   },
+  "minecraft:purpur_stairs[facing=south,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:purpur_stairs[facing=south,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:purpur_stairs[facing=west,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -12962,6 +20450,58 @@
     },
     "cobbleWallConnections": {
       "north": false,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:purpur_stairs[facing=west,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:purpur_stairs[facing=west,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
       "south": false,
       "west": true,
       "east": false
@@ -12993,6 +20533,58 @@
       "east": false
     }
   },
+  "minecraft:purpur_stairs[facing=west,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": true,
+      "east": false
+    }
+  },
+  "minecraft:purpur_stairs[facing=west,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": true,
+      "east": false
+    }
+  },
   "minecraft:purpur_stairs[facing=east,half=top,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -13019,6 +20611,58 @@
       "east": true
     }
   },
+  "minecraft:purpur_stairs[facing=east,half=top,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:purpur_stairs[facing=east,half=top,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    }
+  },
   "minecraft:purpur_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]": {
     "fenceConnections": {
       "north": false,
@@ -13041,6 +20685,58 @@
     "cobbleWallConnections": {
       "north": false,
       "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:purpur_stairs[facing=east,half=bottom,shape=inner_left,waterlogged=false]": {
+    "fenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": true,
+      "south": false,
+      "west": false,
+      "east": true
+    }
+  },
+  "minecraft:purpur_stairs[facing=east,half=bottom,shape=inner_right,waterlogged=false]": {
+    "fenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "netherFenceConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "paneConnections": {
+      "north": false,
+      "south": true,
+      "west": false,
+      "east": true
+    },
+    "cobbleWallConnections": {
+      "north": false,
+      "south": true,
       "west": false,
       "east": true
     }
