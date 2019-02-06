@@ -168,8 +168,8 @@ public class ConnectionData {
 		BasicFenceConnectionHandler.init();
 		NetherFenceConnectionHandler.init();
 		WallConnectionHandler.init();
-		MelonConnectionHandler.init();
 		GlassConnectionHandler.init();
+		SnowyGrassConnectionHandler.init();
 		ChestConnectionHandler.init();
 		DoorConnectionHandler.init();
 		RedstoneConnectionHandler.init();
