@@ -14,8 +14,8 @@ import java.util.Set;
 public class FlowerConnectionHandler extends ConnectionHandler {
     private static Map<Integer, Integer> flowers = new HashMap<>();
 
-    static void init() {
-        Set<String> baseFlower = new HashSet<>();
+    static ConnectionData.ConnectorInitAction init() {
+        final Set<String> baseFlower = new HashSet<>();
         baseFlower.add("minecraft:rose_bush");
         baseFlower.add("minecraft:sunflower");
         baseFlower.add("minecraft:peony");
@@ -23,17 +23,19 @@ public class FlowerConnectionHandler extends ConnectionHandler {
         baseFlower.add("minecraft:large_fern");
         baseFlower.add("minecraft:lilac");
 
-        FlowerConnectionHandler handler = new FlowerConnectionHandler();
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            WrappedBlockData data = WrappedBlockData.fromString(blockState.getKey());
-            if (baseFlower.contains(data.getMinecraftKey())) {
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), handler);
-                if (data.getValue("half").equals("lower")) {
-                    data.set("half", "upper");
-                    flowers.put(blockState.getValue(), data.getBlockStateId());
+        final FlowerConnectionHandler handler = new FlowerConnectionHandler();
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (baseFlower.contains(blockData.getMinecraftKey())) {
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                    if (blockData.getValue("half").equals("lower")) {
+                        blockData.set("half", "upper");
+                        flowers.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
+                    }
                 }
             }
-        }
+        };
     }
 
     @Override

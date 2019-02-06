@@ -17,18 +17,23 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
     private static final StairConnectionHandler STAIR_CONNECTION_HANDLER = new StairConnectionHandler();
 
-    public AbstractFenceConnectionHandler(String blockConnections, String key) {
+    public AbstractFenceConnectionHandler(String blockConnections) {
         this.blockConnections = blockConnections;
+    }
 
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            if (key.equals(blockState.getKey().split("\\[")[0])) {
-                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-                if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) continue;
-                blockStates.add(blockState.getValue());
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), this);
-                connectedBlockStates.put(getStates(blockData), blockState.getValue());
+    public ConnectionData.ConnectorInitAction getInitAction(final String key) {
+        final AbstractFenceConnectionHandler handler = this;
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (key.equals(blockData.getMinecraftKey())) {
+                    if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) return;
+                    blockStates.add(blockData.getSavedBlockStateId());
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                    connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
+                }
             }
-        }
+        };
     }
 
     protected byte getStates(WrappedBlockData blockData) {

@@ -4,18 +4,23 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class WallConnectionHandler extends AbstractFenceConnectionHandler {
     private static final BlockFace[] BLOCK_FACES = {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
     private static final int[] OPPOSITES = {3, 2, 1, 0};
 
-    static void init() {
-        new WallConnectionHandler("cobbleWallConnections", "minecraft:cobblestone_wall");
-        new WallConnectionHandler("cobbleWallConnections", "minecraft:mossy_cobblestone_wall");
+    static List<ConnectionData.ConnectorInitAction> init() {
+        List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(2);
+        actions.add(new WallConnectionHandler("cobbleWallConnections").getInitAction("minecraft:cobblestone_wall"));
+        actions.add(new WallConnectionHandler("cobbleWallConnections").getInitAction("minecraft:mossy_cobblestone_wall"));
+        return actions;
     }
 
 
-    public WallConnectionHandler(String blockConnections, String key) {
-        super(blockConnections, key);
+    public WallConnectionHandler(String blockConnections) {
+        super(blockConnections);
     }
 
     @Override

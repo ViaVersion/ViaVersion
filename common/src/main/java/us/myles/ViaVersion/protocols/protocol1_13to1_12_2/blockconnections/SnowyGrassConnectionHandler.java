@@ -14,27 +14,29 @@ public class SnowyGrassConnectionHandler extends ConnectionHandler {
     private static Map<Pair<Integer, Boolean>, Integer> grassBlocks = new HashMap<>();
     private static Set<Integer> snows = new HashSet<>();
 
-    static void init() {
-        Set<String> snowyGrassBlocks = new HashSet<>();
+    static ConnectionData.ConnectorInitAction init() {
+        final Set<String> snowyGrassBlocks = new HashSet<>();
         snowyGrassBlocks.add("minecraft:grass_block");
         snowyGrassBlocks.add("minecraft:podzol");
         snowyGrassBlocks.add("minecraft:mycelium");
 
-        SnowyGrassConnectionHandler handler = new SnowyGrassConnectionHandler();
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            WrappedBlockData data = WrappedBlockData.fromString(blockState.getKey());
-            if (snowyGrassBlocks.contains(data.getMinecraftKey())) {
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), handler);
-                data.set("snowy", "true");
-                grassBlocks.put(new Pair<>(blockState.getValue(), true), data.getBlockStateId());
-                data.set("snowy", "false");
-                grassBlocks.put(new Pair<>(blockState.getValue(), false), data.getBlockStateId());
+        final SnowyGrassConnectionHandler handler = new SnowyGrassConnectionHandler();
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (snowyGrassBlocks.contains(blockData.getMinecraftKey())) {
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                    blockData.set("snowy", "true");
+                    grassBlocks.put(new Pair<>(blockData.getSavedBlockStateId(), true), blockData.getBlockStateId());
+                    blockData.set("snowy", "false");
+                    grassBlocks.put(new Pair<>(blockData.getSavedBlockStateId(), false), blockData.getBlockStateId());
+                }
+                if (blockData.getMinecraftKey().equals("minecraft:snow") || blockData.getMinecraftKey().equals("minecraft:snow_block")) {
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                    snows.add(blockData.getSavedBlockStateId());
+                }
             }
-            if (data.getMinecraftKey().equals("minecraft:snow") || data.getMinecraftKey().equals("minecraft:snow_block")) {
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), handler);
-                snows.add(blockState.getValue());
-            }
-        }
+        };
     }
 
     @Override
