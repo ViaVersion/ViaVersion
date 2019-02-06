@@ -11,11 +11,10 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ParticleRewriter {
     private static List<NewParticle> particles = new LinkedList<>();
-    private static Random rand = new Random();
 
     static {
         add(34); // (0->34) explode -> minecraft:poof
@@ -108,17 +107,17 @@ public class ParticleRewriter {
         return new ParticleDataHandler() {
             @Override
             public Particle handler(Particle particle, Integer[] data) {
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Red 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Green 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomFloat())); // Blue 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1));// Scale 0.01 - 4
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomBool() ? 1f : 0f)); // Red 0 - 1
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0f)); // Green 0 - 1
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomBool() ? 1f : 0f)); // Blue 0 - 1
+                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1f));// Scale 0.01 - 4
                 return particle;
             }
         };
     }
 
-    private static float randomFloat() {
-        return rand.nextFloat();
+    private static boolean randomBool() {
+        return ThreadLocalRandom.current().nextBoolean();
     }
 
     // Rewrite IconCrack items to new format :)

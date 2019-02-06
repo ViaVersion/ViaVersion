@@ -162,7 +162,6 @@ public class ConnectionData {
 
         List<ConnectorInitAction> initActions = new ArrayList<>();
         initActions.add(PumpkinConnectionHandler.init());
-        initActions.add(MelonConnectionHandler.init());
         initActions.addAll(BasicFenceConnectionHandler.init());
         initActions.add(NetherFenceConnectionHandler.init());
         initActions.addAll(WallConnectionHandler.init());
@@ -175,6 +174,7 @@ public class ConnectionData {
         initActions.add(FlowerConnectionHandler.init());
         initActions.addAll(ChorusPlantConnectionHandler.init());
         initActions.add(TripwireConnectionHandler.init());
+        initActions.add(SnowyGrassConnectionHandler.init());
         for (String key : keyToId.keySet()) {
             WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(key);
             for (ConnectorInitAction action : initActions) {
