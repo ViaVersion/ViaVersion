@@ -392,19 +392,6 @@ public class PlayerPackets {
 
         /* Removed packets */
 
-        // Map Bulk
-        protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
-
         // Set Compression
         protocol.registerOutgoing(State.PLAY, 0x46, 0x46, new PacketRemapper() {
             @Override
