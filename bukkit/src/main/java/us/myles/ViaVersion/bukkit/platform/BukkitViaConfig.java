@@ -244,4 +244,9 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
     public boolean isSnowCollisionFix() {
         return getBoolean("fix-low-snow-collision", false);
     }
+
+    @Override
+    public int get1_13TabCompleteDelay() {
+        return getInt("1_13-tab-complete-delay", 0);
+    }
 }

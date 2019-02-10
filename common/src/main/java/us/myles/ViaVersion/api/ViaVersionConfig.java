@@ -302,4 +302,10 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isSnowCollisionFix();
+
+    /**
+     * When greater than 0, enables tab complete request delaying by x ticks
+     * @return the delay in ticks
+     */
+    int get1_13TabCompleteDelay();
 }
