@@ -29,7 +29,11 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
 
         int blockId = storage.get(position).getOriginal();
 
-        int color = (int) tag.get("Base").getValue();
+        Tag base = tag.get("Base");
+        int color = 0;
+        if (base != null) {
+            color = ((Number) tag.get("Base").getValue()).intValue();
+        }
         // Standing banner
         if (blockId >= BANNER_START && blockId <= BANNER_STOP) {
             blockId += ((15 - color) * 16);
@@ -43,8 +47,10 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
         if (tag.get("Patterns") instanceof ListTag) {
             for (Tag pattern : (ListTag) tag.get("Patterns")) {
                 if (pattern instanceof CompoundTag) {
-                    IntTag c = ((CompoundTag) pattern).get("Color");
-                    c.setValue(15 - c.getValue()); // Invert color id
+                    Tag c = ((CompoundTag) pattern).get("Color");
+                    if (c instanceof IntTag) {
+                        ((IntTag)c).setValue(15 - (int) c.getValue()); // Invert color id
+                    }
                 }
             }
         }
