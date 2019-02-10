@@ -16,8 +16,8 @@ public class StairConnectionHandler extends ConnectionHandler {
     private static Map<Integer, StairData> stairDataMap = new HashMap<>();
     private static Map<Short, Integer> connectedBlocks = new HashMap<>();
 
-    static void init() {
-        List<String> baseStairs = new LinkedList<>();
+    static ConnectionData.ConnectorInitAction init() {
+        final List<String> baseStairs = new LinkedList<>();
         baseStairs.add("minecraft:oak_stairs");
         baseStairs.add("minecraft:cobblestone_stairs");
         baseStairs.add("minecraft:brick_stairs");
@@ -36,36 +36,37 @@ public class StairConnectionHandler extends ConnectionHandler {
         baseStairs.add("minecraft:prismarine_brick_stairs");
         baseStairs.add("minecraft:dark_prismarine_stairs");
 
-        StairConnectionHandler connectionHandler = new StairConnectionHandler();
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            String key = blockState.getKey().split("\\[")[0];
-            int type = baseStairs.indexOf(key);
-            if (type == -1) continue;
+        final StairConnectionHandler connectionHandler = new StairConnectionHandler();
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                int type = baseStairs.indexOf(blockData.getMinecraftKey());
+                if (type == -1) return;
 
-            WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-            if (blockData.getValue("waterlogged").equals("true")) continue;
+                if (blockData.getValue("waterlogged").equals("true")) return;
 
-            byte shape;
-            switch (blockData.getValue("shape")) {
-                case "straight": shape = 0; break;
-                case "inner_left": shape = 1; break;
-                case "inner_right": shape = 2; break;
-                case "outer_left": shape = 3; break;
-                case "outer_right": shape = 4; break;
-                default: continue;
+                byte shape;
+                switch (blockData.getValue("shape")) {
+                    case "straight": shape = 0; break;
+                    case "inner_left": shape = 1; break;
+                    case "inner_right": shape = 2; break;
+                    case "outer_left": shape = 3; break;
+                    case "outer_right": shape = 4; break;
+                    default: return;
+                }
+
+                StairData stairData = new StairData(
+                        blockData.getValue("half").equals("bottom"),
+                        shape, (byte) type,
+                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase())
+                );
+
+                stairDataMap.put(blockData.getSavedBlockStateId(), stairData);
+                connectedBlocks.put(getStates(stairData), blockData.getSavedBlockStateId());
+
+                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
             }
-
-            StairData stairData = new StairData(
-                    blockData.getValue("half").equals("bottom"),
-                    shape, (byte) type,
-                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase())
-            );
-
-            stairDataMap.put(blockState.getValue(), stairData);
-            connectedBlocks.put(getStates(stairData), blockState.getValue());
-
-            ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
-        }
+        };
     }
 
     private static short getStates(StairData stairData) {
@@ -98,15 +99,15 @@ public class StairConnectionHandler extends ConnectionHandler {
         StairData relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing)));
         if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
             BlockFace facing2 = relativeStair.getFacing();
-            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2.opposite())){
+            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2.opposite())) {
                 return facing2 == rotateAntiClockwise(facing) ? 3 : 4; // outer_left : outer_right
             }
         }
 
         relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing.opposite())));
-        if(relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
+        if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
             BlockFace facing2 = relativeStair.getFacing();
-            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2)){
+            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2)) {
                 return facing2 == rotateAntiClockwise(facing) ? 1 : 2; // inner_left : inner_right
             }
         }

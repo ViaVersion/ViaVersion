@@ -175,11 +175,12 @@ public class WorldPackets {
 
                         if (Via.getConfig().isServersideBlockConnections()) {
                             UserConnection userConnection = wrapper.user();
+
+                            ConnectionData.updateBlockStorage(userConnection, position, newId);
+
                             if (ConnectionData.connects(newId)) {
                                 newId = ConnectionData.connect(userConnection, position, newId);
                             }
-
-                            ConnectionData.updateBlockStorage(userConnection, position, newId);
 
                             ConnectionData.update(userConnection, position);
                         }
@@ -415,15 +416,20 @@ public class WorldPackets {
                         if (particle.getId() == 11) {
                             int count = wrapper.get(Type.INT, 1);
                             float speed = wrapper.get(Type.FLOAT, 6);
-                            // Only handle for count = 0 & speed = 1
-                            if (count == 0 && speed == 1) {
+                            // Only handle for count = 0
+                            if (count == 0) {
                                 wrapper.set(Type.INT, 1, 1);
                                 wrapper.set(Type.FLOAT, 6, 0f);
 
                                 List<Particle.ParticleData> arguments = particle.getArguments();
                                 for (int i = 0; i < 3; i++) {
                                     //RGB values are represented by the X/Y/Z offset
-                                    arguments.get(i).setValue(wrapper.get(Type.FLOAT, i + 3));
+                                    float colorValue = wrapper.get(Type.FLOAT, i + 3) * speed;
+                                    if (colorValue == 0 && i == 0) {
+                                        // https://minecraft.gamepedia.com/User:Alphappy/reddust
+                                        colorValue = 1;
+                                    }
+                                    arguments.get(i).setValue(colorValue);
                                     wrapper.set(Type.FLOAT, i + 3, 0f);
                                 }
                             }

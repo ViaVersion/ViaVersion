@@ -4,23 +4,35 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler {
     private int endstone;
 
-    static void init() {
-        new ChorusPlantConnectionHandler("minecraft:chorus_plant");
+    static List<ConnectionData.ConnectorInitAction> init() {
+        List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(2);
+        ChorusPlantConnectionHandler handler = new ChorusPlantConnectionHandler();
+        actions.add(handler.getInitAction("minecraft:chorus_plant"));
+        actions.add(handler.getExtraAction());
+        return actions;
     }
 
-    public ChorusPlantConnectionHandler(String key) {
-        super(null, key);
+    public ChorusPlantConnectionHandler() {
+        super(null);
         endstone = ConnectionData.getId("minecraft:end_stone");
-        for (Map.Entry<String, Integer> entry : ConnectionData.keyToId.entrySet()) {
-            if (entry.getKey().split("\\[")[0].equals("minecraft:chorus_flower")) {
-                getBlockStates().add(entry.getValue());
+    }
+
+    public ConnectionData.ConnectorInitAction getExtraAction() {
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (blockData.getMinecraftKey().equals("minecraft:chorus_flower")) {
+                    getBlockStates().add(blockData.getSavedBlockStateId());
+                }
             }
-        }
+        };
     }
 
     @Override

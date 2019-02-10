@@ -615,7 +615,7 @@ public class InventoryPackets {
                         ench.add(enchEntry);
                     }
                 }
-                tag.remove("Enchantment");
+                tag.remove("Enchantments");
                 tag.put(ench);
             }
             if (tag.get("StoredEnchantments") instanceof ListTag) {

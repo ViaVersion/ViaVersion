@@ -14,18 +14,19 @@ class ChestConnectionHandler extends ConnectionHandler {
     private static Map<Byte, Integer> connectedStates = new HashMap<>();
     private static Set<Integer> trappedChests = new HashSet<>();
 
-    static void init() {
-        ChestConnectionHandler connectionHandler = new ChestConnectionHandler();
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            String key = blockState.getKey().split("\\[")[0];
-            if (!key.equals("minecraft:chest") && !key.equals("minecraft:trapped_chest")) continue;
-            WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-            if (blockData.getValue("waterlogged").equals("true")) continue;
-            chestFacings.put(blockState.getValue(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase()));
-            if (key.equalsIgnoreCase("minecraft:trapped_chest")) trappedChests.add(blockState.getValue());
-            connectedStates.put(getStates(blockData), blockState.getValue());
-            ConnectionData.connectionHandlerMap.put(blockState.getValue(), connectionHandler);
-        }
+    static ConnectionData.ConnectorInitAction init() {
+        final ChestConnectionHandler connectionHandler = new ChestConnectionHandler();
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (!blockData.getMinecraftKey().equals("minecraft:chest") && !blockData.getMinecraftKey().equals("minecraft:trapped_chest")) return;
+                if (blockData.getValue("waterlogged").equals("true")) return;
+                chestFacings.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase()));
+                if (blockData.getMinecraftKey().equalsIgnoreCase("minecraft:trapped_chest")) trappedChests.add(blockData.getSavedBlockStateId());
+                connectedStates.put(getStates(blockData), blockData.getSavedBlockStateId());
+                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
+            }
+        };
     }
 
     private static Byte getStates(WrappedBlockData blockData) {

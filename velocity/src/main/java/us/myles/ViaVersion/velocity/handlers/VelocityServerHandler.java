@@ -5,21 +5,27 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.storage.VelocityStorage;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 public class VelocityServerHandler {
@@ -27,6 +33,7 @@ public class VelocityServerHandler {
     private static Method setNextProtocolVersion;
     private static Method getMinecraftConnection;
     private static Method getNextProtocolVersion;
+    private static Method getKnownChannels;
 
     static {
         try {
@@ -38,6 +45,8 @@ public class VelocityServerHandler {
                     .getDeclaredMethod("getMinecraftConnection");
             getNextProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection")
                     .getDeclaredMethod("getNextProtocolVersion");
+            getKnownChannels = Class.forName("com.velocitypowered.proxy.connection.client.ClientPlaySessionHandler")
+                    .getDeclaredMethod("getKnownChannels");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -78,14 +87,6 @@ public class VelocityServerHandler {
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
-        // Manually hide ViaVersion-created BossBars if the childserver was version 1.8.x (#666)
-        if (user.has(EntityTracker.class)) {
-            EntityTracker tracker = user.get(EntityTracker.class);
-
-            if (tracker.getBossBarMap() != null)
-                for (BossBar bar : tracker.getBossBarMap().values())
-                    bar.hide();
-        }
         // Handle server/version change
         if (user.has(VelocityStorage.class)) {
             // Wait all the scheduled packets be sent
@@ -99,6 +100,8 @@ public class VelocityServerHandler {
 
             VelocityStorage storage = user.get(VelocityStorage.class);
 
+            if (storage.getBossbar() == null) storage.saveServerBossBars();
+
             if (e.getServer() != null) {
                 if (!e.getServer().getServerInfo().getName().equals(storage.getCurrentServer())) {
                     String serverName = e.getServer().getServerInfo().getName();
@@ -107,7 +110,20 @@ public class VelocityServerHandler {
 
                     int protocolId = ProtocolDetectorService.getProtocolId(serverName);
 
+                    if (protocolId <= ProtocolVersion.MINECRAFT_1_8.getProtocol()) { // 1.8 doesn't have BossBar packet
+                        if (storage.getBossbar() != null) {
+                            for (UUID uuid : storage.getBossbar()) {
+                                PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
+                                wrapper.write(Type.UUID, uuid);
+                                wrapper.write(Type.VAR_INT, 1); // remove
+                                wrapper.send(Protocol1_9TO1_8.class, true, true);
+                            }
+                            storage.getBossbar().clear();
+                        }
+                    }
+
                     ProtocolInfo info = user.get(ProtocolInfo.class);
+                    int previousServerProtocol = info.getServerProtocolVersion();
 
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
@@ -126,6 +142,33 @@ public class VelocityServerHandler {
                     info.setServerProtocolVersion(protocolId);
                     // Add version-specific base Protocol
                     pipeline.add(ProtocolRegistry.getBaseProtocol(protocolId));
+
+                    // Workaround 1.13 server change
+                    Set<String> knownChannels = (Set<String>) getKnownChannels.invoke(
+                            ReflectionUtil.invoke(
+                                    getMinecraftConnection.invoke(e.getPlayer()),
+                                    "getSessionHandler"
+                            )
+                    );
+                    if (previousServerProtocol != -1) {
+                        int id1_13 = ProtocolVersion.MINECRAFT_1_13.getProtocol();
+                        if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
+                            ArrayList<String> newChannels = new ArrayList<>();
+                            for (String oldChannel : knownChannels) {
+                                newChannels.add(InventoryPackets.getNewPluginChannelId(oldChannel));
+                            }
+                            knownChannels.clear();
+                            knownChannels.addAll(newChannels);
+
+                        } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
+                            ArrayList<String> newChannels = new ArrayList<>();
+                            for (String oldChannel : knownChannels) {
+                                newChannels.add(InventoryPackets.getOldPluginChannelId(oldChannel));
+                            }
+                            knownChannels.clear();
+                            knownChannels.addAll(newChannels);
+                        }
+                    }
 
                     user.put(info);
                     user.put(storage);

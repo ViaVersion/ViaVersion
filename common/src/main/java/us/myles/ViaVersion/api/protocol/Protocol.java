@@ -98,8 +98,14 @@ public abstract class Protocol {
      * @param packetRemapper The remapper to use for the packet
      */
     public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
+        registerIncoming(state, oldPacketID, newPacketID, packetRemapper, false);
+    }
+
+    public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
-        incoming.put(new Pair<>(state, newPacketID), protocolPacket);
+        Pair<State, Integer> pair = new Pair<>(state, newPacketID);
+        if (!override && incoming.containsKey(pair)) throw new IllegalArgumentException(pair + " already registered");
+        incoming.put(pair, protocolPacket);
     }
 
     /**
@@ -122,8 +128,14 @@ public abstract class Protocol {
      * @param packetRemapper The remapper to use for the packet
      */
     public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
+        registerOutgoing(state, oldPacketID, newPacketID, packetRemapper, false);
+    }
+
+    public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
-        outgoing.put(new Pair<>(state, oldPacketID), protocolPacket);
+        Pair<State, Integer> pair = new Pair<>(state, oldPacketID);
+        if (!override && outgoing.containsKey(pair)) throw new IllegalArgumentException(pair + " already registered");
+        outgoing.put(pair, protocolPacket);
     }
 
     /**

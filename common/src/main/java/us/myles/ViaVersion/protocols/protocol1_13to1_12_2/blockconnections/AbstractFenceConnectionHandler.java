@@ -15,18 +15,25 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     @Getter
     private Set<Integer> blockStates = new HashSet<>();
     private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
+    private static final StairConnectionHandler STAIR_CONNECTION_HANDLER = new StairConnectionHandler();
 
-    public AbstractFenceConnectionHandler(String blockConnections, String key) {
+    public AbstractFenceConnectionHandler(String blockConnections) {
         this.blockConnections = blockConnections;
+    }
 
-        for (Map.Entry<String, Integer> blockState : ConnectionData.keyToId.entrySet()) {
-            if (key.equals(blockState.getKey().split("\\[")[0])) {
-                blockStates.add(blockState.getValue());
-                ConnectionData.connectionHandlerMap.put(blockState.getValue(), this);
-                WrappedBlockData blockData = WrappedBlockData.fromString(blockState.getKey());
-                connectedBlockStates.put(getStates(blockData), blockState.getValue());
+    public ConnectionData.ConnectorInitAction getInitAction(final String key) {
+        final AbstractFenceConnectionHandler handler = this;
+        return new ConnectionData.ConnectorInitAction() {
+            @Override
+            public void check(WrappedBlockData blockData) {
+                if (key.equals(blockData.getMinecraftKey())) {
+                    if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) return;
+                    blockStates.add(blockData.getSavedBlockStateId());
+                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                    connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
+                }
             }
-        }
+        };
     }
 
     protected byte getStates(WrappedBlockData blockData) {
@@ -35,7 +42,6 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         if (blockData.getValue("north").equals("true")) states |= 2;
         if (blockData.getValue("south").equals("true")) states |= 4;
         if (blockData.getValue("west").equals("true")) states |= 8;
-        if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) states |= 16;
         return states;
     }
 
@@ -46,6 +52,11 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         if (connects(BlockFace.SOUTH, getBlockData(user, position.getRelative(BlockFace.SOUTH)))) states |= 4;
         if (connects(BlockFace.WEST, getBlockData(user, position.getRelative(BlockFace.WEST)))) states |= 8;
         return states;
+    }
+
+    @Override
+    public int getBlockData(UserConnection user, Position position) {
+        return STAIR_CONNECTION_HANDLER.connect(user, position, super.getBlockData(user, position));
     }
 
     @Override

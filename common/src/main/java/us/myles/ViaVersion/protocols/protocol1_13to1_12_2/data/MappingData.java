@@ -67,7 +67,7 @@ public class MappingData {
                 String[] keyAndTranslation = line.split("=", 2);
                 if (keyAndTranslation.length != 2) continue;
                 String key = keyAndTranslation[0];
-                String translation = keyAndTranslation[1];
+                String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
                 if (!translateData.containsKey(key)) {
                     translateMapping.put(key, translation);
                 } else {

@@ -343,7 +343,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1B, 0x1C);
         // New packet 0x1D - NBT Query
         registerOutgoing(State.PLAY, 0x1C, 0x1E);
-        registerOutgoing(State.PLAY, 0x1D, 0x1F);
         registerOutgoing(State.PLAY, 0x1E, 0x20);
         registerOutgoing(State.PLAY, 0x1F, 0x21);
         // WorldPackets 0x20 -> 0x22
@@ -851,9 +850,15 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 // Fake the end of the packet
                 create(new ValueCreator() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void write(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.BOOLEAN, false);
                         wrapper.write(Type.OPTIONAL_POSITION, null);
+                        if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
+                            TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
+                            wrapper.cancel();
+                            tracker.setTimeToSend(System.currentTimeMillis() + Via.getConfig().get1_13TabCompleteDelay() * 50);
+                            tracker.setLastTabComplete(wrapper.get(Type.STRING, 0));
+                        }
                     }
                 });
             }
@@ -1138,6 +1143,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
             if (Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
                 userConnection.put(new BlockConnectionStorage(userConnection));
             }
+        }
+        if (Via.getConfig().get1_13TabCompleteDelay() > 0) {
+            Via.getPlatform().runRepeatingSync(new TabCompleteThread(), 1L);
         }
     }
 
