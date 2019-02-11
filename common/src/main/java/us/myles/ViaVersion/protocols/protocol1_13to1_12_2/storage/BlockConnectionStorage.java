@@ -91,7 +91,7 @@ public class BlockConnectionStorage extends StoredObject {
 
     public void unloadChunk(int x, int z) {
         for (int y = 0; y < 256; y += 16) {
-            blockStorage.remove(getChunkSectionIndex(x, y, z));
+            blockStorage.remove(getChunkSectionIndex(x << 4, y, z << 4));
         }
     }
 

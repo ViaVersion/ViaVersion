@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -14,6 +15,7 @@ import us.myles.ViaVersion.packets.State;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public abstract class Protocol {
     private final Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
@@ -104,7 +106,10 @@ public abstract class Protocol {
     public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
         Pair<State, Integer> pair = new Pair<>(state, newPacketID);
-        if (!override && incoming.containsKey(pair)) throw new IllegalArgumentException(pair + " already registered");
+        if (!override && incoming.containsKey(pair)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, pair + " already registered!" +
+                    " If this override is intentional, set override to true. Stacktrace: ", new Exception());
+        }
         incoming.put(pair, protocolPacket);
     }
 
@@ -134,7 +139,10 @@ public abstract class Protocol {
     public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
         Pair<State, Integer> pair = new Pair<>(state, oldPacketID);
-        if (!override && outgoing.containsKey(pair)) throw new IllegalArgumentException(pair + " already registered");
+        if (!override && outgoing.containsKey(pair)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, pair + " already registered!" +
+                    " If override is intentional, set override to true. Stacktrace: ", new Exception());
+        }
         outgoing.put(pair, protocolPacket);
     }
 
