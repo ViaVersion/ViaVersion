@@ -109,7 +109,7 @@ public abstract class Protocol {
         if (!override && incoming.containsKey(pair)) {
             Via.getPlatform().getLogger().log(Level.WARNING, pair + " already registered!" +
                     " If this override is intentional, set override to true. Stacktrace: ", new Exception());
-        };
+        }
         incoming.put(pair, protocolPacket);
     }
 
