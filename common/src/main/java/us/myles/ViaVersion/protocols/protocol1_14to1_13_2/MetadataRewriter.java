@@ -6,7 +6,6 @@ import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.VillagerData;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13_2;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
@@ -19,11 +18,13 @@ public class MetadataRewriter {
     public static void handleMetadata(int entityId, Entity1_14Types.EntityType type, List<Metadata> metadatas, UserConnection connection) {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
+                metadata.setMetaType(MetaType1_14.byId(metadata.getMetaType().getTypeID()));
+
                 EntityTracker tracker = connection.get(EntityTracker.class);
                 // 1.13 changed item to flat item (no data)
-                if (metadata.getMetaType() == MetaType1_13_2.Slot) {
+                if (metadata.getMetaType() == MetaType1_14.Slot) {
                     InventoryPackets.toClient((Item) metadata.getValue());
-                } else if (metadata.getMetaType() == MetaType1_13_2.BlockID) {
+                } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
                     // Convert to new block id
                     int data = (int) metadata.getValue();
                     metadata.setValue(Protocol1_14To1_13_2.getNewBlockStateId(data));
@@ -59,8 +60,8 @@ public class MetadataRewriter {
 
                 if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
                     if (metadata.getId() == 7) {
-                        metadata.setValue(tracker.getUUID(((Number) metadata.getValue()).intValue()).orNull());
-                        metadata.setMetaType(MetaType1_14.OptUUID);
+                        if (metadata.getValue().equals(0)) metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
+                        metadata.setMetaType(MetaType1_14.OptVarInt);
                     }
                 }
             } catch (Exception e) {

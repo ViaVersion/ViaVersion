@@ -18,14 +18,15 @@ public enum MetaType1_14 implements MetaType {
     Slot(6, Type.FLAT_VAR_INT_ITEM),
     Boolean(7, Type.BOOLEAN),
     Vector3F(8, Type.ROTATION),
-    Position(9, Type.POSITION),
-    OptPosition(10, Type.OPTIONAL_POSITION),
+    Position(9, Type.POSITION1_14),
+    OptPosition(10, Type.OPTIONAL_POSITION_1_14),
     Direction(11, Type.VAR_INT),
     OptUUID(12, Type.OPTIONAL_UUID),
     BlockID(13, Type.VAR_INT),
     NBTTag(14, Type.NBT),
     PARTICLE(15, Protocol1_13_2To1_13_1.PARTICLE_TYPE),
     VillagerData(16, Type.VILLAGER_DATA),
+    OptVarInt(17, Type.OPTIONAL_VAR_INT),
     Discontinued(99, null);
 
     private final int typeID;
