@@ -4,11 +4,25 @@ import io.netty.channel.ChannelInitializer;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion.velocity.handlers.VelocityChannelInitializer;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 
 public class VelocityViaInjector implements ViaInjector {
+    public static Method getPlayerInfoForwardingMode;
+
+    static {
+        try {
+            getPlayerInfoForwardingMode = Class.forName("com.velocitypowered.proxy.config.VelocityConfiguration").getMethod("getPlayerInfoForwardingMode");
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void inject() throws Exception {
         Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
@@ -30,6 +44,12 @@ public class VelocityViaInjector implements ViaInjector {
     }
 
     public static int getLowestSupportedProtocolVersion() {
+        try {
+            if (getPlayerInfoForwardingMode != null
+                    && ((Enum<?>) getPlayerInfoForwardingMode.invoke(VelocityPlugin.PROXY.getConfiguration()))
+                    .name().equals("MODERN")) return ProtocolVersion.v1_13.getId();
+        } catch (IllegalAccessException | InvocationTargetException ignored) {
+        }
         return com.velocitypowered.api.network.ProtocolVersion.MINIMUM_VERSION.getProtocol();
     }
 
