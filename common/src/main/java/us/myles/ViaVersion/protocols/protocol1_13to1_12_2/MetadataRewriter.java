@@ -20,8 +20,11 @@ public class MetadataRewriter {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
                 // Handle new MetaTypes
-                if (metadata.getMetaType().getTypeID() > 4)
+                if (metadata.getMetaType().getTypeID() > 4) {
                     metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID() + 1));
+                } else {
+                    metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID()));
+                }
 
                 // Handle String -> Chat DisplayName
                 if (metadata.getId() == 2) {
