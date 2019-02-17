@@ -9,7 +9,12 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum BlockFace {
-    NORTH(0, 0, -1, EnumAxis.Z), SOUTH(0, 0, 1, EnumAxis.Z), EAST(1, 0, 0, EnumAxis.X), WEST(-1, 0, 0, EnumAxis.X), TOP(0, 1, 0, EnumAxis.Y), BOTTOM(0, -1, 0, EnumAxis.Y);
+    NORTH(0, 0, -1, EnumAxis.Z),
+    SOUTH(0, 0, 1, EnumAxis.Z),
+    EAST(1, 0, 0, EnumAxis.X),
+    WEST(-1, 0, 0, EnumAxis.X),
+    TOP(0, 1, 0, EnumAxis.Y),
+    BOTTOM(0, -1, 0, EnumAxis.Y);
 
     private static Map<BlockFace, BlockFace> opposites = new HashMap<>();
 

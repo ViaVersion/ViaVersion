@@ -27,25 +27,23 @@ public class ConnectionData {
     static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                for (int y = -1; y <= 1; y++) {
-                    if (Math.abs(x) + Math.abs(y) + Math.abs(z) != 1) continue;
-                    Position pos = new Position(position.getX() + x, position.getY() + y, position.getZ() + z);
-                    int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
-                    if (!connects(blockState)) continue;
-                    int newBlockState = connect(user, pos, blockState);
-                    if (newBlockState == blockState) continue;
+        for (BlockFace face : BlockFace.values()) {
+            Position pos = new Position(
+                    position.getX() + face.getModX(),
+                    position.getY() + face.getModY(),
+                    position.getZ() + face.getModZ()
+            );
+            int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
+            if (!connects(blockState)) continue;
+            int newBlockState = connect(user, pos, blockState);
 
-                    PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
-                    blockUpdatePacket.write(Type.POSITION, pos);
-                    blockUpdatePacket.write(Type.VAR_INT, newBlockState);
-                    try {
-                        blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, false);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
+            PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
+            blockUpdatePacket.write(Type.POSITION, pos);
+            blockUpdatePacket.write(Type.VAR_INT, newBlockState);
+            try {
+                blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, false);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
