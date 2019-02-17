@@ -2,6 +2,7 @@ package us.myles.ViaVersion.bukkit.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -82,6 +83,13 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
             } finally {
                 oldPacket.release();
             }
+        }
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        try (AutoCloseable ignored = info.createTaskListAndRunOnClose()) {
+            super.write(ctx, msg, promise);
         }
     }
 

@@ -82,6 +82,13 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
     }
 
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        try (AutoCloseable ignored = info.createTaskListAndRunOnClose()) {
+            super.channelRead(ctx, msg);
+        }
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (PipelineUtil.containsCause(cause, CancelException.class)) return;
         super.exceptionCaught(ctx, cause);
