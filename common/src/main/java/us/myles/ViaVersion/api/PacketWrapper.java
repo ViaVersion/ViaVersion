@@ -289,17 +289,34 @@ public class PacketWrapper {
     /**
      * Send this packet to the associated user.
      * Be careful not to send packets twice.
-     * (Sends it after current)
+     * (Sends it after current if currentThread is false)
      *
      * @param packetProtocol      - The protocol version of the packet.
      * @param skipCurrentPipeline - Skip the current pipeline
      * @param currentThread       - Run in the same thread
      * @throws Exception if it fails to write
      */
-    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+    public void send(final Class<? extends Protocol> packetProtocol, final boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.OUTGOING);
-            user().sendRawPacket(output, currentThread);
+            List<Runnable> lastStack = user().getAfterSendTasks().get().peekLast();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try (AutoCloseable ignored = user().createTaskListAndRunOnClose()) {
+                        final ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.OUTGOING);
+                        user().sendRawPacket(output, true);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            if (currentThread) {
+                runnable.run();
+            } else if (lastStack != null) {
+                lastStack.add(runnable);
+            } else {
+                user().getChannel().eventLoop().submit(runnable);
+            }
         }
     }
 
@@ -362,8 +379,10 @@ public class PacketWrapper {
      */
     public ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, true, Direction.OUTGOING);
-            return user().sendRawPacketFuture(output);
+            try (AutoCloseable ignored = user().createTaskListAndRunOnClose()) {
+                ByteBuf output = constructPacket(packetProtocol, true, Direction.OUTGOING);
+                return user().sendRawPacketFuture(output);
+            }
         }
         return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
     }
@@ -380,9 +399,24 @@ public class PacketWrapper {
     public void send() throws Exception {
         if (!isCancelled()) {
             // Send
-            ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-            writeToBuffer(output);
-            user().sendRawPacket(output);
+            List<Runnable> lastStack = user().getAfterSendTasks().get().peekLast();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try (AutoCloseable ignored = user().createTaskListAndRunOnClose()) {
+                        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+                        writeToBuffer(output);
+                        user().sendRawPacket(output, true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            if (lastStack != null) {
+                lastStack.add(runnable);
+            } else {
+                user().getChannel().eventLoop().submit(runnable);
+            }
         }
     }
 
@@ -476,25 +510,44 @@ public class PacketWrapper {
     @Deprecated
     public void sendToServer() throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-            writeToBuffer(output);
+            try (AutoCloseable ignored = user().createTaskListAndRunOnClose()) {
+                ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+                writeToBuffer(output);
 
-            user().sendRawPacketToServer(output, true);
+                user().sendRawPacketToServer(output, true);
+            }
         }
     }
 
     /**
      * Send this packet to the server.
      *
-     * @param packetProtocol - The protocol version of the packet.
+     * @param packetProtocol      - The protocol version of the packet.
      * @param skipCurrentPipeline - Skip the current pipeline
-     * @param currentThread - Run in the same thread
+     * @param currentThread       - Run in the same thread
      * @throws Exception if it fails to write
      */
-    public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+    public void sendToServer(final Class<? extends Protocol> packetProtocol, final boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.INCOMING);
-            user().sendRawPacketToServer(output, currentThread);
+            List<Runnable> lastStack = user().getAfterSendTasks().get().peekLast();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try (AutoCloseable ignored = user().createTaskListAndRunOnClose()) {
+                        ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.INCOMING);
+                        user().sendRawPacketToServer(output, true);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            if (currentThread) {
+                runnable.run();
+            } else if (lastStack != null) {
+                lastStack.add(runnable);
+            } else {
+                user().getChannel().eventLoop().submit(runnable);
+            }
         }
     }
 

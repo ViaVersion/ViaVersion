@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.data;
 
+import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -15,8 +16,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -39,9 +39,30 @@ public class UserConnection {
     private int secondsObserved = 0;
     private int warnings = 0;
     private ReadWriteLock velocityLock = new ReentrantReadWriteLock();
+    private ThreadLocal<Deque<List<Runnable>>> afterSendTasks = new ThreadLocal<Deque<List<Runnable>>>() {
+        @Override
+        protected Deque<List<Runnable>> initialValue() {
+            return new ArrayDeque<>();
+        }
+    };
 
     public UserConnection(Channel channel) {
         this.channel = channel;
+    }
+
+    public AutoCloseable createTaskListAndRunOnClose() {
+        getAfterSendTasks().get().addLast(new ArrayList<Runnable>());
+        final int previousQueueSize = getAfterSendTasks().get().size();
+        return new AutoCloseable() {
+            @Override
+            public void close() throws Exception {
+                final int currentQueueSize = getAfterSendTasks().get().size();
+                Preconditions.checkState(previousQueueSize == currentQueueSize, "currentQueueSize != previousQueueSize", currentQueueSize, previousQueueSize);
+                for (Runnable runnable : getAfterSendTasks().get().pollLast()) {
+                    runnable.run();
+                }
+            }
+        };
     }
 
     /**
