@@ -14,6 +14,7 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPacke
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.WindowTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_14To1_13_2 extends Protocol {
@@ -252,6 +253,6 @@ public class Protocol1_14To1_13_2 extends Protocol {
         userConnection.put(new EntityTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
-
+        userConnection.put(new WindowTracker(userConnection));
     }
 }
