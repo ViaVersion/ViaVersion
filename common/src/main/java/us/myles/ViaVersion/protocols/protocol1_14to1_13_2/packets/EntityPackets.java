@@ -156,14 +156,14 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        short animation = wrapper.read(Type.UNSIGNED_BYTE);
+                        short animation = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         if (animation == 2) {  //Leave bed
-                            wrapper.setId(0x3F);
+                            PacketWrapper metadataPacket = wrapper.create(0x3F);
+                            metadataPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             List<Metadata> metadataList = new LinkedList<>();
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
-                            wrapper.write(Types1_14.METADATA_LIST, metadataList);
-                        } else {
-                            wrapper.write(Type.UNSIGNED_BYTE, animation);
+	                        metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
+	                        metadataPacket.send(Protocol1_14To1_13_2.class);
                         }
                     }
                 });
