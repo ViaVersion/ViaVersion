@@ -47,7 +47,7 @@ public class InventoryPackets {
                             wrapper.write(Type.VAR_INT, slots.intValue());
                             wrapper.write(Type.INT, entityId);
                         } else {
-                            wrapper.setId(0x59);
+                            wrapper.setId(0x58);
                             wrapper.write(Type.VAR_INT, windowsId.intValue());
 
                             int typeId = -1;
@@ -152,7 +152,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
                         if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
-                            wrapper.setId(0x5A);
+                            wrapper.setId(0x59);
                             wrapper.resetReader();
                             wrapper.read(Type.STRING); // Remove channel
 
@@ -188,7 +188,7 @@ public class InventoryPackets {
         });
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x43, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x42, 0x42, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -205,7 +205,7 @@ public class InventoryPackets {
         });
 
         // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x56, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x54, 0x55, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

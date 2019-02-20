@@ -36,34 +36,35 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x31, 0x32);
         registerOutgoing(State.PLAY, 0x32, 0x33);
 
-        registerOutgoing(State.PLAY, 0x34, 0x35);
+        //TODO remove if packet ids stay unchanged in 1.14 release
+        registerOutgoing(State.PLAY, 0x34, 0x34);
 
-        registerOutgoing(State.PLAY, 0x36, 0x37);
-        registerOutgoing(State.PLAY, 0x37, 0x38);
+        registerOutgoing(State.PLAY, 0x36, 0x36);
+        registerOutgoing(State.PLAY, 0x37, 0x37);
 
-        registerOutgoing(State.PLAY, 0x39, 0x3A);
-        registerOutgoing(State.PLAY, 0x3A, 0x3B);
-        registerOutgoing(State.PLAY, 0x3B, 0x3C);
-        registerOutgoing(State.PLAY, 0x3C, 0x3D);
-        registerOutgoing(State.PLAY, 0x3D, 0x3E);
-        registerOutgoing(State.PLAY, 0x3E, 0x3F);
+        registerOutgoing(State.PLAY, 0x39, 0x39);
+        registerOutgoing(State.PLAY, 0x3A, 0x3A);
+        registerOutgoing(State.PLAY, 0x3B, 0x3B);
+        registerOutgoing(State.PLAY, 0x3C, 0x3C);
+        registerOutgoing(State.PLAY, 0x3D, 0x3D);
+        registerOutgoing(State.PLAY, 0x3E, 0x3E);
 
-        registerOutgoing(State.PLAY, 0x40, 0x41);
-        registerOutgoing(State.PLAY, 0x41, 0x42);
+        registerOutgoing(State.PLAY, 0x40, 0x40);
+        registerOutgoing(State.PLAY, 0x41, 0x41);
 
-        registerOutgoing(State.PLAY, 0x43, 0x44);
-        registerOutgoing(State.PLAY, 0x44, 0x45);
-        registerOutgoing(State.PLAY, 0x45, 0x46);
-        registerOutgoing(State.PLAY, 0x46, 0x47);
-        registerOutgoing(State.PLAY, 0x47, 0x48);
-        registerOutgoing(State.PLAY, 0x48, 0x49);
+        registerOutgoing(State.PLAY, 0x43, 0x43);
+        registerOutgoing(State.PLAY, 0x44, 0x44);
+        registerOutgoing(State.PLAY, 0x45, 0x45);
+        registerOutgoing(State.PLAY, 0x46, 0x46);
+        registerOutgoing(State.PLAY, 0x47, 0x47);
+        registerOutgoing(State.PLAY, 0x48, 0x48);
 
-        registerOutgoing(State.PLAY, 0x4A, 0x4B);
-        registerOutgoing(State.PLAY, 0x4B, 0x4C);
-        registerOutgoing(State.PLAY, 0x4C, 0x4D);
+        registerOutgoing(State.PLAY, 0x4A, 0x4A);
+        registerOutgoing(State.PLAY, 0x4B, 0x4B);
+        registerOutgoing(State.PLAY, 0x4C, 0x4C);
 
         // Sound Effect
-        registerOutgoing(State.PLAY, 0x4D, 0x4E, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x4D, 0x4D, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Sound Id
@@ -75,11 +76,11 @@ public class Protocol1_14To1_13_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4E, 0x50);
-        registerOutgoing(State.PLAY, 0x4F, 0x51);
-        registerOutgoing(State.PLAY, 0x50, 0x52);
+        registerOutgoing(State.PLAY, 0x4E, 0x4F);
+        registerOutgoing(State.PLAY, 0x4F, 0x50);
+        registerOutgoing(State.PLAY, 0x50, 0x51);
 
-        registerOutgoing(State.PLAY, 0x51, 0x53, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x51, 0x52, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -120,10 +121,10 @@ public class Protocol1_14To1_13_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x52, 0x54);
-        registerOutgoing(State.PLAY, 0x53, 0x55);
+        registerOutgoing(State.PLAY, 0x52, 0x53);
+        registerOutgoing(State.PLAY, 0x53, 0x54);
 
-        registerOutgoing(State.PLAY, 0x55, 0x57, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x55, 0x56, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
