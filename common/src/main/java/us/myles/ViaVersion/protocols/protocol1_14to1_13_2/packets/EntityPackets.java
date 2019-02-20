@@ -4,6 +4,9 @@ import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
+import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -16,6 +19,8 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.EntityTypeRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class EntityPackets {
@@ -143,16 +148,40 @@ public class EntityPackets {
             }
         });
 
-        // Use bed
-        protocol.registerOutgoing(State.PLAY, 0x33, -1, new PacketRemapper() {
+        // Animation
+        protocol.registerOutgoing(State.PLAY, 0x06, 0x06, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
-                map(Type.POSITION, Type.POSITION1_14);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();  //TODO packet was removed - probably uses metadata now
+                        short animation = wrapper.read(Type.UNSIGNED_BYTE);
+                        if (animation == 2) {  //Leave bed
+                            wrapper.setId(0x3F);
+                            List<Metadata> metadataList = new LinkedList<>();
+                            metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
+                            wrapper.write(Types1_14.METADATA_LIST, metadataList);
+                        } else {
+                            wrapper.write(Type.UNSIGNED_BYTE, animation);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Use bed
+        protocol.registerOutgoing(State.PLAY, 0x33, 0x3F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Position position = wrapper.read(Type.POSITION);
+                        List<Metadata> metadataList = new LinkedList<>();
+                        metadataList.add(new Metadata(12, MetaType1_14.OptPosition, position));
+                        wrapper.write(Types1_14.METADATA_LIST, metadataList);
                     }
                 });
             }
