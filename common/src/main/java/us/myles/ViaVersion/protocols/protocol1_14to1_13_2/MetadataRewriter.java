@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2;
 
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
@@ -7,6 +8,7 @@ import us.myles.ViaVersion.api.minecraft.VillagerData;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 
@@ -52,7 +54,23 @@ public class MetadataRewriter {
 
                 if (type.is(Entity1_14Types.EntityType.HORSE)) {
                     if (metadata.getId() == 18) {
-                        metadatas.remove(metadata);  //TODO Probably sent as entity equipment now
+                        metadatas.remove(metadata);
+
+                        int armorType = (int) metadata.getValue();
+                        Item armorItem = null;
+                        if (armorType == 1) {  //iron armor
+                            armorItem = new Item(InventoryPackets.getNewItemId(727), (byte) 1, (short) 0, null);
+                        } else if (armorType == 2) {  //gold armor
+                            armorItem = new Item(InventoryPackets.getNewItemId(728), (byte) 1, (short) 0, null);
+                        } else if (armorType == 3) {  //diamond armor
+                            armorItem = new Item(InventoryPackets.getNewItemId(729), (byte) 1, (short) 0, null);
+                        }
+
+                        PacketWrapper equipmentPacket = new PacketWrapper(0x42, null, connection);
+                        equipmentPacket.write(Type.VAR_INT, entityId);
+                        equipmentPacket.write(Type.VAR_INT, 4);
+                        equipmentPacket.write(Type.FLAT_VAR_INT_ITEM, armorItem);
+                        equipmentPacket.send(Protocol1_14To1_13_2.class);
                     }
                 }
 
