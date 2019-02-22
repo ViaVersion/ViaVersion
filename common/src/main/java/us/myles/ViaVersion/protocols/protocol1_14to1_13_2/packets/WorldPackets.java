@@ -140,7 +140,7 @@ public class WorldPackets {
                             section.setNonAirBlocksCount(nonAirBlockCount);
                         }
 
-                        PacketWrapper lightPacket = wrapper.create(0x58);
+                        PacketWrapper lightPacket = wrapper.create(0x57);
                         lightPacket.write(Type.VAR_INT, chunk.getX());
                         lightPacket.write(Type.VAR_INT, chunk.getZ());
                         int skyLightMask = 0;
@@ -275,7 +275,7 @@ public class WorldPackets {
         });
 
         //respawn
-        protocol.registerOutgoing(State.PLAY, 0x38, 0x39, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x38, 0x38, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -291,7 +291,7 @@ public class WorldPackets {
         });
 
         // Spawn position
-        protocol.registerOutgoing(State.PLAY, 0x49, 0x4A, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
