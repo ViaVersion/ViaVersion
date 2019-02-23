@@ -65,7 +65,7 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
                 bytebuf.clear();
                 bytebuf.release();
                 bytebuf = newPacket;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 bytebuf.clear();
                 bytebuf.release();
                 newPacket.release();

@@ -53,7 +53,7 @@ public class SpongeEncodeHandler extends MessageToByteEncoder {
                 ProtocolInfo protInfo = info.get(ProtocolInfo.class);
                 protInfo.getPipeline().transform(Direction.OUTGOING, protInfo.getState(), wrapper);
                 wrapper.writeToBuffer(bytebuf);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 bytebuf.clear();
                 throw e;
             } finally {

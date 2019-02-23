@@ -53,7 +53,7 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
                     bytebuf.clear();
                     bytebuf = newPacket;
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     // Clear Buffer
                     bytebuf.clear();
                     // Release Packet, be free!
