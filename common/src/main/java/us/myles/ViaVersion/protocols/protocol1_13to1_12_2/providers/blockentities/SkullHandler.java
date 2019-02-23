@@ -25,9 +25,12 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         int id = storage.get(position).getOriginal();
 
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
-            id += (byte) tag.get("SkullType").getValue() * 20;
+            Tag skullType = tag.get("SkullType");
+            if (skullType != null) {
+                id += ((Number) tag.get("SkullType").getValue()).intValue() * 20;
+            }
             if (tag.contains("Rot")) {
-                id += (byte) tag.get("Rot").getValue();
+                id += ((Number) tag.get("Rot").getValue()).intValue();
             }
         } else {
             Via.getPlatform().getLogger().warning("Why does this block have the skull block entity? " + tag);

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -27,27 +28,109 @@ public class ConnectionData {
     static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                for (int y = -1; y <= 1; y++) {
-                    if (Math.abs(x) + Math.abs(y) + Math.abs(z) != 1) continue;
-                    Position pos = new Position(position.getX() + x, position.getY() + y, position.getZ() + z);
-                    int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
-                    if (!connects(blockState)) continue;
-                    int newBlockState = connect(user, pos, blockState);
-                    if (newBlockState == blockState) continue;
+        for (BlockFace face : BlockFace.values()) {
+            Position pos = new Position(
+                    position.getX() + face.getModX(),
+                    position.getY() + face.getModY(),
+                    position.getZ() + face.getModZ()
+            );
+            int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
+            if (!connects(blockState)) continue;
+            int newBlockState = connect(user, pos, blockState);
 
-                    PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
-                    blockUpdatePacket.write(Type.POSITION, pos);
-                    blockUpdatePacket.write(Type.VAR_INT, newBlockState);
+            PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
+            blockUpdatePacket.write(Type.POSITION, pos);
+            blockUpdatePacket.write(Type.VAR_INT, newBlockState);
+            try {
+                blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, false);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static void updateChunkSectionNeighbours(UserConnection user, int chunkX, int chunkZ, int chunkSectionY) {
+        for (int chunkDeltaX = -1; chunkDeltaX <= 1; chunkDeltaX++) {
+            for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
+                if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 0) continue;
+
+                ArrayList<BlockChangeRecord> updates = new ArrayList<>();
+
+                if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 2) { // Corner
+                    for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
+                        int blockPosX = chunkDeltaX == 1 ? 0 : 15;
+                        int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
+                        updateBlock(user,
+                                new Position(
+                                        (long) ((chunkX + chunkDeltaX) << 4) + blockPosX,
+                                        (long) blockY,
+                                        (long) ((chunkZ + chunkDeltaZ) << 4) + blockPosZ
+                                ),
+                                updates
+                        );
+                    }
+                } else {
+                    for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
+                        int xStart;
+                        int xEnd;
+                        int zStart;
+                        int zEnd;
+                        if (chunkDeltaX == 1) {
+                            xStart = 0;
+                            xEnd = 2;
+                            zStart = 0;
+                            zEnd = 16;
+                        } else if (chunkDeltaX == -1) {
+                            xStart = 14;
+                            xEnd = 16;
+                            zStart = 0;
+                            zEnd = 16;
+                        } else if (chunkDeltaZ == 1) {
+                            xStart = 0;
+                            xEnd = 16;
+                            zStart = 0;
+                            zEnd = 2;
+                        } else {
+                            xStart = 0;
+                            xEnd = 16;
+                            zStart = 14;
+                            zEnd = 16;
+                        }
+                        for (int blockX = xStart; blockX < xEnd; blockX++) {
+                            for (int blockZ = zStart; blockZ < zEnd; blockZ++) {
+                                updateBlock(user,
+                                        new Position(
+                                                (long) ((chunkX + chunkDeltaX) << 4) + blockX,
+                                                (long) blockY,
+                                                (long) ((chunkZ + chunkDeltaZ) << 4) + blockZ),
+                                        updates
+                                );
+                            }
+                        }
+                    }
+                }
+
+                if (!updates.isEmpty()) {
+                    PacketWrapper wrapper = new PacketWrapper(0x0F, null, user);
+                    wrapper.write(Type.INT, chunkX + chunkDeltaX);
+                    wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
+                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(new BlockChangeRecord[0]));
                     try {
-                        blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, false);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                        wrapper.send(Protocol1_13To1_12_2.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
         }
+    }
+
+    public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
+        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
+        if (!connects(blockState)) return;
+        int newBlockState = connect(user, pos, blockState);
+
+        records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY().shortValue(), newBlockState));
     }
 
     public static BlockConnectionProvider getProvider() {
@@ -93,29 +176,19 @@ public class ConnectionData {
 
             long yOff = i << 4;
 
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
                         int block = section.getFlatBlock(x, y, z);
 
                         if (ConnectionData.connects(block)) {
                             block = ConnectionData.connect(user, new Position(xOff + x, yOff + y, zOff + z), block);
                             section.setFlatBlock(x, y, z, block);
                         }
-
-                        if (x == 0) {
-                            update(user, new Position(xOff - 1, yOff + y, zOff + z));
-                        } else if (x == 15) {
-                            update(user, new Position(xOff + 16, yOff + y, zOff + z));
-                        }
-                        if (z == 0) {
-                            update(user, new Position(xOff + x, yOff + y, zOff - 1));
-                        } else if (z == 15) {
-                            update(user, new Position(xOff + x, yOff + y, zOff + 16));
-                        }
                     }
                 }
             }
+            updateChunkSectionNeighbours(user, chunk.getX(), chunk.getZ(), i);
         }
     }
 

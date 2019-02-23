@@ -292,21 +292,36 @@ public class WorldPackets {
                             if (section == null)
                                 continue;
 
-                            boolean willStoreAnyBlock = false;
-
                             for (int p = 0; p < section.getPaletteSize(); p++) {
                                 int old = section.getPaletteEntry(p);
                                 int newId = toNewId(old);
-                                if (storage.isWelcome(newId) || (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks() && ConnectionData.isWelcome(newId))) {
-                                    willStoreAnyBlock = true;
-                                }
                                 section.setPaletteEntry(p, newId);
                             }
 
-                            if (willStoreAnyBlock) {
-                                for (int x = 0; x < 16; x++) {
-                                    for (int y = 0; y < 16; y++) {
-                                        for (int z = 0; z < 16; z++) {
+                            boolean willSaveToStorage = false;
+                            for (int p = 0; p < section.getPaletteSize(); p++) {
+                                int newId = section.getPaletteEntry(p);
+                                if (storage.isWelcome(newId)) {
+                                    willSaveToStorage = true;
+                                    break;
+                                }
+                            }
+
+                            boolean willSaveConnection = false;
+                            if (ConnectionData.needStoreBlocks() && Via.getConfig().isServersideBlockConnections()) {
+                                for (int p = 0; p < section.getPaletteSize(); p++) {
+                                    int newId = section.getPaletteEntry(p);
+                                    if (ConnectionData.isWelcome(newId)) {
+                                        willSaveConnection = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (willSaveToStorage) {
+                                for (int y = 0; y < 16; y++) {
+                                    for (int z = 0; z < 16; z++) {
+                                        for (int x = 0; x < 16; x++) {
                                             int block = section.getFlatBlock(x, y, z);
                                             if (storage.isWelcome(block)) {
                                                 storage.store(new Position(
@@ -315,7 +330,17 @@ public class WorldPackets {
                                                         (long) (z + (chunk.getZ() << 4))
                                                 ), block);
                                             }
-                                            if (Via.getConfig().isServersideBlockConnections() && ConnectionData.isWelcome(block)) {
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (willSaveConnection) {
+                                for (int y = 0; y < 16; y++) {
+                                    for (int z = 0; z < 16; z++) {
+                                        for (int x = 0; x < 16; x++) {
+                                            int block = section.getFlatBlock(x, y, z);
+                                            if (ConnectionData.isWelcome(block)) {
                                                 ConnectionData.getProvider().storeBlock(wrapper.user(), (long) (x + (chunk.getX() << 4)),
                                                         (long) (y + (i << 4)),
                                                         (long) (z + (chunk.getZ() << 4)),
