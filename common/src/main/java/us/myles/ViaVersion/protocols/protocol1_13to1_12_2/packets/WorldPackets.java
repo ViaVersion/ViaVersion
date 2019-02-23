@@ -308,7 +308,7 @@ public class WorldPackets {
                             }
 
                             boolean willSaveConnection = false;
-                            if (ConnectionData.needStoreBlocks() && Via.getConfig().isServersideBlockConnections()) {
+                            if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
                                 for (int p = 0; p < section.getPaletteSize(); p++) {
                                     int newId = section.getPaletteEntry(p);
                                     if (ConnectionData.isWelcome(newId)) {
