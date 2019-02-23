@@ -58,8 +58,8 @@ public class ConnectionData {
 
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 2) { // Corner
                     for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
-                        int blockPosX = chunkDeltaX == 1 ? 0 : 16;
-                        int blockPosZ = chunkDeltaZ == 1 ? 0 : 16;
+                        int blockPosX = chunkDeltaX == 1 ? 0 : 15;
+                        int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
                         updateBlock(user,
                                 new Position(
                                         (long) ((chunkX + chunkDeltaX) << 4) + blockPosX,
