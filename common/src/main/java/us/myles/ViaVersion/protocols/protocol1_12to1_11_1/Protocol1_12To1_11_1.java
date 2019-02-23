@@ -135,9 +135,9 @@ public class Protocol1_12To1_11_1 extends Protocol {
                             if (section == null)
                                 continue;
 
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 16; y++) {
-                                    for (int z = 0; z < 16; z++) {
+                            for (int y = 0; y < 16; y++) {
+                                for (int z = 0; z < 16; z++) {
+                                    for (int x = 0; x < 16; x++) {
                                         int block = section.getBlockId(x, y, z);
                                         // Is this a bed?
                                         if (block == 26) {
