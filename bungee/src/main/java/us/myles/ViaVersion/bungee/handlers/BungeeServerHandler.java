@@ -22,6 +22,7 @@ import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -95,6 +96,7 @@ public class BungeeServerHandler implements Listener {
 
             if (e.getServer() != null) {
                 if (!e.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
+                    EntityTracker oldEntityTracker = user.get(EntityTracker.class);
                     String serverName = e.getServer().getInfo().getName();
 
                     storage.setCurrentServer(serverName);
@@ -172,6 +174,12 @@ public class BungeeServerHandler implements Listener {
                     // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
                     for (Protocol protocol : pipeline.pipes()) {
                         protocol.init(user);
+                    }
+
+                    EntityTracker newTracker = user.get(EntityTracker.class);
+                    if (newTracker != null && oldEntityTracker != null) {
+                        newTracker.setAutoTeam(oldEntityTracker.isAutoTeam());
+                        newTracker.setCurrentTeam(oldEntityTracker.getCurrentTeam());
                     }
 
                     Object wrapper = channelWrapper.get(player);

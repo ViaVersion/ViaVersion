@@ -137,7 +137,9 @@ public class PlayerPackets {
                                 if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {
                                     if (mode == 4) {
                                         // since removing add to auto team
-                                        entityTracker.sendTeamPacket(true, false);
+                                        wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                        wrapper.cancel();
+                                        entityTracker.sendTeamPacket(true, true);
                                         entityTracker.setCurrentTeam("viaversion");
                                     } else {
                                         // since adding remove from auto team
@@ -155,7 +157,9 @@ public class PlayerPackets {
                             if (entityTracker.isAutoTeam()
                                     && teamName.equals(entityTracker.getCurrentTeam())) {
                                 // team was removed
-                                entityTracker.sendTeamPacket(true, false);
+                                wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                wrapper.cancel();
+                                entityTracker.sendTeamPacket(true, true);
                                 entityTracker.setCurrentTeam("viaversion");
                             }
                         }
@@ -211,7 +215,9 @@ public class PlayerPackets {
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         if (Via.getConfig().isAutoTeam()) {
                             entityTracker.setAutoTeam(true);
-                            entityTracker.sendTeamPacket(true, false);
+                            wrapper.send(Protocol1_9TO1_8.class, true, true);
+                            wrapper.cancel();
+                            entityTracker.sendTeamPacket(true, true);
                             entityTracker.setCurrentTeam("viaversion");
                         } else {
                             entityTracker.setAutoTeam(false);
