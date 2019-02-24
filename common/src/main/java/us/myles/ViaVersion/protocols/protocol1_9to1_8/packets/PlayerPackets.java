@@ -129,7 +129,7 @@ public class PlayerPackets {
                         }
 
                         if (mode == 0 || mode == 3 || mode == 4) {
-                            String[] players = wrapper.read(Type.STRING_ARRAY); // Players
+                            String[] players = wrapper.passthrough(Type.STRING_ARRAY); // Players
                             final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             String myName = wrapper.user().get(ProtocolInfo.class).getUsername();
                             String teamName = wrapper.get(Type.STRING, 0);
@@ -149,7 +149,6 @@ public class PlayerPackets {
                                     }
                                 }
                             }
-                            wrapper.write(Type.STRING_ARRAY, players);
                         }
 
                         if (mode == 1) { // Remove team
