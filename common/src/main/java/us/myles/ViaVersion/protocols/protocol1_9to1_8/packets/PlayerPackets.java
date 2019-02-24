@@ -137,6 +137,7 @@ public class PlayerPackets {
                                 if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {
                                     if (mode == 4) {
                                         // since removing add to auto team
+                                        // Workaround for packet order issue
                                         wrapper.send(Protocol1_9TO1_8.class, true, true);
                                         wrapper.cancel();
                                         entityTracker.sendTeamPacket(true, true);
@@ -157,6 +158,7 @@ public class PlayerPackets {
                             if (entityTracker.isAutoTeam()
                                     && teamName.equals(entityTracker.getCurrentTeam())) {
                                 // team was removed
+                                // Workaround for packet order issue
                                 wrapper.send(Protocol1_9TO1_8.class, true, true);
                                 wrapper.cancel();
                                 entityTracker.sendTeamPacket(true, true);
@@ -215,6 +217,7 @@ public class PlayerPackets {
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         if (Via.getConfig().isAutoTeam()) {
                             entityTracker.setAutoTeam(true);
+                            // Workaround for packet order issue
                             wrapper.send(Protocol1_9TO1_8.class, true, true);
                             wrapper.cancel();
                             entityTracker.sendTeamPacket(true, true);
