@@ -183,10 +183,10 @@ public class WorldPackets {
                             }
                         }
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
-                        // Workaround for packet order issue
-                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
-                        wrapper.cancel();
                         if (Via.getConfig().isServersideBlockConnections()) {
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.cancel();
                             ConnectionData.update(userConnection, position);
                         }
 
