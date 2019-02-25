@@ -129,7 +129,7 @@ public class PlayerPackets {
                         }
 
                         if (mode == 0 || mode == 3 || mode == 4) {
-                            String[] players = wrapper.read(Type.STRING_ARRAY); // Players
+                            String[] players = wrapper.passthrough(Type.STRING_ARRAY); // Players
                             final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                             String myName = wrapper.user().get(ProtocolInfo.class).getUsername();
                             String teamName = wrapper.get(Type.STRING, 0);
@@ -137,7 +137,10 @@ public class PlayerPackets {
                                 if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {
                                     if (mode == 4) {
                                         // since removing add to auto team
-                                        entityTracker.sendTeamPacket(true, false);
+                                        // Workaround for packet order issue
+                                        wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                        wrapper.cancel();
+                                        entityTracker.sendTeamPacket(true, true);
                                         entityTracker.setCurrentTeam("viaversion");
                                     } else {
                                         // since adding remove from auto team
@@ -146,7 +149,6 @@ public class PlayerPackets {
                                     }
                                 }
                             }
-                            wrapper.write(Type.STRING_ARRAY, players);
                         }
 
                         if (mode == 1) { // Remove team
@@ -155,7 +157,10 @@ public class PlayerPackets {
                             if (entityTracker.isAutoTeam()
                                     && teamName.equals(entityTracker.getCurrentTeam())) {
                                 // team was removed
-                                entityTracker.sendTeamPacket(true, false);
+                                // Workaround for packet order issue
+                                wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                wrapper.cancel();
+                                entityTracker.sendTeamPacket(true, true);
                                 entityTracker.setCurrentTeam("viaversion");
                             }
                         }
@@ -211,7 +216,10 @@ public class PlayerPackets {
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         if (Via.getConfig().isAutoTeam()) {
                             entityTracker.setAutoTeam(true);
-                            entityTracker.sendTeamPacket(true, false);
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_9TO1_8.class, true, true);
+                            wrapper.cancel();
+                            entityTracker.sendTeamPacket(true, true);
                             entityTracker.setCurrentTeam("viaversion");
                         } else {
                             entityTracker.setAutoTeam(false);

@@ -42,7 +42,7 @@ public class ConnectionData {
             blockUpdatePacket.write(Type.POSITION, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
             try {
-                blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, false);
+                blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, true);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

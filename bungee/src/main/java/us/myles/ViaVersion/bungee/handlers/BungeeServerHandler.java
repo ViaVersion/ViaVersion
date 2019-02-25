@@ -5,6 +5,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import net.md_5.bungee.protocol.packet.PluginMessage;
@@ -22,6 +23,7 @@ import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -88,6 +90,7 @@ public class BungeeServerHandler implements Listener {
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
+        // Auto-team handling
         // Handle server/version change
         if (user.has(BungeeStorage.class)) {
             BungeeStorage storage = user.get(BungeeStorage.class);
@@ -95,6 +98,14 @@ public class BungeeServerHandler implements Listener {
 
             if (e.getServer() != null) {
                 if (!e.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
+                    // Clear auto-team
+                    EntityTracker oldEntityTracker = user.get(EntityTracker.class);
+                    if (oldEntityTracker != null) {
+                        if (oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
+                            oldEntityTracker.sendTeamPacket(false, true);
+                        }
+                    }
+
                     String serverName = e.getServer().getInfo().getName();
 
                     storage.setCurrentServer(serverName);
@@ -172,6 +183,31 @@ public class BungeeServerHandler implements Listener {
                     // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
                     for (Protocol protocol : pipeline.pipes()) {
                         protocol.init(user);
+                    }
+
+                    EntityTracker newTracker = user.get(EntityTracker.class);
+                    if (newTracker != null) {
+                        if (Via.getConfig().isAutoTeam()) {
+                            String currentTeam = null;
+                            for (Team team : player.getScoreboard().getTeams()) {
+                                if (team.getPlayers().contains(info.getUsername())) {
+                                    currentTeam = team.getName();
+
+                                }
+                            }
+
+                            // Reinitialize auto-team
+                            newTracker.setAutoTeam(true);
+                            if (currentTeam == null) {
+                                // Send auto-team as it was cleared above
+                                newTracker.sendTeamPacket(true, true);
+                                newTracker.setCurrentTeam("viaversion");
+                            } else {
+                                // Auto-team will be sent when bungee send remove packet
+                                newTracker.setAutoTeam(Via.getConfig().isAutoTeam());
+                                newTracker.setCurrentTeam(currentTeam);
+                            }
+                        }
                     }
 
                     Object wrapper = channelWrapper.get(player);
