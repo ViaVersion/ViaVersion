@@ -1,5 +1,5 @@
 # ViaVersion 1.6.0 - Spigot, Sponge, BungeeCord
-[![Build Status](https://travis-ci.org/MylesIsCool/ViaVersion.svg?branch=master)](https://travis-ci.org/MylesIsCool/ViaVersion)
+[![Build Status](https://travis-ci.com/ViaVersion/ViaVersion.svg?branch=master)](https://travis-ci.com/ViaVersion/ViaVersion)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
 
 IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
