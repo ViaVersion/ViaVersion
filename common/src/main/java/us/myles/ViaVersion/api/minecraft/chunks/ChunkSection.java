@@ -30,8 +30,7 @@ public class ChunkSection {
     public ChunkSection() {
         this.blocks = new int[SIZE];
         this.blockLight = new NibbleArray(SIZE);
-        palette.add(0);
-        inversePalette.put(0, 0);
+        addPaletteEntry(0);
     }
 
     /**
