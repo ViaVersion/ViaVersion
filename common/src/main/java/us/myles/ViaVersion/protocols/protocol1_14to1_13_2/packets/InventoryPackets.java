@@ -177,6 +177,7 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
                             }
                         } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
+                            wrapper.passthrough(Type.REMAINING_BYTES);
                             int hand = wrapper.read(Type.VAR_INT);
                             wrapper.clearPacket();
                             wrapper.setId(0x2C);
