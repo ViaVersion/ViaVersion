@@ -11,6 +11,11 @@
 
     <artifactId>viaversion-bungee</artifactId>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
     <build>
         <resources>
             <resource>
@@ -29,7 +34,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.10-SNAPSHOT</version>
+            <version>1.13-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 

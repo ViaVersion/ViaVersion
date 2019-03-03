@@ -173,19 +173,23 @@ public class WorldPackets {
                         Position position = wrapper.get(Type.POSITION, 0);
                         int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
+                        UserConnection userConnection = wrapper.user();
                         if (Via.getConfig().isServersideBlockConnections()) {
-                            UserConnection userConnection = wrapper.user();
 
                             ConnectionData.updateBlockStorage(userConnection, position, newId);
 
                             if (ConnectionData.connects(newId)) {
                                 newId = ConnectionData.connect(userConnection, position, newId);
                             }
-
+                        }
+                        wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.cancel();
                             ConnectionData.update(userConnection, position);
                         }
 
-                        wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                     }
                 });
             }
@@ -204,8 +208,9 @@ public class WorldPackets {
                         int chunkX = wrapper.get(Type.INT, 0);
                         int chunkZ = wrapper.get(Type.INT, 1);
                         UserConnection userConnection = wrapper.user();
+                        BlockChangeRecord[] records = wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0);
                         // Convert ids
-                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
+                        for (BlockChangeRecord record : records) {
                             int newBlock = toNewId(record.getBlockId());
                             Position position = new Position(
                                     (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
@@ -218,23 +223,33 @@ public class WorldPackets {
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
 
-                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-                            int blockState = record.getBlockId();
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            for (BlockChangeRecord record : records) {
+                                int blockState = record.getBlockId();
 
-                            Position position = new Position(
-                                    (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                    (long) record.getY(),
-                                    (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                Position position = new Position(
+                                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+                                        (long) record.getY(),
+                                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
-                            if (Via.getConfig().isServersideBlockConnections()) {
                                 if (ConnectionData.connects(blockState)) {
                                     blockState = ConnectionData.connect(userConnection, position, blockState);
                                     record.setBlockId(blockState);
                                 }
+                            }
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.cancel();
 
+                            for (BlockChangeRecord record : records) {
+                                Position position = new Position(
+                                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+                                        (long) record.getY(),
+                                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
                                 ConnectionData.update(userConnection, position);
                             }
                         }
+
                     }
                 });
             }
@@ -308,7 +323,7 @@ public class WorldPackets {
                             }
 
                             boolean willSaveConnection = false;
-                            if (ConnectionData.needStoreBlocks() && Via.getConfig().isServersideBlockConnections()) {
+                            if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
                                 for (int p = 0; p < section.getPaletteSize(); p++) {
                                     int newId = section.getPaletteEntry(p);
                                     if (ConnectionData.isWelcome(newId)) {

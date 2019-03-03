@@ -15,7 +15,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSection();
-        chunkSection.clearPalette();
+        // Don't clear palette because 0 index needs to be air in 1.9 version
 
         ByteBuf littleEndianView = buffer.order(ByteOrder.LITTLE_ENDIAN);
 
