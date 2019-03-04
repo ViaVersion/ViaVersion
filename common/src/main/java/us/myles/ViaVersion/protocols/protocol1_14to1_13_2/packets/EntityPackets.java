@@ -57,6 +57,29 @@ public class EntityPackets {
                             if (type1_14.is(Entity1_14Types.EntityType.FALLING_BLOCK)) {
                                 int data = wrapper.get(Type.INT, 0);
                                 wrapper.set(Type.INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
+                            } else if (type1_14.is(Entity1_14Types.EntityType.MINECART)) {
+                                int data = wrapper.get(Type.INT, 0);
+                                // default is 0 = rideable minecart
+                                switch (data) {
+                                    case 1:
+                                        typeId = Entity1_14Types.EntityType.CHEST_MINECART.getId();
+                                        break;
+                                    case 2:
+                                        typeId = Entity1_14Types.EntityType.FURNACE_MINECART.getId();
+                                        break;
+                                    case 3:
+                                        typeId = Entity1_14Types.EntityType.TNT_MINECART.getId();
+                                        break;
+                                    case 4:
+                                        typeId = Entity1_14Types.EntityType.SPAWNER_MINECART.getId();
+                                        break;
+                                    case 5:
+                                        typeId = Entity1_14Types.EntityType.HOPPER_MINECART.getId();
+                                        break;
+                                    case 6:
+                                        typeId = Entity1_14Types.EntityType.COMMANDBLOCK_MINECART.getId();
+                                        break;
+                                }
                             }
                         }
 
@@ -162,8 +185,8 @@ public class EntityPackets {
                             metadataPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             List<Metadata> metadataList = new LinkedList<>();
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
-	                        metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
-	                        metadataPacket.send(Protocol1_14To1_13_2.class);
+                            metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
+                            metadataPacket.send(Protocol1_14To1_13_2.class);
                         }
                     }
                 });
