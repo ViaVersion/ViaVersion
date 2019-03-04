@@ -1,7 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -36,7 +41,23 @@ public class PlayerPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                        final Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                        InventoryPackets.toServer(item);
+
+                        // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
+                        if (Via.getConfig().truncate1_14Books()) {
+                            if (item == null) return;
+                            CompoundTag tag = item.getTag();
+
+                            if (tag == null) return;
+                            Tag pages = tag.get("pages");
+
+                            if (!(pages instanceof ListTag)) return;
+
+                            ListTag listTag = (ListTag) pages;
+                            if (listTag.size() <= 50) return;
+                            listTag.setValue(listTag.getValue().subList(0, 50));
+                        }
                     }
                 });
             }

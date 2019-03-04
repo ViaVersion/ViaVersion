@@ -305,7 +305,15 @@ public interface ViaVersionConfig {
 
     /**
      * When greater than 0, enables tab complete request delaying by x ticks
+     *
      * @return the delay in ticks
      */
     int get1_13TabCompleteDelay();
+
+    /**
+     * When activated, edited books with more than 50 pages will be shortened to 50.
+     *
+     * @return True if enabled
+     */
+    boolean truncate1_14Books();
 }
