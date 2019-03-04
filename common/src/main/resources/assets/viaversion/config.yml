@@ -118,6 +118,8 @@ disable-1_13-auto-complete: false
 1_13-tab-complete-delay: 0
 # For 1.13 clients the smallest (1 layer) snow doesn't have collision, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
 fix-low-snow-collision: false
+# In 1.14 the client page limit has been upped to 100 (from 50). Some anti-exploit plugins ban when clients go higher than 50. This option cuts edited books to 50 pages.
+truncate-1_14-books: false
 #
 # Enable serverside block-connections for 1.13+ clients
 serverside-blockconnections: false
