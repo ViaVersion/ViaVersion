@@ -203,7 +203,7 @@ public class Entity1_12Types {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
-        MINECART(10, EntityType.MINECART_ABSTRACT),
+        MINECART(10, EntityType.MINECART_RIDEABLE),
         TNT_PRIMED(50, EntityType.PRIMED_TNT),
         ENDER_CRYSTAL(51, EntityType.ENDER_CRYSTAL),
         TIPPED_ARROW(60, EntityType.ARROW),
