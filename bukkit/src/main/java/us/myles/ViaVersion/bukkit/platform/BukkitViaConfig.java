@@ -249,4 +249,9 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
     public int get1_13TabCompleteDelay() {
         return getInt("1_13-tab-complete-delay", 0);
     }
+
+    @Override
+    public boolean isLeftHandedHandling() {
+        return getBoolean("left-handed-handling", true);
+    }
 }
