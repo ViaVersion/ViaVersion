@@ -230,16 +230,19 @@ public class WorldPackets {
 
                         int newId = id;
                         if (newId >= 10) {
-                            newId += 2; // new 10, 11
+                            newId += 2; // new lava drips 10, 11
                         }
                         if (newId >= 13) {
-                            newId += 1; // new 11 -> 13
+                            newId += 1; // new water drip 11 -> 13
                         }
                         if (newId >= 27) {
-                            newId += 2; // new 24, 25 -> 27
+                            newId += 1; // new 24 -> 27
                         }
-                        if (newId >= 42) {
-                            newId += 1; // new 39 -> 42
+                        if (newId >= 29) {
+                            newId += 1; // skip new short happy villager
+                        }
+                        if (newId >= 44) {
+                            newId += 1; // new 39 -> 44
                         }
 
                         if (newId != id) {
