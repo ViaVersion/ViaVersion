@@ -227,6 +227,27 @@ public class WorldPackets {
                         } else if (id == 27) {
                             InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                         }
+
+                        int newId = id;
+                        if (newId >= 10) {
+                            newId += 2; // new lava drips 10, 11
+                        }
+                        if (newId >= 13) {
+                            newId += 1; // new water drip 11 -> 13
+                        }
+                        if (newId >= 27) {
+                            newId += 1; // new 24 -> 27
+                        }
+                        if (newId >= 29) {
+                            newId += 1; // skip new short happy villager
+                        }
+                        if (newId >= 44) {
+                            newId += 1; // new 39 -> 44
+                        }
+
+                        if (newId != id) {
+                            wrapper.set(Type.INT, 0, newId);
+                        }
                     }
                 });
             }
