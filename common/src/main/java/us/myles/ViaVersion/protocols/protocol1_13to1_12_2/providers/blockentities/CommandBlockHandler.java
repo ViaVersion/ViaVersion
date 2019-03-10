@@ -14,6 +14,10 @@ public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandl
         if (name instanceof StringTag) {
             ((StringTag) name).setValue(ChatRewriter.legacyTextToJson(((StringTag) name).getValue()));
         }
+        Tag out = tag.get("LastOutput");
+        if (out instanceof StringTag) {
+            ((StringTag) out).setValue(ChatRewriter.processTranslate(((StringTag) out).getValue()));
+        }
         return -1;
     }
 }
