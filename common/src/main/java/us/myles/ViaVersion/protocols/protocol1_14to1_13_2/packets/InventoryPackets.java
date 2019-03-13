@@ -29,6 +29,7 @@ public class InventoryPackets {
             Outgoing packets
          */
 
+        // Open Inventory
         protocol.registerOutgoing(State.PLAY, 0x14, -1, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -54,45 +55,38 @@ public class InventoryPackets {
                             switch (type) {
                                 case "minecraft:container":
                                 case "minecraft:chest":
-                                    switch (slots) {
-                                        case 27:
-                                            typeId = 0;
-                                            break;
-                                        case 54:
-                                            typeId = 1;
-                                            break;
-                                    }
+                                    typeId = slots / 9 - 1;
                                     break;
                                 case "minecraft:crafting_table":
-                                    typeId = 7;
+                                    typeId = 11;
                                     break;
                                 case "minecraft:furnace":
-                                    typeId = 9;
+                                    typeId = 13;
                                     break;
                                 case "minecraft:dropper":
                                 case "minecraft:dispenser":
-                                    typeId = 2;
-                                    break;
-                                case "minecraft:enchanting_table":
-                                    typeId = 8;
-                                    break;
-                                case "minecraft:brewing_stand":
                                     typeId = 6;
                                     break;
+                                case "minecraft:enchanting_table":
+                                    typeId = 12;
+                                    break;
+                                case "minecraft:brewing_stand":
+                                    typeId = 10;
+                                    break;
                                 case "minecraft:villager":
-                                    typeId = 14;
+                                    typeId = 18;
                                     break;
                                 case "minecraft:beacon":
-                                    typeId = 4;
+                                    typeId = 8;
                                     break;
                                 case "minecraft:anvil":
-                                    typeId = 3;
+                                    typeId = 7;
                                     break;
                                 case "minecraft:hopper":
-                                    typeId = 11;
+                                    typeId = 15;
                                     break;
                                 case "minecraft:shulker_box":
-                                    typeId = 15;
+                                    typeId = 19;
                                     break;
                             }
 
@@ -261,7 +255,7 @@ public class InventoryPackets {
          */
 
         // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x08, 0x08, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x08, 0x09, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -281,7 +275,7 @@ public class InventoryPackets {
         });
 
         // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x24, 0x24, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x24, 0x26, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.SHORT); // 0 - Slot

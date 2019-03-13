@@ -176,6 +176,48 @@ public class Protocol1_14To1_13_2 extends Protocol {
                 });
             }
         });
+
+        registerIncoming(State.PLAY, -1, 0x02);  //Unknown packet added in 19w11a
+        registerIncoming(State.PLAY, 0x02, 0x03);
+        registerIncoming(State.PLAY, 0x03, 0x04);
+        registerIncoming(State.PLAY, 0x04, 0x05);
+        registerIncoming(State.PLAY, 0x05, 0x06);
+        registerIncoming(State.PLAY, 0x06, 0x07);
+        registerIncoming(State.PLAY, 0x07, 0x08);
+
+        registerIncoming(State.PLAY, 0x09, 0x0A);
+        registerIncoming(State.PLAY, 0x0A, 0x0B);
+
+        registerIncoming(State.PLAY, 0x0C, 0x0D);
+        registerIncoming(State.PLAY, 0x0D, 0x0E);
+        registerIncoming(State.PLAY, -1, 0x0F);  //Unknown packet added in 19w11a
+        registerIncoming(State.PLAY, 0x0E, 0x10);
+        registerIncoming(State.PLAY, 0x0F, 0x11);
+        registerIncoming(State.PLAY, 0x10, 0x12);
+        registerIncoming(State.PLAY, 0x11, 0x13);
+        registerIncoming(State.PLAY, 0x12, 0x14);
+        registerIncoming(State.PLAY, 0x13, 0x15);
+        registerIncoming(State.PLAY, 0x14, 0x16);
+        registerIncoming(State.PLAY, 0x15, 0x17);
+        registerIncoming(State.PLAY, 0x16, 0x18);
+        registerIncoming(State.PLAY, 0x17, 0x19);
+
+        registerIncoming(State.PLAY, 0x19, 0x1B);
+        registerIncoming(State.PLAY, 0x1A, 0x1C);
+
+        registerIncoming(State.PLAY, 0x1C, 0x1E);
+        registerIncoming(State.PLAY, 0x1D, 0x1F);
+        registerIncoming(State.PLAY, 0x1E, 0x20);
+        registerIncoming(State.PLAY, 0x1F, 0x21);
+        registerIncoming(State.PLAY, 0x20, 0x22);
+        registerIncoming(State.PLAY, 0x21, 0x23);
+
+        registerIncoming(State.PLAY, 0x23, 0x25);
+
+        registerIncoming(State.PLAY, 0x27, 0x29);
+        registerIncoming(State.PLAY, 0x28, 0x2A);
+
+        registerIncoming(State.PLAY, 0x2A, 0x2C);
     }
 
     public static int getNewSoundId(int id) {

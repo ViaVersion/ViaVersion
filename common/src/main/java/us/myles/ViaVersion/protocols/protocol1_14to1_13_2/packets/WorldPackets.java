@@ -28,7 +28,7 @@ public class WorldPackets {
 
     public static void register(Protocol protocol) {
 
-        // Block break animation
+        // Block Break Animation
         protocol.registerOutgoing(State.PLAY, 0x08, 0x08, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -38,7 +38,7 @@ public class WorldPackets {
             }
         });
 
-        // Update block entity
+        // Update Block Entity
         protocol.registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -80,6 +80,20 @@ public class WorldPackets {
             }
         });
 
+        // Server Difficulty
+        protocol.registerOutgoing(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE);
+                create(new ValueCreator() {
+                    @Override
+                    public void write(PacketWrapper wrapper) throws Exception {
+                        wrapper.write(Type.BOOLEAN, false);  // Added in 19w11a. Maybe https://bugs.mojang.com/browse/MC-44471 ?
+                    }
+                });
+            }
+        });
+
         // Multi Block Change
         protocol.registerOutgoing(State.PLAY, 0xF, 0xF, new PacketRemapper() {
             @Override
@@ -100,7 +114,7 @@ public class WorldPackets {
             }
         });
 
-        //Chunk
+        // Chunk
         protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -181,7 +195,7 @@ public class WorldPackets {
             }
         });
 
-        // Effect packet
+        // Effect
         protocol.registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -203,7 +217,7 @@ public class WorldPackets {
             }
         });
 
-        //spawn particle
+        // Spawn Particle
         protocol.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -253,7 +267,7 @@ public class WorldPackets {
             }
         });
 
-        //join game
+        // Join Game
         protocol.registerOutgoing(State.PLAY, 0x25, 0x25, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -276,10 +290,17 @@ public class WorldPackets {
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, wrapper.user().get(ProtocolInfo.class).getUuid(), entType);
                     }
                 });
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
+                    }
+                });
             }
         });
 
-        //Map Data
+        // Map Data
         protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -295,7 +316,7 @@ public class WorldPackets {
             }
         });
 
-        //respawn
+        // Respawn
         protocol.registerOutgoing(State.PLAY, 0x38, 0x38, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -308,10 +329,16 @@ public class WorldPackets {
                         clientWorld.setEnvironment(dimensionId);
                     }
                 });
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        wrapper.read(Type.UNSIGNED_BYTE); // 19w11 remobed difficulty from respawn
+                    }
+                });
             }
         });
 
-        // Spawn position
+        // Spawn Position
         protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
             @Override
             public void registerMap() {
