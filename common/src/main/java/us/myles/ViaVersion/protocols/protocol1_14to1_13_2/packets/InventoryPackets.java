@@ -169,7 +169,14 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
                                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                                wrapper.write(Type.INT, 0);
+                                wrapper.write(Type.INT, 0);
+                                wrapper.write(Type.FLOAT, 0f);
                             }
+                            wrapper.write(Type.VAR_INT, 0);
+                            wrapper.write(Type.VAR_INT, 0);
+                            wrapper.write(Type.BOOLEAN, false);
                         } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
                             wrapper.read(Type.REMAINING_BYTES);
                             int hand = wrapper.read(Type.VAR_INT);
