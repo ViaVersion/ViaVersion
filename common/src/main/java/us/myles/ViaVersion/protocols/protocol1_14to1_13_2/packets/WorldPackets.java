@@ -26,7 +26,7 @@ public class WorldPackets {
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
 
-    public static void register(Protocol protocol) {
+    public static void register(final Protocol protocol) {
 
         // Block Break Animation
         protocol.registerOutgoing(State.PLAY, 0x08, 0x08, new PacketRemapper() {
@@ -294,7 +294,11 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
+                        short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
+                        PacketWrapper difficultyPacket = wrapper.create(0x0D);
+                        difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
+                        difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
+                        difficultyPacket.send(protocol.getClass());
                     }
                 });
             }
@@ -332,7 +336,11 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.read(Type.UNSIGNED_BYTE); // 19w11 remobed difficulty from respawn
+                        short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
+                        PacketWrapper difficultyPacket = wrapper.create(0x0D);
+                        difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
+                        difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
+                        difficultyPacket.send(protocol.getClass());
                     }
                 });
             }
