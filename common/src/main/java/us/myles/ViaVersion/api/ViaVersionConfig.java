@@ -308,4 +308,9 @@ public interface ViaVersionConfig {
      * @return the delay in ticks
      */
     int get1_13TabCompleteDelay();
+
+    /**
+     * Handles left handed info by using unused bit 7 on Client Settings packet
+     */
+    boolean isLeftHandedHandling();
 }

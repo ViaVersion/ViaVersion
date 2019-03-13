@@ -121,6 +121,7 @@ public class NamedSoundRewriter {
         oldToNew.put("entity.snowman.death", "entity.snow_golem.death");
         oldToNew.put("entity.snowman.hurt", "entity.snow_golem.hurt");
         oldToNew.put("entity.snowman.shoot", "entity.snow_golem.shoot");
+        oldToNew.put("entity.villager.trading", "entity.villager.trade");
         oldToNew.put("entity.vindication_illager.ambient", "entity.vindicator.ambient");
         oldToNew.put("entity.vindication_illager.death", "entity.vindicator.death");
         oldToNew.put("entity.vindication_illager.hurt", "entity.vindicator.hurt");
