@@ -186,7 +186,6 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerIncoming(State.PLAY, 0x06, 0x07);
         registerIncoming(State.PLAY, 0x07, 0x08);
 
-        registerIncoming(State.PLAY, 0x09, 0x0A);
         registerIncoming(State.PLAY, 0x0A, 0x0B);
 
         registerIncoming(State.PLAY, 0x0C, 0x0D);

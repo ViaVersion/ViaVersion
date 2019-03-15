@@ -436,7 +436,7 @@ public class InventoryPackets {
         });
 
         // Close window
-        protocol.registerIncoming(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x09, 0x0A, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
