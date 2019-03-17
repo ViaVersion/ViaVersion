@@ -22,6 +22,8 @@ import java.util.List;
 public class BukkitViaInjector implements ViaInjector {
     private List<ChannelFuture> injectedFutures = new ArrayList<>();
     private List<Pair<Field, Object>> injectedLists = new ArrayList<>();
+    private List<ChannelFuture> injectedFutures = new ConcurrentList<>();
+    private List<Pair<Field, Object>> injectedLists = new ConcurrentList<>();
 
     @Override
     public void inject() throws Exception {
