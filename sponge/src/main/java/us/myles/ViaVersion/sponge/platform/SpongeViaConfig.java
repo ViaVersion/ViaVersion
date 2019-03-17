@@ -257,7 +257,7 @@ public class SpongeViaConfig extends Config implements ViaVersionConfig {
     }
 
     @Override
-    public boolean truncate1_14Books() {
+    public boolean isTruncate1_14Books() {
         return getBoolean("truncate-1_14-books", false);
     }
     

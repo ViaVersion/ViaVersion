@@ -315,7 +315,7 @@ public interface ViaVersionConfig {
      *
      * @return True if enabled
      */
-    boolean truncate1_14Books();
+    boolean isTruncate1_14Books();
     
     /**
      * Handles left handed info by using unused bit 7 on Client Settings packet

@@ -45,7 +45,7 @@ public class PlayerPackets {
                         InventoryPackets.toServer(item);
 
                         // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
-                        if (Via.getConfig().truncate1_14Books()) {
+                        if (Via.getConfig().isTruncate1_14Books()) {
                             if (item == null) return;
                             CompoundTag tag = item.getTag();
 
