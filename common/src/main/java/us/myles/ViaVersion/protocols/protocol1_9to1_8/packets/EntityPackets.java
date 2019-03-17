@@ -283,7 +283,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if (!Via.getConfig().isMinimizeCooldown()) return;
-                        if (wrapper.get(Type.VAR_INT, 0) != wrapper.user().get(EntityTracker.class).getEntityID()) {
+                        if (wrapper.get(Type.VAR_INT, 0) != wrapper.user().get(EntityTracker.class).getProvidedEntityId()) {
                             return;
                         }
                         int propertiesToRead = wrapper.read(Type.INT);

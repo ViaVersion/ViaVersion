@@ -95,6 +95,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         providers.register(CommandBlockProvider.class, new CommandBlockProvider());
         providers.register(EntityIdProvider.class, new EntityIdProvider());
         providers.register(BossBarProvider.class, new BossBarProvider());
+        providers.register(MainHandProvider.class, new MainHandProvider());
         providers.require(MovementTransmitterProvider.class);
         if (Via.getConfig().isStimulatePlayerTick()) {
             Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);

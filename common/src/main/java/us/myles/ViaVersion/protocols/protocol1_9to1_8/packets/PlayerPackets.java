@@ -19,6 +19,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -458,8 +459,15 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int hand = wrapper.read(Type.VAR_INT);
 
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.setMainHand(hand);
+                        if (Via.getConfig().isLeftHandedHandling()) {
+                            // Add 0x80 if left handed
+                            if (hand == 0) wrapper.set(Type.UNSIGNED_BYTE, 0,
+                                    (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80)
+                            );
+                        }
+                        wrapper.sendToServer(Protocol1_9TO1_8.class, true, true);
+                        wrapper.cancel();
+                        Via.getManager().getProviders().get(MainHandProvider.class).setMainHand(wrapper.user(), hand);
                     }
                 });
             }

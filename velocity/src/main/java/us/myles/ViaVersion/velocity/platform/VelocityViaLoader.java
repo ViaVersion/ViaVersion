@@ -9,7 +9,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import us.myles.ViaVersion.velocity.handlers.VelocityServerHandler;
 import us.myles.ViaVersion.velocity.listeners.ElytraPatch;
-import us.myles.ViaVersion.velocity.listeners.MainHandPatch;
 import us.myles.ViaVersion.velocity.listeners.UpdateListener;
 import us.myles.ViaVersion.velocity.providers.VelocityBossBarProvider;
 import us.myles.ViaVersion.velocity.providers.VelocityMovementTransmitter;
@@ -26,10 +25,10 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
         Via.getManager().getProviders().use(VersionProvider.class, new VelocityVersionProvider());
         // We probably don't need a EntityIdProvider because velocity sends a Join packet on server change
+        // We don't need main hand patch because Join Game packet makes client send hand data again
 
         VelocityPlugin.PROXY.getEventManager().register(plugin, new UpdateListener());
         VelocityPlugin.PROXY.getEventManager().register(plugin, new VelocityServerHandler());
-        VelocityPlugin.PROXY.getEventManager().register(plugin, new MainHandPatch());
         VelocityPlugin.PROXY.getEventManager().register(plugin, new ElytraPatch());
 
         int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();

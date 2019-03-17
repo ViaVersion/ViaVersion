@@ -254,4 +254,8 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
     public boolean truncate1_14Books() {
         return getBoolean("truncate-1_14-books", false);
     }
+    
+    public boolean isLeftHandedHandling() {
+        return getBoolean("left-handed-handling", true);
+    }
 }

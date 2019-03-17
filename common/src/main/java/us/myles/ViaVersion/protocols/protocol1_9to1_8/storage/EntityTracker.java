@@ -52,8 +52,6 @@ public class EntityTracker extends StoredObject {
     @Setter
     private GameMode gameMode;
     @Setter
-    private int mainHand;
-    @Setter
     private String currentTeam;
 
     public EntityTracker(UserConnection user) {
@@ -169,6 +167,13 @@ public class EntityTracker extends StoredObject {
                             setSecondHand(entityID, null);
                         }
                     }
+                }
+                if (metadata.getId() == 12 && Via.getConfig().isLeftHandedHandling()) { // Player model
+                    metadataList.add(new Metadata(
+                            13, // Main hand
+                            MetaType1_9.Byte,
+                            (byte) (((((byte) metadata.getValue()) & 0x80) != 0) ? 0 : 1)
+                    ));
                 }
             }
             if (type == Entity1_10Types.EntityType.ARMOR_STAND && Via.getConfig().isHologramPatch()) {
