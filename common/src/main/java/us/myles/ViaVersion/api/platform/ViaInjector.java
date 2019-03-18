@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api.platform;
 
+import com.google.gson.JsonObject;
+
 public interface ViaInjector {
     /**
      * Inject into the current Platform
@@ -36,4 +38,11 @@ public interface ViaInjector {
      * @return The name
      */
     String getDecoderName();
+
+    /**
+     * Get any relevant data for debugging injection issues.
+     *
+     * @return JSONObject containing the data
+     */
+    JsonObject getDump();
 }

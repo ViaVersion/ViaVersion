@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.bukkit.platform;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
@@ -16,7 +18,6 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BukkitViaInjector implements ViaInjector {
@@ -274,5 +275,66 @@ public class BukkitViaInjector implements ViaInjector {
         } catch (Exception e) {
         }
         return false;
+    }
+
+    @Override
+    public JsonObject getDump() {
+        JsonObject data = new JsonObject();
+
+        // Generate information about current injections
+        JsonArray injectedChannelInitializers = new JsonArray();
+        for (ChannelFuture cf : injectedFutures) {
+            JsonObject info = new JsonObject();
+            info.addProperty("futureClass", cf.getClass().getName());
+            info.addProperty("channelClass", cf.channel().getClass().getName());
+
+            // Get information about the pipes for this channel future
+            JsonArray pipeline = new JsonArray();
+            for (String pipeName : cf.channel().pipeline().names()) {
+                JsonObject pipe = new JsonObject();
+                pipe.addProperty("name", pipeName);
+                if (cf.channel().pipeline().get(pipeName) != null) {
+                    pipe.addProperty("class", cf.channel().pipeline().get(pipeName).getClass().getName());
+                    try {
+                        Object child = ReflectionUtil.get(cf.channel().pipeline().get(pipeName), "childHandler", ChannelInitializer.class);
+                        pipe.addProperty("childClass", child.getClass().getName());
+                        if (child instanceof BukkitChannelInitializer) {
+                            pipe.addProperty("oldInit", ((BukkitChannelInitializer) child).getOriginal().getClass().getName());
+                        }
+                    } catch (Exception e) {
+                        // Don't display
+                    }
+                }
+                // Add to the pipeline array
+                pipeline.add(pipe);
+            }
+            info.add("pipeline", pipeline);
+
+            // Add to the list
+            injectedChannelInitializers.add(info);
+        }
+        data.add("injectedChannelInitializers", injectedChannelInitializers);
+
+        // Generate information about lists we've injected into
+        JsonObject wrappedLists = new JsonObject();
+        JsonObject currentLists = new JsonObject();
+        try {
+            for (Pair<Field, Object> pair : injectedLists) {
+                Object list = pair.getKey().get(pair.getValue());
+                // Note down the current value (could be overridden by another plugin)
+                currentLists.addProperty(pair.getKey().getName(), list.getClass().getName());
+                // Also if it's not overridden we can display what's inside our list (possibly another plugin)
+                if (list instanceof ListWrapper) {
+                    wrappedLists.addProperty(pair.getKey().getName(), ((ListWrapper) list).getOriginalList().getClass().getName());
+                }
+            }
+            data.add("wrappedLists", wrappedLists);
+            data.add("currentLists", currentLists);
+        } catch (Exception e) {
+            // Ignored, fields won't be present
+        }
+
+        data.addProperty("binded", isBinded());
+        return data;
     }
 }
