@@ -155,15 +155,20 @@ public class VelocityServerHandler {
                         if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
                             ArrayList<String> newChannels = new ArrayList<>();
                             for (String oldChannel : knownChannels) {
-                                newChannels.add(InventoryPackets.getNewPluginChannelId(oldChannel));
+                                String transformed = InventoryPackets.getNewPluginChannelId(oldChannel);
+                                if (transformed != null) {
+                                    newChannels.add(transformed);
+                                }
                             }
                             knownChannels.clear();
                             knownChannels.addAll(newChannels);
-
                         } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
                             ArrayList<String> newChannels = new ArrayList<>();
                             for (String oldChannel : knownChannels) {
-                                newChannels.add(InventoryPackets.getOldPluginChannelId(oldChannel));
+                                String transformed = InventoryPackets.getOldPluginChannelId(oldChannel);
+                                if (transformed != null) {
+                                    newChannels.add(transformed);
+                                }
                             }
                             knownChannels.clear();
                             knownChannels.addAll(newChannels);
