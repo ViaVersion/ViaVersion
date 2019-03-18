@@ -48,7 +48,7 @@ public class DumpSubCmd extends ViaSubCommand {
 
         Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
 
-        final DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump());
+        final DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump());
 
         Via.getPlatform().runAsync(new Runnable() {
             @Override

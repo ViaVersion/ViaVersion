@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.bungee.platform;
 
+import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import us.myles.ViaVersion.api.Via;
@@ -55,5 +56,32 @@ public class BungeeViaInjector implements ViaInjector {
     @Override
     public String getDecoderName() {
         return "via-decoder";
+    }
+
+    private ChannelInitializer<Channel> getChannelInitializer() throws Exception {
+        Class<?> pipelineUtils = Class.forName("net.md_5.bungee.netty.PipelineUtils");
+        Field field = pipelineUtils.getDeclaredField("SERVER_CHILD");
+        field.setAccessible(true);
+        // Remove any final stuff
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        return (ChannelInitializer<Channel>) field.get(null);
+    }
+
+    @Override
+    public JsonObject getDump() {
+        JsonObject data = new JsonObject();
+        try {
+            ChannelInitializer<Channel> initializer = getChannelInitializer();
+            data.addProperty("currentInitializer", initializer.getClass().getName());
+            if (initializer instanceof BungeeChannelInitializer) {
+                data.addProperty("originalInitializer", ((BungeeChannelInitializer) initializer).getOriginal().getClass().getName());
+            }
+        } catch (Exception e) {
+            // Ignored, not printed in the dump
+        }
+        return data;
     }
 }

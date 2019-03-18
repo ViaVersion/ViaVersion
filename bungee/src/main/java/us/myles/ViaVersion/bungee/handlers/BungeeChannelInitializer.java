@@ -3,13 +3,14 @@ package us.myles.ViaVersion.bungee.handlers;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
-public class BungeeChannelInitializer extends ChannelInitializer<SocketChannel> {
-
+public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
+    @Getter
     private final ChannelInitializer<Channel> original;
     private Method method;
 
@@ -24,7 +25,7 @@ public class BungeeChannelInitializer extends ChannelInitializer<SocketChannel> 
     }
 
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
+    protected void initChannel(Channel socketChannel) throws Exception {
         UserConnection info = new UserConnection(socketChannel);
         // init protocol
         new ProtocolPipeline(info);

@@ -12,4 +12,5 @@ public class DumpTemplate {
     private VersionInfo versionInfo;
     private Map<String, Object> configuration;
     private JsonObject platformDump;
+    private JsonObject injectionDump;
 }

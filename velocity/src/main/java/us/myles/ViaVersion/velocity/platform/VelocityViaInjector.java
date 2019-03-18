@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.velocity.platform;
 
+import com.google.gson.JsonObject;
 import io.netty.channel.ChannelInitializer;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
@@ -23,13 +24,19 @@ public class VelocityViaInjector implements ViaInjector {
         }
     }
 
+    private ChannelInitializer getInitializer() throws Exception {
+        Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
+        Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getServerChannelInitializer");
+       return (ChannelInitializer) ReflectionUtil.invoke(channelInitializerHolder, "get");
+    }
+
     @Override
     public void inject() throws Exception {
         Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
         Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getServerChannelInitializer");
-        ChannelInitializer originalIntializer = (ChannelInitializer) ReflectionUtil.invoke(channelInitializerHolder, "get");
+        ChannelInitializer originalInitializer = getInitializer();
         channelInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
-                .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalIntializer));
+                .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalInitializer));
     }
 
     @Override
@@ -61,5 +68,16 @@ public class VelocityViaInjector implements ViaInjector {
     @Override
     public String getDecoderName() {
         return "via-decoder";
+    }
+
+    @Override
+    public JsonObject getDump() {
+        JsonObject data = new JsonObject();
+        try {
+            data.addProperty("currentInitializer", getInitializer().getClass().getName());
+        } catch (Exception e) {
+            // Ignored
+        }
+        return data;
     }
 }
