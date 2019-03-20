@@ -12,7 +12,7 @@ public class ViaIdleThread implements Runnable {
         for (UserConnection info : Via.getManager().getPortedPlayers().values()) {
             if (info.has(ProtocolInfo.class) && info.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) {
                 long nextIdleUpdate = info.get(MovementTracker.class).getNextIdlePacket();
-                if (nextIdleUpdate <= System.currentTimeMillis()) {
+                if (nextIdleUpdate <= System.nanoTime()) {
                     if (info.getChannel().isOpen()) {
                         Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(info);
                     }

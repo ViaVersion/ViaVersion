@@ -18,6 +18,7 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -137,10 +138,10 @@ public class UserConnection {
      */
     public boolean incrementReceived() {
         // handle stats
-        long diff = System.currentTimeMillis() - startTime;
-        if (diff >= 1000) {
+        long diff = System.nanoTime() - startTime;
+        if (diff >= TimeUnit.SECONDS.toNanos(1)) {
             packetsPerSecond = intervalPackets;
-            startTime = System.currentTimeMillis();
+            startTime = System.nanoTime();
             intervalPackets = 1;
             return true;
         } else {

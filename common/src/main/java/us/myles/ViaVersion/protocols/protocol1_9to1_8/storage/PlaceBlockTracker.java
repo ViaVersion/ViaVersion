@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
+import java.util.concurrent.TimeUnit;
+
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.data.StoredObject;
@@ -23,13 +25,13 @@ public class PlaceBlockTracker extends StoredObject {
      * @return True if it has passed
      */
     public boolean isExpired(int ms) {
-        return System.currentTimeMillis() > (lastPlaceTimestamp + ms);
+        return System.nanoTime() > (lastPlaceTimestamp + TimeUnit.MILLISECONDS.toNanos(ms));
     }
 
     /**
      * Set the last place time to the current time
      */
     public void updateTime() {
-        lastPlaceTimestamp = System.currentTimeMillis();
+        lastPlaceTimestamp = System.nanoTime();
     }
 }

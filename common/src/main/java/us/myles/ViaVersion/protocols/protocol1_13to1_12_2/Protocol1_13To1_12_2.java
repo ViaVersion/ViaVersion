@@ -38,6 +38,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 // Development of 1.13 support!
 public class Protocol1_13To1_12_2 extends Protocol {
@@ -857,7 +858,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                             TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
                             wrapper.cancel();
-                            tracker.setTimeToSend(System.currentTimeMillis() + Via.getConfig().get1_13TabCompleteDelay() * 50);
+                            tracker.setTimeToSend(System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(Via.getConfig().get1_13TabCompleteDelay() * 50));
                             tracker.setLastTabComplete(wrapper.get(Type.STRING, 0));
                         }
                     }
