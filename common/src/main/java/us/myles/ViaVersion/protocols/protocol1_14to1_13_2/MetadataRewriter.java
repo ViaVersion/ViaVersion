@@ -23,7 +23,7 @@ public class MetadataRewriter {
                 metadata.setMetaType(MetaType1_14.byId(metadata.getMetaType().getTypeID()));
 
                 EntityTracker tracker = connection.get(EntityTracker.class);
-                // 1.13 changed item to flat item (no data)
+
                 if (metadata.getMetaType() == MetaType1_14.Slot) {
                     InventoryPackets.toClient((Item) metadata.getValue());
                 } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
@@ -98,6 +98,26 @@ public class MetadataRewriter {
                     if (metadata.getId() == 8) {
                         if (metadata.getValue().equals(0)) metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
                         metadata.setMetaType(MetaType1_14.OptVarInt);
+                    }
+                }
+
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_SKELETON)) {
+                    if (metadata.getId() == 12) {
+                        metadatas.remove(metadata);  // TODO "Is swinging arms", maybe moved to pos / entity status
+                    }
+                }
+
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
+                    if (metadata.getId() == 16) {
+                        metadatas.remove(metadata);  // TODO "Are hands held up", maybe moved to pos / entity status
+                    } else if (metadata.getId() > 16) {
+                        metadata.setId(metadata.getId() - 1);
+                    }
+                }
+
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
+                    if (metadata.getId() == 14) {
+                        metadatas.remove(metadata);  // TODO "Has target (aggressive state)", maybe moved to pos / entity status
                     }
                 }
             } catch (Exception e) {
