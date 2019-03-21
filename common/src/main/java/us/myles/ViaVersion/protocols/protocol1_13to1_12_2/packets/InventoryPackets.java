@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.conversion.ConverterRegistry;
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -388,9 +389,12 @@ public class InventoryPackets {
                 tag.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|CanPlaceOn", ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
-                    String[] newValues = BlockIdData.blockIdMapping.get(value instanceof String
-                            ? ((String) value).replace("minecraft:", "")
-                            : null);
+                    String oldId = value.toString().replace("minecraft:", "");
+                    String numberConverted = BlockIdData.numberIdToString.get(Ints.tryParse(oldId));
+                    if (numberConverted != null) {
+                        oldId = numberConverted;
+                    }
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanPlaceOn.add(new StringTag("", newValue));
@@ -407,9 +411,12 @@ public class InventoryPackets {
                 tag.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|CanDestroy", ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
-                    String[] newValues = BlockIdData.blockIdMapping.get(value instanceof String
-                            ? ((String) value).replace("minecraft:", "")
-                            : null);
+                    String oldId = value.toString().replace("minecraft:", "");
+                    String numberConverted = BlockIdData.numberIdToString.get(Ints.tryParse(oldId));
+                    if (numberConverted != null) {
+                        oldId = numberConverted;
+                    }
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanDestroy.add(new StringTag("", newValue));

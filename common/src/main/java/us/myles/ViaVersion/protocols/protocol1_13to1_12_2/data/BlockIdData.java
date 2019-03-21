@@ -13,6 +13,7 @@ import java.util.Map;
 public class BlockIdData {
     public static Map<String, String[]> blockIdMapping;
     public static Map<String, String[]> fallbackReverseMapping;
+    public static Map<Integer, String> numberIdToString;
 
     public static void init() {
         InputStream stream = MappingData.class.getClassLoader()
@@ -35,6 +36,23 @@ public class BlockIdData {
         } finally {
             try {
                 reader.close();
+            } catch (IOException ignored) {
+                // Ignored
+            }
+        }
+
+        InputStream blockS = MappingData.class.getClassLoader()
+                .getResourceAsStream("assets/viaversion/data/blockNumberToString1.12.json");
+        InputStreamReader blockR = new InputStreamReader(blockS);
+        try {
+            numberIdToString = new HashMap<>((Map<Integer, String>) GsonUtil.getGson().fromJson(
+                    blockR,
+                    new TypeToken<Map<Integer, String>>() {
+                    }.getType()
+            ));
+        } finally {
+            try {
+                blockR.close();
             } catch (IOException ignored) {
                 // Ignored
             }
