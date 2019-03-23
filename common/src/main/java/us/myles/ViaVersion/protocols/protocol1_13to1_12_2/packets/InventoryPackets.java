@@ -400,7 +400,7 @@ public class InventoryPackets {
                             newCanPlaceOn.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanPlaceOn.add(oldTag);
+                        newCanPlaceOn.add(new StringTag("", oldId));
                     }
                 }
                 tag.put(newCanPlaceOn);
@@ -422,7 +422,7 @@ public class InventoryPackets {
                             newCanDestroy.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanDestroy.add(oldTag);
+                        newCanDestroy.add(new StringTag("", oldId));
                     }
                 }
                 tag.put(newCanDestroy);
