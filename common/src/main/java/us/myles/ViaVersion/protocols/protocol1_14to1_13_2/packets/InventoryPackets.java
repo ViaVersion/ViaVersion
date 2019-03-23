@@ -168,7 +168,7 @@ public class InventoryPackets {
                                                         "2Mjc3Y2QzNjI2NjI4M2NiNWE5ZTY5NDM5NTNjNzgzZTZmZjdkNmEyZDU5ZDE1YWQwNjk" +
                                                         "3ZTkxZDQzYyJ9fX0=");
                                         tag.put(display);
-                                        newItems[i] = new Item(768, (byte) 1, (short) 0, tag); // Head
+                                        newItems[i] = new Item(getNewItemId(705), (byte) 1, (short) 0, tag); // Head
                                     } else if (i == 45 && oversized && 0 != tracker.getCurrentPage()) {
                                         CompoundTag tag = new CompoundTag("");
                                         CompoundTag display = new CompoundTag("display");
@@ -179,13 +179,13 @@ public class InventoryPackets {
                                                         "wYTBhYzUyYWYxMWU0YmM4NDAwOWM2ODkwYTQwMjk0NzJmMzk0N2I0ZjQ2NWI1YjU3MjI" +
                                                         "4ODFhYWNjNyJ9fX0=");
                                         tag.put(display);
-                                        newItems[i] = new Item(768, (byte) 1, (short) 0, tag); // Head
+                                        newItems[i] = new Item(getNewItemId(705), (byte) 1, (short) 0, tag); // Head
                                     } else {
                                         CompoundTag tag = new CompoundTag("");
                                         CompoundTag display = new CompoundTag("display");
                                         display.put(new StringTag("Name", "{\"text\":\"\"}"));
                                         tag.put(display);
-                                        newItems[i] = new Item(346, (byte) 1, (short) 0, tag); // Black stained glass panel
+                                        newItems[i] = new Item(getNewItemId(342), (byte) 1, (short) 0, tag); // Black stained glass panel
                                     }
                                 }
                                 System.arraycopy(stacks, size, newItems, clientSize, stacks.length - size);
