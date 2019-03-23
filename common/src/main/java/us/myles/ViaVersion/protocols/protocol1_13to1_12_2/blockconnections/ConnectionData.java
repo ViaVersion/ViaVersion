@@ -212,16 +212,17 @@ public class ConnectionData {
                 for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
                     String name = type.getKey();
                     JsonObject object = type.getValue().getAsJsonObject();
-                    Boolean[] data = new Boolean[6];
+                    boolean[] data = new boolean[6];
                     for (BlockFace value : BlockFace.values()) {
                         String face = value.toString().toLowerCase();
                         if (object.has(face)) {
                             data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
-                        } else {
-                            data[value.ordinal()] = false;
                         }
                     }
                     blockData.put(name, data);
+                }
+                if (entry.getKey().contains("stairs")) {
+                    blockData.put("allFalseIfStairPre1_12", new boolean[6]);
                 }
                 blockConnectionData.put(id, blockData);
             }
