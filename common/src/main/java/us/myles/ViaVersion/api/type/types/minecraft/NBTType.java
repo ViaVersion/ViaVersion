@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.type.types.minecraft;
 
 import com.github.steveice10.opennbt.NBTIO;
+import com.github.steveice10.opennbt.tag.TagRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
@@ -14,6 +15,13 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 
 public class NBTType extends Type<CompoundTag> {
+    static {
+        // We don't need them
+        TagRegistry.unregister(60);
+        TagRegistry.unregister(61);
+        TagRegistry.unregister(65);
+    }
+
     public NBTType() {
         super(CompoundTag.class);
     }
