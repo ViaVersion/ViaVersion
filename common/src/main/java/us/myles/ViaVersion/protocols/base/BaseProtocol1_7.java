@@ -81,7 +81,7 @@ public class BaseProtocol1_7 extends Protocol {
                             }
 
                             if (protocols != null) {
-                                if (protocolVersion != 9999) {
+                                if (protocolVersion == protocol || protocolVersion == 0) {
                                     //Fix ServerListPlus
                                     version.addProperty("protocol", info.getProtocolVersion());
                                 }
