@@ -18,7 +18,7 @@ public class PlayerPackets {
     public static void register(Protocol protocol) {
 
         // Open Sign Editor
-        protocol.registerOutgoing(State.PLAY, 0x2C, 0x2D, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x2C, 0x2E, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
@@ -110,7 +110,7 @@ public class PlayerPackets {
         });
 
         // Update Structure Block
-        protocol.registerIncoming(State.PLAY, 0x25, 0x27, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x25, 0x28, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14, Type.POSITION);
@@ -118,7 +118,7 @@ public class PlayerPackets {
         });
 
         // Update Sign
-        protocol.registerIncoming(State.PLAY, 0x26, 0x28, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x26, 0x29, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14, Type.POSITION);
@@ -126,7 +126,7 @@ public class PlayerPackets {
         });
 
         // Player Block Placement
-        protocol.registerIncoming(State.PLAY, 0x29, 0x2B, new PacketRemapper() {
+        protocol.registerIncoming(State.PLAY, 0x29, 0x2C, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

@@ -299,6 +299,11 @@ public class WorldPackets {
                         difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                         difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
                         difficultyPacket.send(protocol.getClass());
+
+                        wrapper.passthrough(Type.UNSIGNED_BYTE); // Max Players
+                        wrapper.passthrough(Type.STRING); // Level Type
+
+                        wrapper.write(Type.VAR_INT, 0);  // Added in 19w13a, maybe difficulty?
                     }
                 });
             }
