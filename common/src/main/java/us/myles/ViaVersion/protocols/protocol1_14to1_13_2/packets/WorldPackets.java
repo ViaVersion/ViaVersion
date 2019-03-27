@@ -303,7 +303,7 @@ public class WorldPackets {
                         wrapper.passthrough(Type.UNSIGNED_BYTE); // Max Players
                         wrapper.passthrough(Type.STRING); // Level Type
 
-                        wrapper.write(Type.VAR_INT, 0);  // Added in 19w13a, maybe difficulty?
+                        wrapper.write(Type.VAR_INT, 64);  // Serverside view distance, added in 19w13a
                     }
                 });
             }
