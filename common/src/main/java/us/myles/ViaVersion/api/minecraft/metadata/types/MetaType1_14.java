@@ -27,6 +27,7 @@ public enum MetaType1_14 implements MetaType {
     PARTICLE(15, Protocol1_13_2To1_13_1.PARTICLE_TYPE),
     VillagerData(16, Type.VILLAGER_DATA),
     OptVarInt(17, Type.OPTIONAL_VAR_INT),
+    Pose(18, Type.VAR_INT),
     Discontinued(99, null);
 
     private final int typeID;
