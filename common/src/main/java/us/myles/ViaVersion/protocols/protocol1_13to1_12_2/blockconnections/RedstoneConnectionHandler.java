@@ -83,6 +83,6 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
 
     private boolean connects(BlockFace side, int blockState) {
         final BlockData blockData = ConnectionData.blockConnectionData.get(blockState);
-        return blockData != null && blockData.connectsTo("redstoneConnections", side.opposite());
+        return blockData != null && blockData.connectsTo("redstoneConnections", side.opposite(), false);
     }
 }

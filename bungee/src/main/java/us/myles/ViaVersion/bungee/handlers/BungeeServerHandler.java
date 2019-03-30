@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.bungee.handlers;
 
-import com.google.common.base.Joiner;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -29,8 +28,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BungeeServerHandler implements Listener {
     private static Method getHandshake;
@@ -152,23 +154,28 @@ public class BungeeServerHandler implements Listener {
                         String channel = plMsg.getTag();
                         int id1_13 = ProtocolVersion.v1_13.getId();
                         if (previousServerProtocol != -1) {
+                            String oldChannel = channel;
                             if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
                                 channel = InventoryPackets.getNewPluginChannelId(channel);
+                                if (channel == null) {
+                                    throw new RuntimeException(oldChannel + " found in relayMessages");
+                                }
                                 if (channel.equals("minecraft:register")) {
-                                    String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
-                                    for (int i = 0; i < channels.length; i++) {
-                                        channels[i] = InventoryPackets.getNewPluginChannelId(channels[i]);
-                                    }
-                                    plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
+                                    plMsg.setData(Arrays.stream(new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0"))
+                                            .map(InventoryPackets::getNewPluginChannelId)
+                                            .filter(Objects::nonNull)
+                                            .collect(Collectors.joining("\0")).getBytes(StandardCharsets.UTF_8));
                                 }
                             } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
                                 channel = InventoryPackets.getOldPluginChannelId(channel);
+                                if (channel == null) {
+                                    throw new RuntimeException(oldChannel + " found in relayMessages");
+                                }
                                 if (channel.equals("REGISTER")) {
-                                    String[] channels = new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0");
-                                    for (int i = 0; i < channels.length; i++) {
-                                        channels[i] = InventoryPackets.getOldPluginChannelId(channels[i]);
-                                    }
-                                    plMsg.setData(Joiner.on('\0').join(channels).getBytes(StandardCharsets.UTF_8));
+                                    plMsg.setData(Arrays.stream(new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0"))
+                                            .map(InventoryPackets::getOldPluginChannelId)
+                                            .filter(Objects::nonNull)
+                                            .collect(Collectors.joining("\0")).getBytes(StandardCharsets.UTF_8));
                                 }
                             }
                         }

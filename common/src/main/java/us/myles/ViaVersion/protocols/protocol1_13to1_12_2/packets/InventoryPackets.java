@@ -4,7 +4,7 @@ import com.github.steveice10.opennbt.conversion.ConverterRegistry;
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.io.BaseEncoding;
+import com.google.common.primitives.Ints;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -159,8 +159,12 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
                             }
                         } else {
+                            String old = channel;
                             channel = getNewPluginChannelId(channel);
                             if (channel == null) {
+                                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                    Via.getPlatform().getLogger().warning("Ignoring outgoing plugin message with channel: " + old);
+                                }
                                 wrapper.cancel();
                                 return;
                             } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
@@ -171,7 +175,7 @@ public class InventoryPackets {
                                     if (rewritten != null) {
                                         rewrittenChannels.add(rewritten);
                                     } else if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                                        Via.getPlatform().getLogger().warning("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                        Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + channels[i]);
                                     }
                                 }
                                 wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
@@ -238,8 +242,12 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
+                        String old = channel;
                         channel = getOldPluginChannelId(channel);
                         if (channel == null) {
+                            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                Via.getPlatform().getLogger().warning("Ignoring incoming plugin message with channel: " + old);
+                            }
                             wrapper.cancel();
                             return;
                         } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
@@ -250,7 +258,7 @@ public class InventoryPackets {
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
                                 } else if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in REGISTER: " + channels[i]);
+                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + channels[i]);
                                 }
                             }
                             wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
@@ -381,15 +389,18 @@ public class InventoryPackets {
                 tag.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|CanPlaceOn", ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
-                    String[] newValues = BlockIdData.blockIdMapping.get(value instanceof String
-                            ? ((String) value).replace("minecraft:", "")
-                            : null);
+                    String oldId = value.toString().replace("minecraft:", "");
+                    String numberConverted = BlockIdData.numberIdToString.get(Ints.tryParse(oldId));
+                    if (numberConverted != null) {
+                        oldId = numberConverted;
+                    }
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanPlaceOn.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanPlaceOn.add(oldTag);
+                        newCanPlaceOn.add(new StringTag("", oldId));
                     }
                 }
                 tag.put(newCanPlaceOn);
@@ -400,15 +411,18 @@ public class InventoryPackets {
                 tag.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|CanDestroy", ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
-                    String[] newValues = BlockIdData.blockIdMapping.get(value instanceof String
-                            ? ((String) value).replace("minecraft:", "")
-                            : null);
+                    String oldId = value.toString().replace("minecraft:", "");
+                    String numberConverted = BlockIdData.numberIdToString.get(Ints.tryParse(oldId));
+                    if (numberConverted != null) {
+                        oldId = numberConverted;
+                    }
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanDestroy.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanDestroy.add(oldTag);
+                        newCanDestroy.add(new StringTag("", oldId));
                     }
                 }
                 tag.put(newCanDestroy);
@@ -488,9 +502,7 @@ public class InventoryPackets {
                 return "wdl:request";
             default:
                 return old.matches("([0-9a-z_-]*:)?[0-9a-z_/.-]*") // Identifier regex
-                        ? old
-                        : "viaversion:legacy/" + BaseEncoding.base32().lowerCase().withPadChar('-').encode(
-                        old.getBytes(StandardCharsets.UTF_8));
+                        ? old : null;
         }
     }
 
@@ -710,14 +722,8 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             default:
-                return newId.startsWith("viaversion:legacy/") // Our format :)
-                        ? new String(BaseEncoding.base32().lowerCase().withPadChar('-').decode(
-                        newId.substring(18)), StandardCharsets.UTF_8)
-                        : newId.startsWith("legacy:")
-                        ? newId.substring(7) // Rewrite BungeeCord's format. It will only prevent kicks, plugins will still be broken because of case-sensitivity *plays sad violin*
-                        : newId.startsWith("bungeecord:legacy/")
-                        ? newId.substring(18)
-                        : newId;
+                return newId.matches("([0-9a-z_-]*:)?[0-9a-z_/.-]*") // Identifier regex
+                        ? newId : null;
         }
     }
 

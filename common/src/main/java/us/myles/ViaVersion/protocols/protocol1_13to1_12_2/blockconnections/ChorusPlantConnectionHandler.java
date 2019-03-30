@@ -3,10 +3,11 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler {
     private int endstone;
@@ -46,13 +47,13 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
     @Override
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
-        if (connects(BlockFace.TOP, getBlockData(user, position.getRelative(BlockFace.TOP)))) states |= 16;
-        if (connects(BlockFace.BOTTOM, getBlockData(user, position.getRelative(BlockFace.BOTTOM)))) states |= 32;
+        if (connects(BlockFace.TOP, getBlockData(user, position.getRelative(BlockFace.TOP)), false)) states |= 16;
+        if (connects(BlockFace.BOTTOM, getBlockData(user, position.getRelative(BlockFace.BOTTOM)), false)) states |= 32;
         return states;
     }
 
     @Override
-    protected boolean connects(BlockFace side, int blockState) {
+    protected boolean connects(BlockFace side, int blockState, boolean pre1_12) {
         return getBlockStates().contains(blockState) || (side == BlockFace.BOTTOM && blockState == endstone);
     }
 }

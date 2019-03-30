@@ -4,6 +4,8 @@ import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,10 +49,11 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
 
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = 0;
-        if (connects(BlockFace.EAST, getBlockData(user, position.getRelative(BlockFace.EAST)))) states |= 1;
-        if (connects(BlockFace.NORTH, getBlockData(user, position.getRelative(BlockFace.NORTH)))) states |= 2;
-        if (connects(BlockFace.SOUTH, getBlockData(user, position.getRelative(BlockFace.SOUTH)))) states |= 4;
-        if (connects(BlockFace.WEST, getBlockData(user, position.getRelative(BlockFace.WEST)))) states |= 8;
+        boolean pre1_12 = user.get(ProtocolInfo.class).getServerProtocolVersion() < ProtocolVersion.v1_12.getId();
+        if (connects(BlockFace.EAST, getBlockData(user, position.getRelative(BlockFace.EAST)), pre1_12)) states |= 1;
+        if (connects(BlockFace.NORTH, getBlockData(user, position.getRelative(BlockFace.NORTH)), pre1_12)) states |= 2;
+        if (connects(BlockFace.SOUTH, getBlockData(user, position.getRelative(BlockFace.SOUTH)), pre1_12)) states |= 4;
+        if (connects(BlockFace.WEST, getBlockData(user, position.getRelative(BlockFace.WEST)), pre1_12)) states |= 8;
         return states;
     }
 
@@ -65,7 +68,9 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         return newBlockState == null ? blockState : newBlockState;
     }
 
-    protected boolean connects(BlockFace side, int blockState) {
-        return blockStates.contains(blockState) || blockConnections != null && ConnectionData.blockConnectionData.containsKey(blockState) && ConnectionData.blockConnectionData.get(blockState).connectsTo(blockConnections, side.opposite());
+    protected boolean connects(BlockFace side, int blockState, boolean pre1_12) {
+        return blockStates.contains(blockState) || blockConnections != null
+                && ConnectionData.blockConnectionData.containsKey(blockState)
+                && ConnectionData.blockConnectionData.get(blockState).connectsTo(blockConnections, side.opposite(), pre1_12);
     }
 }
