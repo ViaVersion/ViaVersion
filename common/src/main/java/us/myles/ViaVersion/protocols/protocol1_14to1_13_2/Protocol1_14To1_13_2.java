@@ -34,7 +34,19 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x2F, 0x30);
         registerOutgoing(State.PLAY, 0x30, 0x31);
         registerOutgoing(State.PLAY, 0x31, 0x32);
-        registerOutgoing(State.PLAY, 0x32, 0x33);
+        // Position and look
+        registerOutgoing(State.PLAY, 0x32, 0x33, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.setSentPosAndLook(true);
+                    }
+                });
+            }
+        });
 
         //TODO remove if packet ids stay unchanged in 1.14 release
         registerOutgoing(State.PLAY, 0x34, 0x34);
