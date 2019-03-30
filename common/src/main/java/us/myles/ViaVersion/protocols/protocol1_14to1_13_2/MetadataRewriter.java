@@ -120,6 +120,13 @@ public class MetadataRewriter {
                         metadatas.remove(metadata);  // TODO "Has target (aggressive state)", maybe moved to pos / entity status
                     }
                 }
+
+                // TODO Are witch and ravager also abstract illagers? They all inherit the new metadata 14 added in 19w13a
+                if (type.is(Entity1_14Types.EntityType.WITCH) || type.is(Entity1_14Types.EntityType.RAVAGER) || type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
+                    if (metadata.getId() >= 14) {  // TODO 19w13 added a new boolean with id 14
+                        metadata.setId(metadata.getId() + 1);
+                    }
+                }
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
