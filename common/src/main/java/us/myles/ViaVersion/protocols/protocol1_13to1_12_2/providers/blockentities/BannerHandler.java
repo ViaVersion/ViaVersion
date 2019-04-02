@@ -1,12 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 
@@ -53,6 +51,11 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
                     }
                 }
             }
+        }
+
+        Tag name = tag.get("CustomName");
+        if (name instanceof StringTag) {
+            ((StringTag) name).setValue(ChatRewriter.legacyTextToJson(((StringTag) name).getValue()));
         }
 
         return blockId;
