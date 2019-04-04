@@ -178,7 +178,6 @@ public class InventoryPackets {
                             wrapper.write(Type.VAR_INT, 0);
                             wrapper.write(Type.BOOLEAN, false);
                         } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
-                            wrapper.read(Type.REMAINING_BYTES);
                             int hand = wrapper.read(Type.VAR_INT);
                             wrapper.clearPacket();
                             wrapper.setId(0x2C);
