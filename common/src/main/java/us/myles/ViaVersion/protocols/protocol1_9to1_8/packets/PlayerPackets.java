@@ -293,7 +293,7 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String name = wrapper.get(Type.STRING, 0);
                         if (name.equalsIgnoreCase("MC|BOpen")) {
-                            wrapper.passthrough(Type.REMAINING_BYTES); // This is so ugly, :(
+                            wrapper.read(Type.REMAINING_BYTES); // Not used anymore
                             wrapper.write(Type.VAR_INT, 0);
                         }
                         if (name.equalsIgnoreCase("MC|TrList")) {
