@@ -52,18 +52,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x30, 0x33);
         registerOutgoing(State.PLAY, 0x31, 0x34);
         // Position and look
-        registerOutgoing(State.PLAY, 0x32, 0x35, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.setSentPosAndLook(true);
-                    }
-                });
-            }
-        });
+        registerOutgoing(State.PLAY, 0x32, 0x35);
 
         registerOutgoing(State.PLAY, 0x34, 0x36);
 
