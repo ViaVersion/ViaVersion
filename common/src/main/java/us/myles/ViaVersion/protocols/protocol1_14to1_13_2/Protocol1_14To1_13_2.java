@@ -29,13 +29,30 @@ public class Protocol1_14To1_13_2 extends Protocol {
         WorldPackets.register(this);
         PlayerPackets.register(this);
 
-        registerOutgoing(State.PLAY, 0x2D, 0x2E);
-        registerOutgoing(State.PLAY, 0x2E, 0x2F);
-        registerOutgoing(State.PLAY, 0x2F, 0x30);
-        registerOutgoing(State.PLAY, 0x30, 0x31);
-        registerOutgoing(State.PLAY, 0x31, 0x32);
+        registerOutgoing(State.PLAY, 0x16, 0x15);
+
+        registerOutgoing(State.PLAY, 0x18, 0x17);
+
+        registerOutgoing(State.PLAY, 0x1A, 0x19);
+        registerOutgoing(State.PLAY, 0x1B, 0x1A);
+        registerOutgoing(State.PLAY, 0x1C, 0x1B);
+        registerOutgoing(State.PLAY, 0x1D, 0x54);
+        registerOutgoing(State.PLAY, 0x1E, 0x1C);
+        registerOutgoing(State.PLAY, 0x1F, 0x1D);
+        registerOutgoing(State.PLAY, 0x20, 0x1E);
+        registerOutgoing(State.PLAY, 0x21, 0x20);
+
+        registerOutgoing(State.PLAY, 0x27, 0x2B);
+
+        registerOutgoing(State.PLAY, 0x2B, 0x2C);
+
+        registerOutgoing(State.PLAY, 0x2D, 0x30);
+        registerOutgoing(State.PLAY, 0x2E, 0x31);
+        registerOutgoing(State.PLAY, 0x2F, 0x32);
+        registerOutgoing(State.PLAY, 0x30, 0x33);
+        registerOutgoing(State.PLAY, 0x31, 0x34);
         // Position and look
-        registerOutgoing(State.PLAY, 0x32, 0x33, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x32, 0x35, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -48,35 +65,34 @@ public class Protocol1_14To1_13_2 extends Protocol {
             }
         });
 
-        //TODO remove if packet ids stay unchanged in 1.14 release
-        registerOutgoing(State.PLAY, 0x34, 0x34);
+        registerOutgoing(State.PLAY, 0x34, 0x36);
 
-        registerOutgoing(State.PLAY, 0x36, 0x36);
-        registerOutgoing(State.PLAY, 0x37, 0x37);
+        registerOutgoing(State.PLAY, 0x36, 0x38);
+        registerOutgoing(State.PLAY, 0x37, 0x39);
 
-        registerOutgoing(State.PLAY, 0x39, 0x39);
-        registerOutgoing(State.PLAY, 0x3A, 0x3A);
-        registerOutgoing(State.PLAY, 0x3B, 0x3B);
-        registerOutgoing(State.PLAY, 0x3C, 0x3C);
-        registerOutgoing(State.PLAY, 0x3D, 0x3D);
-        registerOutgoing(State.PLAY, 0x3E, 0x3E);
+        registerOutgoing(State.PLAY, 0x39, 0x3B);
+        registerOutgoing(State.PLAY, 0x3A, 0x3C);
+        registerOutgoing(State.PLAY, 0x3B, 0x3D);
+        registerOutgoing(State.PLAY, 0x3C, 0x3E);
+        registerOutgoing(State.PLAY, 0x3D, 0x3F);
+        registerOutgoing(State.PLAY, 0x3E, 0x42);
 
-        registerOutgoing(State.PLAY, 0x40, 0x40);
-        registerOutgoing(State.PLAY, 0x41, 0x41);
+        registerOutgoing(State.PLAY, 0x40, 0x44);
+        registerOutgoing(State.PLAY, 0x41, 0x45);
 
-        registerOutgoing(State.PLAY, 0x43, 0x43);
-        registerOutgoing(State.PLAY, 0x44, 0x44);
-        registerOutgoing(State.PLAY, 0x45, 0x45);
-        registerOutgoing(State.PLAY, 0x46, 0x46);
-        registerOutgoing(State.PLAY, 0x47, 0x47);
-        registerOutgoing(State.PLAY, 0x48, 0x48);
+        registerOutgoing(State.PLAY, 0x43, 0x47);
+        registerOutgoing(State.PLAY, 0x44, 0x48);
+        registerOutgoing(State.PLAY, 0x45, 0x49);
+        registerOutgoing(State.PLAY, 0x46, 0x4A);
+        registerOutgoing(State.PLAY, 0x47, 0x4B);
+        registerOutgoing(State.PLAY, 0x48, 0x4C);
 
-        registerOutgoing(State.PLAY, 0x4A, 0x4A);
-        registerOutgoing(State.PLAY, 0x4B, 0x4B);
-        registerOutgoing(State.PLAY, 0x4C, 0x4C);
+        registerOutgoing(State.PLAY, 0x4A, 0x4E);
+        registerOutgoing(State.PLAY, 0x4B, 0x4F);
+        registerOutgoing(State.PLAY, 0x4C, 0x52);
 
         // Sound Effect
-        registerOutgoing(State.PLAY, 0x4D, 0x4D, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x4D, 0x51, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Sound Id
@@ -88,11 +104,11 @@ public class Protocol1_14To1_13_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4E, 0x4F);
-        registerOutgoing(State.PLAY, 0x4F, 0x50);
-        registerOutgoing(State.PLAY, 0x50, 0x51);
+        registerOutgoing(State.PLAY, 0x4E, 0x53);
+        registerOutgoing(State.PLAY, 0x4F, 0x55);
+        registerOutgoing(State.PLAY, 0x50, 0x56);
 
-        registerOutgoing(State.PLAY, 0x51, 0x52, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x51, 0x57, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -133,10 +149,10 @@ public class Protocol1_14To1_13_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x52, 0x53);
-        registerOutgoing(State.PLAY, 0x53, 0x54);
+        registerOutgoing(State.PLAY, 0x52, 0x58);
+        registerOutgoing(State.PLAY, 0x53, 0x59);
 
-        registerOutgoing(State.PLAY, 0x55, 0x56, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x55, 0x5B, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -202,12 +218,12 @@ public class Protocol1_14To1_13_2 extends Protocol {
 
         registerIncoming(State.PLAY, 0x0C, 0x0D);
         registerIncoming(State.PLAY, 0x0D, 0x0E);
-        registerIncoming(State.PLAY, -1, 0x0F);  //Lock Difficulty packet added in 19w11a
-        registerIncoming(State.PLAY, 0x0E, 0x10);
-        registerIncoming(State.PLAY, 0x0F, 0x11);
-        registerIncoming(State.PLAY, 0x10, 0x12);
-        registerIncoming(State.PLAY, 0x11, 0x13);
-        registerIncoming(State.PLAY, 0x12, 0x14);
+        registerIncoming(State.PLAY, -1, 0x10);  //Lock Difficulty packet added in 19w11a
+        registerIncoming(State.PLAY, 0x0E, 0x0F);
+        registerIncoming(State.PLAY, 0x0F, 0x14);
+        registerIncoming(State.PLAY, 0x10, 0x11);
+        registerIncoming(State.PLAY, 0x11, 0x12);
+        registerIncoming(State.PLAY, 0x12, 0x13);
         registerIncoming(State.PLAY, 0x13, 0x15);
         registerIncoming(State.PLAY, 0x14, 0x16);
         registerIncoming(State.PLAY, 0x15, 0x17);

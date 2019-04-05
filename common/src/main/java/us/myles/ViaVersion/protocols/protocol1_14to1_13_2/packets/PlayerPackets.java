@@ -18,7 +18,7 @@ public class PlayerPackets {
     public static void register(Protocol protocol) {
 
         // Open Sign Editor
-        protocol.registerOutgoing(State.PLAY, 0x2C, 0x2E, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x2C, 0x30, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);

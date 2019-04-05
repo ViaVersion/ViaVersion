@@ -42,13 +42,13 @@ public class InventoryPackets {
                         Short slots = wrapper.read(Type.UNSIGNED_BYTE);
 
                         if (type.equals("EntityHorse")) {
-                            wrapper.setId(0x14);
+                            wrapper.setId(0x1F);
                             int entityId = wrapper.read(Type.INT);
                             wrapper.write(Type.UNSIGNED_BYTE, windowsId);
                             wrapper.write(Type.VAR_INT, slots.intValue());
                             wrapper.write(Type.INT, entityId);
                         } else {
-                            wrapper.setId(0x58);
+                            wrapper.setId(0x2E);
                             wrapper.write(Type.VAR_INT, windowsId.intValue());
 
                             int typeId = -1;
@@ -103,7 +103,7 @@ public class InventoryPackets {
         });
 
         // Window items packet
-        protocol.registerOutgoing(State.PLAY, 0x15, 0x15, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x15, 0x14, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -120,7 +120,7 @@ public class InventoryPackets {
         });
 
         // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x17, 0x16, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -137,7 +137,7 @@ public class InventoryPackets {
         });
 
         // Plugin message
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x19, 0x18, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -146,7 +146,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
                         if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
-                            wrapper.setId(0x59);
+                            wrapper.setId(0x27);
                             wrapper.resetReader();
                             wrapper.read(Type.STRING); // Remove channel
 
@@ -180,7 +180,7 @@ public class InventoryPackets {
                         } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
                             int hand = wrapper.read(Type.VAR_INT);
                             wrapper.clearPacket();
-                            wrapper.setId(0x2C);
+                            wrapper.setId(0x2D);
                             wrapper.write(Type.VAR_INT, hand);
                         }
                     }
@@ -189,7 +189,7 @@ public class InventoryPackets {
         });
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x42, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x42, 0x46, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -206,7 +206,7 @@ public class InventoryPackets {
         });
 
         // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x55, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x54, 0x5A, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

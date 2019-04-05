@@ -64,7 +64,7 @@ public class WorldPackets {
         });
 
         // Block Change
-        protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
@@ -95,7 +95,7 @@ public class WorldPackets {
         });
 
         // Multi Block Change
-        protocol.registerOutgoing(State.PLAY, 0xF, 0xF, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
@@ -115,7 +115,7 @@ public class WorldPackets {
         });
 
         // Chunk
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x22, 0x21, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -154,7 +154,7 @@ public class WorldPackets {
                             section.setNonAirBlocksCount(nonAirBlockCount);
                         }
 
-                        PacketWrapper lightPacket = wrapper.create(0x57);
+                        PacketWrapper lightPacket = wrapper.create(0x24);
                         lightPacket.write(Type.VAR_INT, chunk.getX());
                         lightPacket.write(Type.VAR_INT, chunk.getZ());
                         int skyLightMask = 0;
@@ -195,7 +195,7 @@ public class WorldPackets {
 
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                         if (!tracker.isSentPosAndLook()) { // Workaround for 1.13.2 not loading chunks near to world border on join
-                            PacketWrapper fakePosLook = wrapper.create(0x33);
+                            PacketWrapper fakePosLook = wrapper.create(0x35);
                             fakePosLook.write(Type.DOUBLE, chunkBlockX);
                             fakePosLook.write(Type.DOUBLE, 0d); // Y
                             fakePosLook.write(Type.DOUBLE, chunkBlockZ);
@@ -214,7 +214,7 @@ public class WorldPackets {
         });
 
         // Effect
-        protocol.registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x23, 0x22, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id
@@ -236,7 +236,7 @@ public class WorldPackets {
         });
 
         // Spawn Particle
-        protocol.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x24, 0x23, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID
@@ -344,7 +344,7 @@ public class WorldPackets {
         });
 
         // Respawn
-        protocol.registerOutgoing(State.PLAY, 0x38, 0x38, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x38, 0x3A, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -370,12 +370,11 @@ public class WorldPackets {
         });
 
         // Spawn Position
-        protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x49, 0x4D, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
     }
-
 }

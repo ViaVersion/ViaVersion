@@ -28,7 +28,7 @@ public class EntityPackets {
     public static void register(Protocol protocol) {
 
         // Spawn entity
-        protocol.registerOutgoing(State.PLAY, 0x0, 0x0, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -92,7 +92,7 @@ public class EntityPackets {
         });
 
         // Spawn mob packet
-        protocol.registerOutgoing(State.PLAY, 0x3, 0x3, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -194,7 +194,7 @@ public class EntityPackets {
         });
 
         // Use bed
-        protocol.registerOutgoing(State.PLAY, 0x33, 0x3F, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x33, 0x43, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -211,7 +211,7 @@ public class EntityPackets {
         });
 
         // Destroy entities
-        protocol.registerOutgoing(State.PLAY, 0x35, 0x35, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x35, 0x37, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT_ARRAY); // 0 - Entity IDS
@@ -227,7 +227,7 @@ public class EntityPackets {
         });
 
         // Metadata packet
-        protocol.registerOutgoing(State.PLAY, 0x3F, 0x3F, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x3F, 0x43, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -243,6 +243,5 @@ public class EntityPackets {
                 });
             }
         });
-
     }
 }
