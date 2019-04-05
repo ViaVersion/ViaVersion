@@ -190,22 +190,10 @@ public class WorldPackets {
                             lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
                         }
 
-                        double chunkBlockX = chunk.getX() << 4;
-                        double chunkBlockZ = chunk.getZ() << 4;
-
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        if (!tracker.isSentPosAndLook()) { // Workaround for 1.13.2 not loading chunks near to world border on join
-                            PacketWrapper fakePosLook = wrapper.create(0x35);
-                            fakePosLook.write(Type.DOUBLE, chunkBlockX);
-                            fakePosLook.write(Type.DOUBLE, 0d); // Y
-                            fakePosLook.write(Type.DOUBLE, chunkBlockZ);
-                            fakePosLook.write(Type.FLOAT, 0f); // Yaw
-                            fakePosLook.write(Type.FLOAT, 0f); // Pitch
-                            fakePosLook.write(Type.BYTE, (byte) 0); // All
-                            fakePosLook.write(Type.VAR_INT, -1); // Confirmation id
-                            fakePosLook.send(Protocol1_14To1_13_2.class, true, true);
-                            tracker.setSentPosAndLook(true);
-                        }
+                        PacketWrapper fakePosLook = wrapper.create(0x40); // Set center chunk
+                        fakePosLook.write(Type.VAR_INT, chunk.getX());
+                        fakePosLook.write(Type.VAR_INT, chunk.getZ());
+                        fakePosLook.send(Protocol1_14To1_13_2.class, true, true);
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, false);
                     }
