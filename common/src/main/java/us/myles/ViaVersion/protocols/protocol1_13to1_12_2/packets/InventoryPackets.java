@@ -497,11 +497,13 @@ public class InventoryPackets {
             case "WDL|INIT":
                 return "wdl:init";
             case "WDL|CONTROL":
-                return "wdl:init";
+                return "wdl:control";
             case "WDL|REQUEST":
                 return "wdl:request";
+            case "bungeecord:main":
+                return null;
             default:
-                return old.matches("([0-9a-z_-]*:)?[0-9a-z_/.-]*") // Identifier regex
+                return old.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*") // Identifier regex
                         ? old : null;
         }
     }
@@ -706,7 +708,22 @@ public class InventoryPackets {
     }
 
     public static String getOldPluginChannelId(String newId) {
+        if (!newId.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*")) {
+            return null; // Not valid
+        }
+        int separatorIndex = newId.indexOf(':');
+        if (separatorIndex == -1 || separatorIndex == 0) { // Vanilla parses ``:`` and ```` as ``minecraft:``
+            newId = "minecraft:" + newId;
+        }
         switch (newId) {
+            case "minecraft:trader_list":
+                return "MC|TrList";
+            case "minecraft:book_open":
+                return "MC|BOpen";
+            case "minecraft:debug/paths":
+                return "MC|DebugPath";
+            case "minecraft:debug/neighbors_update":
+                return "MC|DebugNeighborsUpdate";
             case "minecraft:register":
                 return "REGISTER";
             case "minecraft:unregister":
@@ -722,8 +739,7 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             default:
-                return newId.matches("([0-9a-z_-]*:)?[0-9a-z_/.-]*") // Identifier regex
-                        ? newId : null;
+                return newId;
         }
     }
 
