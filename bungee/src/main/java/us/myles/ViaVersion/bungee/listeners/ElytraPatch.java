@@ -18,7 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import java.util.Collections;
 
 /*
- * This patches https://github.com/MylesIsCool/ViaVersion/issues/555
+ * This patches https://github.com/ViaVersion/ViaVersion/issues/555
  */
 public class ElytraPatch implements Listener {
 
