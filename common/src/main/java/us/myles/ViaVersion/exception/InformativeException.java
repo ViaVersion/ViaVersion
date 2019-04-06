@@ -31,7 +31,7 @@ public class InformativeException extends Exception {
     @Override
     public String getMessage() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Please post this error to http://github.com/MylesIsCool/ViaVersion/issues\n{");
+        builder.append("Please post this error to http://github.com/ViaVersion/ViaVersion/issues\n{");
         int i = 0;
         for (Map.Entry<String, Object> entry : info.entrySet()) {
             builder.append((i == 0 ? "" : ", ") + entry.getKey() + ": " + entry.getValue().toString());

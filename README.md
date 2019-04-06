@@ -14,7 +14,6 @@ On Bukkit you may also use ProtocolSupport, but ensure you have the right build 
 
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
-**Contributor Chat:** https://gitter.im/MylesIsCool/ViaVersion
 
 
 
@@ -51,4 +50,4 @@ License:
 MIT License, see LICENSE for more details.
 
 
-Special thanks to all our [Contributors](https://github.com/MylesIsCool/ViaVersion/graphs/contributors)
+Special thanks to all our [Contributors](https://github.com/ViaVersion/ViaVersion/graphs/contributors)
