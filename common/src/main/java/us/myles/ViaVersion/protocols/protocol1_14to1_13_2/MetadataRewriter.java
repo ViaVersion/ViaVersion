@@ -66,7 +66,7 @@ public class MetadataRewriter {
                             armorItem = new Item(InventoryPackets.getNewItemId(729), (byte) 1, (short) 0, null);
                         }
 
-                        PacketWrapper equipmentPacket = new PacketWrapper(0x42, null, connection);
+                        PacketWrapper equipmentPacket = new PacketWrapper(0x46, null, connection);
                         equipmentPacket.write(Type.VAR_INT, entityId);
                         equipmentPacket.write(Type.VAR_INT, 4);
                         equipmentPacket.write(Type.FLAT_VAR_INT_ITEM, armorItem);
