@@ -181,7 +181,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short animation = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         if (animation == 2) {  //Leave bed
-                            PacketWrapper metadataPacket = wrapper.create(0x3F);
+                            PacketWrapper metadataPacket = wrapper.create(0x43);
                             metadataPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             List<Metadata> metadataList = new LinkedList<>();
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
