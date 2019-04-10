@@ -1,10 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -15,9 +12,12 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class InventoryPackets {
     private static String NBT_TAG_NAME;
@@ -151,6 +151,7 @@ public class InventoryPackets {
                             wrapper.read(Type.STRING); // Remove channel
 
                             int windowId = wrapper.read(Type.INT);
+                            wrapper.user().get(EntityTracker.class).setLatestTradeWindowId(windowId);
                             wrapper.write(Type.VAR_INT, windowId);
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
@@ -275,6 +276,29 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         toServer(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
+                    }
+                });
+            }
+        });
+
+        // Select trade
+        protocol.registerIncoming(State.PLAY, 0x1F, 0x21, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        // Selecting trade now moves the items, we need to resync the inventory
+                        PacketWrapper resyncPacket = wrapper.create(0x08);
+                        resyncPacket.write(Type.UNSIGNED_BYTE, ((short) wrapper.user().get(EntityTracker.class).getLatestTradeWindowId())); // 0 - Window ID
+                        resyncPacket.write(Type.SHORT, ((short) -999)); // 1 - Slot
+                        resyncPacket.write(Type.BYTE, (byte) 2); // 2 - Button - End left click
+                        resyncPacket.write(Type.SHORT, ((short) ThreadLocalRandom.current().nextInt())); // 3 - Action number
+                        resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
+                        CompoundTag tag = new CompoundTag("");
+                        tag.put(new DoubleTag("force_resync", Double.NaN)); // Tags with NaN are not equal
+                        resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new Item(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
+                        resyncPacket.sendToServer(Protocol1_14To1_13_2.class, true, true);
                     }
                 });
             }
