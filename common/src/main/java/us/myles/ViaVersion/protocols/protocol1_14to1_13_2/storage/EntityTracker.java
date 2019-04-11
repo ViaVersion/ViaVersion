@@ -1,6 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage;
 
 import com.google.common.base.Optional;
+import lombok.Getter;
+import lombok.Setter;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
@@ -11,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject {
     private final Map<Integer, Entity1_14Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    @Getter
+    @Setter
+    private int latestTradeWindowId;
 
     public EntityTracker(UserConnection user) {
         super(user);
