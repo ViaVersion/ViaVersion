@@ -86,13 +86,13 @@ public class MetadataRewriter {
                         metadata.setMetaType(MetaType1_14.VillagerData);
                     }
                 } else if (type.is(Entity1_14Types.EntityType.ZOMBIE_VILLAGER)) {
-                    if (metadata.getId() == 19) {
+                    if (metadata.getId() == 18) {
                         // plains
                         metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                         metadata.setMetaType(MetaType1_14.VillagerData);
                     }
-                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ARROW)) {
-                    if (metadata.getId() >= 9) {
+                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
+                    if (metadata.getId() >= 9) { // New piercing
                         metadata.setId(metadata.getId() + 1);
                     }
                 } else if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
@@ -134,7 +134,7 @@ public class MetadataRewriter {
 
                 // TODO Are witch and ravager also abstract illagers? They all inherit the new metadata 14 added in 19w13a
                 if (type.is(Entity1_14Types.EntityType.WITCH) || type.is(Entity1_14Types.EntityType.RAVAGER) || type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
-                    if (metadata.getId() >= 14) {  // TODO 19w13 added a new boolean with id 14
+                    if (metadata.getId() >= 14) {  // TODO 19w13 added a new boolean (raid participant - is celebrating) with id 14
                         metadata.setId(metadata.getId() + 1);
                     }
                 }
