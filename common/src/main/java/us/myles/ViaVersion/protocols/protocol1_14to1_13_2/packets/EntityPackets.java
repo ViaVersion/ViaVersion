@@ -83,12 +83,8 @@ public class EntityPackets {
                                         break;
                                 }
                             } else if ((type1_14.is(Entity1_14Types.EntityType.ITEM) && data > 0)
-                                    || type1_14.is(Entity1_14Types.EntityType.ARROW)
-                                    || type1_14.is(Entity1_14Types.EntityType.SPECTRAL_ARROW)
-                                    || type1_14.is(Entity1_14Types.EntityType.TRIDENT)) {
-                                if (type1_14.is(Entity1_14Types.EntityType.ARROW)
-                                        || type1_14.is(Entity1_14Types.EntityType.SPECTRAL_ARROW)
-                                        || type1_14.is(Entity1_14Types.EntityType.TRIDENT))) { // todo check if trident needs it
+                                    || type1_14.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
+                                if (type1_14.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
                                     wrapper.set(Type.INT, 0, data - 1);
                                 }
                                 // send velocity in separate packet, 1.14 is now ignoring the velocity
