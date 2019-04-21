@@ -101,7 +101,7 @@ public class MetadataRewriter {
                         metadata.setMetaType(MetaType1_14.OptVarInt);
                     }
                 } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_SKELETON)) {
-                    if (metadata.getId() == 12) {
+                    if (metadata.getId() == 14) {
                         tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                                 | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                         metadatas.remove(metadata);  // "Is swinging arms"
@@ -126,7 +126,7 @@ public class MetadataRewriter {
                 if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
                     if (metadata.getId() == 14) {
                         tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                                | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
+                                | (((Number) metadata.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
                         metadatas.remove(metadata);  // "Has target (aggressive state)"
                         metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
                     }
