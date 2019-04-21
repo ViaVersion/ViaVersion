@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,8 @@ public class MetadataRewriter {
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
                 metadata.setMetaType(MetaType1_14.byId(metadata.getMetaType().getTypeID()));
+
+                EntityTracker tracker = connection.get(EntityTracker.class);
 
                 if (metadata.getMetaType() == MetaType1_14.Slot) {
                     InventoryPackets.toClient((Item) metadata.getValue());
@@ -42,6 +45,24 @@ public class MetadataRewriter {
                     metadata.setId(metadata.getId() + 1);
                 }
 
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_INSENTIENT)) {
+                    if (metadata.getId() == 13) {
+                        tracker.setInsentientData(entityId, (byte) ((((Number)metadata.getValue()).byteValue() & ~0x4)
+                                | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
+                        metadata.setValue(tracker.getInsentientData(entityId));
+                    }
+                }
+
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
+                    if (metadata.getId() == 16) {
+                        tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
+                                | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
+                        metadatas.remove(metadata);  // "Are hands held up"
+                        metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
+                    } else if (metadata.getId() > 16) {
+                        metadata.setId(metadata.getId() - 1);
+                    }
+                }
                 if (type.isOrHasParent(Entity1_14Types.EntityType.MINECART_ABSTRACT)) {
                     if (metadata.getId() == 10) {
                         // New block format
@@ -75,13 +96,13 @@ public class MetadataRewriter {
                         metadata.setMetaType(MetaType1_14.VillagerData);
                     }
                 } else if (type.is(Entity1_14Types.EntityType.ZOMBIE_VILLAGER)) {
-                    if (metadata.getId() == 19) {
+                    if (metadata.getId() == 18) {
                         // plains
                         metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                         metadata.setMetaType(MetaType1_14.VillagerData);
                     }
-                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ARROW)) {
-                    if (metadata.getId() >= 9) {
+                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
+                    if (metadata.getId() >= 9) { // New piercing
                         metadata.setId(metadata.getId() + 1);
                     }
                 } else if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
@@ -90,14 +111,11 @@ public class MetadataRewriter {
                         metadata.setMetaType(MetaType1_14.OptVarInt);
                     }
                 } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_SKELETON)) {
-                    if (metadata.getId() == 12) {
-                        metadatas.remove(metadata);  // TODO "Is swinging arms", maybe moved to pos / entity status
-                    }
-                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
-                    if (metadata.getId() == 16) {
-                        metadatas.remove(metadata);  // TODO "Are hands held up", maybe moved to pos / entity status
-                    } else if (metadata.getId() > 16) {
-                        metadata.setId(metadata.getId() - 1);
+                    if (metadata.getId() == 14) {
+                        tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
+                                | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
+                        metadatas.remove(metadata);  // "Is swinging arms"
+                        metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
                     }
                 } else if (type.is(Entity1_14Types.EntityType.AREA_EFFECT_CLOUD)) {
                     if (metadata.getId() == 10) {
@@ -108,13 +126,16 @@ public class MetadataRewriter {
 
                 if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
                     if (metadata.getId() == 14) {
-                        metadatas.remove(metadata);  // TODO "Has target (aggressive state)", maybe moved to pos / entity status
+                        tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
+                                | (((Number) metadata.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
+                        metadatas.remove(metadata);  // "Has target (aggressive state)"
+                        metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
                     }
                 }
 
                 // TODO Are witch and ravager also abstract illagers? They all inherit the new metadata 14 added in 19w13a
                 if (type.is(Entity1_14Types.EntityType.WITCH) || type.is(Entity1_14Types.EntityType.RAVAGER) || type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
-                    if (metadata.getId() >= 14) {  // TODO 19w13 added a new boolean with id 14
+                    if (metadata.getId() >= 14) {  // TODO 19w13 added a new boolean (raid participant - is celebrating) with id 14
                         metadata.setId(metadata.getId() + 1);
                     }
                 }

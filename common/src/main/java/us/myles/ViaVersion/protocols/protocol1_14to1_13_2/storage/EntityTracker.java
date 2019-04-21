@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject {
     private final Map<Integer, Entity1_14Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    private final Map<Integer, Byte> insentientData = new ConcurrentHashMap<>();
     @Getter
     @Setter
     private int latestTradeWindowId;
@@ -23,10 +24,20 @@ public class EntityTracker extends StoredObject {
 
     public void removeEntity(int entityId) {
         clientEntityTypes.remove(entityId);
+        insentientData.remove(entityId);
     }
 
     public void addEntity(int entityId, UUID uuid, Entity1_14Types.EntityType type) {
         clientEntityTypes.put(entityId, type);
+    }
+
+    public byte getInsentientData(int entity) {
+        Byte val = insentientData.get(entity);
+        return val == null ? 0 : val;
+    }
+
+    public void setInsentientData(int entity, byte value) {
+        insentientData.put(entity, value);
     }
 
     public boolean has(int entityId) {
