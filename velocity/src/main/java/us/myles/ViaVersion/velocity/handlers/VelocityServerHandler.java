@@ -150,7 +150,7 @@ public class VelocityServerHandler {
                             getMinecraftConnection.invoke(e.getPlayer()),
                             "getSessionHandler"
                     );
-                    System.out.println(sessionHandler);
+
                     if (clientPlaySessionHandler.isInstance(sessionHandler)) { // It may be InitialConnectSessionHandler on the first server connection
                         Set<String> knownChannels = (Set<String>) getKnownChannels.invoke(sessionHandler);
                         if (previousServerProtocol != -1) {
