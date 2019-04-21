@@ -53,6 +53,16 @@ public class MetadataRewriter {
                     }
                 }
 
+                if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
+                    if (metadata.getId() == 16) {
+                        tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
+                                | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
+                        metadatas.remove(metadata);  // "Are hands held up"
+                        metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
+                    } else if (metadata.getId() > 16) {
+                        metadata.setId(metadata.getId() - 1);
+                    }
+                }
                 if (type.isOrHasParent(Entity1_14Types.EntityType.MINECART_ABSTRACT)) {
                     if (metadata.getId() == 10) {
                         // New block format
@@ -106,15 +116,6 @@ public class MetadataRewriter {
                                 | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                         metadatas.remove(metadata);  // "Is swinging arms"
                         metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
-                    }
-                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
-                    if (metadata.getId() == 16) {
-                        tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                                | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
-                        metadatas.remove(metadata);  // "Are hands held up"
-                        metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
-                    } else if (metadata.getId() > 16) {
-                        metadata.setId(metadata.getId() - 1);
                     }
                 } else if (type.is(Entity1_14Types.EntityType.AREA_EFFECT_CLOUD)) {
                     if (metadata.getId() == 10) {
