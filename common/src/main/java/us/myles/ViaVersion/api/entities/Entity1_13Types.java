@@ -270,7 +270,8 @@ public class Entity1_13Types {
         EVOCATION_FANGS(79, EntityType.EVOCATION_FANGS),
         FISHIHNG_HOOK(90, EntityType.FISHING_BOBBER),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
-        DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
+        DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL),
+        TRIDENT(94, EntityType.TRIDENT);
 
         private final int id;
         private final EntityType type;
