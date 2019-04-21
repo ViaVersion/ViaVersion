@@ -34,6 +34,7 @@ public class VelocityServerHandler {
     private static Method getMinecraftConnection;
     private static Method getNextProtocolVersion;
     private static Method getKnownChannels;
+    private static Class<?> clientPlaySessionHandler;
 
     static {
         try {
@@ -45,7 +46,8 @@ public class VelocityServerHandler {
                     .getDeclaredMethod("getMinecraftConnection");
             getNextProtocolVersion = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection")
                     .getDeclaredMethod("getNextProtocolVersion");
-            getKnownChannels = Class.forName("com.velocitypowered.proxy.connection.client.ClientPlaySessionHandler")
+            clientPlaySessionHandler = Class.forName("com.velocitypowered.proxy.connection.client.ClientPlaySessionHandler");
+            getKnownChannels = clientPlaySessionHandler
                     .getDeclaredMethod("getKnownChannels");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -144,34 +146,36 @@ public class VelocityServerHandler {
                     pipeline.add(ProtocolRegistry.getBaseProtocol(protocolId));
 
                     // Workaround 1.13 server change
-                    Set<String> knownChannels = (Set<String>) getKnownChannels.invoke(
-                            ReflectionUtil.invoke(
-                                    getMinecraftConnection.invoke(e.getPlayer()),
-                                    "getSessionHandler"
-                            )
+                    Object sessionHandler = ReflectionUtil.invoke(
+                            getMinecraftConnection.invoke(e.getPlayer()),
+                            "getSessionHandler"
                     );
-                    if (previousServerProtocol != -1) {
-                        int id1_13 = ProtocolVersion.MINECRAFT_1_13.getProtocol();
-                        if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
-                            ArrayList<String> newChannels = new ArrayList<>();
-                            for (String oldChannel : knownChannels) {
-                                String transformed = InventoryPackets.getNewPluginChannelId(oldChannel);
-                                if (transformed != null) {
-                                    newChannels.add(transformed);
+                    System.out.println(sessionHandler);
+                    if (clientPlaySessionHandler.isInstance(sessionHandler)) { // It may be InitialConnectSessionHandler on the first server connection
+                        Set<String> knownChannels = (Set<String>) getKnownChannels.invoke(sessionHandler);
+                        if (previousServerProtocol != -1) {
+                            int id1_13 = ProtocolVersion.MINECRAFT_1_13.getProtocol();
+                            if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
+                                ArrayList<String> newChannels = new ArrayList<>();
+                                for (String oldChannel : knownChannels) {
+                                    String transformed = InventoryPackets.getNewPluginChannelId(oldChannel);
+                                    if (transformed != null) {
+                                        newChannels.add(transformed);
+                                    }
                                 }
-                            }
-                            knownChannels.clear();
-                            knownChannels.addAll(newChannels);
-                        } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
-                            ArrayList<String> newChannels = new ArrayList<>();
-                            for (String oldChannel : knownChannels) {
-                                String transformed = InventoryPackets.getOldPluginChannelId(oldChannel);
-                                if (transformed != null) {
-                                    newChannels.add(transformed);
+                                knownChannels.clear();
+                                knownChannels.addAll(newChannels);
+                            } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
+                                ArrayList<String> newChannels = new ArrayList<>();
+                                for (String oldChannel : knownChannels) {
+                                    String transformed = InventoryPackets.getOldPluginChannelId(oldChannel);
+                                    if (transformed != null) {
+                                        newChannels.add(transformed);
+                                    }
                                 }
+                                knownChannels.clear();
+                                knownChannels.addAll(newChannels);
                             }
-                            knownChannels.clear();
-                            knownChannels.addAll(newChannels);
                         }
                     }
 
