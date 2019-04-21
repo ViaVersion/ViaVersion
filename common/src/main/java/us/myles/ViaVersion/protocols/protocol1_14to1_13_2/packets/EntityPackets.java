@@ -40,6 +40,9 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Type.BYTE); // 7 - Yaw
                 map(Type.INT); // 8 - Data
+                map(Type.SHORT); // 9 - Velocity X
+                map(Type.SHORT); // 10 - Velocity Y
+                map(Type.SHORT); // 11 - Velocity Z
 
                 // Track Entity
                 handler(new PacketHandler() {
@@ -54,11 +57,10 @@ public class EntityPackets {
                         Entity1_14Types.EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
 
                         if (type1_14 != null) {
+                            int data = wrapper.get(Type.INT, 0);
                             if (type1_14.is(Entity1_14Types.EntityType.FALLING_BLOCK)) {
-                                int data = wrapper.get(Type.INT, 0);
                                 wrapper.set(Type.INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
                             } else if (type1_14.is(Entity1_14Types.EntityType.MINECART)) {
-                                int data = wrapper.get(Type.INT, 0);
                                 // default is 0 = rideable minecart
                                 switch (data) {
                                     case 1:
@@ -80,6 +82,22 @@ public class EntityPackets {
                                         typeId = Entity1_14Types.EntityType.COMMANDBLOCK_MINECART.getId();
                                         break;
                                 }
+                            } else if ((type1_14.is(Entity1_14Types.EntityType.ITEM) && data > 0)
+                                    || type1_14.is(Entity1_14Types.EntityType.ARROW)
+                                    || type1_14.is(Entity1_14Types.EntityType.SPECTRAL_ARROW)
+                                    || type1_14.is(Entity1_14Types.EntityType.TRIDENT)) {
+                                if (type1_14.is(Entity1_14Types.EntityType.ARROW)
+                                        || type1_14.is(Entity1_14Types.EntityType.SPECTRAL_ARROW)
+                                        || type1_14.is(Entity1_14Types.EntityType.TRIDENT))) { // todo check if trident needs it
+                                    wrapper.set(Type.INT, 0, data - 1);
+                                }
+                                // send velocity in separate packet, 1.14 is now ignoring the velocity
+                                PacketWrapper velocity = wrapper.create(0x45);
+                                velocity.write(Type.VAR_INT, entityId);
+                                velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 0));
+                                velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 1));
+                                velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 2));
+                                velocity.send(Protocol1_14To1_13_2.class);
                             }
                         }
 
