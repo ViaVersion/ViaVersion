@@ -15,6 +15,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
@@ -248,23 +249,7 @@ public class WorldPackets {
                             InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                         }
 
-                        int newId = id;
-                        if (newId >= 10) {
-                            newId += 2; // new lava drips 10, 11
-                        }
-                        if (newId >= 13) {
-                            newId += 1; // new water drip 11 -> 13
-                        }
-                        if (newId >= 27) {
-                            newId += 1; // new 24 -> 27
-                        }
-                        if (newId >= 29) {
-                            newId += 1; // skip new short happy villager
-                        }
-                        if (newId >= 44) {
-                            newId += 1; // new 39 -> 44
-                        }
-
+                        int newId = MetadataRewriter.getNewParticleId(id);
                         if (newId != id) {
                             wrapper.set(Type.INT, 0, newId);
                         }
