@@ -227,7 +227,7 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
 
     @Override
     public String getBlockConnectionMethod() {
-        return getString("blockconnection-method", "world");
+        return getString("blockconnection-method", "packet");
     }
 
     @Override
