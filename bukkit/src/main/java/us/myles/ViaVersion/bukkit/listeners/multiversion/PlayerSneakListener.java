@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerSneakListener extends ViaBukkitListener {
+    private static final float STANDING_HEIGHT = 1.8F;
+    private static final float HEIGHT_1_14 = 1.5F;
+    private static final float HEIGHT_1_9 = 1.6F;
+    private static final float DEFAULT_WIDTH = 0.6F;
+
     private Map<Player, Boolean> sneaking; // true = 1.14+, else false
     private Method getHandle;
     private Method setSize;
@@ -49,7 +54,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
                 @Override
                 public void run() {
                     for (Map.Entry<Player, Boolean> entry : sneaking.entrySet()) {
-                        setHight(entry.getKey(), entry.getValue() ? 1.5F : 1.6F);
+                        setHeight(entry.getKey(), entry.getValue() ? HEIGHT_1_14 : HEIGHT_1_9);
                     }
                 }
             }, 1, 1);
@@ -61,14 +66,14 @@ public class PlayerSneakListener extends ViaBukkitListener {
         Player player = event.getPlayer();
         int protocolVersion = getUserConnection(player).get(ProtocolInfo.class).getProtocolVersion();
         if (is1_14Fix && protocolVersion >= ProtocolVersion.v1_14.getId()) {
-            setHight(player, event.isSneaking() ? 1.5F : 1.8F);
+            setHeight(player, event.isSneaking() ? HEIGHT_1_14 : STANDING_HEIGHT);
             if (!useCache) return;
             if (event.isSneaking())
                 sneaking.put(player, true);
             else
                 sneaking.remove(player);
         } else if (is1_9Fix && protocolVersion >= ProtocolVersion.v1_9.getId()) {
-            setHight(player, event.isSneaking() ? 1.6F : 1.8F);
+            setHeight(player, event.isSneaking() ? HEIGHT_1_9 : STANDING_HEIGHT);
             if (!useCache) return;
             if (event.isSneaking())
                 sneaking.put(player, false);
@@ -77,9 +82,9 @@ public class PlayerSneakListener extends ViaBukkitListener {
         }
     }
 
-    private void setHight(Player player, float hight) {
+    private void setHeight(Player player, float height) {
         try {
-            setSize.invoke(getHandle.invoke(player), 0.6F, hight);
+            setSize.invoke(getHandle.invoke(player), DEFAULT_WIDTH, height);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
