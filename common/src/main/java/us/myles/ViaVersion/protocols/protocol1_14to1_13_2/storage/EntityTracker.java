@@ -17,6 +17,9 @@ public class EntityTracker extends StoredObject {
     @Getter
     @Setter
     private int latestTradeWindowId;
+    @Getter
+    @Setter
+    private int chunkCenterX, chunkCenterZ;
 
     public EntityTracker(UserConnection user) {
         super(user);
