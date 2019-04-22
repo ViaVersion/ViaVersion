@@ -316,11 +316,25 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isTruncate1_14Books();
-    
+
     /**
      * Handles left handed info by using unused bit 7 on Client Settings packet
      *
      * @return True if enabled
      */
     boolean isLeftHandedHandling();
+
+    /**
+     * Fixes velocity bugs due to different hitbox for 1.9-1.13 clients on 1.8 servers.
+     *
+     * @return True if enabled
+     */
+    boolean is1_9HitboxFix();
+
+    /**
+     * Fixes velocity bugs due to different hitbox for 1.14+ clients on sub 1.14 servers.
+     *
+     * @return True if enabled
+     */
+    boolean is1_14HitboxFix();
 }

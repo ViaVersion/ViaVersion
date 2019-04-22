@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SpongeViaConfig extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "quick-move-action-fix");
+    private static List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox");
     private final PluginContainer pluginContainer;
 
     public SpongeViaConfig(PluginContainer pluginContainer, File configFile) {
@@ -260,8 +260,19 @@ public class SpongeViaConfig extends Config implements ViaVersionConfig {
     public boolean isTruncate1_14Books() {
         return getBoolean("truncate-1_14-books", false);
     }
-    
+
+    @Override
     public boolean isLeftHandedHandling() {
         return getBoolean("left-handed-handling", true);
+    }
+
+    @Override
+    public boolean is1_9HitboxFix() {
+        return false;
+    }
+
+    @Override
+    public boolean is1_14HitboxFix() {
+        return false;
     }
 }

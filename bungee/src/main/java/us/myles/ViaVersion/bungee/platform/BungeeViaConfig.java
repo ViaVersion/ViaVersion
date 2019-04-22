@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.*;
 
 public class BungeeViaConfig extends Config implements ViaVersionConfig {
-    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method");
+    private static List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
 
     public BungeeViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
@@ -307,8 +307,19 @@ public class BungeeViaConfig extends Config implements ViaVersionConfig {
     public boolean isTruncate1_14Books() {
         return getBoolean("truncate-1_14-books", false);
     }
-    
+
+    @Override
     public boolean isLeftHandedHandling() {
         return getBoolean("left-handed-handling", true);
+    }
+
+    @Override
+    public boolean is1_9HitboxFix() {
+        return false;
+    }
+
+    @Override
+    public boolean is1_14HitboxFix() {
+        return false;
     }
 }
