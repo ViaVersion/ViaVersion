@@ -26,6 +26,7 @@ public class WorldPackets {
     private static final int AIR = MappingData.blockStateMappings.getNewBlock(0);
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
+    public static final int SERVERSIDE_VIEW_DISTANCE = 64;
 
     public static void register(final Protocol protocol) {
 
@@ -191,10 +192,17 @@ public class WorldPackets {
                             lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
                         }
 
-                        PacketWrapper fakePosLook = wrapper.create(0x40); // Set center chunk
-                        fakePosLook.write(Type.VAR_INT, chunk.getX());
-                        fakePosLook.write(Type.VAR_INT, chunk.getZ());
-                        fakePosLook.send(Protocol1_14To1_13_2.class, true, true);
+                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        int diffX = Math.abs(entityTracker.getChunkCenterX() - chunk.getX());
+                        int diffZ = Math.abs(entityTracker.getChunkCenterZ() - chunk.getZ());
+                        if (diffX >= SERVERSIDE_VIEW_DISTANCE || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
+                            PacketWrapper fakePosLook = wrapper.create(0x40); // Set center chunk
+                            fakePosLook.write(Type.VAR_INT, chunk.getX());
+                            fakePosLook.write(Type.VAR_INT, chunk.getZ());
+                            fakePosLook.send(Protocol1_14To1_13_2.class, true, true);
+                            entityTracker.setChunkCenterX(chunk.getX());
+                            entityTracker.setChunkCenterZ(chunk.getZ());
+                        }
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, false);
                     }
@@ -294,7 +302,7 @@ public class WorldPackets {
                         wrapper.passthrough(Type.UNSIGNED_BYTE); // Max Players
                         wrapper.passthrough(Type.STRING); // Level Type
 
-                        wrapper.write(Type.VAR_INT, 64);  // Serverside view distance, added in 19w13a
+                        wrapper.write(Type.VAR_INT, SERVERSIDE_VIEW_DISTANCE);  // Serverside view distance, added in 19w13a
                     }
                 });
             }
