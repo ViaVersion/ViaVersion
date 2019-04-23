@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +17,22 @@ import java.util.UUID;
 public class VelocityStorage extends StoredObject {
     private Player player;
     private String currentServer;
-    private List<UUID> bossbar;
+    private List<UUID> cachedBossbar;
+    private static Method getServerBossBars;
+    private static Class<?> clientPlaySessionHandler;
+    private static Method getMinecraftConnection;
+
+    static {
+        try {
+            clientPlaySessionHandler = Class.forName("com.velocitypowered.proxy.connection.client.ClientPlaySessionHandler");
+            getServerBossBars = clientPlaySessionHandler
+                    .getDeclaredMethod("getServerBossBars");
+            getMinecraftConnection = Class.forName("com.velocitypowered.proxy.connection.client.ConnectedPlayer")
+                    .getDeclaredMethod("getMinecraftConnection");
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     public VelocityStorage(UserConnection user, Player player) {
         super(user);
@@ -24,16 +40,22 @@ public class VelocityStorage extends StoredObject {
         this.currentServer = "";
     }
 
-    public void saveServerBossBars() {
-        // Get bossbar list if it's supported
-        try {
-            Object connection = ReflectionUtil.invoke(player, "getMinecraftConnection");
-            Object sessionHandler = ReflectionUtil.invoke(connection, "getSessionHandler");
-            if (sessionHandler.getClass().getSimpleName().contains("Play")) {
-                bossbar = (List<UUID>) ReflectionUtil.invoke(sessionHandler, "getServerBossBars");
+    public List<UUID> getBossbar() {
+        if (cachedBossbar == null) {
+            if (clientPlaySessionHandler == null) return null;
+            if (getServerBossBars == null) return null;
+            if (getMinecraftConnection == null) return null;
+            // Get bossbar list if it's supported
+            try {
+                Object connection = getMinecraftConnection.invoke(player);
+                Object sessionHandler = ReflectionUtil.invoke(connection, "getSessionHandler");
+                if (clientPlaySessionHandler.isInstance(sessionHandler)) {
+                    cachedBossbar = (List<UUID>) getServerBossBars.invoke(sessionHandler);
+                }
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                e.printStackTrace();
             }
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
         }
+        return cachedBossbar;
     }
 }
