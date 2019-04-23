@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -44,7 +44,7 @@ public class CommandBlockProvider implements Provider {
         wrapper.write(Type.INT, user.get(EntityTracker.class).getProvidedEntityId()); // Entity ID
         wrapper.write(Type.BYTE, (byte) 26); // Hardcoded op permission level
 
-        wrapper.send(Protocol1_9TO1_8.class);
+        wrapper.send(Protocol1_9To1_8.class);
 
         user.get(CommandBlockStorage.class).setPermissions(true);
     }

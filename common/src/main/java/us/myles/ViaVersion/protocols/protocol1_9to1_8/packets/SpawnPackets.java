@@ -16,7 +16,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -111,7 +111,7 @@ public class SpawnPackets {
                                     wrapper.write(Types1_9.METADATA_LIST, meta);
                                 }
                             });
-                            metaPacket.send(Protocol1_9TO1_8.class);
+                            metaPacket.send(Protocol1_9To1_8.class);
                         }
                     }
                 });
@@ -304,7 +304,7 @@ public class SpawnPackets {
                             packet.write(Type.VAR_INT, 0);
                             packet.write(Type.ITEM, new Item(item, (byte) 1, (short) 0, null));
                             try {
-                                packet.send(Protocol1_9TO1_8.class, true, true);
+                                packet.send(Protocol1_9To1_8.class, true, true);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

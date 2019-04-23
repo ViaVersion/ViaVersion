@@ -10,7 +10,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +117,7 @@ public class MetadataRewriter {
                                 entry.setValue(angle);
                                 break;
                             case Chat:
-                                value = Protocol1_9TO1_8.fixJson((String) value);
+                                value = Protocol1_9To1_8.fixJson((String) value);
                                 entry.setValue(value);
                                 break;
                             default:

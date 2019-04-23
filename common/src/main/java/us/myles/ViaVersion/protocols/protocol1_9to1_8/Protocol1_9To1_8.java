@@ -18,7 +18,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.List;
 
-public class Protocol1_9TO1_8 extends Protocol {
+public class Protocol1_9To1_8 extends Protocol {
     public static final ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
         public String transform(PacketWrapper wrapper, String line) {
@@ -76,7 +76,7 @@ public class Protocol1_9TO1_8 extends Protocol {
         registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Reason
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Reason
             }
         });
 

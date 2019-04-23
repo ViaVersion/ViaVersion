@@ -7,12 +7,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class PaperPatch extends ViaBukkitListener {
 
     public PaperPatch(ViaVersionPlugin plugin) {
-        super(plugin, Protocol1_9TO1_8.class);
+        super(plugin, Protocol1_9To1_8.class);
     }
 
     /*

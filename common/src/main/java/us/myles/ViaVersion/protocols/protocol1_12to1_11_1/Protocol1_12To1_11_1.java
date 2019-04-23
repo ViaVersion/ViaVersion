@@ -24,7 +24,7 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQui
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class Protocol1_12To1_11_1 extends Protocol {
 
@@ -95,7 +95,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Chat Message (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
                 map(Type.BYTE); // 1 - Chat Positon
 
                 handler(new PacketHandler() {

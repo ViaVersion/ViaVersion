@@ -16,7 +16,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.sponge.listeners.ViaSpongeListener;
 
 import java.util.Optional;
@@ -26,7 +26,7 @@ public class Sponge5ArmorListener extends ViaSpongeListener {
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
 
     public Sponge5ArmorListener(SpongePlugin plugin) {
-        super(plugin, Protocol1_9TO1_8.class);
+        super(plugin, Protocol1_9To1_8.class);
     }
 
     //
@@ -52,7 +52,7 @@ public class Sponge5ArmorListener extends ViaSpongeListener {
             wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
             wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 is add number
 
-            wrapper.send(Protocol1_9TO1_8.class);
+            wrapper.send(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

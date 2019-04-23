@@ -19,7 +19,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Ty
 
 import java.util.List;
 
-public class Protocol1_9_3TO1_9_1_2 extends Protocol {
+public class Protocol1_9_3To1_9_1_2 extends Protocol {
     @Override
     protected void registerPackets() {
 

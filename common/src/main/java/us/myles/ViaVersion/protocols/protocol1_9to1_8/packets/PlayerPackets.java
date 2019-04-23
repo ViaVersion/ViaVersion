@@ -15,7 +15,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.PlayerMovementMapper;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
@@ -29,7 +29,7 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x02, 0x0F, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Chat Message (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
                 map(Type.BYTE); // 1 - Chat Positon
 
                 handler(new PacketHandler() {
@@ -51,8 +51,8 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x47, 0x48, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Header
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 1 - Footer
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Header
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Footer
             }
         });
 
@@ -60,7 +60,7 @@ public class PlayerPackets {
         protocol.registerOutgoing(State.PLAY, 0x40, 0x1A, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 0 - Reason
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Reason
             }
         });
 
@@ -75,7 +75,7 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action == 0 || action == 1) {
-                            Protocol1_9TO1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
+                            Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
                         }
                     }
                 });
@@ -139,7 +139,7 @@ public class PlayerPackets {
                                     if (mode == 4) {
                                         // since removing add to auto team
                                         // Workaround for packet order issue
-                                        wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                        wrapper.send(Protocol1_9To1_8.class, true, true);
                                         wrapper.cancel();
                                         entityTracker.sendTeamPacket(true, true);
                                         entityTracker.setCurrentTeam("viaversion");
@@ -159,7 +159,7 @@ public class PlayerPackets {
                                     && teamName.equals(entityTracker.getCurrentTeam())) {
                                 // team was removed
                                 // Workaround for packet order issue
-                                wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                wrapper.send(Protocol1_9To1_8.class, true, true);
                                 wrapper.cancel();
                                 entityTracker.sendTeamPacket(true, true);
                                 entityTracker.setCurrentTeam("viaversion");
@@ -218,7 +218,7 @@ public class PlayerPackets {
                         if (Via.getConfig().isAutoTeam()) {
                             entityTracker.setAutoTeam(true);
                             // Workaround for packet order issue
-                            wrapper.send(Protocol1_9TO1_8.class, true, true);
+                            wrapper.send(Protocol1_9To1_8.class, true, true);
                             wrapper.cancel();
                             entityTracker.sendTeamPacket(true, true);
                             entityTracker.setCurrentTeam("viaversion");
@@ -265,14 +265,14 @@ public class PlayerPackets {
                                 wrapper.passthrough(Type.VAR_INT); // ping
                                 boolean hasDisplayName = wrapper.passthrough(Type.BOOLEAN);
                                 if (hasDisplayName) {
-                                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING)); // display name
+                                    Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING)); // display name
                                 }
                             } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
                                 wrapper.passthrough(Type.VAR_INT);
                             } else if (action == 3) { // update display name
                                 boolean hasDisplayName = wrapper.passthrough(Type.BOOLEAN);
                                 if (hasDisplayName) {
-                                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING)); // display name
+                                    Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING)); // display name
                                 }
                             } else if (action == 4) { // remove player
                                 // no fields
@@ -465,7 +465,7 @@ public class PlayerPackets {
                                     (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80)
                             );
                         }
-                        wrapper.sendToServer(Protocol1_9TO1_8.class, true, true);
+                        wrapper.sendToServer(Protocol1_9To1_8.class, true, true);
                         wrapper.cancel();
                         Via.getManager().getProviders().get(MainHandProvider.class).setMainHand(wrapper.user(), hand);
                     }

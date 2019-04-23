@@ -16,7 +16,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
@@ -37,10 +37,10 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Sign Position
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 1 - Sign Line (json)
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 2 - Sign Line (json)
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 3 - Sign Line (json)
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 4 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 4 - Sign Line (json)
             }
         });
 
@@ -166,7 +166,7 @@ public class WorldPackets {
                             output.setId(-1); // -1 for no writing of id
                             output.writeToBuffer(buffer);
                             PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
-                            chunkPacket.send(Protocol1_9TO1_8.class, false, true);
+                            chunkPacket.send(Protocol1_9To1_8.class, false, true);
                             buffer.release();
                         }
                     }
@@ -238,10 +238,10 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Sign Position
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 1 - Sign Line (json)
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 2 - Sign Line (json)
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 3 - Sign Line (json)
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 4 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 4 - Sign Line (json)
             }
         });
 
@@ -292,12 +292,12 @@ public class WorldPackets {
                         wrapper.write(Type.LONG, -1L);
                         wrapper.write(Type.BYTE, (byte) 255);
                         // Write item in hand
-                        Item item = Protocol1_9TO1_8.getHandItem(wrapper.user());
+                        Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-                            if (item != null && Protocol1_9TO1_8.isSword(item.getId())) {
+                            if (item != null && Protocol1_9To1_8.isSword(item.getId())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
@@ -332,7 +332,7 @@ public class WorldPackets {
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
-                        Item item = Protocol1_9TO1_8.getHandItem(wrapper.user());
+                        Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         wrapper.write(Type.ITEM, item); // 3 - Item
                     }
                 });
@@ -405,7 +405,7 @@ public class WorldPackets {
                             updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
                             updateBlockEntity.write(Type.NBT, tag.get());
 
-                            updateBlockEntity.send(Protocol1_9TO1_8.class);
+                            updateBlockEntity.send(Protocol1_9To1_8.class);
                         }
                     }
                 });
