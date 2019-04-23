@@ -102,8 +102,6 @@ public class VelocityServerHandler {
 
             VelocityStorage storage = user.get(VelocityStorage.class);
 
-            if (storage.getBossbar() == null) storage.saveServerBossBars();
-
             if (e.getServer() != null) {
                 if (!e.getServer().getServerInfo().getName().equals(storage.getCurrentServer())) {
                     String serverName = e.getServer().getServerInfo().getName();
