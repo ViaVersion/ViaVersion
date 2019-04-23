@@ -13,7 +13,7 @@ import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.*;
 
@@ -167,7 +167,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
             return;
         }
         try {
-            wrapper.send(Protocol1_9TO1_8.class);
+            wrapper.send(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -180,7 +180,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
             wrapper.write(Type.VAR_INT, action.getId());
             switch (action) {
                 case ADD:
-                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, title);
+                    Protocol1_9To1_8.FIX_JSON.write(wrapper, title);
                     wrapper.write(Type.FLOAT, health);
                     wrapper.write(Type.VAR_INT, color.getId());
                     wrapper.write(Type.VAR_INT, style.getId());
@@ -192,7 +192,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
                     wrapper.write(Type.FLOAT, health);
                     break;
                 case UPDATE_TITLE:
-                    Protocol1_9TO1_8.FIX_JSON.write(wrapper, title);
+                    Protocol1_9To1_8.FIX_JSON.write(wrapper, title);
                     break;
                 case UPDATE_STYLE:
                     wrapper.write(Type.VAR_INT, color.getId());

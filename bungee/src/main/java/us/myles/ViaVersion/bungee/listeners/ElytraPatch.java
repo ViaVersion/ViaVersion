@@ -12,7 +12,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 import java.util.Collections;
@@ -28,7 +28,7 @@ public class ElytraPatch implements Listener {
         if (user == null) return;
 
         try {
-            if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9TO1_8.class)) {
+            if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9To1_8.class)) {
                 int entityId = user.get(EntityTracker.class).getProvidedEntityId();
 
                 PacketWrapper wrapper = new PacketWrapper(0x39, null, user);
@@ -36,7 +36,7 @@ public class ElytraPatch implements Listener {
                 wrapper.write(Type.VAR_INT, entityId);
                 wrapper.write(Types1_9.METADATA_LIST, Collections.singletonList(new Metadata(0, MetaType1_9.Byte, (byte) 0)));
 
-                wrapper.send(Protocol1_9TO1_8.class);
+                wrapper.send(Protocol1_9To1_8.class);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -20,7 +20,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
@@ -78,7 +78,7 @@ public class EntityTracker extends StoredObject {
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, item);
         try {
-            wrapper.send(Protocol1_9TO1_8.class);
+            wrapper.send(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -193,7 +193,7 @@ public class EntityTracker extends StoredObject {
                                 wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
                                 wrapper.write(Type.SHORT, (short) 0);
                                 wrapper.write(Type.BOOLEAN, true);
-                                wrapper.send(Protocol1_9TO1_8.class, true, false);
+                                wrapper.send(Protocol1_9To1_8.class, true, false);
                             } catch (Exception ignored) {
                             }
                         }
@@ -271,7 +271,7 @@ public class EntityTracker extends StoredObject {
         }
         teamExists = add;
         try {
-            wrapper.send(Protocol1_9TO1_8.class, true, now);
+            wrapper.send(Protocol1_9To1_8.class, true, now);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -296,7 +296,7 @@ public class EntityTracker extends StoredObject {
             handleMetadata(entityID, metadataList);
             if (metadataList.size() > 0) {
                 try {
-                    wrapper.send(Protocol1_9TO1_8.class);
+                    wrapper.send(Protocol1_9To1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -17,7 +17,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
@@ -62,7 +62,7 @@ public class EntityPackets {
                                 passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{passenger});
                                 tracker.getVehicleMap().put(passenger, vehicle);
                             }
-                            passengerPacket.send(Protocol1_9TO1_8.class); // Send the packet
+                            passengerPacket.send(Protocol1_9To1_8.class); // Send the packet
                         }
                         return null;
                     }
@@ -162,7 +162,7 @@ public class EntityPackets {
                         Item stack = wrapper.get(Type.ITEM, 0);
 
                         if (stack != null) {
-                            if (Protocol1_9TO1_8.isSword(stack.getId())) {
+                            if (Protocol1_9To1_8.isSword(stack.getId())) {
                                 entityTracker.getValidBlocking().add(entityID);
                                 return;
                             }
@@ -267,7 +267,7 @@ public class EntityPackets {
                         if (wrapper.get(Type.VAR_INT, 0) == 2) { // entity dead
                             wrapper.passthrough(Type.VAR_INT); //Player id
                             wrapper.passthrough(Type.INT); //Entity id
-                            Protocol1_9TO1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
+                            Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
                         }
                     }
                 });

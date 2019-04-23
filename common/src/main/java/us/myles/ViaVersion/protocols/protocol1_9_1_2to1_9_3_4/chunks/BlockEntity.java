@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2TO1_9_3_4;
+import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
 
 import java.util.List;
 import java.util.Map;
@@ -63,6 +63,6 @@ public class BlockEntity {
         wrapper.write(Type.POSITION, pos);
         wrapper.write(Type.UNSIGNED_BYTE, id);
         wrapper.write(Type.NBT, tag);
-        wrapper.send(Protocol1_9_1_2TO1_9_3_4.class, false);
+        wrapper.send(Protocol1_9_1_2To1_9_3_4.class, false);
     }
 }

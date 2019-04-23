@@ -15,7 +15,7 @@ import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.util.ReflectionUtil;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.storage.VelocityStorage;
@@ -116,7 +116,7 @@ public class VelocityServerHandler {
                                 PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
                                 wrapper.write(Type.UUID, uuid);
                                 wrapper.write(Type.VAR_INT, 1); // remove
-                                wrapper.send(Protocol1_9TO1_8.class, true, true);
+                                wrapper.send(Protocol1_9To1_8.class, true, true);
                             }
                             storage.getBossbar().clear();
                         }

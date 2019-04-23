@@ -15,7 +15,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 
-public class Protocol1_9_1_2TO1_9_3_4 extends Protocol {
+public class Protocol1_9_1_2To1_9_3_4 extends Protocol {
 
     @Override
     protected void registerPackets() {

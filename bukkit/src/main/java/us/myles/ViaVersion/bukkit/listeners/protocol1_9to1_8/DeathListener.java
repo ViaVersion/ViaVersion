@@ -11,11 +11,11 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class DeathListener extends ViaBukkitListener {
     public DeathListener(ViaVersionPlugin plugin) {
-        super(plugin, Protocol1_9TO1_8.class);
+        super(plugin, Protocol1_9To1_8.class);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -44,9 +44,9 @@ public class DeathListener extends ViaBukkitListener {
                         wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
                         wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID
                         wrapper.write(Type.INT, p.getEntityId()); // Entity ID
-                        Protocol1_9TO1_8.FIX_JSON.write(wrapper, msg); // Message
+                        Protocol1_9To1_8.FIX_JSON.write(wrapper, msg); // Message
 
-                        wrapper.send(Protocol1_9TO1_8.class);
+                        wrapper.send(Protocol1_9To1_8.class);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

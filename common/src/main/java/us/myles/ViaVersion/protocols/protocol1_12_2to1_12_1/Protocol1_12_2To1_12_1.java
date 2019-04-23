@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
-public class Protocol1_12_2TO1_12_1 extends Protocol {
+public class Protocol1_12_2To1_12_1 extends Protocol {
     @Override
     protected void registerPackets() {
         // Outgoing

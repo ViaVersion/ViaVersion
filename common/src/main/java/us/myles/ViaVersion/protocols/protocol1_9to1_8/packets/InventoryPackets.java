@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 
@@ -44,7 +44,7 @@ public class InventoryPackets {
                                             wrapper.write(Type.SHORT, property);
                                             wrapper.write(Type.SHORT, enchantID);
                                         }
-                                    }).send(Protocol1_9TO1_8.class);
+                                    }).send(Protocol1_9To1_8.class);
 
                                     wrapper.set(Type.SHORT, 0, (short) (property + 3));
                                     wrapper.set(Type.SHORT, 1, level);
@@ -62,7 +62,7 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.STRING); // 1 - Window Type
-                map(Type.STRING, Protocol1_9TO1_8.FIX_JSON); // 2 - Window Title
+                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Window Title
                 map(Type.UNSIGNED_BYTE); // 3 - Slot Count
                 // There is a horse parameter after this, we don't handle it and let it passthrough
                 // Inventory tracking
@@ -230,7 +230,7 @@ public class InventoryPackets {
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);
                                 }
-                            }).send(Protocol1_9TO1_8.class);
+                            }).send(Protocol1_9To1_8.class);
                             // Finally reset to simulate throwing item
                             wrapper.set(Type.SHORT, 0, (short) -999); // Set slot to -999
                         }
@@ -285,7 +285,7 @@ public class InventoryPackets {
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);
                                 }
-                            }).send(Protocol1_9TO1_8.class);
+                            }).send(Protocol1_9To1_8.class);
                             // Finally reset to simulate throwing item
                             wrapper.set(Type.BYTE, 0, (byte) 0); // Set button to 0
                             wrapper.set(Type.BYTE, 1, (byte) 0); // Set mode to 0
