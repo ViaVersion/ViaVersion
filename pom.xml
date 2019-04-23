@@ -108,7 +108,8 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-chat</artifactId>
-            <version>1.10-SNAPSHOT</version>
+            <version>1.14-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Guava magic -->
