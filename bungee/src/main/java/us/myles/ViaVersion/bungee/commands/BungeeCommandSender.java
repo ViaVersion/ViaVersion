@@ -2,7 +2,6 @@ package us.myles.ViaVersion.bungee.commands;
 
 import lombok.AllArgsConstructor;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 
@@ -19,7 +18,7 @@ public class BungeeCommandSender implements ViaCommandSender {
 
     @Override
     public void sendMessage(String msg) {
-        sender.sendMessage(TextComponent.fromLegacyText(msg));
+        sender.sendMessage(msg);
     }
 
     @Override

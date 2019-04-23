@@ -2,7 +2,6 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -111,13 +110,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        getProxy().getPlayer(uuid).sendMessage(TextComponent.fromLegacyText(message));
+        getProxy().getPlayer(uuid).sendMessage(message);
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         if (getProxy().getPlayer(uuid) != null) {
-            getProxy().getPlayer(uuid).disconnect(TextComponent.fromLegacyText(message));
+            getProxy().getPlayer(uuid).disconnect(message);
             return true;
         }
         return false;
