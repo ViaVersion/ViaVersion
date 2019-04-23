@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
@@ -64,7 +65,11 @@ public class PlayerSneakListener extends ViaBukkitListener {
     @EventHandler(ignoreCancelled = true)
     public void playerToggleSneak(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        int protocolVersion = getUserConnection(player).get(ProtocolInfo.class).getProtocolVersion();
+        UserConnection userConnection = getUserConnection(player);
+        if (userConnection == null) return;
+        if (!userConnection.has(ProtocolInfo.class)) return;
+
+        int protocolVersion = userConnection.get(ProtocolInfo.class).getProtocolVersion();
         if (is1_14Fix && protocolVersion >= ProtocolVersion.v1_14.getId()) {
             setHeight(player, event.isSneaking() ? HEIGHT_1_14 : STANDING_HEIGHT);
             if (!useCache) return;
