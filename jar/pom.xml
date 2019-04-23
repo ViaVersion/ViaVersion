@@ -61,6 +61,16 @@
                             <pattern>org.yaml.snakeyaml</pattern>
                             <shadedPattern>us.myles.viaversion.libs.snakeyaml</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>net.md_5.bungee</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.bungeecordchat</shadedPattern>
+                            <includes>
+                                <include>net.md_5.bungee.api.chat.**</include>
+                                <include>net.md_5.bungee.api.ChatColor</include>
+                                <include>net.md_5.bungee.api.ChatMessageType</include>
+                                <include>net.md_5.bungee.chat.**</include>
+                            </includes>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
