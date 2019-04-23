@@ -3,6 +3,7 @@ package us.myles.ViaVersion.bungee.handlers;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
@@ -11,6 +12,8 @@ import net.md_5.bungee.protocol.packet.PluginMessage;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
+import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
@@ -22,6 +25,7 @@ import us.myles.ViaVersion.bungee.storage.BungeeStorage;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
 
 import java.lang.reflect.Field;
@@ -89,6 +93,25 @@ public class BungeeServerHandler implements Listener {
             e1.printStackTrace();
         }
     }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onServerSwitch(ServerSwitchEvent e) {
+        // Update entity id
+        UserConnection userConnection = Via.getManager().getConnection(e.getPlayer().getUniqueId());
+        if (userConnection == null) return;
+        int playerId;
+        try {
+            playerId = Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(userConnection);
+        } catch (Exception ex) {
+            return; // Ignored
+        }
+        for (StoredObject storedObject : userConnection.getStoredObjects().values()) {
+            if (storedObject instanceof ExternalJoinGameListener) {
+                ((ExternalJoinGameListener) storedObject).onExternalJoinGame(playerId);
+            }
+        }
+    }
+
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;

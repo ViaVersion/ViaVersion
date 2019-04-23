@@ -99,7 +99,7 @@ public class EntityPackets {
 
                         wrapper.set(Type.VAR_INT, 1, typeId);
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, uuid, type1_14);
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, type1_14);
                     }
                 });
             }
@@ -137,7 +137,7 @@ public class EntityPackets {
                         wrapper.set(Type.VAR_INT, 1, type);
 
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, uuid, entType);
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
 
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
@@ -178,7 +178,7 @@ public class EntityPackets {
 
                         Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, uuid, entType);
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });

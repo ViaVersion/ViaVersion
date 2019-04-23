@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class EntityTracker extends StoredObject {
+public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
@@ -311,5 +312,10 @@ public class EntityTracker extends StoredObject {
         } catch (Exception e) {
             return entityID;
         }
+    }
+
+    @Override
+    public void onExternalJoinGame(int playerEntityId) {
+        clientEntityTypes.put(playerEntityId, Entity1_10Types.EntityType.PLAYER);
     }
 }
