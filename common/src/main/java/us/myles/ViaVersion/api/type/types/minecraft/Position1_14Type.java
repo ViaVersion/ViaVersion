@@ -12,9 +12,10 @@ public class Position1_14Type extends Type<Position> {
     @Override
     public Position read(ByteBuf buffer) {
         long val = buffer.readLong();
+
         long x = (val >> 38);
-        long y = val & 0xfff;
-        long z = (((val << 38) >> 38)) >> 12;
+        long y = val << 52 >> 52;
+        long z = val << 26 >> 38;
 
         return new Position(x, y, z);
     }
