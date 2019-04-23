@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.InventoryNameRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
@@ -38,8 +39,9 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Short windowsId = wrapper.read(Type.UNSIGNED_BYTE);
                         String type = wrapper.read(Type.STRING);
-                        String title = wrapper.read(Type.STRING);
+                        String title = InventoryNameRewriter.processTranslate(wrapper.read(Type.STRING));
                         Short slots = wrapper.read(Type.UNSIGNED_BYTE);
+
 
                         if (type.equals("EntityHorse")) {
                             wrapper.setId(0x1F);
