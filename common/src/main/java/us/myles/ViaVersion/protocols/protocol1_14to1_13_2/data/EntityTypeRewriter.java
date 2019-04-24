@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class EntityTypeRewriter {
     private static Map<Integer, Integer> entityTypes = new HashMap<>();
-    private static Map<Integer, Integer> objectTypes = new HashMap<>();
 
     static {
         regEnt(6, 7);  // cave_spider
@@ -33,7 +32,8 @@ public class EntityTypeRewriter {
         regEnt(26, 28); // ghast
         regEnt(27, 29); // giant
         regEnt(28, 30); // guardian
-        regEnt(29, 31); // husk
+        regEnt(29, 31); // horse
+        regEnt(30, 32); // husk
         regEnt(31, 33); // illusioner
         regEnt(32, 34); // item
         regEnt(33, 35); // item_frame
