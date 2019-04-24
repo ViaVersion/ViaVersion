@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -126,7 +128,11 @@ public class WorldPackets {
                         Chunk chunk = wrapper.read(new Chunk1_13Type(clientWorld));
                         wrapper.write(new Chunk1_14Type(clientWorld), chunk);
 
-                        for (ChunkSection section : chunk.getSections()) {
+                        int[] motionBlocking = new int[16 * 16];
+                        int[] worldSurface = new int[16 * 16];
+
+                        for (int s = 0; s < 16; s++) {
+                            ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
                             boolean hasBlock = false;
                             for (int i = 0; i < section.getPaletteSize(); i++) {
@@ -148,12 +154,21 @@ public class WorldPackets {
                                         int id = section.getFlatBlock(x, y, z);
                                         if (id != AIR && id != VOID_AIR && id != CAVE_AIR) {
                                             nonAirBlockCount++;
+                                            worldSurface[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
+                                        }
+                                        if (MappingData.motionBlocking.contains(id)) {
+                                            motionBlocking[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
                                         }
                                     }
                                 }
                             }
                             section.setNonAirBlocksCount(nonAirBlockCount);
                         }
+
+                        CompoundTag heightMap = new CompoundTag("");
+                        heightMap.put(new LongArrayTag("MOTION_BLOCKING", encodeHeightMap(motionBlocking)));
+                        heightMap.put(new LongArrayTag("WORLD_SURFACE", encodeHeightMap(worldSurface)));
+                        chunk.setHeightMap(heightMap);
 
                         PacketWrapper lightPacket = wrapper.create(0x24);
                         lightPacket.write(Type.VAR_INT, chunk.getX());
@@ -359,5 +374,28 @@ public class WorldPackets {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
+    }
+
+    private static long[] encodeHeightMap(int[] heightMap) {
+        final int bitsPerBlock = 9;
+        long maxEntryValue = (1L << bitsPerBlock) - 1;
+
+        int length = (int) Math.ceil(heightMap.length * bitsPerBlock / 64.0);
+        long[] data = new long[length];
+
+        for (int index = 0; index < heightMap.length; index++) {
+            int value = heightMap[index];
+            int bitIndex = index * 9;
+            int startIndex = bitIndex / 64;
+            int endIndex = ((index + 1) * bitsPerBlock - 1) / 64;
+            int startBitSubIndex = bitIndex % 64;
+            data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
+            if (startIndex != endIndex) {
+                int endBitSubIndex = 64 - startBitSubIndex;
+                data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
+            }
+        }
+
+        return data;
     }
 }

@@ -30,7 +30,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
-        Type.NBT.read(input); // todo save this
+        CompoundTag heightMap = Type.NBT.read(input);
         Type.VAR_INT.read(input);
 
         BitSet usedSections = new BitSet(16);
@@ -68,7 +68,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, nbtData);
+        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, heightMap, nbtData);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
 
         output.writeBoolean(chunk.isGroundUp());
         Type.VAR_INT.write(output, chunk.getBitmask());
-        Type.NBT.write(output, new CompoundTag(""));  //TODO unknown compound tag
+        Type.NBT.write(output, chunk.getHeightMap());
 
         ByteBuf buf = output.alloc().buffer();
         for (int i = 0; i < 16; i++) {
