@@ -1,4 +1,4 @@
-# ViaVersion 2.0.0 - Spigot, Sponge, BungeeCord, Velocity
+# ViaVersion 2.0.1 - Spigot, Sponge, BungeeCord, Velocity
 [![Build Status](https://travis-ci.com/ViaVersion/ViaVersion.svg?branch=master)](https://travis-ci.com/ViaVersion/ViaVersion)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
 
