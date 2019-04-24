@@ -12,13 +12,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MappingData {
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static BlockMappings blockStateMappings;
     public static BlockMappings blockMappings;
     public static SoundMappings soundMappings;
+    public static Set<Integer> motionBlocking;
 
     public static void init() {
         JsonObject mapping1_13_2 = loadData("mapping-1.13.2.json");
@@ -32,6 +36,27 @@ public class MappingData {
         mapIdentifiers(oldToNewItems, mapping1_13_2.getAsJsonObject("items"), mapping1_14.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 sound mapping...");
         soundMappings = new SoundMappingShortArray(mapping1_13_2.getAsJsonArray("sounds"), mapping1_14.getAsJsonArray("sounds"));
+
+        Via.getPlatform().getLogger().info("Loading 1.14 blockstates...");
+        JsonObject blockStates = mapping1_14.getAsJsonObject("blockstates");
+        Map<String, Integer> blockStateMap = new HashMap<>(blockStates.entrySet().size());
+        for (Map.Entry<String, JsonElement> entry : blockStates.entrySet()) {
+            blockStateMap.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
+        }
+
+        Via.getPlatform().getLogger().info("Loading 1.14 heightmap data...");
+        JsonObject heightMapData = loadData("heightMapData-1.14.json");
+        JsonArray motionBlocking = heightMapData.getAsJsonArray("MOTION_BLOCKING");
+        MappingData.motionBlocking = new HashSet<>(motionBlocking.size());
+        for (JsonElement blockState : motionBlocking) {
+            String key = blockState.getAsString();
+            Integer id = blockStateMap.get(key);
+            if (id == null) {
+                Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
+            } else {
+                MappingData.motionBlocking.add(id);
+            }
+        }
     }
 
     public static JsonObject loadData(String name) {

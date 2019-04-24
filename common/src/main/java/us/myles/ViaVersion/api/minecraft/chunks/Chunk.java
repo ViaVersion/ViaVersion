@@ -17,6 +17,10 @@ public interface Chunk {
 
     int[] getBiomeData();
 
+    CompoundTag getHeightMap();
+
+    void setHeightMap(CompoundTag heightMap);
+
     List<CompoundTag> getBlockEntities();
 
     boolean isGroundUp();

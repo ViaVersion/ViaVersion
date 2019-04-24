@@ -15,7 +15,18 @@ public class BaseChunk implements Chunk {
     protected int bitmask;
     protected ChunkSection[] sections;
     protected int[] biomeData;
+    protected CompoundTag heightMap;
     protected List<CompoundTag> blockEntities;
+
+    public BaseChunk(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
+        this.x = x;
+        this.z = z;
+        this.groundUp = groundUp;
+        this.bitmask = bitmask;
+        this.sections = sections;
+        this.biomeData = biomeData;
+        this.blockEntities = blockEntities;
+    }
 
     @Override
     public boolean isBiomeData() {
