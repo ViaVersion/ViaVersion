@@ -9,7 +9,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
@@ -18,6 +17,9 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
     @Getter
     @Setter
     private int latestTradeWindowId;
+    @Getter
+    @Setter
+    private boolean forceSendCenterChunk = true;
     @Getter
     @Setter
     private int chunkCenterX, chunkCenterZ;

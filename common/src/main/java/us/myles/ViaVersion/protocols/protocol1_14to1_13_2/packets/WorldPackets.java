@@ -209,7 +209,9 @@ public class WorldPackets {
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         int diffX = Math.abs(entityTracker.getChunkCenterX() - chunk.getX());
                         int diffZ = Math.abs(entityTracker.getChunkCenterZ() - chunk.getZ());
-                        if (diffX >= SERVERSIDE_VIEW_DISTANCE || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
+                        if (entityTracker.isForceSendCenterChunk()
+                                || diffX >= SERVERSIDE_VIEW_DISTANCE
+                                || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
                             PacketWrapper fakePosLook = wrapper.create(0x40); // Set center chunk
                             fakePosLook.write(Type.VAR_INT, chunk.getX());
                             fakePosLook.write(Type.VAR_INT, chunk.getZ());
@@ -350,8 +352,8 @@ public class WorldPackets {
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                        entityTracker.setChunkCenterX(0);
-                        entityTracker.setChunkCenterZ(0);
+                        // The client may reset the center chunk if dimension is changed
+                        entityTracker.setForceSendCenterChunk(true);
                     }
                 });
                 handler(new PacketHandler() {
