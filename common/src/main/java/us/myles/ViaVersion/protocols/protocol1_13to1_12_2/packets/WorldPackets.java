@@ -16,6 +16,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
@@ -177,10 +178,7 @@ public class WorldPackets {
                         if (Via.getConfig().isServersideBlockConnections()) {
 
                             ConnectionData.updateBlockStorage(userConnection, position, newId);
-
-                            if (ConnectionData.connects(newId)) {
-                                newId = ConnectionData.connect(userConnection, position, newId);
-                            }
+                            newId = ConnectionData.connect(userConnection, position, newId);
                         }
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                         if (Via.getConfig().isServersideBlockConnections()) {
@@ -232,8 +230,9 @@ public class WorldPackets {
                                         (long) record.getY(),
                                         (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
-                                if (ConnectionData.connects(blockState)) {
-                                    blockState = ConnectionData.connect(userConnection, position, blockState);
+                                ConnectionHandler handler = ConnectionData.getConnectionHandler(blockState);
+                                if (handler != null) {
+                                    blockState = handler.connect(userConnection, position, blockState);
                                     record.setBlockId(blockState);
                                 }
                             }
