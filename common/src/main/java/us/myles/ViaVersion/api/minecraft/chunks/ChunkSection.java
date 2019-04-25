@@ -92,8 +92,18 @@ public class ChunkSection {
 
     public void setPaletteEntry(int index, int id) {
         if (index < 0 || index >= palette.size()) throw new IndexOutOfBoundsException();
-        palette.set(index, id);
+        int oldId = palette.set(index, id);
+        if (oldId == id) return;
         inversePalette.put(id, index);
+        if (inversePalette.get(oldId) == index) {
+            inversePalette.remove(oldId);
+            for (int i = 0; i < palette.size(); i++) {
+                if (palette.get(i) == oldId) {
+                    inversePalette.put(oldId, i);
+                    break;
+                }
+            }
+        }
     }
 
     public void replacePaletteEntry(int oldId, int newId) {
