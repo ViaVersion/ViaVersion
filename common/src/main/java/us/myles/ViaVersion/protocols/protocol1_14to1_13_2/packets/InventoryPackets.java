@@ -331,10 +331,12 @@ public class InventoryPackets {
         CompoundTag tag;
         if ((tag = item.getTag()) != null) {
             // Display Lore now uses JSON
-            if (tag.get("display") instanceof CompoundTag) {
-                CompoundTag display = tag.get("display");
-                if (display.get("Lore") instanceof ListTag) {
-                    ListTag lore = display.get("Lore");
+            Tag displayTag = tag.get("display");
+            if (displayTag instanceof CompoundTag) {
+                CompoundTag display = (CompoundTag) displayTag;
+                Tag loreTag = display.get("Lore");
+                if (loreTag instanceof ListTag) {
+                    ListTag lore = (ListTag) loreTag;
                     display.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|Lore", ConverterRegistry.convertToValue(lore)));
                     for (Tag loreEntry : lore) {
                         if (loreEntry instanceof StringTag) {
@@ -366,10 +368,12 @@ public class InventoryPackets {
         CompoundTag tag;
         if ((tag = item.getTag()) != null) {
             // Display Name now uses JSON
-            if (tag.get("display") instanceof CompoundTag) {
-                CompoundTag display = tag.get("display");
-                if (((CompoundTag) tag.get("display")).get("Lore") instanceof ListTag) {
-                    ListTag lore = display.get("Lore");
+            Tag displayTag = tag.get("display");
+            if (displayTag instanceof CompoundTag) {
+                CompoundTag display = (CompoundTag) displayTag;
+                Tag loreTag = display.get("Lore");
+                if (loreTag instanceof ListTag) {
+                    ListTag lore = (ListTag) loreTag;
                     ListTag via = display.get(NBT_TAG_NAME + "|Lore");
                     if (via != null) {
                         display.put(ConverterRegistry.convertToTag("Lore", ConverterRegistry.convertToValue(via)));
