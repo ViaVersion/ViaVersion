@@ -39,7 +39,7 @@ public class ConnectionData {
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) continue;
 
-            int newBlockState = handler.connect(user, position, blockState);
+            int newBlockState = handler.connect(user, pos, blockState);
             PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
             blockUpdatePacket.write(Type.POSITION, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
