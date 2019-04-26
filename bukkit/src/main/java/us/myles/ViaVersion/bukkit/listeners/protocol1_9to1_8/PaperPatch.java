@@ -25,15 +25,16 @@ public class PaperPatch extends ViaBukkitListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent e) {
         if (isOnPipe(e.getPlayer())) {
-            Location diff = e.getPlayer().getLocation().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
+            Location location = e.getPlayer().getLocation();
+            Location diff = location.subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
             Material block = e.getBlockPlaced().getType();
-            if (!block.isSolid()) {
+            if (isPlacable(block)) {
                 return;
             }
-            if (e.getPlayer().getLocation().getBlock().equals(e.getBlock())) {
+            if (location.getBlock().equals(e.getBlock())) {
                 e.setCancelled(true);
             } else {
-                if (e.getPlayer().getLocation().getBlock().getRelative(BlockFace.UP).equals(e.getBlock())) {
+                if (location.getBlock().getRelative(BlockFace.UP).equals(e.getBlock())) {
                     e.setCancelled(true);
                 } else {
                     // Within radius of block
@@ -53,6 +54,20 @@ public class PaperPatch extends ViaBukkitListener {
                     }
                 }
             }
+        }
+    }
+
+    private boolean isPlacable(Material material) {
+        if (!material.isSolid()) return true;
+        // signs and banners
+        switch (material.getId()) {
+            case 63:
+            case 68:
+            case 176:
+            case 177:
+                return true;
+            default:
+                return false;
         }
     }
 }
