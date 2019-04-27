@@ -9,6 +9,7 @@ import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersion;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -38,8 +39,9 @@ public class DeathListener extends ViaBukkitListener {
             @Override
             public void run() {
                 // If online
-                if (getUserConnection(p) != null) {
-                    PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p));
+                UserConnection userConnection = getUserConnection(p);
+                if (userConnection != null) {
+                    PacketWrapper wrapper = new PacketWrapper(0x2C, null, userConnection);
                     try {
                         wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
                         wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID

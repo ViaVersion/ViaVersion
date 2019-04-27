@@ -1,10 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Effect {
 
-    private final static HashMap<Integer, Integer> effects;
+    private static final Map<Integer, Integer> effects;
 
     static {
         effects = new HashMap<>();
@@ -29,9 +30,8 @@ public class Effect {
     }
 
     public static int getNewId(int id) {
-        if (!contains(id))
-            return id;
-        return effects.get(id);
+        Integer newId = effects.get(id);
+        return newId != null ? newId : id;
     }
 
     public static boolean contains(int oldId) {

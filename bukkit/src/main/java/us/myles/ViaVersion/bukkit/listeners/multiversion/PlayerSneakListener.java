@@ -67,9 +67,10 @@ public class PlayerSneakListener extends ViaBukkitListener {
         Player player = event.getPlayer();
         UserConnection userConnection = getUserConnection(player);
         if (userConnection == null) return;
-        if (!userConnection.has(ProtocolInfo.class)) return;
+        ProtocolInfo info = userConnection.get(ProtocolInfo.class);
+        if (info == null) return;
 
-        int protocolVersion = userConnection.get(ProtocolInfo.class).getProtocolVersion();
+        int protocolVersion = info.getProtocolVersion();
         if (is1_14Fix && protocolVersion >= ProtocolVersion.v1_14.getId()) {
             setHeight(player, event.isSneaking() ? HEIGHT_1_14 : STANDING_HEIGHT);
             if (!useCache) return;

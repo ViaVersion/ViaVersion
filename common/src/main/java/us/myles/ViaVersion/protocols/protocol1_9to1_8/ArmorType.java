@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Getter
@@ -31,7 +32,7 @@ public enum ArmorType {
     GOLD_BOOTS(1, 317, "minecraft:gold_boots"),
     NONE(0, 0, "none");
 
-    private static HashMap<Integer, ArmorType> armor;
+    private static Map<Integer, ArmorType> armor;
 
     static {
         armor = new HashMap<>();
@@ -51,10 +52,8 @@ public enum ArmorType {
      * @return Return the ArmourType, ArmourType.NONE if not found
      */
     public static ArmorType findById(int id) {
-        for (ArmorType a : ArmorType.values())
-            if (a.getId() == id)
-                return a;
-        return ArmorType.NONE;
+        ArmorType type = armor.get(id);
+        return type == null ? ArmorType.NONE : type;
     }
 
     /**
@@ -77,10 +76,7 @@ public enum ArmorType {
      * @return True if the item is a piece of armour
      */
     public static boolean isArmor(int id) {
-        for (ArmorType a : ArmorType.values())
-            if (a.getId() == id)
-                return true;
-        return false;
+        return armor.containsKey(id);
     }
 
     /**
