@@ -22,6 +22,9 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
     private int latestTradeWindowId;
     @Getter
     @Setter
+    private int clientEntityId;
+    @Getter
+    @Setter
     private boolean forceSendCenterChunk = true;
     @Getter
     @Setter
@@ -92,6 +95,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 
     @Override
     public void onExternalJoinGame(int playerEntityId) {
+        clientEntityId = playerEntityId;
         clientEntityTypes.put(playerEntityId, Entity1_14Types.EntityType.PLAYER);
     }
 

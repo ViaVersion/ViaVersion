@@ -302,7 +302,9 @@ public class WorldPackets {
 
                         Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.addEntity(entityId, entType);
+                        tracker.setClientEntityId(entityId);
                     }
                 });
 

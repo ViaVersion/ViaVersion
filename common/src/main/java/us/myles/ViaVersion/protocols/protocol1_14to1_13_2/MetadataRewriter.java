@@ -54,15 +54,17 @@ public class MetadataRewriter {
                 }
 
                 if (type.isOrHasParent(Entity1_14Types.EntityType.PLAYER)) {
-                    if (metadata.getId() == 0) {
-                        byte flags = ((Number) metadata.getValue()).byteValue();
-                        // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
-                        tracker.setEntityFlags(entityId, flags);
-                    } else if (metadata.getId() == 7) {
-                        tracker.setRiptide(entityId, (((Number) metadata.getValue()).byteValue() & 0x4) != 0);
-                    }
-                    if (metadata.getId() == 0 || metadata.getId() == 7) {
-                        metadatas.add(new Metadata(6, MetaType1_14.Pose, recalculatePlayerPose(entityId, tracker)));
+                    if (entityId != tracker.getClientEntityId()) {
+                        if (metadata.getId() == 0) {
+                            byte flags = ((Number) metadata.getValue()).byteValue();
+                            // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
+                            tracker.setEntityFlags(entityId, flags);
+                        } else if (metadata.getId() == 7) {
+                            tracker.setRiptide(entityId, (((Number) metadata.getValue()).byteValue() & 0x4) != 0);
+                        }
+                        if (metadata.getId() == 0 || metadata.getId() == 7) {
+                            metadatas.add(new Metadata(6, MetaType1_14.Pose, recalculatePlayerPose(entityId, tracker)));
+                        }
                     }
                 } else if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
                     if (metadata.getId() == 16) {
