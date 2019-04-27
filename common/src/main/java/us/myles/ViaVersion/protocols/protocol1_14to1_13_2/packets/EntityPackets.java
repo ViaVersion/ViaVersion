@@ -196,11 +196,13 @@ public class EntityPackets {
                         short animation = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         if (animation == 2) {  //Leave bed
                             EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                            tracker.setSleeping(wrapper.get(Type.VAR_INT, 0), false);
+                            int entityId = wrapper.get(Type.VAR_INT, 0);
+                            tracker.setSleeping(entityId, false);
 
                             PacketWrapper metadataPacket = wrapper.create(0x43);
-                            metadataPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
+                            metadataPacket.write(Type.VAR_INT, entityId);
                             List<Metadata> metadataList = new LinkedList<>();
+                            metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter.recalculatePlayerPose(entityId, tracker)));
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
                             metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
                             metadataPacket.send(Protocol1_14To1_13_2.class);
@@ -219,11 +221,13 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        tracker.setSleeping(wrapper.get(Type.VAR_INT, 0), true);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        tracker.setSleeping(entityId, true);
 
                         Position position = wrapper.read(Type.POSITION);
                         List<Metadata> metadataList = new LinkedList<>();
                         metadataList.add(new Metadata(12, MetaType1_14.OptPosition, position));
+                        metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter.recalculatePlayerPose(entityId, tracker)));
                         wrapper.write(Types1_14.METADATA_LIST, metadataList);
                     }
                 });

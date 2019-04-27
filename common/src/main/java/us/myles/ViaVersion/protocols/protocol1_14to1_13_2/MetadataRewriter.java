@@ -194,7 +194,7 @@ public class MetadataRewriter {
         return (entityFlags & 0x80) != 0;
     }
 
-    private static int recalculatePlayerPose(int entityId, EntityTracker tracker) {
+    public static int recalculatePlayerPose(int entityId, EntityTracker tracker) {
         byte flags = tracker.getEntityFlags(entityId);
         // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
         int pose = 0; // standing
