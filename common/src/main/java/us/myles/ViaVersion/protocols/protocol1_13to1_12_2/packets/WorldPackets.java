@@ -403,10 +403,15 @@ public class WorldPackets {
                         }
 
                         if (Via.getConfig().isServersideBlockConnections()) {
+                            ConnectionData.connectBlocks(wrapper.user(), chunk);
                             // Workaround for packet order issue
                             wrapper.send(Protocol1_13To1_12_2.class, true, true);
                             wrapper.cancel();
-                            ConnectionData.connectBlocks(wrapper.user(), chunk);
+                            for (int i = 0; i < chunk.getSections().length; i++) {
+                                ChunkSection section = chunk.getSections()[i];
+                                if (section == null) continue;
+                                ConnectionData.updateChunkSectionNeighbours(wrapper.user(), chunk.getX(), chunk.getZ(), i);
+                            }
                         }
                     }
                 });
