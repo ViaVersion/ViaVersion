@@ -366,10 +366,6 @@ public class WorldPackets {
                             }
                         }
 
-                        if (Via.getConfig().isServersideBlockConnections()) {
-                            ConnectionData.connectBlocks(wrapper.user(), chunk);
-                        }
-
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
                             int latestBiomeWarn = Integer.MIN_VALUE;
@@ -403,6 +399,18 @@ public class WorldPackets {
                                     storage.get(position).setReplacement(newId);
 
                                 chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
+                            }
+                        }
+
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            ConnectionData.connectBlocks(wrapper.user(), chunk);
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.cancel();
+                            for (int i = 0; i < chunk.getSections().length; i++) {
+                                ChunkSection section = chunk.getSections()[i];
+                                if (section == null) continue;
+                                ConnectionData.updateChunkSectionNeighbours(wrapper.user(), chunk.getX(), chunk.getZ(), i);
                             }
                         }
                     }

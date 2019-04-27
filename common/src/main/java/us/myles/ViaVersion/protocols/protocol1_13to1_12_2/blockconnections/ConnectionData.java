@@ -118,7 +118,7 @@ public class ConnectionData {
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
                     wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(new BlockChangeRecord[0]));
                     try {
-                        wrapper.send(Protocol1_13To1_12_2.class);
+                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
