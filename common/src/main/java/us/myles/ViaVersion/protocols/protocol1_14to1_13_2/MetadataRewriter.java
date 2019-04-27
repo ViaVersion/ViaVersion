@@ -47,13 +47,24 @@ public class MetadataRewriter {
 
                 if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_INSENTIENT)) {
                     if (metadata.getId() == 13) {
-                        tracker.setInsentientData(entityId, (byte) ((((Number)metadata.getValue()).byteValue() & ~0x4)
+                        tracker.setInsentientData(entityId, (byte) ((((Number) metadata.getValue()).byteValue() & ~0x4)
                                 | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
                         metadata.setValue(tracker.getInsentientData(entityId));
                     }
                 }
 
-                if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
+                if (type.isOrHasParent(Entity1_14Types.EntityType.PLAYER)) {
+                    if (metadata.getId() == 0) {
+                        byte flags = ((Number) metadata.getValue()).byteValue();
+                        // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
+                        tracker.setEntityFlags(entityId, flags);
+                    } else if (metadata.getId() == 7) {
+                        tracker.setRiptide(entityId, (((Number) metadata.getValue()).byteValue() & 0x4) != 0);
+                    }
+                    if (metadata.getId() == 0 || metadata.getId() == 7) {
+                        metadatas.add(new Metadata(6, MetaType1_14.Pose, recalculatePlayerPose(entityId, tracker)));
+                    }
+                } else if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
                     if (metadata.getId() == 16) {
                         tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                                 | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
@@ -107,7 +118,8 @@ public class MetadataRewriter {
                     }
                 } else if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
                     if (metadata.getId() == 8) {
-                        if (metadata.getValue().equals(0)) metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
+                        if (metadata.getValue().equals(0))
+                            metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
                         metadata.setMetaType(MetaType1_14.OptVarInt);
                     }
                 } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_SKELETON)) {
@@ -150,6 +162,14 @@ public class MetadataRewriter {
         }
     }
 
+    private static boolean isSneaking(byte flags) {
+        return (flags & 0x2) != 0;
+    }
+
+    private static boolean isSwimming(byte flags) {
+        return (flags & 0x10) != 0;
+    }
+
     private static int getNewProfessionId(int old) {
         // profession -> career
         switch (old) {
@@ -168,6 +188,28 @@ public class MetadataRewriter {
             default:
                 return 0; // none
         }
+    }
+
+    private static boolean isFallFlying(int entityFlags) {
+        return (entityFlags & 0x80) != 0;
+    }
+
+    private static int recalculatePlayerPose(int entityId, EntityTracker tracker) {
+        byte flags = tracker.getEntityFlags(entityId);
+        // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
+        int pose = 0; // standing
+        if (isFallFlying(flags)) {
+            pose = 1;
+        } else if (tracker.isSleeping(entityId)) {
+            pose = 2;
+        } else if (isSwimming(flags)) {
+            pose = 3;
+        } else if (tracker.isRiptide(entityId)) {
+            pose = 4;
+        } else if (isSneaking(flags)) {
+            pose = 5;
+        }
+        return pose;
     }
 
     public static int getNewParticleId(int id) {

@@ -195,6 +195,9 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short animation = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         if (animation == 2) {  //Leave bed
+                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            tracker.setSleeping(wrapper.get(Type.VAR_INT, 0), false);
+
                             PacketWrapper metadataPacket = wrapper.create(0x43);
                             metadataPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             List<Metadata> metadataList = new LinkedList<>();
@@ -215,6 +218,9 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.setSleeping(wrapper.get(Type.VAR_INT, 0), true);
+
                         Position position = wrapper.read(Type.POSITION);
                         List<Metadata> metadataList = new LinkedList<>();
                         metadataList.add(new Metadata(12, MetaType1_14.OptPosition, position));
