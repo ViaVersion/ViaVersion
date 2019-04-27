@@ -35,7 +35,7 @@ public class HandItemCache extends BukkitRunnable {
     }
 
     public static Item convert(ItemStack itemInHand) {
-        if (itemInHand == null) return Item.EMPTY;
+        if (itemInHand == null) new Item((short) 0, (byte) 0, (short) 0, null);
         return new Item((short) itemInHand.getTypeId(), (byte) itemInHand.getAmount(), itemInHand.getDurability(), null);
     }
 }

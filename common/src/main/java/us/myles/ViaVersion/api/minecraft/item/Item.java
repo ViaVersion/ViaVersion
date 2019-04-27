@@ -11,7 +11,6 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 public class Item {
-    public static final Item EMPTY = new Item((short) 0, (byte) 0, (short) 0, null);
     @SerializedName(value = "identifier", alternate = "id")
     private int identifier;
     private byte amount;
