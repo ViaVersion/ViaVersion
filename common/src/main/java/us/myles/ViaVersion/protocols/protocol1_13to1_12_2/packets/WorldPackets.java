@@ -25,6 +25,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityP
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -366,10 +367,6 @@ public class WorldPackets {
                             }
                         }
 
-                        if (Via.getConfig().isServersideBlockConnections()) {
-                            ConnectionData.connectBlocks(wrapper.user(), chunk);
-                        }
-
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
                             int latestBiomeWarn = Integer.MIN_VALUE;
@@ -404,6 +401,13 @@ public class WorldPackets {
 
                                 chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
                             }
+                        }
+
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_14To1_13_2.class, true, true);
+                            wrapper.cancel();
+                            ConnectionData.connectBlocks(wrapper.user(), chunk);
                         }
                     }
                 });
