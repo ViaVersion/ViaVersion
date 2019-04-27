@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
@@ -28,7 +29,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     @Override
     protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         if (bytebuf.readableBytes() == 0) {
-            throw new CancelException();
+            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
         }
         boolean needsCompress = false;
         if (!handledCompression) {
