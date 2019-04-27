@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class Entity1_14Types {
     public static EntityType getTypeFromId(int typeID) {
@@ -196,6 +199,8 @@ public class Entity1_14Types {
         BOAT(5, ENTITY),
         ;
 
+        private static final Map<Integer, EntityType> TYPES = new HashMap<>();
+
         private final int id;
         private final EntityType parent;
 
@@ -204,15 +209,16 @@ public class Entity1_14Types {
             this.parent = null;
         }
 
+        static {
+            for (EntityType type : EntityType.values()) {
+                TYPES.put(type.id, type);
+            }
+        }
+
         public static Optional<EntityType> findById(int id) {
-            if (id == -1)  // Check if this is called
+            if (id == -1)
                 return Optional.absent();
-
-            for (EntityType ent : EntityType.values())
-                if (ent.getId() == id)
-                    return Optional.of(ent);
-
-            return Optional.absent();
+            return Optional.fromNullable(TYPES.get(id));
         }
 
         public boolean is(EntityType... types) {

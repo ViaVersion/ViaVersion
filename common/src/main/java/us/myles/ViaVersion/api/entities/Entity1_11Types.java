@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
+import java.util.HashMap;
+import java.util.Map;
+
 // 1.11 Entity / Object ids TODO maybe in the future instead of copying it, some api.
 public class Entity1_11Types {
     public static EntityType getTypeFromId(int typeID, boolean isObject) {
@@ -140,6 +143,8 @@ public class Entity1_11Types {
         COMPLEX_PART(-1, ENTITY),
         LIAMA_SPIT(-1, ENTITY);
 
+        private static final Map<Integer, EntityType> TYPES = new HashMap<>();
+
         private final int id;
         private final EntityType parent;
 
@@ -148,15 +153,16 @@ public class Entity1_11Types {
             this.parent = null;
         }
 
+        static {
+            for (EntityType type : EntityType.values()) {
+                TYPES.put(type.id, type);
+            }
+        }
+
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
                 return Optional.absent();
-
-            for (EntityType ent : EntityType.values())
-                if (ent.getId() == id)
-                    return Optional.of(ent);
-
-            return Optional.absent();
+            return Optional.fromNullable(TYPES.get(id));
         }
 
         public boolean is(EntityType... types) {
@@ -215,18 +221,21 @@ public class Entity1_11Types {
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
 
+        private static final Map<Integer, ObjectTypes> TYPES = new HashMap<>();
+
         private final int id;
         private final EntityType type;
+
+        static {
+            for (ObjectTypes type : ObjectTypes.values()) {
+                TYPES.put(type.id, type);
+            }
+        }
 
         public static Optional<ObjectTypes> findById(int id) {
             if (id == -1)
                 return Optional.absent();
-
-            for (ObjectTypes ent : ObjectTypes.values())
-                if (ent.getId() == id)
-                    return Optional.of(ent);
-
-            return Optional.absent();
+            return Optional.fromNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {

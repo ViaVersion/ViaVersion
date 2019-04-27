@@ -10,7 +10,8 @@ public class ViaIdleThread implements Runnable {
     @Override
     public void run() {
         for (UserConnection info : Via.getManager().getPortedPlayers().values()) {
-            if (info.has(ProtocolInfo.class) && info.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9To1_8.class)) {
+            ProtocolInfo protocolInfo = info.get(ProtocolInfo.class);
+            if (protocolInfo != null && protocolInfo.getPipeline().contains(Protocol1_9To1_8.class)) {
                 long nextIdleUpdate = info.get(MovementTracker.class).getNextIdlePacket();
                 if (nextIdleUpdate <= System.currentTimeMillis()) {
                     if (info.getChannel().isOpen()) {

@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 public enum SoundEffect {
@@ -259,7 +260,7 @@ public enum SoundEffect {
     private final SoundCategory category;
     private final boolean breaksound;
 
-    private static HashMap<String, SoundEffect> effects;
+    private static Map<String, SoundEffect> effects;
 
     static {
         effects = new HashMap<>();

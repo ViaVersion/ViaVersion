@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 // TODO auto generate 18w11a with PAaaS
 public class Entity1_13Types {
@@ -196,6 +199,7 @@ public class Entity1_13Types {
         SPAWNER_MINECART(44, MINECART_ABSTRACT), // amb
         BOAT(5, ENTITY); // alv
 
+        private static final Map<Integer, EntityType> TYPES = new HashMap<>();
 
         private final int id;
         private final EntityType parent;
@@ -205,15 +209,16 @@ public class Entity1_13Types {
             this.parent = null;
         }
 
+        static {
+            for (EntityType type : EntityType.values()) {
+                TYPES.put(type.id, type);
+            }
+        }
+
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
                 return Optional.absent();
-
-            for (EntityType ent : EntityType.values())
-                if (ent.getId() == id)
-                    return Optional.of(ent);
-
-            return Optional.absent();
+            return Optional.fromNullable(TYPES.get(id));
         }
 
         public boolean is(EntityType... types) {
@@ -273,18 +278,21 @@ public class Entity1_13Types {
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL),
         TRIDENT(94, EntityType.TRIDENT);
 
+        private static final Map<Integer, ObjectTypes> TYPES = new HashMap<>();
+
         private final int id;
         private final EntityType type;
+
+        static {
+            for (ObjectTypes type : ObjectTypes.values()) {
+                TYPES.put(type.id, type);
+            }
+        }
 
         public static Optional<ObjectTypes> findById(int id) {
             if (id == -1)
                 return Optional.absent();
-
-            for (ObjectTypes ent : ObjectTypes.values())
-                if (ent.getId() == id)
-                    return Optional.of(ent);
-
-            return Optional.absent();
+            return Optional.fromNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
