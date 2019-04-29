@@ -26,7 +26,7 @@ public class PaperPatch extends ViaBukkitListener {
     public void onPlace(BlockPlaceEvent e) {
         if (isOnPipe(e.getPlayer())) {
             Location location = e.getPlayer().getLocation();
-            Location diff = location.subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
+            Location diff = location.clone().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
             Material block = e.getBlockPlaced().getType();
             if (isPlacable(block)) {
                 return;
