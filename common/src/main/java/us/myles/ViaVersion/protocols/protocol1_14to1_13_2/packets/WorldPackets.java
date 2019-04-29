@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.google.common.primitives.Bytes;
-import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
@@ -189,21 +188,11 @@ public class WorldPackets {
                         lightPacket.write(Type.VAR_INT, 0);  //TODO
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) continue;
-                            ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
-                            section.writeSkyLight(buf);
-                            byte[] data = new byte[buf.readableBytes()];
-                            buf.readBytes(data);
-                            buf.release();
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getSkyLight()).toArray(new Byte[0]));
                         }
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
-                            section.writeBlockLight(buf);
-                            byte[] data = new byte[buf.readableBytes()];
-                            buf.readBytes(data);
-                            buf.release();
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getBlockLight()).toArray(new Byte[0]));
                         }
 
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
