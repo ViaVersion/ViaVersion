@@ -192,7 +192,6 @@ public class ConnectionData {
                     }
                 }
             }
-            updateChunkSectionNeighbours(user, chunk.getX(), chunk.getZ(), i);
         }
     }
 
