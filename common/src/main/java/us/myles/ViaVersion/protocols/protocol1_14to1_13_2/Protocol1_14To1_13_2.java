@@ -172,30 +172,17 @@ public class Protocol1_14To1_13_2 extends Protocol {
                         // Fences and walls tags - used for block connections
                         wrapper.write(Type.STRING, "minecraft:fences");
                         wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
-                                216,
-                                217,
-                                218,
-                                219,
-                                220,
-                                221,
-                                227
+                                189,
+                                248,
+                                472,
+                                473,
+                                474,
+                                475
                         });
                         wrapper.write(Type.STRING, "minecraft:walls");
                         wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
-                                245,
-                                246,
-                                247,
-                                248,
-                                249,
-                                250,
-                                251,
-                                252,
-                                253,
-                                254,
-                                255,
-                                256,
-                                257,
-                                258
+                                271,
+                                272,
                         });
                         int itemTagsSize = wrapper.read(Type.VAR_INT);
                         wrapper.write(Type.VAR_INT, itemTagsSize + 2); // item tags
