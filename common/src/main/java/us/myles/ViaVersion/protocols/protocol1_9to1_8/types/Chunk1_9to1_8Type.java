@@ -141,20 +141,23 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         Type.VAR_INT.write(output, chunk.getBitmask());
 
         ByteBuf buf = output.alloc().buffer();
-        for (int i = 0; i < SECTION_COUNT; i++) {
-            ChunkSection section = chunk.getSections()[i];
-            if (section == null) continue; // Section not set
-            Types1_9.CHUNK_SECTION.write(buf, section);
-            section.writeBlockLight(buf);
+        try {
+            for (int i = 0; i < SECTION_COUNT; i++) {
+                ChunkSection section = chunk.getSections()[i];
+                if (section == null) continue; // Section not set
+                Types1_9.CHUNK_SECTION.write(buf, section);
+                section.writeBlockLight(buf);
 
-            if (!section.hasSkyLight()) continue; // No sky light, we're done here.
-            section.writeSkyLight(buf);
+                if (!section.hasSkyLight()) continue; // No sky light, we're done here.
+                section.writeSkyLight(buf);
 
+            }
+            buf.readerIndex(0);
+            Type.VAR_INT.write(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
+            output.writeBytes(buf);
+        } finally {
+            buf.release(); // release buffer
         }
-        buf.readerIndex(0);
-        Type.VAR_INT.write(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
-        output.writeBytes(buf);
-        buf.release(); // release buffer
 
         // Write biome data
         if (chunk.hasBiomeData()) {

@@ -214,32 +214,41 @@ public class UserConnection {
     public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
         final ByteBuf buf = packet.alloc().buffer();
         try {
-            Type.VAR_INT.write(buf, PacketWrapper.PASSTHROUGH_ID);
-        } catch (Exception e) {
-            // Should not happen
-            Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
-        }
-        buf.writeBytes(packet);
-        packet.release();
-        final ChannelHandlerContext context = PipelineUtil
-                .getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline());
-        if (currentThread) {
-            if (context != null) {
-                context.fireChannelRead(buf);
-            } else {
-                getChannel().pipeline().fireChannelRead(buf);
+            try {
+                Type.VAR_INT.write(buf, PacketWrapper.PASSTHROUGH_ID);
+            } catch (Exception e) {
+                // Should not happen
+                Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
             }
-        } else {
-            channel.eventLoop().submit(new Runnable() {
-                @Override
-                public void run() {
-                    if (context != null) {
-                        context.fireChannelRead(buf);
-                    } else {
-                        getChannel().pipeline().fireChannelRead(buf);
-                    }
+            buf.writeBytes(packet);
+            final ChannelHandlerContext context = PipelineUtil
+                    .getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline());
+            if (currentThread) {
+                if (context != null) {
+                    context.fireChannelRead(buf);
+                } else {
+                    getChannel().pipeline().fireChannelRead(buf);
                 }
-            });
+            } else {
+                try {
+                    channel.eventLoop().submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (context != null) {
+                                context.fireChannelRead(buf);
+                            } else {
+                                getChannel().pipeline().fireChannelRead(buf);
+                            }
+                        }
+                    });
+                } catch (Throwable t) {
+                    // Couldn't schedule
+                    buf.release();
+                    throw t;
+                }
+            }
+        } finally {
+            packet.release();
         }
     }
 

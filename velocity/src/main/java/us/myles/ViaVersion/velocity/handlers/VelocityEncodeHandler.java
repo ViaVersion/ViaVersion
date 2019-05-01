@@ -77,8 +77,11 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         if (needsCompress) {
             ByteBuf old = bytebuf;
             bytebuf = ctx.alloc().buffer();
-            PipelineUtil.callEncode((MessageToByteEncoder) ctx.pipeline().get("compression-encoder"), ctx, old, bytebuf);
-            old.release();
+            try {
+                PipelineUtil.callEncode((MessageToByteEncoder) ctx.pipeline().get("compression-encoder"), ctx, old, bytebuf);
+            } finally {
+                old.release();
+            }
         }
         out.add(bytebuf);
     }
