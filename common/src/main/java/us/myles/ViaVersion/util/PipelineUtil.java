@@ -6,7 +6,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -90,14 +89,15 @@ public class PipelineUtil {
      *
      * @param t The throwable
      * @param c The exception to look for
-     * @return True if the stack trace contained it as its cause.
+     * @return True if the stack trace contained it as its cause or if t is an instance of c.
      */
     public static boolean containsCause(Throwable t, Class<? extends Throwable> c) {
-        while (t != null) {
-            t = t.getCause();
-            if (t != null)
+        do {
+            if (t != null) {
                 if (c.isAssignableFrom(t.getClass())) return true;
-        }
+                t = t.getCause();
+            }
+        } while (t != null);
         return false;
     }
 

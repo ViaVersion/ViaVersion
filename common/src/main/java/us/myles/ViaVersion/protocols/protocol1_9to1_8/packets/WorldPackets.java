@@ -17,7 +17,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
@@ -163,11 +162,14 @@ public class WorldPackets {
 
                             PacketWrapper output = (PacketWrapper) obj;
                             ByteBuf buffer = wrapper.user().getChannel().alloc().buffer();
-                            output.setId(-1); // -1 for no writing of id
-                            output.writeToBuffer(buffer);
-                            PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
-                            chunkPacket.send(Protocol1_9To1_8.class, false, true);
-                            buffer.release();
+                            try {
+                                output.setId(-1); // -1 for no writing of id
+                                output.writeToBuffer(buffer);
+                                PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
+                                chunkPacket.send(Protocol1_9To1_8.class, false, true);
+                            } finally {
+                                buffer.release();
+                            }
                         }
                     }
                 });

@@ -184,8 +184,8 @@ public class WorldPackets {
                         }
                         lightPacket.write(Type.VAR_INT, skyLightMask);
                         lightPacket.write(Type.VAR_INT, blockLightMask);
-                        lightPacket.write(Type.VAR_INT, 0);  //TODO find out what these two bitmasks mean
-                        lightPacket.write(Type.VAR_INT, 0);  //TODO
+                        lightPacket.write(Type.VAR_INT, 0);  // empty sky light mask
+                        lightPacket.write(Type.VAR_INT, 0);  // empty block light mask
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) continue;
                             lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getSkyLight()).toArray(new Byte[0]));
@@ -209,7 +209,7 @@ public class WorldPackets {
                             entityTracker.setChunkCenterZ(chunk.getZ());
                         }
 
-                        lightPacket.send(Protocol1_14To1_13_2.class, true, false);
+                        lightPacket.send(Protocol1_14To1_13_2.class, true, true);
                     }
                 });
             }

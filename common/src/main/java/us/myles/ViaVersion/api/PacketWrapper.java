@@ -10,10 +10,12 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.TypeConverter;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -298,8 +300,14 @@ public class PacketWrapper {
      */
     public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.OUTGOING);
-            user().sendRawPacket(output, currentThread);
+            try {
+                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.OUTGOING);
+                user().sendRawPacket(output, currentThread);
+            } catch (Exception e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw e;
+                }
+            }
         }
     }
 
@@ -493,8 +501,14 @@ public class PacketWrapper {
      */
     public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.INCOMING);
-            user().sendRawPacketToServer(output, currentThread);
+            try {
+                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.INCOMING);
+                user().sendRawPacketToServer(output, currentThread);
+            } catch (Exception e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw e;
+                }
+            }
         }
     }
 
