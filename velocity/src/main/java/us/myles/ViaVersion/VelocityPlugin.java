@@ -11,7 +11,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
-import net.kyori.text.serializer.ComponentSerializers;
+import net.kyori.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.slf4j.Logger;
@@ -148,7 +148,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public void sendMessage(UUID uuid, String message) {
         PROXY.getPlayer(uuid).ifPresent(it -> it.sendMessage(
-                ComponentSerializers.JSON.deserialize(
+                GsonComponentSerializer.INSTANCE.deserialize(
                         ComponentSerializer.toString(TextComponent.fromLegacyText(message)) // Fixes links
                 )
         ));
@@ -158,8 +158,8 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     public boolean kickPlayer(UUID uuid, String message) {
         return PROXY.getPlayer(uuid).map(it -> {
             it.disconnect(
-                    ComponentSerializers.JSON.deserialize(
-                            ComponentSerializer.toString(TextComponent.fromLegacyText(message)) // ComponentSerializers.LEGACY is deprecated
+                    GsonComponentSerializer.INSTANCE.deserialize(
+                            ComponentSerializer.toString(TextComponent.fromLegacyText(message))
                     )
             );
             return true;
