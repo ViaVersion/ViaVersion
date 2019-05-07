@@ -81,16 +81,19 @@ public class Chunk1_14Type extends PartialType<Chunk, ClientWorld> {
         Type.NBT.write(output, chunk.getHeightMap());
 
         ByteBuf buf = output.alloc().buffer();
-        for (int i = 0; i < 16; i++) {
-            ChunkSection section = chunk.getSections()[i];
-            if (section == null) continue; // Section not set
-            buf.writeShort(section.getNonAirBlocksCount());
-            Types1_13.CHUNK_SECTION.write(buf, section);
+        try {
+            for (int i = 0; i < 16; i++) {
+                ChunkSection section = chunk.getSections()[i];
+                if (section == null) continue; // Section not set
+                buf.writeShort(section.getNonAirBlocksCount());
+                Types1_13.CHUNK_SECTION.write(buf, section);
+            }
+            buf.readerIndex(0);
+            Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 * 4 : 0));
+            output.writeBytes(buf);
+        } finally {
+            buf.release(); // release buffer
         }
-        buf.readerIndex(0);
-        Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 * 4 : 0));
-        output.writeBytes(buf);
-        buf.release(); // release buffer
 
         // Write biome data
         if (chunk.isBiomeData()) {

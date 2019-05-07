@@ -148,7 +148,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int blockTagsSize = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, blockTagsSize + 3); // block tags
+                        wrapper.write(Type.VAR_INT, blockTagsSize + 5); // block tags
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             Integer[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
@@ -169,8 +169,23 @@ public class Protocol1_14To1_13_2 extends Protocol {
                         wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
                                 getNewBlockId(150)
                         });
+                        // Fences and walls tags - used for block connections
+                        wrapper.write(Type.STRING, "minecraft:fences");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                189,
+                                248,
+                                472,
+                                473,
+                                474,
+                                475
+                        });
+                        wrapper.write(Type.STRING, "minecraft:walls");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                271,
+                                272,
+                        });
                         int itemTagsSize = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, itemTagsSize + 1); // item tags
+                        wrapper.write(Type.VAR_INT, itemTagsSize + 2); // item tags
                         for (int i = 0; i < itemTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             Integer[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
@@ -182,6 +197,11 @@ public class Protocol1_14To1_13_2 extends Protocol {
                         wrapper.write(Type.STRING, "minecraft:signs");
                         wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
                                 InventoryPackets.getNewItemId(541)
+                        });
+                        // Arrows tag (used by bow)
+                        wrapper.write(Type.STRING, "minecraft:arrows");
+                        wrapper.write(Type.VAR_INT_ARRAY, new Integer[]{
+                                526, 825, 826
                         });
                         int fluidTagsSize = wrapper.passthrough(Type.VAR_INT); // fluid tags
                         for (int i = 0; i < fluidTagsSize; i++) {

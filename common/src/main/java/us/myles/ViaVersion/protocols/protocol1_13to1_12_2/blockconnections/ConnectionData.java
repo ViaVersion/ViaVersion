@@ -28,16 +28,18 @@ public class ConnectionData {
     static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {
+        BlockConnectionProvider connectionProvider = Via.getManager().getProviders().get(BlockConnectionProvider.class);
         for (BlockFace face : BlockFace.values()) {
             Position pos = new Position(
                     position.getX() + face.getModX(),
                     position.getY() + face.getModY(),
                     position.getZ() + face.getModZ()
             );
-            int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
-            if (!connects(blockState)) continue;
-            int newBlockState = connect(user, pos, blockState);
+            int blockState = connectionProvider.getBlockdata(user, pos);
+            ConnectionHandler handler = connectionHandlerMap.get(blockState);
+            if (handler == null) continue;
 
+            int newBlockState = handler.connect(user, pos, blockState);
             PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
             blockUpdatePacket.write(Type.POSITION, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
@@ -54,7 +56,7 @@ public class ConnectionData {
             for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 0) continue;
 
-                ArrayList<BlockChangeRecord> updates = new ArrayList<>();
+                List<BlockChangeRecord> updates = new ArrayList<>();
 
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 2) { // Corner
                     for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
@@ -116,7 +118,7 @@ public class ConnectionData {
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
                     wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(new BlockChangeRecord[0]));
                     try {
-                        wrapper.send(Protocol1_13To1_12_2.class);
+                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -127,9 +129,10 @@ public class ConnectionData {
 
     public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
         int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
-        if (!connects(blockState)) return;
-        int newBlockState = connect(user, pos, blockState);
+        ConnectionHandler handler = getConnectionHandler(blockState);
+        if (handler == null) return;
 
+        int newBlockState = handler.connect(user, pos, blockState);
         records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY().shortValue(), newBlockState));
     }
 
@@ -181,14 +184,14 @@ public class ConnectionData {
                     for (int x = 0; x < 16; x++) {
                         int block = section.getFlatBlock(x, y, z);
 
-                        if (ConnectionData.connects(block)) {
-                            block = ConnectionData.connect(user, new Position(xOff + x, yOff + y, zOff + z), block);
+                        ConnectionHandler handler = ConnectionData.getConnectionHandler(block);
+                        if (handler != null) {
+                            block = handler.connect(user, new Position(xOff + x, yOff + y, zOff + z), block);
                             section.setFlatBlock(x, y, z, block);
                         }
                     }
                 }
             }
-            updateChunkSectionNeighbours(user, chunk.getX(), chunk.getZ(), i);
         }
     }
 
@@ -270,12 +273,12 @@ public class ConnectionData {
     }
 
     public static int connect(UserConnection user, Position position, int blockState) {
-        if (connectionHandlerMap.containsKey(blockState)) {
-            ConnectionHandler handler = connectionHandlerMap.get(blockState);
-            return handler.connect(user, position, blockState);
-        } else {
-            return blockState;
-        }
+        ConnectionHandler handler = connectionHandlerMap.get(blockState);
+        return handler != null ? handler.connect(user, position, blockState) : blockState;
+    }
+
+    public static ConnectionHandler getConnectionHandler(int blockstate) {
+        return connectionHandlerMap.get(blockstate);
     }
 
     public static int getId(String key) {

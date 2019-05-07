@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
@@ -37,7 +38,7 @@ public class SpongeEncodeHandler extends MessageToByteEncoder {
             }
         }
         if (bytebuf.readableBytes() == 0) {
-            throw new CancelException();
+            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
         }
         // Increment sent
         info.incrementSent();

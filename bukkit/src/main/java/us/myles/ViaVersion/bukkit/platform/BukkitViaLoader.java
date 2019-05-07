@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.bukkit.platform;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -116,8 +117,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                             @Override
                             public Item call() throws Exception {
                                 UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
-                                if (Bukkit.getPlayer(playerUUID) != null) {
-                                    return HandItemCache.convert(Bukkit.getPlayer(playerUUID).getItemInHand());
+                                Player player = Bukkit.getPlayer(playerUUID);
+                                if (player != null) {
+                                    return HandItemCache.convert(player.getItemInHand());
                                 }
                                 return null;
                             }

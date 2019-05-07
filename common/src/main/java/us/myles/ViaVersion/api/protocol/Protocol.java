@@ -167,8 +167,9 @@ public abstract class Protocol {
         // remap
         if (protocolPacket.getRemapper() != null) {
             protocolPacket.getRemapper().remap(packetWrapper);
-            if (packetWrapper.isCancelled())
-                throw new CancelException();
+            if (packetWrapper.isCancelled()) {
+                throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
+            }
         }
     }
 

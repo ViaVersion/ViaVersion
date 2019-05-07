@@ -9,6 +9,7 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
@@ -28,7 +29,7 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     @Override
     protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         if (bytebuf.readableBytes() == 0) {
-            throw new CancelException();
+            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
         }
         boolean needsCompress = false;
         if (!handledCompression
@@ -76,8 +77,11 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         if (needsCompress) {
             ByteBuf old = bytebuf;
             bytebuf = ctx.alloc().buffer();
-            PipelineUtil.callEncode((MessageToByteEncoder) ctx.pipeline().get("compression-encoder"), ctx, old, bytebuf);
-            old.release();
+            try {
+                PipelineUtil.callEncode((MessageToByteEncoder) ctx.pipeline().get("compression-encoder"), ctx, old, bytebuf);
+            } finally {
+                old.release();
+            }
         }
         out.add(bytebuf);
     }

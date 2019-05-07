@@ -16,6 +16,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
@@ -177,10 +178,7 @@ public class WorldPackets {
                         if (Via.getConfig().isServersideBlockConnections()) {
 
                             ConnectionData.updateBlockStorage(userConnection, position, newId);
-
-                            if (ConnectionData.connects(newId)) {
-                                newId = ConnectionData.connect(userConnection, position, newId);
-                            }
+                            newId = ConnectionData.connect(userConnection, position, newId);
                         }
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                         if (Via.getConfig().isServersideBlockConnections()) {
@@ -232,8 +230,9 @@ public class WorldPackets {
                                         (long) record.getY(),
                                         (long) (record.getHorizontal() & 15) + (chunkZ * 16));
 
-                                if (ConnectionData.connects(blockState)) {
-                                    blockState = ConnectionData.connect(userConnection, position, blockState);
+                                ConnectionHandler handler = ConnectionData.getConnectionHandler(blockState);
+                                if (handler != null) {
+                                    blockState = handler.connect(userConnection, position, blockState);
                                     record.setBlockId(blockState);
                                 }
                             }
@@ -367,10 +366,6 @@ public class WorldPackets {
                             }
                         }
 
-                        if (Via.getConfig().isServersideBlockConnections()) {
-                            ConnectionData.connectBlocks(wrapper.user(), chunk);
-                        }
-
                         // Rewrite biome id 255 to plains
                         if (chunk.isBiomeData()) {
                             int latestBiomeWarn = Integer.MIN_VALUE;
@@ -404,6 +399,18 @@ public class WorldPackets {
                                     storage.get(position).setReplacement(newId);
 
                                 chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
+                            }
+                        }
+
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            ConnectionData.connectBlocks(wrapper.user(), chunk);
+                            // Workaround for packet order issue
+                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.cancel();
+                            for (int i = 0; i < chunk.getSections().length; i++) {
+                                ChunkSection section = chunk.getSections()[i];
+                                if (section == null) continue;
+                                ConnectionData.updateChunkSectionNeighbours(wrapper.user(), chunk.getX(), chunk.getZ(), i);
                             }
                         }
                     }

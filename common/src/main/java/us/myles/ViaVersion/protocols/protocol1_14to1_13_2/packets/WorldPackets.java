@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.google.common.primitives.Bytes;
-import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
@@ -185,25 +184,15 @@ public class WorldPackets {
                         }
                         lightPacket.write(Type.VAR_INT, skyLightMask);
                         lightPacket.write(Type.VAR_INT, blockLightMask);
-                        lightPacket.write(Type.VAR_INT, 0);  //TODO find out what these two bitmasks mean
-                        lightPacket.write(Type.VAR_INT, 0);  //TODO
+                        lightPacket.write(Type.VAR_INT, 0);  // empty sky light mask
+                        lightPacket.write(Type.VAR_INT, 0);  // empty block light mask
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) continue;
-                            ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
-                            section.writeSkyLight(buf);
-                            byte[] data = new byte[buf.readableBytes()];
-                            buf.readBytes(data);
-                            buf.release();
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getSkyLight()).toArray(new Byte[0]));
                         }
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            ByteBuf buf = wrapper.user().getChannel().alloc().buffer();
-                            section.writeBlockLight(buf);
-                            byte[] data = new byte[buf.readableBytes()];
-                            buf.readBytes(data);
-                            buf.release();
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(data).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getBlockLight()).toArray(new Byte[0]));
                         }
 
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
@@ -220,7 +209,7 @@ public class WorldPackets {
                             entityTracker.setChunkCenterZ(chunk.getZ());
                         }
 
-                        lightPacket.send(Protocol1_14To1_13_2.class, true, false);
+                        lightPacket.send(Protocol1_14To1_13_2.class, true, true);
                     }
                 });
             }
@@ -302,7 +291,9 @@ public class WorldPackets {
 
                         Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        tracker.addEntity(entityId, entType);
+                        tracker.setClientEntityId(entityId);
                     }
                 });
 
