@@ -12,7 +12,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 
 public class EntityPackets {
     public static void register(Protocol protocol) {
@@ -72,7 +72,7 @@ public class EntityPackets {
 
                         }
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
                     }
                 });
             }
@@ -110,7 +110,7 @@ public class EntityPackets {
 
 
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
 
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
                     }
@@ -138,7 +138,7 @@ public class EntityPackets {
 
                         Entity1_13Types.EntityType entType = Entity1_13Types.EntityType.PLAYER;
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
                         MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
                     }
                 });
@@ -154,7 +154,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0))
-                            wrapper.user().get(EntityTracker.class).removeEntity(entity);
+                            wrapper.user().get(EntityTracker1_13.class).removeEntity(entity);
                     }
                 });
             }
@@ -171,7 +171,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
-                        Optional<Entity1_13Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
+                        Optional<Entity1_13Types.EntityType> type = wrapper.user().get(EntityTracker1_13.class).getEntity(entityId);
                         MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
                     }
                 });

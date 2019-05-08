@@ -116,7 +116,7 @@ public class Protocol1_9To1_8 extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         // Entity tracker
-        userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new EntityTracker1_9(userConnection));
         // Chunk tracker
         userConnection.put(new ClientChunks(userConnection));
         // Movement tracker

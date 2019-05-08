@@ -30,7 +30,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityP
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Particle1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -385,7 +385,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // Store the player
                         int entityId = wrapper.get(Type.INT, 0);
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, Entity1_13Types.EntityType.PLAYER);
+                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, Entity1_13Types.EntityType.PLAYER);
 
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
@@ -1134,7 +1134,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new EntityTracker1_13(userConnection));
         userConnection.put(new TabCompleteTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));

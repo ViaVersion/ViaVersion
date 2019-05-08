@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +177,7 @@ public class MetadataRewriter {
                         // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
                         if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
                                 && ((String) customName.get().getValue()).length() != 0 && (boolean) customNameVisible.get().getValue()) {
-                            EntityTracker tracker = connection.get(EntityTracker.class);
+                            EntityTracker1_11 tracker = connection.get(EntityTracker1_11.class);
                             if (!tracker.isHologram(entityId)) {
                                 tracker.addHologram(entityId);
                                 try {

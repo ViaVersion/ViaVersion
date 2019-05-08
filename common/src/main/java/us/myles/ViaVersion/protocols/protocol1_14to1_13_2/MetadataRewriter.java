@@ -11,7 +11,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class MetadataRewriter {
             try {
                 metadata.setMetaType(MetaType1_14.byId(metadata.getMetaType().getTypeID()));
 
-                EntityTracker tracker = connection.get(EntityTracker.class);
+                EntityTracker1_14 tracker = connection.get(EntityTracker1_14.class);
 
                 if (metadata.getMetaType() == MetaType1_14.Slot) {
                     InventoryPackets.toClient((Item) metadata.getValue());
@@ -196,7 +196,7 @@ public class MetadataRewriter {
         return (entityFlags & 0x80) != 0;
     }
 
-    public static int recalculatePlayerPose(int entityId, EntityTracker tracker) {
+    public static int recalculatePlayerPose(int entityId, EntityTracker1_14 tracker) {
         byte flags = tracker.getEntityFlags(entityId);
         // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
         int pose = 0; // standing

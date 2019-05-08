@@ -10,7 +10,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 
 public class InventoryPackets {
@@ -320,7 +320,7 @@ public class InventoryPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                         if (entityTracker.isBlocking()) {
                             entityTracker.setBlocking(false);
                             entityTracker.setSecondHand(null);

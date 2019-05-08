@@ -10,14 +10,13 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
-import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
+import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -31,10 +30,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import static us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType;
+
 @Getter
-public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
+public class EntityTracker1_9 extends EntityTracker<EntityType> {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
-    private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
     private final Map<Integer, BossBar> bossBarMap = new ConcurrentHashMap<>();
@@ -46,8 +46,6 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
     @Setter
     private boolean autoTeam = false;
     @Setter
-    private int entityID = -1;
-    @Setter
     private Position currentlyDigging = null;
     private boolean teamExists = false;
     @Setter
@@ -55,8 +53,8 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
     @Setter
     private String currentTeam;
 
-    public EntityTracker(UserConnection user) {
-        super(user);
+    public EntityTracker1_9(UserConnection user) {
+        super(user, EntityType.PLAYER);
     }
 
     public UUID getEntityUUID(int id) {
@@ -70,7 +68,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
     }
 
     public void setSecondHand(Item item) {
-        setSecondHand(entityID, item);
+        setSecondHand(getClientEntityId(), item);
     }
 
     public void setSecondHand(int entityID, Item item) {
@@ -85,15 +83,17 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
         }
     }
 
-    public void removeEntity(Integer entityID) {
-        clientEntityTypes.remove(entityID);
-        vehicleMap.remove(entityID);
-        uuidMap.remove(entityID);
-        validBlocking.remove(entityID);
-        knownHolograms.remove(entityID);
-        metadataBuffer.remove(entityID);
+    @Override
+    public void removeEntity(int entityId) {
+        super.removeEntity(entityId);
 
-        BossBar bar = bossBarMap.remove(entityID);
+        vehicleMap.remove(entityId);
+        uuidMap.remove(entityId);
+        validBlocking.remove(entityId);
+        knownHolograms.remove(entityId);
+        metadataBuffer.remove(entityId);
+
+        BossBar bar = bossBarMap.remove(entityId);
         if (bar != null) {
             bar.hide();
             // Send to provider
@@ -117,8 +117,8 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
         blockInteractions.put(p, 0);
     }
 
-    public void handleMetadata(int entityID, List<Metadata> metadataList) {
-        Entity1_10Types.EntityType type = clientEntityTypes.get(entityID);
+    public void handleMetadata(int entityId, List<Metadata> metadataList) {
+        Entity1_10Types.EntityType type = getEntity(entityId).orNull();
         if (type == null) {
             return;
         }
@@ -156,16 +156,16 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
                 if (metadata.getId() == 0) {
                     // Byte
                     byte data = (byte) metadata.getValue();
-                    if (entityID != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
+                    if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
-                            if (validBlocking.contains(entityID)) {
+                            if (validBlocking.contains(entityId)) {
                                 Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
-                                setSecondHand(entityID, shield);
+                                setSecondHand(entityId, shield);
                             } else {
-                                setSecondHand(entityID, null);
+                                setSecondHand(entityId, null);
                             }
                         } else {
-                            setSecondHand(entityID, null);
+                            setSecondHand(entityId, null);
                         }
                     }
                 }
@@ -183,13 +183,13 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
                     byte data = (byte) metadata.getValue();
                     // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
                     if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                            && ((String) getMetaByIndex(metadataList, 2).getValue()).length() != 0 && (boolean) getMetaByIndex(metadataList, 3).getValue()) {
-                        if (!knownHolograms.contains(entityID)) {
-                            knownHolograms.add(entityID);
+                            && !((String) getMetaByIndex(metadataList, 2).getValue()).isEmpty() && (boolean) getMetaByIndex(metadataList, 3).getValue()) {
+                        if (!knownHolograms.contains(entityId)) {
+                            knownHolograms.add(entityId);
                             try {
                                 // Send movement
                                 PacketWrapper wrapper = new PacketWrapper(0x25, null, getUser());
-                                wrapper.write(Type.VAR_INT, entityID);
+                                wrapper.write(Type.VAR_INT, entityId);
                                 wrapper.write(Type.SHORT, (short) 0);
                                 wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
                                 wrapper.write(Type.SHORT, (short) 0);
@@ -206,12 +206,12 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
             if (Via.getConfig().isBossbarPatch()) {
                 if (type == Entity1_10Types.EntityType.ENDER_DRAGON || type == Entity1_10Types.EntityType.WITHER) {
                     if (metadata.getId() == 2) {
-                        BossBar bar = bossBarMap.get(entityID);
+                        BossBar bar = bossBarMap.get(entityId);
                         String title = (String) metadata.getValue();
                         title = title.isEmpty() ? (type == Entity1_10Types.EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
                         if (bar == null) {
                             bar = Via.getAPI().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
-                            bossBarMap.put(entityID, bar);
+                            bossBarMap.put(entityId, bar);
                             bar.addPlayer(uuid);
                             bar.show();
 
@@ -221,14 +221,14 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
                             bar.setTitle(title);
                         }
                     } else if (metadata.getId() == 6 && !Via.getConfig().isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
-                        BossBar bar = bossBarMap.get(entityID);
+                        BossBar bar = bossBarMap.get(entityId);
                         // Make health range between 0 and 1
                         float maxHealth = type == Entity1_10Types.EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
                         float health = Math.max(0.0f, Math.min(((float) metadata.getValue()) / maxHealth, 1.0f));
                         if (bar == null) {
                             String title = type == Entity1_10Types.EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
                             bar = Via.getAPI().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
-                            bossBarMap.put(entityID, bar);
+                            bossBarMap.put(entityId, bar);
                             bar.addPlayer(uuid);
                             bar.show();
                             // Send to provider
@@ -287,22 +287,22 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
         }
     }
 
-    public void sendMetadataBuffer(int entityID) {
-        List<Metadata> metadataList = metadataBuffer.get(entityID);
+    public void sendMetadataBuffer(int entityId) {
+        List<Metadata> metadataList = metadataBuffer.get(entityId);
         if (metadataList != null) {
             PacketWrapper wrapper = new PacketWrapper(0x39, null, getUser());
-            wrapper.write(Type.VAR_INT, entityID);
+            wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
-            MetadataRewriter.transform(getClientEntityTypes().get(entityID), metadataList);
-            handleMetadata(entityID, metadataList);
-            if (metadataList.size() > 0) {
+            MetadataRewriter.transform(getEntity(entityId).orNull(), metadataList);
+            handleMetadata(entityId, metadataList);
+            if (!metadataList.isEmpty()) {
                 try {
                     wrapper.send(Protocol1_9To1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            metadataBuffer.remove(entityID);
+            metadataBuffer.remove(entityId);
         }
     }
 
@@ -310,12 +310,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
         try {
             return Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(getUser());
         } catch (Exception e) {
-            return entityID;
+            return getClientEntityId();
         }
-    }
-
-    @Override
-    public void onExternalJoinGame(int playerEntityId) {
-        clientEntityTypes.put(playerEntityId, Entity1_10Types.EntityType.PLAYER);
     }
 }

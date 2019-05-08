@@ -1,13 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage;
 
-import com.google.common.base.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
-import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_14Types;
+import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
@@ -15,8 +12,9 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
-    private final Map<Integer, Entity1_14Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+import static us.myles.ViaVersion.api.entities.Entity1_14Types.EntityType;
+
+public class EntityTracker1_14 extends EntityTracker<EntityType> {
     private final Map<Integer, Byte> insentientData = new ConcurrentHashMap<>();
     // 0x1 = sleeping, 0x2 = riptide
     private final Map<Integer, Byte> sleepingAndRiptideData = new ConcurrentHashMap<>();
@@ -26,27 +24,22 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
     private int latestTradeWindowId;
     @Getter
     @Setter
-    private int clientEntityId;
-    @Getter
-    @Setter
     private boolean forceSendCenterChunk = true;
     @Getter
     @Setter
     private int chunkCenterX, chunkCenterZ;
 
-    public EntityTracker(UserConnection user) {
-        super(user);
+    public EntityTracker1_14(UserConnection user) {
+        super(user, EntityType.PLAYER);
     }
 
+    @Override
     public void removeEntity(int entityId) {
-        clientEntityTypes.remove(entityId);
+        super.removeEntity(entityId);
+
         insentientData.remove(entityId);
         sleepingAndRiptideData.remove(entityId);
         playerEntityFlags.remove(entityId);
-    }
-
-    public void addEntity(int entityId, Entity1_14Types.EntityType type) {
-        clientEntityTypes.put(entityId, type);
     }
 
     public byte getInsentientData(int entity) {
@@ -89,18 +82,10 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
         }
     }
 
-    public boolean has(int entityId) {
-        return clientEntityTypes.containsKey(entityId);
-    }
-
-    public Optional<Entity1_14Types.EntityType> get(int id) {
-        return Optional.fromNullable(clientEntityTypes.get(id));
-    }
-
     @Override
     public void onExternalJoinGame(int playerEntityId) {
-        clientEntityId = playerEntityId;
-        clientEntityTypes.put(playerEntityId, Entity1_14Types.EntityType.PLAYER);
+        super.onExternalJoinGame(playerEntityId);
+
         PacketWrapper setViewDistance = new PacketWrapper(0x41, null, getUser());
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         try {

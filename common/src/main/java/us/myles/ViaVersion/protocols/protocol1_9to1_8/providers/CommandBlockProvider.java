@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.platform.providers.Provider;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 public class CommandBlockProvider implements Provider {
 
@@ -41,7 +41,7 @@ public class CommandBlockProvider implements Provider {
             return;
         PacketWrapper wrapper = new PacketWrapper(0x1B, null, user); // Entity status
 
-        wrapper.write(Type.INT, user.get(EntityTracker.class).getProvidedEntityId()); // Entity ID
+        wrapper.write(Type.INT, user.get(EntityTracker1_9.class).getProvidedEntityId()); // Entity ID
         wrapper.write(Type.BYTE, (byte) 26); // Hardcoded op permission level
 
         wrapper.send(Protocol1_9To1_8.class);

@@ -15,7 +15,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.InventoryNameRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -153,7 +153,7 @@ public class InventoryPackets {
                             wrapper.read(Type.STRING); // Remove channel
 
                             int windowId = wrapper.read(Type.INT);
-                            wrapper.user().get(EntityTracker.class).setLatestTradeWindowId(windowId);
+                            wrapper.user().get(EntityTracker1_14.class).setLatestTradeWindowId(windowId);
                             wrapper.write(Type.VAR_INT, windowId);
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
@@ -292,7 +292,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // Selecting trade now moves the items, we need to resync the inventory
                         PacketWrapper resyncPacket = wrapper.create(0x08);
-                        resyncPacket.write(Type.UNSIGNED_BYTE, ((short) wrapper.user().get(EntityTracker.class).getLatestTradeWindowId())); // 0 - Window ID
+                        resyncPacket.write(Type.UNSIGNED_BYTE, ((short) wrapper.user().get(EntityTracker1_14.class).getLatestTradeWindowId())); // 0 - Window ID
                         resyncPacket.write(Type.SHORT, ((short) -999)); // 1 - Slot
                         resyncPacket.write(Type.BYTE, (byte) 2); // 2 - Button - End left click
                         resyncPacket.write(Type.SHORT, ((short) ThreadLocalRandom.current().nextInt())); // 3 - Action number

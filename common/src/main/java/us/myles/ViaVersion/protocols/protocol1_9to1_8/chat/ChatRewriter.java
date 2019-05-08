@@ -3,7 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.chat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 public class ChatRewriter {
     /**
@@ -15,7 +15,7 @@ public class ChatRewriter {
     public static void toClient(JsonObject obj, UserConnection user) {
         //Check gamemode change
         if (obj.get("translate") != null && obj.get("translate").getAsString().equals("gameMode.changed")) {
-            String gameMode = user.get(EntityTracker.class).getGameMode().getText();
+            String gameMode = user.get(EntityTracker1_9.class).getGameMode().getText();
 
             JsonObject gameModeObject = new JsonObject();
             gameModeObject.addProperty("text", gameMode);

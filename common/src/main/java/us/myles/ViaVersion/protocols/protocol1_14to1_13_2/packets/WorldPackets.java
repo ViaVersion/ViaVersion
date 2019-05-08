@@ -18,7 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -195,7 +195,7 @@ public class WorldPackets {
                             lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getBlockLight()).toArray(new Byte[0]));
                         }
 
-                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_14 entityTracker = wrapper.user().get(EntityTracker1_14.class);
                         int diffX = Math.abs(entityTracker.getChunkCenterX() - chunk.getX());
                         int diffZ = Math.abs(entityTracker.getChunkCenterZ() - chunk.getZ());
                         if (entityTracker.isForceSendCenterChunk()
@@ -291,7 +291,7 @@ public class WorldPackets {
 
                         Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
                         // Register Type ID
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_14 tracker = wrapper.user().get(EntityTracker1_14.class);
                         tracker.addEntity(entityId, entType);
                         tracker.setClientEntityId(entityId);
                     }
@@ -342,7 +342,7 @@ public class WorldPackets {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
-                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_14 entityTracker = wrapper.user().get(EntityTracker1_14.class);
                         // The client may reset the center chunk if dimension is changed
                         entityTracker.setForceSendCenterChunk(true);
                     }
