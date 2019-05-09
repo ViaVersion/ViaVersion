@@ -23,6 +23,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.provi
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.BlockIdData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
@@ -133,6 +134,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
     @Override
     protected void registerPackets() {
+        put(new MetadataRewriter1_13To1_12_2());
+
         // Register grouped packet changes
         EntityPackets.register(this);
         WorldPackets.register(this);

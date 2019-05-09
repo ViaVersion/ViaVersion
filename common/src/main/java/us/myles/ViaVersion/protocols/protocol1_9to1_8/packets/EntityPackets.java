@@ -19,7 +19,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.*;
@@ -32,7 +32,7 @@ public class EntityPackets {
         }
     };
 
-    public static void register(Protocol protocol) {
+    public static void register(final Protocol protocol) {
         // Attach Entity Packet
         protocol.registerOutgoing(State.PLAY, 0x1B, 0x3A, new PacketRemapper() {
 
@@ -184,14 +184,14 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
-                        Optional<Entity1_10Types.EntityType> type = tracker.getEntity(entityID);
+                        Optional<Entity1_10Types.EntityType> type = tracker.getEntity(entityId);
                         if (type.isPresent()) {
-                            MetadataRewriter.transform(type.get(), metadataList);
+                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, type.get(), metadataList, wrapper.user());
                         } else {
                             // Buffer
-                            tracker.addMetadataToBuffer(entityID, metadataList);
+                            tracker.addMetadataToBuffer(entityId, metadataList);
                             wrapper.cancel();
                         }
                     }

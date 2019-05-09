@@ -29,7 +29,7 @@ public class Entity1_10Types {
 
     @AllArgsConstructor
     @Getter
-    public enum EntityType {
+    public enum EntityType implements IEntityType {
         ENTITY(-1),
         DROPPED_ITEM(1, EntityType.ENTITY),
         EXPERIENCE_ORB(2, EntityType.ENTITY),

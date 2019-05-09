@@ -15,11 +15,14 @@ import us.myles.ViaVersion.packets.State;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public abstract class Protocol {
     private final Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
     private final Map<Pair<State, Integer>, ProtocolPacket> outgoing = new HashMap<>();
+
+    private final Map<Class, Object> storedObjects = new ConcurrentHashMap<>();
 
     public Protocol() {
         registerPackets();
@@ -171,6 +174,14 @@ public abstract class Protocol {
                 throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
             }
         }
+    }
+
+    public <T> T get(Class<T> objectClass) {
+        return (T) storedObjects.get(objectClass);
+    }
+
+    public void put(Object object) {
+        storedObjects.put(object.getClass(), object);
     }
 
     @Override

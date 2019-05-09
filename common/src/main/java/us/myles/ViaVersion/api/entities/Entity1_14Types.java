@@ -23,7 +23,7 @@ public class Entity1_14Types {
 
     @AllArgsConstructor
     @Getter
-    public enum EntityType {
+    public enum EntityType implements IEntityType {
         // Auto generated
 
         ENTITY(-1),

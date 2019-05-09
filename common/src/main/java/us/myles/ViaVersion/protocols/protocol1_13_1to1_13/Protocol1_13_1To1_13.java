@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
@@ -19,6 +20,8 @@ public class Protocol1_13_1To1_13 extends Protocol {
 
     @Override
     protected void registerPackets() {
+        put(new MetadataRewriter1_13_1To1_13());
+
         EntityPackets.register(this);
         InventoryPackets.register(this);
         WorldPackets.register(this);

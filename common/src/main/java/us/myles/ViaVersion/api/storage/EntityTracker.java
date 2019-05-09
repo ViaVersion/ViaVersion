@@ -6,11 +6,12 @@ import lombok.Setter;
 import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.IEntityType;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class EntityTracker<T> extends StoredObject implements ExternalJoinGameListener {
+public abstract class EntityTracker<T extends IEntityType> extends StoredObject implements ExternalJoinGameListener {
 	private final Map<Integer, T> clientEntityTypes = new ConcurrentHashMap<>();
 	@Getter
 	@Setter

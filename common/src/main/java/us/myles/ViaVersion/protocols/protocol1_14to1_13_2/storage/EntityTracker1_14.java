@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_14Types;
+import us.myles.ViaVersion.api.entities.Entity1_14Types.EntityType;
 import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
@@ -12,9 +14,7 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static us.myles.ViaVersion.api.entities.Entity1_14Types.EntityType;
-
-public class EntityTracker1_14 extends EntityTracker<EntityType> {
+public class EntityTracker1_14 extends EntityTracker<Entity1_14Types.EntityType> {
     private final Map<Integer, Byte> insentientData = new ConcurrentHashMap<>();
     // 0x1 = sleeping, 0x2 = riptide
     private final Map<Integer, Byte> sleepingAndRiptideData = new ConcurrentHashMap<>();

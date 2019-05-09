@@ -151,6 +151,13 @@ public class ProtocolPipeline extends Protocol {
         return false;
     }
 
+    public <P extends Protocol> P getProtocol(Class<P> pipeClass) {
+        for (Protocol protocol : protocolList) {
+            if (protocol.getClass() == pipeClass) return (P) protocol;
+        }
+        return null;
+    }
+
     /**
      * Use the pipeline to filter a NMS packet
      *

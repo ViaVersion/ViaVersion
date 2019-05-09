@@ -14,7 +14,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_13_2;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.EntityTypeRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 public class EntityPackets {
 
-    public static void register(Protocol protocol) {
+    public static void register(final Protocol protocol) {
 
         // Spawn entity
         protocol.registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
@@ -139,7 +139,7 @@ public class EntityPackets {
                         // Register Type ID
                         wrapper.user().get(EntityTracker1_14.class).addEntity(entityId, entType);
 
-                        MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        protocol.get(MetadataRewriter1_14To1_13_2.class).handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -179,7 +179,7 @@ public class EntityPackets {
                         Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
                         // Register Type ID
                         wrapper.user().get(EntityTracker1_14.class).addEntity(entityId, entType);
-                        MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        protocol.get(MetadataRewriter1_14To1_13_2.class).handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -203,7 +203,7 @@ public class EntityPackets {
                             metadataPacket.write(Type.VAR_INT, entityId);
                             List<Metadata> metadataList = new LinkedList<>();
                             if (tracker.getClientEntityId() != entityId) {
-                                metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter.recalculatePlayerPose(entityId, tracker)));
+                                metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
                             }
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
                             metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
@@ -230,7 +230,7 @@ public class EntityPackets {
                         List<Metadata> metadataList = new LinkedList<>();
                         metadataList.add(new Metadata(12, MetaType1_14.OptPosition, position));
                         if (tracker.getClientEntityId() != entityId) {
-                            metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter.recalculatePlayerPose(entityId, tracker)));
+                            metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
                         }
                         wrapper.write(Types1_14.METADATA_LIST, metadataList);
                     }
@@ -266,7 +266,7 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
                         Optional<Entity1_14Types.EntityType> type = wrapper.user().get(EntityTracker1_14.class).getEntity(entityId);
-                        MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        protocol.get(MetadataRewriter1_14To1_13_2.class).handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }

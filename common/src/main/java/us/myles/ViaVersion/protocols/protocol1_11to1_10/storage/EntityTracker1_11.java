@@ -2,13 +2,13 @@ package us.myles.ViaVersion.protocols.protocol1_11to1_10.storage;
 
 import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_11Types;
+import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
 import us.myles.ViaVersion.api.storage.EntityTracker;
 
 import java.util.Set;
 
-import static us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
-
-public class EntityTracker1_11 extends EntityTracker<EntityType> {
+public class EntityTracker1_11 extends EntityTracker<Entity1_11Types.EntityType> {
     private final Set<Integer> holograms = Sets.newConcurrentHashSet();
 
     public EntityTracker1_11(UserConnection user) {
