@@ -14,7 +14,8 @@ import java.util.List;
 
 public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter<Entity1_13Types.EntityType> {
 
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
+    @Override
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         // 1.13 changed item to flat item (no data)
         if (metadata.getMetaType() == MetaType1_13.Slot) {
             InventoryPackets.toClient((Item) metadata.getValue());

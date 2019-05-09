@@ -12,7 +12,8 @@ import java.util.List;
 
 public class MetadataRewriter1_12To1_11_1 extends MetadataRewriter<Entity1_12Types.EntityType> {
 
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
+    @Override
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         if (metadata.getValue() instanceof Item) {
             // Apply rewrite
             BedRewriter.toClientItem((Item) metadata.getValue());

@@ -18,7 +18,8 @@ import java.util.Map;
 
 public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter<Entity1_13Types.EntityType> {
 
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
+    @Override
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
         // Handle new MetaTypes
         if (metadata.getMetaType().getTypeID() > 4) {
             metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID() + 1));

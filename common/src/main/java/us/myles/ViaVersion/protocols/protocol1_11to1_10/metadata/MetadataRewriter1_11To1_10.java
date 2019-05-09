@@ -20,7 +20,8 @@ import java.util.Map;
 
 public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Entity1_11Types.EntityType> {
 
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) {
+    @Override
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) {
         if (metadata.getValue() instanceof Item) {
             // Apply rewrite
             EntityIdRewriter.toClientItem((Item) metadata.getValue());

@@ -20,7 +20,7 @@ import java.util.List;
 public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Entity1_14Types.EntityType> {
 
     @Override
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
         metadata.setMetaType(MetaType1_14.byId(metadata.getMetaType().getTypeID()));
 
         EntityTracker1_14 tracker = connection.get(EntityTracker1_14.class);
