@@ -55,13 +55,12 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
 
         int[] biomeData = groundUp ? new int[256] : null;
         if (groundUp) {
-            try {
+            if (data.readableBytes() >= 256 * 4) {
                 for (int i = 0; i < 256; i++) {
                     biomeData[i] = data.readInt();
                 }
-            } catch (IndexOutOfBoundsException e) {
-                // Some plugin isn't sending biome data while groundUp is true, see #1312
-                Via.getPlatform().getLogger().log(Level.WARNING, "IndexOutOfBoundsException while trying to read biome data", e);
+            } else {
+                Via.getPlatform().getLogger().log(Level.WARNING, "Chunk x="+ chunkX + " z=" + chunkZ + " doesn't have biome data!");
             }
         }
 
