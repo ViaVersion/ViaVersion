@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.UUID;
 
 public class UpdateUtil {
@@ -81,7 +82,7 @@ public class UpdateUtil {
         if (current.compareTo(newest) < 0)
             return "There is a newer version available: " + newest.toString() + ", you're on: " + current.toString();
         else if (console && current.compareTo(newest) != 0) {
-            if (current.getTag().toLowerCase().startsWith("dev") || current.getTag().toLowerCase().startsWith("snapshot")) {
+            if (current.getTag().toLowerCase(Locale.ROOT).startsWith("dev") || current.getTag().toLowerCase(Locale.ROOT).startsWith("snapshot")) {
                 return "You are running a development version, please report any bugs to GitHub.";
             } else {
                 return "You are running a newer version than is released!";

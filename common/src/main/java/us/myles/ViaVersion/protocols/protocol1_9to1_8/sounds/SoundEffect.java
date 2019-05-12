@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Getter
@@ -284,7 +285,7 @@ public enum SoundEffect {
     }
 
     public static SoundEffect getByName(String name) {
-        name = name.toLowerCase();
+        name = name.toLowerCase(Locale.ROOT);
         return effects.get(name);
     }
 

@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class TripwireConnectionHandler extends ConnectionHandler {
@@ -21,7 +22,7 @@ public class TripwireConnectionHandler extends ConnectionHandler {
             @Override
             public void check(WrappedBlockData blockData) {
                 if (blockData.getMinecraftKey().equals("minecraft:tripwire_hook")) {
-                    tripwireHooks.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase()));
+                    tripwireHooks.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)));
                 } else if (blockData.getMinecraftKey().equals("minecraft:tripwire")) {
                     TripwireData tripwireData = new TripwireData(
                             blockData.getValue("attached").equals("true"),

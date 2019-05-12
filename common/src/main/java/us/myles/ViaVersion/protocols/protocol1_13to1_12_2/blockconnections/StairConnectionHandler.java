@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class StairConnectionHandler extends ConnectionHandler {
@@ -58,7 +59,7 @@ public class StairConnectionHandler extends ConnectionHandler {
                 StairData stairData = new StairData(
                         blockData.getValue("half").equals("bottom"),
                         shape, (byte) type,
-                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase())
+                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT))
                 );
 
                 stairDataMap.put(blockData.getSavedBlockStateId(), stairData);

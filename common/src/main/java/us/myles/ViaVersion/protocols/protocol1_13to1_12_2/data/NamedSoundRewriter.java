@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class NamedSoundRewriter {
@@ -148,6 +149,6 @@ public class NamedSoundRewriter {
 
     public static String getNewId(String old) {
         String newId = oldToNew.get(old);
-        return newId != null ? newId : old.toLowerCase();
+        return newId != null ? newId : old.toLowerCase(Locale.ROOT);
     }
 }

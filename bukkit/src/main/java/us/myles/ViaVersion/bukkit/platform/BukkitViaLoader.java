@@ -30,6 +30,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -85,9 +86,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if ((Bukkit.getVersion().toLowerCase().contains("paper")
-                || Bukkit.getVersion().toLowerCase().contains("taco")
-                || Bukkit.getVersion().toLowerCase().contains("torch"))
+        if ((Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("paper")
+                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("taco")
+                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch"))
                 && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
             plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();

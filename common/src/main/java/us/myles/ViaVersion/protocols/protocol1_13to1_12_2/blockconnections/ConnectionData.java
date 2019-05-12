@@ -217,7 +217,7 @@ public class ConnectionData {
                     JsonObject object = type.getValue().getAsJsonObject();
                     boolean[] data = new boolean[6];
                     for (BlockFace value : BlockFace.values()) {
-                        String face = value.toString().toLowerCase();
+                        String face = value.toString().toLowerCase(Locale.ROOT);
                         if (object.has(face)) {
                             data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
                         }
