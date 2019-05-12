@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class AbstractStempConnectionHandler extends ConnectionHandler {
                     ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
                 }
                 if (blockData.getMinecraftKey().equals(toKey)) {
-                    String facing = blockData.getValue("facing").toUpperCase();
+                    String facing = blockData.getValue("facing").toUpperCase(Locale.ROOT);
                     stemps.put(BlockFace.valueOf(facing), blockData.getSavedBlockStateId());
                 }
             }
