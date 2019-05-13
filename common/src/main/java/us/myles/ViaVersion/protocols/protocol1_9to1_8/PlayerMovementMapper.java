@@ -5,7 +5,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
 
-public class PlayerMovementMapper extends PacketHandler {
+public class PlayerMovementMapper implements PacketHandler {
     @Override
     public void handle(PacketWrapper wrapper) throws Exception {
         MovementTracker tracker = wrapper.user().get(MovementTracker.class);
