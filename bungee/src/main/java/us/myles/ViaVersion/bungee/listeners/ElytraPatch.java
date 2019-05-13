@@ -13,7 +13,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.Collections;
 
@@ -29,7 +29,7 @@ public class ElytraPatch implements Listener {
 
         try {
             if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9To1_8.class)) {
-                int entityId = user.get(EntityTracker.class).getProvidedEntityId();
+                int entityId = user.get(EntityTracker1_9.class).getProvidedEntityId();
 
                 PacketWrapper wrapper = new PacketWrapper(0x39, null, user);
 

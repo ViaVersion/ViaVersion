@@ -9,16 +9,19 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_13_1To1_13 extends Protocol {
 
     @Override
     protected void registerPackets() {
+        put(new MetadataRewriter1_13_1To1_13());
+
         EntityPackets.register(this);
         InventoryPackets.register(this);
         WorldPackets.register(this);
@@ -205,7 +208,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new EntityTracker1_13(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
     }

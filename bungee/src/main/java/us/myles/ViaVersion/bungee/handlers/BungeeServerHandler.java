@@ -26,7 +26,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -124,7 +124,7 @@ public class BungeeServerHandler implements Listener {
             if (e.getServer() != null) {
                 if (!e.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
                     // Clear auto-team
-                    EntityTracker oldEntityTracker = user.get(EntityTracker.class);
+                    EntityTracker1_9 oldEntityTracker = user.get(EntityTracker1_9.class);
                     if (oldEntityTracker != null) {
                         if (oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
                             oldEntityTracker.sendTeamPacket(false, true);
@@ -215,7 +215,7 @@ public class BungeeServerHandler implements Listener {
                         protocol.init(user);
                     }
 
-                    EntityTracker newTracker = user.get(EntityTracker.class);
+                    EntityTracker1_9 newTracker = user.get(EntityTracker1_9.class);
                     if (newTracker != null) {
                         if (Via.getConfig().isAutoTeam()) {
                             String currentTeam = null;

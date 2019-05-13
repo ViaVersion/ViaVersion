@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.*;
@@ -72,6 +73,8 @@ public class Protocol1_9To1_8 extends Protocol {
 
     @Override
     protected void registerPackets() {
+        put(new MetadataRewriter1_9To1_8());
+
         // Disconnect workaround (JSON!)
         registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
             @Override
@@ -116,7 +119,7 @@ public class Protocol1_9To1_8 extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         // Entity tracker
-        userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new EntityTracker1_9(userConnection));
         // Chunk tracker
         userConnection.put(new ClientChunks(userConnection));
         // Movement tracker

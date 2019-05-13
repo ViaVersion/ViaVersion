@@ -19,9 +19,10 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -30,6 +31,8 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
+        put(new MetadataRewriter1_12To1_11_1());
+
         InventoryPackets.register(this);
         // Outgoing
         // Spawn Object
@@ -51,7 +54,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                         Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, true);
 
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        wrapper.user().get(EntityTracker1_12.class).addEntity(entityId, entType);
                     }
                 });
             }
@@ -84,8 +87,8 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
                         Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, false);
                         // Register Type ID
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
-                        MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
+                        wrapper.user().get(EntityTracker1_12.class).addEntity(entityId, entType);
+                        get(MetadataRewriter1_12To1_11_1.class).handleMetadata(entityId, entType, wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -198,7 +201,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0))
-                            wrapper.user().get(EntityTracker.class).removeEntity(entity);
+                            wrapper.user().get(EntityTracker1_12.class).removeEntity(entity);
                     }
                 });
             }
@@ -240,11 +243,11 @@ public class Protocol1_12To1_11_1 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
-                        Optional<Entity1_12Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
+                        Optional<Entity1_12Types.EntityType> type = wrapper.user().get(EntityTracker1_12.class).getEntity(entityId);
                         if (!type.isPresent())
                             return;
 
-                        MetadataRewriter.handleMetadata(entityId, type.get(), wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
+                        get(MetadataRewriter1_12To1_11_1.class).handleMetadata(entityId, type.get(), wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -427,7 +430,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new EntityTracker1_12(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
     }

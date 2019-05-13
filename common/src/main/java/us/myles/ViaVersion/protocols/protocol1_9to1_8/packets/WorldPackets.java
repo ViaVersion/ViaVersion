@@ -22,7 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProv
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 
@@ -99,7 +99,7 @@ public class WorldPackets {
                         wrapper.set(Type.STRING, 0, newname);
                         wrapper.write(Type.VAR_INT, catid); // Write Category ID
                         if (effect != null && effect.isBreaksound()) {
-                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                             int x = wrapper.passthrough(Type.INT); //Position X
                             int y = wrapper.passthrough(Type.INT); //Position Y
                             int z = wrapper.passthrough(Type.INT); //Position Z
@@ -268,7 +268,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         if (status == 5 || status == 4 || status == 3) {
-                            EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                            EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                             if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
                                 entityTracker.setSecondHand(null);
@@ -297,7 +297,7 @@ public class WorldPackets {
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
-                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
 
                             if (item != null && Protocol1_9To1_8.isSword(item.getId())) {
                                 if (hand == 0) {
@@ -386,7 +386,7 @@ public class WorldPackets {
                                 x++;
                                 break;
                         }
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                         tracker.addBlockInteraction(new Position(x, y, z));
                     }
                 });
