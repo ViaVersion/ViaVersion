@@ -2,7 +2,7 @@ package us.myles.ViaVersion.api.rewriters;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.IEntityType;
+import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public abstract class MetadataRewriter<T extends IEntityType> {
+public abstract class MetadataRewriter<T extends EntityType> {
 
     public final void handleMetadata(int entityId, T type, List<Metadata> metadatas, UserConnection connection) {
         Map<Integer, Metadata> metadataMap = new HashMap<>(metadatas.size());

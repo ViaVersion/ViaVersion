@@ -38,7 +38,7 @@ public class Entity1_12Types {
 
     @AllArgsConstructor
     @Getter
-    public enum EntityType implements IEntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
         DROPPED_ITEM(1, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
@@ -115,10 +115,10 @@ public class Entity1_12Types {
         ENDERMITE(67, ENTITY_INSENTIENT),
 
         GUARDIAN(68, ENTITY_INSENTIENT),
-        ELDER_GUARDIAN(4, EntityType.GUARDIAN), // Moved down to avoid illegal forward reference
+        ELDER_GUARDIAN(4, GUARDIAN), // Moved down to avoid illegal forward reference
 
         IRON_GOLEM(99, ENTITY_INSENTIENT), // moved up to avoid illegal forward references
-        SHULKER(69, EntityType.IRON_GOLEM),
+        SHULKER(69, IRON_GOLEM),
         PIG(90, ENTITY_AGEABLE),
         SHEEP(91, ENTITY_AGEABLE),
         COW(92, ENTITY_AGEABLE),
@@ -126,7 +126,7 @@ public class Entity1_12Types {
         SQUID(94, ENTITY_INSENTIENT),
         WOLF(95, ENTITY_TAMEABLE_ANIMAL),
         MUSHROOM_COW(96, COW),
-        SNOWMAN(97, EntityType.IRON_GOLEM),
+        SNOWMAN(97, IRON_GOLEM),
         OCELOT(98, ENTITY_TAMEABLE_ANIMAL),
         PARROT(105, ENTITY_TAMEABLE_ANIMAL),
 

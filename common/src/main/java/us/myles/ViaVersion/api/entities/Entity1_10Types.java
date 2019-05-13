@@ -29,28 +29,28 @@ public class Entity1_10Types {
 
     @AllArgsConstructor
     @Getter
-    public enum EntityType implements IEntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
-        DROPPED_ITEM(1, EntityType.ENTITY),
-        EXPERIENCE_ORB(2, EntityType.ENTITY),
-        LEASH_HITCH(8, EntityType.ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
-        PAINTING(9, EntityType.ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
-        ARROW(10, EntityType.ENTITY),
-        SNOWBALL(11, EntityType.ENTITY), // Actually EntityProjectile
-        FIREBALL(12, EntityType.ENTITY),
-        SMALL_FIREBALL(13, EntityType.ENTITY),
-        ENDER_PEARL(14, EntityType.ENTITY), // Actually EntityProjectile
-        ENDER_SIGNAL(15, EntityType.ENTITY),
-        THROWN_EXP_BOTTLE(17, EntityType.ENTITY),
-        ITEM_FRAME(18, EntityType.ENTITY), // Actually EntityHanging
-        WITHER_SKULL(19, EntityType.ENTITY),
-        PRIMED_TNT(20, EntityType.ENTITY),
-        FALLING_BLOCK(21, EntityType.ENTITY),
-        FIREWORK(22, EntityType.ENTITY),
-        TIPPED_ARROW(23, EntityType.ARROW),
-        SPECTRAL_ARROW(24, EntityType.ARROW),
-        SHULKER_BULLET(25, EntityType.ENTITY),
-        DRAGON_FIREBALL(26, EntityType.FIREBALL),
+        DROPPED_ITEM(1, ENTITY),
+        EXPERIENCE_ORB(2, ENTITY),
+        LEASH_HITCH(8, ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
+        PAINTING(9, ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
+        ARROW(10, ENTITY),
+        SNOWBALL(11, ENTITY), // Actually EntityProjectile
+        FIREBALL(12, ENTITY),
+        SMALL_FIREBALL(13, ENTITY),
+        ENDER_PEARL(14, ENTITY), // Actually EntityProjectile
+        ENDER_SIGNAL(15, ENTITY),
+        THROWN_EXP_BOTTLE(17, ENTITY),
+        ITEM_FRAME(18, ENTITY), // Actually EntityHanging
+        WITHER_SKULL(19, ENTITY),
+        PRIMED_TNT(20, ENTITY),
+        FALLING_BLOCK(21, ENTITY),
+        FIREWORK(22, ENTITY),
+        TIPPED_ARROW(23, ARROW),
+        SPECTRAL_ARROW(24, ARROW),
+        SHULKER_BULLET(25, ENTITY),
+        DRAGON_FIREBALL(26, FIREBALL),
 
         ENTITY_LIVING(-1, ENTITY),
         ENTITY_INSENTIENT(-1, ENTITY_LIVING),
@@ -58,7 +58,7 @@ public class Entity1_10Types {
         ENTITY_TAMEABLE_ANIMAL(-1, ENTITY_AGEABLE),
         ENTITY_HUMAN(-1, ENTITY_LIVING),
 
-        ARMOR_STAND(30, EntityType.ENTITY_LIVING),
+        ARMOR_STAND(30, ENTITY_LIVING),
 
         // Vehicles
         MINECART_ABSTRACT(-1, ENTITY),
@@ -91,7 +91,7 @@ public class Entity1_10Types {
         ENDERMITE(67, ENTITY_INSENTIENT),
         GUARDIAN(68, ENTITY_INSENTIENT),
         IRON_GOLEM(99, ENTITY_INSENTIENT), // moved up to avoid illegal forward references
-        SHULKER(69, EntityType.IRON_GOLEM),
+        SHULKER(69, IRON_GOLEM),
         PIG(90, ENTITY_AGEABLE),
         SHEEP(91, ENTITY_AGEABLE),
         COW(92, ENTITY_AGEABLE),
@@ -99,7 +99,7 @@ public class Entity1_10Types {
         SQUID(94, ENTITY_INSENTIENT),
         WOLF(95, ENTITY_TAMEABLE_ANIMAL),
         MUSHROOM_COW(96, COW),
-        SNOWMAN(97, EntityType.IRON_GOLEM),
+        SNOWMAN(97, IRON_GOLEM),
         OCELOT(98, ENTITY_TAMEABLE_ANIMAL),
         HORSE(100, ENTITY_AGEABLE),
         RABBIT(101, ENTITY_AGEABLE),

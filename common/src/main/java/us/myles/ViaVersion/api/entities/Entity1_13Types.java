@@ -29,7 +29,7 @@ public class Entity1_13Types {
 
     @AllArgsConstructor
     @Getter
-    public enum EntityType implements IEntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         // Auto generated
 
         ENTITY(-1), // abm

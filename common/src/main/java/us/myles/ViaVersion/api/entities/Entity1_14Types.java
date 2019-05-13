@@ -11,11 +11,11 @@ import java.util.Map;
 
 public class Entity1_14Types {
     public static EntityType getTypeFromId(int typeID) {
-        Optional<EntityType> type = EntityType.findById(typeID);
+        Optional<EntityType> type = Entity1_14Types.EntityType.findById(typeID);
 
         if (!type.isPresent()) {
             Via.getPlatform().getLogger().severe("Could not find type id " + typeID);
-            return EntityType.ENTITY; // Fall back to the basic ENTITY
+            return Entity1_14Types.EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
         return type.get();
@@ -23,7 +23,7 @@ public class Entity1_14Types {
 
     @AllArgsConstructor
     @Getter
-    public enum EntityType implements IEntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         // Auto generated
 
         ENTITY(-1),
@@ -210,7 +210,7 @@ public class Entity1_14Types {
         }
 
         static {
-            for (EntityType type : EntityType.values()) {
+            for (EntityType type : Entity1_14Types.EntityType.values()) {
                 TYPES.put(type.id, type);
             }
         }

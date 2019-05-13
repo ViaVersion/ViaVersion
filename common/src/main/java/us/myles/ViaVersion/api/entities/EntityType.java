@@ -1,9 +1,9 @@
 package us.myles.ViaVersion.api.entities;
 
-public interface IEntityType {
+public interface EntityType {
 
     int getId();
 
-    IEntityType getParent();
+    EntityType getParent();
 
 }
