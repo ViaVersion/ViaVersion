@@ -14,7 +14,7 @@ import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.storage.EntityTracker1
 
 public class EntityPackets {
 
-	public static void register(Protocol protocol) {
+	public static void register(final Protocol protocol) {
 
 		// Spawn Mob
 		protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
