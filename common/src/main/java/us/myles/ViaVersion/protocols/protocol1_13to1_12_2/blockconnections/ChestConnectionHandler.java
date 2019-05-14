@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,10 +20,12 @@ class ChestConnectionHandler extends ConnectionHandler {
         return new ConnectionData.ConnectorInitAction() {
             @Override
             public void check(WrappedBlockData blockData) {
-                if (!blockData.getMinecraftKey().equals("minecraft:chest") && !blockData.getMinecraftKey().equals("minecraft:trapped_chest")) return;
+                if (!blockData.getMinecraftKey().equals("minecraft:chest") && !blockData.getMinecraftKey().equals("minecraft:trapped_chest"))
+                    return;
                 if (blockData.getValue("waterlogged").equals("true")) return;
-                chestFacings.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase()));
-                if (blockData.getMinecraftKey().equalsIgnoreCase("minecraft:trapped_chest")) trappedChests.add(blockData.getSavedBlockStateId());
+                chestFacings.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)));
+                if (blockData.getMinecraftKey().equalsIgnoreCase("minecraft:trapped_chest"))
+                    trappedChests.add(blockData.getSavedBlockStateId());
                 connectedStates.put(getStates(blockData), blockData.getSavedBlockStateId());
                 ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
             }
@@ -34,7 +37,7 @@ class ChestConnectionHandler extends ConnectionHandler {
         String type = blockData.getValue("type");
         if (type.equals("left")) states |= 1;
         if (type.equals("right")) states |= 2;
-        states |= (BlockFace.valueOf(blockData.getValue("facing").toUpperCase()).ordinal() << 2);
+        states |= (BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)).ordinal() << 2);
         if (blockData.getMinecraftKey().equals("minecraft:trapped_chest")) states |= 16;
         return states;
     }
