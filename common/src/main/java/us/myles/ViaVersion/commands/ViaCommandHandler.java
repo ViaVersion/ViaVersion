@@ -28,17 +28,17 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         Preconditions.checkArgument(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid sub-command name.");
         if (hasSubCommand(command.name()))
             throw new Exception("ViaSubCommand " + command.name() + " does already exists!"); //Maybe another exception later.
-        commandMap.put(command.name().toLowerCase(), command);
+        commandMap.put(command.name().toLowerCase(Locale.ROOT), command);
     }
 
     @Override
     public boolean hasSubCommand(String name) {
-        return commandMap.containsKey(name.toLowerCase());
+        return commandMap.containsKey(name.toLowerCase(Locale.ROOT));
     }
 
     @Override
     public ViaSubCommand getSubCommand(String name) {
-        return commandMap.get(name.toLowerCase());
+        return commandMap.get(name.toLowerCase(Locale.ROOT));
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         if (args.length == 1) {
             if (!args[0].isEmpty()) {
                 for (ViaSubCommand sub : allowed)
-                    if (sub.name().toLowerCase().startsWith(args[0].toLowerCase()))
+                    if (sub.name().toLowerCase().startsWith(args[0].toLowerCase(Locale.ROOT)))
                         output.add(sub.name());
             } else {
                 for (ViaSubCommand sub : allowed)

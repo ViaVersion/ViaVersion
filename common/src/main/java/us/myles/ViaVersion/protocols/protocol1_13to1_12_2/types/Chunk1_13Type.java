@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.logging.Level;
 
 public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
     public Chunk1_13Type(ClientWorld param) {
@@ -30,7 +31,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
 
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
-        Type.VAR_INT.read(input);
+        ByteBuf data = input.readSlice(Type.VAR_INT.read(input));
 
         BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
@@ -44,18 +45,22 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         // Read sections
         for (int i = 0; i < 16; i++) {
             if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
+            ChunkSection section = Types1_13.CHUNK_SECTION.read(data);
             sections[i] = section;
-            section.readBlockLight(input);
+            section.readBlockLight(data);
             if (world.getEnvironment() == Environment.NORMAL) {
-                section.readSkyLight(input);
+                section.readSkyLight(data);
             }
         }
 
         int[] biomeData = groundUp ? new int[256] : null;
         if (groundUp) {
-            for (int i = 0; i < 256; i++) {
-                biomeData[i] = input.readInt();
+            if (data.readableBytes() >= 256 * 4) {
+                for (int i = 0; i < 256; i++) {
+                    biomeData[i] = data.readInt();
+                }
+            } else {
+                Via.getPlatform().getLogger().log(Level.WARNING, "Chunk x="+ chunkX + " z=" + chunkZ + " doesn't have biome data!");
             }
         }
 

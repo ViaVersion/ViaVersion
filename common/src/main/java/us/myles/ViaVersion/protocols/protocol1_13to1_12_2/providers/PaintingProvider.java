@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
 import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,7 +46,7 @@ public class PaintingProvider implements Provider {
     public Optional<Integer> getIntByIdentifier(String motive) {
         // Handle older versions
         if (!motive.startsWith("minecraft:"))
-            motive = "minecraft:" + motive.toLowerCase();
+            motive = "minecraft:" + motive.toLowerCase(Locale.ROOT);
         return Optional.fromNullable(paintings.get(motive));
     }
 }

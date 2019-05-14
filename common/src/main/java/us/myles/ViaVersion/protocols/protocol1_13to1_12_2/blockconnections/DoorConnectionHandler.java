@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class DoorConnectionHandler extends ConnectionHandler {
@@ -40,7 +41,7 @@ public class DoorConnectionHandler extends ConnectionHandler {
                         blockData.getValue("hinge").equals("right"),
                         blockData.getValue("powered").equals("true"),
                         blockData.getValue("open").equals("true"),
-                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase()),
+                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)),
                         type
                 );
 
