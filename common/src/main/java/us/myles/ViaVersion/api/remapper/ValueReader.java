@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.remapper;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 
+@FunctionalInterface
 public interface ValueReader<T> {
     /**
      * Reads value from a PacketWrapper
