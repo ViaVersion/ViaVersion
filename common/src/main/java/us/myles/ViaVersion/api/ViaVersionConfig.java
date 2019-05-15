@@ -81,7 +81,9 @@ public interface ViaVersionConfig {
      * @return true if boss bar patching is enabled
      */
     @Deprecated
-    boolean isUnknownEntitiesSuppressed();
+    default boolean isUnknownEntitiesSuppressed() {
+        return false;
+    }
 
     /**
      * Get the vertical offset armor stands are being moved with when the hologram patch is enabled
@@ -103,7 +105,9 @@ public interface ViaVersionConfig {
      * @return true if it is enabled.
      */
     @Deprecated
-    boolean isBlockBreakPatch();
+    default boolean isBlockBreakPatch() {
+        return false;
+    }
 
     /**
      * Get the maximum number of packets a client can send per second.
