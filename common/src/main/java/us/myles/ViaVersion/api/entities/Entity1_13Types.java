@@ -8,9 +8,9 @@ import us.myles.ViaVersion.api.Via;
 import java.util.HashMap;
 import java.util.Map;
 
-
 // TODO auto generate 18w11a with PAaaS
 public class Entity1_13Types {
+
     public static EntityType getTypeFromId(int typeID, boolean isObject) {
         Optional<EntityType> type;
 
@@ -219,30 +219,6 @@ public class Entity1_13Types {
             if (id == -1)  // Check if this is called
                 return Optional.absent();
             return Optional.fromNullable(TYPES.get(id));
-        }
-
-        public boolean is(EntityType... types) {
-            for (EntityType type : types)
-                if (is(type))
-                    return true;
-            return false;
-        }
-
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
-        public boolean isOrHasParent(EntityType type) {
-            EntityType parent = this;
-
-            do {
-                if (parent.equals(type))
-                    return true;
-
-                parent = parent.getParent();
-            } while (parent != null);
-
-            return false;
         }
     }
 

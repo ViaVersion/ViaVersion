@@ -10,6 +10,7 @@ import java.util.Map;
 
 
 public class Entity1_14Types {
+
     public static EntityType getTypeFromId(int typeID) {
         Optional<EntityType> type = Entity1_14Types.EntityType.findById(typeID);
 
@@ -219,30 +220,6 @@ public class Entity1_14Types {
             if (id == -1)
                 return Optional.absent();
             return Optional.fromNullable(TYPES.get(id));
-        }
-
-        public boolean is(EntityType... types) {
-            for (EntityType type : types)
-                if (is(type))
-                    return true;
-            return false;
-        }
-
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
-        public boolean isOrHasParent(EntityType type) {
-            EntityType parent = this;
-
-            do {
-                if (parent == type)
-                    return true;
-
-                parent = parent.getParent();
-            } while (parent != null);
-
-            return false;
         }
     }
 }

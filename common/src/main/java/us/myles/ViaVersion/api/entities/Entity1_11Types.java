@@ -10,6 +10,7 @@ import java.util.Map;
 
 // 1.11 Entity / Object ids TODO maybe in the future instead of copying it, some api.
 public class Entity1_11Types {
+
     public static EntityType getTypeFromId(int typeID, boolean isObject) {
         Optional<EntityType> type;
 
@@ -163,30 +164,6 @@ public class Entity1_11Types {
             if (id == -1)  // Check if this is called
                 return Optional.absent();
             return Optional.fromNullable(TYPES.get(id));
-        }
-
-        public boolean is(EntityType... types) {
-            for (EntityType type : types)
-                if (is(type))
-                    return true;
-            return false;
-        }
-
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
-        public boolean isOrHasParent(EntityType type) {
-            EntityType parent = this;
-
-            do {
-                if (parent.equals(type))
-                    return true;
-
-                parent = parent.getParent();
-            } while (parent != null);
-
-            return false;
         }
     }
 
