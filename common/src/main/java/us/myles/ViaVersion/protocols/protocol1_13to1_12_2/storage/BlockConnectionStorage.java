@@ -28,7 +28,7 @@ public class BlockConnectionStorage extends StoredObject {
         }
         reverseBlockMappings = new HashMap<>();
         for (int i = 0; i < 4096; i++) {
-            int newBlock = MappingData.blockMappings.getNewBlock(i);
+            int newBlock = MappingData.blockMappings.getNewId(i);
             if (newBlock != -1) reverseBlockMappings.put((short) newBlock, (short) i);
         }
     }

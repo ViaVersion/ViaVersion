@@ -296,7 +296,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
     }
 
     public static int getNewSoundId(int id) {
-        int newId = MappingData.soundMappings.getNewSound(id);
+        int newId = MappingData.soundMappings.getNewId(id);
         if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.14 sound for 1.13.2 sound " + id);
             return 0;
@@ -305,7 +305,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
     }
 
     public static int getNewBlockStateId(int id) {
-        int newId = MappingData.blockStateMappings.getNewBlock(id);
+        int newId = MappingData.blockStateMappings.getNewId(id);
         if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.14 blockstate for 1.13.2 blockstate " + id);
             return 0;
@@ -314,7 +314,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
     }
 
     public static int getNewBlockId(int id) {
-        int newId = MappingData.blockMappings.getNewBlock(id);
+        int newId = MappingData.blockMappings.getNewId(id);
         if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.14 block for 1.13.2 block " + id);
             return 0;

@@ -81,7 +81,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short property = wrapper.get(Type.SHORT, 0);
                         if (property >= 4 && property <= 6) { // Enchantment id
-                            wrapper.set(Type.SHORT, 1, (short) MappingData.enchantmentMappings.getNewEnchantment(
+                            wrapper.set(Type.SHORT, 1, (short) MappingData.enchantmentMappings.getNewId(
                                     wrapper.get(Type.SHORT, 1)
                             ));
                         }

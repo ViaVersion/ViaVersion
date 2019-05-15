@@ -9,7 +9,7 @@ public class BlockConnectionProvider implements Provider {
 
     public int getBlockdata(UserConnection connection, Position position) {
         int oldId = getWorldBlockData(connection, position);
-        return MappingData.blockMappings.getNewBlock(oldId);
+        return MappingData.blockMappings.getNewId(oldId);
     }
 
     public int getWorldBlockData(UserConnection connection, Position position) {
