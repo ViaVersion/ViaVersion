@@ -102,7 +102,10 @@ public class PlayerSneakListener extends ViaBukkitListener {
 
         Player player = (Player) event.getEntity();
         if (!sneakingUuids.contains(player.getUniqueId())) return;
-        event.setCancelled(true);
+        // Don't cancel damage when they should actually suffocate
+        if (!player.getEyeLocation().getBlock().getType().isOccluding()) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
