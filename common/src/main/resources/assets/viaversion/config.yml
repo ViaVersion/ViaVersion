@@ -124,7 +124,6 @@ truncate-1_14-books: false
 change-1_9-hitbox: false
 # Similar to the above, but for 1.14+ players on 1.8-1.13 servers.
 # WARNING: This gives 1.14+ players the ability to sneak under blocks, that players under that version cannot (sneaking in places that are only 1.5 blocks high)!
-# ANOTHER WARNING: 1.14+ players can fully avoid taking damage from suffocation (applied when trapped inside blocks) by sneaking.
 # Another thing to remember is that those players might be missed by projectiles and other hits directed at the very top of their head whilst sneaking.
 change-1_14-hitbox: false
 #
