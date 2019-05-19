@@ -341,9 +341,12 @@ public class PacketWrapper {
         apply(direction, user().get(ProtocolInfo.class).getState(), index, protocols);
         // Send
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-        writeToBuffer(output);
-
-        return output;
+        try {
+            writeToBuffer(output);
+            return output.retain();
+        } finally {
+            output.release();
+        }
     }
 
     /**

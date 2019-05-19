@@ -42,11 +42,15 @@ public class BungeePipelineUtil {
     public static ByteBuf callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, ByteBuf input) throws InvocationTargetException {
         ByteBuf output = ctx.alloc().buffer();
         try {
-            BungeePipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, input, output);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            try {
+                BungeePipelineUtil.ENCODE_METHOD.invoke(encoder, ctx, input, output);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return output.retain();
+        } finally {
+            output.release();
         }
-        return output;
     }
 
     public static ByteBuf decompress(ChannelHandlerContext ctx, ByteBuf bytebuf) {
