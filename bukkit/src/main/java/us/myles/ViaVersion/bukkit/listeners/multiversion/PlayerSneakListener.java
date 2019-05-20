@@ -102,7 +102,14 @@ public class PlayerSneakListener extends ViaBukkitListener {
 
         Player player = (Player) event.getEntity();
         if (!sneakingUuids.contains(player.getUniqueId())) return;
-        event.setCancelled(true);
+
+        // Don't cancel when they should actually be suffocating; Essentially cancel when the head is in the top block only ever so slightly
+        // ~0.041 should suffice, but gotta stay be safe
+        double y = player.getEyeLocation().getY() + 0.045;
+        y -= (int) y;
+        if (y < 0.09) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
