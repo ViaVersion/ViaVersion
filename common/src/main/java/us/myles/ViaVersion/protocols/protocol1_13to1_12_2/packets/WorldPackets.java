@@ -496,11 +496,11 @@ public class WorldPackets {
         if (oldId < 0) {
             oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
         }
-        int newId = MappingData.blockMappings.getNewBlock(oldId);
+        int newId = MappingData.blockMappings.getNewId(oldId);
         if (newId != -1) {
             return newId;
         }
-        newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
+        newId = MappingData.blockMappings.getNewId(oldId & ~0xF); // Remove data
         if (newId != -1) {
             if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Missing block " + oldId);

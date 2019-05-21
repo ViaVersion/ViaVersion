@@ -76,14 +76,6 @@ public interface ViaVersionConfig {
     boolean isBossbarAntiflicker();
 
     /**
-     * Get if unknown entity errors will be suppressed
-     *
-     * @return true if boss bar patching is enabled
-     */
-    @Deprecated
-    boolean isUnknownEntitiesSuppressed();
-
-    /**
      * Get the vertical offset armor stands are being moved with when the hologram patch is enabled
      *
      * @return the vertical offset holograms will be moved with
@@ -96,14 +88,6 @@ public interface ViaVersionConfig {
      * @return true if automatic teaming is enabled
      */
     boolean isAutoTeam();
-
-    /**
-     * Get if our block break patch is enabled to prevent weird ghost glitches.
-     *
-     * @return true if it is enabled.
-     */
-    @Deprecated
-    boolean isBlockBreakPatch();
 
     /**
      * Get the maximum number of packets a client can send per second.

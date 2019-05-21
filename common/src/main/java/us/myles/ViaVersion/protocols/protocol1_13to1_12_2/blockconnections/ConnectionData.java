@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
@@ -15,7 +16,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -198,7 +198,7 @@ public class ConnectionData {
     public static void init() {
         if (!Via.getConfig().isServersideBlockConnections()) return;
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        JsonObject mapping1_13 = MappingData.loadData("mapping-1.13.json");
+        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json");
         JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
         for (Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {
             Integer id = Integer.parseInt(blockState.getKey());
@@ -208,7 +208,7 @@ public class ConnectionData {
         }
 
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
-            JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
+            JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());
                 BlockData blockData = new BlockData();
@@ -231,7 +231,7 @@ public class ConnectionData {
             }
         }
 
-        JsonObject blockData = MappingData.loadData("blockData.json");
+        JsonObject blockData = MappingDataLoader.loadData("blockData.json");
         JsonArray occluding = blockData.getAsJsonArray("occluding");
         for (JsonElement jsonElement : occluding) {
             occludingStates.add(keyToId.get(jsonElement.getAsString()));
