@@ -178,7 +178,12 @@ public class InventoryPackets {
                                         Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + channels[i]);
                                     }
                                 }
-                                wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                                if (!rewrittenChannels.isEmpty()) {
+                                    wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                                } else {
+                                    wrapper.cancel();
+                                    return;
+                                }
                             }
                         }
                         wrapper.set(Type.STRING, 0, channel);
