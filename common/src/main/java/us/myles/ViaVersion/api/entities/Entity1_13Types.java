@@ -77,7 +77,6 @@ public class Entity1_13Types {
         ABSTRACT_PARROT(-1, ABSTRACT_TAMEABLE_ANIMAL), // agr
         PARROT(50, ABSTRACT_PARROT), // agk
 
-
         // Horses
         ABSTRACT_HORSE(-1, ABSTRACT_ANIMAL), // aha
         CHESTED_HORSE(-1, ABSTRACT_HORSE), // agz
@@ -152,6 +151,7 @@ public class Entity1_13Types {
 
         ABSTRACT_WATERMOB(-1, ABSTRACT_INSENTIENT), // agx
         SQUID(70, ABSTRACT_WATERMOB), // agt
+        DOLPHIN(12, ABSTRACT_WATERMOB),
 
         // Slimes
         SLIME(64, ABSTRACT_INSENTIENT), // aka
