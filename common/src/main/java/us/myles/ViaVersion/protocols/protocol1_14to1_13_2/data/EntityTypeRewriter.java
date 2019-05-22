@@ -47,6 +47,7 @@ public class EntityTypeRewriter {
         regEnt(41, 43); // command_block_minecart
         regEnt(42, 44); // furnace_minecart
         regEnt(43, 45); // hopper_minecart
+        regEnt(44, 46); // spawner_minecart
         regEnt(45, 47); // tnt_minecart
         regEnt(46, 48); // mule
         regEnt(47, 49); // mooshroom
