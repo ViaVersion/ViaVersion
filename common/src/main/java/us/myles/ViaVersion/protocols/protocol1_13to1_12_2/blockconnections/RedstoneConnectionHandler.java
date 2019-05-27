@@ -35,7 +35,7 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
         b |= getState(data.getValue("north")) << 2;
         b |= getState(data.getValue("south")) << 4;
         b |= getState(data.getValue("west")) << 6;
-        b |= Integer.valueOf(data.getValue("power")) << 8;
+        b |= Integer.parseInt(data.getValue("power")) << 8;
         return b;
     }
 

@@ -79,7 +79,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
         // Check if it's a spigot build with a protocol mod
         try {
-            compatSpigotBuild = NMSUtil.nms("PacketEncoder").getDeclaredField("version") != null;
+            NMSUtil.nms("PacketEncoder").getDeclaredField("version");
+            compatSpigotBuild = true;
         } catch (Exception e) {
             compatSpigotBuild = false;
         }

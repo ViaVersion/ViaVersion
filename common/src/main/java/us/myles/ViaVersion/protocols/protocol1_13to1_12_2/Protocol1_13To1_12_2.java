@@ -40,7 +40,6 @@ import us.myles.ViaVersion.util.GsonUtil;
 import java.util.EnumMap;
 import java.util.Map;
 
-// Development of 1.13 support!
 public class Protocol1_13To1_12_2 extends Protocol {
     public static final Particle1_13Type PARTICLE_TYPE = new Particle1_13Type();
 
@@ -106,8 +105,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             };
 
     // These are arbitrary rewrite values, it just needs an invalid color code character.
-    protected static EnumMap<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<>(ChatColor.class);
-    // @formatter:on
+    protected final static EnumMap<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<>(ChatColor.class);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BLACK, 'g');
@@ -363,11 +361,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         int id = wrapper.get(Type.INT, 0);
                         int data = wrapper.get(Type.INT, 1);
                         if (id == 1010) { // Play record
-                            wrapper.set(Type.INT, 1, data = MappingData.oldToNewItems.get(data << 4));
+                            wrapper.set(Type.INT, 1, MappingData.oldToNewItems.get(data << 4));
                         } else if (id == 2001) { // Block break + block break sound
                             int blockId = data & 0xFFF;
                             int blockData = data >> 12;
-                            wrapper.set(Type.INT, 1, data = WorldPackets.toNewId(blockId << 4 | blockData));
+                            wrapper.set(Type.INT, 1, WorldPackets.toNewId(blockId << 4 | blockData));
                         }
                     }
                 });

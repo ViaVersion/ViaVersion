@@ -624,14 +624,16 @@ public class InventoryPackets {
                         if (oldId == null && newId.startsWith("viaversion:legacy/")) {
                             oldId = Short.valueOf(newId.substring(18));
                         }
-                        enchEntry.put(
-                                new ShortTag(
-                                        "id",
-                                        oldId
-                                )
-                        );
-                        enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
-                        ench.add(enchEntry);
+                        if (oldId != null) {
+                            enchEntry.put(
+                                    new ShortTag(
+                                            "id",
+                                            oldId
+                                    )
+                            );
+                            enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                            ench.add(enchEntry);
+                        }
                     }
                 }
                 tag.remove("Enchantments");
@@ -648,14 +650,16 @@ public class InventoryPackets {
                         if (oldId == null && newId.startsWith("viaversion:legacy/")) {
                             oldId = Short.valueOf(newId.substring(18));
                         }
-                        enchEntry.put(
-                                new ShortTag(
-                                        "id",
-                                        oldId
-                                )
-                        );
-                        enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
-                        newStoredEnch.add(enchEntry);
+                        if (oldId != null) {
+                            enchEntry.put(
+                                    new ShortTag(
+                                            "id",
+                                            oldId
+                                    )
+                            );
+                            enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                            newStoredEnch.add(enchEntry);
+                        }
                     }
                 }
                 tag.remove("StoredEnchantments");

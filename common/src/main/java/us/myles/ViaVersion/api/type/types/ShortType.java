@@ -27,6 +27,6 @@ public class ShortType extends Type<Short> implements TypeConverter<Short> {
         if (o instanceof Boolean) {
             return ((Boolean) o) ? (short) 1 : 0;
         }
-        return (short) o;
+        return (Short) o;
     }
 }

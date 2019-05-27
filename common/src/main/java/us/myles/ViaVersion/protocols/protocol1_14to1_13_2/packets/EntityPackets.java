@@ -49,7 +49,6 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        UUID uuid = wrapper.get(Type.UUID, 0);
                         int typeId = wrapper.get(Type.VAR_INT, 1);
 
                         Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
@@ -95,11 +94,12 @@ public class EntityPackets {
                                 velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 2));
                                 velocity.send(Protocol1_14To1_13_2.class);
                             }
+
+                            // Register Type ID
+                            wrapper.user().get(EntityTracker1_14.class).addEntity(entityId, type1_14);
                         }
 
                         wrapper.set(Type.VAR_INT, 1, typeId);
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_14.class).addEntity(entityId, type1_14);
                     }
                 });
             }
@@ -128,14 +128,11 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         int type = wrapper.get(Type.VAR_INT, 1);
-                        UUID uuid = wrapper.get(Type.UUID, 0);
 
                         type = EntityTypeRewriter.getNewId(type).or(type);
-
-                        Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type);
-
                         wrapper.set(Type.VAR_INT, 1, type);
 
+                        Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type);
                         // Register Type ID
                         wrapper.user().get(EntityTracker1_14.class).addEntity(entityId, entType);
 
@@ -173,7 +170,6 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        UUID uuid = wrapper.get(Type.UUID, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
                         Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;

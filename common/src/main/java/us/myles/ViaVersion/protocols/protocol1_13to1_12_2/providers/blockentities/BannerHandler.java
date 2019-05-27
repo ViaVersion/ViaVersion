@@ -9,11 +9,11 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityP
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 
 public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
-    private final int WALL_BANNER_START = 7110; // 4 each
-    private final int WALL_BANNER_STOP = 7173;
+    private static final int WALL_BANNER_START = 7110; // 4 each
+    private static final int WALL_BANNER_STOP = 7173;
 
-    private final int BANNER_START = 6854; // 16 each
-    private final int BANNER_STOP = 7109;
+    private static final int BANNER_START = 6854; // 16 each
+    private static final int BANNER_STOP = 7109;
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {

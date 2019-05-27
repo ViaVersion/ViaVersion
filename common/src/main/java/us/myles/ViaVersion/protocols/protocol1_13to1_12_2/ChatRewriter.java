@@ -135,7 +135,9 @@ public class ChatRewriter {
             String oldTranslate = ((TranslatableComponent) component).getTranslate();
             String newTranslate;
             newTranslate = MappingData.translateMapping.get(oldTranslate);
-            if (newTranslate == null) MappingData.mojangTranslation.get(oldTranslate);
+            if (newTranslate == null) {
+                newTranslate = MappingData.mojangTranslation.get(oldTranslate);
+            }
             if (newTranslate != null) {
                 ((TranslatableComponent) component).setTranslate(newTranslate);
             }

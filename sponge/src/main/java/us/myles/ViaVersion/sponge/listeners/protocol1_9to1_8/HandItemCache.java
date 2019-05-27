@@ -70,18 +70,22 @@ public class HandItemCache implements Runnable {
             }
         }
         int id = 0;
-        try {
-            id = (int) GET_ID.invoke(null, itemInHand.getItem());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        if (GET_ID != null) {
+            try {
+                id = (int) GET_ID.invoke(null, itemInHand.getItem());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
         int damage = 0;
-        try {
-            damage = (int) GET_DAMAGE.get(itemInHand);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if (GET_DAMAGE != null) {
+            try {
+                damage = (int) GET_DAMAGE.get(itemInHand);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         return new Item((short) id, (byte) itemInHand.getQuantity(), (short) damage, null);
     }

@@ -329,7 +329,7 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position
-                map(Type.VAR_INT, Type.BYTE); // 1 - Block Face
+                map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 1 - Block Face
                 map(Type.VAR_INT, Type.NOTHING); // 2 - Hand
                 create(new ValueCreator() {
                     @Override
@@ -359,7 +359,7 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int face = wrapper.get(Type.BYTE, 0);
+                        int face = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         if (face == 255)
                             return;
                         Position p = wrapper.get(Type.POSITION, 0);

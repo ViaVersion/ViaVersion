@@ -87,12 +87,13 @@ public class Protocol1_11To1_10 extends Protocol {
                         int type = wrapper.get(Type.VAR_INT, 1);
 
                         Entity1_11Types.EntityType entType = MetadataRewriter1_11To1_10.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
-                        if (entType != null)
+                        if (entType != null) {
                             wrapper.set(Type.VAR_INT, 1, entType.getId());
 
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_11.class).addEntity(entityId, entType);
-                        get(MetadataRewriter1_11To1_10.class).handleMetadata(entityId, entType, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                            // Register Type ID
+                            wrapper.user().get(EntityTracker1_11.class).addEntity(entityId, entType);
+                            get(MetadataRewriter1_11To1_10.class).handleMetadata(entityId, entType, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                        }
                     }
                 });
             }

@@ -10,8 +10,8 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 
 public class EntityPackets {
@@ -68,11 +68,11 @@ public class EntityPackets {
                                 }
 
                                 wrapper.set(Type.INT, 0, data);
-                            }
 
+                                // Register Type ID
+                                wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
+                            }
                         }
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
                     }
                 });
             }

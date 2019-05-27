@@ -34,7 +34,8 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
-        int size = Type.VAR_INT.read(input);
+        // Size (unused)
+        Type.VAR_INT.read(input);
 
         BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];

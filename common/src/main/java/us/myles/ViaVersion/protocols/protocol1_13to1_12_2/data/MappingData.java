@@ -21,13 +21,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
-    public static Map<String, Integer[]> blockTags = new HashMap<>();
-    public static Map<String, Integer[]> itemTags = new HashMap<>();
-    public static Map<String, Integer[]> fluidTags = new HashMap<>();
-    public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
-    public static Map<String, String> translateMapping = new HashMap<>();
-    public static Map<String, String> mojangTranslation = new HashMap<>();
+    public static final BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static final Map<String, Integer[]> blockTags = new HashMap<>();
+    public static final Map<String, Integer[]> itemTags = new HashMap<>();
+    public static final Map<String, Integer[]> fluidTags = new HashMap<>();
+    public static final BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
+    public static final Map<String, String> translateMapping = new HashMap<>();
+    public static final Map<String, String> mojangTranslation = new HashMap<>();
     public static Mappings enchantmentMappings;
     public static Mappings soundMappings;
     public static Mappings blockMappings;
@@ -50,7 +50,6 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 sound mapping...");
         soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
         Via.getPlatform().getLogger().info("Loading translation mappping");
-        translateMapping = new HashMap<>();
         Map<String, String> translateData = GsonUtil.getGson().fromJson(
                 new InputStreamReader(
                         MappingData.class.getClassLoader()

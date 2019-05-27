@@ -12,7 +12,7 @@ import us.myles.ViaVersion.api.data.Mappings;
 import java.util.*;
 
 public class MappingData {
-    public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public final static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Mappings blockStateMappings;
     public static Mappings blockMappings;
     public static Mappings soundMappings;

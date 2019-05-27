@@ -191,7 +191,7 @@ public abstract class Protocol {
 
     @AllArgsConstructor
     @Getter
-    class ProtocolPacket {
+    public static class ProtocolPacket {
         State state;
         int oldID;
         int newID;

@@ -100,14 +100,14 @@ public class UpdateUtil {
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;
-            String content = "";
+            StringBuilder builder = new StringBuilder();
             while ((input = br.readLine()) != null) {
-                content = content + input;
+                builder.append(input);
             }
             br.close();
             JsonObject statistics;
             try {
-                statistics = GsonUtil.getGson().fromJson(content, JsonObject.class);
+                statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
             } catch (JsonParseException e) {
                 e.printStackTrace();
                 return null;

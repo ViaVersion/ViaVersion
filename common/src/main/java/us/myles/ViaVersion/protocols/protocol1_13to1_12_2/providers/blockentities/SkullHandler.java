@@ -9,8 +9,8 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityP
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 
 public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
-    private final int SKULL_WALL_START = 5447;
-    private final int SKULL_END = 5566;
+    private static final int SKULL_WALL_START = 5447;
+    private static final int SKULL_END = 5566;
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {

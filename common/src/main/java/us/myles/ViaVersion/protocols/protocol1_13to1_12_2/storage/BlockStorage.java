@@ -72,7 +72,7 @@ public class BlockStorage extends StoredObject {
 
     @Data
     @AllArgsConstructor
-    public class ReplacementData {
+    public static class ReplacementData {
         private int original;
         private int replacement;
     }

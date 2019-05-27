@@ -45,9 +45,9 @@ public class EntityPackets {
                                 int data = wrapper.get(Type.INT, 0);
                                 wrapper.set(Type.INT, 0, Protocol1_13_1To1_13.getNewBlockStateId(data));
                             }
+                            // Register Type ID
+                            wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
                         }
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
                     }
                 });
             }

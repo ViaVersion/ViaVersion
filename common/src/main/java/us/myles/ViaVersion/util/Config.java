@@ -76,10 +76,10 @@ public abstract class Config implements ConfigurationProvider {
                 defaults.remove(option);
             }
             // Merge with defaultLoader
-            for (Object key : config.keySet()) {
+            for (Map.Entry<String, Object> entry : config.entrySet()) {
                 // Set option in new conf if exists
-                if (defaults.containsKey(key) && !unsupported.contains(key.toString())) {
-                    defaults.put((String) key, config.get(key));
+                if (defaults.containsKey(entry.getKey()) && !unsupported.contains(entry.getKey())) {
+                    defaults.put(entry.getKey(), entry.getValue());
                 }
             }
         } catch (IOException e) {
