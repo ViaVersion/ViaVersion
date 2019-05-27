@@ -2,6 +2,8 @@ package us.myles.ViaVersion.update;
 
 import com.google.common.base.Joiner;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,6 +85,13 @@ public class Version implements Comparable<Version> {
     @Override
     public boolean equals(Object that) {
         return that instanceof Version && equals(this, (Version) that);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(tag);
+        result = 31 * result + Arrays.hashCode(parts);
+        return result;
     }
 
     /**
