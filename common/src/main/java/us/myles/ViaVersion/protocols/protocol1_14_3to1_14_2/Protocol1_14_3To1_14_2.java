@@ -36,9 +36,8 @@ public class Protocol1_14_3To1_14_2 extends Protocol {
                         }
                         wrapper.passthrough(Type.VAR_INT);
                         wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.BOOLEAN);
-
-                        wrapper.write(Type.BOOLEAN, true); // new "restockable" boolean added in pre-1
+                        boolean regularVillager = wrapper.passthrough(Type.BOOLEAN);
+                        wrapper.write(Type.BOOLEAN, regularVillager); // new boolean added in pre-1
                     }
                 });
             }
