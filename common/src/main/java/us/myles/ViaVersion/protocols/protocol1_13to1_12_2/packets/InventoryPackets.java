@@ -1,7 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.ShortTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.primitives.Ints;
@@ -717,7 +722,8 @@ public class InventoryPackets {
             return null; // Not valid
         }
         int separatorIndex = newId.indexOf(':');
-        if (separatorIndex == -1 || separatorIndex == 0) { // Vanilla parses ``:`` and ```` as ``minecraft:``
+        // Vanilla parses ``:`` and ```` as ``minecraft:`` (also ensure there's enough space)
+        if ((separatorIndex == -1 || separatorIndex == 0) && newId.length() <= 10) {
             newId = "minecraft:" + newId;
         }
         switch (newId) {
@@ -744,7 +750,7 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             default:
-                return newId;
+                return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }
     }
 
