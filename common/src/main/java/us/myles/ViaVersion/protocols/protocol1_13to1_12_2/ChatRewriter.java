@@ -131,6 +131,7 @@ public class ChatRewriter {
     }
 
     private static void processTranslate(BaseComponent component) {
+        if (component == null) return;
         if (component instanceof TranslatableComponent) {
             String oldTranslate = ((TranslatableComponent) component).getTranslate();
             String newTranslate;
