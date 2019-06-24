@@ -13,17 +13,18 @@ import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.Protocol1_12_1To1_12;
 import us.myles.ViaVersion.protocols.protocol1_12_2to1_12_1.Protocol1_12_2To1_12_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.Protocol1_13_2To1_13_1;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.Protocol1_14_1To1_14;
 import us.myles.ViaVersion.protocols.protocol1_14_2to1_14_1.Protocol1_14_2To1_14_1;
+import us.myles.ViaVersion.protocols.protocol1_14_3to1_14_2.Protocol1_14_3To1_14_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1To1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3To1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,6 +67,7 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_14To1_13_2(), Arrays.asList(ProtocolVersion.v1_14.getId()), ProtocolVersion.v1_13_2.getId());
         registerProtocol(new Protocol1_14_1To1_14(), Arrays.asList(ProtocolVersion.v1_14_1.getId()), ProtocolVersion.v1_14.getId());
         registerProtocol(new Protocol1_14_2To1_14_1(), Arrays.asList(ProtocolVersion.v1_14_2.getId()), ProtocolVersion.v1_14_1.getId());
+        registerProtocol(new Protocol1_14_3To1_14_2(), Arrays.asList(ProtocolVersion.v1_14_3.getId()), ProtocolVersion.v1_14_2.getId());
     }
 
     /**
