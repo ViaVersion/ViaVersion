@@ -157,14 +157,15 @@ public class ItemRewriter {
         WEAPON_DAMAGE.put(277, 4.0);
         WEAPON_DAMAGE.put(256, 3.0);
         WEAPON_DAMAGE.put(273, 2.0);
-        WEAPON_DAMAGE.put(269, 1.0);
-        WEAPON_DAMAGE.put(284, 1.0);
+        // -1 = remove attributes, but don't add attack damage text
+        WEAPON_DAMAGE.put(269, -1.0);
+        WEAPON_DAMAGE.put(284, -1.0);
 
-        WEAPON_DAMAGE.put(293, 1.0);
-        WEAPON_DAMAGE.put(292, 1.0);
-        WEAPON_DAMAGE.put(291, 1.0);
-        WEAPON_DAMAGE.put(290, 1.0);
-        WEAPON_DAMAGE.put(294, 1.0);
+        WEAPON_DAMAGE.put(293, -1.0);
+        WEAPON_DAMAGE.put(292, -1.0);
+        WEAPON_DAMAGE.put(291, -1.0);
+        WEAPON_DAMAGE.put(290, -1.0);
+        WEAPON_DAMAGE.put(294, -1.0);
     }
 
     public static void toServer(Item item) {
@@ -364,7 +365,7 @@ public class ItemRewriter {
         }
 
         double damage = getWeaponDamage(item);
-        if (damage <= 1) return;
+        if (damage == -1) return;
         String damageString = "§9+" + (damage % 1 == 0 ? Integer.toString((int) damage) : damage) + " Attack Damage";
 
         CompoundTag display = tag.get("display");
@@ -381,7 +382,7 @@ public class ItemRewriter {
 
     private static double getWeaponDamage(Item item) {
         double damage = WEAPON_DAMAGE.get(item.getIdentifier());
-        if (damage <= 1) return 1;
+        if (damage == -1) return -1;
         if (item.getTag() != null && item.getTag().contains("ench")) {
             ListTag ench = item.getTag().get("ench");
             for (int i = 0; i < ench.size(); i++) {
