@@ -337,4 +337,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_14HitboxFix();
+
+    /**
+     * Rewrites the lore of a weapon to read the correct 1.8 attack damage for 1.9+ clients.
+     *
+     * @return True if enabled
+     */
+    boolean is1_8DamageConverter();
 }

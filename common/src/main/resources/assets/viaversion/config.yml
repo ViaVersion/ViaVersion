@@ -176,3 +176,5 @@ force-json-transform: false
 minimize-cooldown: true
 # Left handed handling on 1.8 servers
 left-handed-handling: true
+# Removes the attack speed attribute and reads the correct 1.8 damage of a weapon.
+correct-attack-damage: false

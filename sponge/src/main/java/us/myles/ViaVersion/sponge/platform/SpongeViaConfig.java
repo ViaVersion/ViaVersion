@@ -275,4 +275,9 @@ public class SpongeViaConfig extends Config implements ViaVersionConfig {
     public boolean is1_14HitboxFix() {
         return false;
     }
+
+    @Override
+    public boolean is1_8DamageConverter() {
+        return getBoolean("correct-attack-damage", false);
+    }
 }
