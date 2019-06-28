@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
@@ -22,7 +23,7 @@ public class PaperPatch extends ViaBukkitListener {
     If there is a better fix then we'll replace this.
      */
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlace(BlockPlaceEvent e) {
         if (isOnPipe(e.getPlayer())) {
             Location location = e.getPlayer().getLocation();
