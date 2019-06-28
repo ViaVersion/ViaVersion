@@ -110,6 +110,14 @@ public class MappingData {
             if (Via.getConfig().isSnowCollisionFix()) {
                 oldToNew[1248] = 3416;
             }
+
+            // Remap infested blocks, as they are instantly breakabale in 1.13+ and can't be broken by those clients on older servers
+            oldToNew[1552] = 1; // stone
+            oldToNew[1553] = 14; // cobblestone
+            oldToNew[1554] = 3983; // stone bricks
+            oldToNew[1555] = 3984; // mossy stone bricks
+            oldToNew[1556] = 3985; // cracked stone bricks
+            oldToNew[1557] = 3986; // chiseled stone bricks
         }
 
         @Override
