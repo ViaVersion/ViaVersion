@@ -19,6 +19,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.Protocol1_14_1To1_14;
 import us.myles.ViaVersion.protocols.protocol1_14_2to1_14_1.Protocol1_14_2To1_14_1;
 import us.myles.ViaVersion.protocols.protocol1_14_3to1_14_2.Protocol1_14_3To1_14_2;
+import us.myles.ViaVersion.protocols.protocol1_14_4to1_14_3.Protocol1_14_4To1_14_3;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1To1_9;
@@ -61,13 +62,14 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_12_2To1_12_1(), Collections.singletonList(ProtocolVersion.v1_12_2.getId()), ProtocolVersion.v1_12_1.getId());
 
         registerProtocol(new Protocol1_13To1_12_2(), Collections.singletonList(ProtocolVersion.v1_13.getId()), ProtocolVersion.v1_12_2.getId());
-        registerProtocol(new Protocol1_13_1To1_13(), Arrays.asList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
-        registerProtocol(new Protocol1_13_2To1_13_1(), Arrays.asList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
+        registerProtocol(new Protocol1_13_1To1_13(), Collections.singletonList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
+        registerProtocol(new Protocol1_13_2To1_13_1(), Collections.singletonList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
 
-        registerProtocol(new Protocol1_14To1_13_2(), Arrays.asList(ProtocolVersion.v1_14.getId()), ProtocolVersion.v1_13_2.getId());
-        registerProtocol(new Protocol1_14_1To1_14(), Arrays.asList(ProtocolVersion.v1_14_1.getId()), ProtocolVersion.v1_14.getId());
-        registerProtocol(new Protocol1_14_2To1_14_1(), Arrays.asList(ProtocolVersion.v1_14_2.getId()), ProtocolVersion.v1_14_1.getId());
-        registerProtocol(new Protocol1_14_3To1_14_2(), Arrays.asList(ProtocolVersion.v1_14_3.getId()), ProtocolVersion.v1_14_2.getId());
+        registerProtocol(new Protocol1_14To1_13_2(), Collections.singletonList(ProtocolVersion.v1_14.getId()), ProtocolVersion.v1_13_2.getId());
+        registerProtocol(new Protocol1_14_1To1_14(), Collections.singletonList(ProtocolVersion.v1_14_1.getId()), ProtocolVersion.v1_14.getId());
+        registerProtocol(new Protocol1_14_2To1_14_1(), Collections.singletonList(ProtocolVersion.v1_14_2.getId()), ProtocolVersion.v1_14_1.getId());
+        registerProtocol(new Protocol1_14_3To1_14_2(), Collections.singletonList(ProtocolVersion.v1_14_3.getId()), ProtocolVersion.v1_14_2.getId());
+        registerProtocol(new Protocol1_14_4To1_14_3(), Collections.singletonList(ProtocolVersion.v1_14_4.getId()), ProtocolVersion.v1_14_3.getId());
     }
 
     /**
