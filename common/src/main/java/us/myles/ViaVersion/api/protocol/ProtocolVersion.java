@@ -75,7 +75,7 @@ public class ProtocolVersion {
         register(v1_14_1 = new ProtocolVersion(480, "1.14.1"));
         register(v1_14_2 = new ProtocolVersion(485, "1.14.2"));
         register(v1_14_3 = new ProtocolVersion(490, "1.14.3"));
-        register(v1_14_4 = new ProtocolVersion(496, "1.14.4"));
+        register(v1_14_4 = new ProtocolVersion(498, "1.14.4"));
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
