@@ -22,11 +22,18 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.Arrays;
+
 public class WorldPackets {
     private static final int AIR = MappingData.blockStateMappings.getNewBlock(0);
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
+    private static final byte[] FULL_LIGHT = new byte[2048];
+
+    static {
+        Arrays.fill(FULL_LIGHT, (byte) 0xff);
+    }
 
     public static void register(final Protocol protocol) {
 
@@ -172,24 +179,39 @@ public class WorldPackets {
                         PacketWrapper lightPacket = wrapper.create(0x24);
                         lightPacket.write(Type.VAR_INT, chunk.getX());
                         lightPacket.write(Type.VAR_INT, chunk.getZ());
-                        int skyLightMask = 0;
+
+                        int skyLightMask = chunk.isGroundUp() ? 0x3ffff : 0; // all 18 bits set if ground up
                         int blockLightMask = 0;
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection sec = chunk.getSections()[i];
                             if (sec == null) continue;
-                            if (sec.hasSkyLight()) {
+                            if (!chunk.isGroundUp() && sec.hasSkyLight()) {
                                 skyLightMask |= (1 << (i + 1));
                             }
                             blockLightMask |= (1 << (i + 1));
                         }
+
                         lightPacket.write(Type.VAR_INT, skyLightMask);
                         lightPacket.write(Type.VAR_INT, blockLightMask);
                         lightPacket.write(Type.VAR_INT, 0);  // empty sky light mask
                         lightPacket.write(Type.VAR_INT, 0);  // empty block light mask
+
+                        // not sending skylight/setting empty skylight causes client lag due to some weird calculations
+                        // only do this on the initial chunk send (not when chunk.isGroundUp() is false)
+                        if (chunk.isGroundUp())
+                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0])); // chunk below 0
                         for (ChunkSection section : chunk.getSections()) {
-                            if (section == null || !section.hasSkyLight()) continue;
+                            if (section == null || !section.hasSkyLight()) {
+                                if (chunk.isGroundUp()) {
+                                    lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0]));
+                                }
+                                continue;
+                            }
                             lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getSkyLight()).toArray(new Byte[0]));
                         }
+                        if (chunk.isGroundUp())
+                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0])); // chunk above 255
+
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
                             lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getBlockLight()).toArray(new Byte[0]));
