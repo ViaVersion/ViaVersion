@@ -426,13 +426,13 @@ public class InventoryPackets {
                     if (numberConverted != null) {
                         oldId = numberConverted;
                     }
-                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId.toLowerCase());
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanDestroy.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanDestroy.add(new StringTag("", oldId));
+                        newCanDestroy.add(new StringTag("", oldId.toLowerCase()));
                     }
                 }
                 tag.put(newCanDestroy);
