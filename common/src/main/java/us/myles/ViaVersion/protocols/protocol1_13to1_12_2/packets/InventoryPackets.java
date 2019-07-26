@@ -405,13 +405,13 @@ public class InventoryPackets {
                     if (numberConverted != null) {
                         oldId = numberConverted;
                     }
-                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId.toLowerCase(Locale.ROOT));
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanPlaceOn.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanPlaceOn.add(new StringTag("", oldId));
+                        newCanPlaceOn.add(new StringTag("", oldId.toLowerCase(Locale.ROOT)));
                     }
                 }
                 tag.put(newCanPlaceOn);
