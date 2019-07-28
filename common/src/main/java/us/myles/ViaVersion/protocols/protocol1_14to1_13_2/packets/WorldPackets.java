@@ -4,11 +4,14 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.google.common.primitives.Bytes;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
+import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -19,6 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.ChunkLightStorage;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -171,7 +175,7 @@ public class WorldPackets {
 
                                         // Manually update light for non full blocks (block light must not be sent)
                                         if (MappingData.nonFullBlocks.contains(id)) {
-                                            setNonFullLight(chunk, section, s, x, y, z);
+                                            setNonFullLight(wrapper.user(), chunk, section, s, x, y, z);
                                         }
                                     }
                                 }
@@ -241,6 +245,43 @@ public class WorldPackets {
                         }
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, true);
+
+                        if (Via.getConfig().isNonFullBlockLightFix()) {
+                            ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
+                            if (lightStorage != null) {
+                                NibbleArray[] skyLightArrays = new NibbleArray[16];
+
+                                ChunkSection[] sections = chunk.getSections();
+                                for (int i = 0; i < sections.length; i++) {
+                                    ChunkSection section = sections[i];
+                                    if (section == null || !section.hasSkyLight()) continue;
+
+                                    skyLightArrays[i] = section.getSkyLightNibbleArray();
+                                }
+
+                                lightStorage.getSkyLight().put(getChunkIndex(chunk.getX(), chunk.getZ()), skyLightArrays);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // Chunk unload
+        protocol.registerOutgoing(State.PLAY, 0x1F, 0x1D, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if (!Via.getConfig().isNonFullBlockLightFix()) return;
+
+                        int x = wrapper.passthrough(Type.INT);
+                        int z = wrapper.passthrough(Type.INT);
+                        ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
+                        if (lightStorage == null) return;
+
+                        lightStorage.getSkyLight().remove(getChunkIndex(x, z));
                     }
                 });
             }
@@ -423,48 +464,97 @@ public class WorldPackets {
         return data;
     }
 
-    private static void setNonFullLight(Chunk chunk, ChunkSection section, int currentSection, int x, int y, int z) {
+    private static void setNonFullLight(UserConnection user, Chunk chunk, ChunkSection section, int ySection, int x, int y, int z) {
         int light = 0;
         for (BlockFace blockFace : BlockFace.values()) {
-            ChunkSection sectionToCheck = section;
+            NibbleArray skyLight = section.getSkyLightNibbleArray();
             int neigbourX = x + blockFace.getModX();
             int neigbourY = y + blockFace.getModY();
             int neigbourZ = z + blockFace.getModZ();
 
             if (blockFace.getModX() != 0) {
                 if (neigbourX == 16 || neigbourX == -1) {
-                    continue;
+                    if (!Via.getConfig().isNonFullBlockLightFix()) continue;
+
+                    ChunkLightStorage lightStorage = user.get(ChunkLightStorage.class);
+                    if (lightStorage == null) continue;
+
+                    int newX;
+                    if (neigbourX == 16) {
+                        neigbourX = 0;
+                        newX = chunk.getX() + 1;
+                    } else {
+                        neigbourX = 15;
+                        newX = chunk.getX() - 1;
+                    }
+
+                    NibbleArray[] nibbleArrays = lightStorage.getSkyLight().get(getChunkIndex(newX, chunk.getZ()));
+                    if (nibbleArrays == null) continue;
+
+                    skyLight = nibbleArrays[ySection];
+                    if (skyLight == null) continue;
                 }
             } else if (blockFace.getModY() != 0) {
-                boolean tooHigh = neigbourY == 16;
-                if (tooHigh || neigbourY == -1) {
-                    if (tooHigh) {
-                        currentSection += 1;
+                if (neigbourY == 16 || neigbourY == -1) {
+                    if (neigbourY == 16) {
+                        ySection += 1;
                         neigbourY = 0;
                     } else {
-                        currentSection -= 1;
+                        ySection -= 1;
                         neigbourY = 15;
                     }
 
-                    if (currentSection == 16 || currentSection == -1) continue;
+                    if (ySection == 16 || ySection == -1) continue;
 
-                    sectionToCheck = chunk.getSections()[currentSection];
-                    if (sectionToCheck == null || !sectionToCheck.hasSkyLight()) continue;
+                    ChunkSection newSection = chunk.getSections()[ySection];
+                    if (newSection == null || !newSection.hasSkyLight()) continue;
+
+                    skyLight = section.getSkyLightNibbleArray();
                 }
             } else if (blockFace.getModZ() != 0) {
                 if (neigbourZ == 16 || neigbourZ == -1) {
-                    continue;
+                    if (!Via.getConfig().isNonFullBlockLightFix()) continue;
+
+                    ChunkLightStorage lightStorage = user.get(ChunkLightStorage.class);
+                    if (lightStorage == null) continue;
+
+                    int newZ;
+                    if (neigbourZ == 16) {
+                        neigbourZ = 0;
+                        newZ = chunk.getZ() + 1;
+                    } else {
+                        neigbourZ = 15;
+                        newZ = chunk.getZ() - 1;
+                    }
+
+                    NibbleArray[] nibbleArrays = lightStorage.getSkyLight().get(getChunkIndex(chunk.getX(), newZ));
+                    if (nibbleArrays == null) continue;
+
+                    skyLight = nibbleArrays[ySection];
+                    if (skyLight == null) continue;
                 }
             }
 
-            int neighbourLight = sectionToCheck.getSkyLightNibbleArray().get(neigbourX, neigbourY, neigbourZ);
-            if (neighbourLight > light) {
-                light = neighbourLight;
+            int neighbourLight = skyLight.get(neigbourX, neigbourY, neigbourZ);
+            if (neighbourLight == 15) {
+                if (blockFace.getModY() == 1) {
+                    // Keep 15 if block is exposed to sky
+                    light = 15;
+                    break;
+                }
+
+                light = 14;
+            } else if (neighbourLight > light) {
+                light = neighbourLight - 1; // lower light level by one
             }
         }
 
         if (light != 0) {
-            section.getSkyLightNibbleArray().set(x, y, z, light - 1); // also lower light level by one
+            section.getSkyLightNibbleArray().set(x, y, z, light);
         }
+    }
+
+    private static long getChunkIndex(int x, int z) {
+        return ((x & 0x3FFFFFFL) << 38) | (z & 0x3FFFFFFL);
     }
 }

@@ -337,4 +337,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_14HitboxFix();
+
+    /**
+     * Fixes slabs, stairs, and walls having 0 light in specific cases when at chunk corners.
+     *
+     * @return True if enabled
+     */
+    boolean isNonFullBlockLightFix();
 }

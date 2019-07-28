@@ -322,4 +322,9 @@ public class BungeeViaConfig extends Config implements ViaVersionConfig {
     public boolean is1_14HitboxFix() {
         return false;
     }
+
+    @Override
+    public boolean isNonFullBlockLightFix() {
+        return getBoolean("fix-non-full-block-light", false);
+    }
 }

@@ -136,6 +136,9 @@ reduce-blockstorage-memory: false
 # When activated with serverside-blockconnections, flower parts with blocks above will be sent as stems
 # Useful for lobbyservers where users can't build and those stems are used decoratively
 flowerstem-when-block-above: false
+# This fixes slabs, stairs, and walls having 0 light in specific cases when they are at chunk corners for 1.14+ clients
+# Requires some caching of light values for those clients
+fix-non-full-block-light: false
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
