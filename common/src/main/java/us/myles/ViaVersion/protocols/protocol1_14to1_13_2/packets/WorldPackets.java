@@ -6,6 +6,7 @@ import com.google.common.primitives.Bytes;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
+import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -140,6 +141,7 @@ public class WorldPackets {
                         for (int s = 0; s < 16; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
+
                             boolean hasBlock = false;
                             for (int i = 0; i < section.getPaletteSize(); i++) {
                                 int old = section.getPaletteEntry(i);
@@ -153,6 +155,7 @@ public class WorldPackets {
                                 section.setNonAirBlocksCount(0);
                                 continue;
                             }
+
                             int nonAirBlockCount = 0;
                             for (int x = 0; x < 16; x++) {
                                 for (int y = 0; y < 16; y++) {
@@ -165,9 +168,15 @@ public class WorldPackets {
                                         if (MappingData.motionBlocking.contains(id)) {
                                             motionBlocking[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
                                         }
+
+                                        // Manually update light for non full blocks (block light must not be sent)
+                                        if (MappingData.nonFullBlocks.contains(id)) {
+                                            setNonFullLight(chunk, section, s, x, y, z);
+                                        }
                                     }
                                 }
                             }
+
                             section.setNonAirBlocksCount(nonAirBlockCount);
                         }
 
@@ -412,5 +421,50 @@ public class WorldPackets {
         }
 
         return data;
+    }
+
+    private static void setNonFullLight(Chunk chunk, ChunkSection section, int currentSection, int x, int y, int z) {
+        int light = 0;
+        for (BlockFace blockFace : BlockFace.values()) {
+            ChunkSection sectionToCheck = section;
+            int neigbourX = x + blockFace.getModX();
+            int neigbourY = y + blockFace.getModY();
+            int neigbourZ = z + blockFace.getModZ();
+
+            if (blockFace.getModX() != 0) {
+                if (neigbourX == 16 || neigbourX == -1) {
+                    continue;
+                }
+            } else if (blockFace.getModY() != 0) {
+                boolean tooHigh = neigbourY == 16;
+                if (tooHigh || neigbourY == -1) {
+                    if (tooHigh) {
+                        currentSection += 1;
+                        neigbourY = 0;
+                    } else {
+                        currentSection -= 1;
+                        neigbourY = 15;
+                    }
+
+                    if (currentSection == 16 || currentSection == -1) continue;
+
+                    sectionToCheck = chunk.getSections()[currentSection];
+                    if (sectionToCheck == null || !sectionToCheck.hasSkyLight()) continue;
+                }
+            } else if (blockFace.getModZ() != 0) {
+                if (neigbourZ == 16 || neigbourZ == -1) {
+                    continue;
+                }
+            }
+
+            int neighbourLight = sectionToCheck.getSkyLightNibbleArray().get(neigbourX, neigbourY, neigbourZ);
+            if (neighbourLight > light) {
+                light = neighbourLight;
+            }
+        }
+
+        if (light != 0) {
+            section.getSkyLightNibbleArray().set(x, y, z, light - 1); // also lower light level by one
+        }
     }
 }

@@ -11,11 +11,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MappingData {
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
@@ -23,6 +19,7 @@ public class MappingData {
     public static BlockMappings blockMappings;
     public static SoundMappings soundMappings;
     public static Set<Integer> motionBlocking;
+    public static Set<Integer> nonFullBlocks; // slabs, stairs, and walls
 
     public static void init() {
         JsonObject mapping1_13_2 = loadData("mapping-1.13.2.json");
@@ -56,6 +53,13 @@ public class MappingData {
             } else {
                 MappingData.motionBlocking.add(id);
             }
+        }
+
+        nonFullBlocks = new HashSet<>();
+        for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
+            final String state = blockstates.getValue().getAsString();
+            if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))
+                nonFullBlocks.add(blockStateMappings.getNewBlock(Integer.parseInt(blockstates.getKey())));
         }
     }
 
