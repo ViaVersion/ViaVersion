@@ -468,23 +468,23 @@ public class WorldPackets {
         int light = 0;
         for (BlockFace blockFace : BlockFace.values()) {
             NibbleArray skyLight = section.getSkyLightNibbleArray();
-            int neigbourX = x + blockFace.getModX();
-            int neigbourY = y + blockFace.getModY();
-            int neigbourZ = z + blockFace.getModZ();
+            int neighbourX = x + blockFace.getModX();
+            int neighbourY = y + blockFace.getModY();
+            int neighbourZ = z + blockFace.getModZ();
 
             if (blockFace.getModX() != 0) {
-                if (neigbourX == 16 || neigbourX == -1) {
+                if (neighbourX == 16 || neighbourX == -1) {
                     if (!Via.getConfig().isNonFullBlockLightFix()) continue;
 
                     ChunkLightStorage lightStorage = user.get(ChunkLightStorage.class);
                     if (lightStorage == null) continue;
 
                     int newX;
-                    if (neigbourX == 16) {
-                        neigbourX = 0;
+                    if (neighbourX == 16) {
+                        neighbourX = 0;
                         newX = chunk.getX() + 1;
                     } else {
-                        neigbourX = 15;
+                        neighbourX = 15;
                         newX = chunk.getX() - 1;
                     }
 
@@ -495,13 +495,13 @@ public class WorldPackets {
                     if (skyLight == null) continue;
                 }
             } else if (blockFace.getModY() != 0) {
-                if (neigbourY == 16 || neigbourY == -1) {
-                    if (neigbourY == 16) {
+                if (neighbourY == 16 || neighbourY == -1) {
+                    if (neighbourY == 16) {
                         ySection += 1;
-                        neigbourY = 0;
+                        neighbourY = 0;
                     } else {
                         ySection -= 1;
-                        neigbourY = 15;
+                        neighbourY = 15;
                     }
 
                     if (ySection == 16 || ySection == -1) continue;
@@ -512,18 +512,18 @@ public class WorldPackets {
                     skyLight = section.getSkyLightNibbleArray();
                 }
             } else if (blockFace.getModZ() != 0) {
-                if (neigbourZ == 16 || neigbourZ == -1) {
+                if (neighbourZ == 16 || neighbourZ == -1) {
                     if (!Via.getConfig().isNonFullBlockLightFix()) continue;
 
                     ChunkLightStorage lightStorage = user.get(ChunkLightStorage.class);
                     if (lightStorage == null) continue;
 
                     int newZ;
-                    if (neigbourZ == 16) {
-                        neigbourZ = 0;
+                    if (neighbourZ == 16) {
+                        neighbourZ = 0;
                         newZ = chunk.getZ() + 1;
                     } else {
-                        neigbourZ = 15;
+                        neighbourZ = 15;
                         newZ = chunk.getZ() - 1;
                     }
 
@@ -535,7 +535,7 @@ public class WorldPackets {
                 }
             }
 
-            int neighbourLight = skyLight.get(neigbourX, neigbourY, neigbourZ);
+            int neighbourLight = skyLight.get(neighbourX, neighbourY, neighbourZ);
             if (neighbourLight == 15) {
                 if (blockFace.getModY() == 1) {
                     // Keep 15 if block is exposed to sky
