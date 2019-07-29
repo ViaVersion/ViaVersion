@@ -535,6 +535,8 @@ public class WorldPackets {
                 }
             }
 
+            if (skyLight == null) continue;
+
             int neighbourLight = skyLight.get(neighbourX, neighbourY, neighbourZ);
             if (neighbourLight == 15) {
                 if (blockFace.getModY() == 1) {
