@@ -19,7 +19,7 @@ public class MappingData {
     public static BlockMappings blockMappings;
     public static SoundMappings soundMappings;
     public static Set<Integer> motionBlocking;
-    public static Set<Integer> nonFullBlocks; // slabs, stairs, and walls
+    public static Set<Integer> nonFullBlocks;
 
     public static void init() {
         JsonObject mapping1_13_2 = loadData("mapping-1.13.2.json");
@@ -60,6 +60,10 @@ public class MappingData {
             final String state = blockstates.getValue().getAsString();
             if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))
                 nonFullBlocks.add(blockStateMappings.getNewBlock(Integer.parseInt(blockstates.getKey())));
+        }
+        nonFullBlocks.add(blockStateMappings.getNewBlock(8163)); // grass path
+        for (int i = 3060; i < 3067; i++) { // farmland
+            nonFullBlocks.add(blockStateMappings.getNewBlock(i));
         }
     }
 
