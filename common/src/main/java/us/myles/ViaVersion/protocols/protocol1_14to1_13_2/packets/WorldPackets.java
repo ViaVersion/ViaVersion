@@ -173,7 +173,7 @@ public class WorldPackets {
 
                                         // Manually update light for non full blocks (block light must not be sent)
                                         if (MappingData.nonFullBlocks.contains(id)) {
-                                            setNonFullLight(wrapper.user(), chunk, section, s, x, y, z);
+                                            setNonFullLight(chunk, section, s, x, y, z);
                                         }
                                     }
                                 }
@@ -425,7 +425,7 @@ public class WorldPackets {
         return data;
     }
 
-    private static void setNonFullLight(UserConnection user, Chunk chunk, ChunkSection section, int ySection, int x, int y, int z) {
+    private static void setNonFullLight(Chunk chunk, ChunkSection section, int ySection, int x, int y, int z) {
         int skyLight = 0;
         int blockLight = 0;
         for (BlockFace blockFace : BlockFace.values()) {
@@ -461,6 +461,14 @@ public class WorldPackets {
                 if (neighbourZ == 16 || neighbourZ == -1) continue;
             }
 
+            if (blockLightArray != null && blockLight != 15) {
+                int neighbourBlockLight = blockLightArray.get(neighbourX, neighbourY, neighbourZ);
+                if (neighbourBlockLight == 15) {
+                    blockLight = 14;
+                } else if (neighbourBlockLight > blockLight) {
+                    blockLight = neighbourBlockLight - 1; // lower light level by one
+                }
+            }
             if (skyLightArray != null && skyLight != 15) {
                 int neighbourSkyLight = skyLightArray.get(neighbourX, neighbourY, neighbourZ);
                 if (neighbourSkyLight == 15) {
@@ -473,14 +481,6 @@ public class WorldPackets {
                     skyLight = 14;
                 } else if (neighbourSkyLight > skyLight) {
                     skyLight = neighbourSkyLight - 1; // lower light level by one
-                }
-            }
-            if (blockLightArray != null && blockLight != 15) {
-                int neighbourBlockLight = blockLightArray.get(neighbourX, neighbourY, neighbourZ);
-                if (neighbourBlockLight == 15) {
-                    blockLight = 14;
-                } else if (neighbourBlockLight > blockLight) {
-                    blockLight = neighbourBlockLight - 1; // lower light level by one
                 }
             }
         }
