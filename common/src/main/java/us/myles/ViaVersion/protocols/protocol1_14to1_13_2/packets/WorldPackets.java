@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.google.common.primitives.Bytes;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
@@ -486,11 +485,6 @@ public class WorldPackets {
         }
 
         if (skyLight != 0) {
-            if (!section.hasSkyLight()) {
-                byte[] newSkyLight = new byte[2028];
-                section.setSkyLight(newSkyLight);
-            }
-
             section.getSkyLightNibbleArray().set(x, y, z, skyLight);
         }
         if (blockLight != 0) {
