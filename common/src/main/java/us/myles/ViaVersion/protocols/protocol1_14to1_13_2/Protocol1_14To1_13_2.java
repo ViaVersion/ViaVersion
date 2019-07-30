@@ -13,7 +13,6 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.ChunkLightStorage;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -39,6 +38,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1C, 0x1B);
         registerOutgoing(State.PLAY, 0x1D, 0x54);
         registerOutgoing(State.PLAY, 0x1E, 0x1C);
+        registerOutgoing(State.PLAY, 0x1F, 0x1D);
         registerOutgoing(State.PLAY, 0x20, 0x1E);
         registerOutgoing(State.PLAY, 0x21, 0x20);
 
@@ -324,7 +324,5 @@ public class Protocol1_14To1_13_2 extends Protocol {
         userConnection.put(new EntityTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
-        if (Via.getConfig().isNonFullBlockLightFix())
-            userConnection.put(new ChunkLightStorage(userConnection));
     }
 }
