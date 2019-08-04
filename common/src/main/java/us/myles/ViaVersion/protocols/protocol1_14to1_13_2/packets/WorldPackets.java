@@ -14,6 +14,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
@@ -117,6 +118,30 @@ public class WorldPackets {
                         for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
                             int id = record.getBlockId();
                             record.setBlockId(Protocol1_14To1_13_2.getNewBlockStateId(id));
+                        }
+                    }
+                });
+            }
+        });
+
+        // Explosion
+        protocol.registerOutgoing(State.PLAY, 0x1E, 0x1C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.FLOAT); // X
+                map(Type.FLOAT); // Y
+                map(Type.FLOAT); // Z
+                map(Type.FLOAT); // Radius
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        for (int i = 0; i < 3; i++) {
+                            float coord = wrapper.get(Type.FLOAT, i);
+
+                            if (coord < 0f) {
+                                coord = (int) coord;
+                                wrapper.set(Type.FLOAT, i, coord);
+                            }
                         }
                     }
                 });
