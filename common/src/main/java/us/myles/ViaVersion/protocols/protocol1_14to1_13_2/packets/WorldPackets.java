@@ -123,6 +123,30 @@ public class WorldPackets {
             }
         });
 
+        // Explosion
+        protocol.registerOutgoing(State.PLAY, 0x1E, 0x1C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.FLOAT); // X
+                map(Type.FLOAT); // Y
+                map(Type.FLOAT); // Z
+                map(Type.FLOAT); // Radius
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        for (int i = 0; i < 3; i++) {
+                            float coord = wrapper.get(Type.FLOAT, i);
+
+                            if (coord < 0f) {
+                                coord = (int) coord;
+                                wrapper.set(Type.FLOAT, i, coord);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         // Chunk
         protocol.registerOutgoing(State.PLAY, 0x22, 0x21, new PacketRemapper() {
             @Override
