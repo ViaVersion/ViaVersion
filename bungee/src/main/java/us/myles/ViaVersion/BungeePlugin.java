@@ -7,6 +7,7 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.protocol.ProtocolConstants;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -35,6 +36,17 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public void onLoad() {
+        try {
+            ProtocolConstants.class.getField("MINECRAFT_1_14_4");
+        } catch (NoSuchFieldException e) {
+            getLogger().warning("      / \\");
+            getLogger().warning("     /   \\");
+            getLogger().warning("    /  |  \\");
+            getLogger().warning("   /   |   \\         BUNGEECORD IS OUTDATED");
+            getLogger().warning("  /         \\   VIAVERSION MAY NOT WORK AS INTENDED");
+            getLogger().warning(" /     o     \\");
+            getLogger().warning("/_____________\\");
+        }
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
         commandHandler = new BungeeCommandHandler();

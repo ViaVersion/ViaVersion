@@ -27,6 +27,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class InventoryPackets {
     private static String NBT_TAG_NAME;
@@ -404,13 +405,13 @@ public class InventoryPackets {
                     if (numberConverted != null) {
                         oldId = numberConverted;
                     }
-                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId.toLowerCase(Locale.ROOT));
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanPlaceOn.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanPlaceOn.add(new StringTag("", oldId));
+                        newCanPlaceOn.add(new StringTag("", oldId.toLowerCase(Locale.ROOT)));
                     }
                 }
                 tag.put(newCanPlaceOn);
@@ -426,13 +427,13 @@ public class InventoryPackets {
                     if (numberConverted != null) {
                         oldId = numberConverted;
                     }
-                    String[] newValues = BlockIdData.blockIdMapping.get(oldId);
+                    String[] newValues = BlockIdData.blockIdMapping.get(oldId.toLowerCase(Locale.ROOT));
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanDestroy.add(new StringTag("", newValue));
                         }
                     } else {
-                        newCanDestroy.add(new StringTag("", oldId));
+                        newCanDestroy.add(new StringTag("", oldId.toLowerCase(Locale.ROOT)));
                     }
                 }
                 tag.put(newCanDestroy);
