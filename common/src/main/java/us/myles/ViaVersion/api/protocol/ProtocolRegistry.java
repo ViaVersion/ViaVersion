@@ -43,33 +43,44 @@ public class ProtocolRegistry {
     static {
         // Base Protocol
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
-        registerBaseProtocol(new BaseProtocol1_7(), Range.<Integer>all());
+        registerBaseProtocol(new BaseProtocol1_7(), Range.all());
 
         // Register built in protocols
-        registerProtocol(new Protocol1_9To1_8(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_8.getId());
+        registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
         registerProtocol(new Protocol1_9_1To1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9.getId());
-        registerProtocol(new Protocol1_9_3To1_9_1_2(), Collections.singletonList(ProtocolVersion.v1_9_3.getId()), ProtocolVersion.v1_9_2.getId());
+        registerProtocol(new Protocol1_9_3To1_9_1_2(), ProtocolVersion.v1_9_3, ProtocolVersion.v1_9_2);
         // Only supported for 1.9.4 server to 1.9 (nothing else)
-        registerProtocol(new Protocol1_9To1_9_1(), Collections.singletonList(ProtocolVersion.v1_9.getId()), ProtocolVersion.v1_9_2.getId());
+        registerProtocol(new Protocol1_9To1_9_1(), ProtocolVersion.v1_9, ProtocolVersion.v1_9_2);
         registerProtocol(new Protocol1_9_1_2To1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
-        registerProtocol(new Protocol1_10To1_9_3_4(), Collections.singletonList(ProtocolVersion.v1_10.getId()), ProtocolVersion.v1_9_3.getId());
+        registerProtocol(new Protocol1_10To1_9_3_4(), ProtocolVersion.v1_10, ProtocolVersion.v1_9_3);
 
-        registerProtocol(new Protocol1_11To1_10(), Collections.singletonList(ProtocolVersion.v1_11.getId()), ProtocolVersion.v1_10.getId());
-        registerProtocol(new Protocol1_11_1To1_11(), Collections.singletonList(ProtocolVersion.v1_11_1.getId()), ProtocolVersion.v1_11.getId());
+        registerProtocol(new Protocol1_11To1_10(), ProtocolVersion.v1_11, ProtocolVersion.v1_10);
+        registerProtocol(new Protocol1_11_1To1_11(), ProtocolVersion.v1_11_1, ProtocolVersion.v1_11);
 
-        registerProtocol(new Protocol1_12To1_11_1(), Collections.singletonList(ProtocolVersion.v1_12.getId()), ProtocolVersion.v1_11_1.getId());
-        registerProtocol(new Protocol1_12_1To1_12(), Collections.singletonList(ProtocolVersion.v1_12_1.getId()), ProtocolVersion.v1_12.getId());
-        registerProtocol(new Protocol1_12_2To1_12_1(), Collections.singletonList(ProtocolVersion.v1_12_2.getId()), ProtocolVersion.v1_12_1.getId());
+        registerProtocol(new Protocol1_12To1_11_1(), ProtocolVersion.v1_12, ProtocolVersion.v1_11_1);
+        registerProtocol(new Protocol1_12_1To1_12(), ProtocolVersion.v1_12_1, ProtocolVersion.v1_12);
+        registerProtocol(new Protocol1_12_2To1_12_1(), ProtocolVersion.v1_12_2, ProtocolVersion.v1_12_1);
 
-        registerProtocol(new Protocol1_13To1_12_2(), Collections.singletonList(ProtocolVersion.v1_13.getId()), ProtocolVersion.v1_12_2.getId());
-        registerProtocol(new Protocol1_13_1To1_13(), Collections.singletonList(ProtocolVersion.v1_13_1.getId()), ProtocolVersion.v1_13.getId());
-        registerProtocol(new Protocol1_13_2To1_13_1(), Collections.singletonList(ProtocolVersion.v1_13_2.getId()), ProtocolVersion.v1_13_1.getId());
+        registerProtocol(new Protocol1_13To1_12_2(), ProtocolVersion.v1_13, ProtocolVersion.v1_12_2);
+        registerProtocol(new Protocol1_13_1To1_13(), ProtocolVersion.v1_13_1, ProtocolVersion.v1_13);
+        registerProtocol(new Protocol1_13_2To1_13_1(), ProtocolVersion.v1_13_2, ProtocolVersion.v1_13_1);
 
-        registerProtocol(new Protocol1_14To1_13_2(), Collections.singletonList(ProtocolVersion.v1_14.getId()), ProtocolVersion.v1_13_2.getId());
-        registerProtocol(new Protocol1_14_1To1_14(), Collections.singletonList(ProtocolVersion.v1_14_1.getId()), ProtocolVersion.v1_14.getId());
-        registerProtocol(new Protocol1_14_2To1_14_1(), Collections.singletonList(ProtocolVersion.v1_14_2.getId()), ProtocolVersion.v1_14_1.getId());
-        registerProtocol(new Protocol1_14_3To1_14_2(), Collections.singletonList(ProtocolVersion.v1_14_3.getId()), ProtocolVersion.v1_14_2.getId());
-        registerProtocol(new Protocol1_14_4To1_14_3(), Collections.singletonList(ProtocolVersion.v1_14_4.getId()), ProtocolVersion.v1_14_3.getId());
+        registerProtocol(new Protocol1_14To1_13_2(), ProtocolVersion.v1_14, ProtocolVersion.v1_13_2);
+        registerProtocol(new Protocol1_14_1To1_14(), ProtocolVersion.v1_14_1, ProtocolVersion.v1_14);
+        registerProtocol(new Protocol1_14_2To1_14_1(), ProtocolVersion.v1_14_2, ProtocolVersion.v1_14_1);
+        registerProtocol(new Protocol1_14_3To1_14_2(), ProtocolVersion.v1_14_3, ProtocolVersion.v1_14_2);
+        registerProtocol(new Protocol1_14_4To1_14_3(), ProtocolVersion.v1_14_4, ProtocolVersion.v1_14_3);
+    }
+
+    /**
+     * Register a protocol
+     *
+     * @param protocol  The protocol to register.
+     * @param supported Supported client versions.
+     * @param output    The output server version it converts to.
+     */
+    public static void registerProtocol(Protocol protocol, ProtocolVersion supported, ProtocolVersion output) {
+        registerProtocol(protocol, Collections.singletonList(supported.getId()), output.getId());
     }
 
     /**
@@ -81,7 +92,7 @@ public class ProtocolRegistry {
      */
     public static void registerProtocol(Protocol protocol, List<Integer> supported, Integer output) {
         // Clear cache as this may make new routes.
-        if (pathCache.size() > 0)
+        if (!pathCache.isEmpty())
             pathCache.clear();
 
         for (Integer version : supported) {

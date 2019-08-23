@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,17 +45,14 @@ public class MappingData {
         loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
         Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 enchantment mapping...");
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
-        enchantmentMappings = new EnchantmentMappingByteArray(mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
+        enchantmentMappings = new Mappings(72, mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
         Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 sound mapping...");
-        soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
+        soundMappings = new Mappings(662, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
         Via.getPlatform().getLogger().info("Loading translation mappping");
         Map<String, String> translateData = GsonUtil.getGson().fromJson(
-                new InputStreamReader(
-                        MappingData.class.getClassLoader()
-                                .getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")
-                ),
-                (new TypeToken<Map<String, String>>() {
-                }).getType());
+                new InputStreamReader(MappingData.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
+                new TypeToken<Map<String, String>>() {
+                }.getType());
         try {
             String[] lines;
             try (Reader reader = new InputStreamReader(MappingData.class.getClassLoader()
@@ -100,12 +96,11 @@ public class MappingData {
         }
     }
 
-    private static class BlockMappingsShortArray implements Mappings {
-        private short[] oldToNew = new short[4084];
+    private static class BlockMappingsShortArray extends Mappings {
 
         private BlockMappingsShortArray(JsonObject mapping1_12, JsonObject mapping1_13) {
-            Arrays.fill(oldToNew, (short) -1);
-            MappingDataLoader.mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
+            super(4084, mapping1_12, mapping1_13);
+
             // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
             if (Via.getConfig().isSnowCollisionFix()) {
                 oldToNew[1248] = 3416;
@@ -118,39 +113,6 @@ public class MappingData {
             oldToNew[1555] = 3984; // mossy stone bricks
             oldToNew[1556] = 3985; // cracked stone bricks
             oldToNew[1557] = 3986; // chiseled stone bricks
-        }
-
-        @Override
-        public int getNewId(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
-        }
-    }
-
-    private static class SoundMappingShortArray implements Mappings {
-        private short[] oldToNew = new short[662];
-
-        private SoundMappingShortArray(JsonArray mapping1_12, JsonArray mapping1_13) {
-            Arrays.fill(oldToNew, (short) -1);
-            MappingDataLoader.mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
-        }
-
-        @Override
-        public int getNewId(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
-        }
-    }
-
-    private static class EnchantmentMappingByteArray implements Mappings {
-        private byte[] oldToNew = new byte[72];
-
-        private EnchantmentMappingByteArray(JsonObject m1_12, JsonObject m1_13) {
-            Arrays.fill(oldToNew, (byte) -1);
-            MappingDataLoader.mapIdentifiers(oldToNew, m1_12, m1_13);
-        }
-
-        @Override
-        public int getNewId(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
         }
     }
 }

@@ -224,7 +224,7 @@ public class PacketWrapper {
         if (id != -1) {
             Type.VAR_INT.write(buffer, id);
         }
-        if (readableObjects.size() > 0) {
+        if (!readableObjects.isEmpty()) {
             packetValues.addAll(readableObjects);
             readableObjects.clear();
         }
