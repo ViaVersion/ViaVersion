@@ -150,10 +150,10 @@ public enum PacketType {
         }
     }
 
-    private State state;
-    private Direction direction;
-    private int packetID;
-    private int newPacketID = -1;
+    private final State state;
+    private final Direction direction;
+    private final int packetID;
+    private final int newPacketID;
 
     PacketType(State state, Direction direction, int packetID) {
         this.state = state;

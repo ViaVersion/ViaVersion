@@ -7,5 +7,5 @@ import us.myles.ViaVersion.api.platform.TaskId;
 @Getter
 @AllArgsConstructor
 public class BukkitTaskId implements TaskId {
-    private Integer object;
+    private final Integer object;
 }

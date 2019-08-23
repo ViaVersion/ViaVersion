@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
 
-    public AbstractViaConfig(File configFile) {
+    protected AbstractViaConfig(File configFile) {
         super(configFile);
     }
 

@@ -23,12 +23,13 @@ public class PlayerSneakListener extends ViaBukkitListener {
     private static final float HEIGHT_1_9 = 1.6F;
     private static final float DEFAULT_WIDTH = 0.6F;
 
+    private final boolean is1_9Fix;
+    private final boolean is1_14Fix;
     private Map<Player, Boolean> sneaking; // true = 1.14+, else false
     private Set<UUID> sneakingUuids;
     private Method getHandle;
     private Method setSize;
-    private boolean is1_9Fix;
-    private boolean is1_14Fix;
+
     private boolean useCache;
 
     public PlayerSneakListener(ViaVersionPlugin plugin, boolean is1_9Fix, boolean is1_14Fix) {

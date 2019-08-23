@@ -17,45 +17,25 @@ import java.util.UUID;
 
 public class UpdateUtil {
 
-    public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
-    private final static String URL = "https://api.spiget.org/v2/resources/";
-    private final static int PLUGIN = 19254;
-    private final static String LATEST_VERSION = "/versions/latest";
+    public static final String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
+    private static final String URL = "https://api.spiget.org/v2/resources/";
+    private static final int PLUGIN = 19254;
+    private static final String LATEST_VERSION = "/versions/latest";
 
     public static void sendUpdateMessage(final UUID uuid) {
-        Via.getPlatform().runAsync(new Runnable() {
-            @Override
-            public void run() {
-                final String message = getUpdateMessage(false);
-                if (message != null) {
-                    Via.getPlatform().runSync(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Via.getPlatform().sendMessage(uuid, PREFIX + message);
-                                }
-                            }
-                    );
-                }
+        Via.getPlatform().runAsync(() -> {
+            final String message = getUpdateMessage(false);
+            if (message != null) {
+                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(uuid, PREFIX + message));
             }
         });
     }
 
     public static void sendUpdateMessage() {
-        Via.getPlatform().runAsync(new Runnable() {
-            @Override
-            public void run() {
-                final String message = getUpdateMessage(true);
-                if (message != null) {
-                    Via.getPlatform().runSync(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Via.getPlatform().getLogger().warning(message);
-                                }
-                            }
-                    );
-                }
+        Via.getPlatform().runAsync(() -> {
+            final String message = getUpdateMessage(true);
+            if (message != null) {
+                Via.getPlatform().runSync(() -> Via.getPlatform().getLogger().warning(message));
             }
         });
     }

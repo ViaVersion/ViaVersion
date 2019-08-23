@@ -26,8 +26,8 @@ import java.util.logging.Level;
 
 public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider {
 
-    private static Map<UUID, BukkitInventoryUpdateTask> updateTasks = new ConcurrentHashMap<UUID, BukkitInventoryUpdateTask>();
-    private boolean supported;
+    private static final Map<UUID, BukkitInventoryUpdateTask> UPDATE_TASK = new ConcurrentHashMap<>();
+    private final boolean supported;
     // packet class
     private Class<?> windowClickPacketClass;
     private Object clickTypeEnum;
@@ -65,11 +65,11 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         }
         ProtocolInfo info = userConnection.get(ProtocolInfo.class);
         UUID uuid = info.getUuid();
-        BukkitInventoryUpdateTask updateTask = updateTasks.get(uuid);
+        BukkitInventoryUpdateTask updateTask = UPDATE_TASK.get(uuid);
         final boolean registered = updateTask != null;
         if (!registered) {
             updateTask = new BukkitInventoryUpdateTask(this, uuid);
-            updateTasks.put(uuid, updateTask);
+            UPDATE_TASK.put(uuid, updateTask);
         }
         // http://wiki.vg/index.php?title=Protocol&oldid=13223#Click_Window
         updateTask.addItem(windowId, slotId, actionId);
@@ -93,7 +93,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
                 if (tinvtype == InventoryType.BREWING) {
                     // 1.9 added the blaze powder slot to brewing stand fix for 1.8 servers
                     if (slotId >= 5 && slotId <= 40) {
-                        slotId = (short) (slotId - 1);
+                        slotId -= 1;
                     }
                 }
             }
@@ -147,7 +147,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
     }
 
     public void onTaskExecuted(UUID uuid) {
-        updateTasks.remove(uuid);
+        UPDATE_TASK.remove(uuid);
     }
 
     private void setupReflection() {

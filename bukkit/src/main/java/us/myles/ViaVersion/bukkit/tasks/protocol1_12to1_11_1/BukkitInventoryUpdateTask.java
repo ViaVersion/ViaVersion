@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class BukkitInventoryUpdateTask implements Runnable {
 
-    private BukkitInventoryQuickMoveProvider provider;
+    private final BukkitInventoryQuickMoveProvider provider;
     private final UUID uuid;
     private final List<ItemTransaction> items;
 
