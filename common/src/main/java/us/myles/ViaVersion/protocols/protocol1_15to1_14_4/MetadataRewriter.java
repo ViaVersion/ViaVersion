@@ -26,6 +26,8 @@ public class MetadataRewriter {
                 if (metadata.getId() > 11 && type.isOrHasParent(Entity1_15Types.EntityType.LIVINGENTITY)) {
                     metadata.setId(metadata.getId() + 1); //TODO is it 11 or 12? what is it for?
                 }
+
+                //TODO new boolean with id 17 for enderman?
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
