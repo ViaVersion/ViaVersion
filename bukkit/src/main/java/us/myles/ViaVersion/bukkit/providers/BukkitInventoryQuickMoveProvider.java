@@ -26,7 +26,7 @@ import java.util.logging.Level;
 
 public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider {
 
-    private static final Map<UUID, BukkitInventoryUpdateTask> UPDATE_TASK = new ConcurrentHashMap<>();
+    private final Map<UUID, BukkitInventoryUpdateTask> updateTasks = new ConcurrentHashMap<>();
     private final boolean supported;
     // packet class
     private Class<?> windowClickPacketClass;
@@ -65,11 +65,11 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         }
         ProtocolInfo info = userConnection.get(ProtocolInfo.class);
         UUID uuid = info.getUuid();
-        BukkitInventoryUpdateTask updateTask = UPDATE_TASK.get(uuid);
+        BukkitInventoryUpdateTask updateTask = updateTasks.get(uuid);
         final boolean registered = updateTask != null;
         if (!registered) {
             updateTask = new BukkitInventoryUpdateTask(this, uuid);
-            UPDATE_TASK.put(uuid, updateTask);
+            updateTasks.put(uuid, updateTask);
         }
         // http://wiki.vg/index.php?title=Protocol&oldid=13223#Click_Window
         updateTask.addItem(windowId, slotId, actionId);
@@ -147,7 +147,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
     }
 
     public void onTaskExecuted(UUID uuid) {
-        UPDATE_TASK.remove(uuid);
+        updateTasks.remove(uuid);
     }
 
     private void setupReflection() {
