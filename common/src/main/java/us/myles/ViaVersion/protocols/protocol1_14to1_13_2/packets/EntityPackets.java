@@ -26,7 +26,6 @@ import java.util.UUID;
 public class EntityPackets {
 
     public static void register(Protocol protocol) {
-
         // Spawn entity
         protocol.registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
             @Override

@@ -37,7 +37,6 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x1B, 0x1A);
         registerOutgoing(State.PLAY, 0x1C, 0x1B);
         registerOutgoing(State.PLAY, 0x1D, 0x54);
-        registerOutgoing(State.PLAY, 0x1E, 0x1C);
         registerOutgoing(State.PLAY, 0x1F, 0x1D);
         registerOutgoing(State.PLAY, 0x20, 0x1E);
         registerOutgoing(State.PLAY, 0x21, 0x20);
