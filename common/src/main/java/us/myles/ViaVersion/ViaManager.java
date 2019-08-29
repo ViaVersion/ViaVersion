@@ -21,14 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class ViaManager {
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
-    private ViaPlatform platform;
-    private ViaProviders providers = new ViaProviders();
+    private final ViaPlatform platform;
+    private final ViaProviders providers = new ViaProviders();
     @Setter
     private boolean debug = false;
     // Internals
-    private ViaInjector injector;
-    private ViaCommandHandler commandHandler;
-    private ViaPlatformLoader loader;
+    private final ViaInjector injector;
+    private final ViaCommandHandler commandHandler;
+    private final ViaPlatformLoader loader;
 
     @Builder
     public ViaManager(ViaPlatform platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
@@ -52,19 +52,14 @@ public class ViaManager {
         try {
             injector.inject();
         } catch (Exception e) {
-            getPlatform().getLogger().severe("ViaVersion failed to inject:");
+            platform.getLogger().severe("ViaVersion failed to inject:");
             e.printStackTrace();
             return;
         }
         // Mark as injected
-        System.setProperty("ViaVersion", getPlatform().getPluginVersion());
+        System.setProperty("ViaVersion", platform.getPluginVersion());
         // If successful
-        platform.runSync(new Runnable() {
-            @Override
-            public void run() {
-                onServerLoaded();
-            }
-        });
+        platform.runSync(this::onServerLoaded);
 
     }
 
@@ -73,14 +68,14 @@ public class ViaManager {
         try {
             ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
         } catch (Exception e) {
-            getPlatform().getLogger().severe("ViaVersion failed to get the server protocol!");
+            platform.getLogger().severe("ViaVersion failed to get the server protocol!");
             e.printStackTrace();
         }
         // Check if there are any pipes to this version
         if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
-            getPlatform().getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
+            platform.getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
             if (!ProtocolRegistry.isWorkingPipe()) {
-                getPlatform().getLogger().warning("ViaVersion does not have any compatible versions for this server version, please read our resource page carefully.");
+                platform.getLogger().warning("ViaVersion does not have any compatible versions for this server version, please read our resource page carefully.");
             }
         }
         // Load Listeners / Tasks
@@ -95,11 +90,11 @@ public class ViaManager {
 
     public void destroy() {
         // Uninject
-        getPlatform().getLogger().info("ViaVersion is disabling, if this is a reload and you experience issues consider rebooting.");
+        platform.getLogger().info("ViaVersion is disabling, if this is a reload and you experience issues consider rebooting.");
         try {
             injector.uninject();
         } catch (Exception e) {
-            getPlatform().getLogger().severe("ViaVersion failed to uninject:");
+            platform.getLogger().severe("ViaVersion failed to uninject:");
             e.printStackTrace();
         }
 

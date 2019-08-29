@@ -23,7 +23,6 @@ public abstract class MetadataRewriter<T extends EntityType> {
         metadataMap = Collections.unmodifiableMap(metadataMap);
 
         for (Metadata metadata : new ArrayList<>(metadatas)) {
-            int oldId = metadata.getId();
             try {
                 handleMetadata(entityId, type, metadata, metadatas, metadataMap, connection);
             } catch (Exception e) {

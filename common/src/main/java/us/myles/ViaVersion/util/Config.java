@@ -14,18 +14,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public abstract class Config implements ConfigurationProvider {
-    private static final ThreadLocal<Yaml> YAML = new ThreadLocal<Yaml>() {
-        @Override
-        protected Yaml initialValue() {
-            DumperOptions options = new DumperOptions();
-            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-            options.setPrettyFlow(false);
-            options.setIndent(2);
-            return new Yaml(new YamlConstructor(), new Representer(), options);
-        }
-    };
+    private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setPrettyFlow(false);
+        options.setIndent(2);
+        return new Yaml(new YamlConstructor(), new Representer(), options);
+    });
 
-    private CommentStore commentStore = new CommentStore('.', 2);
+    private final CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
     private ConcurrentSkipListMap<String, Object> config;
 

@@ -37,10 +37,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class BukkitViaLoader implements ViaPlatformLoader {
-    private ViaVersionPlugin plugin;
+    private final ViaVersionPlugin plugin;
 
-    private Set<Listener> listeners = new HashSet<>();
-    private Set<BukkitTask> tasks = new HashSet<>();
+    private final Set<Listener> listeners = new HashSet<>();
+    private final Set<BukkitTask> tasks = new HashSet<>();
+
+    private HandItemCache handItemCache;
 
     public BukkitViaLoader(ViaVersionPlugin plugin) {
         this.plugin = plugin;
@@ -94,8 +96,8 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             storeListener(new PaperPatch(plugin)).register();
         }
         if (plugin.getConf().isItemCache()) {
-            tasks.add(new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
-            HandItemCache.CACHE = true;
+            handItemCache = new HandItemCache();
+            tasks.add(handItemCache.runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
         }
 
         /* Providers */
@@ -110,8 +112,8 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
             @Override
             public Item getHandItem(final UserConnection info) {
-                if (HandItemCache.CACHE) {
-                    return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
+                if (handItemCache != null) {
+                    return handItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
                 } else {
                     try {
                         return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Item>() {

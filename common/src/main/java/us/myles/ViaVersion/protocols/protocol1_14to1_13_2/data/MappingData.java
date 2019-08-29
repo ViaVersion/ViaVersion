@@ -9,10 +9,13 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class MappingData {
-    public final static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static final BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Mappings blockStateMappings;
     public static Mappings blockMappings;
     public static Mappings soundMappings;
@@ -23,13 +26,13 @@ public class MappingData {
         JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json");
 
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 blockstate mapping...");
-        blockStateMappings = new BlockMappingsShortArray(mapping1_13_2.getAsJsonObject("blockstates"), mapping1_14.getAsJsonObject("blockstates"));
+        blockStateMappings = new Mappings(mapping1_13_2.getAsJsonObject("blockstates"), mapping1_14.getAsJsonObject("blockstates"));
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 block mapping...");
-        blockMappings = new BlockMappingsShortArray(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));
+        blockMappings = new Mappings(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 item mapping...");
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_13_2.getAsJsonObject("items"), mapping1_14.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 sound mapping...");
-        soundMappings = new SoundMappingShortArray(mapping1_13_2.getAsJsonArray("sounds"), mapping1_14.getAsJsonArray("sounds"));
+        soundMappings = new Mappings(mapping1_13_2.getAsJsonArray("sounds"), mapping1_14.getAsJsonArray("sounds"));
 
         Via.getPlatform().getLogger().info("Loading 1.14 blockstates...");
         JsonObject blockStates = mapping1_14.getAsJsonObject("blockstates");
@@ -50,36 +53,6 @@ public class MappingData {
             } else {
                 us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking.add(id);
             }
-        }
-    }
-
-    private static class SoundMappingShortArray implements Mappings {
-        private short[] oldToNew;
-
-        private SoundMappingShortArray(JsonArray mapping1_13_2, JsonArray mapping1_14) {
-            oldToNew = new short[mapping1_13_2.size()];
-            Arrays.fill(oldToNew, (short) -1);
-            MappingDataLoader.mapIdentifiers(oldToNew, mapping1_13_2, mapping1_14);
-        }
-
-        @Override
-        public int getNewId(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
-        }
-    }
-
-    private static class BlockMappingsShortArray implements Mappings {
-        private short[] oldToNew;
-
-        private BlockMappingsShortArray(JsonObject mapping1_13_2, JsonObject mapping1_14) {
-            oldToNew = new short[mapping1_13_2.entrySet().size()];
-            Arrays.fill(oldToNew, (short) -1);
-            MappingDataLoader.mapIdentifiers(oldToNew, mapping1_13_2, mapping1_14);
-        }
-
-        @Override
-        public int getNewId(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
         }
     }
 }

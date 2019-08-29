@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class StoredObject {
-    private UserConnection user;
+    private final UserConnection user;
 }

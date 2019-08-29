@@ -26,7 +26,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class BukkitViaAPI implements ViaAPI<Player>, ViaVersionAPI {
-    private ViaVersionPlugin plugin;
+    private final ViaVersionPlugin plugin;
 
     @Override
     public int getPlayerVersion(@NonNull Player player) {

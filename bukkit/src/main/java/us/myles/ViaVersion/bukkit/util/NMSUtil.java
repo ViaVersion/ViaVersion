@@ -3,8 +3,8 @@ package us.myles.ViaVersion.bukkit.util;
 import org.bukkit.Bukkit;
 
 public class NMSUtil {
-    private static String BASE = Bukkit.getServer().getClass().getPackage().getName();
-    private static String NMS = BASE.replace("org.bukkit.craftbukkit", "net.minecraft.server");
+    private static final String BASE = Bukkit.getServer().getClass().getPackage().getName();
+    private static final String NMS = BASE.replace("org.bukkit.craftbukkit", "net.minecraft.server");
 
     public static Class<?> nms(String className) throws ClassNotFoundException {
         return Class.forName(NMS + "." + className);

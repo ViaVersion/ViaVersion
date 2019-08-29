@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class BukkitCommandSender implements ViaCommandSender {
-    private CommandSender sender;
+    private final CommandSender sender;
 
     @Override
     public boolean hasPermission(String permission) {

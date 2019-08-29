@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InformativeException extends Exception {
-    final Map<String, Object> info = new HashMap<>();
-    int sources = 0;
+    private final Map<String, Object> info = new HashMap<>();
+    private int sources = 0;
 
     public InformativeException(Throwable cause) {
         super(cause);
@@ -34,7 +34,7 @@ public class InformativeException extends Exception {
         builder.append("Please post this error to http://github.com/ViaVersion/ViaVersion/issues\n{");
         int i = 0;
         for (Map.Entry<String, Object> entry : info.entrySet()) {
-            builder.append((i == 0 ? "" : ", ") + entry.getKey() + ": " + entry.getValue().toString());
+            builder.append(i == 0 ? "" : ", ").append(entry.getKey()).append(": ").append(entry.getValue().toString());
             i++;
         }
         builder.append("}\nActual Error: ");

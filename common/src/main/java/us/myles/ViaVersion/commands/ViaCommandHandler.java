@@ -107,7 +107,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
      */
     public void showHelp(ViaCommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
-        if (allowed.size() == 0) {
+        if (allowed.isEmpty()) {
             sender.sendMessage(color("&cYou are not allowed to use these commands!"));
             return;
         }

@@ -28,17 +28,17 @@ import java.util.UUID;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
-    private BukkitCommandHandler commandHandler;
+    private final BukkitCommandHandler commandHandler;
     private boolean compatSpigotBuild = false;
     private boolean spigot = true;
     private boolean lateBind = false;
     private boolean protocolSupport = false;
     @Getter
-    private BukkitViaConfig conf;
+    private final BukkitViaConfig conf;
     @Getter
-    private ViaAPI<Player> api = new BukkitViaAPI(this);
-    private List<Runnable> queuedTasks = new ArrayList<>();
-    private List<Runnable> asyncQueuedTasks = new ArrayList<>();
+    private final ViaAPI<Player> api = new BukkitViaAPI(this);
+    private final List<Runnable> queuedTasks = new ArrayList<>();
+    private final List<Runnable> asyncQueuedTasks = new ArrayList<>();
 
     public ViaVersionPlugin() {
         // Command handler
@@ -238,7 +238,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
             getLogger().severe("ViaVersion is already loaded, we're going to kick all the players... because otherwise we'll crash because of ProtocolLib.");
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.kickPlayer(ChatColor.translateAlternateColorCodes('&', getConf().getReloadDisconnectMsg()));
+                player.kickPlayer(ChatColor.translateAlternateColorCodes('&', conf.getReloadDisconnectMsg()));
             }
 
         } else {

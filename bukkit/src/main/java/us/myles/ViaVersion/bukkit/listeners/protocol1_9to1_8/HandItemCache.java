@@ -13,12 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HandItemCache extends BukkitRunnable {
-    public static boolean CACHE = false;
-    private static Map<UUID, Item> handCache = new ConcurrentHashMap<>();
-
-    public static Item getHandItem(UUID player) {
-        return handCache.get(player);
-    }
+    private final Map<UUID, Item> handCache = new ConcurrentHashMap<>();
 
     @Override
     public void run() {
@@ -32,6 +27,10 @@ public class HandItemCache extends BukkitRunnable {
         for (UUID uuid : players) {
             handCache.remove(uuid);
         }
+    }
+
+    public Item getHandItem(UUID player) {
+        return handCache.get(player);
     }
 
     public static Item convert(ItemStack itemInHand) {
