@@ -62,7 +62,7 @@ public class MappingData {
                 nonFullBlocks.add(blockStateMappings.getNewBlock(Integer.parseInt(blockstates.getKey())));
         }
         nonFullBlocks.add(blockStateMappings.getNewBlock(8163)); // grass path
-        for (int i = 3060; i < 3067; i++) { // farmland
+        for (int i = 3060; i <= 3067; i++) { // farmland
             nonFullBlocks.add(blockStateMappings.getNewBlock(i));
         }
     }
