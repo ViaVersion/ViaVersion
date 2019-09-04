@@ -18,6 +18,10 @@ public class MetadataRewriter {
             try {
                 if (metadata.getMetaType() == MetaType1_14.Slot) {
                     InventoryPackets.toClient((Item) metadata.getValue());
+                } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
+                    // Convert to new block id
+                    int data = (int) metadata.getValue();
+                    metadata.setValue(Protocol1_15To1_14_4.getNewBlockStateId(data));
                 }
 
                 if (type == null) continue;

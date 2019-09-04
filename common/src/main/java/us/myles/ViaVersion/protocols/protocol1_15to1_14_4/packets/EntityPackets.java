@@ -10,7 +10,10 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.MetadataRewriter;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker;
+
+import java.util.UUID;
 
 public class EntityPackets {
 
@@ -19,17 +22,34 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity id
+                map(Type.UUID); // 1 - UUID
+                map(Type.VAR_INT); // 2 - Type
+                map(Type.DOUBLE); // 3 - X
+                map(Type.DOUBLE); // 4 - Y
+                map(Type.DOUBLE); // 5 - Z
+                map(Type.BYTE); // 6 - Pitch
+                map(Type.BYTE); // 7 - Yaw
+                map(Type.INT); // 8 - Data
+                map(Type.SHORT); // 9 - Velocity X
+                map(Type.SHORT); // 10 - Velocity Y
+                map(Type.SHORT); // 11 - Velocity Z
+
                 // Track Entity
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.UUID);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        UUID uuid = wrapper.get(Type.UUID, 0);
+                        int typeId = wrapper.get(Type.VAR_INT, 1);
 
-                        int typeId = wrapper.read(Type.VAR_INT);
                         Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
                         wrapper.user().get(EntityTracker.class).addEntity(entityId, entityType);
-                        wrapper.write(Type.VAR_INT, entityType.getId());
+                        wrapper.set(Type.VAR_INT, 1, entityType.getId());
+
+                        if (entityType == Entity1_15Types.EntityType.FALLING_BLOCK) {
+                            wrapper.set(Type.INT, 0, Protocol1_15To1_14_4.getNewBlockStateId(wrapper.get(Type.INT, 0)));
+                        }
                     }
                 });
             }

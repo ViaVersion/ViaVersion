@@ -8,14 +8,15 @@ import us.myles.ViaVersion.api.Via;
 public class MappingData {
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappings blockMappings;
+    public static us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappings blockStateMappings;
     public static us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.SoundMappings soundMappings;
 
     public static void init() {
         JsonObject mapping1_14 = us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.loadData("mapping-1.14.json");
         JsonObject mapping1_15 = us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.loadData("mapping-1.15.json");
 
-        // New blockstates have just been appended to the old, so mappings are not (yet) necessary.
-
+        Via.getPlatform().getLogger().info("Loading 1.14 -> 1.15 blockstate mapping...");
+        blockStateMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappingsShortArray(mapping1_14.getAsJsonObject("blockstates"), mapping1_15.getAsJsonObject("blockstates"));
         Via.getPlatform().getLogger().info("Loading 1.14 -> 1.15 block mapping...");
         blockMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappingsShortArray(mapping1_14.getAsJsonObject("blocks"), mapping1_15.getAsJsonObject("blocks"));
         Via.getPlatform().getLogger().info("Loading 1.14 -> 1.15 item mapping...");

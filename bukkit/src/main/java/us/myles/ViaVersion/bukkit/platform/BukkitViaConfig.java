@@ -269,4 +269,9 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
     public boolean is1_14HitboxFix() {
         return getBoolean("change-1_14-hitbox", false);
     }
+
+    @Override
+    public boolean is1_15InstantRespawn() {
+        return getBoolean("use-1_15-instant-respawn", false);
+    }
 }
