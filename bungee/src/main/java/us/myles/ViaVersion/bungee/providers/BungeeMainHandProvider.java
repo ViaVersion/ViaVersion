@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
  */
 public class BungeeMainHandProvider extends MainHandProvider {
     private static final MethodHandle getSettings;
-    private static MethodHandle setMainHand ;
+    private static final MethodHandle setMainHand;
 
     static {
         try {
