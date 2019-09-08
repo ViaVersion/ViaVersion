@@ -2,6 +2,7 @@ package us.myles.ViaVersion.bungee.handlers;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.NettyChannelInternals;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -12,16 +13,9 @@ import java.lang.reflect.Method;
 public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
     @Getter
     private final ChannelInitializer<Channel> original;
-    private Method method;
 
     public BungeeChannelInitializer(ChannelInitializer<Channel> oldInit) {
         this.original = oldInit;
-        try {
-            this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
-            this.method.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -30,7 +24,7 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
         // init protocol
         new ProtocolPipeline(info);
         // Add originals
-        this.method.invoke(this.original, socketChannel);
+        NettyChannelInternals.initChannel(this.original, socketChannel);
 
         if (socketChannel.pipeline().get("packet-encoder") == null) return; // Don't inject if no packet-encoder
         if (socketChannel.pipeline().get("packet-decoder") == null) return; // Don't inject if no packet-decoder

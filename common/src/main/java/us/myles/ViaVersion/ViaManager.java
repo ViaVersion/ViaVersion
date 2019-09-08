@@ -17,6 +17,7 @@ import us.myles.ViaVersion.update.UpdateUtil;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 @Getter
 public class ViaManager {
@@ -52,8 +53,7 @@ public class ViaManager {
         try {
             injector.inject();
         } catch (Exception e) {
-            getPlatform().getLogger().severe("ViaVersion failed to inject:");
-            e.printStackTrace();
+            getPlatform().getLogger().log(Level.SEVERE, "ViaVersion failed to inject:", e);
             return;
         }
         // Mark as injected
@@ -73,8 +73,7 @@ public class ViaManager {
         try {
             ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
         } catch (Exception e) {
-            getPlatform().getLogger().severe("ViaVersion failed to get the server protocol!");
-            e.printStackTrace();
+            getPlatform().getLogger().log(Level.SEVERE, "ViaVersion failed to get the server protocol!", e);
         }
         // Check if there are any pipes to this version
         if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
@@ -99,8 +98,7 @@ public class ViaManager {
         try {
             injector.uninject();
         } catch (Exception e) {
-            getPlatform().getLogger().severe("ViaVersion failed to uninject:");
-            e.printStackTrace();
+            getPlatform().getLogger().log(Level.SEVERE, "ViaVersion failed to uninject:", e);
         }
 
         // Unload

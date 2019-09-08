@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.bungee.handlers;
 
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -8,6 +9,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
@@ -27,10 +29,11 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPacke
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.util.InvokeUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -39,32 +42,34 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BungeeServerHandler implements Listener {
-    private static Method getHandshake;
-    private static Method getRelayMessages;
-    private static Method setProtocol;
-    private static Method getEntityMap = null;
-    private static Method setVersion = null;
-    private static Field entityRewrite = null;
-    private static Field channelWrapper = null;
+    private static final MethodHandle getHandshake;
+    private static final MethodHandle getRelayMessages;
+    private static final MethodHandle getEntityMap;
+    private static final MethodHandle setVersion;
+    private static final MethodHandle entityRewrite;
+    private static final MethodHandle channelWrapper;
 
     static {
         try {
-            getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
-            getRelayMessages = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getRelayMessages");
-            setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
-            getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
-            setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
-            channelWrapper = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("ch");
-            channelWrapper.setAccessible(true);
-            entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
-            entityRewrite.setAccessible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
+            MethodHandles.Lookup lookup = InvokeUtil.lookup();
+            Class<?> initialHandlerClass = Class.forName("net.md_5.bungee.connection.InitialHandler");
+            getHandshake = lookup.findVirtual(initialHandlerClass, "getHandshake", MethodType.methodType(Handshake.class));
+            getRelayMessages = lookup.findVirtual(initialHandlerClass, "getRelayMessages", MethodType.methodType(List.class));
+            Class<?> entityMapClass = Class.forName("net.md_5.bungee.entitymap.EntityMap");
+            getEntityMap = lookup.findStatic(entityMapClass, "getEntityMap", MethodType.methodType(entityMapClass, Integer.TYPE));
+            Class<?> channelWrapperClass = Class.forName("net.md_5.bungee.netty.ChannelWrapper");
+            setVersion = lookup.findVirtual(channelWrapperClass, "setVersion", MethodType.methodType(Void.TYPE, Integer.TYPE));
+            Class<?> userConnectionClass = Class.forName("net.md_5.bungee.UserConnection");
+            channelWrapper = lookup.findGetter(userConnectionClass, "ch", channelWrapperClass);
+            entityRewrite = lookup.findSetter(userConnectionClass, "entityRewrite", entityMapClass);
+        } catch (NoSuchFieldException | NoSuchMethodException | ClassNotFoundException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
         }
     }
 
     // Set the handshake version every time someone connects to any server
     @EventHandler
+    @SneakyThrows
     public void onServerConnect(ServerConnectEvent e) {
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (user == null) return;
@@ -76,13 +81,8 @@ public class BungeeServerHandler implements Listener {
         List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
 
         // Check if ViaVersion can support that version
-        try {
-            //Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
-            Object handshake = getHandshake.invoke(e.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
-        } catch (InvocationTargetException | IllegalAccessException e1) {
-            e1.printStackTrace();
-        }
+        Handshake handshake = (Handshake) getHandshake.invoke(e.getPlayer().getPendingConnection());
+        handshake.setProtocolVersion(protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -112,8 +112,8 @@ public class BungeeServerHandler implements Listener {
         }
     }
 
-
-    public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
+    @SneakyThrows
+    public void checkServerChange(ServerConnectedEvent e, UserConnection user) {
         if (user == null) return;
         // Auto-team handling
         // Handle server/version change
@@ -240,11 +240,10 @@ public class BungeeServerHandler implements Listener {
                         }
                     }
 
-                    Object wrapper = channelWrapper.get(player);
+                    Object wrapper = channelWrapper.invoke(player);
                     setVersion.invoke(wrapper, protocolId);
-
-                    Object entityMap = getEntityMap.invoke(null, protocolId);
-                    entityRewrite.set(player, entityMap);
+                    Object entityMap = getEntityMap.invoke(protocolId);
+                    entityRewrite.invoke(player, entityMap);
                 }
             }
         }

@@ -15,9 +15,8 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
-public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHandler {
+public final class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHandler {
     private static Field versionField = null;
 
     static {
@@ -46,13 +45,7 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
         // handle the packet type
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder
-            try {
-                PipelineUtil.callEncode(this.minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, bytebuf);
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                }
-            }
+            PipelineUtil.callEncode(this.minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, bytebuf);
         }
 
         transform(bytebuf);

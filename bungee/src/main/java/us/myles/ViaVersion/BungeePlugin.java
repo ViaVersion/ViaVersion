@@ -127,8 +127,9 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
-        if (getProxy().getPlayer(uuid) != null) {
-            getProxy().getPlayer(uuid).disconnect(message);
+        ProxiedPlayer p = getProxy().getPlayer(uuid);
+        if (p != null) {
+            p.disconnect(message);
             return true;
         }
         return false;

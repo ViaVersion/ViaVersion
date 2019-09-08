@@ -11,10 +11,9 @@ import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class BukkitDecodeHandler extends ByteToMessageDecoder {
+public final class BukkitDecodeHandler extends ByteToMessageDecoder {
 
     private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
@@ -27,7 +26,7 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
         // use transformers
-        if (bytebuf.readableBytes() > 0) {
+        if (bytebuf.isReadable()) {
             // Ignore if pending disconnect
             if (info.isPendingDisconnect()) {
                 return;
@@ -69,10 +68,6 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
             // call minecraft decoder
             try {
                 list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                }
             } finally {
                 if (info.isActive()) {
                     bytebuf.release();

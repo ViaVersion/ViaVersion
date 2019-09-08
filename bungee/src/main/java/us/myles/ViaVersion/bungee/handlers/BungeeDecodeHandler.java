@@ -26,7 +26,7 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         // use transformers
-        if (bytebuf.readableBytes() > 0) {
+        if (bytebuf.isReadable()) {
             // Ignore if pending disconnect
             if (info.isPendingDisconnect()) {
                 return;

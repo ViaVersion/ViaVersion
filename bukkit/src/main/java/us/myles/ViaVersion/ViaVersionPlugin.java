@@ -32,13 +32,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     private boolean compatSpigotBuild = false;
     private boolean spigot = true;
     private boolean lateBind = false;
-    private boolean protocolSupport = false;
+    private boolean protocolSupport;
     @Getter
     private BukkitViaConfig conf;
     @Getter
-    private ViaAPI<Player> api = new BukkitViaAPI(this);
-    private List<Runnable> queuedTasks = new ArrayList<>();
-    private List<Runnable> asyncQueuedTasks = new ArrayList<>();
+    private final ViaAPI<Player> api = new BukkitViaAPI(this);
+    private final List<Runnable> queuedTasks = new ArrayList<>();
+    private final List<Runnable> asyncQueuedTasks = new ArrayList<>();
 
     public ViaVersionPlugin() {
         // Command handler

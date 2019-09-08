@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
@@ -113,8 +112,6 @@ public class UpdateUtil {
                 return null;
             }
             return statistics.get("name").getAsString();
-        } catch (MalformedURLException e) {
-            return null;
         } catch (IOException e) {
             return null;
         }

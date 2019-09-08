@@ -21,14 +21,14 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 @RequiredArgsConstructor
-public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
+public final class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     @NonNull
     private final UserConnection info;
     private boolean handledCompression = false;
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
-        if (bytebuf.readableBytes() == 0) {
+        if (!bytebuf.isReadable()) {
             throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
         }
         boolean needsCompress = false;
