@@ -511,6 +511,8 @@ public class InventoryPackets {
                 return "wdl:control";
             case "WDL|REQUEST":
                 return "wdl:request";
+            case "FML|HS":
+                return "fml:hs";
             case "bungeecord:main":
                 return null;
             default:
