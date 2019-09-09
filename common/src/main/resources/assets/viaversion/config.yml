@@ -126,7 +126,7 @@ change-1_9-hitbox: false
 # WARNING: This gives 1.14+ players the ability to sneak under blocks, that players under that version cannot (sneaking in places that are only 1.5 blocks high)!
 # Another thing to remember is that those players might be missed by projectiles and other hits directed at the very top of their head whilst sneaking.
 change-1_14-hitbox: false
-# Fixes 1.14+ client on sub 1.14 servers having a light value of 0 for non full blocks.
+# Fixes 1.14+ clients on sub 1.14 servers having a light value of 0 for non full blocks.
 fix-non-full-blocklight: true
 #
 # Enable serverside block-connections for 1.13+ clients
