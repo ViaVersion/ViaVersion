@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
-import com.google.common.primitives.Bytes;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -33,7 +32,7 @@ public class WorldPackets {
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
-    private static final byte[] FULL_LIGHT = new byte[2048];
+    private static final Byte[] FULL_LIGHT = new Byte[2048];
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
@@ -235,22 +234,22 @@ public class WorldPackets {
                         // not sending skylight/setting empty skylight causes client lag due to some weird calculations
                         // only do this on the initial chunk send (not when chunk.isGroundUp() is false)
                         if (chunk.isGroundUp())
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0])); // chunk below 0
+                            lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk below 0
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) {
                                 if (chunk.isGroundUp()) {
-                                    lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0]));
+                                    lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT);
                                 }
                                 continue;
                             }
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getSkyLight()).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getSkyLight()));
                         }
                         if (chunk.isGroundUp())
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0])); // chunk above 255
+                            lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk above 255
 
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getBlockLight()).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getBlockLight()));
                         }
 
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
@@ -268,6 +267,14 @@ public class WorldPackets {
                         }
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, true);
+                    }
+
+                    private Byte[] fromPrimitiveArray(byte[] bytes) {
+                        Byte[] newArray = new Byte[bytes.length];
+                        for (int i = 0; i < bytes.length; i++) {
+                            newArray[i] = bytes[i];
+                        }
+                        return newArray;
                     }
                 });
             }
