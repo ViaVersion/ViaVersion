@@ -750,6 +750,8 @@ public class InventoryPackets {
                 return "WDL|CONTROL";
             case "wdl:request":
                 return "WDL|REQUEST";
+            case "fml:hs":
+                return "FML|HS";
             default:
                 return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }
