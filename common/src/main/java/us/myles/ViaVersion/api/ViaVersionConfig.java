@@ -337,4 +337,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_14HitboxFix();
+
+    /**
+     * Fixes non full blocks having 0 light for 1.14+ clients on sub 1.14 servers.
+     *
+     * @return True if enabled
+     */
+    boolean isNonFullBlockLightFix();
 }

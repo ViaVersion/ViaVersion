@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.google.common.primitives.Bytes;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
@@ -172,7 +173,7 @@ public class WorldPackets {
                                         }
 
                                         // Manually update light for non full blocks (block light must not be sent)
-                                        if (MappingData.nonFullBlocks.contains(id)) {
+                                        if (Via.getConfig().isNonFullBlockLightFix() && MappingData.nonFullBlocks.contains(id)) {
                                             setNonFullLight(chunk, section, s, x, y, z);
                                         }
                                     }

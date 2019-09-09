@@ -55,15 +55,17 @@ public class MappingData {
             }
         }
 
-        nonFullBlocks = new HashSet<>();
-        for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
-            final String state = blockstates.getValue().getAsString();
-            if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))
-                nonFullBlocks.add(blockStateMappings.getNewBlock(Integer.parseInt(blockstates.getKey())));
-        }
-        nonFullBlocks.add(blockStateMappings.getNewBlock(8163)); // grass path
-        for (int i = 3060; i <= 3067; i++) { // farmland
-            nonFullBlocks.add(blockStateMappings.getNewBlock(i));
+        if (Via.getConfig().isNonFullBlockLightFix()) {
+            nonFullBlocks = new HashSet<>();
+            for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
+                final String state = blockstates.getValue().getAsString();
+                if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))
+                    nonFullBlocks.add(blockStateMappings.getNewBlock(Integer.parseInt(blockstates.getKey())));
+            }
+            nonFullBlocks.add(blockStateMappings.getNewBlock(8163)); // grass path
+            for (int i = 3060; i <= 3067; i++) { // farmland
+                nonFullBlocks.add(blockStateMappings.getNewBlock(i));
+            }
         }
     }
 
