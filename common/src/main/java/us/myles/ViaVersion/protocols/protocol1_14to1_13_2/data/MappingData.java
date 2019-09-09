@@ -11,11 +11,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MappingData {
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
@@ -23,6 +19,7 @@ public class MappingData {
     public static BlockMappings blockMappings;
     public static SoundMappings soundMappings;
     public static Set<Integer> motionBlocking;
+    public static Set<Integer> nonFullBlocks;
 
     public static void init() {
         JsonObject mapping1_13_2 = loadData("mapping-1.13.2.json");
@@ -55,6 +52,19 @@ public class MappingData {
                 Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
             } else {
                 MappingData.motionBlocking.add(id);
+            }
+        }
+
+        if (Via.getConfig().isNonFullBlockLightFix()) {
+            nonFullBlocks = new HashSet<>();
+            for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
+                final String state = blockstates.getValue().getAsString();
+                if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))
+                    nonFullBlocks.add(blockStateMappings.getNewBlock(Integer.parseInt(blockstates.getKey())));
+            }
+            nonFullBlocks.add(blockStateMappings.getNewBlock(8163)); // grass path
+            for (int i = 3060; i <= 3067; i++) { // farmland
+                nonFullBlocks.add(blockStateMappings.getNewBlock(i));
             }
         }
     }
