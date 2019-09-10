@@ -511,11 +511,24 @@ public class InventoryPackets {
                 return "wdl:control";
             case "WDL|REQUEST":
                 return "wdl:request";
+            case "FML|HS":
+            	return "fml:hs";
+            case "FML|MP":
+            	return "fml:mp";
+            case "FML":
+            	return "unk:fml";
+            case "FORGE":
+            	return "unk:forge";
             case "bungeecord:main":
                 return null;
             default:
-                return old.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*") // Identifier regex
-                        ? old : null;
+            	if(old.indexOf('|') != -1)
+            		return old.replace("|", ":").toLowerCase();
+            	
+            	if(old.indexOf(':') != -1)
+            		return old;
+            	
+                return "unk:" + old;
         }
     }
 
@@ -750,8 +763,14 @@ public class InventoryPackets {
                 return "WDL|CONTROL";
             case "wdl:request":
                 return "WDL|REQUEST";
+            case "fml:hs":
+            	return "FML|HS";
+            case "fml:mp":
+            	return "FML|MP";
             default:
-                return newId.length() > 20 ? newId.substring(0, 20) : newId;
+            	if(newId.startsWith("unk:"))
+            		return newId.replace("unk:", "").toUpperCase();
+                return newId.replace(":", "|").toUpperCase();
         }
     }
 
