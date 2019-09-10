@@ -514,7 +514,7 @@ public class InventoryPackets {
             case "bungeecord:main":
                 return null;
             default:
-                return old.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*") // Identifier regex
+                return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
                         ? old : null;
         }
     }
@@ -719,7 +719,7 @@ public class InventoryPackets {
     }
 
     public static String getOldPluginChannelId(String newId) {
-        if (!newId.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*")) {
+        if (!newId.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)")) {
             return null; // Not valid
         }
         int separatorIndex = newId.indexOf(':');
