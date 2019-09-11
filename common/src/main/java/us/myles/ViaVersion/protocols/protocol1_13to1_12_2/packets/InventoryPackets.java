@@ -518,7 +518,8 @@ public class InventoryPackets {
             case "bungeecord:main":
                 return null;
             default:
-            	return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") ? old : null;
+            	return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
+            			? old : null;
         }
     }
 
