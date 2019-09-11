@@ -515,20 +515,10 @@ public class InventoryPackets {
             	return "fml:hs";
             case "FML|MP":
             	return "fml:mp";
-            case "FML":
-            	return "unk:fml";
-            case "FORGE":
-            	return "unk:forge";
             case "bungeecord:main":
                 return null;
             default:
-            	if(old.indexOf('|') != -1)
-            		return old.replace("|", ":").toLowerCase();
-            	
-            	if(old.indexOf(':') != -1)
-            		return old;
-            	
-                return "unk:" + old;
+            	return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") ? old : null;
         }
     }
 
@@ -732,7 +722,7 @@ public class InventoryPackets {
     }
 
     public static String getOldPluginChannelId(String newId) {
-        if (!newId.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*")) {
+        if (!newId.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)")) {
             return null; // Not valid
         }
         int separatorIndex = newId.indexOf(':');
@@ -768,9 +758,7 @@ public class InventoryPackets {
             case "fml:mp":
             	return "FML|MP";
             default:
-            	if(newId.startsWith("unk:"))
-            		return newId.replace("unk:", "").toUpperCase();
-                return newId.replace(":", "|").toUpperCase();
+            	return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }
     }
 
