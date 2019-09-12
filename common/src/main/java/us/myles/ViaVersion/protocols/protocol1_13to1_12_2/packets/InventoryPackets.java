@@ -513,6 +513,10 @@ public class InventoryPackets {
                 return "wdl:request";
             case "bungeecord:main":
                 return null;
+            case "FML|MP":
+            	return "fml:mp";
+            case "FML|HS":
+            	return "fml:hs";
             default:
                 return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
                         ? old : null;
@@ -750,6 +754,10 @@ public class InventoryPackets {
                 return "WDL|CONTROL";
             case "wdl:request":
                 return "WDL|REQUEST";
+            case "fml:hs":
+            	return "FML|HS";
+            case "fml:mp":
+            	return "FML:MP";
             default:
                 return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }
