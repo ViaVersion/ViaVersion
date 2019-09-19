@@ -126,6 +126,8 @@ change-1_9-hitbox: false
 # WARNING: This gives 1.14+ players the ability to sneak under blocks, that players under that version cannot (sneaking in places that are only 1.5 blocks high)!
 # Another thing to remember is that those players might be missed by projectiles and other hits directed at the very top of their head whilst sneaking.
 change-1_14-hitbox: false
+# Should 1.15+ clients respawn instantly / without showing a death screen?
+use-1_15-instant-respawn: false
 #
 # Enable serverside block-connections for 1.13+ clients
 serverside-blockconnections: false

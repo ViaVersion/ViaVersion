@@ -321,4 +321,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_14HitboxFix();
+
+    /**
+     * Should 1.15 clients respawn instantly / without showing the death screen
+     *
+     * @return True if enabled
+     */
+    boolean is1_15InstantRespawn();
 }
