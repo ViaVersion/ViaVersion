@@ -239,6 +239,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
+    public boolean isNonFullBlockLightFix() {
+        return getBoolean("fix-non-full-blocklight", false);
+    }
+
+    @Override
     public boolean is1_15InstantRespawn() {
         return getBoolean("use-1_15-instant-respawn", false);
     }

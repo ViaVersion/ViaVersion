@@ -323,6 +323,13 @@ public interface ViaVersionConfig {
     boolean is1_14HitboxFix();
 
     /**
+     * Fixes non full blocks having 0 light for 1.14+ clients on sub 1.14 servers.
+     *
+     * @return True if enabled
+     */
+    boolean isNonFullBlockLightFix();
+
+    /**
      * Should 1.15 clients respawn instantly / without showing the death screen
      *
      * @return True if enabled

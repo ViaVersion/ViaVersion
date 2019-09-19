@@ -66,6 +66,10 @@ public class BungeeServerHandler implements Listener {
     // Set the handshake version every time someone connects to any server
     @EventHandler
     public void onServerConnect(ServerConnectEvent e) {
+        if (e.isCancelled()) {
+            return;
+        }
+
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (user == null) return;
         if (!user.has(BungeeStorage.class)) {

@@ -32,17 +32,23 @@ public class PlayerSneakListener extends ViaBukkitListener {
 
     private boolean useCache;
 
-    public PlayerSneakListener(ViaVersionPlugin plugin, boolean is1_9Fix, boolean is1_14Fix) {
+    public PlayerSneakListener(ViaVersionPlugin plugin, boolean is1_9Fix, boolean is1_14Fix) throws ReflectiveOperationException {
         super(plugin, null);
         this.is1_9Fix = is1_9Fix;
         this.is1_14Fix = is1_14Fix;
+
+        final String packageName = plugin.getServer().getClass().getPackage().getName();
+        getHandle = Class.forName(packageName + ".entity.CraftPlayer").getMethod("getHandle");
+
+        final Class<?> entityPlayerClass = Class.forName(packageName
+                .replace("org.bukkit.craftbukkit", "net.minecraft.server") + ".EntityPlayer");
         try {
-            getHandle = Class.forName(plugin.getServer().getClass().getPackage().getName() + ".entity.CraftPlayer").getMethod("getHandle");
-            setSize = Class.forName(plugin.getServer().getClass().getPackage().getName()
-                    .replace("org.bukkit.craftbukkit", "net.minecraft.server") + ".EntityPlayer").getMethod("setSize", Float.TYPE, Float.TYPE);
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            e.printStackTrace();
+            setSize = entityPlayerClass.getMethod("setSize", Float.TYPE, Float.TYPE);
+        } catch (NoSuchMethodException e) {
+            // Don't catch this one
+            setSize = entityPlayerClass.getMethod("a", Float.TYPE, Float.TYPE);
         }
+
 
         // From 1.9 upwards the server hitbox is set in every entity tick, so we have to reset it everytime
         if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_9.getId()) {

@@ -20,6 +20,7 @@ public class MappingData {
     public static Mappings blockMappings;
     public static Mappings soundMappings;
     public static Set<Integer> motionBlocking;
+    public static Set<Integer> nonFullBlocks;
 
     public static void init() {
         JsonObject mapping1_13_2 = MappingDataLoader.loadData("mapping-1.13.2.json");
@@ -52,6 +53,19 @@ public class MappingData {
                 Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
             } else {
                 us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking.add(id);
+            }
+        }
+
+        if (Via.getConfig().isNonFullBlockLightFix()) {
+            nonFullBlocks = new HashSet<>();
+            for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
+                final String state = blockstates.getValue().getAsString();
+                if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))
+                    nonFullBlocks.add(blockStateMappings.getNewId(Integer.parseInt(blockstates.getKey())));
+            }
+            nonFullBlocks.add(blockStateMappings.getNewId(8163)); // grass path
+            for (int i = 3060; i <= 3067; i++) { // farmland
+                nonFullBlocks.add(blockStateMappings.getNewId(i));
             }
         }
     }

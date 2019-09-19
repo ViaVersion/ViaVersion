@@ -141,7 +141,15 @@ public class EntityPackets {
                 // 1 - Slot ID
                 map(Type.SHORT, new ValueTransformer<Short, Integer>(Type.VAR_INT) {
                     @Override
-                    public Integer transform(PacketWrapper wrapper, Short slot) {
+                    public Integer transform(PacketWrapper wrapper, Short slot) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        int receiverId = wrapper.user().get(EntityTracker1_9.class).getClientEntityId();
+                        // Normally, 0 = hand and 1-4 = armor
+                        // ... but if the sent id is equal to the receiver's id, 0-3 will instead mark the armor slots
+                        // (In 1.9+, every client treats the received the same: 0=hand, 1=offhand, 2-5=armor)
+                        if (entityId == receiverId) {
+                            return slot.intValue() + 2;
+                        }
                         return slot > 0 ? slot.intValue() + 1 : slot.intValue();
                     }
                 });
