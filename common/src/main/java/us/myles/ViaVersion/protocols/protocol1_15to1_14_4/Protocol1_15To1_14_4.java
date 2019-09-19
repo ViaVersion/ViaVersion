@@ -13,7 +13,7 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets.PlayerPackets;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_15To1_14_4 extends Protocol {
@@ -266,7 +266,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker(userConnection));
+        userConnection.put(new EntityTracker1_15(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
     }

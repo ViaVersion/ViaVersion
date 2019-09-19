@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class PlayerPackets {
@@ -49,7 +49,7 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper wrapper) throws Exception {
 						Entity1_15Types.EntityType entType = Entity1_15Types.EntityType.PLAYER;
-						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+						EntityTracker1_15 tracker = wrapper.user().get(EntityTracker1_15.class);
 						tracker.addEntity(wrapper.get(Type.INT, 0), entType);
 					}
 				});
@@ -62,7 +62,7 @@ public class PlayerPackets {
 						clientChunks.setEnvironment(dimensionId);
 
 						// Register Type ID
-						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+						EntityTracker1_15 tracker = wrapper.user().get(EntityTracker1_15.class);
 						int entityId = wrapper.get(Type.INT, 0);
 						tracker.addEntity(entityId, Entity1_15Types.EntityType.PLAYER);
 					}

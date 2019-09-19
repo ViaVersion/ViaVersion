@@ -11,7 +11,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ public class EntityPackets {
                         int typeId = wrapper.get(Type.VAR_INT, 1);
 
                         Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entityType);
+                        wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
                         wrapper.set(Type.VAR_INT, 1, entityType.getId());
 
                         if (entityType == Entity1_15Types.EntityType.FALLING_BLOCK) {
@@ -68,7 +68,7 @@ public class EntityPackets {
 
                         int typeId = wrapper.read(Type.VAR_INT);
                         Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entityType);
+                        wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
                         wrapper.write(Type.VAR_INT, entityType.getId());
 
                         wrapper.passthrough(Type.DOUBLE);
@@ -98,7 +98,7 @@ public class EntityPackets {
 
                         int typeId = wrapper.read(Type.VAR_INT);
                         Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entityType);
+                        wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
                         wrapper.write(Type.VAR_INT, entityType.getId());
 
                         wrapper.passthrough(Type.DOUBLE);
@@ -122,7 +122,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        Optional<Entity1_15Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
+                        Optional<Entity1_15Types.EntityType> type = wrapper.user().get(EntityTracker1_15.class).getEntity(entityId);
                         MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });

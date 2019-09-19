@@ -15,7 +15,7 @@ public class Entity1_10Types {
         Optional<EntityType> type;
 
         if (isObject)
-            type = ObjectTypes.getPCEntity(typeID);
+            type = ObjectType.getPCEntity(typeID);
         else
             type = EntityType.findById(typeID);
 
@@ -141,7 +141,7 @@ public class Entity1_10Types {
 
     @AllArgsConstructor
     @Getter
-    public enum ObjectTypes {
+    public enum ObjectType implements us.myles.ViaVersion.api.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
@@ -168,25 +168,25 @@ public class Entity1_10Types {
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
 
-        private static final Map<Integer, ObjectTypes> TYPES = new HashMap<>();
+        private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
 
         private final int id;
         private final EntityType type;
 
         static {
-            for (ObjectTypes type : ObjectTypes.values()) {
+            for (ObjectType type : ObjectType.values()) {
                 TYPES.put(type.id, type);
             }
         }
 
-        public static Optional<ObjectTypes> findById(int id) {
+        public static Optional<ObjectType> findById(int id) {
             if (id == -1)
                 return Optional.absent();
             return Optional.fromNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
-            Optional<ObjectTypes> output = findById(id);
+            Optional<ObjectType> output = findById(id);
 
             if (!output.isPresent())
                 return Optional.absent();
