@@ -41,13 +41,23 @@ public class MappingDataLoader {
     }
 
     public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+        MappingDataLoader.mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
+    }
+
+    public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                // Search in diff mappings
+                if (diffIdentifiers != null) {
+                    value = findValue(newIdentifiers, diffIdentifiers.get(entry.getKey()).getAsString());
                 }
-                continue;
+                if (value == null) {
+                    if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                        Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                    }
+                    continue;
+                }
             }
             output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
         }
