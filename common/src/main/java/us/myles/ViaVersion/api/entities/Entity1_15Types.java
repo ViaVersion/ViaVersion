@@ -10,6 +10,7 @@ import java.util.Map;
 
 
 public class Entity1_15Types {
+
     public static EntityType getTypeFromId(int typeID) {
         Optional<EntityType> type = EntityType.findById(typeID);
 
@@ -21,9 +22,10 @@ public class Entity1_15Types {
         return type.get();
     }
 
+
     @AllArgsConstructor
     @Getter
-    public enum EntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
 
         AREA_EFFECT_CLOUD(0, ENTITY),
@@ -219,30 +221,6 @@ public class Entity1_15Types {
             if (id == -1)
                 return Optional.absent();
             return Optional.fromNullable(TYPES.get(id));
-        }
-
-        public boolean is(EntityType... types) {
-            for (EntityType type : types)
-                if (is(type))
-                    return true;
-            return false;
-        }
-
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
-        public boolean isOrHasParent(EntityType type) {
-            EntityType parent = this;
-
-            do {
-                if (parent == type)
-                    return true;
-
-                parent = parent.getParent();
-            } while (parent != null);
-
-            return false;
         }
     }
 }

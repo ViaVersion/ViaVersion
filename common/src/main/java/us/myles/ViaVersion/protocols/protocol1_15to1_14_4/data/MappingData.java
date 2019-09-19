@@ -4,24 +4,26 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
+import us.myles.ViaVersion.api.data.Mappings;
 
 public class MappingData {
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
-    public static us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappings blockMappings;
-    public static us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappings blockStateMappings;
-    public static us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.SoundMappings soundMappings;
+    public static Mappings blockMappings;
+    public static Mappings blockStateMappings;
+    public static Mappings soundMappings;
 
     public static void init() {
-        JsonObject mapping1_14_4 = us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.loadData("mapping-1.14.4.json");
-        JsonObject mapping1_15 = us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.loadData("mapping-1.15.json");
+        JsonObject mapping1_14_4 = MappingDataLoader.loadData("mapping-1.14.4.json");
+        JsonObject mapping1_15 = MappingDataLoader.loadData("mapping-1.15.json");
 
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 blockstate mapping...");
-        blockStateMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappingsShortArray(mapping1_14_4.getAsJsonObject("blockstates"), mapping1_15.getAsJsonObject("blockstates"));
+        blockStateMappings = new Mappings(mapping1_14_4.getAsJsonObject("blockstates"), mapping1_15.getAsJsonObject("blockstates"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 block mapping...");
-        blockMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.BlockMappingsShortArray(mapping1_14_4.getAsJsonObject("blocks"), mapping1_15.getAsJsonObject("blocks"));
+        blockMappings = new Mappings(mapping1_14_4.getAsJsonObject("blocks"), mapping1_15.getAsJsonObject("blocks"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 item mapping...");
-        us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.mapIdentifiers(oldToNewItems, mapping1_14_4.getAsJsonObject("items"), mapping1_15.getAsJsonObject("items"));
+        MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_14_4.getAsJsonObject("items"), mapping1_15.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 sound mapping...");
-        soundMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.SoundMappingShortArray(mapping1_14_4.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"));
+        soundMappings = new Mappings(mapping1_14_4.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"));
     }
 }

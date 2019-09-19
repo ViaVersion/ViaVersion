@@ -34,7 +34,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0, MappingData.soundMappings.getNewSound(wrapper.get(Type.VAR_INT, 0)));
+                        wrapper.set(Type.VAR_INT, 0, MappingData.soundMappings.getNewId(wrapper.get(Type.VAR_INT, 0)));
                     }
                 });
             }
@@ -48,7 +48,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0, MappingData.soundMappings.getNewSound(wrapper.get(Type.VAR_INT, 0)));
+                        wrapper.set(Type.VAR_INT, 0, MappingData.soundMappings.getNewId(wrapper.get(Type.VAR_INT, 0)));
                     }
                 });
             }
@@ -238,7 +238,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
     }
 
     public static int getNewSoundId(int id) {
-        int newId = MappingData.soundMappings.getNewSound(id);
+        int newId = MappingData.soundMappings.getNewId(id);
         if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.15 sound for 1.14.4 sound " + id);
             return 0;
@@ -247,7 +247,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
     }
 
     public static int getNewBlockStateId(int id) {
-        int newId = MappingData.blockStateMappings.getNewBlock(id);
+        int newId = MappingData.blockStateMappings.getNewId(id);
         if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.15 blockstate for 1.14.4 blockstate " + id);
             return 0;
@@ -256,7 +256,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
     }
 
     public static int getNewBlockId(int id) {
-        int newId = MappingData.blockMappings.getNewBlock(id);
+        int newId = MappingData.blockMappings.getNewId(id);
         if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.15 block for 1.14.4 block " + id);
             return 0;
