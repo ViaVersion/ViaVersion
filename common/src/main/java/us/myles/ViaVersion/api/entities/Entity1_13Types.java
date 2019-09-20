@@ -278,5 +278,12 @@ public class Entity1_13Types {
                 return Optional.absent();
             return Optional.of(output.get().getType());
         }
+
+        public static Optional<ObjectType> fromEntityType(EntityType type) {
+            for (ObjectType ent : ObjectType.values())
+                if (ent.getType() == type)
+                    return Optional.of(ent);
+            return Optional.absent();
+        }
     }
 }
