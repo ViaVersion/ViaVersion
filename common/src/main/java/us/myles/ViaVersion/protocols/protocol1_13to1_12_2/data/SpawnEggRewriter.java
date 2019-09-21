@@ -1,11 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import java.util.Optional;
+
 public class SpawnEggRewriter {
-    private final static BiMap<String, Integer> spawnEggs = HashBiMap.create();
+    private static final BiMap<String, Integer> spawnEggs = HashBiMap.create();
 
     static {
         // Class yz.java in 18w14b
@@ -70,7 +71,7 @@ public class SpawnEggRewriter {
     }
 
     public static Optional<String> getEntityId(int spawnEggId) {
-        if (spawnEggId >> 16 != 383) return Optional.absent();
-        return Optional.fromNullable(spawnEggs.inverse().get(spawnEggId & 0xFFFF));
+        if (spawnEggId >> 16 != 383) return Optional.empty();
+        return Optional.ofNullable(spawnEggs.inverse().get(spawnEggId & 0xFFFF));
     }
 }

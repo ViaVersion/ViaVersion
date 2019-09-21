@@ -10,11 +10,11 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.*;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockEntityProvider implements Provider {
-    private final Map<String, BlockEntityHandler> handlers = new ConcurrentHashMap<>();
+    private final Map<String, BlockEntityHandler> handlers = new HashMap<>();
 
     public BlockEntityProvider() {
         handlers.put("minecraft:flower_pot", new FlowerPotHandler());

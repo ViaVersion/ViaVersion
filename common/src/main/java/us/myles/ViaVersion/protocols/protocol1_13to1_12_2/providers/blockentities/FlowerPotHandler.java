@@ -6,12 +6,12 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler {
-    private static final Map<Pair<String, Byte>, Integer> flowers = new ConcurrentHashMap<>();
-    private static final Map<Pair<Byte, Byte>, Integer> flowersNumberId = new ConcurrentHashMap<>();
+    private static final Map<Pair<String, Byte>, Integer> flowers = new HashMap<>();
+    private static final Map<Pair<Byte, Byte>, Integer> flowersNumberId = new HashMap<>();
 
     static {
         register("minecraft:air", (byte) 0, (byte) 0, 5265);

@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -23,6 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SpawnPackets {
     public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {

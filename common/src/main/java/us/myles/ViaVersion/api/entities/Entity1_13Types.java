@@ -1,12 +1,12 @@
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 // TODO auto generate 18w11a with PAaaS
 public class Entity1_13Types {
@@ -217,8 +217,8 @@ public class Entity1_13Types {
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
     }
 
@@ -267,23 +267,22 @@ public class Entity1_13Types {
 
         public static Optional<ObjectType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
             Optional<ObjectType> output = findById(id);
-
             if (!output.isPresent())
-                return Optional.absent();
-            return Optional.of(output.get().getType());
+                return Optional.empty();
+            return Optional.of(output.get().type);
         }
 
         public static Optional<ObjectType> fromEntityType(EntityType type) {
             for (ObjectType ent : ObjectType.values())
-                if (ent.getType() == type)
+                if (ent.type == type)
                     return Optional.of(ent);
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

@@ -8,13 +8,13 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ParticleRewriter {
-    private static List<NewParticle> particles = new LinkedList<>();
+    private static final List<NewParticle> particles = new ArrayList<>();
 
     static {
         add(34); // (0->34) explode -> minecraft:poof

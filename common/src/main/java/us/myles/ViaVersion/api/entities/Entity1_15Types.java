@@ -1,12 +1,12 @@
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class Entity1_15Types {
@@ -219,8 +219,8 @@ public class Entity1_15Types {
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
     }
 }

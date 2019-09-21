@@ -1,19 +1,19 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
-import com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockStorage extends StoredObject {
-    // This BlockStorage is very exclusive (;
-    private static final Set<Integer> whitelist = Sets.newConcurrentHashSet();
+    private static final Set<Integer> whitelist = new HashSet<>();
+    private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     static {
         // Flower pots
@@ -36,8 +36,6 @@ public class BlockStorage extends StoredObject {
         for (int i = 0; i < 5; i++)
             whitelist.add(5447 + i);
     }
-
-    private Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     public BlockStorage(UserConnection user) {
         super(user);

@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 
-import com.google.common.base.Optional;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -8,6 +7,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import static us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType.*;
 
@@ -173,7 +173,7 @@ public enum MetaIndex {
 
     private static Optional<MetaIndex> getIndex(Entity1_10Types.EntityType type, int index) {
         Pair pair = new Pair<>(type, index);
-        return Optional.fromNullable(metadataRewrites.get(pair));
+        return Optional.ofNullable(metadataRewrites.get(pair));
     }
 
     public static MetaIndex searchIndex(Entity1_10Types.EntityType type, int index) {

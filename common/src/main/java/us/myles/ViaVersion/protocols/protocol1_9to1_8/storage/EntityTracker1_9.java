@@ -11,7 +11,6 @@ import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class EntityTracker1_9 extends EntityTracker<Entity1_10Types.EntityType> {
+public class EntityTracker1_9 extends EntityTracker<EntityType> {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
@@ -117,7 +116,7 @@ public class EntityTracker1_9 extends EntityTracker<Entity1_10Types.EntityType> 
     }
 
     public void handleMetadata(int entityId, List<Metadata> metadataList) {
-        EntityType type = getEntity(entityId).orNull();
+        EntityType type = getEntity(entityId).orElse(null);
         if (type == null) {
             return;
         }
@@ -293,7 +292,7 @@ public class EntityTracker1_9 extends EntityTracker<Entity1_10Types.EntityType> 
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
             getUser().get(ProtocolInfo.class).getPipeline().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
-                    .handleMetadata(entityId, getEntity(entityId).orNull(), metadataList, getUser());
+                    .handleMetadata(entityId, getEntity(entityId).orElse(null), metadataList, getUser());
             handleMetadata(entityId, metadataList);
             if (!metadataList.isEmpty()) {
                 try {

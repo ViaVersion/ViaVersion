@@ -1,14 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
 
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 public class PaintingProvider implements Provider {
-    private Map<String, Integer> paintings = new ConcurrentHashMap<>();
+    private final Map<String, Integer> paintings = new HashMap<>();
 
     public PaintingProvider() {
         add("kebab");
@@ -47,6 +47,6 @@ public class PaintingProvider implements Provider {
         // Handle older versions
         if (!motive.startsWith("minecraft:"))
             motive = "minecraft:" + motive.toLowerCase(Locale.ROOT);
-        return Optional.fromNullable(paintings.get(motive));
+        return Optional.ofNullable(paintings.get(motive));
     }
 }

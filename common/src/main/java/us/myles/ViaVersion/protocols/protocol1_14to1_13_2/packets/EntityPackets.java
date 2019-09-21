@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
@@ -14,14 +13,14 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_13_2;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.EntityTypeRewriter;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 public class EntityPackets {
 
@@ -52,7 +51,7 @@ public class EntityPackets {
                         int typeId = wrapper.get(Type.VAR_INT, 1);
 
                         Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
-                        typeId = EntityTypeRewriter.getNewId(type1_13.getId()).or(type1_13.getId());
+                        typeId = EntityTypeRewriter.getNewId(type1_13.getId()).orElse(type1_13.getId());
                         Entity1_14Types.EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
 
                         if (type1_14 != null) {
@@ -129,7 +128,7 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         int type = wrapper.get(Type.VAR_INT, 1);
 
-                        type = EntityTypeRewriter.getNewId(type).or(type);
+                        type = EntityTypeRewriter.getNewId(type).orElse(type);
                         wrapper.set(Type.VAR_INT, 1, type);
 
                         Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type);
@@ -262,7 +261,7 @@ public class EntityPackets {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
                         Optional<Entity1_14Types.EntityType> type = wrapper.user().get(EntityTracker1_14.class).getEntity(entityId);
-                        protocol.get(MetadataRewriter1_14To1_13_2.class).handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        protocol.get(MetadataRewriter1_14To1_13_2.class).handleMetadata(entityId, type.orElse(null), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }

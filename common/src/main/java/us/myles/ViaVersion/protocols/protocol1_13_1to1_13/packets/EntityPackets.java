@@ -1,18 +1,18 @@
 package us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets;
 
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
-import us.myles.ViaVersion.api.entities.Entity1_13Types.EntityType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
+
+import java.util.Optional;
 
 public class EntityPackets {
 
@@ -141,8 +141,8 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
-                        Optional<EntityType> type = wrapper.user().get(EntityTracker1_13.class).getEntity(entityId);
-                        protocol.get(MetadataRewriter1_13_1To1_13.class).handleMetadata(entityId, type.orNull(), wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
+                        Optional<Entity1_13Types.EntityType> type = wrapper.user().get(EntityTracker1_13.class).getEntity(entityId);
+                        protocol.get(MetadataRewriter1_13_1To1_13.class).handleMetadata(entityId, type.orElse(null), wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }

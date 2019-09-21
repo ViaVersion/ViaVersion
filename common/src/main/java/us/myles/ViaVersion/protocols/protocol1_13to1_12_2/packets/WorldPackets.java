@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -30,6 +29,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class WorldPackets {
@@ -76,7 +76,7 @@ public class WorldPackets {
                         if (!id.isPresent() && (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug())) {
                             Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
                         }
-                        wrapper.write(Type.VAR_INT, id.or(0));
+                        wrapper.write(Type.VAR_INT, id.orElse(0));
                     }
                 });
             }

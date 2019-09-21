@@ -10,13 +10,13 @@
 
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 // 1.12 Entity / Object taken from https://github.com/Matsv/ViaBackwards/blob/master/core/src/main/java/nl/matsv/viabackwards/api/entities/types/EntityType1_12.java
 public class Entity1_12Types {
@@ -175,8 +175,8 @@ public class Entity1_12Types {
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
     }
 
@@ -224,16 +224,16 @@ public class Entity1_12Types {
 
         public static Optional<ObjectType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
             Optional<ObjectType> output = findById(id);
 
             if (!output.isPresent())
-                return Optional.absent();
-            return Optional.of(output.get().getType());
+                return Optional.empty();
+            return Optional.of(output.get().type);
         }
     }
 }

@@ -1,12 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data;
 
-import com.google.common.base.Optional;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class EntityTypeRewriter {
-    private static Map<Integer, Integer> entityTypes = new HashMap<>();
+    private static final Map<Integer, Integer> entityTypes = new HashMap<>();
 
     static {
         regEnt(6, 7);  // cave_spider
@@ -105,6 +104,6 @@ public class EntityTypeRewriter {
     }
 
     public static Optional<Integer> getNewId(int type1_13) {
-        return Optional.fromNullable(entityTypes.get(type1_13));
+        return Optional.ofNullable(entityTypes.get(type1_13));
     }
 }

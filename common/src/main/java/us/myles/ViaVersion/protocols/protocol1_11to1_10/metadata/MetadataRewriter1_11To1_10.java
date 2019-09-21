@@ -1,10 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_11to1_10.metadata;
 
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_11Types;
 import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -17,8 +15,9 @@ import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_1
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Entity1_11Types.EntityType> {
+public class MetadataRewriter1_11To1_10 extends MetadataRewriter<EntityType> {
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) {
@@ -95,15 +94,15 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Entity1_11Types
         }
 
         if (type.is(EntityType.ARMOR_STAND) && Via.getConfig().isHologramPatch()) {
-            Optional<Metadata> flags = Optional.fromNullable(metadataMap.get(11));
-            Optional<Metadata> customName = Optional.fromNullable(metadataMap.get(2));
-            Optional<Metadata> customNameVisible = Optional.fromNullable(metadataMap.get(3));
+            Optional<Metadata> flags = Optional.ofNullable(metadataMap.get(11));
+            Optional<Metadata> customName = Optional.ofNullable(metadataMap.get(2));
+            Optional<Metadata> customNameVisible = Optional.ofNullable(metadataMap.get(3));
             if (metadata.getId() == 0 && flags.isPresent() && customName.isPresent() && customNameVisible.isPresent()) {
                 Metadata meta = flags.get();
                 byte data = (byte) metadata.getValue();
                 // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
                 if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                            && !((String) customName.get().getValue()).isEmpty() && (boolean) customNameVisible.get().getValue()) {
+                        && !((String) customName.get().getValue()).isEmpty() && (boolean) customNameVisible.get().getValue()) {
                     EntityTracker1_11 tracker = connection.get(EntityTracker1_11.class);
                     if (!tracker.isHologram(entityId)) {
                         tracker.addHologram(entityId);
@@ -212,6 +211,6 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Entity1_11Types
         for (Metadata metadata : metadatas) {
             if (metadata.getId() == id) return Optional.of(metadata);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }
