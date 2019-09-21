@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_12to1_11_1;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.google.common.base.Optional;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -26,6 +25,8 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+
+import java.util.Optional;
 
 public class Protocol1_12To1_11_1 extends Protocol {
 

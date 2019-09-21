@@ -1,13 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 
-import com.google.common.base.Optional;
-
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 public class EntityTypeRewriter {
-    private static Map<Integer, Integer> entityTypes = new ConcurrentHashMap<>();
+    private static final Map<Integer, Integer> entityTypes = new HashMap<>();
 
     static {
         registerEntity(1, 32); // item - ajl
@@ -94,10 +93,8 @@ public class EntityTypeRewriter {
         registerEntity(105, 50); // parrot - agx
         registerEntity(120, 79); // villager - ala
 
-
         // OBJECTS
         // Couldn't find any object id change with mapped values
-
     }
 
     private static void registerEntity(int type1_12, int type1_13) {
@@ -105,6 +102,6 @@ public class EntityTypeRewriter {
     }
 
     public static Optional<Integer> getNewId(int type1_12) {
-        return Optional.fromNullable(entityTypes.get(type1_12));
+        return Optional.ofNullable(entityTypes.get(type1_12));
     }
 }

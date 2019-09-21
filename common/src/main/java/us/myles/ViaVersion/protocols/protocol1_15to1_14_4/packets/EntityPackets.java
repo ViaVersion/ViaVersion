@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets;
 
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_15Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -13,6 +12,7 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class EntityPackets {
@@ -123,7 +123,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         Optional<Entity1_15Types.EntityType> type = wrapper.user().get(EntityTracker1_15.class).getEntity(entityId);
-                        MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        MetadataRewriter.handleMetadata(entityId, type.orElse(null), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }

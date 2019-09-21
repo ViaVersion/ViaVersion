@@ -1,14 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.ShortTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.primitives.Ints;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -28,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class InventoryPackets {
     private static String NBT_TAG_NAME;
@@ -124,7 +119,7 @@ public class InventoryPackets {
                                     if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
                                         Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                     }
-                                    finalSource = Optional.of(SoundSource.MASTER);
+                                    finalSource = java.util.Optional.of(SoundSource.MASTER);
 
                                 }
 
@@ -514,9 +509,9 @@ public class InventoryPackets {
             case "bungeecord:main":
                 return null;
             case "FML|MP":
-            	return "fml:mp";
+                return "fml:mp";
             case "FML|HS":
-            	return "fml:hs";
+                return "fml:hs";
             default:
                 return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
                         ? old : null;
@@ -759,9 +754,9 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             case "fml:hs":
-            	return "FML|HS";
+                return "FML|HS";
             case "fml:mp":
-            	return "FML:MP";
+                return "FML:MP";
             default:
                 return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }

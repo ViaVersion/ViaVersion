@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -28,6 +27,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {

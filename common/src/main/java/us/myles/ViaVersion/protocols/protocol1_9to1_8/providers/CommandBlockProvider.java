@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.providers;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.common.base.Optional;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -10,6 +9,8 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+
+import java.util.Optional;
 
 public class CommandBlockProvider implements Provider {
 
@@ -23,7 +24,7 @@ public class CommandBlockProvider implements Provider {
         checkPermission(user);
         if (isEnabled())
             return getStorage(user).getCommandBlock(position);
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public void unloadChunk(UserConnection user, int x, int z) throws Exception {

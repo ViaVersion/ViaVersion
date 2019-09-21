@@ -1,22 +1,22 @@
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class Entity1_14Types {
 
     public static EntityType getTypeFromId(int typeID) {
-        Optional<EntityType> type = Entity1_14Types.EntityType.findById(typeID);
+        Optional<EntityType> type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
             Via.getPlatform().getLogger().severe("Could not find type id " + typeID);
-            return Entity1_14Types.EntityType.ENTITY; // Fall back to the basic ENTITY
+            return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
         return type.get();
@@ -212,15 +212,15 @@ public class Entity1_14Types {
         }
 
         static {
-            for (EntityType type : Entity1_14Types.EntityType.values()) {
+            for (EntityType type : EntityType.values()) {
                 TYPES.put(type.id, type);
             }
         }
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
     }
 }

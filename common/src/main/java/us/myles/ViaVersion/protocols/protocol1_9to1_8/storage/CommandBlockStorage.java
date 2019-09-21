@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.common.base.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.Pair;
@@ -11,6 +10,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage extends StoredObject {
@@ -55,11 +55,11 @@ public class CommandBlockStorage extends StoredObject {
 
         Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkCoords);
         if (blocks == null)
-            return Optional.absent();
+            return Optional.empty();
 
         CompoundTag tag = blocks.get(position);
         if (tag == null)
-            return Optional.absent();
+            return Optional.empty();
 
         tag = tag.clone();
         tag.put(new ByteTag("powered", (byte) 0));
