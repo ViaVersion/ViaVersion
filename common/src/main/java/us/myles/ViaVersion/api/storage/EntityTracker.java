@@ -6,15 +6,14 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.EntityType;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class EntityTracker<T extends EntityType> extends StoredObject implements ExternalJoinGameListener {
-    private final Map<Integer, T> clientEntityTypes = new ConcurrentHashMap<>();
+public abstract class EntityTracker extends StoredObject implements ExternalJoinGameListener {
+    private final Map<Integer, EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+    private final EntityType playerType;
     private int clientEntityId;
-    private final T playerType;
 
-    protected EntityTracker(UserConnection user, T playerType) {
+    protected EntityTracker(UserConnection user, EntityType playerType) {
         super(user);
         this.playerType = playerType;
     }
@@ -23,7 +22,7 @@ public abstract class EntityTracker<T extends EntityType> extends StoredObject i
         clientEntityTypes.remove(entityId);
     }
 
-    public void addEntity(int entityId, T type) {
+    public void addEntity(int entityId, EntityType type) {
         clientEntityTypes.put(entityId, type);
     }
 
@@ -31,8 +30,8 @@ public abstract class EntityTracker<T extends EntityType> extends StoredObject i
         return clientEntityTypes.containsKey(entityId);
     }
 
-    public Optional<T> getEntity(int entityId) {
-        return Optional.ofNullable(clientEntityTypes.get(entityId));
+    public EntityType getEntity(int entityId) {
+        return clientEntityTypes.get(entityId);
     }
 
     @Override

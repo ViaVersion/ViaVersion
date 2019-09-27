@@ -26,13 +26,11 @@ import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
-import java.util.Optional;
-
 public class Protocol1_12To1_11_1 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        put(new MetadataRewriter1_12To1_11_1());
+        MetadataRewriter1_12To1_11_1 metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
 
         InventoryPackets.register(this);
         // Outgoing
@@ -89,7 +87,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                         Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, false);
                         // Register Type ID
                         wrapper.user().get(EntityTracker1_12.class).addEntity(entityId, entType);
-                        get(MetadataRewriter1_12To1_11_1.class).handleMetadata(entityId, entType, wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
+                        metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -191,22 +189,11 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x25, 0x26);
         registerOutgoing(State.PLAY, 0x26, 0x27);
         registerOutgoing(State.PLAY, 0x27, 0x28);
+
         // New packet at 0x30
         // Destroy entities
-        registerOutgoing(State.PLAY, 0x30, 0x31, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT_ARRAY); // 0 - Entity IDS
+        metadataRewriter.registerEntityDestroy(0x30, 0x31);
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0))
-                            wrapper.user().get(EntityTracker1_12.class).removeEntity(entity);
-                    }
-                });
-            }
-        });
         registerOutgoing(State.PLAY, 0x31, 0x32);
         registerOutgoing(State.PLAY, 0x32, 0x33);
         // Respawn Packet
@@ -233,26 +220,10 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x36, 0x38);
         registerOutgoing(State.PLAY, 0x37, 0x39);
         registerOutgoing(State.PLAY, 0x38, 0x3a);
+
         // Metadata packet
-        registerOutgoing(State.PLAY, 0x39, 0x3b, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Types1_12.METADATA_LIST); // 1 - Metadata list
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
+        metadataRewriter.registerMetadataRewriter(0x39, 0x3b, Types1_12.METADATA_LIST);
 
-                        Optional<Entity1_12Types.EntityType> type = wrapper.user().get(EntityTracker1_12.class).getEntity(entityId);
-                        if (!type.isPresent())
-                            return;
-
-                        get(MetadataRewriter1_12To1_11_1.class).handleMetadata(entityId, type.get(), wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
-            }
-        });
         registerOutgoing(State.PLAY, 0x3a, 0x3c);
         registerOutgoing(State.PLAY, 0x3b, 0x3d);
         // registerOutgoing(State.PLAY, 0x3c, 0x3e); - Handled in InventoryPackets

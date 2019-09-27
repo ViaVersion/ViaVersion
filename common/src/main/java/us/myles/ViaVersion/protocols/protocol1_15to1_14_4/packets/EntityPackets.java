@@ -8,16 +8,17 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class EntityPackets {
 
     public static void register(Protocol protocol) {
+        MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
+
         // Spawn entity
         protocol.registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
             @Override
@@ -113,21 +114,7 @@ public class EntityPackets {
         });
 
         // Metadata packet
-        protocol.registerOutgoing(State.PLAY, 0x43, 0x44, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Types1_14.METADATA_LIST); // 1 - Metadata list
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        Optional<Entity1_15Types.EntityType> type = wrapper.user().get(EntityTracker1_15.class).getEntity(entityId);
-                        MetadataRewriter.handleMetadata(entityId, type.orElse(null), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerMetadataRewriter(0x43, 0x44, Types1_14.METADATA_LIST);
     }
 
     public static int getNewEntityId(int oldId) {

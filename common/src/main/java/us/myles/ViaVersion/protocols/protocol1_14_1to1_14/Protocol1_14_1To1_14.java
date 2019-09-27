@@ -10,7 +10,7 @@ public class Protocol1_14_1To1_14 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        put(new MetadataRewriter1_14_1To1_14());
+        new MetadataRewriter1_14_1To1_14(this);
 
         EntityPackets.register(this);
     }

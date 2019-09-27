@@ -22,7 +22,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class SpawnPackets {
     public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
@@ -215,9 +214,8 @@ public class SpawnPackets {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
-                        Optional<Entity1_10Types.EntityType> type = tracker.getEntity(entityId);
-                        if (type.isPresent()) {
-                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, type.get(), metadataList, wrapper.user());
+                        if (tracker.hasEntity(entityId)) {
+                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
                             Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                             metadataList.clear();
@@ -321,9 +319,8 @@ public class SpawnPackets {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
-                        Optional<Entity1_10Types.EntityType> type = tracker.getEntity(entityId);
-                        if (type.isPresent()) {
-                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, type.get(), metadataList, wrapper.user());
+                        if (tracker.hasEntity(entityId)) {
+                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
                             Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                             metadataList.clear();

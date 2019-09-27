@@ -132,7 +132,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        put(new MetadataRewriter1_13To1_12_2());
+        new MetadataRewriter1_13To1_12_2(this);
 
         // Register grouped packet changes
         EntityPackets.register(this);

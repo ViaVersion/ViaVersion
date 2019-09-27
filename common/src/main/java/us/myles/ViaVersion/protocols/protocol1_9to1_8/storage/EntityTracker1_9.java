@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class EntityTracker1_9 extends EntityTracker<EntityType> {
+public class EntityTracker1_9 extends EntityTracker {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
@@ -116,7 +116,7 @@ public class EntityTracker1_9 extends EntityTracker<EntityType> {
     }
 
     public void handleMetadata(int entityId, List<Metadata> metadataList) {
-        EntityType type = getEntity(entityId).orElse(null);
+        us.myles.ViaVersion.api.entities.EntityType type = getEntity(entityId);
         if (type == null) {
             return;
         }
@@ -292,7 +292,7 @@ public class EntityTracker1_9 extends EntityTracker<EntityType> {
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
             getUser().get(ProtocolInfo.class).getPipeline().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
-                    .handleMetadata(entityId, getEntity(entityId).orElse(null), metadataList, getUser());
+                    .handleMetadata(entityId, metadataList, getUser());
             handleMetadata(entityId, metadataList);
             if (!metadataList.isEmpty()) {
                 try {

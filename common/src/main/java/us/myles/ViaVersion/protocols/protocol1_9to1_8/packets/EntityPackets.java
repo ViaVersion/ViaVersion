@@ -5,7 +5,6 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Triple;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -193,9 +192,8 @@ public class EntityPackets {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
-                        Optional<Entity1_10Types.EntityType> type = tracker.getEntity(entityId);
-                        if (type.isPresent()) {
-                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, type.get(), metadataList, wrapper.user());
+                        if (tracker.hasEntity(entityId)) {
+                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
                             // Buffer
                             tracker.addMetadataToBuffer(entityId, metadataList);

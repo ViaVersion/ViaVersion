@@ -2,21 +2,27 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.metadata;
 
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
-import us.myles.ViaVersion.api.entities.Entity1_13Types.EntityType;
+import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 
 import java.util.List;
 import java.util.Map;
 
-public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter<Entity1_13Types.EntityType> {
+public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter<Protocol1_13To1_12_2> {
+
+    public MetadataRewriter1_13To1_12_2(Protocol1_13To1_12_2 protocol) {
+        super(protocol, EntityTracker1_13.class);
+    }
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
@@ -50,18 +56,18 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter<Entity1_13Typ
         if (type == null) return;
 
         // Handle new colors
-        if (type.is(EntityType.WOLF) && metadata.getId() == 17) {
+        if (type == Entity1_13Types.EntityType.WOLF && metadata.getId() == 17) {
             metadata.setValue(15 - (int) metadata.getValue());
         }
 
         // Handle new zombie meta (INDEX 15 - Boolean - Zombie is shaking while enabled)
-        if (type.isOrHasParent(EntityType.ZOMBIE)) {
+        if (type.isOrHasParent(Entity1_13Types.EntityType.ZOMBIE)) {
             if (metadata.getId() > 14)
                 metadata.setId(metadata.getId() + 1);
         }
 
         // Handle Minecart inner block
-        if (type.isOrHasParent(EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
+        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
             // New block format
             int oldId = (int) metadata.getValue();
             int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
@@ -70,7 +76,7 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter<Entity1_13Typ
         }
 
         // Handle other changes
-        if (type.is(EntityType.AREA_EFFECT_CLOUD)) {
+        if (type == Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) {
             if (metadata.getId() == 9) {
                 int particleId = (int) metadata.getValue();
                 int parameter1 = metadataMap.containsKey(10) ? (int) metadataMap.get(10).getValue() : 0;

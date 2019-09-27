@@ -17,15 +17,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class MetadataRewriter1_11To1_10 extends MetadataRewriter<EntityType> {
+public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Protocol1_11To1_10> {
+
+    public MetadataRewriter1_11To1_10(Protocol1_11To1_10 protocol) {
+        super(protocol, EntityTracker1_11.class);
+    }
 
     @Override
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) {
+    protected void handleMetadata(int entityId, us.myles.ViaVersion.api.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) {
         if (metadata.getValue() instanceof Item) {
             // Apply rewrite
             EntityIdRewriter.toClientItem((Item) metadata.getValue());
         }
 
+        if (type == null) return;
         if (type.is(EntityType.ELDER_GUARDIAN) || type.is(EntityType.GUARDIAN)) { // Guardians
             int oldid = metadata.getId();
             if (oldid == 12) {
