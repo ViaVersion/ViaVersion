@@ -3,7 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.entities.Entity1_14Types.EntityType;
+import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.VillagerData;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -17,7 +17,11 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1
 
 import java.util.List;
 
-public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Entity1_14Types.EntityType> {
+public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Protocol1_14To1_13_2> {
+
+    public MetadataRewriter1_14To1_13_2(Protocol1_14To1_13_2 protocol) {
+        super(protocol, EntityTracker1_14.class);
+    }
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
@@ -41,19 +45,19 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Entity1_14Typ
         }
 
         //Metadata 12 added to living_entity
-        if (metadata.getId() > 11 && type.isOrHasParent(EntityType.LIVINGENTITY)) {
+        if (metadata.getId() > 11 && type.isOrHasParent(Entity1_14Types.EntityType.LIVINGENTITY)) {
             metadata.setId(metadata.getId() + 1);
         }
 
-        if (type.isOrHasParent(EntityType.ABSTRACT_INSENTIENT)) {
+        if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_INSENTIENT)) {
             if (metadata.getId() == 13) {
                 tracker.setInsentientData(entityId, (byte) ((((Number) metadata.getValue()).byteValue() & ~0x4)
-                                                                    | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
+                        | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
                 metadata.setValue(tracker.getInsentientData(entityId));
             }
         }
 
-        if (type.isOrHasParent(EntityType.PLAYER)) {
+        if (type.isOrHasParent(Entity1_14Types.EntityType.PLAYER)) {
             if (entityId != tracker.getClientEntityId()) {
                 if (metadata.getId() == 0) {
                     byte flags = ((Number) metadata.getValue()).byteValue();
@@ -66,10 +70,10 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Entity1_14Typ
                     metadatas.add(new Metadata(6, MetaType1_14.Pose, recalculatePlayerPose(entityId, tracker)));
                 }
             }
-        } else if (type.isOrHasParent(EntityType.ZOMBIE)) {
+        } else if (type.isOrHasParent(Entity1_14Types.EntityType.ZOMBIE)) {
             if (metadata.getId() == 16) {
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                                                                    | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
+                        | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Are hands held up"
                 metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
             } else if (metadata.getId() > 16) {
@@ -77,13 +81,13 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Entity1_14Typ
             }
         }
 
-        if (type.isOrHasParent(EntityType.MINECART_ABSTRACT)) {
+        if (type.isOrHasParent(Entity1_14Types.EntityType.MINECART_ABSTRACT)) {
             if (metadata.getId() == 10) {
                 // New block format
                 int data = (int) metadata.getValue();
                 metadata.setValue(Protocol1_14To1_13_2.getNewBlockStateId(data));
             }
-        } else if (type.is(EntityType.HORSE)) {
+        } else if (type.is(Entity1_14Types.EntityType.HORSE)) {
             if (metadata.getId() == 18) {
                 metadatas.remove(metadata);
 
@@ -103,53 +107,53 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Entity1_14Typ
                 equipmentPacket.write(Type.FLAT_VAR_INT_ITEM, armorItem);
                 equipmentPacket.send(Protocol1_14To1_13_2.class);
             }
-        } else if (type.is(EntityType.VILLAGER)) {
+        } else if (type.is(Entity1_14Types.EntityType.VILLAGER)) {
             if (metadata.getId() == 15) {
                 // plains
                 metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                 metadata.setMetaType(MetaType1_14.VillagerData);
             }
-        } else if (type.is(EntityType.ZOMBIE_VILLAGER)) {
+        } else if (type.is(Entity1_14Types.EntityType.ZOMBIE_VILLAGER)) {
             if (metadata.getId() == 18) {
                 // plains
                 metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                 metadata.setMetaType(MetaType1_14.VillagerData);
             }
-        } else if (type.isOrHasParent(EntityType.ABSTRACT_ARROW)) {
+        } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
             if (metadata.getId() >= 9) { // New piercing
                 metadata.setId(metadata.getId() + 1);
             }
-        } else if (type.is(EntityType.FIREWORKS_ROCKET)) {
+        } else if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
             if (metadata.getId() == 8) {
                 if (metadata.getValue().equals(0))
                     metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
                 metadata.setMetaType(MetaType1_14.OptVarInt);
             }
-        } else if (type.isOrHasParent(EntityType.ABSTRACT_SKELETON)) {
+        } else if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_SKELETON)) {
             if (metadata.getId() == 14) {
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                                                                    | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
+                        | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Is swinging arms"
                 metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
             }
-        } else if (type.is(EntityType.AREA_EFFECT_CLOUD)) {
+        } else if (type.is(Entity1_14Types.EntityType.AREA_EFFECT_CLOUD)) {
             if (metadata.getId() == 10) {
                 Particle particle = (Particle) metadata.getValue();
                 particle.setId(getNewParticleId(particle.getId()));
             }
         }
 
-        if (type.isOrHasParent(EntityType.ABSTRACT_ILLAGER_BASE)) {
+        if (type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
             if (metadata.getId() == 14) {
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                                                                    | (((Number) metadata.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
+                        | (((Number) metadata.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Has target (aggressive state)"
                 metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
             }
         }
 
         // TODO Are witch and ravager also abstract illagers? They all inherit the new metadata 14 added in 19w13a
-        if (type.is(EntityType.WITCH) || type.is(EntityType.RAVAGER) || type.isOrHasParent(EntityType.ABSTRACT_ILLAGER_BASE)) {
+        if (type.is(Entity1_14Types.EntityType.WITCH) || type.is(Entity1_14Types.EntityType.RAVAGER) || type.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ILLAGER_BASE)) {
             if (metadata.getId() >= 14) {  // TODO 19w13 added a new boolean (raid participant - is celebrating) with id 14
                 metadata.setId(metadata.getId() + 1);
             }

@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 import lombok.Getter;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
+import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 
@@ -146,14 +147,14 @@ public enum MetaIndex {
 
     static {
         for (MetaIndex index : MetaIndex.values())
-            metadataRewrites.put(new Pair<>(index.getClazz(), index.getIndex()), index);
+            metadataRewrites.put(new Pair<>(index.clazz, index.index), index);
     }
 
-    private Entity1_10Types.EntityType clazz;
-    private int newIndex;
-    private MetaType1_9 newType;
-    private MetaType1_8 oldType;
-    private int index;
+    private final Entity1_10Types.EntityType clazz;
+    private final int newIndex;
+    private final MetaType1_9 newType;
+    private final MetaType1_8 oldType;
+    private final int index;
 
     MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, MetaType1_9 newType) {
         this.clazz = type;
@@ -171,13 +172,13 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    private static Optional<MetaIndex> getIndex(Entity1_10Types.EntityType type, int index) {
+    private static Optional<MetaIndex> getIndex(EntityType type, int index) {
         Pair pair = new Pair<>(type, index);
         return Optional.ofNullable(metadataRewrites.get(pair));
     }
 
-    public static MetaIndex searchIndex(Entity1_10Types.EntityType type, int index) {
-        Entity1_10Types.EntityType currentType = type;
+    public static MetaIndex searchIndex(EntityType type, int index) {
+        EntityType currentType = type;
         do {
             Optional<MetaIndex> optMeta = getIndex(currentType, index);
 

@@ -73,7 +73,7 @@ public class Protocol1_9To1_8 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        put(new MetadataRewriter1_9To1_8());
+        new MetadataRewriter1_9To1_8(this);
 
         // Disconnect workaround (JSON!)
         registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {

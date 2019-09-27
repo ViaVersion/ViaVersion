@@ -21,8 +21,6 @@ import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_1
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-import java.util.Optional;
-
 public class Protocol1_11To1_10 extends Protocol {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
         @Override
@@ -33,7 +31,7 @@ public class Protocol1_11To1_10 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        put(new MetadataRewriter1_11To1_10());
+        MetadataRewriter1_11To1_10 metadataRewriter = new MetadataRewriter1_11To1_10(this);
 
         InventoryPackets.register(this);
 
@@ -93,7 +91,7 @@ public class Protocol1_11To1_10 extends Protocol {
 
                             // Register Type ID
                             wrapper.user().get(EntityTracker1_11.class).addEntity(entityId, entType);
-                            get(MetadataRewriter1_11To1_10.class).handleMetadata(entityId, entType, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                            metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
                         }
                     }
                 });
@@ -143,25 +141,7 @@ public class Protocol1_11To1_10 extends Protocol {
         });
 
         // Metadata packet
-        registerOutgoing(State.PLAY, 0x39, 0x39, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Types1_9.METADATA_LIST); // 1 - Metadata list
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-
-                        Optional<Entity1_11Types.EntityType> type = wrapper.user().get(EntityTracker1_11.class).getEntity(entityId);
-                        if (!type.isPresent())
-                            return;
-
-                        get(MetadataRewriter1_11To1_10.class).handleMetadata(entityId, type.get(), wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerMetadataRewriter(0x39, 0x39, Types1_9.METADATA_LIST);
 
         // Entity teleport
         registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
@@ -193,20 +173,7 @@ public class Protocol1_11To1_10 extends Protocol {
         });
 
         // Destroy entities
-        registerOutgoing(State.PLAY, 0x30, 0x30, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT_ARRAY); // 0 - Entity IDS
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0))
-                            wrapper.user().get(EntityTracker1_11.class).removeEntity(entity);
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerEntityDestroy(0x30);
 
         // Title packet
         registerOutgoing(State.PLAY, 0x45, 0x45, new PacketRemapper() {
@@ -416,7 +383,9 @@ public class Protocol1_11To1_10 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
+        // Entity tracker
         userConnection.put(new EntityTracker1_11(userConnection));
+
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
     }

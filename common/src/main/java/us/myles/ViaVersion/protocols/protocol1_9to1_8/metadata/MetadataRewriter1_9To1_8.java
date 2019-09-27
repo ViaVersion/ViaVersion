@@ -2,7 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType;
+import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -13,12 +13,17 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Entity1_10Types.EntityType> {
+public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Protocol1_9To1_8> {
+
+    public MetadataRewriter1_9To1_8(Protocol1_9To1_8 protocol) {
+        super(protocol, EntityTracker1_9.class);
+    }
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
@@ -35,7 +40,7 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Entity1_10Types.E
         metadata.setId(metaIndex.getNewIndex());
         metadata.setMetaType(metaIndex.getNewType());
 
-        if (type == EntityType.ENDERMAN && metaIndex.getNewType() == MetaType1_9.BlockID) {
+        if (type == Entity1_10Types.EntityType.ENDERMAN && metaIndex.getNewType() == MetaType1_9.BlockID) {
             if (metaIndex.getOldType() == MetaType1_8.Short) {
                 int id = (Short) metadata.getValue();
                 int data = metadataMap.containsKey(17) ? (Byte) metadataMap.get(17).getValue() : 0;
@@ -58,7 +63,7 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Entity1_10Types.E
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
-                if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityType.PLAYER) {
+                if (metaIndex == MetaIndex.ENTITY_STATUS && type == Entity1_10Types.EntityType.PLAYER) {
                     Byte val = 0;
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
@@ -74,7 +79,8 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Entity1_10Types.E
                 if (!owner.isEmpty()) {
                     try {
                         toWrite = UUID.fromString(owner);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 metadata.setValue(toWrite);
                 break;

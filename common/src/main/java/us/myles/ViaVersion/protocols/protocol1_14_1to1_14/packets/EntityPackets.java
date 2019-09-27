@@ -11,11 +11,10 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.metadata.MetadataRewriter1_14_1To1_14;
 import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.storage.EntityTracker1_14_1;
 
-import java.util.Optional;
-
 public class EntityPackets {
 
     public static void register(final Protocol protocol) {
+        MetadataRewriter1_14_1To1_14 metadataRewriter = protocol.get(MetadataRewriter1_14_1To1_14.class);
 
         // Spawn Mob
         protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
@@ -46,7 +45,7 @@ public class EntityPackets {
                         // Register Type ID
                         wrapper.user().get(EntityTracker1_14_1.class).addEntity(entityId, entType);
 
-                        protocol.get(MetadataRewriter1_14_1To1_14.class).handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -74,29 +73,13 @@ public class EntityPackets {
 
                         // Register Type ID
                         wrapper.user().get(EntityTracker1_14_1.class).addEntity(entityId, entType);
-                        protocol.get(MetadataRewriter1_14_1To1_14.class).handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                        metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
         });
 
         // Entity Metadata
-        protocol.registerOutgoing(State.PLAY, 0x43, 0x43, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Types1_14.METADATA_LIST); // 1 - Metadata list
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-
-                        Optional<Entity1_14Types.EntityType> type = wrapper.user().get(EntityTracker1_14_1.class).getEntity(entityId);
-                        protocol.get(MetadataRewriter1_14_1To1_14.class).handleMetadata(entityId, type.orElse(null), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerMetadataRewriter(0x43, 0x43, Types1_14.METADATA_LIST);
     }
 }
