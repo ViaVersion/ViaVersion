@@ -336,6 +336,6 @@ public class VelocityViaConfig extends Config implements ViaVersionConfig {
 
     @Override
     public boolean is1_14HealthNaNFix() {
-        return false;
+        return getBoolean("fix-1_14-health-nan", true);
     }
 }
