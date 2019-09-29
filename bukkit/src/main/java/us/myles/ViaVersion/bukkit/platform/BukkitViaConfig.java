@@ -274,4 +274,9 @@ public class BukkitViaConfig extends Config implements ViaVersionConfig {
     public boolean isNonFullBlockLightFix() {
         return getBoolean("fix-non-full-blocklight", true);
     }
+
+    @Override
+    public boolean is1_14HealthNaNFix() {
+        return getBoolean("fix-1_14-health-nan", true);
+    }
 }

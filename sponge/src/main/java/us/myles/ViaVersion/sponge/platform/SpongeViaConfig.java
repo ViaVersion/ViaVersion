@@ -280,4 +280,9 @@ public class SpongeViaConfig extends Config implements ViaVersionConfig {
     public boolean isNonFullBlockLightFix() {
         return getBoolean("fix-non-full-blocklight", true);
     }
+
+    @Override
+    public boolean is1_14HealthNaNFix() {
+        return false;
+    }
 }

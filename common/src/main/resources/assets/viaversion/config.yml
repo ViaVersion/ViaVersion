@@ -178,3 +178,5 @@ force-json-transform: false
 minimize-cooldown: true
 # Left handed handling on 1.8 servers
 left-handed-handling: true
+# Fixes walk animation not shown when health is set to Float.NaN
+fix-1_14-health-nan: true
