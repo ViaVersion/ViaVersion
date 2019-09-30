@@ -39,9 +39,9 @@ public class MetadataRewriter {
                 if (metadata.getId() > 5) {
                     metadata.setId(metadata.getId() + 1);
                 }
-                if( metadata.getId() == 8 && type.isOrHasParent(Entity1_14Types.EntityType.LIVINGENTITY)) {
+                if (metadata.getId() == 8 && type.isOrHasParent(Entity1_14Types.EntityType.LIVINGENTITY)) {
                     final float v = ((Number) metadata.getValue()).floatValue();
-                    if(Float.isNaN(v) && Via.getConfig().is1_14HealthNaNFix()) {
+                    if (Float.isNaN(v) && Via.getConfig().is1_14HealthNaNFix()) {
                        metadata.setValue(1F);
                     }
                 }
