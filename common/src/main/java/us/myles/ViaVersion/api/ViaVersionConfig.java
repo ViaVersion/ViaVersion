@@ -344,4 +344,6 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean isNonFullBlockLightFix();
+
+    boolean is1_14HealthNaNFix();
 }
