@@ -378,34 +378,33 @@ public class Protocol1_11To1_10 extends Protocol {
         });
     }
 
-    private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
+    private int getNewSoundId(int id) {
         if (id == 196) // Experience orb sound got removed
             return -1;
 
-        int newId = id;
-        if (id >= 85) // Hello shulker boxes
-            newId += 2;
-        if (id >= 174) // Hello Guardian flop
-            newId += 1;
-        if (id >= 194) // Hello evocation things
-            newId += 8;
+        if (id >= 85) // Shulker boxes
+            id += 2;
+        if (id >= 176) // Guardian flop
+            id += 1;
+        if (id >= 197) // evocation things
+            id += 8;
         if (id >= 196) // Rip the Experience orb touch sound :'(
-            newId -= 1;
-        if (id >= 269) // Hello Liama's
-            newId += 9;
-        if (id >= 277) // Hello Mule chest
-            newId += 1;
-        if (id >= 370) // Hello Vex
-            newId += 4;
-        if (id >= 376) // Hello vindication
-            newId += 3;
-        if (id >= 423) // Equip Elytra
-            newId += 1;
-        if (id >= 427) // Hello empty bottle
-            newId += 1;
-        if (id >= 441) // Hello item totem use
-            newId += 1;
-        return newId;
+            id -= 1;
+        if (id >= 279) // Liama's
+            id += 9;
+        if (id >= 296) // Mule chest
+            id += 1;
+        if (id >= 390) // Vex
+            id += 4;
+        if (id >= 400) // vindication
+            id += 3;
+        if (id >= 450) // Elytra
+            id += 1;
+        if (id >= 455) // Empty bottle
+            id += 1;
+        if (id >= 470) // Totem use
+            id += 1;
+        return id;
     }
 
 

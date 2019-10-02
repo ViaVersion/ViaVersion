@@ -175,8 +175,16 @@ public class ChunkSection {
         return blockLight == null ? null : blockLight.getHandle();
     }
 
+    public NibbleArray getBlockLightNibbleArray() {
+        return blockLight;
+    }
+
     public byte[] getSkyLight() {
         return skyLight == null ? null : skyLight.getHandle();
+    }
+
+    public NibbleArray getSkyLightNibbleArray() {
+        return skyLight;
     }
 
     public void readBlockLight(ByteBuf input) {
@@ -193,7 +201,7 @@ public class ChunkSection {
         input.readBytes(this.skyLight.getHandle());
     }
 
-    private static int index(int x, int y, int z) {
+    public static int index(int x, int y, int z) {
         return y << 8 | z << 4 | x;
     }
 

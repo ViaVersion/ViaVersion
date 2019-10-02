@@ -30,7 +30,7 @@ public class NibbleArray {
      * @return The value at the given XYZ
      */
     public byte get(int x, int y, int z) {
-        return get(y << 8 | z << 4 | x);
+        return get(ChunkSection.index(x, y, z));
     }
 
     /**
@@ -57,7 +57,7 @@ public class NibbleArray {
      * @param value Desired Value
      */
     public void set(int x, int y, int z, int value) {
-        set(y << 8 | z << 4 | x, value);
+        set(ChunkSection.index(x, y, z), value);
     }
 
     /**

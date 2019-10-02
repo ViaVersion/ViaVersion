@@ -14,88 +14,104 @@ import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.storage.EntityTracker;
 
 public class EntityPackets {
 
-	public static void register(Protocol protocol) {
+    public static void register(Protocol protocol) {
 
-		// Spawn Mob
-		protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.VAR_INT); // 0 - Entity ID
-				map(Type.UUID); // 1 - Entity UUID
-				map(Type.VAR_INT); // 2 - Entity Type
-				map(Type.DOUBLE); // 3 - X
-				map(Type.DOUBLE); // 4 - Y
-				map(Type.DOUBLE); // 5 - Z
-				map(Type.BYTE); // 6 - Yaw
-				map(Type.BYTE); // 7 - Pitch
-				map(Type.BYTE); // 8 - Head Pitch
-				map(Type.SHORT); // 9 - Velocity X
-				map(Type.SHORT); // 10 - Velocity Y
-				map(Type.SHORT); // 11 - Velocity Z
-				map(Types1_14.METADATA_LIST); // 12 - Metadata
+        // Spawn Mob
+        protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.UUID); // 1 - Entity UUID
+                map(Type.VAR_INT); // 2 - Entity Type
+                map(Type.DOUBLE); // 3 - X
+                map(Type.DOUBLE); // 4 - Y
+                map(Type.DOUBLE); // 5 - Z
+                map(Type.BYTE); // 6 - Yaw
+                map(Type.BYTE); // 7 - Pitch
+                map(Type.BYTE); // 8 - Head Pitch
+                map(Type.SHORT); // 9 - Velocity X
+                map(Type.SHORT); // 10 - Velocity Y
+                map(Type.SHORT); // 11 - Velocity Z
+                map(Types1_14.METADATA_LIST); // 12 - Metadata
 
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						int entityId = wrapper.get(Type.VAR_INT, 0);
-						int type = wrapper.get(Type.VAR_INT, 1);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        int type = wrapper.get(Type.VAR_INT, 1);
 
-						Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type);
+                        Entity1_14Types.EntityType entType = Entity1_14Types.getTypeFromId(type);
 
-						// Register Type ID
-						wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        // Register Type ID
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
 
-						MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
-					}
-				});
-			}
-		});
+                        MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                    }
+                });
+            }
+        });
 
-		// Spawn Player
-		protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.VAR_INT); // 0 - Entity ID
-				map(Type.UUID); // 1 - Player UUID
-				map(Type.DOUBLE); // 2 - X
-				map(Type.DOUBLE); // 3 - Y
-				map(Type.DOUBLE); // 4 - Z
-				map(Type.BYTE); // 5 - Yaw
-				map(Type.BYTE); // 6 - Pitch
-				map(Types1_14.METADATA_LIST); // 7 - Metadata
+        // Spawn Player
+        protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.UUID); // 1 - Player UUID
+                map(Type.DOUBLE); // 2 - X
+                map(Type.DOUBLE); // 3 - Y
+                map(Type.DOUBLE); // 4 - Z
+                map(Type.BYTE); // 5 - Yaw
+                map(Type.BYTE); // 6 - Pitch
+                map(Types1_14.METADATA_LIST); // 7 - Metadata
 
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						int entityId = wrapper.get(Type.VAR_INT, 0);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
 
-						Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
+                        Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
 
-						// Register Type ID
-						wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
-						MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
-					}
-				});
-			}
-		});
+                        // Register Type ID
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entType);
+                        MetadataRewriter.handleMetadata(entityId, entType, wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                    }
+                });
+            }
+        });
 
-		// Entity Metadata
-		protocol.registerOutgoing(State.PLAY, 0x43, 0x43, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.VAR_INT); // 0 - Entity ID
-				map(Types1_14.METADATA_LIST); // 1 - Metadata list
+        // Destroy entities
+        protocol.registerOutgoing(State.PLAY, 0x37, 0x37, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT_ARRAY); // 0 - Entity ids
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0)) {
+                            wrapper.user().get(EntityTracker.class).removeEntity(entity);
+                        }
+                    }
+                });
+            }
+        });
 
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper wrapper) throws Exception {
-						int entityId = wrapper.get(Type.VAR_INT, 0);
+        // Entity Metadata
+        protocol.registerOutgoing(State.PLAY, 0x43, 0x43, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Types1_14.METADATA_LIST); // 1 - Metadata list
 
-						Optional<Entity1_14Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
-						MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
-					}
-				});
-			}
-		});
-	}
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+
+                        Optional<Entity1_14Types.EntityType> type = wrapper.user().get(EntityTracker.class).get(entityId);
+                        MetadataRewriter.handleMetadata(entityId, type.orNull(), wrapper.get(Types1_14.METADATA_LIST, 0), wrapper.user());
+                    }
+                });
+            }
+        });
+    }
 }
