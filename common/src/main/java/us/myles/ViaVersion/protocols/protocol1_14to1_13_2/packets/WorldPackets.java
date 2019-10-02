@@ -2,12 +2,15 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
-import com.google.common.primitives.Bytes;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
+import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
+import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -29,7 +32,7 @@ public class WorldPackets {
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
-    private static final byte[] FULL_LIGHT = new byte[2048];
+    private static final Byte[] FULL_LIGHT = new Byte[2048];
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
@@ -164,6 +167,7 @@ public class WorldPackets {
                         for (int s = 0; s < 16; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
+
                             boolean hasBlock = false;
                             for (int i = 0; i < section.getPaletteSize(); i++) {
                                 int old = section.getPaletteEntry(i);
@@ -177,6 +181,7 @@ public class WorldPackets {
                                 section.setNonAirBlocksCount(0);
                                 continue;
                             }
+
                             int nonAirBlockCount = 0;
                             for (int x = 0; x < 16; x++) {
                                 for (int y = 0; y < 16; y++) {
@@ -189,9 +194,15 @@ public class WorldPackets {
                                         if (MappingData.motionBlocking.contains(id)) {
                                             motionBlocking[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
                                         }
+
+                                        // Manually update light for non full blocks (block light must not be sent)
+                                        if (Via.getConfig().isNonFullBlockLightFix() && MappingData.nonFullBlocks.contains(id)) {
+                                            setNonFullLight(chunk, section, s, x, y, z);
+                                        }
                                     }
                                 }
                             }
+
                             section.setNonAirBlocksCount(nonAirBlockCount);
                         }
 
@@ -223,22 +234,22 @@ public class WorldPackets {
                         // not sending skylight/setting empty skylight causes client lag due to some weird calculations
                         // only do this on the initial chunk send (not when chunk.isGroundUp() is false)
                         if (chunk.isGroundUp())
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0])); // chunk below 0
+                            lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk below 0
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) {
                                 if (chunk.isGroundUp()) {
-                                    lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0]));
+                                    lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT);
                                 }
                                 continue;
                             }
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getSkyLight()).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getSkyLight()));
                         }
                         if (chunk.isGroundUp())
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(FULL_LIGHT).toArray(new Byte[0])); // chunk above 255
+                            lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk above 255
 
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            lightPacket.write(Type.BYTE_ARRAY, Bytes.asList(section.getBlockLight()).toArray(new Byte[0]));
+                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getBlockLight()));
                         }
 
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
@@ -256,6 +267,14 @@ public class WorldPackets {
                         }
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, true);
+                    }
+
+                    private Byte[] fromPrimitiveArray(byte[] bytes) {
+                        Byte[] newArray = new Byte[bytes.length];
+                        for (int i = 0; i < bytes.length; i++) {
+                            newArray[i] = bytes[i];
+                        }
+                        return newArray;
                     }
                 });
             }
@@ -436,5 +455,82 @@ public class WorldPackets {
         }
 
         return data;
+    }
+
+    private static void setNonFullLight(Chunk chunk, ChunkSection section, int ySection, int x, int y, int z) {
+        int skyLight = 0;
+        int blockLight = 0;
+        for (BlockFace blockFace : BlockFace.values()) {
+            NibbleArray skyLightArray = section.getSkyLightNibbleArray();
+            NibbleArray blockLightArray = section.getBlockLightNibbleArray();
+            int neighbourX = x + blockFace.getModX();
+            int neighbourY = y + blockFace.getModY();
+            int neighbourZ = z + blockFace.getModZ();
+
+            if (blockFace.getModX() != 0) {
+                // Another chunk, nothing we can do without an unnecessary amount of caching
+                if (neighbourX == 16 || neighbourX == -1) continue;
+            } else if (blockFace.getModY() != 0) {
+                if (neighbourY == 16 || neighbourY == -1) {
+                    if (neighbourY == 16) {
+                        ySection += 1;
+                        neighbourY = 0;
+                    } else {
+                        ySection -= 1;
+                        neighbourY = 15;
+                    }
+
+                    if (ySection == 16 || ySection == -1) continue;
+
+                    ChunkSection newSection = chunk.getSections()[ySection];
+                    if (newSection == null) continue;
+
+                    skyLightArray = newSection.getSkyLightNibbleArray();
+                    blockLightArray = newSection.getBlockLightNibbleArray();
+                }
+            } else if (blockFace.getModZ() != 0) {
+                // Another chunk, nothing we can do without an unnecessary amount of caching
+                if (neighbourZ == 16 || neighbourZ == -1) continue;
+            }
+
+            if (blockLightArray != null && blockLight != 15) {
+                int neighbourBlockLight = blockLightArray.get(neighbourX, neighbourY, neighbourZ);
+                if (neighbourBlockLight == 15) {
+                    blockLight = 14;
+                } else if (neighbourBlockLight > blockLight) {
+                    blockLight = neighbourBlockLight - 1; // lower light level by one
+                }
+            }
+            if (skyLightArray != null && skyLight != 15) {
+                int neighbourSkyLight = skyLightArray.get(neighbourX, neighbourY, neighbourZ);
+                if (neighbourSkyLight == 15) {
+                    if (blockFace.getModY() == 1) {
+                        // Keep 15 if block is exposed to sky
+                        skyLight = 15;
+                        continue;
+                    }
+
+                    skyLight = 14;
+                } else if (neighbourSkyLight > skyLight) {
+                    skyLight = neighbourSkyLight - 1; // lower light level by one
+                }
+            }
+        }
+
+        if (skyLight != 0) {
+            if (!section.hasSkyLight()) {
+                byte[] newSkyLight = new byte[2028];
+                section.setSkyLight(newSkyLight);
+            }
+
+            section.getSkyLightNibbleArray().set(x, y, z, skyLight);
+        }
+        if (blockLight != 0) {
+            section.getBlockLightNibbleArray().set(x, y, z, blockLight);
+        }
+    }
+
+    private static long getChunkIndex(int x, int z) {
+        return ((x & 0x3FFFFFFL) << 38) | (z & 0x3FFFFFFL);
     }
 }

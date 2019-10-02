@@ -7,13 +7,13 @@ import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.storage.EntityTracker;
 
 public class Protocol1_14_1To1_14 extends Protocol {
 
-	@Override
-	protected void registerPackets() {
-		EntityPackets.register(this);
-	}
+    @Override
+    protected void registerPackets() {
+        EntityPackets.register(this);
+    }
 
-	@Override
-	public void init(UserConnection userConnection) {
-		userConnection.put(new EntityTracker(userConnection));
-	}
+    @Override
+    public void init(UserConnection userConnection) {
+        userConnection.put(new EntityTracker(userConnection));
+    }
 }

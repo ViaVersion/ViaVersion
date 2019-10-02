@@ -323,6 +323,5 @@ public class Protocol1_14To1_13_2 extends Protocol {
         userConnection.put(new EntityTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
-
     }
 }
