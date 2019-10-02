@@ -249,7 +249,7 @@ public class EntityPackets {
 
 
         // Update Entity NBT
-        protocol.cancelOutgoing(State.PLAY, 0x49);
+        protocol.cancelOutgoing(State.PLAY, 0x49, 0x49);
 
         // Combat Event Packet
         protocol.registerOutgoing(State.PLAY, 0x42, 0x2C, new PacketRemapper() {

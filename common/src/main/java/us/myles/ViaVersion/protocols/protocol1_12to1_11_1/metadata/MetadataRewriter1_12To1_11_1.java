@@ -33,4 +33,14 @@ public class MetadataRewriter1_12To1_11_1 extends MetadataRewriter<Protocol1_12T
             }
         }
     }
+
+    @Override
+    protected EntityType getTypeFromId(int type) {
+        return Entity1_12Types.getTypeFromId(type, false);
+    }
+
+    @Override
+    protected EntityType getObjectTypeFromId(int type) {
+        return Entity1_12Types.getTypeFromId(type, true);
+    }
 }

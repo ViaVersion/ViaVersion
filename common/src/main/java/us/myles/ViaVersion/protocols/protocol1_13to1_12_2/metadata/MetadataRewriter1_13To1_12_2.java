@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
@@ -97,5 +98,20 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter<Protocol1_13T
         }
 
         // TODO: Boat has changed
+    }
+
+    @Override
+    protected int getNewEntityId(final int oldId) {
+        return EntityTypeRewriter.getNewId(oldId).orElse(oldId);
+    }
+
+    @Override
+    protected EntityType getTypeFromId(int type) {
+        return Entity1_13Types.getTypeFromId(type, false);
+    }
+
+    @Override
+    protected EntityType getObjectTypeFromId(int type) {
+        return Entity1_13Types.getTypeFromId(type, true);
     }
 }

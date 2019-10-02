@@ -402,7 +402,7 @@ public class PlayerPackets {
         /* Removed packets */
 
         // Set Compression
-        protocol.cancelOutgoing(State.PLAY, 0x46);
+        protocol.cancelOutgoing(State.PLAY, 0x46, 0x46);
 
         /* Packets which do not have any field remapping or handlers */
 

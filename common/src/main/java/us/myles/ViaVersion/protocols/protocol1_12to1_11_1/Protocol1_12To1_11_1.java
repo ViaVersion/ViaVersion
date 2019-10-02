@@ -8,7 +8,6 @@ import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_12Types;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
@@ -43,19 +42,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                 map(Type.BYTE); // 2 - Type
 
                 // Track Entity
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        byte type = wrapper.get(Type.BYTE, 0);
-
-                        Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, true);
-
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_12.class).addEntity(entityId, entType);
-                    }
-                });
+                handler(metadataRewriter.getObjectTracker());
             }
         });
 
@@ -77,19 +64,8 @@ public class Protocol1_12To1_11_1 extends Protocol {
                 map(Type.SHORT); // 11 - Velocity Z
                 map(Types1_12.METADATA_LIST); // 12 - Metadata
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        // Change Type :)
-                        int type = wrapper.get(Type.VAR_INT, 1);
-
-                        Entity1_12Types.EntityType entType = Entity1_12Types.getTypeFromId(type, false);
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_12.class).addEntity(entityId, entType);
-                        metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_12.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
+                // Track mob and rewrite metadata
+                handler(metadataRewriter.getTrackerAndRewriter(Types1_12.METADATA_LIST));
             }
         });
 
@@ -272,7 +248,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
         // Incoming
         // New packet at 0x01
-        cancelIncoming(State.PLAY, 0x01);
+        cancelIncoming(State.PLAY, 0x01, 0x01);
 
         registerIncoming(State.PLAY, 0x01, 0x02);
         registerIncoming(State.PLAY, 0x02, 0x03);
@@ -328,12 +304,12 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x15, 0x16);
 
         // New packet at 0x17
-        cancelIncoming(State.PLAY, 0x17);
+        cancelIncoming(State.PLAY, 0x17, 0x17);
 
         registerIncoming(State.PLAY, 0x16, 0x18);
 
         // New packet 0x19
-        cancelIncoming(State.PLAY, 0x19);
+        cancelIncoming(State.PLAY, 0x19, 0x19);
 
         registerIncoming(State.PLAY, 0x17, 0x1a);
         // registerIncoming(State.PLAY, 0x18, 0x1b); - Handled in InventoryPackets

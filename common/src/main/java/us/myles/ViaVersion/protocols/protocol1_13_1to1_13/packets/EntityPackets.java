@@ -51,6 +51,7 @@ public class EntityPackets {
                 });
             }
         });
+
         // Spawn mob packet
         protocol.registerOutgoing(State.PLAY, 0x3, 0x3, new PacketRemapper() {
             @Override
@@ -69,20 +70,7 @@ public class EntityPackets {
                 map(Type.SHORT); // 11 - Velocity Z
                 map(Types1_13.METADATA_LIST); // 12 - Metadata
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        int type = wrapper.get(Type.VAR_INT, 1);
-
-                        Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, false);
-
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
-
-                        metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
+                handler(metadataRewriter.getTrackerAndRewriter(Types1_13.METADATA_LIST));
             }
         });
 
@@ -99,17 +87,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_13.METADATA_LIST); // 7 - Metadata
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-
-                        Entity1_13Types.EntityType entType = Entity1_13Types.EntityType.PLAYER;
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
-                        metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_13.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
+                handler(metadataRewriter.getTrackerAndRewriter(Types1_13.METADATA_LIST, Entity1_13Types.EntityType.PLAYER));
             }
         });
 

@@ -116,13 +116,17 @@ public abstract class Protocol {
         incoming.put(pair, protocolPacket);
     }
 
-    public void cancelIncoming(State state, int newPacketID) {
-        registerIncoming(state, -1, newPacketID, new PacketRemapper() {
+    public void cancelIncoming(State state, int oldPacketID, int newPacketID) {
+        registerIncoming(state, oldPacketID, newPacketID, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(PacketWrapper::cancel);
             }
         });
+    }
+
+    public void cancelIncoming(State state, int newPacketID) {
+        cancelOutgoing(state, -1, newPacketID);
     }
 
     /**
@@ -158,8 +162,8 @@ public abstract class Protocol {
         outgoing.put(pair, protocolPacket);
     }
 
-    public void cancelOutgoing(State state, int oldPacketID) {
-        registerIncoming(state, oldPacketID, -1, new PacketRemapper() {
+    public void cancelOutgoing(State state, int oldPacketID, int newPacketID) {
+        registerIncoming(state, oldPacketID, newPacketID, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(PacketWrapper::cancel);

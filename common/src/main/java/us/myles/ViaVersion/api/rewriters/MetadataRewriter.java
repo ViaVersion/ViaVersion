@@ -78,23 +78,76 @@ public abstract class MetadataRewriter<T extends Protocol> extends Rewriter<T> {
         registerMetadataRewriter(oldPacketId, newPacketId, null, metaType);
     }
 
-    public void registerExtraTracker(int packetId, EntityType entityType, Type intType) {
-        getProtocol().registerOutgoing(State.PLAY, packetId, packetId, new PacketRemapper() {
+    /**
+     * Returns a packethandler to track and rewrite an entity.
+     *
+     * @param metaType type of the metadata list
+     * @return handler for tracking and rewriting entities
+     */
+    public PacketHandler getTrackerAndRewriter(Type<List<Metadata>> metaType) {
+        return new PacketHandler() {
             @Override
-            public void registerMap() {
-                map(intType); // 0 - Entity id
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.user().get(entityTrackerClass).addEntity((int) wrapper.get(intType, 0), entityType);
-                    }
-                });
+            public void handle(PacketWrapper wrapper) throws Exception {
+                int entityId = wrapper.get(Type.VAR_INT, 0);
+                int type = wrapper.get(Type.VAR_INT, 1);
+
+                int newType = getNewEntityId(type);
+                if (newType != type) {
+                    wrapper.set(Type.VAR_INT, 1, newType);
+                }
+
+                EntityType entType = getTypeFromId(newType);
+                // Register Type ID
+                wrapper.user().get(entityTrackerClass).addEntity(entityId, entType);
+
+                if (metaType != null) {
+                    handleMetadata(entityId, wrapper.get(metaType, 0), wrapper.user());
+                }
             }
-        });
+        };
     }
 
-    public void registerExtraTracker(int packetId, EntityType entityType) {
-        registerExtraTracker(packetId, entityType, Type.VAR_INT);
+    public PacketHandler getTracker() {
+        return getTrackerAndRewriter(null);
+    }
+
+    public PacketHandler getTrackerAndRewriter(Type<List<Metadata>> metaType, EntityType entityType) {
+        return new PacketHandler() {
+            @Override
+            public void handle(PacketWrapper wrapper) throws Exception {
+                int entityId = wrapper.get(Type.VAR_INT, 0);
+                // Register Type ID
+                wrapper.user().get(entityTrackerClass).addEntity(entityId, entityType);
+
+                if (metaType != null) {
+                    handleMetadata(entityId, wrapper.get(metaType, 0), wrapper.user());
+                }
+            }
+        };
+    }
+
+    /**
+     * Returns a packethandler to track an object entity.
+     *
+     * @return handler for tracking and rewriting entities
+     */
+    public PacketHandler getObjectTracker() {
+        return new PacketHandler() {
+            @Override
+            public void handle(PacketWrapper wrapper) throws Exception {
+                int entityId = wrapper.get(Type.VAR_INT, 0);
+                byte type = wrapper.get(Type.BYTE, 0);
+
+                int newType = getNewEntityId(type);
+                if (newType != type) {
+                    wrapper.set(Type.BYTE, 0, (byte) newType);
+                }
+
+                EntityType entType = getObjectTypeFromId(newType);
+                // Register Type ID
+                wrapper.user().get(entityTrackerClass).addEntity(entityId, entType);
+            }
+        };
     }
 
     public void registerEntityDestroy(int oldPacketId, int newPacketId) {
@@ -117,6 +170,16 @@ public abstract class MetadataRewriter<T extends Protocol> extends Rewriter<T> {
 
     public void registerEntityDestroy(int packetId) {
         registerEntityDestroy(packetId, packetId);
+    }
+
+    protected abstract EntityType getTypeFromId(int type);
+
+    protected EntityType getObjectTypeFromId(int type) {
+        return getTypeFromId(type);
+    }
+
+    protected int getNewEntityId(int oldId) {
+        return oldId;
     }
 
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {

@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 
@@ -37,5 +38,15 @@ public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter<Protocol1_15T
         }
 
         //TODO new boolean with id 17 for enderman
+    }
+
+    @Override
+    protected int getNewEntityId(final int oldId) {
+        return EntityPackets.getNewEntityId(oldId);
+    }
+
+    @Override
+    protected EntityType getTypeFromId(int type) {
+        return Entity1_15Types.getTypeFromId(type);
     }
 }
