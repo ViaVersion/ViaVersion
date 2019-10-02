@@ -272,18 +272,8 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
         // Incoming
         // New packet at 0x01
-        registerIncoming(State.PLAY, 0x01, 0x01, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
+        cancelIncoming(State.PLAY, 0x01);
 
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
         registerIncoming(State.PLAY, 0x01, 0x02);
         registerIncoming(State.PLAY, 0x02, 0x03);
         registerIncoming(State.PLAY, 0x03, 0x04);
@@ -336,33 +326,15 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerIncoming(State.PLAY, 0x13, 0x14);
         registerIncoming(State.PLAY, 0x14, 0x15);
         registerIncoming(State.PLAY, 0x15, 0x16);
+
         // New packet at 0x17
-        registerIncoming(State.PLAY, 0x17, 0x17, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
+        cancelIncoming(State.PLAY, 0x17);
 
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
         registerIncoming(State.PLAY, 0x16, 0x18);
-        // New packet 0x19
-        registerIncoming(State.PLAY, 0x19, 0x19, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
 
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        // New packet 0x19
+        cancelIncoming(State.PLAY, 0x19);
+
         registerIncoming(State.PLAY, 0x17, 0x1a);
         // registerIncoming(State.PLAY, 0x18, 0x1b); - Handled in InventoryPackets
         registerIncoming(State.PLAY, 0x19, 0x1c);
