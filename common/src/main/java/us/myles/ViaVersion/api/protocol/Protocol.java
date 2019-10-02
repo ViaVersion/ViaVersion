@@ -171,6 +171,15 @@ public abstract class Protocol {
         });
     }
 
+    public void cancelOutgoing(State state, int oldPacketID) {
+        registerIncoming(state, oldPacketID, -1, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(PacketWrapper::cancel);
+            }
+        });
+    }
+
     /**
      * Transform a packet using this protocol
      *
