@@ -138,12 +138,7 @@ public abstract class MetadataRewriter<T extends Protocol> extends Rewriter<T> {
                 int entityId = wrapper.get(Type.VAR_INT, 0);
                 byte type = wrapper.get(Type.BYTE, 0);
 
-                int newType = getNewEntityId(type);
-                if (newType != type) {
-                    wrapper.set(Type.BYTE, 0, (byte) newType);
-                }
-
-                EntityType entType = getObjectTypeFromId(newType);
+                EntityType entType = getObjectTypeFromId(type);
                 // Register Type ID
                 wrapper.user().get(entityTrackerClass).addEntity(entityId, entType);
             }
