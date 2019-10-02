@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.entities.EntityType;
@@ -42,6 +43,12 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Protocol1_14T
         //Metadata 6 added to abstract_entity
         if (metadata.getId() > 5) {
             metadata.setId(metadata.getId() + 1);
+        }
+        if (metadata.getId() == 8 && type.isOrHasParent(Entity1_14Types.EntityType.LIVINGENTITY)) {
+            final float v = ((Number) metadata.getValue()).floatValue();
+            if (Float.isNaN(v) && Via.getConfig().is1_14HealthNaNFix()) {
+                metadata.setValue(1F);
+            }
         }
 
         //Metadata 12 added to living_entity
