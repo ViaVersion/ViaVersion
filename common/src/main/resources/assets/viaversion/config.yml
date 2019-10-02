@@ -128,6 +128,10 @@ change-1_9-hitbox: false
 change-1_14-hitbox: false
 # Fixes 1.14+ clients on sub 1.14 servers having a light value of 0 for non full blocks.
 fix-non-full-blocklight: true
+# Fixes walk animation not shown when health is set to Float.NaN
+fix-1_14-health-nan: true
+# Fixes 1.14+ clients on sub 1.14 servers having a light value of 0 for non full blocks.
+fix-non-full-blocklight: true
 # Should 1.15+ clients respawn instantly / without showing a death screen?
 use-1_15-instant-respawn: false
 #

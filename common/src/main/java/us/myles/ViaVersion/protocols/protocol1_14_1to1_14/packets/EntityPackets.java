@@ -51,6 +51,22 @@ public class EntityPackets {
             }
         });
 
+        // Destroy entities
+        protocol.registerOutgoing(State.PLAY, 0x37, 0x37, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT_ARRAY); // 0 - Entity ids
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0)) {
+                            wrapper.user().get(EntityTracker.class).removeEntity(entity);
+                        }
+                    }
+                });
+            }
+        });
+
         // Spawn Player
         protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
             @Override

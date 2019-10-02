@@ -119,7 +119,7 @@ public class InventoryPackets {
                                     if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
                                         Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                     }
-                                    finalSource = java.util.Optional.of(SoundSource.MASTER);
+                                    finalSource = Optional.of(SoundSource.MASTER);
 
                                 }
 
@@ -509,9 +509,9 @@ public class InventoryPackets {
             case "bungeecord:main":
                 return null;
             case "FML|MP":
-                return "fml:mp";
+            	return "fml:mp";
             case "FML|HS":
-                return "fml:hs";
+            	return "fml:hs";
             default:
                 return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
                         ? old : null;
@@ -754,9 +754,9 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             case "fml:hs":
-                return "FML|HS";
+            	return "FML|HS";
             case "fml:mp":
-                return "FML:MP";
+            	return "FML:MP";
             default:
                 return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }
