@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.EntityTypeRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
@@ -165,6 +166,16 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter<Protocol1_14T
                 metadata.setId(metadata.getId() + 1);
             }
         }
+    }
+
+    @Override
+    protected int getNewEntityId(final int oldId) {
+        return EntityTypeRewriter.getNewId(oldId).orElse(oldId);
+    }
+
+    @Override
+    protected EntityType getTypeFromId(int type) {
+        return Entity1_14Types.getTypeFromId(type);
     }
 
     private static boolean isSneaking(byte flags) {

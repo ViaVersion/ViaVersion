@@ -799,30 +799,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // Incoming packets
 
         // New packet 0x02 - Login Plugin Message
-        registerIncoming(State.LOGIN, -1, 0x02, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        cancelIncoming(State.LOGIN, 0x02);
 
         // New 0x01 - Query Block NBT
-        registerIncoming(State.PLAY, -1, 0x01, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        cancelIncoming(State.PLAY, 0x01);
 
         // Tab-Complete
         registerIncoming(State.PLAY, 0x1, 0x5, new PacketRemapper() {
@@ -890,17 +870,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
         // New 0x0C - Query Entity NBT
-        registerIncoming(State.PLAY, -1, 0x0C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        cancelIncoming(State.PLAY, 0x0C);
+
         registerIncoming(State.PLAY, 0x0A, 0x0D);
         registerIncoming(State.PLAY, 0x0B, 0x0E);
         registerIncoming(State.PLAY, 0x0C, 0x0F);

@@ -116,6 +116,19 @@ public abstract class Protocol {
         incoming.put(pair, protocolPacket);
     }
 
+    public void cancelIncoming(State state, int oldPacketID, int newPacketID) {
+        registerIncoming(state, oldPacketID, newPacketID, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(PacketWrapper::cancel);
+            }
+        });
+    }
+
+    public void cancelIncoming(State state, int newPacketID) {
+        cancelIncoming(state, -1, newPacketID);
+    }
+
     /**
      * Register an outgoing packet, with simple id transformation.
      *
@@ -147,6 +160,19 @@ public abstract class Protocol {
                     " If override is intentional, set override to true. Stacktrace: ", new Exception());
         }
         outgoing.put(pair, protocolPacket);
+    }
+
+    public void cancelOutgoing(State state, int oldPacketID, int newPacketID) {
+        registerOutgoing(state, oldPacketID, newPacketID, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(PacketWrapper::cancel);
+            }
+        });
+    }
+
+    public void cancelOutgoing(State state, int oldPacketID) {
+        cancelOutgoing(state, oldPacketID, -1);
     }
 
     /**

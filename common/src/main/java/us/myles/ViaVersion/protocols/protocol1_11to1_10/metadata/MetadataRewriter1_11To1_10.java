@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_11to1_10.metadata;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_11Types;
 import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -128,6 +129,16 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Protocol1_11To1
                 }
             }
         }
+    }
+
+    @Override
+    protected us.myles.ViaVersion.api.entities.EntityType getTypeFromId(int type) {
+        return Entity1_11Types.getTypeFromId(type, false);
+    }
+
+    @Override
+    protected us.myles.ViaVersion.api.entities.EntityType getObjectTypeFromId(int type) {
+        return Entity1_11Types.getTypeFromId(type, true);
     }
 
     public static EntityType rewriteEntityType(int numType, List<Metadata> metadata) {

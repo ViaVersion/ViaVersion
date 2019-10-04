@@ -44,19 +44,7 @@ public class Protocol1_11To1_10 extends Protocol {
                 map(Type.BYTE); // 2 - Type
 
                 // Track Entity
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        byte type = wrapper.get(Type.BYTE, 0);
-
-                        Entity1_11Types.EntityType entType = Entity1_11Types.getTypeFromId(type, true);
-
-                        // Register Type ID
-                        wrapper.user().get(EntityTracker1_11.class).addEntity(entityId, entType);
-                    }
-                });
+                handler(metadataRewriter.getObjectTracker());
             }
         });
 

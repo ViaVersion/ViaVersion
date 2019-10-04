@@ -130,4 +130,13 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Protocol1_9To1_8>
         }
     }
 
+    @Override
+    protected EntityType getTypeFromId(int type) {
+        return Entity1_10Types.getTypeFromId(type, false);
+    }
+
+    @Override
+    protected EntityType getObjectTypeFromId(int type) {
+        return Entity1_10Types.getTypeFromId(type, true);
+    }
 }

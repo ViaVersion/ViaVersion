@@ -402,17 +402,7 @@ public class PlayerPackets {
         /* Removed packets */
 
         // Set Compression
-        protocol.registerOutgoing(State.PLAY, 0x46, 0x46, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        protocol.cancelOutgoing(State.PLAY, 0x46, 0x46);
 
         /* Packets which do not have any field remapping or handlers */
 
@@ -482,43 +472,13 @@ public class PlayerPackets {
         });
 
         // TP Confirm
-        protocol.registerIncoming(State.PLAY, -1, 0x00, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        protocol.cancelIncoming(State.PLAY, 0x00);
 
         // Vehicle Move
-        protocol.registerIncoming(State.PLAY, -1, 0x10, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        protocol.cancelIncoming(State.PLAY, 0x10);
 
         // Steer Boat
-        protocol.registerIncoming(State.PLAY, -1, 0x11, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        protocol.cancelIncoming(State.PLAY, 0x11);
 
         // Packet Plugin Message Incoming
         protocol.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {

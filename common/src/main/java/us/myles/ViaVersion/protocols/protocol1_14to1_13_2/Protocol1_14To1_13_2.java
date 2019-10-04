@@ -217,17 +217,8 @@ public class Protocol1_14To1_13_2 extends Protocol {
         });
 
         //Set Difficulty packet added in 19w11a
-        registerIncoming(State.PLAY, -1, 0x02, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        cancelIncoming(State.PLAY, 0x02);
+
         registerIncoming(State.PLAY, 0x02, 0x03);
         registerIncoming(State.PLAY, 0x03, 0x04);
         registerIncoming(State.PLAY, 0x04, 0x05);
@@ -242,17 +233,8 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerIncoming(State.PLAY, 0x0D, 0x0E);
 
         //Lock Difficulty packet added in 19w11a
-        registerIncoming(State.PLAY, -1, 0x10, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        cancelIncoming(State.PLAY, 0x10);
+
         registerIncoming(State.PLAY, 0x0E, 0x0F);
         registerIncoming(State.PLAY, 0x0F, 0x14);
         registerIncoming(State.PLAY, 0x10, 0x11);
@@ -276,17 +258,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerIncoming(State.PLAY, 0x23, 0x25);
 
         //Unknown packet added in 19w13a
-        registerIncoming(State.PLAY, -1, 0x27, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
+        cancelIncoming(State.PLAY, 0x27);
 
         registerIncoming(State.PLAY, 0x27, 0x2A);
         registerIncoming(State.PLAY, 0x28, 0x2B);
