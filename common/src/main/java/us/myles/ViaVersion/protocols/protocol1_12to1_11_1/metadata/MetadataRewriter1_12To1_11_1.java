@@ -12,7 +12,7 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1
 
 import java.util.List;
 
-public class MetadataRewriter1_12To1_11_1 extends MetadataRewriter<Protocol1_12To1_11_1> {
+public class MetadataRewriter1_12To1_11_1 extends MetadataRewriter {
 
     public MetadataRewriter1_12To1_11_1(Protocol1_12To1_11_1 protocol) {
         super(protocol, EntityTracker1_12.class);

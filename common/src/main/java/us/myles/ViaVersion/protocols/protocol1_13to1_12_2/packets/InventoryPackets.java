@@ -10,9 +10,11 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.BlockIdData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SoundSource;
@@ -25,14 +27,10 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class InventoryPackets {
-    private static String NBT_TAG_NAME;
+    private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_13To1_12_2.class.getSimpleName();
 
     public static void register(Protocol protocol) {
-        NBT_TAG_NAME = "ViaVersion|" + protocol.getClass().getSimpleName();
-
-        /*
-            Outgoing packets
-         */
+        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
         // Set slot packet
         protocol.registerOutgoing(State.PLAY, 0x16, 0x17, new PacketRemapper() {
@@ -42,13 +40,7 @@ public class InventoryPackets {
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Slot Value
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.FLAT_ITEM, 0);
-                        toClient(stack);
-                    }
-                });
+                handler(itemRewriter.itemToClientHandler(Type.FLAT_ITEM));
             }
         });
 
@@ -59,14 +51,7 @@ public class InventoryPackets {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.ITEM_ARRAY, Type.FLAT_ITEM_ARRAY); // 1 - Window Values
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item[] stacks = wrapper.get(Type.FLAT_ITEM_ARRAY, 0);
-                        for (Item stack : stacks)
-                            toClient(stack);
-                    }
-                });
+                handler(itemRewriter.itemArrayHandler(Type.FLAT_ITEM_ARRAY));
             }
         });
 
@@ -77,14 +62,13 @@ public class InventoryPackets {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.SHORT); // Property
                 map(Type.SHORT); // Value
+
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short property = wrapper.get(Type.SHORT, 0);
                         if (property >= 4 && property <= 6) { // Enchantment id
-                            wrapper.set(Type.SHORT, 1, (short) MappingData.enchantmentMappings.getNewId(
-                                    wrapper.get(Type.SHORT, 1)
-                            ));
+                            wrapper.set(Type.SHORT, 1, (short) MappingData.enchantmentMappings.getNewId(wrapper.get(Type.SHORT, 1)));
                         }
                     }
                 });
@@ -202,42 +186,25 @@ public class InventoryPackets {
                 map(Type.VAR_INT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Item
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.FLAT_ITEM, 0);
-                        toClient(stack);
-                    }
-                });
+                handler(itemRewriter.itemToClientHandler(Type.FLAT_ITEM));
             }
         });
 
 
-        /*
-            Incoming packets
-         */
-
         // Click window packet
         protocol.registerIncoming(State.PLAY, 0x07, 0x08, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                        map(Type.SHORT); // 1 - Slot
-                        map(Type.BYTE); // 2 - Button
-                        map(Type.SHORT); // 3 - Action number
-                        map(Type.VAR_INT); // 4 - Mode
-                        map(Type.FLAT_ITEM, Type.ITEM); // 5 - Clicked Item
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                map(Type.SHORT); // 1 - Slot
+                map(Type.BYTE); // 2 - Button
+                map(Type.SHORT); // 3 - Action number
+                map(Type.VAR_INT); // 4 - Mode
+                map(Type.FLAT_ITEM, Type.ITEM); // 5 - Clicked Item
 
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.ITEM, 0);
-                                toServer(item);
-                            }
-                        });
-                    }
-                }
-        );
+                handler(itemRewriter.itemToServerHandler(Type.ITEM));
+            }
+        });
 
         // Plugin message
         protocol.registerIncoming(State.PLAY, 0x09, 0x0A, new PacketRemapper() {
@@ -277,21 +244,14 @@ public class InventoryPackets {
 
         // Creative Inventory Action
         protocol.registerIncoming(State.PLAY, 0x1B, 0x24, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.SHORT); // 0 - Slot
-                        map(Type.FLAT_ITEM, Type.ITEM); // 1 - Clicked Item
+            @Override
+            public void registerMap() {
+                map(Type.SHORT); // 0 - Slot
+                map(Type.FLAT_ITEM, Type.ITEM); // 1 - Clicked Item
 
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.ITEM, 0);
-                                toServer(item);
-                            }
-                        });
-                    }
-                }
-        );
+                handler(itemRewriter.itemToServerHandler(Type.ITEM));
+            }
+        });
     }
 
     // TODO CLEANUP / SMARTER REWRITE SYSTEM
@@ -509,9 +469,9 @@ public class InventoryPackets {
             case "bungeecord:main":
                 return null;
             case "FML|MP":
-            	return "fml:mp";
+                return "fml:mp";
             case "FML|HS":
-            	return "fml:hs";
+                return "fml:hs";
             default:
                 return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
                         ? old : null;
@@ -754,9 +714,9 @@ public class InventoryPackets {
             case "wdl:request":
                 return "WDL|REQUEST";
             case "fml:hs":
-            	return "FML|HS";
+                return "FML|HS";
             case "fml:mp":
-            	return "FML:MP";
+                return "FML:MP";
             default:
                 return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }

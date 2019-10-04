@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data.MappingData;
@@ -13,22 +14,10 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data.MappingData;
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {
-        // Window items packet
-        protocol.registerOutgoing(State.PLAY, 0x14, 0x15, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.FLAT_VAR_INT_ITEM_ARRAY); // 1 - Window Values
+        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item[] stacks = wrapper.get(Type.FLAT_VAR_INT_ITEM_ARRAY, 0);
-                        for (Item stack : stacks) toClient(stack);
-                    }
-                });
-            }
-        });
+        // Window items packet
+        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, 0x14, 0x15);
 
         // Trade list packet
         protocol.registerOutgoing(State.PLAY, 0x27, 0x28, new PacketRemapper() {
@@ -70,38 +59,10 @@ public class InventoryPackets {
         });
 
         // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x17, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.FLAT_VAR_INT_ITEM); // 2 - Slot Value
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        toClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
-                    }
-                });
-            }
-        });
+        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, 0x16, 0x17);
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x46, 0x47, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.VAR_INT); // 1 - Slot ID
-                map(Type.FLAT_VAR_INT_ITEM); // 2 - Item
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        toClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
-                    }
-                });
-            }
-        });
+        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x46, 0x47);
 
         // Declare Recipes
         protocol.registerOutgoing(State.PLAY, 0x5A, 0x5B, new PacketRemapper() {
@@ -171,40 +132,10 @@ public class InventoryPackets {
         });
 
         // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x09, 0x09, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot
-                map(Type.BYTE); // 2 - Button
-                map(Type.SHORT); // 3 - Action number
-                map(Type.VAR_INT); // 4 - Mode
-                map(Type.FLAT_VAR_INT_ITEM); // 5 - Clicked Item
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        toServer(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
-                    }
-                });
-            }
-        });
+        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, 0x09, 0x09);
 
         // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x26, 0x26, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.SHORT); // 0 - Slot
-                map(Type.FLAT_VAR_INT_ITEM); // 1 - Clicked Item
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        toServer(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
-                    }
-                });
-            }
-        });
+        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, 0x26, 0x26);
     }
 
     public static void toClient(Item item) {

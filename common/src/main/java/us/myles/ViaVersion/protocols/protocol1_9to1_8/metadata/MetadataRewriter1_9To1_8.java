@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class MetadataRewriter1_9To1_8 extends MetadataRewriter<Protocol1_9To1_8> {
+public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
 
     public MetadataRewriter1_9To1_8(Protocol1_9To1_8 protocol) {
         super(protocol, EntityTracker1_9.class);
