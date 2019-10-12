@@ -15,11 +15,12 @@ import us.myles.ViaVersion.packets.State;
 import java.util.*;
 import java.util.logging.Logger;
 
-public abstract class MetadataRewriter<T extends Protocol> extends Rewriter<T> {
+public abstract class MetadataRewriter {
     private final Class<? extends EntityTracker> entityTrackerClass;
+    private final Protocol protocol;
 
-    protected MetadataRewriter(T protocol, Class<? extends EntityTracker> entityTrackerClass) {
-        super(protocol);
+    protected MetadataRewriter(Protocol protocol, Class<? extends EntityTracker> entityTrackerClass) {
+        this.protocol = protocol;
         this.entityTrackerClass = entityTrackerClass;
         protocol.put(this);
     }
@@ -53,7 +54,7 @@ public abstract class MetadataRewriter<T extends Protocol> extends Rewriter<T> {
     }
 
     public void registerMetadataRewriter(int oldPacketId, int newPacketId, Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
-        getProtocol().registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -146,7 +147,7 @@ public abstract class MetadataRewriter<T extends Protocol> extends Rewriter<T> {
     }
 
     public void registerEntityDestroy(int oldPacketId, int newPacketId) {
-        getProtocol().registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT_ARRAY); // 0 - Entity ids

@@ -1,73 +1,27 @@
 package us.myles.ViaVersion.protocols.protocol1_11to1_10.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 
 public class InventoryPackets {
+
     public static void register(Protocol1_11To1_10 protocol) {
-        /*
-            Incoming packets
-         */
+        ItemRewriter itemRewriter = new ItemRewriter(protocol, EntityIdRewriter::toClientItem, EntityIdRewriter::toServerItem);
 
         // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x16, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.ITEM); // 2 - Slot Value
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.ITEM, 0);
-                        EntityIdRewriter.toClientItem(stack);
-                    }
-                });
-            }
-        });
+        itemRewriter.registerSetSlot(Type.ITEM, 0x16, 0x16);
 
         // Window items packet
-        protocol.registerOutgoing(State.PLAY, 0x14, 0x14, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.ITEM_ARRAY); // 1 - Window Values
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item[] stacks = wrapper.get(Type.ITEM_ARRAY, 0);
-                        for (Item stack : stacks)
-                            EntityIdRewriter.toClientItem(stack);
-                    }
-                });
-            }
-        });
+        itemRewriter.registerWindowItems(Type.ITEM_ARRAY, 0x14, 0x14);
 
         // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x3C, 0x3C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.VAR_INT); // 1 - Slot ID
-                map(Type.ITEM); // 2 - Item
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.ITEM, 0);
-                        EntityIdRewriter.toClientItem(stack);
-                    }
-                });
-            }
-        });
+        itemRewriter.registerEntityEquipment(Type.ITEM, 0x3C, 0x3C);
 
         // Plugin message Packet -> Trading
         protocol.registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
@@ -99,49 +53,12 @@ public class InventoryPackets {
                 });
             }
         });
-        
-        /*
-            Incoming packets
-         */
+
 
         // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x07, 0x07, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                        map(Type.SHORT); // 1 - Slot
-                        map(Type.BYTE); // 2 - Button
-                        map(Type.SHORT); // 3 - Action number
-                        map(Type.VAR_INT); // 4 - Mode
-                        map(Type.ITEM); // 5 - Clicked Item
-
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.ITEM, 0);
-                                EntityIdRewriter.toServerItem(item);
-                            }
-                        });
-                    }
-                }
-        );
+        itemRewriter.registerClickWindow(Type.ITEM, 0x07, 0x07);
 
         // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x18, 0x18, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.SHORT); // 0 - Slot
-                        map(Type.ITEM); // 1 - Clicked Item
-
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.ITEM, 0);
-                                EntityIdRewriter.toServerItem(item);
-                            }
-                        });
-                    }
-                }
-        );
+        itemRewriter.registerCreativeInvAction(Type.ITEM, 0x18, 0x18);
     }
 }

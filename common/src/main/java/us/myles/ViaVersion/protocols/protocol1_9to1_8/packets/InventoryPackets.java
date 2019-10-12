@@ -14,6 +14,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 
 public class InventoryPackets {
+
     public static void register(Protocol protocol) {
         // Window Property Packet
         protocol.registerOutgoing(State.PLAY, 0x31, 0x15, new PacketRemapper() {
@@ -334,7 +335,5 @@ public class InventoryPackets {
 
         protocol.registerIncoming(State.PLAY, 0x0F, 0x05); // Confirm Transaction Packet
         protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
-
-
     }
 }

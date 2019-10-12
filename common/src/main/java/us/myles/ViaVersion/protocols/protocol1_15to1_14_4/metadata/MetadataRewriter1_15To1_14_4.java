@@ -14,7 +14,7 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1
 
 import java.util.List;
 
-public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter<Protocol1_15To1_14_4> {
+public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
 
     public MetadataRewriter1_15To1_14_4(Protocol1_15To1_14_4 protocol) {
         super(protocol, EntityTracker1_15.class);

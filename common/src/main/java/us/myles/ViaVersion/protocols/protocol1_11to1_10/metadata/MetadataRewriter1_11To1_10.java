@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class MetadataRewriter1_11To1_10 extends MetadataRewriter<Protocol1_11To1_10> {
+public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
 
     public MetadataRewriter1_11To1_10(Protocol1_11To1_10 protocol) {
         super(protocol, EntityTracker1_11.class);
