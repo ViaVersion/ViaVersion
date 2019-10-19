@@ -52,7 +52,7 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
                 blockData[i] = buffer.readLong();
             }
             CompactArrayUtil.iterateCompactArray(bitsPerBlock, ChunkSection.SIZE, blockData,
-                    bitsPerBlock == GLOBAL_PALETTE ? (i, val) -> chunkSection.setBlock(i, val >> 4, val & 0xF)
+                    bitsPerBlock == GLOBAL_PALETTE ? chunkSection::setFlatBlock
                             : chunkSection::setPaletteIndex);
         }
 
