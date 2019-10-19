@@ -3,6 +3,7 @@ package us.myles.ViaVersion.api.type.types.version;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.util.CompactArrayUtil;
 
 public class ChunkSectionType1_9 extends Type<ChunkSection> {
     private static final int GLOBAL_PALETTE = 13;
@@ -18,7 +19,6 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
         int originalBitsPerBlock = bitsPerBlock;
-        long maxEntryValue = (1L << bitsPerBlock) - 1;
 
         if (bitsPerBlock == 0) {
             bitsPerBlock = GLOBAL_PALETTE;
@@ -51,25 +51,9 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
             for (int i = 0; i < blockData.length; i++) {
                 blockData[i] = buffer.readLong();
             }
-            for (int i = 0; i < ChunkSection.SIZE; i++) {
-                int bitIndex = i * bitsPerBlock;
-                int startIndex = bitIndex / 64;
-                int endIndex = ((i + 1) * bitsPerBlock - 1) / 64;
-                int startBitSubIndex = bitIndex % 64;
-                int val;
-                if (startIndex == endIndex) {
-                    val = (int) (blockData[startIndex] >>> startBitSubIndex & maxEntryValue);
-                } else {
-                    int endBitSubIndex = 64 - startBitSubIndex;
-                    val = (int) ((blockData[startIndex] >>> startBitSubIndex | blockData[endIndex] << endBitSubIndex) & maxEntryValue);
-                }
-
-                if (bitsPerBlock == GLOBAL_PALETTE) {
-                    chunkSection.setBlock(i, val >> 4, val & 0xF);
-                } else {
-                    chunkSection.setPaletteIndex(i, val);
-                }
-            }
+            CompactArrayUtil.iterateCompactArray(bitsPerBlock, ChunkSection.SIZE, blockData,
+                    bitsPerBlock == GLOBAL_PALETTE ? (i, val) -> chunkSection.setBlock(i, val >> 4, val & 0xF)
+                            : chunkSection::setPaletteIndex);
         }
 
         return chunkSection;
@@ -99,21 +83,9 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
             Type.VAR_INT.write(buffer, 0);
         }
 
-        int length = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
-        Type.VAR_INT.write(buffer, length);
-        long[] data = new long[length];
-        for (int index = 0; index < ChunkSection.SIZE; index++) {
-            int value = bitsPerBlock == GLOBAL_PALETTE ? chunkSection.getFlatBlock(index) : chunkSection.getPaletteIndex(index);
-            int bitIndex = index * bitsPerBlock;
-            int startIndex = bitIndex / 64;
-            int endIndex = ((index + 1) * bitsPerBlock - 1) / 64;
-            int startBitSubIndex = bitIndex % 64;
-            data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
-            if (startIndex != endIndex) {
-                int endBitSubIndex = 64 - startBitSubIndex;
-                data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
-            }
-        }
+        long[] data = CompactArrayUtil.createCompactArray(bitsPerBlock, ChunkSection.SIZE,
+                bitsPerBlock == GLOBAL_PALETTE ? chunkSection::getFlatBlock : chunkSection::getPaletteIndex);
+        Type.VAR_INT.write(buffer, data.length);
         for (long l : data) {
             buffer.writeLong(l);
         }
