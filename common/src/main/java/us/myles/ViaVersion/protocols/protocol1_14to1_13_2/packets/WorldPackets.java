@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
@@ -18,12 +17,13 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.util.CompactArrayUtil;
 
 import java.util.Arrays;
 
@@ -435,26 +435,7 @@ public class WorldPackets {
     }
 
     private static long[] encodeHeightMap(int[] heightMap) {
-        final int bitsPerBlock = 9;
-        long maxEntryValue = (1L << bitsPerBlock) - 1;
-
-        int length = (int) Math.ceil(heightMap.length * bitsPerBlock / 64.0);
-        long[] data = new long[length];
-
-        for (int index = 0; index < heightMap.length; index++) {
-            int value = heightMap[index];
-            int bitIndex = index * 9;
-            int startIndex = bitIndex / 64;
-            int endIndex = ((index + 1) * bitsPerBlock - 1) / 64;
-            int startBitSubIndex = bitIndex % 64;
-            data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
-            if (startIndex != endIndex) {
-                int endBitSubIndex = 64 - startBitSubIndex;
-                data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
-            }
-        }
-
-        return data;
+        return CompactArrayUtil.createCompactArray(9, heightMap.length, i -> heightMap[i]);
     }
 
     private static void setNonFullLight(Chunk chunk, ChunkSection section, int ySection, int x, int y, int z) {
