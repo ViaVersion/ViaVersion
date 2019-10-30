@@ -106,22 +106,8 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
 
-<<<<<<< HEAD
-                        int typeId = wrapper.read(Type.VAR_INT);
-                        Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
-                        wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
-                        wrapper.write(Type.VAR_INT, entityType.getId());
-
-                        wrapper.passthrough(Type.DOUBLE);
-                        wrapper.passthrough(Type.DOUBLE);
-                        wrapper.passthrough(Type.DOUBLE);
-                        wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.BYTE);
-                        wrapper.read(Types1_14.METADATA); // removed - probably sent in an update packet?
-=======
                         Entity1_15Types.EntityType entityType = Entity1_15Types.EntityType.PLAYER;
-                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entityType);
->>>>>>> upstream/dev
+                        wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
                     }
                 });
             }
