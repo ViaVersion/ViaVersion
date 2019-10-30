@@ -61,27 +61,28 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.UUID); // 1 - Entity UUID
+                map(Type.VAR_INT); // 2 - Entity Type
+                map(Type.DOUBLE); // 3 - X
+                map(Type.DOUBLE); // 4 - Y
+                map(Type.DOUBLE); // 5 - Z
+                map(Type.BYTE); // 6 - Yaw
+                map(Type.BYTE); // 7 - Pitch
+                map(Type.BYTE); // 8 - Head Pitch
+                map(Type.SHORT); // 9 - Velocity X
+                map(Type.SHORT); // 10 - Velocity Y
+                map(Type.SHORT); // 11 - Velocity Z
+                map(Types1_14.METADATA_LIST, Type.NOTHING); // removed - probably sent in an update packet?
+
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.UUID);
-
-                        int typeId = wrapper.read(Type.VAR_INT);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        int typeId = wrapper.get(Type.VAR_INT, 1);
                         Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
                         wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
-                        wrapper.write(Type.VAR_INT, entityType.getId());
-
-                        wrapper.passthrough(Type.DOUBLE);
-                        wrapper.passthrough(Type.DOUBLE);
-                        wrapper.passthrough(Type.DOUBLE);
-                        wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.SHORT);
-                        wrapper.passthrough(Type.SHORT);
-                        wrapper.passthrough(Type.SHORT);
-                        wrapper.read(Types1_14.METADATA_LIST); // removed - probably sent in an update packet?
+                        wrapper.set(Type.VAR_INT, 1, entityType.getId());
                     }
                 });
             }
@@ -91,12 +92,21 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.UUID); // 1 - Player UUID
+                map(Type.DOUBLE); // 2 - X
+                map(Type.DOUBLE); // 3 - Y
+                map(Type.DOUBLE); // 4 - Z
+                map(Type.BYTE); // 5 - Yaw
+                map(Type.BYTE); // 6 - Pitch
+                map(Types1_14.METADATA_LIST, Type.NOTHING); // removed - probably sent in an update packet?
+
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.UUID);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
 
+<<<<<<< HEAD
                         int typeId = wrapper.read(Type.VAR_INT);
                         Entity1_15Types.EntityType entityType = Entity1_15Types.getTypeFromId(getNewEntityId(typeId));
                         wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
@@ -108,6 +118,10 @@ public class EntityPackets {
                         wrapper.passthrough(Type.BYTE);
                         wrapper.passthrough(Type.BYTE);
                         wrapper.read(Types1_14.METADATA); // removed - probably sent in an update packet?
+=======
+                        Entity1_15Types.EntityType entityType = Entity1_15Types.EntityType.PLAYER;
+                        wrapper.user().get(EntityTracker.class).addEntity(entityId, entityType);
+>>>>>>> upstream/dev
                     }
                 });
             }
