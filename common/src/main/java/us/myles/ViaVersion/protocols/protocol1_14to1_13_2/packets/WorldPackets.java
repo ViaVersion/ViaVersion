@@ -32,7 +32,7 @@ public class WorldPackets {
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewId(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewId(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
-    private static final Byte[] FULL_LIGHT = new Byte[2048];
+    private static final byte[] FULL_LIGHT = new byte[2048];
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
@@ -234,22 +234,22 @@ public class WorldPackets {
                         // not sending skylight/setting empty skylight causes client lag due to some weird calculations
                         // only do this on the initial chunk send (not when chunk.isGroundUp() is false)
                         if (chunk.isGroundUp())
-                            lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk below 0
+                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk below 0
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) {
                                 if (chunk.isGroundUp()) {
-                                    lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT);
+                                    lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT);
                                 }
                                 continue;
                             }
-                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getSkyLight()));
+                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getSkyLight());
                         }
                         if (chunk.isGroundUp())
-                            lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk above 255
+                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk above 255
 
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getBlockLight()));
+                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getBlockLight());
                         }
 
                         EntityTracker1_14 entityTracker = wrapper.user().get(EntityTracker1_14.class);

@@ -150,12 +150,12 @@ public abstract class MetadataRewriter {
         protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT_ARRAY); // 0 - Entity ids
+                map(Type.VAR_INT_ARRAY_PRIMITIVE); // 0 - Entity ids
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         EntityTracker entityTracker = wrapper.user().get(entityTrackerClass);
-                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0)) {
+                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0)) {
                             entityTracker.removeEntity(entity);
                         }
                     }

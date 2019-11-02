@@ -55,10 +55,10 @@ public class EntityPackets {
                                 if (!tracker.getVehicleMap().containsKey(passenger))
                                     return null; // Cancel
                                 passengerPacket.write(Type.VAR_INT, tracker.getVehicleMap().remove(passenger));
-                                passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{});
+                                passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{});
                             } else {
                                 passengerPacket.write(Type.VAR_INT, vehicle);
-                                passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{passenger});
+                                passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{passenger});
                                 tracker.getVehicleMap().put(passenger, vehicle);
                             }
                             passengerPacket.send(Protocol1_9To1_8.class); // Send the packet
