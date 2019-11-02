@@ -108,7 +108,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             };
 
     // These are arbitrary rewrite values, it just needs an invalid color code character.
-    protected final static EnumMap<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<>(ChatColor.class);
+    protected static final EnumMap<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<>(ChatColor.class);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BLACK, 'g');
@@ -127,6 +127,13 @@ public class Protocol1_13To1_12_2 extends Protocol {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.LIGHT_PURPLE, 'z');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.YELLOW, '!');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.WHITE, '?');
+        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.MAGIC, '#');
+        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BOLD, '(');
+        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.STRIKETHROUGH, ')');
+        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.UNDERLINE, ':');
+        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.ITALIC, ';');
+        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.RESET, '/');
+
         MappingData.init();
         ConnectionData.init();
         RecipeData.init();
