@@ -187,7 +187,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
                         int blockTagsSize = wrapper.passthrough(Type.VAR_INT); // block tags
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < blocks.length; j++) {
                                 blocks[j] = getNewBlockId(blocks[j]);
                             }
@@ -195,7 +195,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
                         int itemTagsSize = wrapper.passthrough(Type.VAR_INT); // item tags
                         for (int i = 0; i < itemTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] items = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] items = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < items.length; j++) {
                                 items[j] = InventoryPackets.getNewItemId(items[j]);
                             }

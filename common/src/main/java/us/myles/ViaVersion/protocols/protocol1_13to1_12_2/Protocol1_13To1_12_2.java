@@ -87,17 +87,20 @@ public class Protocol1_13To1_12_2 extends Protocol {
                             wrapper.write(Type.VAR_INT, MappingData.blockTags.size()); // block tags
                             for (Map.Entry<String, Integer[]> tag : MappingData.blockTags.entrySet()) {
                                 wrapper.write(Type.STRING, tag.getKey());
-                                wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
+                                // Needs copy as other protocols may modify it
+                                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
                             }
                             wrapper.write(Type.VAR_INT, MappingData.itemTags.size()); // item tags
                             for (Map.Entry<String, Integer[]> tag : MappingData.itemTags.entrySet()) {
                                 wrapper.write(Type.STRING, tag.getKey());
-                                wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
+                                // Needs copy as other protocols may modify it
+                                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
                             }
                             wrapper.write(Type.VAR_INT, MappingData.fluidTags.size()); // fluid tags
                             for (Map.Entry<String, Integer[]> tag : MappingData.fluidTags.entrySet()) {
                                 wrapper.write(Type.STRING, tag.getKey());
-                                wrapper.write(Type.VAR_INT_ARRAY, tag.getValue().clone());
+                                // Needs copy as other protocols may modify it
+                                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
                             }
                         }
                     }).send(Protocol1_13To1_12_2.class);
@@ -482,7 +485,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         for (int i = 0; i < (action == 0 ? 2 : 1); i++) {
-                            Integer[] ids = wrapper.read(Type.VAR_INT_ARRAY);
+                            int[] ids = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
                             String[] stringIds = new String[ids.length];
                             for (int j = 0; j < ids.length; j++) {
                                 stringIds[j] = "viaversion:legacy/" + ids[j];
@@ -1177,5 +1180,13 @@ public class Protocol1_13To1_12_2 extends Protocol {
             name = newName.toString();
         }
         return name;
+    }
+
+    public static int[] toPrimitive(Integer[] array) {
+        int[] prim = new int[array.length];
+        for (int i = 0; i < array.length; i++) {
+            prim[i] = array[i];
+        }
+        return prim;
     }
 }

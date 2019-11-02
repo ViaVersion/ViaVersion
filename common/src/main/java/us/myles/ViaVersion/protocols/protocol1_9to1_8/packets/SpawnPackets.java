@@ -346,13 +346,13 @@ public class SpawnPackets {
 
             @Override
             public void registerMap() {
-                map(Type.VAR_INT_ARRAY); // 0 - Entities to destroy
+                map(Type.VAR_INT_ARRAY_PRIMITIVE); // 0 - Entities to destroy
 
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        Integer[] entities = wrapper.get(Type.VAR_INT_ARRAY, 0);
-                        for (Integer entity : entities) {
+                        int[] entities = wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0);
+                        for (int entity : entities) {
                             // EntityTracker
                             wrapper.user().get(EntityTracker1_9.class).removeEntity(entity);
                         }

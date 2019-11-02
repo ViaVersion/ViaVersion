@@ -122,7 +122,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
                         int blockTagsSize = wrapper.passthrough(Type.VAR_INT);
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < blockIds.length; j++) {
                                 blockIds[j] = getNewBlockId(blockIds[j]);
                             }
@@ -131,7 +131,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
                         int itemTagsSize = wrapper.passthrough(Type.VAR_INT);
                         for (int i = 0; i < itemTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < itemIds.length; j++) {
                                 itemIds[j] = InventoryPackets.getNewItemId(itemIds[j]);
                             }
@@ -140,13 +140,13 @@ public class Protocol1_15To1_14_4 extends Protocol {
                         int fluidTagsSize = wrapper.passthrough(Type.VAR_INT); // fluid tags
                         for (int i = 0; i < fluidTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                         }
 
                         int entityTagsSize = wrapper.passthrough(Type.VAR_INT); // entity tags
                         for (int i = 0; i < entityTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] entitIds = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] entitIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < entitIds.length; j++) {
                                 entitIds[j] = EntityPackets.getNewEntityId(entitIds[j]);
                             }

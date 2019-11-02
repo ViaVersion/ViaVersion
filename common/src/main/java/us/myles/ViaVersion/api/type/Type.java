@@ -14,32 +14,69 @@ import java.util.UUID;
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Defined Types */
     public static final Type<Byte> BYTE = new ByteType();
+    /**
+     * @deprecated unreasonable overhead, use BYTE_ARRAY_PRIMITIVE
+     */
+    @Deprecated
     public static final Type<Byte[]> BYTE_ARRAY = new ArrayType<>(Type.BYTE);
+    public static final Type<byte[]> BYTE_ARRAY_PRIMITIVE = new ByteArrayType();
 
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 
     public static final Type<Short> UNSIGNED_BYTE = new UnsignedByteType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Short[]> UNSIGNED_BYTE_ARRAY = new ArrayType<>(Type.UNSIGNED_BYTE);
 
     public static final Type<Boolean> BOOLEAN = new BooleanType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Boolean[]> BOOLEAN_ARRAY = new ArrayType<>(Type.BOOLEAN);
     /* Number Types */
     public static final Type<Integer> INT = new IntType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Integer[]> INT_ARRAY = new ArrayType<>(Type.INT);
 
     public static final Type<Double> DOUBLE = new DoubleType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Double[]> DOUBLE_ARRAY = new ArrayType<>(Type.DOUBLE);
 
     public static final Type<Long> LONG = new LongType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Long[]> LONG_ARRAY = new ArrayType<>(Type.LONG);
 
     public static final Type<Float> FLOAT = new FloatType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Float[]> FLOAT_ARRAY = new ArrayType<>(Type.FLOAT);
 
     public static final Type<Short> SHORT = new ShortType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Short[]> SHORT_ARRAY = new ArrayType<>(Type.SHORT);
 
     public static final Type<Integer> UNSIGNED_SHORT = new UnsignedShortType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Integer[]> UNSIGNED_SHORT_ARRAY = new ArrayType<>(Type.UNSIGNED_SHORT);
     /* Other Types */
     public static final Type<String> STRING = new StringType();
@@ -49,9 +86,18 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
     /* Variable Types */
     public static final Type<Integer> VAR_INT = new VarIntType();
+    /**
+     * @deprecated unreasonable overhead, use VAR_INT_ARRAY_PRIMITIVE
+     */
+    @Deprecated
     public static final Type<Integer[]> VAR_INT_ARRAY = new ArrayType<>(Type.VAR_INT);
+    public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
     public static final Type<Integer> OPTIONAL_VAR_INT = new OptionalVarIntType();
     public static final Type<Long> VAR_LONG = new VarLongType();
+    /**
+     * @deprecated unreasonable overhead
+     */
+    @Deprecated
     public static final Type<Long[]> VAR_LONG_ARRAY = new ArrayType<>(Type.VAR_LONG);
     /* Special Types */
     public static final Type<Void> NOTHING = new VoidType(); // This is purely used for remapping.
