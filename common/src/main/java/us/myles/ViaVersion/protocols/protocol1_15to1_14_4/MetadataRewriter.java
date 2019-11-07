@@ -31,7 +31,9 @@ public class MetadataRewriter {
                     metadata.setId(metadata.getId() + 1); //TODO is it 11 or 12? what is it for?
                 }
 
-                //TODO new boolean with id 17 for enderman?
+                //NOTES:
+                //new boolean with id 11 for trident, default = false, added in 19w45a
+                //new boolean with id 17 for enderman
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
