@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.minecraft.*;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
 import us.myles.ViaVersion.api.type.types.minecraft.*;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 
 import java.util.UUID;
 
@@ -75,6 +76,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.BLOCK_CHANGE_RECORD);
 
     public static final Type<VillagerData> VILLAGER_DATA = new VillagerDataType();
+
+    public static final Type<Particle> PARTICLE_1_14 = new Particle1_14Type();
 
     /* 1.13 Flat Item (no data) */
     public static final Type<Item> FLAT_ITEM = new FlatItemType();
