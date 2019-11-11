@@ -19,6 +19,7 @@
         <module>common</module>
         <module>bukkit</module>
         <module>bungee</module>
+        <module>fabric</module>
         <module>sponge</module>
         <module>sponge-legacy</module>
         <module>velocity</module>

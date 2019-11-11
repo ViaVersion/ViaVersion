@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "viaversion",
+  "name": "ViaVersion API",
+  "version": "${project.version}",
+  "description": "${project.description}",
+  "license": "MIT",
+  "contact": {
+    "homepage": "https://viaversion.com/",
+    "issues": "https://github.com/ViaVersion/ViaVersion/issues",
+    "sources": "https://github.com/ViaVersion/ViaVersion"
+  },
+  "icon": "assets/viaversion/textures/squarelogo.png",
+  "environment": "*",
+  "authors": [
+    "_MylesC",
+    "Matsv"
+  ],
+  "depends": {
+    "fabricloader": ">=0.4.0"
+  },
+  "recommends": {
+    "viafabric": ">=0.2.0-SNAPSHOT"
+  },
+  "custom": {
+    "modmenu:api": true
+  }
+}
