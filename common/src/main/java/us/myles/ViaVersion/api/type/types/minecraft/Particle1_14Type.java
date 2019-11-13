@@ -2,7 +2,7 @@ package us.myles.ViaVersion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
+import us.myles.ViaVersion.api.type.types.Particle;
 
 public class Particle1_14Type extends Type<Particle> {
 

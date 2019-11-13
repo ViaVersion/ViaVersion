@@ -2,7 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.types;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
+import us.myles.ViaVersion.api.type.types.Particle;
 
 public class Particle1_13_2Type extends Type<Particle> {
     public Particle1_13_2Type() {

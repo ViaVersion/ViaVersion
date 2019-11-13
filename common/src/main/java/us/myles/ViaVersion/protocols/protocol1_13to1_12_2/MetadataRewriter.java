@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
+import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
