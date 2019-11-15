@@ -23,6 +23,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
     protected void registerPackets() {
         new MetadataRewriter1_15To1_14_4(this);
 
+        MappingData.init();
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);
