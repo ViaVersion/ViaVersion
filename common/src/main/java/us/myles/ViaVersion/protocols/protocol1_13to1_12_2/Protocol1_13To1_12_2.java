@@ -32,7 +32,6 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockConnectio
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Particle1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -41,7 +40,6 @@ import java.util.Map;
 
 // Development of 1.13 support!
 public class Protocol1_13To1_12_2 extends Protocol {
-    public static final Particle1_13Type PARTICLE_TYPE = new Particle1_13Type();
 
     public static final PacketHandler POS_TO_3_INT = new PacketHandler() {
         @Override
