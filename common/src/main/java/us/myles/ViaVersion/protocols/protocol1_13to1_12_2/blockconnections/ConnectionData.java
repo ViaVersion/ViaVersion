@@ -185,7 +185,7 @@ public class ConnectionData {
                             block = handler.connect(user, new Position(
                                     (int) (xOff + x),
                                     (short) (yOff + y),
-                                    (short) (zOff + z)
+                                    (int) (zOff + z)
                             ), block);
                             section.setFlatBlock(x, y, z, block);
                         }
