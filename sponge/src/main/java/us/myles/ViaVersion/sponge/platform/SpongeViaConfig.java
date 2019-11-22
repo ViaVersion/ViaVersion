@@ -18,7 +18,6 @@ public class SpongeViaConfig extends AbstractViaConfig {
     public SpongeViaConfig(PluginContainer pluginContainer, File configFile) {
         super(new File(configFile, "config.yml"));
         this.pluginContainer = pluginContainer;
-        // Load config
         reloadConfig();
     }
 
@@ -38,25 +37,5 @@ public class SpongeViaConfig extends AbstractViaConfig {
     @Override
     public List<String> getUnsupportedOptions() {
         return UNSUPPORTED;
-    }
-
-    @Override
-    public boolean isAntiXRay() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_12QuickMoveActionFix() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_9HitboxFix() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_14HitboxFix() {
-        return false;
     }
 }

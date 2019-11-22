@@ -4,252 +4,351 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
+
+    private boolean checkForUpdates;
+    private boolean preventCollision;
+    private boolean useNewEffectIndicator;
+    private boolean useNewDeathmessages;
+    private boolean suppressMetadataErrors;
+    private boolean shieldBlocking;
+    private boolean hologramPatch;
+    private boolean pistonAnimationPatch;
+    private boolean bossbarPatch;
+    private boolean bossbarAntiFlicker;
+    private double hologramOffset;
+    private int maxPPS;
+    private String maxPPSKickMessage;
+    private int trackingPeriod;
+    private int warningPPS;
+    private int maxPPSWarnings;
+    private String maxPPSWarningsKickMessage;
+    private boolean sendSupportedVersions;
+    private boolean simulatePlayerTick;
+    private boolean itemCache;
+    private boolean nmsPlayerTicking;
+    private boolean replacePistons;
+    private int pistonReplacementId;
+    private boolean autoTeam;
+    private boolean forceJsonTransform;
+    private boolean nbtArrayFix;
+    private Set<Integer> blockedProtocols;
+    private String blockedDisconnectMessage;
+    private String reloadDisconnectMessage;
+    private boolean suppress1_13ConversionErrors;
+    private boolean disable1_13TabComplete;
+    private boolean minimizeCooldown;
+    private boolean teamColourFix;
+    private boolean serversideBlockConnections;
+    private String blockConnectionMethod;
+    private boolean reduceBlockStorageMemory;
+    private boolean flowerStemWhenBlockAbove;
+    private boolean snowCollisionFix;
+    private int tabCompleteDelay;
+    private boolean truncate1_14Books;
+    private boolean leftHandedHandling;
+    private boolean fullBlockLightFix;
+    private boolean healthNaNFix;
+    private boolean instantRespawn;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
     }
 
     @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        loadFields();
+    }
+
+    protected void loadFields() {
+        checkForUpdates = getBoolean("checkforupdates", true);
+        preventCollision = getBoolean("prevent-collision", true);
+        useNewEffectIndicator = getBoolean("use-new-effect-indicator", true);
+        useNewDeathmessages = getBoolean("use-new-deathmessages", true);
+        suppressMetadataErrors = getBoolean("suppress-metadata-errors", false);
+        shieldBlocking = getBoolean("shield-blocking", true);
+        hologramPatch = getBoolean("hologram-patch", false);
+        pistonAnimationPatch = getBoolean("piston-animation-patch", false);
+        bossbarPatch = getBoolean("bossbar-patch", true);
+        bossbarAntiFlicker = getBoolean("bossbar-anti-flicker", false);
+        hologramOffset = getDouble("hologram-y", -0.96D);
+        maxPPS = getInt("max-pps", 800);
+        maxPPSKickMessage = getString("max-pps-kick-msg", "Sending packets too fast? lag?");
+        trackingPeriod = getInt("tracking-period", 6);
+        warningPPS = getInt("tracking-warning-pps", 120);
+        maxPPSWarnings = getInt("tracking-max-warnings", 3);
+        maxPPSWarningsKickMessage = getString("tracking-max-kick-msg", "You are sending too many packets, :(");
+        sendSupportedVersions = getBoolean("send-supported-versions", false);
+        simulatePlayerTick = getBoolean("simulate-pt", true);
+        itemCache = getBoolean("item-cache", true);
+        nmsPlayerTicking = getBoolean("nms-player-ticking", true);
+        replacePistons = getBoolean("replace-pistons", false);
+        pistonReplacementId = getInt("replacement-piston-id", 0);
+        autoTeam = getBoolean("auto-team", true);
+        forceJsonTransform = getBoolean("force-json-transform", false);
+        nbtArrayFix = getBoolean("chat-nbt-fix", true);
+        blockedProtocols = new HashSet<>(getIntegerList("block-protocols"));
+        blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
+        reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
+        suppress1_13ConversionErrors = getBoolean("minimize-cooldown", true);
+        disable1_13TabComplete = getBoolean("team-colour-fix", true);
+        minimizeCooldown = getBoolean("suppress-1_13-conversion-errors", false);
+        teamColourFix = getBoolean("disable-1_13-auto-complete", false);
+        serversideBlockConnections = getBoolean("serverside-blockconnections", false);
+        blockConnectionMethod = getString("blockconnection-method", "packet");
+        reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
+        flowerStemWhenBlockAbove = getBoolean("flowerstem-when-block-above", false);
+        snowCollisionFix = getBoolean("fix-low-snow-collision", false);
+        tabCompleteDelay = getInt("1_13-tab-complete-delay", 0);
+        truncate1_14Books = getBoolean("truncate-1_14-books", false);
+        leftHandedHandling = getBoolean("left-handed-handling", true);
+        fullBlockLightFix = getBoolean("fix-non-full-blocklight", false);
+        healthNaNFix = getBoolean("fix-1_14-health-nan", true);
+        instantRespawn = getBoolean("use-1_15-instant-respawn", false);
+    }
+
+    @Override
     public boolean isCheckForUpdates() {
-        return getBoolean("checkforupdates", true);
+        return checkForUpdates;
     }
 
     @Override
     public boolean isPreventCollision() {
-        return getBoolean("prevent-collision", true);
+        return preventCollision;
     }
 
     @Override
     public boolean isNewEffectIndicator() {
-        return getBoolean("use-new-effect-indicator", true);
+        return useNewEffectIndicator;
     }
 
     @Override
     public boolean isShowNewDeathMessages() {
-        return getBoolean("use-new-deathmessages", true);
+        return useNewDeathmessages;
     }
 
     @Override
     public boolean isSuppressMetadataErrors() {
-        return getBoolean("suppress-metadata-errors", false);
+        return suppressMetadataErrors;
     }
 
     @Override
     public boolean isShieldBlocking() {
-        return getBoolean("shield-blocking", true);
+        return shieldBlocking;
     }
 
     @Override
     public boolean isHologramPatch() {
-        return getBoolean("hologram-patch", false);
+        return hologramPatch;
     }
 
     @Override
     public boolean isPistonAnimationPatch() {
-        return getBoolean("piston-animation-patch", false);
+        return pistonAnimationPatch;
     }
 
     @Override
     public boolean isBossbarPatch() {
-        return getBoolean("bossbar-patch", true);
+        return bossbarPatch;
     }
 
     @Override
     public boolean isBossbarAntiflicker() {
-        return getBoolean("bossbar-anti-flicker", false);
+        return bossbarAntiFlicker;
     }
 
     @Override
     public double getHologramYOffset() {
-        return getDouble("hologram-y", -0.96D);
+        return hologramOffset;
     }
 
     @Override
     public int getMaxPPS() {
-        return getInt("max-pps", 800);
+        return maxPPS;
     }
 
     @Override
     public String getMaxPPSKickMessage() {
-        return getString("max-pps-kick-msg", "Sending packets too fast? lag?");
+        return maxPPSKickMessage;
     }
 
     @Override
     public int getTrackingPeriod() {
-        return getInt("tracking-period", 6);
+        return trackingPeriod;
     }
 
     @Override
     public int getWarningPPS() {
-        return getInt("tracking-warning-pps", 120);
+        return warningPPS;
     }
 
     @Override
     public int getMaxWarnings() {
-        return getInt("tracking-max-warnings", 3);
+        return maxPPSWarnings;
     }
 
     @Override
     public String getMaxWarningsKickMessage() {
-        return getString("tracking-max-kick-msg", "You are sending too many packets, :(");
+        return maxPPSWarningsKickMessage;
     }
 
     @Override
     public boolean isAntiXRay() {
-        return getBoolean("anti-xray-patch", true);
+        return false;
     }
 
     @Override
     public boolean isSendSupportedVersions() {
-        return getBoolean("send-supported-versions", false);
+        return sendSupportedVersions;
     }
 
     @Override
     public boolean isStimulatePlayerTick() {
-        return getBoolean("simulate-pt", true);
+        return simulatePlayerTick;
     }
 
     @Override
     public boolean isItemCache() {
-        return getBoolean("item-cache", true);
+        return itemCache;
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return getBoolean("nms-player-ticking", true);
+        return nmsPlayerTicking;
     }
 
     @Override
     public boolean isReplacePistons() {
-        return getBoolean("replace-pistons", false);
+        return replacePistons;
     }
 
     @Override
     public int getPistonReplacementId() {
-        return getInt("replacement-piston-id", 0);
+        return pistonReplacementId;
     }
 
     @Override
     public boolean isAutoTeam() {
         // Collision has to be enabled first
-        return isPreventCollision() && getBoolean("auto-team", true);
+        return isPreventCollision() && autoTeam;
     }
 
     @Override
     public boolean isForceJsonTransform() {
-        return getBoolean("force-json-transform", false);
+        return forceJsonTransform;
     }
 
     @Override
     public boolean is1_12NBTArrayFix() {
-        return getBoolean("chat-nbt-fix", true);
+        return nbtArrayFix;
     }
 
     @Override
     public boolean is1_12QuickMoveActionFix() {
-        return getBoolean("quick-move-action-fix", false);
+        return false;
     }
 
     @Override
-    public List<Integer> getBlockedProtocols() {
-        return getIntegerList("block-protocols");
+    public Set<Integer> getBlockedProtocols() {
+        return blockedProtocols;
     }
 
     @Override
     public String getBlockedDisconnectMsg() {
-        return getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
+        return blockedDisconnectMessage;
     }
 
     @Override
     public String getReloadDisconnectMsg() {
-        return getString("reload-disconnect-msg", "Server reload, please rejoin!");
+        return reloadDisconnectMessage;
     }
 
     @Override
     public boolean isMinimizeCooldown() {
-        return getBoolean("minimize-cooldown", true);
+        return suppress1_13ConversionErrors;
     }
 
     @Override
     public boolean is1_13TeamColourFix() {
-        return getBoolean("team-colour-fix", true);
+        return disable1_13TabComplete;
     }
 
     @Override
     public boolean isSuppress1_13ConversionErrors() {
-        return getBoolean("suppress-1_13-conversion-errors", false);
+        return minimizeCooldown;
     }
 
     @Override
     public boolean isDisable1_13AutoComplete() {
-        return getBoolean("disable-1_13-auto-complete", false);
+        return teamColourFix;
     }
 
     @Override
     public boolean isServersideBlockConnections() {
-        return getBoolean("serverside-blockconnections", false);
+        return serversideBlockConnections;
     }
 
     @Override
     public String getBlockConnectionMethod() {
-        return getString("blockconnection-method", "packet");
+        return blockConnectionMethod;
     }
 
     @Override
     public boolean isReduceBlockStorageMemory() {
-        return getBoolean("reduce-blockstorage-memory", false);
+        return reduceBlockStorageMemory;
     }
 
     @Override
     public boolean isStemWhenBlockAbove() {
-        return getBoolean("flowerstem-when-block-above", false);
+        return flowerStemWhenBlockAbove;
     }
 
     @Override
     public boolean isSnowCollisionFix() {
-        return getBoolean("fix-low-snow-collision", false);
+        return snowCollisionFix;
     }
 
     @Override
     public int get1_13TabCompleteDelay() {
-        return getInt("1_13-tab-complete-delay", 0);
+        return tabCompleteDelay;
     }
 
     @Override
     public boolean isTruncate1_14Books() {
-        return getBoolean("truncate-1_14-books", false);
+        return truncate1_14Books;
     }
 
     @Override
     public boolean isLeftHandedHandling() {
-        return getBoolean("left-handed-handling", true);
+        return leftHandedHandling;
     }
 
     @Override
     public boolean is1_9HitboxFix() {
-        return getBoolean("change-1_9-hitbox", false);
+        return false;
     }
 
     @Override
     public boolean is1_14HitboxFix() {
-        return getBoolean("change-1_14-hitbox", false);
+        return false;
     }
 
     @Override
     public boolean isNonFullBlockLightFix() {
-        return getBoolean("fix-non-full-blocklight", false);
+        return fullBlockLightFix;
     }
 
     @Override
     public boolean is1_14HealthNaNFix() {
-        return getBoolean("fix-1_14-health-nan", true);
+        return healthNaNFix;
     }
 
     @Override
     public boolean is1_15InstantRespawn() {
-        return getBoolean("use-1_15-instant-respawn", false);
+        return instantRespawn;
     }
 }
