@@ -150,7 +150,7 @@ public interface ViaVersionConfig {
      *
      * @return if true, enabled
      */
-    boolean isStimulatePlayerTick();
+    boolean isSimulatePlayerTick();
 
     /**
      * Use the item cache to prevent high resource usage

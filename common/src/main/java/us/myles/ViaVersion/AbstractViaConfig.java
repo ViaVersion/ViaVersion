@@ -207,7 +207,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean isStimulatePlayerTick() {
+    public boolean isSimulatePlayerTick() {
         return simulatePlayerTick;
     }
 
