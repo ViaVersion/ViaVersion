@@ -21,11 +21,11 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             World world = player.getWorld();
-            int x = (int) (position.getX() >> 4);
-            int z = (int) (position.getZ() >> 4);
+            int x = position.getPosX() >> 4;
+            int z = position.getPosZ() >> 4;
             if (world.isChunkLoaded(x, z)) {
                 Chunk c = getChunk(world, x, z);
-                Block b = c.getBlock(position.getX().intValue(), position.getY().intValue(), position.getZ().intValue());
+                Block b = c.getBlock(position.getPosX(), position.getPosY(), position.getPosZ());
                 return b.getTypeId() << 4 | b.getData();
             }
         }

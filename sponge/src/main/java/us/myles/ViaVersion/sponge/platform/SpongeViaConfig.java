@@ -12,7 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SpongeViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox");
+    private static final List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval",
+            "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers",
+            "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method");
     private final PluginContainer pluginContainer;
 
     public SpongeViaConfig(PluginContainer pluginContainer, File configFile) {
@@ -58,5 +60,10 @@ public class SpongeViaConfig extends AbstractViaConfig {
     @Override
     public boolean is1_14HitboxFix() {
         return false;
+    }
+
+    @Override
+    public String getBlockConnectionMethod() {
+        return "packet";
     }
 }

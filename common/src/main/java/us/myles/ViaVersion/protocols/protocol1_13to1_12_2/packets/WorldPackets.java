@@ -152,7 +152,7 @@ public class WorldPackets {
 
                         if (blockId == 73) { // Note block
                             PacketWrapper blockChange = wrapper.create(0x0B); // block change
-                            blockChange.write(Type.POSITION, new Position(pos.getX(), pos.getY(), pos.getZ())); // Clone because position is mutable
+                            blockChange.write(Type.POSITION, new Position(pos)); // Clone because position is mutable
                             blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                             blockChange.send(Protocol1_13To1_12_2.class, true, true);
                         }
@@ -211,9 +211,9 @@ public class WorldPackets {
                         for (BlockChangeRecord record : records) {
                             int newBlock = toNewId(record.getBlockId());
                             Position position = new Position(
-                                    (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                    (long) record.getY(),
-                                    (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                    (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+                                    record.getY(),
+                                    (record.getHorizontal() & 15) + (chunkZ * 16));
 
                             if (Via.getConfig().isServersideBlockConnections()) {
                                 ConnectionData.updateBlockStorage(userConnection, position, newBlock);
@@ -339,9 +339,9 @@ public class WorldPackets {
                                             int block = section.getFlatBlock(x, y, z);
                                             if (storage.isWelcome(block)) {
                                                 storage.store(new Position(
-                                                        (long) (x + (chunk.getX() << 4)),
-                                                        (long) (y + (i << 4)),
-                                                        (long) (z + (chunk.getZ() << 4))
+                                                        (x + (chunk.getX() << 4)),
+                                                        (short) (y + (i << 4)),
+                                                        (z + (chunk.getZ() << 4))
                                                 ), block);
                                             }
                                         }
@@ -355,9 +355,9 @@ public class WorldPackets {
                                         for (int x = 0; x < 16; x++) {
                                             int block = section.getFlatBlock(x, y, z);
                                             if (ConnectionData.isWelcome(block)) {
-                                                ConnectionData.getProvider().storeBlock(wrapper.user(), (long) (x + (chunk.getX() << 4)),
-                                                        (long) (y + (i << 4)),
-                                                        (long) (z + (chunk.getZ() << 4)),
+                                                ConnectionData.getProvider().storeBlock(wrapper.user(), x + (chunk.getX() << 4),
+                                                        y + (i << 4),
+                                                        z + (chunk.getZ() << 4),
                                                         block);
                                             }
                                         }

@@ -299,7 +299,7 @@ public class WorldPackets {
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
 
-                            if (item != null && Protocol1_9To1_8.isSword(item.getId())) {
+                            if (item != null && Protocol1_9To1_8.isSword(item.getIdentifier())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
@@ -363,9 +363,9 @@ public class WorldPackets {
                         if (face == 255)
                             return;
                         Position p = wrapper.get(Type.POSITION, 0);
-                        long x = p.getX();
-                        long y = p.getY();
-                        long z = p.getZ();
+                        int x = p.getPosX();
+                        short y = p.getPosY();
+                        int z = p.getPosZ();
                         switch (face) {
                             case 0:
                                 y--;

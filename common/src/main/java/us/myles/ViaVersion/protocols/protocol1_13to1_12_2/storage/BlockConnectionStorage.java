@@ -112,7 +112,7 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     private long getChunkSectionIndex(Position position) {
-        return getChunkSectionIndex(position.getX().intValue(), position.getY().intValue(), position.getZ().intValue());
+        return getChunkSectionIndex(position.getPosX(), position.getPosY(), position.getPosZ());
     }
 
     private short encodeBlockPos(int x, int y, int z) {
@@ -120,7 +120,7 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     private short encodeBlockPos(Position pos) {
-        return encodeBlockPos(pos.getX().intValue(), pos.getY().intValue(), pos.getZ().intValue());
+        return encodeBlockPos(pos.getPosX(), pos.getPosY(), pos.getPosZ());
     }
 
     private <T> Map<Long, T> createLongObjectMap() {

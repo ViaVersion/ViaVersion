@@ -34,4 +34,8 @@ public class Item {
         this.data = data;
         this.tag = tag;
     }
+
+    public Item(Item toCopy) {
+        this(toCopy.getIdentifier(), toCopy.getAmount(), toCopy.getData(), toCopy.getTag());
+    }
 }
