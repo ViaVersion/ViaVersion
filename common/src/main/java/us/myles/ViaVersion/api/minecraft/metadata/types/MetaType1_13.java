@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.api.type.types.version.Types1_13;
 
 @RequiredArgsConstructor
 @Getter
@@ -24,7 +24,7 @@ public enum MetaType1_13 implements MetaType {
     OptUUID(12, Type.OPTIONAL_UUID),
     BlockID(13, Type.VAR_INT),
     NBTTag(14, Type.NBT),
-    PARTICLE(15, Protocol1_13To1_12_2.PARTICLE_TYPE),
+    PARTICLE(15, Types1_13.PARTICLE),
     Discontinued(99, null);
 
     private final int typeID;
