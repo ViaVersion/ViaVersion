@@ -18,10 +18,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class PacketWrapper {
     public static final int PASSTHROUGH_ID = 1000;
@@ -326,13 +323,14 @@ public class PacketWrapper {
             // Other way if outgoing
             Collections.reverse(protocols);
         }
-        int index = 0;
+        int index = -1;
         for (int i = 0; i < protocols.size(); i++) {
             if (protocols.get(i).getClass().equals(packetProtocol)) {
                 index = skipCurrentPipeline ? (i + 1) : (i);
                 break;
             }
         }
+        if (index == -1) throw new NoSuchElementException(packetProtocol.getCanonicalName());
 
         // Reset reader before we start
         resetReader();
