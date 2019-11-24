@@ -16,16 +16,16 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
     private Chunk lastChunk;
 
     @Override
-    public int getWorldBlockData(UserConnection user, Position position) {
+    public int getWorldBlockData(UserConnection user, int bx, int by, int bz) {
         UUID uuid = user.get(ProtocolInfo.class).getUuid();
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             World world = player.getWorld();
-            int x = position.getPosX() >> 4;
-            int z = position.getPosZ() >> 4;
+            int x = bx >> 4;
+            int z = bx >> 4;
             if (world.isChunkLoaded(x, z)) {
                 Chunk c = getChunk(world, x, z);
-                Block b = c.getBlock(position.getPosX(), position.getPosY(), position.getPosZ());
+                Block b = c.getBlock(bx, by, bz);
                 return b.getTypeId() << 4 | b.getData();
             }
         }

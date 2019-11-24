@@ -10,59 +10,22 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class Position {
-    private int posX;
-    private short posY;
-    private int posZ;
-
-    @Deprecated
-    public Position(Long x, Long y, Long z) {
-        this.posX = x.intValue();
-        this.posY = y.shortValue();
-        this.posZ = z.intValue();
-    }
+    private int x;
+    private short y;
+    private int z;
 
     public Position(Position toCopy) {
-        this(toCopy.getPosX(), toCopy.getPosY(), toCopy.getPosZ());
-    }
-
-    @Deprecated
-    public void setX(Long x) {
-        this.posX = x.intValue();
-    }
-
-    @Deprecated
-    public void setY(Long y) {
-        this.posY = y.shortValue();
-    }
-
-    @Deprecated
-    public void setZ(Long z) {
-        this.posZ = z.intValue();
-    }
-
-    @Deprecated
-    public Long getX() {
-        return (long) this.posX;
-    }
-
-    @Deprecated
-    public Long getY() {
-        return (long) this.posY;
-    }
-
-    @Deprecated
-    public Long getZ() {
-        return (long) this.posZ;
+        this(toCopy.getX(), toCopy.getY(), toCopy.getZ());
     }
 
     public Position getRelative(BlockFace face) {
-        return new Position(posX + face.getModX(), (short) (posY + face.getModY()), posZ + face.getModZ());
+        return new Position(x + face.getModX(), (short) (y + face.getModY()), z + face.getModZ());
     }
 
     public Position shift(BlockFace face) {
-        this.posX += face.getModX();
-        this.posY += face.getModY();
-        this.posZ += face.getModZ();
+        this.x += face.getModX();
+        this.y += face.getModY();
+        this.z += face.getModZ();
         return this;
     }
 }

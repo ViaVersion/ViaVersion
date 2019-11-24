@@ -45,7 +45,7 @@ public class BlockEntity {
                 int y = (int) tag.get("y").getValue();
                 int z = (int) tag.get("z").getValue();
 
-                Position pos = new Position((long) x, (long) y, (long) z);
+                Position pos = new Position(x, (short) y, z);
 
                 updateBlockEntity(pos, (short) newId, tag, connection);
             } catch (Exception e) {

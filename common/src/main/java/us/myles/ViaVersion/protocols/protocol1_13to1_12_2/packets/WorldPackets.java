@@ -177,7 +177,7 @@ public class WorldPackets {
                         UserConnection userConnection = wrapper.user();
                         if (Via.getConfig().isServersideBlockConnections()) {
 
-                            ConnectionData.updateBlockStorage(userConnection, position, newId);
+                            ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), newId);
                             newId = ConnectionData.connect(userConnection, position, newId);
                         }
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
@@ -216,7 +216,7 @@ public class WorldPackets {
                                     (record.getHorizontal() & 15) + (chunkZ * 16));
 
                             if (Via.getConfig().isServersideBlockConnections()) {
-                                ConnectionData.updateBlockStorage(userConnection, position, newBlock);
+                                ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), newBlock);
                             }
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
@@ -226,9 +226,9 @@ public class WorldPackets {
                                 int blockState = record.getBlockId();
 
                                 Position position = new Position(
-                                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                        (long) record.getY(),
-                                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                        (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+                                        record.getY(),
+                                        (record.getHorizontal() & 15) + (chunkZ * 16));
 
                                 ConnectionHandler handler = ConnectionData.getConnectionHandler(blockState);
                                 if (handler != null) {
@@ -242,9 +242,9 @@ public class WorldPackets {
 
                             for (BlockChangeRecord record : records) {
                                 Position position = new Position(
-                                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                        (long) record.getY(),
-                                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                        (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
+                                        record.getY(),
+                                        (record.getHorizontal() & 15) + (chunkZ * 16));
                                 ConnectionData.update(userConnection, position);
                             }
                         }
@@ -393,7 +393,7 @@ public class WorldPackets {
                                 int y = (int) tag.get("y").getValue();
                                 int z = (int) tag.get("z").getValue();
 
-                                Position position = new Position((long) x, (long) y, (long) z);
+                                Position position = new Position(x, (short) y, z);
                                 // Store the replacement blocks for blockupdates
                                 if (storage.contains(position))
                                     storage.get(position).setReplacement(newId);

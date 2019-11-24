@@ -17,24 +17,6 @@ public class Item {
     private short data;
     private CompoundTag tag;
 
-    @Deprecated
-    public short getId() {
-        return (short) identifier;
-    }
-
-    @Deprecated
-    public void setId(short id) {
-        identifier = id;
-    }
-
-    @Deprecated
-    public Item(short id, byte amount, short data, CompoundTag tag) {
-        this.identifier = id;
-        this.amount = amount;
-        this.data = data;
-        this.tag = tag;
-    }
-
     public Item(Item toCopy) {
         this(toCopy.getIdentifier(), toCopy.getAmount(), toCopy.getData(), toCopy.getTag());
     }

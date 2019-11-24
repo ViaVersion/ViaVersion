@@ -103,7 +103,7 @@ public class SpawnPackets {
                                 public void write(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.VAR_INT, entityID);
                                     List<Metadata> meta = new ArrayList<>();
-                                    Item item = new Item((short) 373, (byte) 1, (short) data, null); // Potion
+                                    Item item = new Item(373, (byte) 1, (short) data, null); // Potion
                                     ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
                                     // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                                     Metadata potion = new Metadata(5, MetaType1_9.Slot, item);

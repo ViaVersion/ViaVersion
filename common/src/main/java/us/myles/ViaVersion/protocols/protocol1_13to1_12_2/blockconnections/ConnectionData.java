@@ -31,7 +31,7 @@ public class ConnectionData {
         BlockConnectionProvider connectionProvider = Via.getManager().getProviders().get(BlockConnectionProvider.class);
         for (BlockFace face : BlockFace.values()) {
             Position pos = position.getRelative(face);
-            int blockState = connectionProvider.getBlockdata(user, pos);
+            int blockState = connectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) continue;
 
@@ -124,24 +124,24 @@ public class ConnectionData {
     }
 
     public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
-        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
+        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
         ConnectionHandler handler = getConnectionHandler(blockState);
         if (handler == null) return;
 
         int newBlockState = handler.connect(user, pos, blockState);
-        records.add(new BlockChangeRecord((short) (((pos.getPosX() & 0xF) << 4) | (pos.getPosZ() & 0xF)), pos.getPosY(), newBlockState));
+        records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY(), newBlockState));
     }
 
     public static BlockConnectionProvider getProvider() {
         return Via.getManager().getProviders().get(BlockConnectionProvider.class);
     }
 
-    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState) {
+    public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {
         if (!needStoreBlocks()) return;
         if (ConnectionData.isWelcome(blockState)) {
-            ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
+            ConnectionData.getProvider().storeBlock(userConnection, x, y, z, blockState);
         } else {
-            ConnectionData.getProvider().removeBlock(userConnection, position);
+            ConnectionData.getProvider().removeBlock(userConnection, x, y, z);
         }
     }
 

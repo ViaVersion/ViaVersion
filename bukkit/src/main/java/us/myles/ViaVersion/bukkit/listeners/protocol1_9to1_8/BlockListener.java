@@ -22,7 +22,7 @@ public class BlockListener extends ViaBukkitListener {
             Block b = e.getBlockPlaced();
             getUserConnection(e.getPlayer())
                     .get(EntityTracker1_9.class)
-                    .addBlockInteraction(new Position((long) b.getX(), (long) b.getY(), (long) b.getZ()));
+                    .addBlockInteraction(new Position(b.getX(), (short) b.getY(), b.getZ()));
         }
     }
 }

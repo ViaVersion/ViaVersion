@@ -47,9 +47,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
         @Override
         public void handle(PacketWrapper wrapper) throws Exception {
             Position position = wrapper.read(Type.POSITION);
-            wrapper.write(Type.INT, position.getPosX());
-            wrapper.write(Type.INT, (int) position.getPosY());
-            wrapper.write(Type.INT, position.getPosZ());
+            wrapper.write(Type.INT, position.getX());
+            wrapper.write(Type.INT, (int) position.getY());
+            wrapper.write(Type.INT, position.getZ());
         }
     };
 

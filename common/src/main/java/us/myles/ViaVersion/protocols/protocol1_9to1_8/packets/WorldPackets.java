@@ -303,7 +303,7 @@ public class WorldPackets {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
-                                        Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                        Item shield = new Item(442, (byte) 1, (short) 0, null);
                                         tracker.setSecondHand(shield);
                                     }
                                     wrapper.cancel();
@@ -363,9 +363,9 @@ public class WorldPackets {
                         if (face == 255)
                             return;
                         Position p = wrapper.get(Type.POSITION, 0);
-                        int x = p.getPosX();
-                        short y = p.getPosY();
-                        int z = p.getPosZ();
+                        int x = p.getX();
+                        short y = p.getY();
+                        int z = p.getZ();
                         switch (face) {
                             case 0:
                                 y--;

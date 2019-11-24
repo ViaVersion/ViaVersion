@@ -153,7 +153,7 @@ public class EntityTracker1_9 extends EntityTracker {
                     if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityId)) {
-                                Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                Item shield = new Item(442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityId, shield);
                             } else {
                                 setSecondHand(entityId, null);

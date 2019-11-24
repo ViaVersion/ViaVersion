@@ -9,7 +9,7 @@ public abstract class ConnectionHandler {
     public abstract int connect(UserConnection user, Position position, int blockState);
 
     public int getBlockData(UserConnection user, Position position) {
-        return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, position);
+        return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, position.getX(), position.getY(), position.getZ());
     }
 
     public boolean canConnect(int id) {

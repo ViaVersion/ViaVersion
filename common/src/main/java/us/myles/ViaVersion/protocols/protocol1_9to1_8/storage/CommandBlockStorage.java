@@ -44,8 +44,8 @@ public class CommandBlockStorage extends StoredObject {
     }
 
     private Pair<Integer, Integer> getChunkCoords(Position position) {
-        int chunkX = Math.floorDiv(position.getPosX(), 16);
-        int chunkZ = Math.floorDiv(position.getPosZ(), 16);
+        int chunkX = Math.floorDiv(position.getX(), 16);
+        int chunkZ = Math.floorDiv(position.getZ(), 16);
 
         return new Pair<>(chunkX, chunkZ);
     }
