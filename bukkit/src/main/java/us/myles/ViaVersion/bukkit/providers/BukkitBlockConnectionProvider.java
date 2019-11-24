@@ -22,7 +22,7 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
         if (player != null) {
             World world = player.getWorld();
             int x = bx >> 4;
-            int z = bx >> 4;
+            int z = bz >> 4;
             if (world.isChunkLoaded(x, z)) {
                 Chunk c = getChunk(world, x, z);
                 Block b = c.getBlock(bx, by, bz);
