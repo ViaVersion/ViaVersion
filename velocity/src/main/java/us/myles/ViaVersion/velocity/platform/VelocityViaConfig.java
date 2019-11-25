@@ -84,11 +84,6 @@ public class VelocityViaConfig extends AbstractViaConfig {
         return false;
     }
 
-    @Override
-    public String getBlockConnectionMethod() {
-        return "packet";
-    }
-
     /**
      * What is the interval for checking servers via ping
      * -1 for disabled

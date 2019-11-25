@@ -16,6 +16,7 @@ public class BukkitViaConfig extends AbstractViaConfig {
     private boolean quickMoveActionFix;
     private boolean hitboxFix1_9;
     private boolean hitboxFix1_14;
+    private String blockConnectionMethod;
 
     public BukkitViaConfig() {
         super(new File(((Plugin) Via.getPlatform()).getDataFolder(), "config.yml"));
@@ -29,6 +30,7 @@ public class BukkitViaConfig extends AbstractViaConfig {
         quickMoveActionFix = getBoolean("quick-move-action-fix", false);
         hitboxFix1_9 = getBoolean("change-1_9-hitbox", false);
         hitboxFix1_14 = getBoolean("change-1_14-hitbox", false);
+        blockConnectionMethod = getString("blockconnection-method", "packet");
     }
 
     @Override
@@ -58,6 +60,11 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     public boolean is1_14HitboxFix() {
         return hitboxFix1_14;
+    }
+
+    @Override
+    public String getBlockConnectionMethod() {
+        return blockConnectionMethod;
     }
 
     @Override

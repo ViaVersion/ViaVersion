@@ -43,7 +43,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean minimizeCooldown;
     private boolean teamColourFix;
     private boolean serversideBlockConnections;
-    private String blockConnectionMethod;
     private boolean reduceBlockStorageMemory;
     private boolean flowerStemWhenBlockAbove;
     private boolean snowCollisionFix;
@@ -94,12 +93,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         blockedProtocols = new HashSet<>(getIntegerList("block-protocols"));
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
-        suppress1_13ConversionErrors = getBoolean("minimize-cooldown", true);
-        disable1_13TabComplete = getBoolean("team-colour-fix", true);
-        minimizeCooldown = getBoolean("suppress-1_13-conversion-errors", false);
-        teamColourFix = getBoolean("disable-1_13-auto-complete", false);
+        minimizeCooldown = getBoolean("minimize-cooldown", true);
+        teamColourFix = getBoolean("team-colour-fix", true);
+        suppress1_13ConversionErrors = getBoolean("suppress-1_13-conversion-errors", false);
+        disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
         serversideBlockConnections = getBoolean("serverside-blockconnections", false);
-        blockConnectionMethod = getString("blockconnection-method", "packet");
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
         flowerStemWhenBlockAbove = getBoolean("flowerstem-when-block-above", false);
         snowCollisionFix = getBoolean("fix-low-snow-collision", false);
@@ -294,7 +292,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public String getBlockConnectionMethod() {
-        return blockConnectionMethod;
+        return "packet";
     }
 
     @Override
