@@ -8,13 +8,17 @@ import java.util.Arrays;
 public class Mappings {
     protected final short[] oldToNew;
 
+    protected Mappings(short[] oldToNew) {
+        this.oldToNew = oldToNew;
+    }
+
     /**
      * Maps old identifiers to the new ones.
      * If an old value cannot be found in the new mappings, the diffmapping will be checked for the given entry.
      *
-     * @param size set size of the underlying short array
-     * @param oldMapping mappings to map from
-     * @param newMapping mappings to map to
+     * @param size        set size of the underlying short array
+     * @param oldMapping  mappings to map from
+     * @param newMapping  mappings to map to
      * @param diffMapping extra mappings that will be used/scanned when an entry cannot be found
      */
     public Mappings(int size, JsonObject oldMapping, JsonObject newMapping, JsonObject diffMapping) {
@@ -30,7 +34,7 @@ public class Mappings {
     /**
      * Maps old identifiers to the new ones.
      *
-     * @param size set size of the underlying short array
+     * @param size       set size of the underlying short array
      * @param oldMapping mappings to map from
      * @param newMapping mappings to map to
      */
@@ -47,7 +51,7 @@ public class Mappings {
     /**
      * Maps old identifiers to the new ones.
      *
-     * @param size set size of the underlying short array
+     * @param size       set size of the underlying short array
      * @param oldMapping mappings to map from
      * @param newMapping mappings to map to
      */
