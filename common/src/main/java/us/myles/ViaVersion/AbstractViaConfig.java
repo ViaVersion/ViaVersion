@@ -267,22 +267,22 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public boolean isMinimizeCooldown() {
-        return suppress1_13ConversionErrors;
-    }
-
-    @Override
-    public boolean is1_13TeamColourFix() {
-        return disable1_13TabComplete;
-    }
-
-    @Override
-    public boolean isSuppress1_13ConversionErrors() {
         return minimizeCooldown;
     }
 
     @Override
-    public boolean isDisable1_13AutoComplete() {
+    public boolean is1_13TeamColourFix() {
         return teamColourFix;
+    }
+
+    @Override
+    public boolean isSuppress1_13ConversionErrors() {
+        return suppress1_13ConversionErrors;
+    }
+
+    @Override
+    public boolean isDisable1_13AutoComplete() {
+        return disable1_13TabComplete;
     }
 
     @Override
