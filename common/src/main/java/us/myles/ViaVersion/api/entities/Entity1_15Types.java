@@ -15,7 +15,7 @@ public class Entity1_15Types {
         Optional<EntityType> type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID);
+            Via.getPlatform().getLogger().severe("Could not find 1.15 type id " + typeID);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
