@@ -38,7 +38,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private Set<Integer> blockedProtocols;
     private String blockedDisconnectMessage;
     private String reloadDisconnectMessage;
-    private boolean suppress1_13ConversionErrors;
+    private boolean suppressConversionWarnings;
     private boolean disable1_13TabComplete;
     private boolean minimizeCooldown;
     private boolean teamColourFix;
@@ -95,7 +95,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
         minimizeCooldown = getBoolean("minimize-cooldown", true);
         teamColourFix = getBoolean("team-colour-fix", true);
-        suppress1_13ConversionErrors = getBoolean("suppress-1_13-conversion-errors", false);
+        suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
         serversideBlockConnections = getBoolean("serverside-blockconnections", false);
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
@@ -276,8 +276,8 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean isSuppress1_13ConversionErrors() {
-        return suppress1_13ConversionErrors;
+    public boolean isSuppressConversionWarnings() {
+        return suppressConversionWarnings;
     }
 
     @Override

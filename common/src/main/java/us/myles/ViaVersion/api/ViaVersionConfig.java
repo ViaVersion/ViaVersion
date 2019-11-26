@@ -231,11 +231,11 @@ public interface ViaVersionConfig {
     String getReloadDisconnectMsg();
 
     /**
-     * Should we hide errors that occur when trying to converting to 1.13 data?
+     * Should we hide errors that occur when trying to convert block and item data over versions?
      *
      * @return True if enabled
      */
-    boolean isSuppress1_13ConversionErrors();
+    boolean isSuppressConversionWarnings();
 
     /**
      * Should we disable the 1.13 auto-complete feature to stop spam kicks? (for any server lower than 1.13)
