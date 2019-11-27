@@ -24,6 +24,6 @@ public class Position1_14Type extends Type<Position> {
     public void write(ByteBuf buffer, Position object) {
         buffer.writeLong((((long) object.getX() & 0x3ffffff) << 38)
                 | (object.getY() & 0xfff)
-                | ((object.getZ() & 0x3ffffff) << 12));
+                | ((((long) object.getZ()) & 0x3ffffff) << 12));
     }
 }

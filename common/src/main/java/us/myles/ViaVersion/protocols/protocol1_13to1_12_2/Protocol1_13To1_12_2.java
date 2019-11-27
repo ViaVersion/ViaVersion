@@ -515,7 +515,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                                     Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                                     for (int i = 0; i < clone.length; i++) {
                                                         if (clone[i] == null) continue;
-                                                        clone[i] = new Item(new Item(clone[i]));
+                                                        clone[i] = new Item(clone[i]);
                                                     }
                                                     wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                                 }
@@ -530,7 +530,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                                     Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                                     for (int i = 0; i < clone.length; i++) {
                                                         if (clone[i] == null) continue;
-                                                        clone[i] = new Item(new Item(clone[i]));
+                                                        clone[i] = new Item(clone[i]);
                                                     }
                                                     wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                                 }
