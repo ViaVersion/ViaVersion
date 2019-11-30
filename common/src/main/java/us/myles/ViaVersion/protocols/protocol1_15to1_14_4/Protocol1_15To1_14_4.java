@@ -199,7 +199,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
         registerOutgoing(State.PLAY, 0x34, 0x35);
         registerOutgoing(State.PLAY, 0x35, 0x36);
         registerOutgoing(State.PLAY, 0x36, 0x37);
-        registerOutgoing(State.PLAY, 0x37, 0x38);
+
         registerOutgoing(State.PLAY, 0x38, 0x39);
         registerOutgoing(State.PLAY, 0x39, 0x3A);
         registerOutgoing(State.PLAY, 0x3B, 0x3C);
