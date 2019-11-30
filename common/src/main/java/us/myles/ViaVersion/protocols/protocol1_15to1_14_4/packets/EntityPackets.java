@@ -128,6 +128,23 @@ public class EntityPackets {
                 });
             }
         });
+
+        // Destroy entities
+        protocol.registerOutgoing(State.PLAY, 0x37, 0x38, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT_ARRAY);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        for (int entity : wrapper.get(Type.VAR_INT_ARRAY, 0)) {
+                            entityTracker.removeEntity(entity);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public static int getNewEntityId(int oldId) {
