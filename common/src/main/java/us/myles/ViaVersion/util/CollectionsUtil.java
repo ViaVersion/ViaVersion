@@ -15,8 +15,8 @@ public class CollectionsUtil {
 
     static {
         try {
-            fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
-            fastUtilIntObjectHashMap = Class.forName("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap").getConstructor();
+            fastUtilLongObjectHashMap = ReflectionUtil.getClass("it.unimi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
+            fastUtilIntObjectHashMap = ReflectionUtil.getClass("it.unimi.fastutil.ints.Int2ObjectOpenHashMap").getConstructor();
             Via.getPlatform().getLogger().info("Using FastUtil for collections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }

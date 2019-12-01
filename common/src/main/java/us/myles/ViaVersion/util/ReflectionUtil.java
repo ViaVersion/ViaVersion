@@ -64,6 +64,13 @@ public class ReflectionUtil {
         field.set(o, value);
     }
 
+    public static Class<?> getClass(String className) throws ClassNotFoundException {
+        try {
+            return Class.forName("org.bukkit.craftbukkit.libs."+className);
+        } catch (ClassNotFoundException ignored) {
+        }
+        return Class.forName(className);
+    }
 
     public static final class ClassReflection {
         private final Class<?> handle;
