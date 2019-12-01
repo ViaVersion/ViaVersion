@@ -64,14 +64,6 @@ public class ReflectionUtil {
         field.set(o, value);
     }
 
-    public static Class<?> getClass(String className) throws ClassNotFoundException {
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException ignored) {
-        }
-        return Class.forName("org.bukkit.craftbukkit.libs."+className);
-    }
-
     public static final class ClassReflection {
         private final Class<?> handle;
         private final Map<String, Field> fields = Maps.newConcurrentMap();

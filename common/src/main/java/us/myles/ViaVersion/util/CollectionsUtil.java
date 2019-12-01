@@ -15,11 +15,19 @@ public class CollectionsUtil {
 
     static {
         try {
-            fastUtilLongObjectHashMap = ReflectionUtil.getClass("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
-            fastUtilIntObjectHashMap = ReflectionUtil.getClass("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap").getConstructor();
+            fastUtilLongObjectHashMap = getConstructor("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap");
+            fastUtilIntObjectHashMap = getConstructor("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap");
             Via.getPlatform().getLogger().info("Using FastUtil for collections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
+    }
+
+    private static Constructor<?> getConstructor(String className) throws ClassNotFoundException, NoSuchMethodException {
+        try {
+            return Class.forName(className).getConstructor();
+        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
+        }
+        return Class.forName("org.bukkit.craftbukkit.libs."+className).getConstructor();
     }
 
     @SuppressWarnings("unchecked")
