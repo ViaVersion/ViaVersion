@@ -16,6 +16,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.util.CollectionsUtil;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -23,8 +24,8 @@ import java.util.Map.Entry;
 public class ConnectionData {
     static Map<Integer, String> idToKey = new HashMap<>();
     static Map<String, Integer> keyToId = new HashMap<>();
-    static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
-    static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
+    static Map<Integer, ConnectionHandler> connectionHandlerMap = CollectionsUtil.createIntObjectMap();
+    static Map<Integer, BlockData> blockConnectionData = CollectionsUtil.createIntObjectMap();
     static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {

@@ -1,31 +1,23 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
 import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
+import us.myles.ViaVersion.util.CollectionsUtil;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
+    private Map<Long, Pair<byte[], NibbleArray>> blockStorage = CollectionsUtil.createLongObjectMap();
 
-    private static Constructor<?> fastUtilLongObjectHashMap;
     private static HashMap<Short, Short> reverseBlockMappings;
 
     static {
-        try {
-            fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
-            Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
-        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
-        }
         reverseBlockMappings = new HashMap<>();
         for (int i = 0; i < 4096; i++) {
             int newBlock = MappingData.blockMappings.getNewBlock(i);
@@ -121,16 +113,5 @@ public class BlockConnectionStorage extends StoredObject {
 
     private short encodeBlockPos(Position pos) {
         return encodeBlockPos(pos.getX().intValue(), pos.getY().intValue(), pos.getZ().intValue());
-    }
-
-    private <T> Map<Long, T> createLongObjectMap() {
-        if (fastUtilLongObjectHashMap != null) {
-            try {
-                return (Map<Long, T>) fastUtilLongObjectHashMap.newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return new HashMap<>();
     }
 }
