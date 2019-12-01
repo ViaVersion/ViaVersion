@@ -66,10 +66,10 @@ public class ReflectionUtil {
 
     public static Class<?> getClass(String className) throws ClassNotFoundException {
         try {
-            return Class.forName("org.bukkit.craftbukkit.libs."+className);
+            return Class.forName(className);
         } catch (ClassNotFoundException ignored) {
         }
-        return Class.forName(className);
+        return Class.forName("org.bukkit.craftbukkit.libs."+className);
     }
 
     public static final class ClassReflection {
