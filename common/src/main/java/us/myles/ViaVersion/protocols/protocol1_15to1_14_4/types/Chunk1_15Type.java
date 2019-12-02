@@ -31,6 +31,14 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
         CompoundTag heightMap = Type.NBT.read(input);
+
+        int[] biomeData = groundUp ? new int[1024] : null;
+        if (groundUp) {
+            for (int i = 0; i < 1024; i++) {
+                biomeData[i] = input.readInt();
+            }
+        }
+
         Type.VAR_INT.read(input);
 
         BitSet usedSections = new BitSet(16);
@@ -39,15 +47,6 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) != 0) {
                 usedSections.set(i);
-            }
-        }
-
-        int[] biomeData = groundUp ? new int[256] : null;
-        if (groundUp) {
-            //TODO Why 1024 ints?
-            for (int i = 0; i < 1024; i++) {
-                //biomeData[i] = input.readInt();
-                input.readInt();
             }
         }
 
@@ -84,13 +83,9 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
 
         // Write biome data
         if (chunk.isBiomeData()) {
-            //TODO Why 1024 ints?
-            for (int i = 0; i < 1024; i++) {
-                output.writeInt(0);
+            for (int value : chunk.getBiomeData()) {
+                output.writeInt(value);
             }
-            /*for (int value : chunk.getBiomeData()) {
-                output.writeInt(value & 0xFF); // This is a temporary workaround, we'll look into fixing this soon :)
-            }*/
         }
 
         ByteBuf buf = output.alloc().buffer();

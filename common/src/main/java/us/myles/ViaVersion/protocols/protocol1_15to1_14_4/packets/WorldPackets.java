@@ -83,6 +83,26 @@ public class WorldPackets {
                         Chunk chunk = wrapper.read(new Chunk1_14Type(clientWorld));
                         wrapper.write(new Chunk1_15Type(clientWorld), chunk);
 
+                        if (chunk.isGroundUp()) {
+                            int[] biomeData = chunk.getBiomeData();
+                            int[] newBiomeData = new int[1024];
+                            // Now in 4x4x4 areas (x, then z, then y)
+                            // Set the x/z data
+                            int i = 0;
+                            for (int z = 1; z <= 16; z += 4) {
+                                for (int x = 1; x <= 16; x += 4) {
+                                    int biome = biomeData[(x * z) - 1];
+                                    // Extend it on the y axis
+                                    for (int y = 0; y < 1024; y += 16) {
+                                        newBiomeData[i + y] = biome;
+                                    }
+                                    i++;
+                                }
+                            }
+
+                            chunk.setBiomeData(newBiomeData);
+                        }
+
                         for (int s = 0; s < 16; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
