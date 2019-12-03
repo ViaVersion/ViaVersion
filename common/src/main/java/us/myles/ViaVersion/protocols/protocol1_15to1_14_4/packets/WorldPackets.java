@@ -125,9 +125,9 @@ public class WorldPackets {
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.FLOAT); // 2 - X
-                map(Type.FLOAT); // 3 - Y
-                map(Type.FLOAT); // 4 - Z
+                map(Type.FLOAT, Type.DOUBLE); // 2 - X
+                map(Type.FLOAT, Type.DOUBLE); // 3 - Y
+                map(Type.FLOAT, Type.DOUBLE); // 4 - Z
                 map(Type.FLOAT); // 5 - Offset X
                 map(Type.FLOAT); // 6 - Offset Y
                 map(Type.FLOAT); // 7 - Offset Z
