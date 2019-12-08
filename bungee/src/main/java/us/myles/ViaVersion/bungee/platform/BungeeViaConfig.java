@@ -10,11 +10,21 @@ import java.util.*;
 
 public class BungeeViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
+    private int bungeePingInterval;
+    private boolean bungeePingSave;
+    private Map<String, Integer> bungeeServerProtocols;
 
     public BungeeViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
-        // Load config
         reloadConfig();
+    }
+
+    @Override
+    protected void loadFields() {
+        super.loadFields();
+        bungeePingInterval = getInt("bungee-ping-interval", 60);
+        bungeePingSave = getBoolean("bungee-ping-save", true);
+        bungeeServerProtocols = get("bungee-servers", Map.class, new HashMap<>());
     }
 
     @Override
@@ -60,37 +70,12 @@ public class BungeeViaConfig extends AbstractViaConfig {
     }
 
     @Override
-    public boolean isAntiXRay() {
-        return false;
-    }
-
-    @Override
     public boolean isItemCache() {
         return false;
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_12QuickMoveActionFix() {
-        return false;
-    }
-
-    @Override
-    public String getBlockConnectionMethod() {
-        return "packet";
-    }
-
-    @Override
-    public boolean is1_9HitboxFix() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_14HitboxFix() {
         return false;
     }
 
@@ -101,7 +86,7 @@ public class BungeeViaConfig extends AbstractViaConfig {
      * @return Ping interval in seconds
      */
     public int getBungeePingInterval() {
-        return getInt("bungee-ping-interval", 60);
+        return bungeePingInterval;
     }
 
     /**
@@ -110,7 +95,7 @@ public class BungeeViaConfig extends AbstractViaConfig {
      * @return True if it should save
      */
     public boolean isBungeePingSave() {
-        return getBoolean("bungee-ping-save", true);
+        return bungeePingSave;
     }
 
     /**
@@ -120,6 +105,6 @@ public class BungeeViaConfig extends AbstractViaConfig {
      * @return Map of String, Integer
      */
     public Map<String, Integer> getBungeeServerProtocols() {
-        return get("bungee-servers", Map.class, new HashMap<>());
+        return bungeeServerProtocols;
     }
 }

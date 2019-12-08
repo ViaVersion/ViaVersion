@@ -15,7 +15,7 @@ public class Entity1_15Types {
         Optional<EntityType> type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID);
+            Via.getPlatform().getLogger().severe("Could not find 1.15 type id " + typeID);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
@@ -104,7 +104,7 @@ public class Entity1_15Types {
 
         // Monsters
         ABSTRACT_MONSTER(-1, ABSTRACT_CREATURE),
-        BLAZE(4, ABSTRACT_MONSTER),
+        BLAZE(5, ABSTRACT_MONSTER),
         CREEPER(12, ABSTRACT_MONSTER),
         ENDERMITE(21, ABSTRACT_MONSTER),
         ENDERMAN(20, ABSTRACT_MONSTER),

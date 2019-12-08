@@ -115,6 +115,8 @@ public class EntityPackets {
 
         // Metadata packet
         metadataRewriter.registerMetadataRewriter(0x43, 0x44, Types1_14.METADATA_LIST);
+
+        metadataRewriter.registerEntityDestroy(0x37, 0x38);
     }
 
     public static int getNewEntityId(int oldId) {

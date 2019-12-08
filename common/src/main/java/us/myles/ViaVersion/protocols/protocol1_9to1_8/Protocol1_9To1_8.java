@@ -100,7 +100,7 @@ public class Protocol1_9To1_8 extends Protocol {
         providers.register(BossBarProvider.class, new BossBarProvider());
         providers.register(MainHandProvider.class, new MainHandProvider());
         providers.require(MovementTransmitterProvider.class);
-        if (Via.getConfig().isStimulatePlayerTick()) {
+        if (Via.getConfig().isSimulatePlayerTick()) {
             Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
         }
     }

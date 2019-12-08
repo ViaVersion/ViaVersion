@@ -31,6 +31,16 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
         CompoundTag heightMap = Type.NBT.read(input);
+
+        int[] biomeData = groundUp ? new int[256] : null;
+        if (groundUp) {
+            //TODO Why 1024 ints?
+            for (int i = 0; i < 1024; i++) {
+                //biomeData[i] = input.readInt();
+                input.readInt();
+            }
+        }
+
         Type.VAR_INT.read(input);
 
         BitSet usedSections = new BitSet(16);
@@ -39,15 +49,6 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) != 0) {
                 usedSections.set(i);
-            }
-        }
-
-        int[] biomeData = groundUp ? new int[256] : null;
-        if (groundUp) {
-            //TODO Why 1024 ints?
-            for (int i = 0; i < 1024; i++) {
-                //biomeData[i] = input.readInt();
-                input.readInt();
             }
         }
 

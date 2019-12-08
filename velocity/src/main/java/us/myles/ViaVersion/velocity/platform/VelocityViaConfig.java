@@ -9,11 +9,21 @@ import java.util.*;
 
 public class VelocityViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "anti-xray-patch", "quick-move-action-fix", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
+    private int velocityPingInterval;
+    private boolean velocityPingSave;
+    private Map<String, Integer> velocityServerProtocols;
 
     public VelocityViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
-        // Load config
         reloadConfig();
+    }
+
+    @Override
+    protected void loadFields() {
+        super.loadFields();
+        velocityPingInterval = getInt("velocity-ping-interval", 60);
+        velocityPingSave = getBoolean("velocity-ping-save", true);
+        velocityServerProtocols = get("velocity-servers", Map.class, new HashMap<>());
     }
 
     @Override
@@ -65,37 +75,12 @@ public class VelocityViaConfig extends AbstractViaConfig {
     }
 
     @Override
-    public boolean isAntiXRay() {
-        return false;
-    }
-
-    @Override
     public boolean isItemCache() {
         return false;
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_12QuickMoveActionFix() {
-        return false;
-    }
-
-    @Override
-    public String getBlockConnectionMethod() {
-        return "packet";
-    }
-
-    @Override
-    public boolean is1_9HitboxFix() {
-        return false;
-    }
-
-    @Override
-    public boolean is1_14HitboxFix() {
         return false;
     }
 
@@ -106,7 +91,7 @@ public class VelocityViaConfig extends AbstractViaConfig {
      * @return Ping interval in seconds
      */
     public int getVelocityPingInterval() {
-        return getInt("velocity-ping-interval", 60);
+        return velocityPingInterval;
     }
 
     /**
@@ -115,7 +100,7 @@ public class VelocityViaConfig extends AbstractViaConfig {
      * @return True if it should save
      */
     public boolean isVelocityPingSave() {
-        return getBoolean("velocity-ping-save", true);
+        return velocityPingSave;
     }
 
     /**
@@ -125,6 +110,6 @@ public class VelocityViaConfig extends AbstractViaConfig {
      * @return Map of String, Integer
      */
     public Map<String, Integer> getVelocityServerProtocols() {
-        return get("velocity-servers", Map.class, new HashMap<>());
+        return velocityServerProtocols;
     }
 }

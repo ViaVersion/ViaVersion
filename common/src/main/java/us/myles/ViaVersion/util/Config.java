@@ -24,7 +24,7 @@ public abstract class Config implements ConfigurationProvider {
 
     private final CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
-    private ConcurrentSkipListMap<String, Object> config;
+    private Map<String, Object> config;
 
     /**
      * Create a new Config instance, this will *not* load the config by default.
