@@ -59,6 +59,7 @@ public class InventoryPackets {
                             wrapper.passthrough(Type.INT);
                             wrapper.passthrough(Type.INT);
                             wrapper.passthrough(Type.FLOAT);
+                            wrapper.passthrough(Type.INT);
                         }
 
                         wrapper.passthrough(Type.VAR_INT);
