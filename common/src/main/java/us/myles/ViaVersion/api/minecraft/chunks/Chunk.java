@@ -17,6 +17,8 @@ public interface Chunk {
 
     int[] getBiomeData();
 
+    void setBiomeData(int[] biomeData);
+
     CompoundTag getHeightMap();
 
     void setHeightMap(CompoundTag heightMap);

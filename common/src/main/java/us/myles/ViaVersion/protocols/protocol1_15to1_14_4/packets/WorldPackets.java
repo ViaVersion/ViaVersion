@@ -83,6 +83,26 @@ public class WorldPackets {
                         Chunk chunk = wrapper.read(new Chunk1_14Type(clientWorld));
                         wrapper.write(new Chunk1_15Type(clientWorld), chunk);
 
+                        if (chunk.isGroundUp()) {
+                            int[] biomeData = chunk.getBiomeData();
+                            int[] newBiomeData = new int[1024];
+                            // Now in 4x4x4 areas - take the biome of each "middle"
+                            for (int i = 0; i < 4; ++i) {
+                                for (int j = 0; j < 4; ++j) {
+                                    int x = (j << 2) + 2;
+                                    int z = (i << 2) + 2;
+                                    int oldIndex = (z << 4 | x);
+                                    newBiomeData[i << 2 | j] = biomeData[oldIndex];
+                                }
+                            }
+                            // ... and copy it to the new y layers
+                            for (int i = 1; i < 64; ++i) {
+                                System.arraycopy(newBiomeData, 0, newBiomeData, i * 16, 16);
+                            }
+
+                            chunk.setBiomeData(newBiomeData);
+                        }
+
                         for (int s = 0; s < 16; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
@@ -125,9 +145,9 @@ public class WorldPackets {
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.FLOAT); // 2 - X
-                map(Type.FLOAT); // 3 - Y
-                map(Type.FLOAT); // 4 - Z
+                map(Type.FLOAT, Type.DOUBLE); // 2 - X
+                map(Type.FLOAT, Type.DOUBLE); // 3 - Y
+                map(Type.FLOAT, Type.DOUBLE); // 4 - Z
                 map(Type.FLOAT); // 5 - Offset X
                 map(Type.FLOAT); // 6 - Offset Y
                 map(Type.FLOAT); // 7 - Offset Z
