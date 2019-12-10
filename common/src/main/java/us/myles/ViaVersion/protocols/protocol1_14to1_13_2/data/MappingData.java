@@ -83,7 +83,7 @@ public class MappingData {
         }
     }
 
-    private static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+    public static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
@@ -147,10 +147,10 @@ public class MappingData {
         int getNewSound(int old);
     }
 
-    private static class SoundMappingShortArray implements SoundMappings {
+    public static class SoundMappingShortArray implements SoundMappings {
         private short[] oldToNew;
 
-        private SoundMappingShortArray(JsonArray mapping1_13_2, JsonArray mapping1_14) {
+        public SoundMappingShortArray(JsonArray mapping1_13_2, JsonArray mapping1_14) {
             oldToNew = new short[mapping1_13_2.size()];
             Arrays.fill(oldToNew, (short) -1);
             mapIdentifiers(oldToNew, mapping1_13_2, mapping1_14);
@@ -166,10 +166,10 @@ public class MappingData {
         int getNewBlock(int old);
     }
 
-    private static class BlockMappingsShortArray implements BlockMappings {
+    public static class BlockMappingsShortArray implements BlockMappings {
         private short[] oldToNew;
 
-        private BlockMappingsShortArray(JsonObject mapping1_13_2, JsonObject mapping1_14) {
+        public BlockMappingsShortArray(JsonObject mapping1_13_2, JsonObject mapping1_14) {
             oldToNew = new short[mapping1_13_2.entrySet().size()];
             Arrays.fill(oldToNew, (short) -1);
             mapIdentifiers(oldToNew, mapping1_13_2, mapping1_14);

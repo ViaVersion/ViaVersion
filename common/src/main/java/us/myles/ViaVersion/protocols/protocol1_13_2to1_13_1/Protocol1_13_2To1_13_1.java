@@ -11,10 +11,8 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.types.Particle1_13_2Type;
 
 public class Protocol1_13_2To1_13_1 extends Protocol {
-    public static final Particle1_13_2Type PARTICLE_TYPE = new Particle1_13_2Type();
 
     @Override
     protected void registerPackets() {

@@ -130,6 +130,8 @@ change-1_14-hitbox: false
 fix-non-full-blocklight: true
 # Fixes walk animation not shown when health is set to Float.NaN
 fix-1_14-health-nan: true
+# Should 1.15+ clients respawn instantly / without showing a death screen?
+use-1_15-instant-respawn: false
 #
 # Enable serverside block-connections for 1.13+ clients
 serverside-blockconnections: false
