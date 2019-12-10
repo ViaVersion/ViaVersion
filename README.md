@@ -6,7 +6,7 @@ IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt fo
 
 **Allows the connection of higher client versions to lower server versions**
 
-Supported Versions:
+Supported Versions (1.15 included, but not in the table yet):
 
 ![Table (https://i.imgur.com/iWAtD1p.png)](https://i.imgur.com/iWAtD1p.png)
 
