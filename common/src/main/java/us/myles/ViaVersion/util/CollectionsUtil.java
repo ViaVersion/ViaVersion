@@ -20,18 +20,18 @@ public class CollectionsUtil {
         try {
             fastUtilLongObjectHashMap = getConstructor("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap");
             fastUtilIntObjectHashMap = getConstructor("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap");
-            fastUtilIntHashSet = getConstructor("it.unimi.dsi.fastutil.ints.IntOpenHashSet");
+            fastUtilIntHashSet = getConstructor("it.unimi.dsi.fastutil.ints.IntOpenHashSet", int.class);
             Via.getPlatform().getLogger().info("Using FastUtil for collections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
     }
 
-    private static Constructor<?> getConstructor(String className) throws ClassNotFoundException, NoSuchMethodException {
+    private static Constructor<?> getConstructor(String className, Class<?>... parameterTypes) throws ClassNotFoundException, NoSuchMethodException {
         try {
-            return Class.forName(className).getConstructor();
+            return Class.forName(className).getConstructor(parameterTypes);
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
-        return Class.forName("org.bukkit.craftbukkit.libs."+className).getConstructor();
+        return Class.forName("org.bukkit.craftbukkit.libs." + className).getConstructor(parameterTypes);
     }
 
     @SuppressWarnings("unchecked")
