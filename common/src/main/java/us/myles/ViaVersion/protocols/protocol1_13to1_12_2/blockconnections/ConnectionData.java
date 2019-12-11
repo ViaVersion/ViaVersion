@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -16,7 +17,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
-import us.myles.ViaVersion.util.CollectionsUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -24,8 +25,10 @@ import java.util.Map.Entry;
 public class ConnectionData {
     static Map<Integer, String> idToKey = new HashMap<>();
     static Map<String, Integer> keyToId = new HashMap<>();
-    static Map<Integer, ConnectionHandler> connectionHandlerMap = CollectionsUtil.createIntObjectMap();
-    static Map<Integer, BlockData> blockConnectionData = CollectionsUtil.createIntObjectMap();
+    static Map<Integer, ConnectionHandler> connectionHandlerMap = ReflectionUtil.isFastUtilLoaded() ?
+            new Int2ObjectOpenHashMap<ConnectionHandler>() : new HashMap<Integer, ConnectionHandler>();
+    static Map<Integer, BlockData> blockConnectionData = ReflectionUtil.isFastUtilLoaded() ?
+            new Int2ObjectOpenHashMap<BlockData>() : new HashMap<Integer, BlockData>();
     static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {

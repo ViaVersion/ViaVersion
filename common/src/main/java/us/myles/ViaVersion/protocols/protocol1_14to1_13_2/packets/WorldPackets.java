@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
@@ -24,6 +23,7 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.util.CollectionsUtil;
 
 import java.util.Arrays;
 
@@ -191,12 +191,12 @@ public class WorldPackets {
                                             nonAirBlockCount++;
                                             worldSurface[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
                                         }
-                                        if (MappingData.motionBlocking.contains(id)) {
+                                        if (CollectionsUtil.containsInt(MappingData.motionBlocking,id)) {
                                             motionBlocking[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
                                         }
 
                                         // Manually update light for non full blocks (block light must not be sent)
-                                        if (Via.getConfig().isNonFullBlockLightFix() && MappingData.nonFullBlocks.contains(id)) {
+                                        if (Via.getConfig().isNonFullBlockLightFix() && CollectionsUtil.containsInt(MappingData.nonFullBlocks,id)) {
                                             setNonFullLight(chunk, section, s, x, y, z);
                                         }
                                     }

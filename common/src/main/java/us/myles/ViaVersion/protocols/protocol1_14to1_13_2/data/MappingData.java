@@ -5,9 +5,10 @@ import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.util.CollectionsUtil;
 import us.myles.ViaVersion.util.GsonUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,8 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading 1.14 heightmap data...");
         JsonObject heightMapData = loadData("heightMapData-1.14.json");
         JsonArray motionBlocking = heightMapData.getAsJsonArray("MOTION_BLOCKING");
-        MappingData.motionBlocking = CollectionsUtil.createIntSet(motionBlocking.size());
+        MappingData.motionBlocking = ReflectionUtil.isFastUtilLoaded() ?
+                new IntOpenHashSet(motionBlocking.size()) : new HashSet<Integer>(motionBlocking.size());
         for (JsonElement blockState : motionBlocking) {
             String key = blockState.getAsString();
             Integer id = blockStateMap.get(key);
@@ -57,7 +59,8 @@ public class MappingData {
         }
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
-            nonFullBlocks = CollectionsUtil.createIntSet(1682);
+            nonFullBlocks = ReflectionUtil.isFastUtilLoaded() ?
+                    new IntOpenHashSet(1682) : new HashSet<Integer>(1682);
             for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
                 final String state = blockstates.getValue().getAsString();
                 if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))

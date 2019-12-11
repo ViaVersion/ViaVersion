@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -7,13 +8,14 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
-import us.myles.ViaVersion.util.CollectionsUtil;
+import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private Map<Long, Pair<byte[], NibbleArray>> blockStorage = CollectionsUtil.createLongObjectMap();
+    private Map<Long, Pair<byte[], NibbleArray>> blockStorage = ReflectionUtil.isFastUtilLoaded() ?
+            new Long2ObjectOpenHashMap<Pair<byte[], NibbleArray>>() : new HashMap<Long,Pair<byte[], NibbleArray>>();
 
     private static HashMap<Short, Short> reverseBlockMappings;
 

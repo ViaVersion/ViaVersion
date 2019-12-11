@@ -10,6 +10,18 @@ import java.util.Collections;
 import java.util.Map;
 
 public class ReflectionUtil {
+    private static boolean fastUtilLoaded;
+
+    static {
+        try {
+            fastUtilLoaded = Class.forName("it.unimi.dsi.fastutil.BigArrays") != null;
+        } catch (ClassNotFoundException ignored) {
+        }
+    }
+
+    public static boolean isFastUtilLoaded() {
+        return fastUtilLoaded;
+    }
 
     public static Object invokeStatic(Class<?> clazz, String method) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method m = clazz.getDeclaredMethod(method);
