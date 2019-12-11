@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
@@ -33,6 +32,7 @@ public class WorldPackets {
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
     private static final Byte[] FULL_LIGHT = new Byte[2048];
+    private static final boolean IS_NON_FULL_BLOCK_LIGHT_FIX = Via.getConfig().isNonFullBlockLightFix();
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
@@ -196,7 +196,7 @@ public class WorldPackets {
                                         }
 
                                         // Manually update light for non full blocks (block light must not be sent)
-                                        if (Via.getConfig().isNonFullBlockLightFix() && MappingData.nonFullBlocks.contains(id)) {
+                                        if (IS_NON_FULL_BLOCK_LIGHT_FIX && MappingData.nonFullBlocks.contains(id)) {
                                             setNonFullLight(chunk, section, s, x, y, z);
                                         }
                                     }
