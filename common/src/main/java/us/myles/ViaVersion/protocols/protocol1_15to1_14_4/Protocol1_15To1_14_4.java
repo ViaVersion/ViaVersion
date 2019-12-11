@@ -236,9 +236,6 @@ public class Protocol1_15To1_14_4 extends Protocol {
 
         registerOutgoing(State.PLAY, 0x58, 0x59);
         registerOutgoing(State.PLAY, 0x59, 0x5A);
-
-
-        registerOutgoing(State.PLAY, 0x5C, 0x08);
     }
 
     public static int getNewSoundId(int id) {

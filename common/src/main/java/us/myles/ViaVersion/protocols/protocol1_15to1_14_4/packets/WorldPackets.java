@@ -9,7 +9,6 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
@@ -18,6 +17,22 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 public class WorldPackets {
 
     public static void register(Protocol protocol) {
+        // Acknowledge player digging
+        protocol.registerOutgoing(State.PLAY, 0x5C, 0x08, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION1_14);
+                map(Type.VAR_INT);
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int blockState = wrapper.get(Type.VAR_INT, 0);
+                        wrapper.set(Type.VAR_INT, 0, Protocol1_15To1_14_4.getNewBlockStateId(blockState));
+                    }
+                });
+            }
+        });
+
         // Block Action
         protocol.registerOutgoing(State.PLAY, 0x0A, 0x0B, new PacketRemapper() {
             @Override
