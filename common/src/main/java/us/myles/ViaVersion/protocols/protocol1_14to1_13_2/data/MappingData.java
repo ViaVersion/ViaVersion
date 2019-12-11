@@ -110,11 +110,15 @@ public class MappingData {
     }
 
     private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
+        mapIdentifiers(output, oldIdentifiers, newIdentifiers, true);
+    }
+
+    private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
         for (int i = 0; i < oldIdentifiers.size(); i++) {
             JsonElement v = oldIdentifiers.get(i);
             Integer index = findIndex(newIdentifiers, v.getAsString());
             if (index == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                if (warnOnMissing && !Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
                 }
                 continue;
@@ -150,10 +154,14 @@ public class MappingData {
     public static class SoundMappingShortArray implements SoundMappings {
         private short[] oldToNew;
 
-        public SoundMappingShortArray(JsonArray mapping1_13_2, JsonArray mapping1_14) {
+        public SoundMappingShortArray(JsonArray mapping1_13_2, JsonArray mapping1_14, boolean warnOnMissing) {
             oldToNew = new short[mapping1_13_2.size()];
             Arrays.fill(oldToNew, (short) -1);
-            mapIdentifiers(oldToNew, mapping1_13_2, mapping1_14);
+            mapIdentifiers(oldToNew, mapping1_13_2, mapping1_14, warnOnMissing);
+        }
+
+        public SoundMappingShortArray(JsonArray mapping1_13_2, JsonArray mapping1_14) {
+            this(mapping1_13_2, mapping1_14, true);
         }
 
         @Override

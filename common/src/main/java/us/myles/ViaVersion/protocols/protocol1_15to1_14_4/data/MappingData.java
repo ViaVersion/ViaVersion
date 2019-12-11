@@ -22,6 +22,7 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 item mapping...");
         us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.mapIdentifiers(oldToNewItems, mapping1_14_4.getAsJsonObject("items"), mapping1_15.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 sound mapping...");
-        soundMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.SoundMappingShortArray(mapping1_14_4.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"));
+        // A few removed sounds we can simply ignore
+        soundMappings = new us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.SoundMappingShortArray(mapping1_14_4.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"), false);
     }
 }
