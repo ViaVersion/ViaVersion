@@ -14,7 +14,7 @@ import java.util.UUID;
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Defined Types */
     public static final Type<Byte> BYTE = new ByteType();
-    public static final Type<Byte[]> BYTE_ARRAY = new ArrayType<>(Type.BYTE);
+    public static final Type<byte[]> BYTE_ARRAY = new ByteArrayType();
 
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 

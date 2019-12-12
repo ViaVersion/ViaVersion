@@ -32,7 +32,7 @@ public class WorldPackets {
     private static final int VOID_AIR = MappingData.blockStateMappings.getNewBlock(8591);
     private static final int CAVE_AIR = MappingData.blockStateMappings.getNewBlock(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
-    private static final Byte[] FULL_LIGHT = new Byte[2048];
+    private static final byte[] FULL_LIGHT = new byte[2048];
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
@@ -242,14 +242,14 @@ public class WorldPackets {
                                 }
                                 continue;
                             }
-                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getSkyLight()));
+                            lightPacket.write(Type.BYTE_ARRAY, section.getSkyLight());
                         }
                         if (chunk.isGroundUp())
                             lightPacket.write(Type.BYTE_ARRAY, FULL_LIGHT); // chunk above 255
 
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            lightPacket.write(Type.BYTE_ARRAY, fromPrimitiveArray(section.getBlockLight()));
+                            lightPacket.write(Type.BYTE_ARRAY, section.getBlockLight());
                         }
 
                         EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
@@ -267,14 +267,6 @@ public class WorldPackets {
                         }
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, true);
-                    }
-
-                    private Byte[] fromPrimitiveArray(byte[] bytes) {
-                        Byte[] newArray = new Byte[bytes.length];
-                        for (int i = 0; i < bytes.length; i++) {
-                            newArray[i] = bytes[i];
-                        }
-                        return newArray;
                     }
                 });
             }
