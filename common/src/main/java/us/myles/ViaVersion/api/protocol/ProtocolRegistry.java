@@ -21,6 +21,7 @@ import us.myles.ViaVersion.protocols.protocol1_14_2to1_14_1.Protocol1_14_2To1_14
 import us.myles.ViaVersion.protocols.protocol1_14_3to1_14_2.Protocol1_14_3To1_14_2;
 import us.myles.ViaVersion.protocols.protocol1_14_4to1_14_3.Protocol1_14_4To1_14_3;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import us.myles.ViaVersion.protocols.protocol1_15_1to1_15.Protocol1_15_1To1_15;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1To1_9;
@@ -73,6 +74,7 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_14_4To1_14_3(), Collections.singletonList(ProtocolVersion.v1_14_4.getId()), ProtocolVersion.v1_14_3.getId());
 
         registerProtocol(new Protocol1_15To1_14_4(), Collections.singletonList(ProtocolVersion.v1_15.getId()), ProtocolVersion.v1_14_4.getId());
+        registerProtocol(new Protocol1_15_1To1_15(), Collections.singletonList(ProtocolVersion.v1_15_1.getId()), ProtocolVersion.v1_15.getId());
     }
 
     /**
