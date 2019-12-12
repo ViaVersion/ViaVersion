@@ -161,6 +161,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
         registerOutgoing(State.PLAY, 0x08, 0x09);
         registerOutgoing(State.PLAY, 0x09, 0x0A);
 
+        registerOutgoing(State.PLAY, 0x0C, 0x0D);
         registerOutgoing(State.PLAY, 0x0D, 0x0E);
         registerOutgoing(State.PLAY, 0x0E, 0x0F);
         registerOutgoing(State.PLAY, 0x10, 0x11);
@@ -201,7 +202,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
         registerOutgoing(State.PLAY, 0x34, 0x35);
         registerOutgoing(State.PLAY, 0x35, 0x36);
         registerOutgoing(State.PLAY, 0x36, 0x37);
-        registerOutgoing(State.PLAY, 0x37, 0x38);
+
         registerOutgoing(State.PLAY, 0x38, 0x39);
         registerOutgoing(State.PLAY, 0x39, 0x3A);
         registerOutgoing(State.PLAY, 0x3B, 0x3C);
@@ -235,9 +236,6 @@ public class Protocol1_15To1_14_4 extends Protocol {
 
         registerOutgoing(State.PLAY, 0x58, 0x59);
         registerOutgoing(State.PLAY, 0x59, 0x5A);
-
-
-        registerOutgoing(State.PLAY, 0x5C, 0x08);
     }
 
     public static int getNewSoundId(int id) {

@@ -20,7 +20,7 @@ public class Entity1_10Types {
             type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID + " isObject=" + isObject);
+            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeID + " isObject=" + isObject);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 

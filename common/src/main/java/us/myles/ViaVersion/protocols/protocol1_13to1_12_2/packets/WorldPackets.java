@@ -18,7 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.Conne
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
+import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
@@ -73,7 +73,7 @@ public class WorldPackets {
 
                         Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                        if (!id.isPresent() && (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug())) {
+                        if (!id.isPresent() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
                             Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
                         }
                         wrapper.write(Type.VAR_INT, id.orElse(0));
@@ -374,7 +374,7 @@ public class WorldPackets {
                                 if (!validBiomes.contains(biome)) {
                                     if (biome != 255 // is it generated naturally? *shrug*
                                             && latestBiomeWarn != biome) {
-                                        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                                             Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
                                         }
                                         latestBiomeWarn = biome;
@@ -502,12 +502,12 @@ public class WorldPackets {
         }
         newId = MappingData.blockMappings.getNewId(oldId & ~0xF); // Remove data
         if (newId != -1) {
-            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Missing block " + oldId);
             }
             return newId;
         }
-        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
             Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
         }
         // Default stone

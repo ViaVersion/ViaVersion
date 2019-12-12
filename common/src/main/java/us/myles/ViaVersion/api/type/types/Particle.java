@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
+package us.myles.ViaVersion.api.type.types;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

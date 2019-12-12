@@ -85,6 +85,18 @@ public class ItemRewriter {
         });
     }
 
+    public void registerSetCooldown(int oldPacketId, int newPacketId, ItemIdRewriteFunction itemIDRewriteFunction) {
+        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    int itemId = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT, itemIDRewriteFunction.rewrite(itemId));
+                });
+            }
+        });
+    }
+
     // Only sent to the client
     public PacketHandler itemArrayHandler(Type<Item[]> type) {
         return wrapper -> {
@@ -107,5 +119,11 @@ public class ItemRewriter {
     public interface RewriteFunction {
 
         void rewrite(Item item);
+    }
+
+    @FunctionalInterface
+    public interface ItemIdRewriteFunction {
+
+        int rewrite(int itemId);
     }
 }

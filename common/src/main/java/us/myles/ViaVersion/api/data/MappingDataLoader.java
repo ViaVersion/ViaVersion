@@ -31,7 +31,7 @@ public class MappingDataLoader {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
             if (value == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                 }
                 continue;
@@ -53,7 +53,7 @@ public class MappingDataLoader {
                     value = findValue(newIdentifiers, diffIdentifiers.get(entry.getKey()).getAsString());
                 }
                 if (value == null) {
-                    if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                         Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                     }
                     continue;
@@ -68,7 +68,7 @@ public class MappingDataLoader {
             JsonElement v = oldIdentifiers.get(i);
             Integer index = findIndex(newIdentifiers, v.getAsString());
             if (index == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
                 }
                 continue;
