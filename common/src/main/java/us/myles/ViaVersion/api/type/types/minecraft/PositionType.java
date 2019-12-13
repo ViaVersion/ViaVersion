@@ -17,11 +17,13 @@ public class PositionType extends Type<Position> {
         // this shifting madness is used to preserve sign
         long z = (val << 38) >> 38; // signed
 
-        return new Position(x, y, z);
+        return new Position((int) x, (short) y, (int) z);
     }
 
     @Override
     public void write(ByteBuf buffer, Position object) {
-        buffer.writeLong(((object.getX() & 0x3ffffff) << 38) | ((object.getY() & 0xfff) << 26) | (object.getZ() & 0x3ffffff));
+        buffer.writeLong((((long) object.getX() & 0x3ffffff) << 38)
+                | ((((long) object.getY()) & 0xfff) << 26)
+                | (object.getZ() & 0x3ffffff));
     }
 }

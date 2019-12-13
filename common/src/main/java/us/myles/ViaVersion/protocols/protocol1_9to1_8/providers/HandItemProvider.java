@@ -6,6 +6,6 @@ import us.myles.ViaVersion.api.platform.providers.Provider;
 
 public class HandItemProvider implements Provider {
     public Item getHandItem(final UserConnection info) {
-        return new Item((short) 0, (byte) 0, (short) 0, null);
+        return new Item(0, (byte) 0, (short) 0, null);
     }
 }

@@ -18,7 +18,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
-        Position position = new Position(getLong(tag.get("x")), getLong(tag.get("y")), getLong(tag.get("z")));
+        Position position = new Position((int) getLong(tag.get("x")), (short) getLong(tag.get("y")), (int) getLong(tag.get("z")));
 
         if (!storage.contains(position)) {
             Via.getPlatform().getLogger().warning("Received an banner color update packet, but there is no banner! O_o " + tag);

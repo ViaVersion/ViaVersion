@@ -51,7 +51,7 @@ public class HandItemCache implements Runnable {
     }
 
     public static Item convert(ItemStack itemInHand) {
-        if (itemInHand == null) return new Item((short) 0, (byte) 0, (short) 0, null);
+        if (itemInHand == null) return new Item(0, (byte) 0, (short) 0, null);
         if (GET_DAMAGE == null) {
             try {
                 GET_DAMAGE = itemInHand.getClass().getDeclaredField("field_77991_e");
@@ -87,7 +87,7 @@ public class HandItemCache implements Runnable {
                 e.printStackTrace();
             }
         }
-        return new Item((short) id, (byte) itemInHand.getQuantity(), (short) damage, null);
+        return new Item(id, (byte) itemInHand.getQuantity(), (short) damage, null);
     }
 }
 

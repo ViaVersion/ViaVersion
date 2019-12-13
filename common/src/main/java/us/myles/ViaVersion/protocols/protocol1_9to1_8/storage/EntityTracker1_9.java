@@ -38,7 +38,11 @@ public class EntityTracker1_9 extends EntityTracker {
     private final Map<Integer, BossBar> bossBarMap = new ConcurrentHashMap<>();
     private final Set<Integer> validBlocking = Sets.newConcurrentHashSet();
     private final Set<Integer> knownHolograms = Sets.newConcurrentHashSet();
-    private final Cache<Position, Integer> blockInteractions = CacheBuilder.newBuilder().maximumSize(10).expireAfterAccess(250, TimeUnit.MILLISECONDS).build();
+    private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
+            .maximumSize(10)
+            .expireAfterAccess(250, TimeUnit.MILLISECONDS)
+            .<Position, Boolean>build()
+            .asMap());
     @Setter
     private boolean blocking = false;
     @Setter
@@ -100,19 +104,11 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public boolean interactedBlockRecently(int x, int y, int z) {
-        if (blockInteractions.size() == 0)
-            return false;
-        for (Position p : blockInteractions.asMap().keySet()) {
-            if (p.getX() == x)
-                if (p.getY() == y)
-                    if (p.getZ() == z)
-                        return true;
-        }
-        return false;
+        return blockInteractions.contains(new Position(x, (short) y , z));
     }
 
     public void addBlockInteraction(Position p) {
-        blockInteractions.put(p, 0);
+        blockInteractions.add(p);
     }
 
     public void handleMetadata(int entityId, List<Metadata> metadataList) {
@@ -157,7 +153,7 @@ public class EntityTracker1_9 extends EntityTracker {
                     if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityId)) {
-                                Item shield = new Item((short) 442, (byte) 1, (short) 0, null);
+                                Item shield = new Item(442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityId, shield);
                             } else {
                                 setSecondHand(entityId, null);

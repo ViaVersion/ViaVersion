@@ -32,7 +32,7 @@ public class CommandBlockStorage extends StoredObject {
         Pair<Integer, Integer> chunkPos = getChunkCoords(position);
 
         if (!storedCommandBlocks.containsKey(chunkPos))
-            storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<Position, CompoundTag>());
+            storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<>());
 
         Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
 
@@ -44,8 +44,8 @@ public class CommandBlockStorage extends StoredObject {
     }
 
     private Pair<Integer, Integer> getChunkCoords(Position position) {
-        int chunkX = (int) Math.floor(position.getX() / 16);
-        int chunkZ = (int) Math.floor(position.getZ() / 16);
+        int chunkX = Math.floorDiv(position.getX(), 16);
+        int chunkZ = Math.floorDiv(position.getZ(), 16);
 
         return new Pair<>(chunkX, chunkZ);
     }

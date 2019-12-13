@@ -1,24 +1,23 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers;
 
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 
 public class PacketBlockConnectionProvider extends BlockConnectionProvider {
 
     @Override
-    public void storeBlock(UserConnection connection, Position position, int blockState) {
-        connection.get(BlockConnectionStorage.class).store(position, blockState);
+    public void storeBlock(UserConnection connection, int x, int y, int z, int blockState) {
+        connection.get(BlockConnectionStorage.class).store(x, y, z, blockState);
     }
 
     @Override
-    public void removeBlock(UserConnection connection, Position position) {
-        connection.get(BlockConnectionStorage.class).remove(position);
+    public void removeBlock(UserConnection connection, int x, int y, int z) {
+        connection.get(BlockConnectionStorage.class).remove(x, y, z);
     }
 
     @Override
-    public int getBlockdata(UserConnection connection, Position position) {
-        return connection.get(BlockConnectionStorage.class).get(position);
+    public int getBlockData(UserConnection connection, int x, int y, int z) {
+        return connection.get(BlockConnectionStorage.class).get(x, y, z);
     }
 
     @Override

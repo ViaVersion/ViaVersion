@@ -45,9 +45,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
         @Override
         public void handle(PacketWrapper wrapper) throws Exception {
             Position position = wrapper.read(Type.POSITION);
-            wrapper.write(Type.INT, position.getX().intValue());
-            wrapper.write(Type.INT, position.getY().intValue());
-            wrapper.write(Type.INT, position.getZ().intValue());
+            wrapper.write(Type.INT, position.getX());
+            wrapper.write(Type.INT, (int) position.getY());
+            wrapper.write(Type.INT, position.getZ());
         }
     };
 
@@ -513,14 +513,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                                     Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                                     for (int i = 0; i < clone.length; i++) {
                                                         if (clone[i] == null) continue;
-                                                        clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
-                                                                (short) 0, null);
+                                                        clone[i] = new Item(clone[i]);
                                                     }
                                                     wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                                 }
-                                                wrapper.write(Type.FLAT_ITEM, new Item(
-                                                        entry.getValue().getResult().getId(),
-                                                        entry.getValue().getResult().getAmount(), (short) 0, null));
+                                                wrapper.write(Type.FLAT_ITEM, new Item(entry.getValue().getResult()));
                                                 break;
                                             }
                                             case "crafting_shaped": {
@@ -531,14 +528,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                                     Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                                     for (int i = 0; i < clone.length; i++) {
                                                         if (clone[i] == null) continue;
-                                                        clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
-                                                                (short) 0, null);
+                                                        clone[i] = new Item(clone[i]);
                                                     }
                                                     wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                                 }
-                                                wrapper.write(Type.FLAT_ITEM, new Item(
-                                                        entry.getValue().getResult().getId(),
-                                                        entry.getValue().getResult().getAmount(), (short) 0, null));
+                                                wrapper.write(Type.FLAT_ITEM, new Item(entry.getValue().getResult()));
                                                 break;
                                             }
                                             case "smelting": {
@@ -546,13 +540,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
                                                 Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
                                                 for (int i = 0; i < clone.length; i++) {
                                                     if (clone[i] == null) continue;
-                                                    clone[i] = new Item(clone[i].getId(), clone[i].getAmount(),
-                                                            (short) 0, null);
+                                                    clone[i] = new Item(clone[i]);
                                                 }
                                                 wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                                wrapper.write(Type.FLAT_ITEM, new Item(
-                                                        entry.getValue().getResult().getId(),
-                                                        entry.getValue().getResult().getAmount(), (short) 0, null));
+                                                wrapper.write(Type.FLAT_ITEM, new Item(entry.getValue().getResult()));
                                                 wrapper.write(Type.FLOAT, entry.getValue().getExperience());
                                                 wrapper.write(Type.VAR_INT, entry.getValue().getCookingTime());
                                                 break;

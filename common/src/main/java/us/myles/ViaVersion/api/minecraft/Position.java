@@ -10,12 +10,16 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class Position {
-    private Long x;
-    private Long y;
-    private Long z;
+    private int x;
+    private short y;
+    private int z;
+
+    public Position(Position toCopy) {
+        this(toCopy.getX(), toCopy.getY(), toCopy.getZ());
+    }
 
     public Position getRelative(BlockFace face) {
-        return new Position(this.x + face.getModX(), this.y + face.getModY(), this.z + face.getModZ());
+        return new Position(x + face.getModX(), (short) (y + face.getModY()), z + face.getModZ());
     }
 
     public Position shift(BlockFace face) {

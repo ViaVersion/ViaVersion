@@ -23,7 +23,7 @@ public class BlockListener extends ViaSpongeListener {
             Location loc = e.getTransactions().get(0).getFinal().getLocation().get();
             getUserConnection(player.getUniqueId())
                     .get(EntityTracker1_9.class)
-                    .addBlockInteraction(new Position((long) loc.getX(), (long) loc.getY(), (long) loc.getZ()));
+                    .addBlockInteraction(new Position(loc.getBlockX(), (short) loc.getBlockY(), loc.getBlockZ()));
         }
     }
 }

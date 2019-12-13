@@ -55,9 +55,9 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol {
                         //Create nbt
                         CompoundTag tag = new CompoundTag("");
                         tag.put(new StringTag("id", "Sign"));
-                        tag.put(new IntTag("x", position.getX().intValue()));
-                        tag.put(new IntTag("y", position.getY().intValue()));
-                        tag.put(new IntTag("z", position.getZ().intValue()));
+                        tag.put(new IntTag("x", position.getX()));
+                        tag.put(new IntTag("y", position.getY()));
+                        tag.put(new IntTag("z", position.getZ()));
                         for (int i = 0; i < lines.length; i++)
                             tag.put(new StringTag("Text" + (i + 1), lines[i]));
 

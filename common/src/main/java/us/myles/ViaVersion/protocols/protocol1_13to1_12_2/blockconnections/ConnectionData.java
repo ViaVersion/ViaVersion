@@ -30,12 +30,8 @@ public class ConnectionData {
     public static void update(UserConnection user, Position position) {
         BlockConnectionProvider connectionProvider = Via.getManager().getProviders().get(BlockConnectionProvider.class);
         for (BlockFace face : BlockFace.values()) {
-            Position pos = new Position(
-                    position.getX() + face.getModX(),
-                    position.getY() + face.getModY(),
-                    position.getZ() + face.getModZ()
-            );
-            int blockState = connectionProvider.getBlockdata(user, pos);
+            Position pos = position.getRelative(face);
+            int blockState = connectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) continue;
 
@@ -64,9 +60,9 @@ public class ConnectionData {
                         int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
                         updateBlock(user,
                                 new Position(
-                                        (long) ((chunkX + chunkDeltaX) << 4) + blockPosX,
-                                        (long) blockY,
-                                        (long) ((chunkZ + chunkDeltaZ) << 4) + blockPosZ
+                                        ((chunkX + chunkDeltaX) << 4) + blockPosX,
+                                        (short) blockY,
+                                        ((chunkZ + chunkDeltaZ) << 4) + blockPosZ
                                 ),
                                 updates
                         );
@@ -102,9 +98,9 @@ public class ConnectionData {
                             for (int blockZ = zStart; blockZ < zEnd; blockZ++) {
                                 updateBlock(user,
                                         new Position(
-                                                (long) ((chunkX + chunkDeltaX) << 4) + blockX,
-                                                (long) blockY,
-                                                (long) ((chunkZ + chunkDeltaZ) << 4) + blockZ),
+                                                ((chunkX + chunkDeltaX) << 4) + blockX,
+                                                (short) blockY,
+                                                ((chunkZ + chunkDeltaZ) << 4) + blockZ),
                                         updates
                                 );
                             }
@@ -128,24 +124,24 @@ public class ConnectionData {
     }
 
     public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
-        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
+        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
         ConnectionHandler handler = getConnectionHandler(blockState);
         if (handler == null) return;
 
         int newBlockState = handler.connect(user, pos, blockState);
-        records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY().shortValue(), newBlockState));
+        records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY(), newBlockState));
     }
 
     public static BlockConnectionProvider getProvider() {
         return Via.getManager().getProviders().get(BlockConnectionProvider.class);
     }
 
-    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState) {
+    public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {
         if (!needStoreBlocks()) return;
         if (ConnectionData.isWelcome(blockState)) {
-            ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
+            ConnectionData.getProvider().storeBlock(userConnection, x, y, z, blockState);
         } else {
-            ConnectionData.getProvider().removeBlock(userConnection, position);
+            ConnectionData.getProvider().removeBlock(userConnection, x, y, z);
         }
     }
 
@@ -186,7 +182,11 @@ public class ConnectionData {
 
                         ConnectionHandler handler = ConnectionData.getConnectionHandler(block);
                         if (handler != null) {
-                            block = handler.connect(user, new Position(xOff + x, yOff + y, zOff + z), block);
+                            block = handler.connect(user, new Position(
+                                    (int) (xOff + x),
+                                    (short) (yOff + y),
+                                    (int) (zOff + z)
+                            ), block);
                             section.setFlatBlock(x, y, z, block);
                         }
                     }
@@ -282,7 +282,7 @@ public class ConnectionData {
     }
 
     public static int getId(String key) {
-        return keyToId.containsKey(key) ? keyToId.get(key) : -1;
+        return keyToId.getOrDefault(key, -1);
     }
 
     public static String getKey(int id) {
