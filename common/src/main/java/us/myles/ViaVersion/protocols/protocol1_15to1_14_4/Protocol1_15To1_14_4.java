@@ -55,7 +55,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
         });
 
         // Edit Book
-        registerIncoming(State.PLAY, 0x0C, 0x0D, new PacketRemapper() {
+        registerIncoming(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
