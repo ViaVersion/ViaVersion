@@ -48,7 +48,7 @@ public class MappingData {
         enchantmentMappings = new EnchantmentMappingByteArray(mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
         Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 sound mapping...");
         soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
-        Via.getPlatform().getLogger().info("Loading translation mappping");
+        Via.getPlatform().getLogger().info("Loading translation mapping");
         translateMapping = new HashMap<>();
         Map<String, String> translateData = GsonUtil.getGson().fromJson(
                 new InputStreamReader(
