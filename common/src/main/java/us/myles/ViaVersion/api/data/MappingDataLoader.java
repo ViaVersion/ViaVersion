@@ -63,12 +63,12 @@ public class MappingDataLoader {
         }
     }
 
-    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
+    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
         for (int i = 0; i < oldIdentifiers.size(); i++) {
             JsonElement v = oldIdentifiers.get(i);
             Integer index = findIndex(newIdentifiers, v.getAsString());
             if (index == null) {
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
                 }
                 continue;

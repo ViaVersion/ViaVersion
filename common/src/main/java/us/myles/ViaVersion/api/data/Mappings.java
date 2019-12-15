@@ -51,18 +51,27 @@ public class Mappings {
     /**
      * Maps old identifiers to the new ones.
      *
-     * @param size       set size of the underlying short array
-     * @param oldMapping mappings to map from
-     * @param newMapping mappings to map to
+     * @param size          set size of the underlying short array
+     * @param oldMapping    mappings to map from
+     * @param newMapping    mappings to map to
+     * @param warnOnMissing should "No key for x" be printed if there is no matching identifier
      */
-    public Mappings(int size, JsonArray oldMapping, JsonArray newMapping) {
+    public Mappings(int size, JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
         oldToNew = new short[size];
         Arrays.fill(oldToNew, (short) -1);
-        MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping);
+        MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, warnOnMissing);
+    }
+
+    public Mappings(JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
+        this(oldMapping.size(), oldMapping, newMapping, warnOnMissing);
+    }
+
+    public Mappings(int size, JsonArray oldMapping, JsonArray newMapping) {
+        this(size, oldMapping, newMapping, true);
     }
 
     public Mappings(JsonArray oldMapping, JsonArray newMapping) {
-        this(oldMapping.size(), oldMapping, newMapping);
+        this(oldMapping.size(), oldMapping, newMapping, true);
     }
 
     public int getNewId(int old) {

@@ -101,18 +101,20 @@ public class WorldPackets {
                         if (chunk.isGroundUp()) {
                             int[] biomeData = chunk.getBiomeData();
                             int[] newBiomeData = new int[1024];
-                            // Now in 4x4x4 areas - take the biome of each "middle"
-                            for (int i = 0; i < 4; ++i) {
-                                for (int j = 0; j < 4; ++j) {
-                                    int x = (j << 2) + 2;
-                                    int z = (i << 2) + 2;
-                                    int oldIndex = (z << 4 | x);
-                                    newBiomeData[i << 2 | j] = biomeData[oldIndex];
+                            if (biomeData != null) {
+                                // Now in 4x4x4 areas - take the biome of each "middle"
+                                for (int i = 0; i < 4; ++i) {
+                                    for (int j = 0; j < 4; ++j) {
+                                        int x = (j << 2) + 2;
+                                        int z = (i << 2) + 2;
+                                        int oldIndex = (z << 4 | x);
+                                        newBiomeData[i << 2 | j] = biomeData[oldIndex];
+                                    }
                                 }
-                            }
-                            // ... and copy it to the new y layers
-                            for (int i = 1; i < 64; ++i) {
-                                System.arraycopy(newBiomeData, 0, newBiomeData, i * 16, 16);
+                                // ... and copy it to the new y layers
+                                for (int i = 1; i < 64; ++i) {
+                                    System.arraycopy(newBiomeData, 0, newBiomeData, i * 16, 16);
+                                }
                             }
 
                             chunk.setBiomeData(newBiomeData);

@@ -25,6 +25,6 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 item mapping...");
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_14.getAsJsonObject("items"), mapping1_15.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 sound mapping...");
-        soundMappings = new Mappings(mapping1_14.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"));
+        soundMappings = new Mappings(mapping1_14.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"), false);
     }
 }
