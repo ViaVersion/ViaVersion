@@ -5,7 +5,6 @@ import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
@@ -14,6 +13,7 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
+import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
@@ -39,6 +39,7 @@ public class WorldPackets {
     }
 
     public static void register(final Protocol protocol) {
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, null, Protocol1_14To1_13_2::getNewBlockStateId, Protocol1_14To1_13_2::getNewBlockId);
 
         // Block Break Animation
         protocol.registerOutgoing(State.PLAY, 0x08, 0x08, new PacketRemapper() {
@@ -107,24 +108,7 @@ public class WorldPackets {
         });
 
         // Multi Block Change
-        protocol.registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Chunk X
-                map(Type.INT); // 1 - Chunk Z
-                map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // Convert ids
-                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-                            int id = record.getBlockId();
-                            record.setBlockId(Protocol1_14To1_13_2.getNewBlockStateId(id));
-                        }
-                    }
-                });
-            }
-        });
+        blockRewriter.registerMultiBlockChange(0x0F, 0x0F);
 
         // Explosion
         protocol.registerOutgoing(State.PLAY, 0x1E, 0x1C, new PacketRemapper() {
@@ -302,39 +286,9 @@ public class WorldPackets {
             }
         });
 
-        // Spawn Particle
-        protocol.registerOutgoing(State.PLAY, 0x24, 0x23, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.FLOAT); // 2 - X
-                map(Type.FLOAT); // 3 - Y
-                map(Type.FLOAT); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.INT, 0);
-                        if (id == 3 || id == 20) {
-                            int data = wrapper.passthrough(Type.VAR_INT);
-                            wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
-                        } else if (id == 27) {
-                            InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                        }
-
-                        int newId = MetadataRewriter1_14To1_13_2.getNewParticleId(id);
-                        if (newId != id) {
-                            wrapper.set(Type.INT, 0, newId);
-                        }
-                    }
-                });
-            }
-        });
+        // Spawn particle
+        blockRewriter.registerSpawnParticle(Type.FLOAT, 0x24, 0x23, 3, 20, 27,
+                MetadataRewriter1_14To1_13_2::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
 
         // Join Game
         protocol.registerOutgoing(State.PLAY, 0x25, 0x25, new PacketRemapper() {

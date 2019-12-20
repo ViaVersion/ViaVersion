@@ -85,7 +85,7 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetCooldown(int oldPacketId, int newPacketId, ItemIdRewriteFunction itemIDRewriteFunction) {
+    public void registerSetCooldown(int oldPacketId, int newPacketId, IdRewriteFunction itemIDRewriteFunction) {
         protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -119,11 +119,5 @@ public class ItemRewriter {
     public interface RewriteFunction {
 
         void rewrite(Item item);
-    }
-
-    @FunctionalInterface
-    public interface ItemIdRewriteFunction {
-
-        int rewrite(int itemId);
     }
 }

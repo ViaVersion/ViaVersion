@@ -1,11 +1,9 @@
 package us.myles.ViaVersion.api.rewriters;
 
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
@@ -13,11 +11,11 @@ import us.myles.ViaVersion.packets.State;
 // If any of these methods become outdated, just create a new rewriter overriding the methods
 public class BlockRewriter {
     private final Protocol protocol;
-    private final BlockIdRewriteFunction blockStateRewriter;
-    private final BlockIdRewriteFunction blockRewriter;
+    private final IdRewriteFunction blockStateRewriter;
+    private final IdRewriteFunction blockRewriter;
     private final Type<Position> positionType;
 
-    public BlockRewriter(Protocol protocol, Type<Position> positionType, BlockIdRewriteFunction blockStateRewriter, BlockIdRewriteFunction blockRewriter) {
+    public BlockRewriter(Protocol protocol, Type<Position> positionType, IdRewriteFunction blockStateRewriter, IdRewriteFunction blockRewriter) {
         this.protocol = protocol;
         this.positionType = positionType;
         this.blockStateRewriter = blockStateRewriter;
@@ -69,7 +67,7 @@ public class BlockRewriter {
         registerBlockChange(oldPacketId, newPacketId);
     }
 
-    public void registerEffect(int oldPacketId, int newPacketId, int playRecordId, int blockBreakId, ItemRewriter.ItemIdRewriteFunction itemIdRewriteFunction) {
+    public void registerEffect(int oldPacketId, int newPacketId, int playRecordId, int blockBreakId, IdRewriteFunction itemIdRewriteFunction) {
         protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -91,6 +89,11 @@ public class BlockRewriter {
 
     public void registerSpawnParticle(Type<?> coordType, int oldPacketId, int newPacketId, int blockId, int fallingDustId, int itemId,
                                       ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType) {
+        registerSpawnParticle(coordType, oldPacketId, newPacketId, blockId, fallingDustId, itemId, null, itemRewriteFunction, itemType);
+    }
+
+    public void registerSpawnParticle(Type<?> coordType, int oldPacketId, int newPacketId, int blockId, int fallingDustId, int itemId,
+                                      IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType) {
         protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -104,26 +107,25 @@ public class BlockRewriter {
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.INT, 0);
-                        if (id == blockId || id == fallingDustId) {
-                            int data = wrapper.passthrough(Type.VAR_INT);
-                            wrapper.set(Type.VAR_INT, 0, blockStateRewriter.rewrite(data));
-                        } else if (id == itemId) {
-                            // Has to be like this, until we make *everything* object oriented inside of each protocol :(
-                            itemRewriteFunction.rewrite(wrapper.passthrough(itemType));
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
+                    if (id == -1) return;
+                    if (id == blockId || id == fallingDustId) {
+                        int data = wrapper.passthrough(Type.VAR_INT);
+                        wrapper.set(Type.VAR_INT, 0, blockStateRewriter.rewrite(data));
+                    } else if (id == itemId) {
+                        // Has to be like this, until we make *everything* object oriented inside of each protocol :(
+                        itemRewriteFunction.rewrite(wrapper.passthrough(itemType));
+                    }
+
+                    if (particleRewriteFunction != null) {
+                        int newId = particleRewriteFunction.rewrite(id);
+                        if (newId != id) {
+                            wrapper.set(Type.INT, 0, newId);
                         }
                     }
                 });
             }
         });
-    }
-
-    @FunctionalInterface
-    public interface BlockIdRewriteFunction {
-
-        int rewrite(int itemId);
     }
 }
