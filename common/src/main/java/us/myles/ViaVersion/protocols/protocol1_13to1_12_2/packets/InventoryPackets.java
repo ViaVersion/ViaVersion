@@ -679,16 +679,22 @@ public class InventoryPackets {
 
         // Default channels that should not be modifiable
         switch (newId) {
-            case "wdl:init":
-                return "WDL|INIT";
-            case "wdl:control":
-                return "WDL|CONTROL";
-            case "wdl:request":
-                return "WDL|REQUEST";
-            case "fml:hs":
-                return "FML|HS";
-            case "fml:mp":
-                return "FML:MP";
+            case "minecraft:trader_list":
+                return "MC|TrList";
+            case "minecraft:book_open":
+                return "MC|BOpen";
+            case "minecraft:debug/paths":
+                return "MC|DebugPath";
+            case "minecraft:debug/neighbors_update":
+                return "MC|DebugNeighborsUpdate";
+            case "minecraft:register":
+                return "REGISTER";
+            case "minecraft:unregister":
+                return "UNREGISTER";
+            case "minecraft:brand":
+                return "MC|Brand";
+            case "bungeecord:main":
+                return "BungeeCord";
             default:
                 String mappedChannel = MappingData.channelMappings.inverse().get(newId);
                 if (mappedChannel != null) return mappedChannel;
