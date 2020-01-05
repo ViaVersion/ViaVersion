@@ -1,20 +1,41 @@
 package us.myles.ViaVersion.api.data;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Map;
 
 public class MappingDataLoader {
 
+    public static JsonObject loadFromDataDir(String name) {
+        File file = new File(Via.getPlatform().getDataFolder(), name);
+        if (!file.exists()) {
+            try (InputStream in = getResource(name)) {
+                Files.copy(in, file.toPath());
+            } catch (IOException e) {
+                Via.getPlatform().getLogger().warning("Error loading " + name + " from the config directory!");
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        try (FileReader reader = new FileReader(file)) {
+            return GsonUtil.getGson().fromJson(reader, JsonObject.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (JsonSyntaxException | JsonIOException e) {
+            Via.getPlatform().getLogger().warning(name + " is badly formatted!");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static JsonObject loadData(String name) {
-        InputStream stream = MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
+        InputStream stream = getResource(name);
         InputStreamReader reader = new InputStreamReader(stream);
         try {
             return GsonUtil.getGson().fromJson(reader, JsonObject.class);
@@ -106,5 +127,9 @@ public class MappingDataLoader {
             }
         }
         return null;
+    }
+
+    private static InputStream getResource(String name) {
+        return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
     }
 }

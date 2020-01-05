@@ -196,6 +196,11 @@ public class SpongePlugin implements ViaPlatform {
     }
 
     @Override
+    public File getDataFolder() {
+        return defaultConfig.getParentFile();
+    }
+
+    @Override
     public void onReload() {
         getLogger().severe("ViaVersion is already loaded, this should work fine. If you get any console errors, try rebooting.");
     }

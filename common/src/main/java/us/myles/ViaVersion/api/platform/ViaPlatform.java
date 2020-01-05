@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
+import java.io.File;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -138,6 +139,13 @@ public interface ViaPlatform<T> {
      * @return The configuration provider
      */
     ConfigurationProvider getConfigurationProvider();
+
+    /**
+     * Get ViaVersions's data folder.
+     *
+     * @return data folder
+     */
+    File getDataFolder();
 
     /**
      * Called when a reload happens
