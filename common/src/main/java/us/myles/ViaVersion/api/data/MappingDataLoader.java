@@ -5,33 +5,25 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Map;
 
 public class MappingDataLoader {
 
     public static JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
-        if (!file.exists()) {
-            try (InputStream in = getResource(name)) {
-                Files.copy(in, file.toPath());
-            } catch (IOException e) {
-                Via.getPlatform().getLogger().warning("Error loading " + name + " from the config directory!");
-                e.printStackTrace();
-                return null;
-            }
-        }
+        if (!file.exists()) return loadData(name);
 
+        // Load the file from the platform's directory if present
         try (FileReader reader = new FileReader(file)) {
             return GsonUtil.getGson().fromJson(reader, JsonObject.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (JsonSyntaxException | JsonIOException e) {
+        } catch (JsonSyntaxException e) {
+            // Users might mess up the format, so let's catch the syntax error
             Via.getPlatform().getLogger().warning(name + " is badly formatted!");
             e.printStackTrace();
-            return null;
+        } catch (IOException | JsonIOException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     public static JsonObject loadData(String name) {
