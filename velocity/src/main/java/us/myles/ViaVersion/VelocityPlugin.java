@@ -30,6 +30,7 @@ import us.myles.ViaVersion.velocity.platform.*;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.util.LoggerWrapper;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -174,6 +175,11 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public ConfigurationProvider getConfigurationProvider() {
         return conf;
+    }
+
+    @Override
+    public File getDataFolder() {
+        return configDir.toFile();
     }
 
     @Override

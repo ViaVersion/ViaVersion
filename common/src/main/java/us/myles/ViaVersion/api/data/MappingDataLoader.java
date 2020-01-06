@@ -1,20 +1,33 @@
 package us.myles.ViaVersion.api.data;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Map;
 
 public class MappingDataLoader {
 
+    public static JsonObject loadFromDataDir(String name) {
+        File file = new File(Via.getPlatform().getDataFolder(), name);
+        if (!file.exists()) return loadData(name);
+
+        // Load the file from the platform's directory if present
+        try (FileReader reader = new FileReader(file)) {
+            return GsonUtil.getGson().fromJson(reader, JsonObject.class);
+        } catch (JsonSyntaxException e) {
+            // Users might mess up the format, so let's catch the syntax error
+            Via.getPlatform().getLogger().warning(name + " is badly formatted!");
+            e.printStackTrace();
+        } catch (IOException | JsonIOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static JsonObject loadData(String name) {
-        InputStream stream = MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
+        InputStream stream = getResource(name);
         InputStreamReader reader = new InputStreamReader(stream);
         try {
             return GsonUtil.getGson().fromJson(reader, JsonObject.class);
@@ -106,5 +119,9 @@ public class MappingDataLoader {
             }
         }
         return null;
+    }
+
+    private static InputStream getResource(String name) {
+        return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
     }
 }

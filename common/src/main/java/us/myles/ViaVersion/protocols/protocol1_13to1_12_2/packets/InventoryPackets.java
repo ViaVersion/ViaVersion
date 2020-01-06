@@ -443,6 +443,7 @@ public class InventoryPackets {
     }
 
     public static String getNewPluginChannelId(String old) {
+        // Default channels that should not be modifiable
         switch (old) {
             case "MC|TrList":
                 return "minecraft:trader_list";
@@ -460,21 +461,12 @@ public class InventoryPackets {
                 return "minecraft:unregister";
             case "BungeeCord":
                 return "bungeecord:main";
-            case "WDL|INIT":
-                return "wdl:init";
-            case "WDL|CONTROL":
-                return "wdl:control";
-            case "WDL|REQUEST":
-                return "wdl:request";
             case "bungeecord:main":
                 return null;
-            case "FML|MP":
-                return "fml:mp";
-            case "FML|HS":
-                return "fml:hs";
             default:
-                return old.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)") // Identifier regex
-                        ? old : null;
+                String mappedChannel = MappingData.channelMappings.get(old);
+                if (mappedChannel != null) return mappedChannel;
+                return MappingData.isValid1_13Channel(old) ? old : null;
         }
     }
 
@@ -682,14 +674,10 @@ public class InventoryPackets {
     }
 
     public static String getOldPluginChannelId(String newId) {
-        if (!newId.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)")) {
-            return null; // Not valid
-        }
-        int separatorIndex = newId.indexOf(':');
-        // Vanilla parses ``:`` and ```` as ``minecraft:`` (also ensure there's enough space)
-        if ((separatorIndex == -1 || separatorIndex == 0) && newId.length() <= 10) {
-            newId = "minecraft:" + newId;
-        }
+        newId = MappingData.validateNewChannel(newId);
+        if (newId == null) return null;
+
+        // Default channels that should not be modifiable
         switch (newId) {
             case "minecraft:trader_list":
                 return "MC|TrList";
@@ -707,17 +695,9 @@ public class InventoryPackets {
                 return "MC|Brand";
             case "bungeecord:main":
                 return "BungeeCord";
-            case "wdl:init":
-                return "WDL|INIT";
-            case "wdl:control":
-                return "WDL|CONTROL";
-            case "wdl:request":
-                return "WDL|REQUEST";
-            case "fml:hs":
-                return "FML|HS";
-            case "fml:mp":
-                return "FML:MP";
             default:
+                String mappedChannel = MappingData.channelMappings.inverse().get(newId);
+                if (mappedChannel != null) return mappedChannel;
                 return newId.length() > 20 ? newId.substring(0, 20) : newId;
         }
     }

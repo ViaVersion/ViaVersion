@@ -1,0 +1,7 @@
+{
+  "WDL|INIT": "wdl:init",
+  "WDL|CONTROL": "wdl:control",
+  "WDL|REQUEST": "wdl:request",
+  "FML|MP": "fml:mp",
+  "FML|HS": "fml:hs"
+}
