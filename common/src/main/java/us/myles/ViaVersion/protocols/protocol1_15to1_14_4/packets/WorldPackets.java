@@ -1,12 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
@@ -17,75 +17,19 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 public class WorldPackets {
 
     public static void register(Protocol protocol) {
-        // Acknowledge player digging
-        protocol.registerOutgoing(State.PLAY, 0x5C, 0x08, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.POSITION1_14);
-                map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int blockState = wrapper.get(Type.VAR_INT, 0);
-                        wrapper.set(Type.VAR_INT, 0, Protocol1_15To1_14_4.getNewBlockStateId(blockState));
-                    }
-                });
-            }
-        });
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_15To1_14_4::getNewBlockStateId, Protocol1_15To1_14_4::getNewBlockId);
 
-        // Block Action
-        protocol.registerOutgoing(State.PLAY, 0x0A, 0x0B, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.POSITION1_14); // Location
-                map(Type.UNSIGNED_BYTE); // Action id
-                map(Type.UNSIGNED_BYTE); // Action param
-                map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0, Protocol1_15To1_14_4.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
-                    }
-                });
-            }
-        });
+        // Block action
+        blockRewriter.registerBlockAction(0x0A, 0x0B);
 
         // Block Change
-        protocol.registerOutgoing(State.PLAY, 0x0B, 0x0C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.POSITION1_14);
-                map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.VAR_INT, 0);
-
-                        wrapper.set(Type.VAR_INT, 0, Protocol1_15To1_14_4.getNewBlockStateId(id));
-                    }
-                });
-            }
-        });
+        blockRewriter.registerBlockChange(0x0B, 0x0C);
 
         // Multi Block Change
-        protocol.registerOutgoing(State.PLAY, 0x0F, 0x10, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Chunk X
-                map(Type.INT); // 1 - Chunk Z
-                map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // Convert ids
-                        for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-                            int id = record.getBlockId();
-                            record.setBlockId(Protocol1_15To1_14_4.getNewBlockStateId(id));
-                        }
-                    }
-                });
-            }
-        });
+        blockRewriter.registerMultiBlockChange(0x0F, 0x10);
+
+        // Acknowledge player digging
+        blockRewriter.registerAcknowledgePlayerDigging(0x5C, 0x08);
 
         // Chunk Data
         protocol.registerOutgoing(State.PLAY, 0x21, 0x22, new PacketRemapper() {
@@ -135,26 +79,7 @@ public class WorldPackets {
         });
 
         // Effect
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x23, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // Effect Id
-                map(Type.POSITION1_14); // Location
-                map(Type.INT); // Data
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.INT, 0);
-                        int data = wrapper.get(Type.INT, 1);
-                        if (id == 1010) { // Play record
-                            wrapper.set(Type.INT, 1, InventoryPackets.getNewItemId(data));
-                        } else if (id == 2001) { // Block break + block break sound
-                            wrapper.set(Type.INT, 1, data = Protocol1_15To1_14_4.getNewBlockStateId(data));
-                        }
-                    }
-                });
-            }
-        });
+        blockRewriter.registerEffect(0x22, 0x23, 1010, 2001, InventoryPackets::getNewItemId);
 
         // Spawn Particle
         protocol.registerOutgoing(State.PLAY, 0x23, 0x24, new PacketRemapper() {
