@@ -75,6 +75,7 @@ public class ProtocolRegistry {
 
         registerProtocol(new Protocol1_15To1_14_4(), Collections.singletonList(ProtocolVersion.v1_15.getId()), ProtocolVersion.v1_14_4.getId());
         registerProtocol(new Protocol1_15_1To1_15(), Collections.singletonList(ProtocolVersion.v1_15_1.getId()), ProtocolVersion.v1_15.getId());
+        registerProtocol(new Protocol1_15_1To1_15(), Collections.singletonList(ProtocolVersion.v1_15_2.getId()), ProtocolVersion.v1_15_1.getId());
     }
 
     /**
