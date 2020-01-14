@@ -189,10 +189,10 @@ public class WorldPackets {
                                         int id = section.getFlatBlock(x, y, z);
                                         if (id != AIR && id != VOID_AIR && id != CAVE_AIR) {
                                             nonAirBlockCount++;
-                                            worldSurface[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
+                                            worldSurface[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
                                         }
                                         if (MappingData.motionBlocking.contains(id)) {
-                                            motionBlocking[x + z * 16] = y + s * 16 + 2; // Should be +1 (top of the block) but +2 works :tm:
+                                            motionBlocking[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
                                         }
 
                                         // Manually update light for non full blocks (block light must not be sent)
