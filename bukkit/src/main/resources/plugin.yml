@@ -1,6 +1,6 @@
 name: ViaVersion
 main: us.myles.ViaVersion.ViaVersionPlugin
-authors: [_MylesC, Matsv]
+authors: [_MylesC, creeper123123321, Gerrygames, KennyTV, Matsv]
 version: ${project.version}
 description: ${project.description}
 load: postworld
