@@ -193,7 +193,7 @@ public class Entity1_11Types {
         FIREWORK(76, EntityType.FIREWORK),
         LEASH(77, EntityType.LEASH_HITCH),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        EVOCATION_FANGS(39, EntityType.EVOCATION_FANGS),
+        EVOCATION_FANGS(79, EntityType.EVOCATION_FANGS),
         FISHIHNG_HOOK(90, EntityType.FISHING_HOOK),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
