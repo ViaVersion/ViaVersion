@@ -77,14 +77,16 @@ public class MappingData {
             }
             for (String line : lines) {
                 if (line.isEmpty()) continue;
+
                 String[] keyAndTranslation = line.split("=", 2);
                 if (keyAndTranslation.length != 2) continue;
+
                 String key = keyAndTranslation[0];
-                String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
                 if (!translateData.containsKey(key)) {
-                    translateMapping.put(key, translation);
+                    String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
+                    mojangTranslation.put(key, translation);
                 } else {
-                    String dataValue = translateData.get(keyAndTranslation[0]);
+                    String dataValue = translateData.get(key);
                     if (dataValue != null) {
                         translateMapping.put(key, dataValue);
                     }
