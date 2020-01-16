@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StatisticMappings {
-    
+
     public static final Map<String, Integer> statistics = new HashMap<>();
     
     static {
