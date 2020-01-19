@@ -42,6 +42,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_14_4;
     public static final ProtocolVersion v1_15;
     public static final ProtocolVersion v1_15_1;
+    public static final ProtocolVersion v1_15_2;
     public static final ProtocolVersion unknown;
 
     private final int id;
@@ -80,6 +81,7 @@ public class ProtocolVersion {
         register(v1_14_4 = new ProtocolVersion(498, "1.14.4"));
         register(v1_15 = new ProtocolVersion(573, "1.15"));
         register(v1_15_1 = new ProtocolVersion(575, "1.15.1"));
+        register(v1_15_2 = new ProtocolVersion(577, "1.15.2"));
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
