@@ -4,6 +4,8 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
@@ -21,15 +23,18 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         Object plugin = VelocityPlugin.PROXY.getPluginManager()
                 .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
 
-        Via.getManager().getProviders().use(MovementTransmitterProvider.class, new VelocityMovementTransmitter());
-        Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new VelocityMovementTransmitter());
+            Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
+            VelocityPlugin.PROXY.getEventManager().register(plugin, new ElytraPatch());
+        }
+
         Via.getManager().getProviders().use(VersionProvider.class, new VelocityVersionProvider());
         // We probably don't need a EntityIdProvider because velocity sends a Join packet on server change
         // We don't need main hand patch because Join Game packet makes client send hand data again
 
         VelocityPlugin.PROXY.getEventManager().register(plugin, new UpdateListener());
         VelocityPlugin.PROXY.getEventManager().register(plugin, new VelocityServerHandler());
-        VelocityPlugin.PROXY.getEventManager().register(plugin, new ElytraPatch());
 
         int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
         if (pingInterval > 0) {

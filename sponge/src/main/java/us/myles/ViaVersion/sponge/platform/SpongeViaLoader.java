@@ -7,6 +7,8 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
@@ -26,10 +28,10 @@ import java.util.Set;
 
 public class SpongeViaLoader implements ViaPlatformLoader {
 
-    private SpongePlugin plugin;
+    private final SpongePlugin plugin;
 
-    private Set<Object> listeners = new HashSet<>();
-    private Set<TaskId> tasks = new HashSet<>();
+    private final Set<Object> listeners = new HashSet<>();
+    private final Set<TaskId> tasks = new HashSet<>();
 
     public SpongeViaLoader(SpongePlugin plugin) {
         this.plugin = plugin;
@@ -50,34 +52,40 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         registerListener(new UpdateListener());
         /* Base Protocol */
         registerListener(new ClientLeaveListener());
-        /* 1.9 client to 1.8 server */
-        try {
-            Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
-            storeListener(new Sponge4ArmorListener()).register();
-        } catch (ClassNotFoundException e) {
-            storeListener(new Sponge5ArmorListener(plugin)).register();
-        }
-        storeListener(new DeathListener(plugin)).register();
-        storeListener(new BlockListener(plugin)).register();
 
-        if (plugin.getConf().isItemCache()) {
-            tasks.add(Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L)); // Updates players items :)
-            HandItemCache.CACHE = true;
+        /* 1.9 client to 1.8 server */
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            try {
+                Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
+                storeListener(new Sponge4ArmorListener()).register();
+            } catch (ClassNotFoundException e) {
+                storeListener(new Sponge5ArmorListener(plugin)).register();
+            }
+            storeListener(new DeathListener(plugin)).register();
+            storeListener(new BlockListener(plugin)).register();
+
+            if (plugin.getConf().isItemCache()) {
+                tasks.add(Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L)); // Updates players items :)
+                HandItemCache.CACHE = true;
+            }
         }
 
         /* Providers */
-        Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new SpongeViaBulkChunkTranslator());
-        Via.getManager().getProviders().use(MovementTransmitterProvider.class, new SpongeViaMovementTransmitter());
-        Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
-            @Override
-            public Item getHandItem(final UserConnection info) {
-                if (HandItemCache.CACHE) {
-                    return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
-                } else {
-                    return super.getHandItem(info); // TODO: On API Docs write about this
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new SpongeViaBulkChunkTranslator());
+            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new SpongeViaMovementTransmitter());
+
+            Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
+                @Override
+                public Item getHandItem(final UserConnection info) {
+                    if (HandItemCache.CACHE) {
+                        return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
+                    } else {
+                        return super.getHandItem(info);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void unload() {
