@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
+    private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
 
+    private static final Map<Short, Short> reverseBlockMappings;
     private static Constructor<?> fastUtilLongObjectHashMap;
-    private static HashMap<Short, Short> reverseBlockMappings;
 
     static {
         try {

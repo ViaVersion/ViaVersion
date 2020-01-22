@@ -9,7 +9,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import java.util.regex.Pattern;
 
 public class ChatItemRewriter {
-    private static Pattern indexRemoval = Pattern.compile("\\d+:(?=([^\"\\\\]*(\\\\.|\"([^\"\\\\]*\\\\.)*[^\"\\\\]*\"))*[^\"]*$)");
+    private static final Pattern indexRemoval = Pattern.compile("\\d+:(?=([^\"\\\\]*(\\\\.|\"([^\"\\\\]*\\\\.)*[^\"\\\\]*\"))*[^\"]*$)");
     // Taken from https://stackoverflow.com/questions/6462578/alternative-to-regex-match-all-instances-not-inside-quotes
 
     public static void toClient(JsonElement element, UserConnection user) {

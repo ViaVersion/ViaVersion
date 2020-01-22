@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class BukkitViaLoader implements ViaPlatformLoader {
@@ -80,6 +79,11 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             storeListener(new ArmorListener(plugin)).register();
             storeListener(new DeathListener(plugin)).register();
             storeListener(new BlockListener(plugin)).register();
+
+            if (plugin.getConf().isItemCache()) {
+                handItemCache = new HandItemCache();
+                tasks.add(handItemCache.runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
+            }
         }
 
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_14.getId()) {
@@ -101,10 +105,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();
         }
-        if (plugin.getConf().isItemCache()) {
-            handItemCache = new HandItemCache();
-            tasks.add(handItemCache.runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
-        }
 
         /* Providers */
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
@@ -116,25 +116,21 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 public Item getHandItem(final UserConnection info) {
                     if (handItemCache != null) {
                         return handItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
-                    } else {
-                        try {
-                            return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Item>() {
-                                @Override
-                                public Item call() throws Exception {
-                                    UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
-                                    Player player = Bukkit.getPlayer(playerUUID);
-                                    if (player != null) {
-                                        return HandItemCache.convert(player.getItemInHand());
-                                    }
-                                    return null;
-                                }
-                            }).get(10, TimeUnit.SECONDS);
-                        } catch (Exception e) {
-                            Via.getPlatform().getLogger().severe("Error fetching hand item: " + e.getClass().getName());
-                            if (Via.getManager().isDebug())
-                                e.printStackTrace();
+                    }
+                    try {
+                        return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
+                            UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
+                            Player player = Bukkit.getPlayer(playerUUID);
+                            if (player != null) {
+                                return HandItemCache.convert(player.getItemInHand());
+                            }
                             return null;
-                        }
+                        }).get(10, TimeUnit.SECONDS);
+                    } catch (Exception e) {
+                        Via.getPlatform().getLogger().severe("Error fetching hand item: " + e.getClass().getName());
+                        if (Via.getManager().isDebug())
+                            e.printStackTrace();
+                        return null;
                     }
                 }
             });
