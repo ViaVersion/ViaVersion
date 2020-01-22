@@ -6,6 +6,8 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 import us.myles.ViaVersion.BungeePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bungee.handlers.BungeeServerHandler;
 import us.myles.ViaVersion.bungee.listeners.ElytraPatch;
 import us.myles.ViaVersion.bungee.listeners.UpdateListener;
@@ -42,14 +44,20 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         registerListener(plugin);
         registerListener(new UpdateListener());
         registerListener(new BungeeServerHandler());
-        registerListener(new ElytraPatch());
+
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            registerListener(new ElytraPatch());
+        }
 
         // Providers
-        Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
         Via.getManager().getProviders().use(VersionProvider.class, new BungeeVersionProvider());
-        Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
-        Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
-        Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());
+
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
+            Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
+            Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
+            Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());
+        }
 
         if (plugin.getConf().getBungeePingInterval() > 0) {
             tasks.add(plugin.getProxy().getScheduler().schedule(
