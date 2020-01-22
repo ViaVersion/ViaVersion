@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import io.netty.util.AttributeKey;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -22,7 +23,6 @@ import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
 import us.myles.ViaVersion.sponge.platform.*;
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 @Plugin(id = "viaversion",
         name = "ViaVersion",
-        version = VersionInfo.VERSION,
+        version = "",
         authors = {"_MylesC", "creeper123123321", "Gerrygames", "KennyTV", "Matsv"},
         description = "Allow newer Minecraft versions to connect to an older server version."
 )
@@ -222,5 +222,15 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public boolean is1_9Supported() {
+        return true;
+    }
+
+    @Override
+    public AttributeKey<Integer> getVersionAttributeKey() {
+        return null;
     }
 }

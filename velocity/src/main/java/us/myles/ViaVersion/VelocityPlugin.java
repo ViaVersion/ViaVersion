@@ -10,6 +10,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import io.netty.util.AttributeKey;
 import lombok.Getter;
 import net.kyori.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -23,7 +24,6 @@ import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.velocity.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
 import us.myles.ViaVersion.velocity.command.VelocityCommandSender;
 import us.myles.ViaVersion.velocity.platform.*;
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 @Plugin(
         id = "viaversion",
         name = "ViaVersion",
-        version = VersionInfo.VERSION,
+        version = "",
         authors = {"_MylesC", "creeper123123321", "Gerrygames", "KennyTV", "Matsv"},
         description = "Allow newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
@@ -100,7 +100,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Override
     public String getPluginVersion() {
-        return VersionInfo.VERSION;
+        return "";
     }
 
     @Override
@@ -202,5 +202,15 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public boolean is1_9Supported() {
+        return true;
+    }
+
+    @Override
+    public AttributeKey<Integer> getVersionAttributeKey() {
+        return null;
     }
 }
