@@ -37,6 +37,8 @@ public class BaseProtocol extends Protocol {
                         int protVer = wrapper.get(Type.VAR_INT, 0);
                         int state = wrapper.get(Type.VAR_INT, 1);
 
+                        wrapper.user().getChannel().attr(Via.getPlatform().getVersionAttributeKey()).set(protVer);
+
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setProtocolVersion(protVer);
                         // Ensure the server has a version provider

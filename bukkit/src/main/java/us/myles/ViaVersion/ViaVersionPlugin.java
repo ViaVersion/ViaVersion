@@ -1,12 +1,15 @@
 package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
+import io.netty.util.AttributeKey;
 import lombok.Getter;
+import net.minecraft.server.v1_8_R3.NetworkManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import spg.lgdev.config.iSpigotConfig;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersion;
@@ -263,4 +266,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     public boolean isOldClientsAllowed() {
         return !protocolSupport; // Use protocolsupport for older clients
     }
+
+    public AttributeKey<Integer> getVersionAttributeKey() {
+        return (AttributeKey<Integer>) NetworkManager.protocolVersion;
+    }
+
+    public boolean is1_9Supported() {
+        return iSpigotConfig.native_19_support;
+    }
+
 }
