@@ -104,7 +104,7 @@ public class ProtocolRegistry {
 
         for (Integer version : supported) {
             if (!registryMap.containsKey(version)) {
-                registryMap.put(version, new HashMap<Integer, Protocol>());
+                registryMap.put(version, new HashMap<>());
             }
 
             registryMap.get(version).put(output, protocol);

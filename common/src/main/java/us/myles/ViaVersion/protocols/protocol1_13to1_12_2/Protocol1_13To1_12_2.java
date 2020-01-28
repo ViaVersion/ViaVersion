@@ -1167,9 +1167,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
     protected void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
-        if (Via.getConfig().get1_13TabCompleteDelay() > 0) {
-            Via.getPlatform().runRepeatingSync(new TabCompleteThread(), 1L);
-        }
     }
 
     private int getNewSoundID(final int oldID) {
