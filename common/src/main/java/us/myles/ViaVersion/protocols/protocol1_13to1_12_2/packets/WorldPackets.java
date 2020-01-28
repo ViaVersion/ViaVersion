@@ -12,13 +12,13 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
-import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
@@ -264,7 +264,7 @@ public class WorldPackets {
                         public void handle(PacketWrapper wrapper) throws Exception {
                             int x = wrapper.passthrough(Type.INT);
                             int z = wrapper.passthrough(Type.INT);
-                            ConnectionData.getProvider().unloadChunk(wrapper.user(), x, z);
+                            ConnectionData.blockConnectionProvider.unloadChunk(wrapper.user(), x, z);
                         }
                     });
                 }
@@ -355,7 +355,7 @@ public class WorldPackets {
                                         for (int x = 0; x < 16; x++) {
                                             int block = section.getFlatBlock(x, y, z);
                                             if (ConnectionData.isWelcome(block)) {
-                                                ConnectionData.getProvider().storeBlock(wrapper.user(), x + (chunk.getX() << 4),
+                                                ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), x + (chunk.getX() << 4),
                                                         y + (i << 4),
                                                         z + (chunk.getZ() << 4),
                                                         block);

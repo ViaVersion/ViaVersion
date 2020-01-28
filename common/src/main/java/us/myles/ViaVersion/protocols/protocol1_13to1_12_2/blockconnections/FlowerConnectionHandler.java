@@ -12,7 +12,7 @@ import java.util.Set;
 
 
 public class FlowerConnectionHandler extends ConnectionHandler {
-    private static Map<Integer, Integer> flowers = new HashMap<>();
+    private static final Map<Integer, Integer> flowers = new HashMap<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> baseFlower = new HashSet<>();
@@ -24,15 +24,12 @@ public class FlowerConnectionHandler extends ConnectionHandler {
         baseFlower.add("minecraft:lilac");
 
         final FlowerConnectionHandler handler = new FlowerConnectionHandler();
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                if (baseFlower.contains(blockData.getMinecraftKey())) {
-                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
-                    if (blockData.getValue("half").equals("lower")) {
-                        blockData.set("half", "upper");
-                        flowers.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
-                    }
+        return blockData -> {
+            if (baseFlower.contains(blockData.getMinecraftKey())) {
+                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                if (blockData.getValue("half").equals("lower")) {
+                    blockData.set("half", "upper");
+                    flowers.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
                 }
             }
         };
@@ -41,14 +38,15 @@ public class FlowerConnectionHandler extends ConnectionHandler {
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
-        if (flowers.containsKey(blockBelowId)) {
+        Integer connectBelow = flowers.get(blockBelowId);
+        if (connectBelow != null) {
             int blockAboveId = getBlockData(user, position.getRelative(BlockFace.TOP));
             if (Via.getConfig().isStemWhenBlockAbove()) {
                 if (blockAboveId == 0) {
-                    return flowers.get(blockBelowId);
+                    return connectBelow;
                 }
             } else if (!flowers.containsKey(blockAboveId)) {
-                return flowers.get(blockBelowId);
+                return connectBelow;
             }
         }
         return blockState;

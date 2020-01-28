@@ -10,22 +10,19 @@ import java.util.Map;
 import java.util.Set;
 
 public class RedstoneConnectionHandler extends ConnectionHandler {
-    private static Set<Integer> redstone = new HashSet<>();
-    private static Map<Short, Integer> connectedBlockStates = new HashMap<>();
-    private static Map<Integer, Integer> powerMappings = new HashMap<>();
+    private static final Set<Integer> redstone = new HashSet<>();
+    private static final Map<Short, Integer> connectedBlockStates = new HashMap<>();
+    private static final Map<Integer, Integer> powerMappings = new HashMap<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final RedstoneConnectionHandler connectionHandler = new RedstoneConnectionHandler();
         final String redstoneKey = "minecraft:redstone_wire";
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                if (!redstoneKey.equals(blockData.getMinecraftKey())) return;
-                redstone.add(blockData.getSavedBlockStateId());
-                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
-                connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
-                powerMappings.put(blockData.getSavedBlockStateId(), Integer.valueOf(blockData.getValue("power")));
-            }
+        return blockData -> {
+            if (!redstoneKey.equals(blockData.getMinecraftKey())) return;
+            redstone.add(blockData.getSavedBlockStateId());
+            ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
+            connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
+            powerMappings.put(blockData.getSavedBlockStateId(), Integer.valueOf(blockData.getValue("power")));
         };
     }
 

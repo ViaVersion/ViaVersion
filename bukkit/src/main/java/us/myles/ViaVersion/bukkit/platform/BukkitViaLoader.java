@@ -24,6 +24,7 @@ import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
@@ -143,7 +144,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_13.getId()) {
             if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")) {
-                Via.getManager().getProviders().use(BlockConnectionProvider.class, new BukkitBlockConnectionProvider());
+                BukkitBlockConnectionProvider blockConnectionProvider = new BukkitBlockConnectionProvider();
+                Via.getManager().getProviders().use(BlockConnectionProvider.class, blockConnectionProvider);
+                ConnectionData.blockConnectionProvider = blockConnectionProvider;
             }
         }
     }

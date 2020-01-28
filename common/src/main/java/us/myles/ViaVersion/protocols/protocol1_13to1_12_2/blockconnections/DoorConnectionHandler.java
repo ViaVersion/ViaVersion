@@ -1,21 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class DoorConnectionHandler extends ConnectionHandler {
-    private static Map<Integer, DoorData> doorDataMap = new HashMap<>();
-    private static Map<Short, Integer> connectedStates = new HashMap<>();
+    private static final Map<Integer, DoorData> doorDataMap = new HashMap<>();
+    private static final Map<Short, Integer> connectedStates = new HashMap<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final List<String> baseDoors = new LinkedList<>();
@@ -28,29 +21,26 @@ public class DoorConnectionHandler extends ConnectionHandler {
         baseDoors.add("minecraft:iron_door");
 
         final DoorConnectionHandler connectionHandler = new DoorConnectionHandler();
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                int type = baseDoors.indexOf(blockData.getMinecraftKey());
-                if (type == -1) return;
+        return blockData -> {
+            int type = baseDoors.indexOf(blockData.getMinecraftKey());
+            if (type == -1) return;
 
-                int id = blockData.getSavedBlockStateId();
+            int id = blockData.getSavedBlockStateId();
 
-                DoorData doorData = new DoorData(
-                        blockData.getValue("half").equals("lower"),
-                        blockData.getValue("hinge").equals("right"),
-                        blockData.getValue("powered").equals("true"),
-                        blockData.getValue("open").equals("true"),
-                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)),
-                        type
-                );
+            DoorData doorData = new DoorData(
+                    blockData.getValue("half").equals("lower"),
+                    blockData.getValue("hinge").equals("right"),
+                    blockData.getValue("powered").equals("true"),
+                    blockData.getValue("open").equals("true"),
+                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)),
+                    type
+            );
 
-                doorDataMap.put(id, doorData);
+            doorDataMap.put(id, doorData);
 
-                connectedStates.put(getStates(doorData), id);
+            connectedStates.put(getStates(doorData), id);
 
-                ConnectionData.connectionHandlerMap.put(id, connectionHandler);
-            }
+            ConnectionData.connectionHandlerMap.put(id, connectionHandler);
         };
     }
 
@@ -87,16 +77,47 @@ public class DoorConnectionHandler extends ConnectionHandler {
             if (doorData.isRightHinge()) s |= 8;
             s |= lowerHalf.getFacing().ordinal() << 4;
         }
+
         Integer newBlockState = connectedStates.get(s);
         return newBlockState == null ? blockState : newBlockState;
     }
 
-    @AllArgsConstructor
-    @Getter
-    @ToString
-    private static class DoorData {
+    private static final class DoorData {
         private final boolean lower, rightHinge, powered, open;
         private final BlockFace facing;
-        private int type;
+        private final int type;
+
+        private DoorData(boolean lower, boolean rightHinge, boolean powered, boolean open, BlockFace facing, int type) {
+            this.lower = lower;
+            this.rightHinge = rightHinge;
+            this.powered = powered;
+            this.open = open;
+            this.facing = facing;
+            this.type = type;
+        }
+
+        public boolean isLower() {
+            return lower;
+        }
+
+        public boolean isRightHinge() {
+            return rightHinge;
+        }
+
+        public boolean isPowered() {
+            return powered;
+        }
+
+        public boolean isOpen() {
+            return open;
+        }
+
+        public BlockFace getFacing() {
+            return facing;
+        }
+
+        public int getType() {
+            return type;
+        }
     }
 }

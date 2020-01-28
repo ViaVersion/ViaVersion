@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class ConnectionData {
+    private static final BlockChangeRecord[] A = new BlockChangeRecord[0];
+    public static BlockConnectionProvider blockConnectionProvider;
     static Map<Integer, String> idToKey = new HashMap<>();
     static Map<String, Integer> keyToId = new HashMap<>();
     static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
@@ -28,10 +30,9 @@ public class ConnectionData {
     static Set<Integer> occludingStates = new HashSet<>();
 
     public static void update(UserConnection user, Position position) {
-        BlockConnectionProvider connectionProvider = Via.getManager().getProviders().get(BlockConnectionProvider.class);
         for (BlockFace face : BlockFace.values()) {
             Position pos = position.getRelative(face);
-            int blockState = connectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
+            int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) continue;
 
@@ -112,7 +113,7 @@ public class ConnectionData {
                     PacketWrapper wrapper = new PacketWrapper(0x0F, null, user);
                     wrapper.write(Type.INT, chunkX + chunkDeltaX);
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
-                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(new BlockChangeRecord[0]));
+                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(A));
                     try {
                         wrapper.send(Protocol1_13To1_12_2.class, true, true);
                     } catch (Exception e) {
@@ -124,7 +125,7 @@ public class ConnectionData {
     }
 
     public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
-        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
+        int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
         ConnectionHandler handler = getConnectionHandler(blockState);
         if (handler == null) return;
 
@@ -132,26 +133,22 @@ public class ConnectionData {
         records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY(), newBlockState));
     }
 
-    public static BlockConnectionProvider getProvider() {
-        return Via.getManager().getProviders().get(BlockConnectionProvider.class);
-    }
-
     public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {
         if (!needStoreBlocks()) return;
         if (ConnectionData.isWelcome(blockState)) {
-            ConnectionData.getProvider().storeBlock(userConnection, x, y, z, blockState);
+            blockConnectionProvider.storeBlock(userConnection, x, y, z, blockState);
         } else {
-            ConnectionData.getProvider().removeBlock(userConnection, x, y, z);
+            blockConnectionProvider.removeBlock(userConnection, x, y, z);
         }
     }
 
     public static void clearBlockStorage(UserConnection connection) {
         if (!needStoreBlocks()) return;
-        getProvider().clearStorage(connection);
+        blockConnectionProvider.clearStorage(connection);
     }
 
     public static boolean needStoreBlocks() {
-        return getProvider().storesBlocks();
+        return blockConnectionProvider.storesBlocks();
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
@@ -260,7 +257,8 @@ public class ConnectionData {
         }
 
         if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")) {
-            Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
+            blockConnectionProvider = new PacketBlockConnectionProvider();
+            Via.getManager().getProviders().register(BlockConnectionProvider.class, blockConnectionProvider);
         }
     }
 
@@ -289,6 +287,7 @@ public class ConnectionData {
         return idToKey.get(id);
     }
 
+    @FunctionalInterface
     interface ConnectorInitAction {
 
         void check(WrappedBlockData blockData);
