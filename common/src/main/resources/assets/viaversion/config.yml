@@ -118,6 +118,8 @@ disable-1_13-auto-complete: false
 1_13-tab-complete-delay: 0
 # For 1.13 clients the smallest (1 layer) snow doesn't have collision, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
 fix-low-snow-collision: false
+# Infested blocks are instantly breakable for 1.13+ clients, resulting in them being unable to break them on sub 1.13 servers. This remaps them to their normal stone variants
+fix-infested-block-breaking: true
 # In 1.14 the client page limit has been upped to 100 (from 50). Some anti-exploit plugins ban when clients go higher than 50. This option cuts edited books to 50 pages.
 truncate-1_14-books: false
 # This prevents clients using 1.9-1.13 on 1.8 servers from receiving no knockback/having velocity bugs whilst sneaking under a block.

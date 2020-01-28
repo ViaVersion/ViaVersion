@@ -304,6 +304,13 @@ public interface ViaVersionConfig {
     boolean isSnowCollisionFix();
 
     /**
+     * When activated, infested blocks will be mapped to their normal stone variants for 1.13+ clients.
+     *
+     * @return True if enabled
+     */
+    boolean isInfestedBlocksFix();
+
+    /**
      * When greater than 0, enables tab complete request delaying by x ticks
      *
      * @return the delay in ticks

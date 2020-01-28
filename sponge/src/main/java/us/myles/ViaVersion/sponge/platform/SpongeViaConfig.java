@@ -252,6 +252,11 @@ public class SpongeViaConfig extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isInfestedBlocksFix() {
+        return getBoolean("fix-infested-block-breaking", true);
+    }
+
+    @Override
     public int get1_13TabCompleteDelay() {
         return getInt("1_13-tab-complete-delay", 0);
     }
