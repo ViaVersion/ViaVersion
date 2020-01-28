@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -13,27 +12,23 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
-    private final String blockConnections;
-    @Getter
-    private Set<Integer> blockStates = new HashSet<>();
-    private Map<Byte, Integer> connectedBlockStates = new HashMap<>();
     private static final StairConnectionHandler STAIR_CONNECTION_HANDLER = new StairConnectionHandler();
+    private final String blockConnections;
+    private final Set<Integer> blockStates = new HashSet<>();
+    private final Map<Byte, Integer> connectedBlockStates = new HashMap<>();
 
-    public AbstractFenceConnectionHandler(String blockConnections) {
+    protected AbstractFenceConnectionHandler(String blockConnections) {
         this.blockConnections = blockConnections;
     }
 
     public ConnectionData.ConnectorInitAction getInitAction(final String key) {
         final AbstractFenceConnectionHandler handler = this;
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                if (key.equals(blockData.getMinecraftKey())) {
-                    if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) return;
-                    blockStates.add(blockData.getSavedBlockStateId());
-                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
-                    connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
-                }
+        return blockData -> {
+            if (key.equals(blockData.getMinecraftKey())) {
+                if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) return;
+                blockStates.add(blockData.getSavedBlockStateId());
+                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
             }
         };
     }
@@ -69,8 +64,14 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     }
 
     protected boolean connects(BlockFace side, int blockState, boolean pre1_12) {
-        return blockStates.contains(blockState) || blockConnections != null
-                && ConnectionData.blockConnectionData.containsKey(blockState)
-                && ConnectionData.blockConnectionData.get(blockState).connectsTo(blockConnections, side.opposite(), pre1_12);
+        if (blockStates.contains(blockState)) return true;
+        if (blockConnections == null) return false;
+
+        BlockData blockData = ConnectionData.blockConnectionData.get(blockState);
+        return blockData != null && blockData.connectsTo(blockConnections, side.opposite(), pre1_12);
+    }
+
+    public Set<Integer> getBlockStates() {
+        return blockStates;
     }
 }

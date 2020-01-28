@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockData {
-    private Map<String, boolean[]> connectData = new HashMap<>();
+    private final Map<String, boolean[]> connectData = new HashMap<>();
 
     public void put(String key, boolean[] booleans) {
         connectData.put(key, booleans);

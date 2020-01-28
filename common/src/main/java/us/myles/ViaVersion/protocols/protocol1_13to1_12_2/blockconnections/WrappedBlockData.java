@@ -1,17 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 public class WrappedBlockData {
-    @Getter
-    private String minecraftKey;
-    @Getter
-    private int savedBlockStateId;
-    private LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
+    private final String minecraftKey;
+    private final int savedBlockStateId;
+    private final LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
 
     public static WrappedBlockData fromString(String s) {
         String[] array = s.split("\\[");
@@ -43,12 +40,21 @@ public class WrappedBlockData {
         this.savedBlockStateId = savedBlockStateId;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(minecraftKey + "[");
         for (Entry<String, String> entry : blockData.entrySet()) {
             sb.append(entry.getKey()).append('=').append(entry.getValue()).append(',');
         }
-        return sb.substring(0, sb.length()-1) + "]";
+        return sb.substring(0, sb.length() - 1) + "]";
+    }
+
+    public String getMinecraftKey() {
+        return minecraftKey;
+    }
+
+    public int getSavedBlockStateId() {
+        return savedBlockStateId;
     }
 
     public int getBlockStateId() {
@@ -56,7 +62,8 @@ public class WrappedBlockData {
     }
 
     public WrappedBlockData set(String data, Object value) {
-        if (!hasData(data)) throw new UnsupportedOperationException("No blockdata found for " + data + " at " + minecraftKey);
+        if (!hasData(data))
+            throw new UnsupportedOperationException("No blockdata found for " + data + " at " + minecraftKey);
         blockData.put(data, value.toString());
         return this;
     }

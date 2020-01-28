@@ -1,21 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class StairConnectionHandler extends ConnectionHandler {
-    private static Map<Integer, StairData> stairDataMap = new HashMap<>();
-    private static Map<Short, Integer> connectedBlocks = new HashMap<>();
+    private static final Map<Integer, StairData> stairDataMap = new HashMap<>();
+    private static final Map<Short, Integer> connectedBlocks = new HashMap<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final List<String> baseStairs = new LinkedList<>();
@@ -38,35 +31,43 @@ public class StairConnectionHandler extends ConnectionHandler {
         baseStairs.add("minecraft:dark_prismarine_stairs");
 
         final StairConnectionHandler connectionHandler = new StairConnectionHandler();
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                int type = baseStairs.indexOf(blockData.getMinecraftKey());
-                if (type == -1) return;
+        return blockData -> {
+            int type = baseStairs.indexOf(blockData.getMinecraftKey());
+            if (type == -1) return;
 
-                if (blockData.getValue("waterlogged").equals("true")) return;
+            if (blockData.getValue("waterlogged").equals("true")) return;
 
-                byte shape;
-                switch (blockData.getValue("shape")) {
-                    case "straight": shape = 0; break;
-                    case "inner_left": shape = 1; break;
-                    case "inner_right": shape = 2; break;
-                    case "outer_left": shape = 3; break;
-                    case "outer_right": shape = 4; break;
-                    default: return;
-                }
-
-                StairData stairData = new StairData(
-                        blockData.getValue("half").equals("bottom"),
-                        shape, (byte) type,
-                        BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT))
-                );
-
-                stairDataMap.put(blockData.getSavedBlockStateId(), stairData);
-                connectedBlocks.put(getStates(stairData), blockData.getSavedBlockStateId());
-
-                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
+            byte shape;
+            switch (blockData.getValue("shape")) {
+                case "straight":
+                    shape = 0;
+                    break;
+                case "inner_left":
+                    shape = 1;
+                    break;
+                case "inner_right":
+                    shape = 2;
+                    break;
+                case "outer_left":
+                    shape = 3;
+                    break;
+                case "outer_right":
+                    shape = 4;
+                    break;
+                default:
+                    return;
             }
+
+            StairData stairData = new StairData(
+                    blockData.getValue("half").equals("bottom"),
+                    shape, (byte) type,
+                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT))
+            );
+
+            stairDataMap.put(blockData.getSavedBlockStateId(), stairData);
+            connectedBlocks.put(getStates(stairData), blockData.getSavedBlockStateId());
+
+            ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
         };
     }
 
@@ -136,12 +137,32 @@ public class StairConnectionHandler extends ConnectionHandler {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    @ToString
-    private static class StairData {
+    private static final class StairData {
         private final boolean bottom;
         private final byte shape, type;
         private final BlockFace facing;
+
+        private StairData(boolean bottom, byte shape, byte type, BlockFace facing) {
+            this.bottom = bottom;
+            this.shape = shape;
+            this.type = type;
+            this.facing = facing;
+        }
+
+        public boolean isBottom() {
+            return bottom;
+        }
+
+        public byte getShape() {
+            return shape;
+        }
+
+        public byte getType() {
+            return type;
+        }
+
+        public BlockFace getFacing() {
+            return facing;
+        }
     }
 }
