@@ -92,7 +92,7 @@ public class EntityPackets {
         });
 
         // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x35);
+        metadataRewriter.registerEntityDestroy(0x35, 0x35);
 
         // Metadata packet
         metadataRewriter.registerMetadataRewriter(0x3F, 0x3F, Types1_13.METADATA_LIST);

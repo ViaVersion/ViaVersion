@@ -161,7 +161,7 @@ public class Protocol1_11To1_10 extends Protocol {
         });
 
         // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x30);
+        metadataRewriter.registerEntityDestroy(0x30, 0x30);
 
         // Title packet
         registerOutgoing(State.PLAY, 0x45, 0x45, new PacketRemapper() {
@@ -264,42 +264,10 @@ public class Protocol1_11To1_10 extends Protocol {
         });
 
         // Join (save dimension id)
-        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerJoinGame(0x23, 0x23, null);
 
         // Respawn (save dimension id)
-        registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Dimension ID
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerRespawn(0x33, 0x33);
 
         /*
             INCOMING PACKETS

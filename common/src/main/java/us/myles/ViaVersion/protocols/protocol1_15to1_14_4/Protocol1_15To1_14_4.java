@@ -238,15 +238,6 @@ public class Protocol1_15To1_14_4 extends Protocol {
         registerOutgoing(State.PLAY, 0x59, 0x5A);
     }
 
-    public static int getNewSoundId(int id) {
-        int newId = MappingData.soundMappings.getNewId(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.15 sound for 1.14.4 sound " + id);
-            return 0;
-        }
-        return newId;
-    }
-
     public static int getNewBlockStateId(int id) {
         int newId = MappingData.blockStateMappings.getNewId(id);
         if (newId == -1) {

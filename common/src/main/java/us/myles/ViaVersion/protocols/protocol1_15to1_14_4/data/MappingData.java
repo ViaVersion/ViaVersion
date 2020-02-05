@@ -14,12 +14,12 @@ public class MappingData {
     public static Mappings soundMappings;
 
     public static void init() {
+        JsonObject diffmapping = MappingDataLoader.loadData("mappingdiff-1.14to1.15.json");
         JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json");
-        JsonObject mapping1_14_4 = MappingDataLoader.loadData("mapping-1.14.4.json");
         JsonObject mapping1_15 = MappingDataLoader.loadData("mapping-1.15.json");
 
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 blockstate mapping...");
-        blockStateMappings = new Mappings(mapping1_14.getAsJsonObject("blockstates"), mapping1_15.getAsJsonObject("blockstates"), mapping1_14_4.getAsJsonObject("blockstates"));
+        blockStateMappings = new Mappings(mapping1_14.getAsJsonObject("blockstates"), mapping1_15.getAsJsonObject("blockstates"), diffmapping.getAsJsonObject("blockstates"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 block mapping...");
         blockMappings = new Mappings(mapping1_14.getAsJsonObject("blocks"), mapping1_15.getAsJsonObject("blocks"));
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 item mapping...");
