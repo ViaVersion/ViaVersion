@@ -2,12 +2,13 @@ package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
 public class EntityIdRewriter {
-    private static BiMap<String, String> oldToNewNames = HashBiMap.create();
+    private static final BiMap<String, String> oldToNewNames = HashBiMap.create();
 
     static {
         oldToNewNames.put("AreaEffectCloud", "minecraft:area_effect_cloud");
@@ -88,9 +89,14 @@ public class EntityIdRewriter {
     }
 
     public static void toClient(CompoundTag tag) {
-        if (tag.get("id") instanceof StringTag) {
-            StringTag id = tag.get("id");
-            String newName = oldToNewNames.get(id.getValue());
+        toClient(tag, false);
+    }
+
+    public static void toClient(CompoundTag tag, boolean backwards) {
+        Tag idTag = tag.get("id");
+        if (idTag instanceof StringTag) {
+            StringTag id = (StringTag) idTag;
+            String newName = backwards ? oldToNewNames.inverse().get(id.getValue()) : oldToNewNames.get(id.getValue());
             if (newName != null) {
                 id.setValue(newName);
             }
@@ -98,43 +104,54 @@ public class EntityIdRewriter {
     }
 
     public static void toClientSpawner(CompoundTag tag) {
-        if (tag != null && tag.contains("SpawnData")) {
-            CompoundTag spawnData = tag.get("SpawnData");
-            if (spawnData != null && spawnData.contains("id"))
-                toClient(spawnData);
+        toClientSpawner(tag, false);
+    }
+
+    public static void toClientSpawner(CompoundTag tag, boolean backwards) {
+        if (tag == null) return;
+
+        Tag spawnDataTag = tag.get("SpawnData");
+        if (spawnDataTag != null) {
+            toClient((CompoundTag) spawnDataTag, backwards);
         }
     }
 
     public static void toClientItem(Item item) {
+        toClientItem(item, false);
+    }
+
+    public static void toClientItem(Item item, boolean backwards) {
         if (hasEntityTag(item)) {
-            CompoundTag entityTag = item.getTag().get("EntityTag");
-            toClient(entityTag);
+            toClient(item.getTag().get("EntityTag"), backwards);
         }
         if (item != null && item.getAmount() <= 0) item.setAmount((byte) 1);
     }
 
     public static void toServerItem(Item item) {
-        if (hasEntityTag(item)) {
-            CompoundTag entityTag = item.getTag().get("EntityTag");
-            if (entityTag.get("id") instanceof StringTag) {
-                StringTag id = entityTag.get("id");
-                String newName = oldToNewNames.inverse().get(id.getValue());
-                if (newName != null) {
-                    id.setValue(newName);
-                }
+        toServerItem(item, false);
+    }
+
+    public static void toServerItem(Item item, boolean backwards) {
+        if (!hasEntityTag(item)) return;
+
+        CompoundTag entityTag = item.getTag().get("EntityTag");
+        Tag idTag = entityTag.get("id");
+        if (idTag instanceof StringTag) {
+            StringTag id = (StringTag) idTag;
+            String newName = backwards ? oldToNewNames.get(id.getValue()) : oldToNewNames.inverse().get(id.getValue());
+            if (newName != null) {
+                id.setValue(newName);
             }
         }
     }
 
     private static boolean hasEntityTag(Item item) {
-        if (item != null && item.getIdentifier() == 383) { // Monster Egg
-            CompoundTag tag = item.getTag();
-            if (tag != null && tag.contains("EntityTag") && tag.get("EntityTag") instanceof CompoundTag) {
-                if (((CompoundTag) tag.get("EntityTag")).get("id") instanceof StringTag) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        if (item == null || item.getIdentifier() != 383) return false; // Monster Egg
+
+        CompoundTag tag = item.getTag();
+        if (tag == null) return false;
+
+        Tag entityTag = tag.get("EntityTag");
+        return entityTag instanceof CompoundTag && ((CompoundTag) entityTag).get("id") instanceof StringTag;
     }
 }
