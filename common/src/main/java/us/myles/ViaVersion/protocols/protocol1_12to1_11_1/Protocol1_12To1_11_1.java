@@ -141,24 +141,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
         });
 
         // Join Packet
-        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerJoinGame(0x23, 0x23, null);
 
         // 0x28 moved to 0x25
         registerOutgoing(State.PLAY, 0x28, 0x25);
@@ -172,23 +155,9 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
         registerOutgoing(State.PLAY, 0x31, 0x32);
         registerOutgoing(State.PLAY, 0x32, 0x33);
+
         // Respawn Packet
-        registerOutgoing(State.PLAY, 0x33, 0x34, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Dimension ID
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
-                });
-            }
-        });
+        metadataRewriter.registerRespawn(0x33, 0x34);
 
         registerOutgoing(State.PLAY, 0x34, 0x35);
         // New packet at 0x36

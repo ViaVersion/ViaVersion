@@ -36,7 +36,7 @@ public class EntityPackets {
         });
 
         // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x37);
+        metadataRewriter.registerEntityDestroy(0x37, 0x37);
 
         // Spawn Player
         protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
