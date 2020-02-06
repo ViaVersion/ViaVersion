@@ -52,6 +52,13 @@ public class WorldPackets {
 
         // Spawn Particle
         blockRewriter.registerSpawnParticle(Type.DOUBLE, 0x24, 0x24, 3, 23, 32,
-                Protocol1_16To1_15_2::getNewBlockStateId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
+                WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
+    }
+
+    public static int getNewParticleId(int id) {
+        if (id >= 27) {
+            id += 1; // soul flame
+        }
+        return id;
     }
 }
