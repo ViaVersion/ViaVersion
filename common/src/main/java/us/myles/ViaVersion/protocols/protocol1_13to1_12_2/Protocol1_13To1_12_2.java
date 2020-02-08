@@ -339,9 +339,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
+
         // InventoryPackets 0x14 -> 0x15
         // InventoryPackets 0x15 -> 0x16
         // InventoryPackets 0x16 -> 0x17
+
         // Set cooldown
         registerOutgoing(State.PLAY, 0x17, 0x18, new PacketRemapper() {
             @Override
