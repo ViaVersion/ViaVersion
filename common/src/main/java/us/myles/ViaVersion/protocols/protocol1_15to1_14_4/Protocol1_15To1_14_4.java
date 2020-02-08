@@ -171,7 +171,6 @@ public class Protocol1_15To1_14_4 extends Protocol {
 
         registerOutgoing(State.PLAY, 0x15, 0x16);
 
-        registerOutgoing(State.PLAY, 0x17, 0x18);
         registerOutgoing(State.PLAY, 0x18, 0x19);
         registerOutgoing(State.PLAY, 0x19, 0x1A);
         registerOutgoing(State.PLAY, 0x1A, 0x1B);

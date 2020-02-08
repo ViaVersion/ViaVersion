@@ -93,22 +93,6 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Set cooldown
-        registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Item
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0,
-                                InventoryPackets.getNewItemId(wrapper.get(Type.VAR_INT, 0))
-                        );
-                    }
-                });
-            }
-        });
-
         // Boss bar
         registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
             @Override

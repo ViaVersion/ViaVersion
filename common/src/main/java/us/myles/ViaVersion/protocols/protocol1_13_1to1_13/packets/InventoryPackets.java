@@ -14,6 +14,9 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
+        // Set cooldown
+        itemRewriter.registerSetCooldown(0x18, 0x18, InventoryPackets::getNewItemId);
+
         // Set slot packet
         itemRewriter.registerSetSlot(Type.FLAT_ITEM, 0x17, 0x17);
 

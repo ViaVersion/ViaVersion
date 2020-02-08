@@ -28,6 +28,9 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
+        // Set cooldown
+        itemRewriter.registerSetCooldown(0x18, 0x17, InventoryPackets::getNewItemId);
+
         // Open Inventory
         protocol.registerOutgoing(State.PLAY, 0x14, -1, new PacketRemapper() {
             @Override
