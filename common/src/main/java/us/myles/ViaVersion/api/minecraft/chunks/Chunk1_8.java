@@ -1,14 +1,12 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Chunk1_8 extends BaseChunk {
-    @Getter
-    private boolean unloadPacket = false;
+    private boolean unloadPacket;
 
     public Chunk1_8(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
         super(x, z, groundUp, bitmask, sections, biomeData, blockEntities);
@@ -21,7 +19,7 @@ public class Chunk1_8 extends BaseChunk {
      * @param z coord
      */
     public Chunk1_8(int x, int z) {
-        this(x, z, true, 0, new ChunkSection[16], null, new ArrayList<CompoundTag>());
+        this(x, z, true, 0, new ChunkSection[16], null, new ArrayList<>());
         this.unloadPacket = true;
     }
 
@@ -37,5 +35,9 @@ public class Chunk1_8 extends BaseChunk {
     @Override
     public boolean isBiomeData() {
         return biomeData != null;
+    }
+
+    public boolean isUnloadPacket() {
+        return unloadPacket;
     }
 }
