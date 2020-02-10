@@ -3,7 +3,6 @@ package us.myles.ViaVersion.boss;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
@@ -19,14 +18,14 @@ import java.util.*;
 
 @Getter
 public abstract class CommonBoss<T> extends BossBar<T> {
-    private UUID uuid;
+    private final UUID uuid;
     private String title;
     private float health;
     private BossColor color;
     private BossStyle style;
-    private Set<UUID> players;
+    private final Set<UUID> players;
     private boolean visible;
-    private Set<BossFlag> flags;
+    private final Set<BossFlag> flags;
 
     public CommonBoss(String title, float health, BossColor color, BossStyle style) {
         Preconditions.checkNotNull(title, "Title cannot be null");
@@ -217,8 +216,6 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         return bitmask;
     }
 
-    @RequiredArgsConstructor
-    @Getter
     private enum UpdateAction {
         ADD(0),
         REMOVE(1),
@@ -228,5 +225,13 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         UPDATE_FLAGS(5);
 
         private final int id;
+
+        UpdateAction(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
     }
 }

@@ -1,14 +1,11 @@
 package us.myles.ViaVersion.api;
 
 import com.google.common.base.Preconditions;
-import lombok.Getter;
 import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 
 public class Via {
-    @Getter
     private static ViaPlatform platform;
-    @Getter
     private static ViaManager manager;
 
     /**
@@ -41,5 +38,13 @@ public class Via {
     public static ViaVersionConfig getConfig() {
         Preconditions.checkArgument(platform != null, "ViaVersion has not loaded the Platform");
         return Via.platform.getConf();
+    }
+
+    public static ViaPlatform getPlatform() {
+        return platform;
+    }
+
+    public static ViaManager getManager() {
+        return manager;
     }
 }

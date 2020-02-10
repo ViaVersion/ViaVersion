@@ -5,8 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
@@ -174,12 +172,7 @@ public class BaseProtocol1_7 extends Protocol {
 
                             // Send and close
                             ChannelFuture future = disconnectPacket.sendFuture(BaseProtocol.class);
-                            future.addListener(new GenericFutureListener<Future<? super Void>>() {
-                                @Override
-                                public void operationComplete(Future<? super Void> future) throws Exception {
-                                    wrapper.user().getChannel().close();
-                                }
-                            });
+                            future.addListener(f -> wrapper.user().getChannel().close());
                         }
                     }
                 });

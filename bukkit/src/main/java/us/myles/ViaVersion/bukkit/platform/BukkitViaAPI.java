@@ -1,18 +1,15 @@
 package us.myles.ViaVersion.bukkit.platform;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.ViaVersionAPI;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.command.ViaVersionCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.boss.ViaBossBar;
@@ -24,15 +21,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-@AllArgsConstructor
-public class BukkitViaAPI implements ViaAPI<Player>, ViaVersionAPI {
+public class BukkitViaAPI implements ViaAPI<Player> {
     private final ViaVersionPlugin plugin;
+
+    public BukkitViaAPI(ViaVersionPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public int getPlayerVersion(@NonNull Player player) {
-        if (!isPorted(player))
-            return getExternalVersion(player);
-        return getPortedPlayers().get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
+        return getPlayerVersion(player.getUniqueId());
     }
 
     @Override
@@ -48,11 +46,6 @@ public class BukkitViaAPI implements ViaAPI<Player>, ViaVersionAPI {
         } else {
             return ProtocolSupportUtil.getProtocolVersion(player);
         }
-    }
-
-    @Override
-    public boolean isPorted(Player player) {
-        return isPorted(player.getUniqueId());
     }
 
     @Override
@@ -88,16 +81,6 @@ public class BukkitViaAPI implements ViaAPI<Player>, ViaVersionAPI {
     }
 
     @Override
-    public boolean isDebug() {
-        return Via.getManager().isDebug();
-    }
-
-    @Override
-    public ViaVersionCommand getCommandHandler() {
-        return Via.getManager().getCommandHandler();
-    }
-
-    @Override
     public SortedSet<Integer> getSupportedVersions() {
         SortedSet<Integer> outputSet = new TreeSet<>(ProtocolRegistry.getSupportedVersions());
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
@@ -105,18 +88,21 @@ public class BukkitViaAPI implements ViaAPI<Player>, ViaVersionAPI {
         return outputSet;
     }
 
-    @Override
+    /**
+     * Returns if this version is a compatibility build for spigot.
+     * Eg. 1.9.1 / 1.9.2 allow certain versions to connect
+     *
+     * @return true if compat Spigot build
+     */
     public boolean isCompatSpigotBuild() {
         return plugin.isCompatSpigotBuild();
     }
 
-
-    @Override
-    public boolean isSpigot() {
-        return plugin.isSpigot();
-    }
-
-    @Override
+    /**
+     * Returns if ProtocolSupport is also being used.
+     *
+     * @return true if ProtocolSupport is used
+     */
     public boolean isProtocolSupport() {
         return plugin.isProtocolSupport();
     }

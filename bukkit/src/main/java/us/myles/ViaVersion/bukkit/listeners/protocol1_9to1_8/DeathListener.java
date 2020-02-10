@@ -8,7 +8,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
@@ -22,7 +21,7 @@ public class DeathListener extends ViaBukkitListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent e) {
         Player p = e.getEntity();
-        if (isOnPipe(p) && ViaVersion.getConfig().isShowNewDeathMessages() && checkGamerule(p.getWorld()) && e.getDeathMessage() != null)
+        if (isOnPipe(p) && Via.getConfig().isShowNewDeathMessages() && checkGamerule(p.getWorld()) && e.getDeathMessage() != null)
             sendPacket(p, e.getDeathMessage());
     }
 

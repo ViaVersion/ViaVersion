@@ -5,7 +5,6 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.packets.PacketType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
@@ -84,55 +83,23 @@ public class ProtocolPipeline extends Protocol {
 
         if (Via.getManager().isDebug()) {
             // Debug packet
-            String packet = "UNKNOWN";
-
-
             int serverProtocol = userConnection.get(ProtocolInfo.class).getServerProtocolVersion();
             int clientProtocol = userConnection.get(ProtocolInfo.class).getProtocolVersion();
-
-            // For 1.8/1.9 server version, eventually we'll probably get an API for this...
-            if (serverProtocol >= ProtocolVersion.v1_8.getId() &&
-                    serverProtocol <= ProtocolVersion.v1_9_3.getId()) {
-                PacketType type;
-                if (serverProtocol <= ProtocolVersion.v1_8.getId()) {
-                    if (direction == Direction.INCOMING) {
-                        type = PacketType.findNewPacket(state, direction, originalID);
-                    } else {
-                        type = PacketType.findOldPacket(state, direction, originalID);
-                    }
-                } else {
-                    type = PacketType.findNewPacket(state, direction, originalID);
-                }
-                if (type != null) {
-                    // Filter :) This would be not hard coded too, sorry :(
-                    if (type == PacketType.PLAY_CHUNK_DATA) return;
-                    if (type == PacketType.PLAY_TIME_UPDATE) return;
-                    if (type == PacketType.PLAY_KEEP_ALIVE) return;
-                    if (type == PacketType.PLAY_KEEP_ALIVE_REQUEST) return;
-                    if (type == PacketType.PLAY_ENTITY_LOOK_MOVE) return;
-                    if (type == PacketType.PLAY_ENTITY_LOOK) return;
-                    if (type == PacketType.PLAY_ENTITY_RELATIVE_MOVE) return;
-                    if (type == PacketType.PLAY_PLAYER_POSITION_LOOK_REQUEST) return;
-                    if (type == PacketType.PLAY_PLAYER_LOOK_REQUEST) return;
-                    if (type == PacketType.PLAY_PLAYER_POSITION_REQUEST) return;
-
-                    packet = type.name();
-                }
-            }
-            String name = packet + "[" + clientProtocol + "]";
             ViaPlatform platform = Via.getPlatform();
 
             String actualUsername = packetWrapper.user().get(ProtocolInfo.class).getUsername();
             String username = actualUsername != null ? actualUsername + " " : "";
 
-            platform.getLogger().log(Level.INFO, "{0}{1}: {2} {3} -> {4} [{5}] Value: {6}",
+            platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} (0x{4}) -> {5} (0x{6}) [{7}] {8}",
                     new Object[]{
                             username,
                             direction,
                             state,
                             originalID,
+                            Integer.toHexString(originalID),
                             packetWrapper.getId(),
-                            name,
+                            Integer.toHexString(packetWrapper.getId()),
+                            Integer.toString(clientProtocol),
                             packetWrapper
                     });
         }

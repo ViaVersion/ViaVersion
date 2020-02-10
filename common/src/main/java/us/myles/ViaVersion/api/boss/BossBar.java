@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class BossBar<T> {
+
     /**
      * Get the current title
      *
