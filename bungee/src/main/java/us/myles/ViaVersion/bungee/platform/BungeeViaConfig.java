@@ -294,6 +294,11 @@ public class BungeeViaConfig extends Config implements ViaVersionConfig {
     }
 
     @Override
+    public boolean isVineClimbFix() {
+        return getBoolean("vine-climb-fix", false);
+    }
+
+    @Override
     public boolean isSnowCollisionFix() {
         return getBoolean("fix-low-snow-collision", false);
     }

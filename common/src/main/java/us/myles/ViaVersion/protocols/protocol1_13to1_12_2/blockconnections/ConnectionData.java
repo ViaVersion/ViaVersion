@@ -252,6 +252,10 @@ public class ConnectionData {
         initActions.addAll(ChorusPlantConnectionHandler.init());
         initActions.add(TripwireConnectionHandler.init());
         initActions.add(SnowyGrassConnectionHandler.init());
+        if (Via.getConfig().isVineClimbFix()) {
+            initActions.add(VineConnectionHandler.init());
+        }
+
         for (String key : keyToId.keySet()) {
             WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(key);
             for (ConnectorInitAction action : initActions) {

@@ -135,7 +135,7 @@ fix-1_14-health-nan: true
 # Should 1.15+ clients respawn instantly / without showing a death screen?
 use-1_15-instant-respawn: false
 #
-# Enable serverside block-connections for 1.13+ clients
+# Enable serverside block-connections for 1.13+ clients - all of the options in this section are built around this option
 serverside-blockconnections: false
 # Sets the method for the block connections (world for highly experimental (USE AT OWN RISK) world-level or packet for packet-level)
 blockconnection-method: packet
@@ -144,6 +144,8 @@ reduce-blockstorage-memory: false
 # When activated with serverside-blockconnections, flower parts with blocks above will be sent as stems
 # Useful for lobbyservers where users can't build and those stems are used decoratively
 flowerstem-when-block-above: false
+# Vines that are not connected to blocks will be mapped to air, else 1.13+ would still be able to climb up on them.
+vine-climb-fix: false
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
