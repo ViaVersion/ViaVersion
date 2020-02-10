@@ -45,7 +45,9 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean serversideBlockConnections;
     private boolean reduceBlockStorageMemory;
     private boolean flowerStemWhenBlockAbove;
+    private boolean vineClimbFix;
     private boolean snowCollisionFix;
+    private boolean infestedBlocksFix;
     private int tabCompleteDelay;
     private boolean truncate1_14Books;
     private boolean leftHandedHandling;
@@ -100,7 +102,9 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         serversideBlockConnections = getBoolean("serverside-blockconnections", false);
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
         flowerStemWhenBlockAbove = getBoolean("flowerstem-when-block-above", false);
+        vineClimbFix = getBoolean("vine-climb-fix", false);
         snowCollisionFix = getBoolean("fix-low-snow-collision", false);
+        infestedBlocksFix = getBoolean("fix-infested-block-breaking", true);
         tabCompleteDelay = getInt("1_13-tab-complete-delay", 0);
         truncate1_14Books = getBoolean("truncate-1_14-books", false);
         leftHandedHandling = getBoolean("left-handed-handling", true);
@@ -232,7 +236,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isAutoTeam() {
         // Collision has to be enabled first
-        return isPreventCollision() && autoTeam;
+        return preventCollision && autoTeam;
     }
 
     @Override
@@ -306,8 +310,18 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
+    public boolean isVineClimbFix() {
+        return vineClimbFix;
+    }
+
+    @Override
     public boolean isSnowCollisionFix() {
         return snowCollisionFix;
+    }
+
+    @Override
+    public boolean isInfestedBlocksFix() {
+        return infestedBlocksFix;
     }
 
     @Override

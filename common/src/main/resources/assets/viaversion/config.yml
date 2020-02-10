@@ -118,6 +118,8 @@ disable-1_13-auto-complete: false
 1_13-tab-complete-delay: 0
 # For 1.13 clients the smallest (1 layer) snow doesn't have collision, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
 fix-low-snow-collision: false
+# Infested blocks are instantly breakable for 1.13+ clients, resulting in them being unable to break them on sub 1.13 servers. This remaps them to their normal stone variants
+fix-infested-block-breaking: true
 # In 1.14 the client page limit has been upped to 100 (from 50). Some anti-exploit plugins ban when clients go higher than 50. This option cuts edited books to 50 pages.
 truncate-1_14-books: false
 # This prevents clients using 1.9-1.13 on 1.8 servers from receiving no knockback/having velocity bugs whilst sneaking under a block.
@@ -133,7 +135,7 @@ fix-1_14-health-nan: true
 # Should 1.15+ clients respawn instantly / without showing a death screen?
 use-1_15-instant-respawn: false
 #
-# Enable serverside block-connections for 1.13+ clients
+# Enable serverside block-connections for 1.13+ clients - all of the options in this section are built around this option
 serverside-blockconnections: false
 # Sets the method for the block connections (world for highly experimental (USE AT OWN RISK) world-level or packet for packet-level)
 blockconnection-method: packet
@@ -142,6 +144,8 @@ reduce-blockstorage-memory: false
 # When activated with serverside-blockconnections, flower parts with blocks above will be sent as stems
 # Useful for lobbyservers where users can't build and those stems are used decoratively
 flowerstem-when-block-above: false
+# Vines that are not connected to blocks will be mapped to air, else 1.13+ would still be able to climb up on them.
+vine-climb-fix: false
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
