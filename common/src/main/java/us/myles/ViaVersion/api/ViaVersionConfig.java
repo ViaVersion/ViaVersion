@@ -297,6 +297,13 @@ public interface ViaVersionConfig {
     boolean isStemWhenBlockAbove();
 
     /**
+     * Vines not connected to any blocks will be mapped to air for 1.13+ clients to prevent them from climbing up.
+     *
+     * @return True if enabled
+     */
+    boolean isVineClimbFix();
+
+    /**
      * When activated, the 1-layer snow will be sent as 2-layer snow to 1.13+ clients to have collision.
      *
      * @return True if enabled
