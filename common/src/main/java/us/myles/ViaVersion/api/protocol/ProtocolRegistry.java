@@ -114,7 +114,6 @@ public class ProtocolRegistry {
         }
 
         if (Via.getPlatform().isPluginEnabled()) {
-            protocol.registerListeners();
             protocol.register(Via.getManager().getProviders());
             refreshVersions();
         } else {
@@ -133,7 +132,6 @@ public class ProtocolRegistry {
     public static void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
         if (Via.getPlatform().isPluginEnabled()) {
-            baseProtocol.registerListeners();
             baseProtocol.register(Via.getManager().getProviders());
             refreshVersions();
         } else {
@@ -180,7 +178,6 @@ public class ProtocolRegistry {
      */
     public static void onServerLoaded() {
         for (Protocol protocol : registerList) {
-            protocol.registerListeners();
             protocol.register(Via.getManager().getProviders());
         }
         registerList.clear();

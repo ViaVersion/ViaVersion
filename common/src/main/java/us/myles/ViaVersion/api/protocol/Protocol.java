@@ -52,16 +52,6 @@ public abstract class Protocol {
     }
 
     /**
-     * Register listeners for this protocol
-     *
-     * @deprecated No longer used as listeners are registered in {@link us.myles.ViaVersion.api.platform.ViaPlatformLoader#load}
-     */
-    @Deprecated
-    protected void registerListeners() {
-
-    }
-
-    /**
      * Handle protocol registration phase, use this to register providers / tasks.
      *
      * @param providers The current providers

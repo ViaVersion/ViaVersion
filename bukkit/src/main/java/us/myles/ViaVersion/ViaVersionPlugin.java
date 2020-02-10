@@ -1,7 +1,6 @@
 package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -9,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.platform.TaskId;
@@ -28,19 +26,20 @@ import java.util.UUID;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
 
+    private static ViaVersionPlugin instance;
     private final BukkitCommandHandler commandHandler;
-    private boolean compatSpigotBuild = false;
-    private boolean spigot = true;
-    private boolean lateBind = false;
-    private boolean protocolSupport = false;
-    @Getter
     private final BukkitViaConfig conf;
-    @Getter
     private final ViaAPI<Player> api = new BukkitViaAPI(this);
     private final List<Runnable> queuedTasks = new ArrayList<>();
     private final List<Runnable> asyncQueuedTasks = new ArrayList<>();
+    private final boolean protocolSupport;
+    private boolean compatSpigotBuild;
+    private boolean spigot = true;
+    private boolean lateBind;
 
     public ViaVersionPlugin() {
+        instance = this;
+
         // Command handler
         commandHandler = new BukkitCommandHandler();
         // Init platform
@@ -52,8 +51,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
                 .build());
         // Config magic
         conf = new BukkitViaConfig();
-        // For compatibility
-        ViaVersion.setInstance(this);
 
         // Check if we're using protocol support too
         protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
@@ -125,19 +122,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     @Override
     public void onDisable() {
         Via.getManager().destroy();
-    }
-
-    public boolean isCompatSpigotBuild() {
-        return compatSpigotBuild;
-    }
-
-
-    public boolean isSpigot() {
-        return this.spigot;
-    }
-
-    public boolean isProtocolSupport() {
-        return protocolSupport;
     }
 
     @Override
@@ -263,5 +247,31 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
     @Override
     public boolean isOldClientsAllowed() {
         return !protocolSupport; // Use protocolsupport for older clients
+    }
+
+    @Override
+    public BukkitViaConfig getConf() {
+        return conf;
+    }
+
+    @Override
+    public ViaAPI<Player> getApi() {
+        return api;
+    }
+
+    public boolean isCompatSpigotBuild() {
+        return compatSpigotBuild;
+    }
+
+    public boolean isSpigot() {
+        return this.spigot;
+    }
+
+    public boolean isProtocolSupport() {
+        return protocolSupport;
+    }
+
+    public static ViaVersionPlugin getInstance() {
+        return instance;
     }
 }

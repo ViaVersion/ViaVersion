@@ -3,8 +3,6 @@ package us.myles.ViaVersion.api;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
@@ -26,8 +24,6 @@ public class PacketWrapper {
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
-    @Setter
-    @Getter
     private int id = -1;
     private final LinkedList<Pair<Type, Object>> readableObjects = new LinkedList<>();
     private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
@@ -518,6 +514,13 @@ public class PacketWrapper {
         sendToServer(packetProtocol, true);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {

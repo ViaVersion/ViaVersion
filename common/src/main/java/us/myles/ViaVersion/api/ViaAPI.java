@@ -15,6 +15,7 @@ import java.util.UUID;
  * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
  */
 public interface ViaAPI<T> {
+
     /**
      * Get protocol number from a player
      * Will also retrieve version from ProtocolSupport if it's being used.
@@ -33,11 +34,11 @@ public interface ViaAPI<T> {
     int getPlayerVersion(UUID uuid);
 
     /**
-     * Is player using 1.9?
+     * Returns if the player is ported by Via.
      *
      * @param playerUUID UUID of a player
-     * @return True if the client is on 1.9
-     * @deprecated As of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)}
+     * @return true if Via has a cached userconnection for this player
+     * @deprecated as of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)}
      */
     @Deprecated
     boolean isPorted(UUID playerUUID);

@@ -21,13 +21,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
 public class ViaManager {
     private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
     private final ViaPlatform platform;
     private final ViaProviders providers = new ViaProviders();
-    @Setter
-    private boolean debug = false;
+    private boolean debug;
     // Internals
     private final ViaInjector injector;
     private final ViaCommandHandler commandHandler;
@@ -128,4 +126,35 @@ public class ViaManager {
         return portedPlayers.get(playerUUID);
     }
 
+    public Map<UUID, UserConnection> getPortedPlayers() {
+        return portedPlayers;
+    }
+
+    public ViaPlatform getPlatform() {
+        return platform;
+    }
+
+    public ViaProviders getProviders() {
+        return providers;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public ViaInjector getInjector() {
+        return injector;
+    }
+
+    public ViaCommandHandler getCommandHandler() {
+        return commandHandler;
+    }
+
+    public ViaPlatformLoader getLoader() {
+        return loader;
+    }
 }
