@@ -95,7 +95,9 @@ public class Protocol1_16To1_15_2 extends Protocol {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    int blockTagsSize = wrapper.passthrough(Type.VAR_INT);
+                    int blockTagsSize = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT, blockTagsSize + 1); // new tag(s)
+
                     for (int i = 0; i < blockTagsSize; i++) {
                         wrapper.passthrough(Type.STRING);
                         int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
@@ -103,6 +105,10 @@ public class Protocol1_16To1_15_2 extends Protocol {
                             blockIds[j] = getNewBlockId(blockIds[j]);
                         }
                     }
+
+                    // Only send the necessary new tags
+                    wrapper.write(Type.STRING, "minecraft:beacon_base_blocks");
+                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{getNewBlockId(133), getNewBlockId(134), getNewBlockId(148), getNewBlockId(265)});
 
                     int itemTagsSize = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < itemTagsSize; i++) {
