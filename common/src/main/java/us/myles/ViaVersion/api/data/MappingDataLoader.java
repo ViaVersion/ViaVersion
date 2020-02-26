@@ -41,15 +41,15 @@ public class MappingDataLoader {
     }
 
     public static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+        mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
+    }
+
+    public static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                }
-                continue;
+            Map.Entry<String, JsonElement> value = mapIdentifierEntry(entry, oldIdentifiers, newIdentifiers, diffIdentifiers);
+            if (value != null) {
+                output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
             }
-            output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
         }
     }
 
@@ -59,32 +59,48 @@ public class MappingDataLoader {
 
     public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                // Search in diff mappings
-                if (diffIdentifiers != null) {
-                    value = findValue(newIdentifiers, diffIdentifiers.get(entry.getKey()).getAsString());
-                }
-                if (value == null) {
-                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                        Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                    }
-                    continue;
-                }
+            Map.Entry<String, JsonElement> value = mapIdentifierEntry(entry, oldIdentifiers, newIdentifiers, diffIdentifiers);
+            if (value != null) {
+                output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
             }
-            output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
         }
     }
 
-    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
-        for (int i = 0; i < oldIdentifiers.size(); i++) {
-            JsonElement v = oldIdentifiers.get(i);
-            Integer index = findIndex(newIdentifiers, v.getAsString());
-            if (index == null) {
-                if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
+    private static Map.Entry<String, JsonElement> mapIdentifierEntry(Map.Entry<String, JsonElement> entry, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
+        Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
+        if (value == null) {
+            // Search in diff mappings
+            if (diffIdentifiers != null) {
+                value = findValue(newIdentifiers, diffIdentifiers.get(entry.getKey()).getAsString());
+            }
+            if (value == null) {
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                 }
-                continue;
+                return null;
+            }
+        }
+        return value;
+    }
+
+    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
+        mapIdentifiers(output, oldIdentifiers, newIdentifiers, null, warnOnMissing);
+    }
+
+    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, JsonObject diffIdentifiers, boolean warnOnMissing) {
+        for (int i = 0; i < oldIdentifiers.size(); i++) {
+            JsonElement value = oldIdentifiers.get(i);
+            Integer index = findIndex(newIdentifiers, value.getAsString());
+            if (index == null) {
+                if (diffIdentifiers != null) {
+                    index = findIndex(newIdentifiers, diffIdentifiers.get(value.getAsString()).getAsString());
+                }
+                if (index == null) {
+                    if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                        Via.getPlatform().getLogger().warning("No key for " + value + " :( ");
+                    }
+                    continue;
+                }
             }
             output[i] = index.shortValue();
         }

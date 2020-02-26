@@ -54,12 +54,17 @@ public class Mappings {
      * @param size          set size of the underlying short array
      * @param oldMapping    mappings to map from
      * @param newMapping    mappings to map to
+     * @param diffMapping   extra mappings that will be used/scanned when an entry cannot be found
      * @param warnOnMissing should "No key for x" be printed if there is no matching identifier
      */
-    public Mappings(int size, JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
+    public Mappings(int size, JsonArray oldMapping, JsonArray newMapping, JsonObject diffMapping, boolean warnOnMissing) {
         oldToNew = new short[size];
         Arrays.fill(oldToNew, (short) -1);
-        MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, warnOnMissing);
+        MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, diffMapping, warnOnMissing);
+    }
+
+    public Mappings(int size, JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
+        this(size, oldMapping, newMapping, null, warnOnMissing);
     }
 
     public Mappings(JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
@@ -68,6 +73,10 @@ public class Mappings {
 
     public Mappings(int size, JsonArray oldMapping, JsonArray newMapping) {
         this(size, oldMapping, newMapping, true);
+    }
+
+    public Mappings(JsonArray oldMapping, JsonArray newMapping, JsonObject diffMapping) {
+        this(oldMapping.size(), oldMapping, newMapping, diffMapping, true);
     }
 
     public Mappings(JsonArray oldMapping, JsonArray newMapping) {

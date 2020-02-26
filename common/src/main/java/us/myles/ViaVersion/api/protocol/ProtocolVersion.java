@@ -58,6 +58,7 @@ public class ProtocolVersion {
         register(v_1_6_2 = new ProtocolVersion(74, "1.6.2"));
         register(v_1_6_3 = new ProtocolVersion(77, "1.6.3"));
         register(v_1_6_4 = new ProtocolVersion(78, "1.6.4"));
+
         // After netty rewrite
         register(v1_7_1 = new ProtocolVersion(4, "1.7-1.7.5"));
         register(v1_7_6 = new ProtocolVersion(5, "1.7.6-1.7.10"));
@@ -83,7 +84,8 @@ public class ProtocolVersion {
         register(v1_15 = new ProtocolVersion(573, "1.15"));
         register(v1_15_1 = new ProtocolVersion(575, "1.15.1"));
         register(v1_15_2 = new ProtocolVersion(578, "1.15.2"));
-        register(v1_16 = new ProtocolVersion(703, "1.16"));
+        register(v1_16 = new ProtocolVersion(704, "1.16"));
+
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
