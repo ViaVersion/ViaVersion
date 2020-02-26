@@ -144,7 +144,7 @@ public class Entity1_16Types {
         ZOMBIE(95, ABSTRACT_MONSTER),
         DROWNED(16, ZOMBIE),
         HUSK(33, ZOMBIE),
-        ZOMBIEFIED_PIGLIN(57, ZOMBIE),
+        ZOMBIFIED_PIGLIN(57, ZOMBIE),
         ZOMBIE_VILLAGER(97, ZOMBIE),
 
         // Flying entities
