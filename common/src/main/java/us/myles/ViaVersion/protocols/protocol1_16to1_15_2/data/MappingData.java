@@ -23,8 +23,8 @@ public class MappingData {
         Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 block mapping...");
         blockMappings = new Mappings(mapping1_15.getAsJsonObject("blocks"), mapping1_16.getAsJsonObject("blocks"));
         Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 item mapping...");
-        MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_15.getAsJsonObject("items"), mapping1_16.getAsJsonObject("items"));
+        MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_15.getAsJsonObject("items"), mapping1_16.getAsJsonObject("items"), diffmapping.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 sound mapping...");
-        soundMappings = new Mappings(mapping1_15.getAsJsonArray("sounds"), mapping1_16.getAsJsonArray("sounds"));
+        soundMappings = new Mappings(mapping1_15.getAsJsonArray("sounds"), mapping1_16.getAsJsonArray("sounds"), diffmapping.getAsJsonObject("sounds"));
     }
 }
