@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.velocity.storage;
 
 import com.velocitypowered.api.proxy.Player;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -12,10 +11,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
 public class VelocityStorage extends StoredObject {
-    private Player player;
+    private final Player player;
     private String currentServer;
     private List<UUID> cachedBossbar;
     private static Method getServerBossBars;
@@ -56,6 +54,22 @@ public class VelocityStorage extends StoredObject {
                 e.printStackTrace();
             }
         }
+        return cachedBossbar;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public String getCurrentServer() {
+        return currentServer;
+    }
+
+    public void setCurrentServer(final String currentServer) {
+        this.currentServer = currentServer;
+    }
+
+    public List<UUID> getCachedBossbar() {
         return cachedBossbar;
     }
 }

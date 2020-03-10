@@ -1,13 +1,9 @@
 package us.myles.ViaVersion.api.protocol;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import com.google.common.base.Preconditions;
 
 import java.util.*;
 
-@AllArgsConstructor
-@Getter
 public class ProtocolVersion {
     private static final Map<Integer, ProtocolVersion> versions = new HashMap<>();
     private static final List<ProtocolVersion> versionList = new ArrayList<>();
@@ -89,7 +85,13 @@ public class ProtocolVersion {
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
-    public static void register(@NonNull ProtocolVersion protocol) {
+    public ProtocolVersion(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public static void register(ProtocolVersion protocol) {
+        Preconditions.checkNotNull(protocol);
         versions.put(protocol.getId(), protocol);
         versionList.add(protocol);
     }
@@ -131,6 +133,14 @@ public class ProtocolVersion {
             }
         }
         return null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
