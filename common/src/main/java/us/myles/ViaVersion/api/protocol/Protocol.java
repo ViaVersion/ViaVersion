@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.api.protocol;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -205,12 +203,33 @@ public abstract class Protocol {
         return "Protocol:" + getClass().getSimpleName();
     }
 
-    @AllArgsConstructor
-    @Getter
     public static class ProtocolPacket {
-        State state;
-        int oldID;
-        int newID;
-        PacketRemapper remapper;
+        private final State state;
+        private final int oldID;
+        private final int newID;
+        private final PacketRemapper remapper;
+
+        public ProtocolPacket(State state, int oldID, int newID, PacketRemapper remapper) {
+            this.state = state;
+            this.oldID = oldID;
+            this.newID = newID;
+            this.remapper = remapper;
+        }
+
+        public State getState() {
+            return state;
+        }
+
+        public int getOldID() {
+            return oldID;
+        }
+
+        public int getNewID() {
+            return newID;
+        }
+
+        public PacketRemapper getRemapper() {
+            return remapper;
+        }
     }
 }

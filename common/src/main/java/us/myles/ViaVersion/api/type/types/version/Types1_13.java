@@ -24,5 +24,5 @@ public class Types1_13 {
     /**
      * Particle type for 1.13
      */
-    public static Type<Particle> PARTICLE = new Particle1_13Type();
+    public static final Type<Particle> PARTICLE = new Particle1_13Type();
 }

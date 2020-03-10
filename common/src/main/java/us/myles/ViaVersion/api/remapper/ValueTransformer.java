@@ -1,12 +1,10 @@
 package us.myles.ViaVersion.api.remapper;
 
-import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.InformativeException;
 
 public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
-    @Getter
     private final Type<T1> inputType;
     private final Type<T2> outputType;
 
@@ -37,5 +35,13 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
             e.addSource(this.getClass());
             throw e;
         }
+    }
+
+    public Type<T1> getInputType() {
+        return inputType;
+    }
+
+    public Type<T2> getOutputType() {
+        return outputType;
     }
 }

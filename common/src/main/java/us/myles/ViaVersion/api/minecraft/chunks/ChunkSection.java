@@ -1,8 +1,6 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -2,7 +2,6 @@ package us.myles.ViaVersion.api.type;
 
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import lombok.Getter;
 import us.myles.ViaVersion.api.minecraft.*;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
@@ -10,7 +9,6 @@ import us.myles.ViaVersion.api.type.types.minecraft.*;
 
 import java.util.UUID;
 
-@Getter
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Defined Types */
     public static final Type<Byte> BYTE = new ByteType();
@@ -144,12 +142,20 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
         this.typeName = typeName;
     }
 
+    public Class<? super T> getOutputClass() {
+        return outputClass;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
     public Class<? extends Type> getBaseClass() {
         return this.getClass();
     }
 
     @Override
     public String toString() {
-        return "Type|" + getTypeName();
+        return "Type|" + typeName;
     }
 }

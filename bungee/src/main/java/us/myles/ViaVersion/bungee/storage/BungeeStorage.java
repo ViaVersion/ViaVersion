@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.bungee.storage;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.myles.ViaVersion.api.data.StoredObject;
@@ -10,7 +9,6 @@ import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.UUID;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
 public class BungeeStorage extends StoredObject {
     private static Field bossField;
@@ -27,7 +25,7 @@ public class BungeeStorage extends StoredObject {
         }
     }
 
-    private ProxiedPlayer player;
+    private final ProxiedPlayer player;
     private String currentServer;
     private Set<UUID> bossbar;
 
@@ -44,5 +42,21 @@ public class BungeeStorage extends StoredObject {
                 e.printStackTrace();
             }
         }
+    }
+
+    public ProxiedPlayer getPlayer() {
+        return player;
+    }
+
+    public String getCurrentServer() {
+        return currentServer;
+    }
+
+    public void setCurrentServer(String currentServer) {
+        this.currentServer = currentServer;
+    }
+
+    public Set<UUID> getBossbar() {
+        return bossbar;
     }
 }

@@ -1,18 +1,18 @@
 package us.myles.ViaVersion.api;
 
-import lombok.*;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.UUID;
 
-@Getter(AccessLevel.PROTECTED)
-@Setter(AccessLevel.PROTECTED)
-@RequiredArgsConstructor
 public abstract class ViaListener {
     private final Class<? extends Protocol> requiredPipeline;
-    private boolean registered = false;
+    private boolean registered;
+
+    public ViaListener(Class<? extends Protocol> requiredPipeline) {
+        this.requiredPipeline = requiredPipeline;
+    }
 
     /**
      * Get the UserConnection from an UUID
@@ -20,7 +20,7 @@ public abstract class ViaListener {
      * @param uuid UUID object
      * @return The UserConnection
      */
-    protected UserConnection getUserConnection(@NonNull UUID uuid) {
+    protected UserConnection getUserConnection(UUID uuid) {
         return Via.getManager().getConnection(uuid);
     }
 
@@ -40,4 +40,16 @@ public abstract class ViaListener {
      * Register the event
      */
     public abstract void register();
+
+    protected Class<? extends Protocol> getRequiredPipeline() {
+        return requiredPipeline;
+    }
+
+    protected boolean isRegistered() {
+        return registered;
+    }
+
+    protected void setRegistered(boolean registered) {
+        this.registered = registered;
+    }
 }
