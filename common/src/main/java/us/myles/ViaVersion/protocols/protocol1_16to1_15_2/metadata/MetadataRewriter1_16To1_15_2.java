@@ -32,10 +32,16 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
 
         if (type == null) return;
 
-        if (type.is(Entity1_16Types.EntityType.AREA_EFFECT_CLOUD)) {
+        if (type == Entity1_16Types.EntityType.AREA_EFFECT_CLOUD) {
             if (metadata.getId() == 10) {
                 Particle particle = (Particle) metadata.getValue();
                 particle.setId(WorldPackets.getNewParticleId(particle.getId()));
+            }
+        } else if (type.isOrHasParent(Entity1_16Types.EntityType.ABSTRACT_ARROW)) {
+            if (metadata.getId() == 8) {
+                metadatas.remove(metadata);
+            } else if (metadata.getId() > 8) {
+                metadata.setId(metadata.getId() - 1);
             }
         }
     }
