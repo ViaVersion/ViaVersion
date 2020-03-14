@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.api.data;
 
-import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -40,7 +39,6 @@ public class UserConnection {
     private ReadWriteLock velocityLock = new ReentrantReadWriteLock();
 
     public UserConnection(Channel channel) {
-        Preconditions.checkNotNull(channel);
         this.channel = channel;
     }
 
