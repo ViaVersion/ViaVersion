@@ -81,6 +81,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);
 
     public static final Type<UUID> UUID = new UUIDType();
+    public static final Type<UUID> UUID_INT_ARRAY = new UUIDIntArrayType();
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
     /* Variable Types */
     public static final Type<Integer> VAR_INT = new VarIntType();

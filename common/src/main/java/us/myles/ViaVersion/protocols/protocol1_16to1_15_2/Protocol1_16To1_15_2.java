@@ -14,6 +14,8 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.UUID;
+
 public class Protocol1_16To1_15_2 extends Protocol {
 
     @Override
@@ -24,6 +26,18 @@ public class Protocol1_16To1_15_2 extends Protocol {
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
+
+        // Login Success
+        registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    // Transform string to int array
+                    UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
+                    wrapper.write(Type.UUID_INT_ARRAY, uuid);
+                });
+            }
+        });
 
         // Entity Sound Effect
         registerOutgoing(State.PLAY, 0x51, 0x51, new PacketRemapper() {
@@ -123,6 +137,19 @@ public class Protocol1_16To1_15_2 extends Protocol {
                 });
             }
         });
+
+        registerOutgoing(State.PLAY, 0x43, 0x44);
+
+        registerOutgoing(State.PLAY, 0x45, 0x46);
+        registerOutgoing(State.PLAY, 0x46, 0x47);
+
+        registerOutgoing(State.PLAY, 0x48, 0x49);
+        registerOutgoing(State.PLAY, 0x49, 0x4A);
+        registerOutgoing(State.PLAY, 0x4A, 0x4B);
+        registerOutgoing(State.PLAY, 0x4B, 0x4C);
+        registerOutgoing(State.PLAY, 0x4C, 0x4D);
+        registerOutgoing(State.PLAY, 0x4D, 0x4E);
+        registerOutgoing(State.PLAY, 0x4E, 0x43);
     }
 
     public static int getNewBlockStateId(int id) {

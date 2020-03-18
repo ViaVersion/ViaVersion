@@ -21,7 +21,7 @@ public class EntityPackets {
         metadataRewriter.registerTracker(0x05, 0x05, Entity1_16Types.EntityType.PLAYER);
 
         // Metadata
-        metadataRewriter.registerMetadataRewriter(0x44, 0x44, Types1_14.METADATA_LIST);
+        metadataRewriter.registerMetadataRewriter(0x44, 0x45, Types1_14.METADATA_LIST);
 
         // Entity Destroy
         metadataRewriter.registerEntityDestroy(0x38, 0x38);
