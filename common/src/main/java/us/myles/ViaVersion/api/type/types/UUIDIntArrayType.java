@@ -13,19 +13,22 @@ public class UUIDIntArrayType extends Type<UUID> {
 
     @Override
     public UUID read(ByteBuf buffer) {
-        int[] ints = new int[4];
-        for (int i = 0; i < 4; ++i) {
-            ints[i] = buffer.readInt();
-        }
+        int[] ints = {
+                buffer.readInt(),
+                buffer.readInt(),
+                buffer.readInt(),
+                buffer.readInt()
+        };
         return uuidFromIntArray(ints);
     }
 
     @Override
     public void write(ByteBuf buffer, UUID object) {
         int[] ints = uuidToIntArray(object);
-        for (int i = 0; i < 4; i++) {
-            buffer.writeInt(ints[i]);
-        }
+        buffer.writeInt(ints[0]);
+        buffer.writeInt(ints[1]);
+        buffer.writeInt(ints[2]);
+        buffer.writeInt(ints[3]);
     }
 
     public static UUID uuidFromIntArray(int[] ints) {
