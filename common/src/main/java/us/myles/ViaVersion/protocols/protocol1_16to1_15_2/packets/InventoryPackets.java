@@ -60,7 +60,7 @@ public class InventoryPackets {
         itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, 0x17, 0x17);
 
         // Entity Equipment Packet
-        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x47, 0x47);
+        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x47, 0x48);
 
         // Declare Recipes
         protocol.registerOutgoing(State.PLAY, 0x5B, 0x5B, new PacketRemapper() {
