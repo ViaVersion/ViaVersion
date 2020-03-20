@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -109,22 +110,29 @@ public class BaseProtocol1_7 extends Protocol {
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING); // 0 - UUID as String
-                map(Type.STRING); // 1 - Player Username
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
                         info.setState(State.PLAY);
-                        // Save other info
-                        String stringUUID = wrapper.get(Type.STRING, 0);
-                        if (stringUUID.length() == 32) { // Trimmed UUIDs are 32 characters
-                            // Trimmed
-                            stringUUID = addDashes(stringUUID);
+
+                        if (info.getServerProtocolVersion() >= ProtocolVersion.v1_16.getId()) {
+                            // 1.16+ uses int arrays
+                            UUID uuid = wrapper.passthrough(Type.UUID_INT_ARRAY);
+                            info.setUuid(uuid);
+                        } else {
+                            // Save other info
+                            String stringUUID = wrapper.passthrough(Type.STRING);
+                            if (stringUUID.length() == 32) { // Trimmed UUIDs are 32 characters
+                                // Trimmed
+                                stringUUID = addDashes(stringUUID);
+                            }
+                            UUID uuid = UUID.fromString(stringUUID);
+                            info.setUuid(uuid);
                         }
-                        UUID uuid = UUID.fromString(stringUUID);
-                        info.setUuid(uuid);
-                        info.setUsername(wrapper.get(Type.STRING, 1));
+
+                        String username = wrapper.passthrough(Type.STRING);
+                        info.setUsername(username);
                         // Add to ported clients
                         Via.getManager().addPortedClient(wrapper.user());
 
@@ -137,7 +145,7 @@ public class BaseProtocol1_7 extends Protocol {
                             // Print out the route to console
                             Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
                                     new Object[]{
-                                            wrapper.get(Type.STRING, 1),
+                                            username,
                                             info.getProtocolVersion(),
                                             Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
                                     });
