@@ -1,15 +1,22 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+
+import java.util.UUID;
 
 public class WorldPackets {
 
@@ -43,6 +50,34 @@ public class WorldPackets {
                             section.setPaletteEntry(i, Protocol1_16To1_15_2.getNewBlockStateId(old));
                         }
                     }
+
+                    if (chunk.getBlockEntities() == null) return;
+                    for (CompoundTag blockEntity : chunk.getBlockEntities()) {
+                        String id = ((StringTag) blockEntity.get("id")).getValue();
+                        if (id.equals("minecraft:conduit")) {
+                            StringTag targetUuidTag = blockEntity.remove("target_uuid");
+                            if (targetUuidTag == null) continue;
+
+
+                            // target_uuid -> Target
+                            UUID targetUuid = UUID.fromString(targetUuidTag.getValue());
+                            blockEntity.put(new IntArrayTag("Target", UUIDIntArrayType.uuidToIntArray(targetUuid)));
+                        } else if (id.equals("minecraft:skull")) {
+                            CompoundTag ownerTag = blockEntity.remove("Owner");
+                            if (ownerTag == null) continue;
+
+                            StringTag ownerUuidTag = ownerTag.remove("Id");
+                            UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
+                            ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+
+                            // Owner -> SkullOwner
+                            CompoundTag skullOwnerTag = new CompoundTag("SkullOwner");
+                            for (Tag tag : ownerTag) {
+                                skullOwnerTag.put(tag);
+                            }
+                            blockEntity.put(skullOwnerTag);
+                        }
+                    }
                 });
             }
         });
@@ -57,7 +92,7 @@ public class WorldPackets {
 
     public static int getNewParticleId(int id) {
         if (id >= 27) {
-            id += 1; // soul flame
+            id += 2; // soul flame, soul
         }
         return id;
     }
