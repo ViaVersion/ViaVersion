@@ -1,13 +1,19 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
+
+import java.util.UUID;
 
 public class InventoryPackets {
 
@@ -131,12 +137,32 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
+
+        if (item.getIdentifier() == 771 && item.getTag() != null) {
+            CompoundTag tag = item.getTag();
+            CompoundTag ownerTag = tag.get("SkullOwner");
+            if (ownerTag != null) {
+                UUID id = UUID.fromString(((StringTag) ownerTag.get("Id")).getValue());
+                ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(id)));
+            }
+        }
+
         item.setIdentifier(getNewItemId(item.getIdentifier()));
     }
 
     public static void toServer(Item item) {
         if (item == null) return;
+
         item.setIdentifier(getOldItemId(item.getIdentifier()));
+
+        if (item.getIdentifier() == 771 && item.getTag() != null) {
+            CompoundTag tag = item.getTag();
+            CompoundTag ownerTag = tag.get("SkullOwner");
+            if (ownerTag != null && ownerTag.contains("Id")) {
+                UUID id = UUIDIntArrayType.uuidFromIntArray(((IntArrayTag) ownerTag.get("Id")).getValue());
+                ownerTag.put(new StringTag("Id", id.toString()));
+            }
+        }
     }
 
     public static int getNewItemId(int id) {
