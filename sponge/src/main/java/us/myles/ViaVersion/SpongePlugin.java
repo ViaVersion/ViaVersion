@@ -6,7 +6,6 @@ import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -26,7 +25,6 @@ import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
-import us.myles.ViaVersion.sponge.listeners.GeneralListener;
 import us.myles.ViaVersion.sponge.platform.*;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -70,7 +68,6 @@ public class SpongePlugin implements ViaPlatform {
         conf = new SpongeViaConfig(container, defaultConfig.getParentFile());
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
-        Sponge.getEventManager().registerListeners(this, new GeneralListener());
         getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded!");
         // Init platform
         Via.init(ViaManager.builder()
