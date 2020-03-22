@@ -19,8 +19,10 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_14To1_13_2 extends Protocol {
 
-    static {
+    @Override
+    public void loadMappings() {
         MappingData.init();
+        WorldPackets.onMappingsLoaded();
     }
 
     @Override

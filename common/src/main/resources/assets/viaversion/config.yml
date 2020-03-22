@@ -24,6 +24,8 @@ block-disconnect-msg: "You are using an unsupported Minecraft version!"
 reload-disconnect-msg: "Server reload, please rejoin!"
 # We warn when there's a error converting item and block data over versions, should we suppress these? (Only suggested if spamming)
 suppress-conversion-warnings: false
+# Load the mapping data async to make the server boot up faster
+load-mappings-async: false
 #
 #----------------------------------------------------------#
 #                     BUNGEE OPTIONS                       #

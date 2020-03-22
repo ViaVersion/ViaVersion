@@ -44,7 +44,11 @@ public class ProtocolRegistry {
     private static final Set<Integer> supportedVersions = Sets.newConcurrentHashSet();
     private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
 
-    static {
+
+    /**
+     * Registers all Protocols
+     */
+    public static void registerProtocols(){
         // Base Protocol
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
         registerBaseProtocol(new BaseProtocol1_7(), Range.all());
@@ -181,6 +185,19 @@ public class ProtocolRegistry {
             protocol.register(Via.getManager().getProviders());
         }
         registerList.clear();
+    }
+
+
+    /**
+     * Loads the mapping data for all registered protocols
+     */
+    public static void loadMappings(){
+        long time = System.currentTimeMillis();
+        for (Protocol protocol : new ArrayList<>(registerList)) {
+            protocol.loadMappings();
+        }
+        long diff = System.currentTimeMillis() - time;
+        Via.getPlatform().getLogger().info("All mapping data loaded in " + diff + "ms");
     }
 
     /**

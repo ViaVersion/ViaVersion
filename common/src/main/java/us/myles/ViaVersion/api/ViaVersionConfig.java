@@ -351,4 +351,11 @@ public interface ViaVersionConfig {
      * @return True if enabled
      */
     boolean is1_15InstantRespawn();
+
+    /**
+     * Should the mapping data be loaded async
+     *
+     * @return True if enabled
+     */
+    boolean isLoadMappingsAsync();
 }

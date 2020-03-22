@@ -18,11 +18,16 @@ import java.util.UUID;
 
 public class Protocol1_16To1_15_2 extends Protocol {
 
+
+    @Override
+    public void loadMappings() {
+        MappingData.init();
+    }
+
     @Override
     protected void registerPackets() {
         new MetadataRewriter1_16To1_15_2(this);
 
-        MappingData.init();
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);

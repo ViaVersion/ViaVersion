@@ -47,8 +47,23 @@ public class ViaManager {
         // Check for updates
         if (platform.getConf().isCheckForUpdates())
             UpdateUtil.sendUpdateMessage();
-        // Force class load
-        ProtocolRegistry.getSupportedVersions();
+
+        //Register Protocols
+        ProtocolRegistry.registerProtocols();
+
+        //Load Mapping data
+        if(!platform.getConf().isLoadMappingsAsync()){
+            Via.getPlatform().getLogger().info("Loading mapping data ...");
+            ProtocolRegistry.loadMappings();
+        }else{
+            Via.getPlatform().getLogger().info("Load mapping data async ...");
+            Thread thread = new Thread(() -> {
+                ProtocolRegistry.loadMappings();
+            });
+            thread.setName("ViaVersion Async Mapping Loader");
+            thread.start();
+        }
+
         // Inject
         try {
             injector.inject();

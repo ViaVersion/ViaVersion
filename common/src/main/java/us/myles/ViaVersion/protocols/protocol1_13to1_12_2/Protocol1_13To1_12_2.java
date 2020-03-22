@@ -132,7 +132,10 @@ public class Protocol1_13To1_12_2 extends Protocol {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.UNDERLINE, ':');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.ITALIC, ';');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.RESET, '/');
+    }
 
+    @Override
+    public void loadMappings() {
         MappingData.init();
         ConnectionData.init();
         RecipeData.init();

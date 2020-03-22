@@ -20,10 +20,14 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 public class Protocol1_15To1_14_4 extends Protocol {
 
     @Override
+    public void loadMappings() {
+        MappingData.init();
+    }
+
+    @Override
     protected void registerPackets() {
         new MetadataRewriter1_15To1_14_4(this);
 
-        MappingData.init();
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);

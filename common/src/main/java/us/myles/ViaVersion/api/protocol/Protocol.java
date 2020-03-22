@@ -190,6 +190,14 @@ public abstract class Protocol {
         }
     }
 
+
+    /**
+     * Load the mapping data for this protocol
+     */
+    public void loadMappings(){
+
+    }
+
     public <T> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }

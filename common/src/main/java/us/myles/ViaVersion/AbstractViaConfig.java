@@ -54,6 +54,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean fullBlockLightFix;
     private boolean healthNaNFix;
     private boolean instantRespawn;
+    private boolean loadMappingsAsync;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -111,6 +112,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         fullBlockLightFix = getBoolean("fix-non-full-blocklight", false);
         healthNaNFix = getBoolean("fix-1_14-health-nan", true);
         instantRespawn = getBoolean("use-1_15-instant-respawn", false);
+        loadMappingsAsync = getBoolean("load-mappings-async", false);
     }
 
     @Override
@@ -362,5 +364,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean is1_15InstantRespawn() {
         return instantRespawn;
+    }
+
+    @Override
+    public boolean isLoadMappingsAsync() {
+        return loadMappingsAsync;
     }
 }

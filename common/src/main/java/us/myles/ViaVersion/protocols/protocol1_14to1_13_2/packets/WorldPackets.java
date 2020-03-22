@@ -28,14 +28,20 @@ import us.myles.ViaVersion.util.CompactArrayUtil;
 import java.util.Arrays;
 
 public class WorldPackets {
-    private static final int AIR = MappingData.blockStateMappings.getNewId(0);
-    private static final int VOID_AIR = MappingData.blockStateMappings.getNewId(8591);
-    private static final int CAVE_AIR = MappingData.blockStateMappings.getNewId(8592);
+    private static int AIR;
+    private static int VOID_AIR;
+    private static int CAVE_AIR;
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
     private static final byte[] FULL_LIGHT = new byte[2048];
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
+    }
+
+    public static void onMappingsLoaded(){
+        AIR = MappingData.blockStateMappings.getNewId(0);
+        VOID_AIR = MappingData.blockStateMappings.getNewId(8591);
+        CAVE_AIR = MappingData.blockStateMappings.getNewId(8592);
     }
 
     public static void register(final Protocol protocol) {
