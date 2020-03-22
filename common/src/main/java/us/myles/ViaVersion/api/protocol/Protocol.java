@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.api.protocol;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
@@ -13,14 +12,12 @@ import us.myles.ViaVersion.packets.State;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public abstract class Protocol {
-    private final Map<Pair<State, Integer>, ProtocolPacket> incoming = new HashMap<>();
-    private final Map<Pair<State, Integer>, ProtocolPacket> outgoing = new HashMap<>();
-
-    private final Map<Class, Object> storedObjects = new ConcurrentHashMap<>();
+    private final Map<Packet, ProtocolPacket> incoming = new HashMap<>();
+    private final Map<Packet, ProtocolPacket> outgoing = new HashMap<>();
+    private final Map<Class, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
 
     public Protocol() {
         registerPackets();
@@ -50,26 +47,30 @@ public abstract class Protocol {
     }
 
     /**
-     * Handle protocol registration phase, use this to register providers / tasks.
-     *
-     * @param providers The current providers
-     */
-    protected void register(ViaProviders providers) {
-
-    }
-
-    /**
-     * Register the packets for this protocol
+     * Register the packets for this protocol.
      */
     protected abstract void registerPackets();
 
     /**
+     * Handle protocol registration phase, use this to register providers / tasks.
+     * <p>
+     * To be overridden if needed.
+     *
+     * @param providers The current providers
+     */
+    protected void register(ViaProviders providers) {
+    }
+
+    /**
      * Initialise a user for this protocol setting up objects.
      * /!\ WARNING - May be called more than once in a single {@link UserConnection}
+     * <p>
+     * To be overridden if needed.
      *
      * @param userConnection The user to initialise
      */
-    public abstract void init(UserConnection userConnection);
+    public void init(UserConnection userConnection) {
+    }
 
     /**
      * Register an incoming packet, with simple id transformation.
@@ -96,12 +97,12 @@ public abstract class Protocol {
 
     public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
-        Pair<State, Integer> pair = new Pair<>(state, newPacketID);
-        if (!override && incoming.containsKey(pair)) {
-            Via.getPlatform().getLogger().log(Level.WARNING, pair + " already registered!" +
+        Packet packet = new Packet(state, newPacketID);
+        if (!override && incoming.containsKey(packet)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, packet + " already registered!" +
                     " If this override is intentional, set override to true. Stacktrace: ", new Exception());
         }
-        incoming.put(pair, protocolPacket);
+        incoming.put(packet, protocolPacket);
     }
 
     public void cancelIncoming(State state, int oldPacketID, int newPacketID) {
@@ -142,12 +143,12 @@ public abstract class Protocol {
 
     public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
-        Pair<State, Integer> pair = new Pair<>(state, oldPacketID);
-        if (!override && outgoing.containsKey(pair)) {
-            Via.getPlatform().getLogger().log(Level.WARNING, pair + " already registered!" +
+        Packet packet = new Packet(state, oldPacketID);
+        if (!override && outgoing.containsKey(packet)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, packet + " already registered!" +
                     " If override is intentional, set override to true. Stacktrace: ", new Exception());
         }
-        outgoing.put(pair, protocolPacket);
+        outgoing.put(packet, protocolPacket);
     }
 
     public void cancelOutgoing(State state, int oldPacketID, int newPacketID) {
@@ -172,12 +173,13 @@ public abstract class Protocol {
      * @throws Exception Throws exception if it fails to transform
      */
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-        Pair<State, Integer> statePacket = new Pair<>(state, packetWrapper.getId());
-        Map<Pair<State, Integer>, ProtocolPacket> packetMap = (direction == Direction.OUTGOING ? outgoing : incoming);
+        Packet statePacket = new Packet(state, packetWrapper.getId());
+        Map<Packet, ProtocolPacket> packetMap = (direction == Direction.OUTGOING ? outgoing : incoming);
         ProtocolPacket protocolPacket = packetMap.get(statePacket);
         if (protocolPacket == null) {
             return;
         }
+
         // write packet id
         int newID = direction == Direction.OUTGOING ? protocolPacket.getNewID() : protocolPacket.getOldID();
         packetWrapper.setId(newID);
@@ -201,6 +203,44 @@ public abstract class Protocol {
     @Override
     public String toString() {
         return "Protocol:" + getClass().getSimpleName();
+    }
+
+    public static class Packet {
+        private final State state;
+        private final int packetId;
+
+        public Packet(State state, int packetId) {
+            this.state = state;
+            this.packetId = packetId;
+        }
+
+        public State getState() {
+            return state;
+        }
+
+        public int getPacketId() {
+            return packetId;
+        }
+
+        @Override
+        public String toString() {
+            return "Packet{" + "state=" + state + ", packetId=" + packetId + '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Packet that = (Packet) o;
+            return packetId == that.packetId && state == that.state;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = state != null ? state.hashCode() : 0;
+            result = 31 * result + packetId;
+            return result;
+        }
     }
 
     public static class ProtocolPacket {

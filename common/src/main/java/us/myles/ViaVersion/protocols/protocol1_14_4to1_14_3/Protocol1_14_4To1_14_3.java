@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_14_4to1_14_3;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -39,9 +38,5 @@ public class Protocol1_14_4To1_14_3 extends Protocol {
                 });
             }
         });
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
     }
 }
