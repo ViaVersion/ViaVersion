@@ -26,6 +26,8 @@ import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.velocity.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
 import us.myles.ViaVersion.velocity.command.VelocityCommandSender;
+import us.myles.ViaVersion.velocity.listeners.GeneralListener;
+import us.myles.ViaVersion.velocity.listeners.UpdateListener;
 import us.myles.ViaVersion.velocity.platform.*;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.util.LoggerWrapper;
@@ -62,12 +64,16 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
+        Object plugin = VelocityPlugin.PROXY.getPluginManager()
+                .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
+
         PROXY = proxy;
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
         PROXY.getCommandManager().register(commandHandler, "viaver", "vvvelocity", "viaversion");
         api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
+        proxy.getEventManager().register(plugin, new GeneralListener());
         Via.init(ViaManager.builder()
                 .platform(this)
                 .commandHandler(commandHandler)

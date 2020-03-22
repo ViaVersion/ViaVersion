@@ -18,6 +18,7 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
+import us.myles.ViaVersion.bungee.listeners.GeneralListener;
 import us.myles.ViaVersion.bungee.platform.*;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.dump.PluginInfo;
@@ -50,6 +51,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
         commandHandler = new BungeeCommandHandler();
+        ProxyServer.getInstance().getPluginManager().registerListener(this, new GeneralListener());
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
         // Init platform
         Via.init(ViaManager.builder()

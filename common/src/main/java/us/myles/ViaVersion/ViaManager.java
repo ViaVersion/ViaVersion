@@ -1,8 +1,6 @@
 package us.myles.ViaVersion;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaInjector;
@@ -31,6 +29,8 @@ public class ViaManager {
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
 
+    private boolean mappingsLoaded;
+
     @Builder
     public ViaManager(ViaPlatform platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
@@ -55,10 +55,12 @@ public class ViaManager {
         if(!platform.getConf().isLoadMappingsAsync()){
             Via.getPlatform().getLogger().info("Loading mapping data ...");
             ProtocolRegistry.loadMappings();
+            mappingsLoaded = true;
         }else{
             Via.getPlatform().getLogger().info("Load mapping data async ...");
             Thread thread = new Thread(() -> {
                 ProtocolRegistry.loadMappings();
+                mappingsLoaded = true;
             });
             thread.setName("ViaVersion Async Mapping Loader");
             thread.start();
@@ -171,5 +173,9 @@ public class ViaManager {
 
     public ViaPlatformLoader getLoader() {
         return loader;
+    }
+
+    public boolean isMappingsLoaded(){
+        return mappingsLoaded;
     }
 }
