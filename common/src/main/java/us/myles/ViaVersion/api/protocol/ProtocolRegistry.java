@@ -127,8 +127,7 @@ public class ProtocolRegistry {
         if (protocol.hasMappingDataToLoad()) {
             if (mappingLoaderExecutor != null) {
                 // Submit mapping data loading
-                CompletableFuture<Void> future = CompletableFuture.runAsync(protocol::loadMappingData, mappingLoaderExecutor);
-                mappingLoaderFutures.put(protocol.getClass(), future);
+                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
             } else {
                 // Late protocol adding - just do it on the current thread
                 protocol.loadMappingData();
@@ -330,15 +329,12 @@ public class ProtocolRegistry {
         }
     }
 
+    public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
+        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor);
+        mappingLoaderFutures.put(protocolClass, future);
+    }
+
     public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
         return mappingLoaderFutures.get(protocolClass);
-    }
-
-    public static Map<Class<? extends Protocol>, CompletableFuture<Void>> getMappingLoaderFutures() {
-        return mappingLoaderFutures;
-    }
-
-    public static ThreadPoolExecutor getMappingLoaderExecutor() {
-        return mappingLoaderExecutor;
     }
 }
