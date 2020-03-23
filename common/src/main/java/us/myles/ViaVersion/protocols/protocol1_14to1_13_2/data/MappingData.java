@@ -23,9 +23,9 @@ public class MappingData {
     public static Set<Integer> nonFullBlocks;
 
     public static void init() {
+        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 mappings...");
         JsonObject mapping1_13_2 = MappingDataLoader.loadData("mapping-1.13.2.json", true);
         JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json", true);
-        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 mappings...");
 
         blockStateMappings = new Mappings(mapping1_13_2.getAsJsonObject("blockstates"), mapping1_14.getAsJsonObject("blockstates"));
         blockMappings = new Mappings(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));

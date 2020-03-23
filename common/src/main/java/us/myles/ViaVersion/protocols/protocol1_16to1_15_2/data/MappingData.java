@@ -18,10 +18,10 @@ public class MappingData {
     public static Mappings soundMappings;
 
     public static void init() {
+        Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 mappings...");
         JsonObject diffmapping = MappingDataLoader.loadData("mappingdiff-1.15to1.16.json");
         JsonObject mapping1_15 = MappingDataLoader.loadData("mapping-1.15.json", true);
         JsonObject mapping1_16 = MappingDataLoader.loadData("mapping-1.16.json", true);
-        Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 mappings...");
 
         blockStateMappings = new Mappings(mapping1_15.getAsJsonObject("blockstates"), mapping1_16.getAsJsonObject("blockstates"), diffmapping.getAsJsonObject("blockstates"));
         blockMappings = new Mappings(mapping1_15.getAsJsonObject("blocks"), mapping1_16.getAsJsonObject("blocks"));

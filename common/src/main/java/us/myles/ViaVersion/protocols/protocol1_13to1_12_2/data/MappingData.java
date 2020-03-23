@@ -33,9 +33,9 @@ public class MappingData {
     public static Mappings blockMappings;
 
     public static void init() {
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 mappings...");
         JsonObject mapping1_12 = MappingDataLoader.loadData("mapping-1.12.json", true);
         JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 mappings...");
 
         blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));

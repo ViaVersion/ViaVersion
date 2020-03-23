@@ -130,7 +130,11 @@ public class ProtocolRegistry {
                 CompletableFuture<Void> future = new CompletableFuture<>();
                 mappingLoaderFutures.put(protocol.getClass(), future);
                 mappingLoaderExecutor.execute(() -> {
-                    protocol.loadMappingData();
+                    try {
+                        protocol.loadMappingData();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     future.complete(null);
                 });
             } else {
@@ -334,12 +338,15 @@ public class ProtocolRegistry {
         }
     }
 
-    public static void getMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
-        CompletableFuture<Void> future = mappingLoaderFutures.get(protocolClass);
-        if (future != null) {
-            future.whenComplete((v, t) -> runnable.run());
-        } else {
-            runnable.run();
-        }
+    public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
+        return mappingLoaderFutures.get(protocolClass);
+    }
+
+    public static Map<Class<? extends Protocol>, CompletableFuture<Void>> getMappingLoaderFutures() {
+        return mappingLoaderFutures;
+    }
+
+    public static ThreadPoolExecutor getMappingLoaderExecutor() {
+        return mappingLoaderExecutor;
     }
 }
