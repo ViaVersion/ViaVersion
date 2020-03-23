@@ -2,9 +2,9 @@ package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
-import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.base.BaseProtocol1_7;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
@@ -32,7 +32,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
@@ -40,11 +40,17 @@ public class ProtocolRegistry {
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private static final Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
     private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
-    private static final List<Protocol> registerList = Lists.newCopyOnWriteArrayList();
-    private static final Set<Integer> supportedVersions = Sets.newConcurrentHashSet();
+    private static final List<Protocol> registerList = new ArrayList<>();
+    private static final Set<Integer> supportedVersions = new HashSet<>();
     private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
 
+    private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new ConcurrentHashMap<>();
+    private static ThreadPoolExecutor mappingLoaderExecutor;
+
     static {
+        mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>());
+        mappingLoaderExecutor.allowCoreThreadTimeOut(true);
+
         // Base Protocol
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
         registerBaseProtocol(new BaseProtocol1_7(), Range.all());
@@ -102,15 +108,13 @@ public class ProtocolRegistry {
      */
     public static void registerProtocol(Protocol protocol, List<Integer> supported, Integer output) {
         // Clear cache as this may make new routes.
-        if (!pathCache.isEmpty())
+        if (!pathCache.isEmpty()) {
             pathCache.clear();
+        }
 
         for (Integer version : supported) {
-            if (!registryMap.containsKey(version)) {
-                registryMap.put(version, new HashMap<>());
-            }
-
-            registryMap.get(version).put(output, protocol);
+            Map<Integer, Protocol> protocolMap = registryMap.computeIfAbsent(version, k -> new HashMap<>());
+            protocolMap.put(output, protocol);
         }
 
         if (Via.getPlatform().isPluginEnabled()) {
@@ -118,6 +122,21 @@ public class ProtocolRegistry {
             refreshVersions();
         } else {
             registerList.add(protocol);
+        }
+
+        if (protocol.hasMappingDataToLoad()) {
+            if (mappingLoaderExecutor != null) {
+                // Submit mapping data loading
+                CompletableFuture<Void> future = new CompletableFuture<>();
+                mappingLoaderFutures.put(protocol.getClass(), future);
+                mappingLoaderExecutor.execute(() -> {
+                    protocol.loadMappingData();
+                    future.complete(null);
+                });
+            } else {
+                // Late protocol adding - just do it on the current thread
+                protocol.loadMappingData();
+            }
         }
     }
 
@@ -248,7 +267,7 @@ public class ProtocolRegistry {
             return protocolList;
         }
         // Generate path
-        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);
+        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
         // If it found a path, cache it.
         if (outputPath != null) {
             pathCache.put(protocolKey, outputPath);
@@ -274,4 +293,53 @@ public class ProtocolRegistry {
         return false;
     }
 
+    /**
+     * Ensure that mapping data for that protocol has already been loaded, completes it otherwise.
+     *
+     * @param protocolClass protocol class
+     */
+    public static void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
+        if (mappingLoaderFutures == null) return;
+
+        CompletableFuture<Void> future = mappingLoaderFutures.remove(protocolClass);
+        if (future == null) return;
+
+        future.get();
+
+        if (mappingLoaderFutures.isEmpty()) {
+            shutdownLoaderExecutor();
+        }
+    }
+
+    /**
+     * Ensure that all mapping data has already been loaded, completes it otherwise.
+     */
+    public static void completeMappingDataLoading() throws Exception {
+        if (mappingLoaderFutures == null) return;
+
+        for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
+            future.get();
+        }
+
+        mappingLoaderFutures.clear();
+        shutdownLoaderExecutor();
+    }
+
+    private static void shutdownLoaderExecutor() {
+        mappingLoaderExecutor.shutdown();
+        mappingLoaderExecutor = null;
+        mappingLoaderFutures = null;
+        if (MappingDataLoader.cacheJsonMappings()) {
+            MappingDataLoader.getMappingsCache().clear();
+        }
+    }
+
+    public static void getMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
+        CompletableFuture<Void> future = mappingLoaderFutures.get(protocolClass);
+        if (future != null) {
+            future.whenComplete((v, t) -> runnable.run());
+        } else {
+            runnable.run();
+        }
+    }
 }

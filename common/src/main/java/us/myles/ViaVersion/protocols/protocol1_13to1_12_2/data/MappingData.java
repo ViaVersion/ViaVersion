@@ -33,23 +33,19 @@ public class MappingData {
     public static Mappings blockMappings;
 
     public static void init() {
-        JsonObject mapping1_12 = MappingDataLoader.loadData("mapping-1.12.json");
-        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json");
+        JsonObject mapping1_12 = MappingDataLoader.loadData("mapping-1.12.json", true);
+        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 mappings...");
 
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 block mapping...");
         blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 item mapping...");
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
-        Via.getPlatform().getLogger().info("Loading new 1.13 tags...");
         loadTags(blockTags, mapping1_13.getAsJsonObject("block_tags"));
         loadTags(itemTags, mapping1_13.getAsJsonObject("item_tags"));
         loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 enchantment mapping...");
+
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
         enchantmentMappings = new Mappings(72, mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 sound mapping...");
         soundMappings = new Mappings(662, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 plugin channel mappings...");
 
         JsonObject object = MappingDataLoader.loadFromDataDir("channelmappings-1.13.json");
         if (object != null) {
@@ -64,7 +60,6 @@ public class MappingData {
             }
         }
 
-        Via.getPlatform().getLogger().info("Loading translation mappping");
         Map<String, String> translateData = GsonUtil.getGson().fromJson(
                 new InputStreamReader(MappingData.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
                 new TypeToken<Map<String, String>>() {

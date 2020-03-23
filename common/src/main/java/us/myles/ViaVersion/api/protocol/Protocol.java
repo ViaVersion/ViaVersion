@@ -18,8 +18,14 @@ public abstract class Protocol {
     private final Map<Packet, ProtocolPacket> incoming = new HashMap<>();
     private final Map<Packet, ProtocolPacket> outgoing = new HashMap<>();
     private final Map<Class, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
+    private final boolean hasMappingDataToLoad;
 
     public Protocol() {
+        this(false);
+    }
+
+    public Protocol(boolean hasMappingDataToLoad) {
+        this.hasMappingDataToLoad = hasMappingDataToLoad;
         registerPackets();
     }
 
@@ -50,6 +56,14 @@ public abstract class Protocol {
      * Register the packets for this protocol.
      */
     protected abstract void registerPackets();
+
+    /**
+     * Load mapping data for the protocol.
+     * <p>
+     * To be overridden if needed.
+     */
+    protected void loadMappingData() {
+    }
 
     /**
      * Handle protocol registration phase, use this to register providers / tasks.
@@ -162,6 +176,10 @@ public abstract class Protocol {
 
     public void cancelOutgoing(State state, int oldPacketID) {
         cancelOutgoing(state, oldPacketID, -1);
+    }
+
+    public boolean hasMappingDataToLoad() {
+        return hasMappingDataToLoad;
     }
 
     /**

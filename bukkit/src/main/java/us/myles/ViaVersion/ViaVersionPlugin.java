@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
@@ -80,6 +81,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
             compatSpigotBuild = true;
         } catch (Exception e) {
             compatSpigotBuild = false;
+        }
+
+        if (getServer().getPluginManager().getPlugin("ViaBackwards") != null) {
+            MappingDataLoader.setCacheJsonMappings(true);
         }
 
         // Generate classes needed (only works if it's compat or ps)

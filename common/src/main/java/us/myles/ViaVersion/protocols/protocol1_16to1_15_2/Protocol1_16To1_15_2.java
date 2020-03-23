@@ -20,11 +20,14 @@ import java.util.UUID;
 
 public class Protocol1_16To1_15_2 extends Protocol {
 
+    public Protocol1_16To1_15_2() {
+        super(true);
+    }
+
     @Override
     protected void registerPackets() {
         MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
 
-        MappingData.init();
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
@@ -130,6 +133,11 @@ public class Protocol1_16To1_15_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4C, 0x4D);
         registerOutgoing(State.PLAY, 0x4D, 0x4E);
         registerOutgoing(State.PLAY, 0x4E, 0x43);
+    }
+
+    @Override
+    protected void loadMappingData() {
+        MappingData.init();
     }
 
     public static int getNewBlockStateId(int id) {

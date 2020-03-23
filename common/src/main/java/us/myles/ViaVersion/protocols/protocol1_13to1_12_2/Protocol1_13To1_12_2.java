@@ -42,14 +42,15 @@ import java.util.Map;
 
 public class Protocol1_13To1_12_2 extends Protocol {
 
-    public static final PacketHandler POS_TO_3_INT = new PacketHandler() {
-        @Override
-        public void handle(PacketWrapper wrapper) throws Exception {
-            Position position = wrapper.read(Type.POSITION);
-            wrapper.write(Type.INT, position.getX());
-            wrapper.write(Type.INT, (int) position.getY());
-            wrapper.write(Type.INT, position.getZ());
-        }
+    public Protocol1_13To1_12_2() {
+        super(true);
+    }
+
+    public static final PacketHandler POS_TO_3_INT = wrapper -> {
+        Position position = wrapper.read(Type.POSITION);
+        wrapper.write(Type.INT, position.getX());
+        wrapper.write(Type.INT, (int) position.getY());
+        wrapper.write(Type.INT, position.getZ());
     };
 
     public static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
@@ -132,11 +133,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.UNDERLINE, ':');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.ITALIC, ';');
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.RESET, '/');
-
-        MappingData.init();
-        ConnectionData.init();
-        RecipeData.init();
-        BlockIdData.init();
     }
 
     @Override
@@ -1149,6 +1145,14 @@ public class Protocol1_13To1_12_2 extends Protocol {
         registerIncoming(State.PLAY, 0x1E, 0x28);
         registerIncoming(State.PLAY, 0x1F, 0x29);
         registerIncoming(State.PLAY, 0x20, 0x2A);
+    }
+
+    @Override
+    protected void loadMappingData() {
+        MappingData.init();
+        ConnectionData.init();
+        RecipeData.init();
+        BlockIdData.init();
     }
 
     @Override

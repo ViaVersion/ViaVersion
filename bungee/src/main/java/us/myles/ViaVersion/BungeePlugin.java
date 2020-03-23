@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
@@ -37,7 +38,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     @Override
     public void onLoad() {
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_14_4");
+            ProtocolConstants.class.getField("MINECRAFT_1_15_2");
         } catch (NoSuchFieldException e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");
@@ -47,10 +48,12 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
             getLogger().warning(" /     o     \\");
             getLogger().warning("/_____________\\");
         }
+
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
         commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
+
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -62,6 +65,10 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public void onEnable() {
+        if (ProxyServer.getInstance().getPluginManager().getPlugin("ViaBackwards") != null) {
+            MappingDataLoader.setCacheJsonMappings(true);
+        }
+
         // Inject
         Via.getManager().init();
     }

@@ -5,9 +5,35 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class MappingDataLoader {
+
+    private static final Map<String, JsonObject> MAPPINGS_CACHE = new HashMap<>();
+    private static boolean cacheJsonMappings;
+
+    /**
+     * Returns true if a selected number of mappings should be cached.
+     * If enabled, cleanup should be done after the cache is no longer needed.
+     *
+     * @return true if mappings should be cached
+     */
+    public static boolean cacheJsonMappings() {
+        return cacheJsonMappings;
+    }
+
+    public static void setCacheJsonMappings(boolean cacheJsonMappings) {
+        MappingDataLoader.cacheJsonMappings = cacheJsonMappings;
+        Via.getPlatform().getLogger().info("Enabled caching of mappingdata for ViaBackwards!");
+    }
+
+    /**
+     * @see #cacheJsonMappings()
+     */
+    public static Map<String, JsonObject> getMappingsCache() {
+        return MAPPINGS_CACHE;
+    }
 
     public static JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
@@ -27,10 +53,18 @@ public class MappingDataLoader {
     }
 
     public static JsonObject loadData(String name) {
+        return loadData(name, false);
+    }
+
+    public static JsonObject loadData(String name, boolean cacheIfEnabled) {
         InputStream stream = getResource(name);
         InputStreamReader reader = new InputStreamReader(stream);
         try {
-            return GsonUtil.getGson().fromJson(reader, JsonObject.class);
+            JsonObject object = GsonUtil.getGson().fromJson(reader, JsonObject.class);
+            if (cacheIfEnabled && cacheJsonMappings) {
+                MAPPINGS_CACHE.put(name, object);
+            }
+            return object;
         } finally {
             try {
                 reader.close();

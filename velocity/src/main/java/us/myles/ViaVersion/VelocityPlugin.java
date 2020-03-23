@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
@@ -73,6 +74,11 @@ public class VelocityPlugin implements ViaPlatform<Player> {
                 .commandHandler(commandHandler)
                 .loader(new VelocityViaLoader())
                 .injector(new VelocityViaInjector()).build());
+
+        if (proxy.getPluginManager().getPlugin("ViaBackwards").isPresent()) {
+            MappingDataLoader.setCacheJsonMappings(true);
+        }
+
         Via.getManager().init();
     }
 
