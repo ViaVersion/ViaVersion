@@ -127,16 +127,8 @@ public class ProtocolRegistry {
         if (protocol.hasMappingDataToLoad()) {
             if (mappingLoaderExecutor != null) {
                 // Submit mapping data loading
-                CompletableFuture<Void> future = new CompletableFuture<>();
+                CompletableFuture<Void> future = CompletableFuture.runAsync(protocol::loadMappingData, mappingLoaderExecutor);
                 mappingLoaderFutures.put(protocol.getClass(), future);
-                mappingLoaderExecutor.execute(() -> {
-                    try {
-                        protocol.loadMappingData();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    future.complete(null);
-                });
             } else {
                 // Late protocol adding - just do it on the current thread
                 protocol.loadMappingData();
