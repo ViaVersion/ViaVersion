@@ -88,6 +88,10 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_16To1_15_2(), ProtocolVersion.v1_16, ProtocolVersion.v1_15_2);
     }
 
+    public static void init() {
+        // Empty method to trigger static initializer once
+    }
+
     /**
      * Register a protocol
      *
