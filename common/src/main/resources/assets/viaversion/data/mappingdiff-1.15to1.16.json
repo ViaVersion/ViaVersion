@@ -904,6 +904,12 @@
     "11095": "minecraft:diorite_wall[east=none,north=none,south=none,up=false,waterlogged=true,west=tall]",
     "11096": "minecraft:diorite_wall[east=none,north=none,south=none,up=false,waterlogged=true,west=none]",
     "11097": "minecraft:diorite_wall[east=none,north=none,south=none,up=false,waterlogged=false,west=tall]",
-    "11098": "minecraft:diorite_wall[east=none,north=none,south=none,up=false,waterlogged=false,west=none]"
+    "11098": "minecraft:diorite_wall[east=none,north=none,south=none,up=false,waterlogged=false,west=none]",
+    "11272": "minecraft:jigsaw[orientation=north_up]",
+    "11273": "minecraft:jigsaw[orientation=east_up]",
+    "11274": "minecraft:jigsaw[orientation=south_up]",
+    "11275": "minecraft:jigsaw[orientation=west_up]",
+    "11276": "minecraft:jigsaw[orientation=up_east]",
+    "11277": "minecraft:jigsaw[orientation=down_east]"
   }
 }
