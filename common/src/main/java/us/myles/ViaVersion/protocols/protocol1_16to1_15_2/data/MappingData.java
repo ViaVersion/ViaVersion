@@ -7,8 +7,12 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MappingData {
     public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static Map<String, String> attributeMappings = new HashMap<>();
     public static Mappings blockMappings;
     public static Mappings blockStateMappings;
     public static Mappings soundMappings;
@@ -26,5 +30,17 @@ public class MappingData {
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_15.getAsJsonObject("items"), mapping1_16.getAsJsonObject("items"), diffmapping.getAsJsonObject("items"));
         Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 sound mapping...");
         soundMappings = new Mappings(mapping1_15.getAsJsonArray("sounds"), mapping1_16.getAsJsonArray("sounds"), diffmapping.getAsJsonObject("sounds"));
+
+        attributeMappings.put("generic.maxHealth", "minecraft:generic.max_health");
+        attributeMappings.put("zombie.spawnReinforcements", "minecraft:zombie.spawn_reinforcements");
+        attributeMappings.put("horse.jumpStrength", "minecraft:horse.jump_strength");
+        attributeMappings.put("generic.followRange", "minecraft:generic.follow_range");
+        attributeMappings.put("generic.knockbackResistance", "minecraft:generic.knockback_resistance");
+        attributeMappings.put("generic.movementSpeed", "minecraft:generic.movement_speed");
+        attributeMappings.put("generic.flyingSpeed", "minecraft:generic.flying_speed");
+        attributeMappings.put("generic.attackDamage", "minecraft:generic.attack_damage");
+        attributeMappings.put("generic.attackKnockback", "minecraft:generic.attack_knockback");
+        attributeMappings.put("generic.attackSpeed", "minecraft:generic.attack_speed");
+        attributeMappings.put("generic.armorToughness", "minecraft:generic.armor_toughness");
     }
 }

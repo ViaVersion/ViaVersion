@@ -50,4 +50,18 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
     protected EntityType getTypeFromId(int type) {
         return Entity1_16Types.getTypeFromId(type);
     }
+
+    @Override
+    public int getNewEntityId(final int oldId) {
+        if (oldId == 57) {
+            return 95;
+        }
+        if (oldId > 57 && oldId < 95) {
+            return oldId - 1;
+        }
+        if (oldId > 102) {
+            return oldId + 1;
+        }
+        return oldId;
+    }
 }
