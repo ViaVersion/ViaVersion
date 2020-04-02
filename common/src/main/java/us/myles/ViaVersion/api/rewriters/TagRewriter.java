@@ -61,21 +61,19 @@ public class TagRewriter {
 
     private void handle(PacketWrapper wrapper, IdRewriteFunction rewriteFunction, List<TagData> newTags) throws Exception {
         int tagsSize = wrapper.read(Type.VAR_INT);
-        if (newTags != null) {
-            wrapper.write(Type.VAR_INT, tagsSize + newTags.size()); // new tags
-        } else {
-            wrapper.write(Type.VAR_INT, tagsSize);
-        }
+        wrapper.write(Type.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
 
         for (int i = 0; i < tagsSize; i++) {
             wrapper.passthrough(Type.STRING);
             int[] ids = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-            for (int j = 0; j < ids.length; j++) {
-                ids[j] = rewriteFunction.rewrite(ids[j]);
+            if (rewriteFunction != null) {
+                for (int j = 0; j < ids.length; j++) {
+                    ids[j] = rewriteFunction.rewrite(ids[j]);
+                }
             }
         }
 
-        // Send new block tags if present
+        // Send new tags if present
         if (newTags != null) {
             for (TagData tag : newTags) {
                 wrapper.write(Type.STRING, tag.identifier);
@@ -88,7 +86,7 @@ public class TagRewriter {
         private final String identifier;
         private final int[] entries;
 
-        private TagData(final String identifier, final int[] entries) {
+        private TagData(String identifier, int[] entries) {
             this.identifier = identifier;
             this.entries = entries;
         }
