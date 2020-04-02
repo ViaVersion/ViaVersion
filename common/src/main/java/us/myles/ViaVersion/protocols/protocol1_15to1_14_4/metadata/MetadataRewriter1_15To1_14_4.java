@@ -51,7 +51,7 @@ public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
     }
 
     @Override
-    protected int getNewEntityId(final int oldId) {
+    public int getNewEntityId(final int oldId) {
         return EntityPackets.getNewEntityId(oldId);
     }
 

@@ -242,7 +242,7 @@ public abstract class MetadataRewriter {
         return getTypeFromId(type);
     }
 
-    protected int getNewEntityId(int oldId) {
+    public int getNewEntityId(int oldId) {
         return oldId;
     }
 

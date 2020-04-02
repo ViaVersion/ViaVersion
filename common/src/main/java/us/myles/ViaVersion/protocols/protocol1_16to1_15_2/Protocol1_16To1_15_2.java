@@ -4,6 +4,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
@@ -20,12 +21,22 @@ public class Protocol1_16To1_15_2 extends Protocol {
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_16To1_15_2(this);
+        MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
 
         MappingData.init();
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
+
+        TagRewriter tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
+        tagRewriter.addBlockTag("minecraft:beacon_base_blocks", 133, 134, 148, 265);
+        tagRewriter.addBlockTag("minecraft:climbable", 160, 241, 658);
+        // The client crashes if we don't send these tags
+        tagRewriter.addEmptyBlockTag("minecraft:soul_speed_blocks");
+        tagRewriter.addEmptyBlockTag("minecraft:soul_fire_base_blocks");
+        tagRewriter.addEmptyBlockTag("minecraft:fire");
+        tagRewriter.addEmptyBlockTag("minecraft:beacon_payment_items");
+        tagRewriter.register(0x5C, 0x5C);
 
         // Login Success
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
@@ -98,40 +109,6 @@ public class Protocol1_16To1_15_2 extends Protocol {
                         int arrayLength = wrapper.passthrough(Type.VAR_INT);
                         for (int array = 0; array < arrayLength; array++) {
                             wrapper.passthrough(Type.STRING_ARRAY); // String array
-                        }
-                    }
-                });
-            }
-        });
-
-        // Tags
-        registerOutgoing(State.PLAY, 0x5C, 0x5C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int blockTagsSize = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, blockTagsSize + 2); // new tag(s)
-
-                    for (int i = 0; i < blockTagsSize; i++) {
-                        wrapper.passthrough(Type.STRING);
-                        int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                        for (int j = 0; j < blockIds.length; j++) {
-                            blockIds[j] = getNewBlockId(blockIds[j]);
-                        }
-                    }
-
-                    // Only send the necessary new tags
-                    wrapper.write(Type.STRING, "minecraft:beacon_base_blocks");
-                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{getNewBlockId(133), getNewBlockId(134), getNewBlockId(148), getNewBlockId(265)});
-                    wrapper.write(Type.STRING, "minecraft:climbable");
-                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{getNewBlockId(160), getNewBlockId(241), getNewBlockId(658)});
-
-                    int itemTagsSize = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < itemTagsSize; i++) {
-                        wrapper.passthrough(Type.STRING);
-                        int[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                        for (int j = 0; j < itemIds.length; j++) {
-                            itemIds[j] = InventoryPackets.getNewItemId(itemIds[j]);
                         }
                     }
                 });
