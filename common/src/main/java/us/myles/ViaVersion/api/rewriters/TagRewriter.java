@@ -16,7 +16,8 @@ public class TagRewriter {
     private final IdRewriteFunction itemRewriter;
     private final IdRewriteFunction entityRewriter;
     private final List<TagData> newBlockTags = new ArrayList<>();
-    // add item, fluid, or entity tag lists if needed at some point
+    private final List<TagData> newItemTags = new ArrayList<>();
+    // add fluid or entity tag lists if needed at some point
 
     public TagRewriter(Protocol protocol, IdRewriteFunction blockRewriter, IdRewriteFunction itemRewriter, IdRewriteFunction entityRewriter) {
         this.protocol = protocol;
@@ -29,12 +30,24 @@ public class TagRewriter {
         newBlockTags.add(new TagData(id, EMPTY_ARRAY));
     }
 
+    public void addEmptyItemTag(String id) {
+        newItemTags.add(new TagData(id, EMPTY_ARRAY));
+    }
+
     public void addBlockTag(String id, int... oldBlockIds) {
-        for (int i = 0; i < oldBlockIds.length; i++) {
-            int oldBlockId = oldBlockIds[i];
-            oldBlockIds[i] = blockRewriter.rewrite(oldBlockId);
+        addTag(newBlockTags, blockRewriter, id, oldBlockIds);
+    }
+
+    public void addItemTag(String id, int... oldItemIds) {
+        addTag(newItemTags, itemRewriter, id, oldItemIds);
+    }
+
+    private void addTag(List<TagData> list, IdRewriteFunction rewriteFunction, String id, int... oldIds) {
+        for (int i = 0; i < oldIds.length; i++) {
+            int oldId = oldIds[i];
+            oldIds[i] = rewriteFunction.rewrite(oldId);
         }
-        newBlockTags.add(new TagData(id, oldBlockIds));
+        list.add(new TagData(id, oldIds));
     }
 
     public void register(int oldId, int newId) {
@@ -43,7 +56,7 @@ public class TagRewriter {
             public void registerMap() {
                 handler(wrapper -> {
                     handle(wrapper, blockRewriter, newBlockTags);
-                    handle(wrapper, itemRewriter, null);
+                    handle(wrapper, itemRewriter, newItemTags);
 
                     if (entityRewriter == null) return;
 
