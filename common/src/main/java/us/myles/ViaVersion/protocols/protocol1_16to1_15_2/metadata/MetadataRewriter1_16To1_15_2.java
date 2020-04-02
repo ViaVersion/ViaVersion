@@ -59,7 +59,7 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
         if (oldId > 57 && oldId < 95) {
             return oldId - 1;
         }
-        if (oldId > 103) {
+        if (oldId > 102) {
             return oldId + 1;
         }
         return oldId;
