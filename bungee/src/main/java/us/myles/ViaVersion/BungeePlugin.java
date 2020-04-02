@@ -66,7 +66,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     @Override
     public void onEnable() {
         if (ProxyServer.getInstance().getPluginManager().getPlugin("ViaBackwards") != null) {
-            MappingDataLoader.setCacheJsonMappings(true);
+            MappingDataLoader.enableMappingsCache();
         }
 
         // Inject

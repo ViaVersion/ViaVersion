@@ -84,7 +84,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform {
         }
 
         if (getServer().getPluginManager().getPlugin("ViaBackwards") != null) {
-            MappingDataLoader.setCacheJsonMappings(true);
+            MappingDataLoader.enableMappingsCache();
         }
 
         // Generate classes needed (only works if it's compat or ps)

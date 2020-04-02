@@ -76,7 +76,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
                 .injector(new VelocityViaInjector()).build());
 
         if (proxy.getPluginManager().getPlugin("ViaBackwards").isPresent()) {
-            MappingDataLoader.setCacheJsonMappings(true);
+            MappingDataLoader.enableMappingsCache();
         }
 
         Via.getManager().init();

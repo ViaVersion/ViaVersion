@@ -31,8 +31,21 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3To1_9_1
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
@@ -44,8 +57,10 @@ public class ProtocolRegistry {
     private static final Set<Integer> supportedVersions = new HashSet<>();
     private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
 
-    private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new ConcurrentHashMap<>();
+    private static final Object MAPPING_LOADER_LOCK = new Object();
+    private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
     private static ThreadPoolExecutor mappingLoaderExecutor;
+    private static boolean mappingsLoaded;
 
     static {
         mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>());
@@ -165,8 +180,9 @@ public class ProtocolRegistry {
             List<Pair<Integer, Protocol>> paths = getProtocolPath(versions.getId(), ProtocolRegistry.SERVER_PROTOCOL);
             if (paths == null) continue;
             supportedVersions.add(versions.getId());
-            for (Pair<Integer, Protocol> path : paths)
+            for (Pair<Integer, Protocol> path : paths) {
                 supportedVersions.add(path.getKey());
+            }
         }
     }
 
@@ -298,47 +314,45 @@ public class ProtocolRegistry {
      * @param protocolClass protocol class
      */
     public static void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
-        if (mappingLoaderFutures == null) return;
+        if (mappingsLoaded) return;
 
-        CompletableFuture<Void> future = mappingLoaderFutures.remove(protocolClass);
+        CompletableFuture<Void> future = getMappingLoaderFuture(protocolClass);
         if (future == null) return;
 
         future.get();
 
-        if (mappingLoaderFutures.isEmpty()) {
-            shutdownLoaderExecutor();
+        synchronized (MAPPING_LOADER_LOCK) {
+            if (mappingsLoaded) return;
+
+            // Remove only after execution to block other potential threads
+            mappingLoaderFutures.remove(protocolClass);
+            if (mappingLoaderFutures.isEmpty()) {
+                shutdownLoaderExecutor();
+            }
         }
-    }
-
-    /**
-     * Ensure that all mapping data has already been loaded, completes it otherwise.
-     */
-    public static void completeMappingDataLoading() throws Exception {
-        if (mappingLoaderFutures == null) return;
-
-        for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
-            future.get();
-        }
-
-        mappingLoaderFutures.clear();
-        shutdownLoaderExecutor();
     }
 
     private static void shutdownLoaderExecutor() {
+        mappingsLoaded = true;
         mappingLoaderExecutor.shutdown();
         mappingLoaderExecutor = null;
         mappingLoaderFutures = null;
-        if (MappingDataLoader.cacheJsonMappings()) {
+        if (MappingDataLoader.isCacheJsonMappings()) {
             MappingDataLoader.getMappingsCache().clear();
         }
     }
 
     public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
-        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor);
-        mappingLoaderFutures.put(protocolClass, future);
+        synchronized (MAPPING_LOADER_LOCK) {
+            CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor);
+            mappingLoaderFutures.put(protocolClass, future);
+        }
     }
 
     public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
-        return mappingLoaderFutures.get(protocolClass);
+        synchronized (MAPPING_LOADER_LOCK) {
+            if (mappingsLoaded) return null;
+            return mappingLoaderFutures.get(protocolClass);
+        }
     }
 }
