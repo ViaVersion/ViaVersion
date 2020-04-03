@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -55,7 +56,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        List<CompoundTag> nbtData = Arrays.asList(Type.NBT_ARRAY.read(input));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
 
         // Read all the remaining bytes (workaround for #681)
         if (input.readableBytes() > 0) {
