@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
+import us.myles.ViaVersion.api.rewriters.TagType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
@@ -29,15 +30,15 @@ public class Protocol1_16To1_15_2 extends Protocol {
         InventoryPackets.register(this);
 
         TagRewriter tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
-        tagRewriter.addBlockTag("minecraft:beacon_base_blocks", 133, 134, 148, 265);
-        tagRewriter.addBlockTag("minecraft:climbable", 160, 241, 658);
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:climbable", 160, 241, 658);
         // The client crashes if we don't send these tags
-        tagRewriter.addEmptyBlockTag("minecraft:soul_speed_blocks");
-        tagRewriter.addEmptyBlockTag("minecraft:soul_fire_base_blocks");
-        tagRewriter.addEmptyBlockTag("minecraft:fire");
-        tagRewriter.addEmptyBlockTag("minecraft:beacon_payment_items");
-        tagRewriter.addEmptyBlockTag("minecraft:non_flammable_wood");
-        tagRewriter.addEmptyItemTag("minecraft:non_flammable_wood");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_speed_blocks");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_fire_base_blocks");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:fire");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:beacon_payment_items");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:non_flammable_wood");
+        tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:non_flammable_wood");
         tagRewriter.register(0x5C, 0x5C);
 
         // Login Success

@@ -26,28 +26,18 @@ public class TagRewriter {
         this.entityRewriter = entityRewriter;
     }
 
-    public void addEmptyBlockTag(String id) {
-        newBlockTags.add(new TagData(id, EMPTY_ARRAY));
+    public void addEmptyTag(TagType tagType, String id) {
+        getNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
     }
 
-    public void addEmptyItemTag(String id) {
-        newItemTags.add(new TagData(id, EMPTY_ARRAY));
-    }
-
-    public void addBlockTag(String id, int... oldBlockIds) {
-        addTag(newBlockTags, blockRewriter, id, oldBlockIds);
-    }
-
-    public void addItemTag(String id, int... oldItemIds) {
-        addTag(newItemTags, itemRewriter, id, oldItemIds);
-    }
-
-    private void addTag(List<TagData> list, IdRewriteFunction rewriteFunction, String id, int... oldIds) {
+    public void addTag(TagType tagType, String id, int... oldIds) {
+        List<TagData> newTags = getNewTags(tagType);
+        IdRewriteFunction rewriteFunction = getRewriter(tagType);
         for (int i = 0; i < oldIds.length; i++) {
             int oldId = oldIds[i];
             oldIds[i] = rewriteFunction.rewrite(oldId);
         }
-        list.add(new TagData(id, oldIds));
+        newTags.add(new TagData(id, oldIds));
     }
 
     public void register(int oldId, int newId) {
@@ -92,6 +82,33 @@ public class TagRewriter {
                 wrapper.write(Type.STRING, tag.identifier);
                 wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.entries);
             }
+        }
+    }
+
+    private List<TagData> getNewTags(TagType tagType) {
+        switch (tagType) {
+            case BLOCK:
+                return newBlockTags;
+            case ITEM:
+                return newItemTags;
+            case ENTITY:
+            case FLUID:
+            default:
+                return null;
+        }
+    }
+
+    private IdRewriteFunction getRewriter(TagType tagType) {
+        switch (tagType) {
+            case BLOCK:
+                return blockRewriter;
+            case ITEM:
+                return itemRewriter;
+            case ENTITY:
+                return entityRewriter;
+            case FLUID:
+            default:
+                return null;
         }
     }
 
