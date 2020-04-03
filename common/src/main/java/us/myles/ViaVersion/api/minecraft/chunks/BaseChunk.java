@@ -1,29 +1,32 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 
-@AllArgsConstructor
 public class BaseChunk implements Chunk {
     protected final int x;
     protected final int z;
-    protected final boolean groundUp;
+    protected final boolean fullChunk;
     protected final int bitmask;
     protected final ChunkSection[] sections;
     protected int[] biomeData;
     protected CompoundTag heightMap;
     protected final List<CompoundTag> blockEntities;
 
-    public BaseChunk(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
+    public BaseChunk(int x, int z, boolean fullChunk, int bitmask, ChunkSection[] sections, int[] biomeData, CompoundTag heightMap, List<CompoundTag> blockEntities) {
         this.x = x;
         this.z = z;
-        this.groundUp = groundUp;
+        this.fullChunk = fullChunk;
         this.bitmask = bitmask;
         this.sections = sections;
         this.biomeData = biomeData;
+        this.heightMap = heightMap;
         this.blockEntities = blockEntities;
+    }
+
+    public BaseChunk(int x, int z, boolean fullChunk, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
+        this(x, z, fullChunk, bitmask, sections, biomeData, null, blockEntities);
     }
 
     @Override
@@ -42,8 +45,8 @@ public class BaseChunk implements Chunk {
     }
 
     @Override
-    public boolean isGroundUp() {
-        return groundUp;
+    public boolean isFullChunk() {
+        return fullChunk;
     }
 
     @Override

@@ -42,7 +42,7 @@ public class WorldPackets {
                         Chunk chunk = wrapper.read(new Chunk1_14Type(clientWorld));
                         wrapper.write(new Chunk1_15Type(clientWorld), chunk);
 
-                        if (chunk.isGroundUp()) {
+                        if (chunk.isFullChunk()) {
                             int[] biomeData = chunk.getBiomeData();
                             int[] newBiomeData = new int[1024];
                             if (biomeData != null) {
