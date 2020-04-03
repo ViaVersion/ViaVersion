@@ -6,6 +6,8 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.TagRewriter;
+import us.myles.ViaVersion.api.rewriters.TagType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data.MappingData;
@@ -113,50 +115,14 @@ public class Protocol1_15To1_14_4 extends Protocol {
         });
 
         // Tags
-        registerOutgoing(State.PLAY, 0x5B, 0x5C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        //TODO do the new (flower) tags have to be sent?
-                        int blockTagsSize = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < blockTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < blockIds.length; j++) {
-                                blockIds[j] = getNewBlockId(blockIds[j]);
-                            }
-                        }
-
-                        int itemTagsSize = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < itemTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < itemIds.length; j++) {
-                                itemIds[j] = InventoryPackets.getNewItemId(itemIds[j]);
-                            }
-                        }
-
-                        int fluidTagsSize = wrapper.passthrough(Type.VAR_INT); // fluid tags
-                        for (int i = 0; i < fluidTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                        }
-
-                        int entityTagsSize = wrapper.passthrough(Type.VAR_INT); // entity tags
-                        for (int i = 0; i < entityTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] entitIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < entitIds.length; j++) {
-                                entitIds[j] = EntityPackets.getNewEntityId(entitIds[j]);
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
+        TagRewriter tagRewriter = new TagRewriter(this, Protocol1_15To1_14_4::getNewBlockId, InventoryPackets::getNewItemId, EntityPackets::getNewEntityId);
+        int[] shulkerBoxes = new int[17];
+        int shulkerBoxOffset = 501;
+        for (int i = 0; i < 17; i++) {
+            shulkerBoxes[i] = shulkerBoxOffset + i;
+        }
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
+        tagRewriter.register(0x5B, 0x5C);
 
         registerOutgoing(State.PLAY, 0x08, 0x09);
         registerOutgoing(State.PLAY, 0x09, 0x0A);

@@ -148,7 +148,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int blockTagsSize = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, blockTagsSize + 5); // block tags
+                        wrapper.write(Type.VAR_INT, blockTagsSize + 6); // block tags
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
                             int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
@@ -174,6 +174,8 @@ public class Protocol1_14To1_13_2 extends Protocol {
                         wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 248, 472, 473, 474, 475});
                         wrapper.write(Type.STRING, "minecraft:walls");
                         wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{271, 272});
+                        wrapper.write(Type.STRING, "minecraft:wooden_fences");
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 472, 473, 474, 475});
                         int itemTagsSize = wrapper.read(Type.VAR_INT);
                         wrapper.write(Type.VAR_INT, itemTagsSize + 2); // item tags
                         for (int i = 0; i < itemTagsSize; i++) {
