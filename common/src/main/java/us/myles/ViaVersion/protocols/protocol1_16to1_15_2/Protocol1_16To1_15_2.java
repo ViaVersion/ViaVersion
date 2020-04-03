@@ -36,9 +36,9 @@ public class Protocol1_16To1_15_2 extends Protocol {
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_speed_blocks");
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_fire_base_blocks");
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:fire");
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:beacon_payment_items");
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:non_flammable_wood");
         tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:non_flammable_wood");
+        tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:beacon_payment_items");
         tagRewriter.register(0x5C, 0x5C);
 
         // Login Success
