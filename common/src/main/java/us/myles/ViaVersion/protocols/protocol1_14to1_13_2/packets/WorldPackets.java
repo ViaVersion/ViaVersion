@@ -28,11 +28,11 @@ import us.myles.ViaVersion.util.CompactArrayUtil;
 import java.util.Arrays;
 
 public class WorldPackets {
-    private static final int AIR = MappingData.blockStateMappings.getNewId(0);
-    private static final int VOID_AIR = MappingData.blockStateMappings.getNewId(8591);
-    private static final int CAVE_AIR = MappingData.blockStateMappings.getNewId(8592);
     public static final int SERVERSIDE_VIEW_DISTANCE = 64;
     private static final byte[] FULL_LIGHT = new byte[2048];
+    public static int air;
+    public static int voidAir;
+    public static int caveAir;
 
     static {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
@@ -156,7 +156,7 @@ public class WorldPackets {
                             for (int i = 0; i < section.getPaletteSize(); i++) {
                                 int old = section.getPaletteEntry(i);
                                 int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
-                                if (!hasBlock && newId != AIR && newId != VOID_AIR && newId != CAVE_AIR) { // air, void_air, cave_air
+                                if (!hasBlock && newId != air && newId != voidAir && newId != caveAir) { // air, void_air, cave_air
                                     hasBlock = true;
                                 }
                                 section.setPaletteEntry(i, newId);
@@ -171,7 +171,7 @@ public class WorldPackets {
                                 for (int y = 0; y < 16; y++) {
                                     for (int z = 0; z < 16; z++) {
                                         int id = section.getFlatBlock(x, y, z);
-                                        if (id != AIR && id != VOID_AIR && id != CAVE_AIR) {
+                                        if (id != air && id != voidAir && id != caveAir) {
                                             nonAirBlockCount++;
                                             worldSurface[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
                                         }

@@ -1,14 +1,52 @@
 package us.myles.ViaVersion.api.data;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MappingDataLoader {
 
+    private static final Map<String, JsonObject> MAPPINGS_CACHE = new ConcurrentHashMap<>();
+    private static boolean cacheJsonMappings;
+
+    /**
+     * Returns true if a selected number of mappings should be cached.
+     * If enabled, cleanup should be done after the cache is no longer needed.
+     *
+     * @return true if mappings should be cached
+     */
+    public static boolean isCacheJsonMappings() {
+        return cacheJsonMappings;
+    }
+
+    public static void enableMappingsCache() {
+        cacheJsonMappings = true;
+    }
+
+    /**
+     * Returns the cached mappings. Cleared after Via has been fully loaded.
+     *
+     * @see #isCacheJsonMappings()
+     */
+    public static Map<String, JsonObject> getMappingsCache() {
+        return MAPPINGS_CACHE;
+    }
+
+    /**
+     * Loads the file from the plugin folder if present, else from the bundled resources.
+     */
     public static JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
         if (!file.exists()) return loadData(name);
@@ -26,11 +64,34 @@ public class MappingDataLoader {
         return null;
     }
 
+    /**
+     * Loads the file from the bundled resources. Uses the cache if enabled.
+     */
     public static JsonObject loadData(String name) {
+        return loadData(name, false);
+    }
+
+    /**
+     * Loads the file from the bundled resources. Uses the cache if enabled.
+     *
+     * @param cacheIfEnabled whether loaded files should be cached
+     */
+    public static JsonObject loadData(String name, boolean cacheIfEnabled) {
+        if (cacheJsonMappings) {
+            JsonObject cached = MAPPINGS_CACHE.get(name);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
         InputStream stream = getResource(name);
         InputStreamReader reader = new InputStreamReader(stream);
         try {
-            return GsonUtil.getGson().fromJson(reader, JsonObject.class);
+            JsonObject object = GsonUtil.getGson().fromJson(reader, JsonObject.class);
+            if (cacheIfEnabled && cacheJsonMappings) {
+                MAPPINGS_CACHE.put(name, object);
+            }
+            return object;
         } finally {
             try {
                 reader.close();

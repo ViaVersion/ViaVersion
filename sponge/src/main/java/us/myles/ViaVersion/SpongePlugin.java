@@ -19,6 +19,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
@@ -68,7 +69,8 @@ public class SpongePlugin implements ViaPlatform {
         conf = new SpongeViaConfig(container, defaultConfig.getParentFile());
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
-        getLogger().info("ViaVersion " + getPluginVersion() + " is now loaded!");
+        logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
+
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -80,6 +82,10 @@ public class SpongePlugin implements ViaPlatform {
 
     @Listener
     public void onServerStart(GameAboutToStartServerEvent event) {
+        if (game.getPluginManager().getPlugin("ViaBackwards").isPresent()) {
+            MappingDataLoader.enableMappingsCache();
+        }
+
         // Inject!
         logger.info("ViaVersion is injecting!");
         Via.getManager().init();

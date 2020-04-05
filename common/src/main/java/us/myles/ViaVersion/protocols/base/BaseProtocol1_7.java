@@ -9,7 +9,6 @@ import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
@@ -188,11 +187,6 @@ public class BaseProtocol1_7 extends Protocol {
         }); // Login Start Packet
         registerIncoming(State.LOGIN, 0x01, 0x01); // Encryption Response Packet
         registerIncoming(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
-
     }
 
     public static String addDashes(String trimmedUUID) {

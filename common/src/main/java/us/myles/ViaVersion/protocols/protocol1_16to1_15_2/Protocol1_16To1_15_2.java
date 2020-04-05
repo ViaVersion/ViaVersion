@@ -20,25 +20,21 @@ import java.util.UUID;
 
 public class Protocol1_16To1_15_2 extends Protocol {
 
+    private TagRewriter tagRewriter;
+
+    public Protocol1_16To1_15_2() {
+        super(true);
+    }
+
     @Override
     protected void registerPackets() {
         MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
 
-        MappingData.init();
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
 
-        TagRewriter tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:climbable", 160, 241, 658);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:fire", 142);
-        tagRewriter.addTag(TagType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
-        // The client crashes if we don't send all tags it may use
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_speed_blocks");
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_fire_base_blocks");
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:non_flammable_wood");
-        tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:non_flammable_wood");
+        tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
         tagRewriter.register(0x5C, 0x5C);
 
         // Login Success
@@ -130,6 +126,21 @@ public class Protocol1_16To1_15_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4C, 0x4D);
         registerOutgoing(State.PLAY, 0x4D, 0x4E);
         registerOutgoing(State.PLAY, 0x4E, 0x43);
+    }
+
+    @Override
+    protected void loadMappingData() {
+        MappingData.init();
+
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:climbable", 160, 241, 658);
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:fire", 142);
+        tagRewriter.addTag(TagType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
+        // The client crashes if we don't send all tags it may use
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_speed_blocks");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_fire_base_blocks");
+        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:non_flammable_wood");
+        tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:non_flammable_wood");
     }
 
     public static int getNewBlockStateId(int id) {

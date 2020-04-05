@@ -23,26 +23,21 @@ public class MappingData {
     public static Set<Integer> nonFullBlocks;
 
     public static void init() {
-        JsonObject mapping1_13_2 = MappingDataLoader.loadData("mapping-1.13.2.json");
-        JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json");
+        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 mappings...");
+        JsonObject mapping1_13_2 = MappingDataLoader.loadData("mapping-1.13.2.json", true);
+        JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json", true);
 
-        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 blockstate mapping...");
         blockStateMappings = new Mappings(mapping1_13_2.getAsJsonObject("blockstates"), mapping1_14.getAsJsonObject("blockstates"));
-        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 block mapping...");
         blockMappings = new Mappings(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));
-        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 item mapping...");
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_13_2.getAsJsonObject("items"), mapping1_14.getAsJsonObject("items"));
-        Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 sound mapping...");
         soundMappings = new Mappings(mapping1_13_2.getAsJsonArray("sounds"), mapping1_14.getAsJsonArray("sounds"));
 
-        Via.getPlatform().getLogger().info("Loading 1.14 blockstates...");
         JsonObject blockStates = mapping1_14.getAsJsonObject("blockstates");
         Map<String, Integer> blockStateMap = new HashMap<>(blockStates.entrySet().size());
         for (Map.Entry<String, JsonElement> entry : blockStates.entrySet()) {
             blockStateMap.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
         }
 
-        Via.getPlatform().getLogger().info("Loading 1.14 heightmap data...");
         JsonObject heightMapData = MappingDataLoader.loadData("heightMapData-1.14.json");
         JsonArray motionBlocking = heightMapData.getAsJsonArray("MOTION_BLOCKING");
         us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking = new HashSet<>(motionBlocking.size());

@@ -19,8 +19,8 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_14To1_13_2 extends Protocol {
 
-    static {
-        MappingData.init();
+    public Protocol1_14To1_13_2() {
+        super(true);
     }
 
     @Override
@@ -252,6 +252,14 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerIncoming(State.PLAY, 0x28, 0x2B);
 
         registerIncoming(State.PLAY, 0x2A, 0x2D);
+    }
+
+    @Override
+    protected void loadMappingData() {
+        MappingData.init();
+        WorldPackets.air = MappingData.blockStateMappings.getNewId(0);
+        WorldPackets.voidAir = MappingData.blockStateMappings.getNewId(8591);
+        WorldPackets.caveAir = MappingData.blockStateMappings.getNewId(8592);
     }
 
     public static int getNewSoundId(int id) {

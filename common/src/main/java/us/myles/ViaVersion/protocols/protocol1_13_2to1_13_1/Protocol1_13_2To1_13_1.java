@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -70,10 +69,5 @@ public class Protocol1_13_2To1_13_1 extends Protocol {
                 });
             }
         });
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
-
     }
 }

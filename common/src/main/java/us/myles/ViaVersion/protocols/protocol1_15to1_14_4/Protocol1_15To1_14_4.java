@@ -21,11 +21,16 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_15To1_14_4 extends Protocol {
 
+    private TagRewriter tagRewriter;
+
+    public Protocol1_15To1_14_4() {
+        super(true);
+    }
+
     @Override
     protected void registerPackets() {
         new MetadataRewriter1_15To1_14_4(this);
 
-        MappingData.init();
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);
@@ -115,13 +120,7 @@ public class Protocol1_15To1_14_4 extends Protocol {
         });
 
         // Tags
-        TagRewriter tagRewriter = new TagRewriter(this, Protocol1_15To1_14_4::getNewBlockId, InventoryPackets::getNewItemId, EntityPackets::getNewEntityId);
-        int[] shulkerBoxes = new int[17];
-        int shulkerBoxOffset = 501;
-        for (int i = 0; i < 17; i++) {
-            shulkerBoxes[i] = shulkerBoxOffset + i;
-        }
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
+        tagRewriter = new TagRewriter(this, Protocol1_15To1_14_4::getNewBlockId, InventoryPackets::getNewItemId, EntityPackets::getNewEntityId);
         tagRewriter.register(0x5B, 0x5C);
 
         registerOutgoing(State.PLAY, 0x08, 0x09);
@@ -201,6 +200,18 @@ public class Protocol1_15To1_14_4 extends Protocol {
 
         registerOutgoing(State.PLAY, 0x58, 0x59);
         registerOutgoing(State.PLAY, 0x59, 0x5A);
+    }
+
+    @Override
+    protected void loadMappingData() {
+        MappingData.init();
+
+        int[] shulkerBoxes = new int[17];
+        int shulkerBoxOffset = 501;
+        for (int i = 0; i < 17; i++) {
+            shulkerBoxes[i] = shulkerBoxOffset + i;
+        }
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
     }
 
     public static int getNewBlockStateId(int id) {

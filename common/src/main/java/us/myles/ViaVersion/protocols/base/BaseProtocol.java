@@ -58,6 +58,8 @@ public class BaseProtocol extends Protocol {
                         if (protocols != null) {
                             for (Pair<Integer, Protocol> prot : protocols) {
                                 pipeline.add(prot.getValue());
+                                // Ensure mapping data has already been loaded
+                                ProtocolRegistry.completeMappingDataLoading(prot.getValue().getClass());
                             }
                             wrapper.set(Type.VAR_INT, 0, protocol);
                         }

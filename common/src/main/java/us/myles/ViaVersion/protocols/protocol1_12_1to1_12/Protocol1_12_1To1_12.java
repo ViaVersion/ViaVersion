@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_12_1to1_12;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -86,10 +85,5 @@ public class Protocol1_12_1To1_12 extends Protocol {
                 });
             }
         });
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
-
     }
 }

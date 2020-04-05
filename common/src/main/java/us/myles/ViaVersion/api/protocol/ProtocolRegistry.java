@@ -2,9 +2,9 @@ package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
-import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.protocols.base.BaseProtocol;
 import us.myles.ViaVersion.protocols.base.BaseProtocol1_7;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
@@ -31,8 +31,21 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3To1_9_1
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
@@ -40,11 +53,19 @@ public class ProtocolRegistry {
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private static final Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
     private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
-    private static final List<Protocol> registerList = Lists.newCopyOnWriteArrayList();
-    private static final Set<Integer> supportedVersions = Sets.newConcurrentHashSet();
+    private static final List<Protocol> registerList = new ArrayList<>();
+    private static final Set<Integer> supportedVersions = new HashSet<>();
     private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
 
+    private static final Object MAPPING_LOADER_LOCK = new Object();
+    private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
+    private static ThreadPoolExecutor mappingLoaderExecutor;
+    private static boolean mappingsLoaded;
+
     static {
+        mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>());
+        mappingLoaderExecutor.allowCoreThreadTimeOut(true);
+
         // Base Protocol
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
         registerBaseProtocol(new BaseProtocol1_7(), Range.all());
@@ -82,6 +103,10 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_16To1_15_2(), ProtocolVersion.v1_16, ProtocolVersion.v1_15_2);
     }
 
+    public static void init() {
+        // Empty method to trigger static initializer once
+    }
+
     /**
      * Register a protocol
      *
@@ -102,15 +127,13 @@ public class ProtocolRegistry {
      */
     public static void registerProtocol(Protocol protocol, List<Integer> supported, Integer output) {
         // Clear cache as this may make new routes.
-        if (!pathCache.isEmpty())
+        if (!pathCache.isEmpty()) {
             pathCache.clear();
+        }
 
         for (Integer version : supported) {
-            if (!registryMap.containsKey(version)) {
-                registryMap.put(version, new HashMap<>());
-            }
-
-            registryMap.get(version).put(output, protocol);
+            Map<Integer, Protocol> protocolMap = registryMap.computeIfAbsent(version, k -> new HashMap<>());
+            protocolMap.put(output, protocol);
         }
 
         if (Via.getPlatform().isPluginEnabled()) {
@@ -118,6 +141,16 @@ public class ProtocolRegistry {
             refreshVersions();
         } else {
             registerList.add(protocol);
+        }
+
+        if (protocol.hasMappingDataToLoad()) {
+            if (mappingLoaderExecutor != null) {
+                // Submit mapping data loading
+                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
+            } else {
+                // Late protocol adding - just do it on the current thread
+                protocol.loadMappingData();
+            }
         }
     }
 
@@ -147,8 +180,9 @@ public class ProtocolRegistry {
             List<Pair<Integer, Protocol>> paths = getProtocolPath(versions.getId(), ProtocolRegistry.SERVER_PROTOCOL);
             if (paths == null) continue;
             supportedVersions.add(versions.getId());
-            for (Pair<Integer, Protocol> path : paths)
+            for (Pair<Integer, Protocol> path : paths) {
                 supportedVersions.add(path.getKey());
+            }
         }
     }
 
@@ -248,7 +282,7 @@ public class ProtocolRegistry {
             return protocolList;
         }
         // Generate path
-        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<Pair<Integer, Protocol>>(), clientVersion, serverVersion);
+        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
         // If it found a path, cache it.
         if (outputPath != null) {
             pathCache.put(protocolKey, outputPath);
@@ -274,4 +308,51 @@ public class ProtocolRegistry {
         return false;
     }
 
+    /**
+     * Ensure that mapping data for that protocol has already been loaded, completes it otherwise.
+     *
+     * @param protocolClass protocol class
+     */
+    public static void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
+        if (mappingsLoaded) return;
+
+        CompletableFuture<Void> future = getMappingLoaderFuture(protocolClass);
+        if (future == null) return;
+
+        future.get();
+
+        synchronized (MAPPING_LOADER_LOCK) {
+            if (mappingsLoaded) return;
+
+            // Remove only after execution to block other potential threads
+            mappingLoaderFutures.remove(protocolClass);
+            if (mappingLoaderFutures.isEmpty()) {
+                shutdownLoaderExecutor();
+            }
+        }
+    }
+
+    private static void shutdownLoaderExecutor() {
+        mappingsLoaded = true;
+        mappingLoaderExecutor.shutdown();
+        mappingLoaderExecutor = null;
+        mappingLoaderFutures = null;
+        if (MappingDataLoader.isCacheJsonMappings()) {
+            MappingDataLoader.getMappingsCache().clear();
+        }
+    }
+
+    public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
+        synchronized (MAPPING_LOADER_LOCK) {
+            CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor);
+            mappingLoaderFutures.put(protocolClass, future);
+        }
+    }
+
+    public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
+        synchronized (MAPPING_LOADER_LOCK) {
+            if (mappingsLoaded) return null;
+            return mappingLoaderFutures.get(protocolClass);
+        }
+    }
 }

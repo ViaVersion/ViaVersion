@@ -1,8 +1,6 @@
 package us.myles.ViaVersion;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaInjector;
@@ -48,7 +46,7 @@ public class ViaManager {
         if (platform.getConf().isCheckForUpdates())
             UpdateUtil.sendUpdateMessage();
         // Force class load
-        ProtocolRegistry.getSupportedVersions();
+        ProtocolRegistry.init();
         // Inject
         try {
             injector.inject();
