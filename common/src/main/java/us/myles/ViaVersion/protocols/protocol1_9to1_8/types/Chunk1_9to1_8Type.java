@@ -54,7 +54,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
         long chunkHash = toLong(chunkX, chunkZ);
-        boolean groundUp = input.readByte() != 0;
+        boolean fullChunk = input.readByte() != 0;
         int bitmask = input.readUnsignedShort();
         int dataLength = Type.VAR_INT.read(input);
 
@@ -74,7 +74,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         // If the chunks is from a chunks bulk, it is never an unload packet
         // Other wise, if it has no data, it is :)
         boolean isBulkPacket = param.getBulkChunks().remove(chunkHash);
-        if (sectionCount == 0 && groundUp && !isBulkPacket && param.getLoadedChunks().contains(chunkHash)) {
+        if (sectionCount == 0 && fullChunk && !isBulkPacket && param.getLoadedChunks().contains(chunkHash)) {
             // This is a chunks unload packet
             param.getLoadedChunks().remove(chunkHash);
             return new Chunk1_8(chunkX, chunkZ);
@@ -121,11 +121,11 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
 
         // Check remaining bytes
         if (bytesLeft > 0) {
-            Via.getPlatform().getLogger().log(Level.WARNING, bytesLeft + " Bytes left after reading chunks! (" + groundUp + ")");
+            Via.getPlatform().getLogger().log(Level.WARNING, bytesLeft + " Bytes left after reading chunks! (" + fullChunk + ")");
         }
 
         // Return chunks
-        return new Chunk1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData, new ArrayList<CompoundTag>());
+        return new Chunk1_8(chunkX, chunkZ, fullChunk, bitmask, sections, biomeData, new ArrayList<CompoundTag>());
     }
 
     @Override
@@ -137,7 +137,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
         if (chunk.isUnloadPacket()) return;
-        output.writeByte(chunk.isGroundUp() ? 0x01 : 0x00);
+        output.writeByte(chunk.isFullChunk() ? 0x01 : 0x00);
         Type.VAR_INT.write(output, chunk.getBitmask());
 
         ByteBuf buf = output.alloc().buffer();
@@ -150,7 +150,6 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
 
                 if (!section.hasSkyLight()) continue; // No sky light, we're done here.
                 section.writeSkyLight(buf);
-
             }
             buf.readerIndex(0);
             Type.VAR_INT.write(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));

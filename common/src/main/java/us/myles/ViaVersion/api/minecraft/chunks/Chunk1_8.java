@@ -29,12 +29,7 @@ public class Chunk1_8 extends BaseChunk {
      * @return True if the chunks has biome data
      */
     public boolean hasBiomeData() {
-        return biomeData != null && groundUp;
-    }
-
-    @Override
-    public boolean isBiomeData() {
-        return biomeData != null;
+        return biomeData != null && fullChunk;
     }
 
     public boolean isUnloadPacket() {

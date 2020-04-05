@@ -199,12 +199,12 @@ public class WorldPackets {
                         lightPacket.write(Type.VAR_INT, chunk.getX());
                         lightPacket.write(Type.VAR_INT, chunk.getZ());
 
-                        int skyLightMask = chunk.isGroundUp() ? 0x3ffff : 0; // all 18 bits set if ground up
+                        int skyLightMask = chunk.isFullChunk() ? 0x3ffff : 0; // all 18 bits set if ground up
                         int blockLightMask = 0;
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection sec = chunk.getSections()[i];
                             if (sec == null) continue;
-                            if (!chunk.isGroundUp() && sec.hasSkyLight()) {
+                            if (!chunk.isFullChunk() && sec.hasSkyLight()) {
                                 skyLightMask |= (1 << (i + 1));
                             }
                             blockLightMask |= (1 << (i + 1));
@@ -217,18 +217,18 @@ public class WorldPackets {
 
                         // not sending skylight/setting empty skylight causes client lag due to some weird calculations
                         // only do this on the initial chunk send (not when chunk.isGroundUp() is false)
-                        if (chunk.isGroundUp())
+                        if (chunk.isFullChunk())
                             lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk below 0
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null || !section.hasSkyLight()) {
-                                if (chunk.isGroundUp()) {
+                                if (chunk.isFullChunk()) {
                                     lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT);
                                 }
                                 continue;
                             }
                             lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getSkyLight());
                         }
-                        if (chunk.isGroundUp())
+                        if (chunk.isFullChunk())
                             lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk above 255
 
                         for (ChunkSection section : chunk.getSections()) {

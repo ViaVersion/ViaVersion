@@ -75,7 +75,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
-        output.writeBoolean(chunk.isGroundUp());
+        output.writeBoolean(chunk.isFullChunk());
         Type.VAR_INT.write(output, chunk.getBitmask());
 
         ByteBuf buf = output.alloc().buffer();

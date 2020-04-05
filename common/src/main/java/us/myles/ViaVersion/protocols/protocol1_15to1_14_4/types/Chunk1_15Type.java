@@ -14,10 +14,10 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.List;
 
 public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
+    private static final CompoundTag[] A = new CompoundTag[0];
 
     public Chunk1_15Type(ClientWorld param) {
         super(param, Chunk.class);
@@ -28,31 +28,24 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        boolean groundUp = input.readBoolean();
+        boolean fullChunk = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.read(input);
         CompoundTag heightMap = Type.NBT.read(input);
 
-        int[] biomeData = groundUp ? new int[1024] : null;
-        if (groundUp) {
+        int[] biomeData = fullChunk ? new int[1024] : null;
+        if (fullChunk) {
             for (int i = 0; i < 1024; i++) {
                 biomeData[i] = input.readInt();
             }
         }
 
-        Type.VAR_INT.read(input);
-
-        BitSet usedSections = new BitSet(16);
-        ChunkSection[] sections = new ChunkSection[16];
-        // Calculate section count from bitmask
-        for (int i = 0; i < 16; i++) {
-            if ((primaryBitmask & (1 << i)) != 0) {
-                usedSections.set(i);
-            }
-        }
+        Type.VAR_INT.read(input); // data size in bytes
 
         // Read sections
+        ChunkSection[] sections = new ChunkSection[16];
         for (int i = 0; i < 16; i++) {
-            if (!usedSections.get(i)) continue; // Section not set
+            if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
+
             short nonAirBlocksCount = input.readShort();
             ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
             section.setNonAirBlocksCount(nonAirBlocksCount);
@@ -69,7 +62,7 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, heightMap, nbtData);
+        return new BaseChunk(chunkX, chunkZ, fullChunk, primaryBitmask, sections, biomeData, heightMap, nbtData);
     }
 
     @Override
@@ -77,7 +70,7 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
-        output.writeBoolean(chunk.isGroundUp());
+        output.writeBoolean(chunk.isFullChunk());
         Type.VAR_INT.write(output, chunk.getBitmask());
         Type.NBT.write(output, chunk.getHeightMap());
 
@@ -93,6 +86,7 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
             for (int i = 0; i < 16; i++) {
                 ChunkSection section = chunk.getSections()[i];
                 if (section == null) continue; // Section not set
+
                 buf.writeShort(section.getNonAirBlocksCount());
                 Types1_13.CHUNK_SECTION.write(buf, section);
             }
@@ -104,7 +98,7 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         }
 
         // Write Block Entities
-        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
+        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(A));
     }
 
     @Override

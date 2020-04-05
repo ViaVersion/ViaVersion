@@ -5,11 +5,19 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import java.util.List;
 
 public interface Chunk {
+
     int getX();
 
     int getZ();
 
     boolean isBiomeData();
+
+    boolean isFullChunk();
+
+    @Deprecated
+    default boolean isGroundUp() {
+        return isFullChunk();
+    }
 
     int getBitmask();
 
@@ -24,6 +32,4 @@ public interface Chunk {
     void setHeightMap(CompoundTag heightMap);
 
     List<CompoundTag> getBlockEntities();
-
-    boolean isGroundUp();
 }
