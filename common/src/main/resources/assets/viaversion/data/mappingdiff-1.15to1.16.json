@@ -6,7 +6,8 @@
     "entity.zombie_pigman.ambient": "entity.zombified_piglin.ambient",
     "entity.zombie_pigman.angry": "entity.zombified_piglin.angry",
     "entity.zombie_pigman.death": "entity.zombified_piglin.death",
-    "entity.zombie_pigman.hurt": "entity.zombified_piglin.hurt"
+    "entity.zombie_pigman.hurt": "entity.zombified_piglin.hurt",
+    "music.nether": "music.nether.nether_wastes"
   },
   "blockstates": {
     "5641": "minecraft:cobblestone_wall[east=tall,north=tall,south=tall,up=true,waterlogged=true,west=tall]",
