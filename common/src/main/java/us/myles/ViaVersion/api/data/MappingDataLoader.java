@@ -154,7 +154,10 @@ public class MappingDataLoader {
             Integer index = findIndex(newIdentifiers, value.getAsString());
             if (index == null) {
                 if (diffIdentifiers != null) {
-                    index = findIndex(newIdentifiers, diffIdentifiers.get(value.getAsString()).getAsString());
+                    JsonElement diffElement = diffIdentifiers.get(value.getAsString());
+                    if (diffElement != null) {
+                        index = findIndex(newIdentifiers, diffElement.getAsString());
+                    }
                 }
                 if (index == null) {
                     if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
