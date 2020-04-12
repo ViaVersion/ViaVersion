@@ -78,13 +78,13 @@ public class VelocityServerHandler {
     @Subscribe(order = PostOrder.LATE)
     public void connectedEvent(ServerConnectedEvent e) {
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
-            CompletableFuture.runAsync(() -> {
-                try {
-                    checkServerChange(e, Via.getManager().getConnection(e.getPlayer().getUniqueId()));
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }, user.getChannel().eventLoop()).join();
+        CompletableFuture.runAsync(() -> {
+            try {
+                checkServerChange(e, Via.getManager().getConnection(e.getPlayer().getUniqueId()));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }, user.getChannel().eventLoop()).join();
     }
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
