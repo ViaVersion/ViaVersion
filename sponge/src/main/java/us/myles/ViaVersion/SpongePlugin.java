@@ -2,7 +2,6 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.spongepowered.api.Game;
@@ -20,11 +19,10 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
@@ -34,7 +32,6 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 @Plugin(id = "viaversion",
@@ -44,25 +41,17 @@ import java.util.logging.Logger;
         description = "Allow newer Minecraft versions to connect to an older server version."
 )
 public class SpongePlugin implements ViaPlatform<Player> {
-    private final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
-    private final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
     @Inject
     private Game game;
-
     @Inject
     private PluginContainer container;
-
     @Inject
     @DefaultConfig(sharedRoot = true)
     private File spongeConfig;
 
-    @Getter
-    private SpongeViaAPI api = new SpongeViaAPI();
-    @Getter
+    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
+    private final SpongeViaAPI api = new SpongeViaAPI();
     private SpongeViaConfig conf;
-
-    @Getter
     private Logger logger;
 
     @Listener
@@ -190,7 +179,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         return game.getServer().getPlayer(uuid).map(player -> {
-            player.kick(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
+            player.kick(TextSerializers.formattingCode('§').deserialize(message));
             return true;
         }).orElse(false);
     }
@@ -239,35 +228,23 @@ public class SpongePlugin implements ViaPlatform<Player> {
         return true;
     }
 
-
     @Override
-    public void onLoginSuccess(UserConnection connection) {
-        Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.get(ProtocolInfo.class).getUuid();
-        connections.add(connection);
-        clients.put(id, connection);
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 
     @Override
-    public void onDisconnect(UserConnection connection) {
-        Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.get(ProtocolInfo.class).getUuid();
-        connections.remove(connection);
-        clients.remove(id);
+    public SpongeViaAPI getApi() {
+        return api;
     }
 
     @Override
-    public Map<UUID, UserConnection> getConnectedClients() {
-        return Collections.unmodifiableMap(clients);
+    public SpongeViaConfig getConf() {
+        return conf;
     }
 
     @Override
-    public UserConnection getConnectedClient(UUID clientIdentifier) {
-        return clients.get(clientIdentifier);
-    }
-
-    @Override
-    public Set<UserConnection> getConnections() {
-        return Collections.unmodifiableSet(connections);
+    public Logger getLogger() {
+        return logger;
     }
 }

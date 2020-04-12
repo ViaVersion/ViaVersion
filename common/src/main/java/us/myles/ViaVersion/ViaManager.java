@@ -111,7 +111,7 @@ public class ViaManager {
     }
 
     public Set<UserConnection> getConnections() {
-        return platform.getConnections();
+        return platform.getConnectionManager().getConnections();
     }
 
     /**
@@ -123,11 +123,11 @@ public class ViaManager {
     }
 
     public Map<UUID, UserConnection> getConnectedClients() {
-        return platform.getConnectedClients();
+        return platform.getConnectionManager().getConnectedClients();
     }
 
     public void handleLoginSuccess(UserConnection info) {
-        platform.onLoginSuccess(info);
+        platform.getConnectionManager().onLoginSuccess(info);
     }
 
     public void handleDisconnect(UUID id) {
@@ -135,7 +135,7 @@ public class ViaManager {
     }
 
     public void handleDisconnect(UserConnection info) {
-        platform.onDisconnect(info);
+        platform.getConnectionManager().onDisconnect(info);
     }
 
     public ViaPlatform<?> getPlatform() {
@@ -167,6 +167,6 @@ public class ViaManager {
     }
 
     public UserConnection getConnection(UUID playerUUID) {
-        return platform.getConnectedClient(playerUUID);
+        return platform.getConnectionManager().getConnectedClient(playerUUID);
     }
 }

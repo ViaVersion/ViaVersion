@@ -5,11 +5,8 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.io.File;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -170,17 +167,5 @@ public interface ViaPlatform<T> {
      */
     boolean isOldClientsAllowed();
 
-    void onLoginSuccess(UserConnection connection);
-
-    void onDisconnect(UserConnection connection);
-
-    Map<UUID, UserConnection> getConnectedClients();
-
-    UserConnection getConnectedClient(UUID clientIdentifier);
-
-    /**
-     * May contain duplicated UUIDs on multiple ProtocolInfo.
-     * May contain client-sided connections.
-     */
-    Set<UserConnection> getConnections();
+    ViaConnectionManager getConnectionManager();
 }

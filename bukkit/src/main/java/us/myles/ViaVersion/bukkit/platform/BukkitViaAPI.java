@@ -71,12 +71,12 @@ public class BukkitViaAPI implements ViaAPI<Player> {
     }
 
     @Override
-    public BossBar createBossBar(String title, BossColor color, BossStyle style) {
+    public BossBar<Player> createBossBar(String title, BossColor color, BossStyle style) {
         return new ViaBossBar(title, 1F, color, style);
     }
 
     @Override
-    public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
+    public BossBar<Player> createBossBar(String title, float health, BossColor color, BossStyle style) {
         return new ViaBossBar(title, health, color, style);
     }
 
@@ -107,7 +107,7 @@ public class BukkitViaAPI implements ViaAPI<Player> {
         return plugin.isProtocolSupport();
     }
 
-    public Map<UUID, UserConnection> getPortedPlayers() {
+    private Map<UUID, UserConnection> getPortedPlayers() {
         return Via.getManager().getConnectedClients();
     }
 }

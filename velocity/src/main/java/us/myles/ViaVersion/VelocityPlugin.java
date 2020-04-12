@@ -10,7 +10,6 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import lombok.Getter;
 import net.kyori.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -21,9 +20,9 @@ import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.velocity.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
@@ -35,7 +34,6 @@ import us.myles.ViaVersion.velocity.util.LoggerWrapper;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(
@@ -47,23 +45,20 @@ import java.util.concurrent.TimeUnit;
         url = "https://viaversion.com"
 )
 public class VelocityPlugin implements ViaPlatform<Player> {
-    private final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
-    private final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    public static ProxyServer PROXY;
+
     @Inject
     private ProxyServer proxy;
     @Inject
-    public static ProxyServer PROXY;
-    @Inject
     private Logger loggerslf4j;
-
-    private java.util.logging.Logger logger;
     @Inject
     @DataDirectory
     private Path configDir;
 
     private VelocityViaAPI api;
-
+    private java.util.logging.Logger logger;
     private VelocityViaConfig conf;
+    private ViaConnectionManager connectionManager;
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
@@ -73,6 +68,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
+        connectionManager = new ViaConnectionManager();
         Via.init(ViaManager.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
@@ -88,7 +84,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Subscribe
     public void onQuit(DisconnectEvent e) {
-        UserConnection userConnection = getConnectedClient(e.getPlayer().getUniqueId());
+        UserConnection userConnection = connectionManager.getConnectedClient(e.getPlayer().getUniqueId());
         if (userConnection != null) {
             // Only remove if the connection is disconnected (eg. relogin)
             if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
@@ -236,33 +232,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public void onLoginSuccess(UserConnection connection) {
-        Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.get(ProtocolInfo.class).getUuid();
-        connections.add(connection);
-        clients.put(id, connection);
-    }
-
-    @Override
-    public void onDisconnect(UserConnection connection) {
-        Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.get(ProtocolInfo.class).getUuid();
-        connections.remove(connection);
-        clients.remove(id);
-    }
-
-    @Override
-    public Map<UUID, UserConnection> getConnectedClients() {
-        return Collections.unmodifiableMap(clients);
-    }
-
-    @Override
-    public UserConnection getConnectedClient(UUID clientIdentifier) {
-        return clients.get(clientIdentifier);
-    }
-
-    @Override
-    public Set<UserConnection> getConnections() {
-        return Collections.unmodifiableSet(connections);
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 }
