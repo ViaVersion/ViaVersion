@@ -23,6 +23,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.velocity.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
@@ -33,9 +34,8 @@ import us.myles.ViaVersion.velocity.util.LoggerWrapper;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(
@@ -46,19 +46,23 @@ import java.util.concurrent.TimeUnit;
         description = "Allow newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
 )
-@Getter
 public class VelocityPlugin implements ViaPlatform<Player> {
+    private final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
+    private final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
     @Inject
     private ProxyServer proxy;
     @Inject
     public static ProxyServer PROXY;
     @Inject
     private Logger loggerslf4j;
+
     private java.util.logging.Logger logger;
     @Inject
     @DataDirectory
     private Path configDir;
+
     private VelocityViaAPI api;
+
     private VelocityViaConfig conf;
 
     @Subscribe
@@ -84,11 +88,11 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Subscribe
     public void onQuit(DisconnectEvent e) {
-        UserConnection userConnection = Via.getManager().getPortedPlayers().get(e.getPlayer().getUniqueId());
+        UserConnection userConnection = getConnectedClient(e.getPlayer().getUniqueId());
         if (userConnection != null) {
             // Only remove if the connection is disconnected (eg. relogin)
             if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
             }
         }
     }
@@ -189,6 +193,16 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
+    public VelocityViaAPI getApi() {
+        return api;
+    }
+
+    @Override
+    public VelocityViaConfig getConf() {
+        return conf;
+    }
+
+    @Override
     public void onReload() {
 
     }
@@ -214,5 +228,41 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public java.util.logging.Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void onLoginSuccess(UserConnection connection) {
+        Objects.requireNonNull(connection, "connection is null!");
+        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        connections.add(connection);
+        clients.put(id, connection);
+    }
+
+    @Override
+    public void onDisconnect(UserConnection connection) {
+        Objects.requireNonNull(connection, "connection is null!");
+        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        connections.remove(connection);
+        clients.remove(id);
+    }
+
+    @Override
+    public Map<UUID, UserConnection> getConnectedClients() {
+        return Collections.unmodifiableMap(clients);
+    }
+
+    @Override
+    public UserConnection getConnectedClient(UUID clientIdentifier) {
+        return clients.get(clientIdentifier);
+    }
+
+    @Override
+    public Set<UserConnection> getConnections() {
+        return Collections.unmodifiableSet(connections);
     }
 }

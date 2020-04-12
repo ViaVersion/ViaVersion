@@ -8,7 +8,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTra
 public class TabCompleteThread implements Runnable {
     @Override
     public void run() {
-        for (UserConnection info : Via.getManager().getPortedPlayers().values()) {
+        for (UserConnection info : Via.getManager().getConnections()) {
             if (info.has(ProtocolInfo.class) && info.get(ProtocolInfo.class).getPipeline().contains(Protocol1_13To1_12_2.class)) {
                 if (info.getChannel().isOpen()) {
                     info.get(TabCompleteTracker.class).sendPacketToServer();

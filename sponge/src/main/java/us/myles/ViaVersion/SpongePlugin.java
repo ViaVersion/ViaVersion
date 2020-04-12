@@ -20,9 +20,11 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.sponge.VersionInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
@@ -31,9 +33,8 @@ import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 @Plugin(id = "viaversion",
@@ -42,7 +43,10 @@ import java.util.logging.Logger;
         authors = {"_MylesC", "creeper123123321", "Gerrygames", "KennyTV", "Matsv"},
         description = "Allow newer Minecraft versions to connect to an older server version."
 )
-public class SpongePlugin implements ViaPlatform {
+public class SpongePlugin implements ViaPlatform<Player> {
+    private final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
+    private final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
     @Inject
     private Game game;
 
@@ -50,8 +54,8 @@ public class SpongePlugin implements ViaPlatform {
     private PluginContainer container;
 
     @Inject
-    @DefaultConfig(sharedRoot = false)
-    private File defaultConfig;
+    @DefaultConfig(sharedRoot = true)
+    private File spongeConfig;
 
     @Getter
     private SpongeViaAPI api = new SpongeViaAPI();
@@ -66,7 +70,7 @@ public class SpongePlugin implements ViaPlatform {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
-        conf = new SpongeViaConfig(container, defaultConfig.getParentFile());
+        conf = new SpongeViaConfig(container, spongeConfig);
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
         logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
@@ -203,7 +207,7 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public File getDataFolder() {
-        return defaultConfig.getParentFile();
+        return spongeConfig;
     }
 
     @Override
@@ -233,5 +237,37 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+
+    @Override
+    public void onLoginSuccess(UserConnection connection) {
+        Objects.requireNonNull(connection, "connection is null!");
+        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        connections.add(connection);
+        clients.put(id, connection);
+    }
+
+    @Override
+    public void onDisconnect(UserConnection connection) {
+        Objects.requireNonNull(connection, "connection is null!");
+        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        connections.remove(connection);
+        clients.remove(id);
+    }
+
+    @Override
+    public Map<UUID, UserConnection> getConnectedClients() {
+        return Collections.unmodifiableMap(clients);
+    }
+
+    @Override
+    public UserConnection getConnectedClient(UUID clientIdentifier) {
+        return clients.get(clientIdentifier);
+    }
+
+    @Override
+    public Set<UserConnection> getConnections() {
+        return Collections.unmodifiableSet(connections);
     }
 }

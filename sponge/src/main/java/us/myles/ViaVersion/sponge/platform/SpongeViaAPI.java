@@ -74,6 +74,6 @@ public class SpongeViaAPI implements ViaAPI<Player> {
     }
 
     public Map<UUID, UserConnection> getPortedPlayers() {
-        return Via.getManager().getPortedPlayers();
+        return Via.getManager().getConnectedClients();
     }
 }

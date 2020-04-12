@@ -10,18 +10,16 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
 import us.myles.ViaVersion.update.UpdateUtil;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ViaManager {
-    private final Map<UUID, UserConnection> portedPlayers = new ConcurrentHashMap<>();
-    private final ViaPlatform platform;
+    private final ViaPlatform<?> platform;
     private final ViaProviders providers = new ViaProviders();
     private boolean debug;
     // Internals
@@ -30,7 +28,7 @@ public class ViaManager {
     private final ViaPlatformLoader loader;
 
     @Builder
-    public ViaManager(ViaPlatform platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
+    public ViaManager(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
         this.injector = injector;
         this.commandHandler = commandHandler;
@@ -112,23 +110,35 @@ public class ViaManager {
         loader.unload();
     }
 
-    public void addPortedClient(UserConnection info) {
-        portedPlayers.put(info.get(ProtocolInfo.class).getUuid(), info);
+    public Set<UserConnection> getConnections() {
+        return platform.getConnections();
     }
 
-    public void removePortedClient(UUID clientID) {
-        portedPlayers.remove(clientID);
+    /**
+     * @deprecated use getConnectedClients()
+     */
+    @Deprecated
+    public Map<UUID, UserConnection> getPortedClients() {
+        return getConnectedClients();
     }
 
-    public UserConnection getConnection(UUID playerUUID) {
-        return portedPlayers.get(playerUUID);
+    public Map<UUID, UserConnection> getConnectedClients() {
+        return platform.getConnectedClients();
     }
 
-    public Map<UUID, UserConnection> getPortedPlayers() {
-        return portedPlayers;
+    public void handleLoginSuccess(UserConnection info) {
+        platform.onLoginSuccess(info);
     }
 
-    public ViaPlatform getPlatform() {
+    public void handleDisconnect(UUID id) {
+        handleDisconnect(getConnection(id));
+    }
+
+    public void handleDisconnect(UserConnection info) {
+        platform.onDisconnect(info);
+    }
+
+    public ViaPlatform<?> getPlatform() {
         return platform;
     }
 
@@ -154,5 +164,9 @@ public class ViaManager {
 
     public ViaPlatformLoader getLoader() {
         return loader;
+    }
+
+    public UserConnection getConnection(UUID playerUUID) {
+        return platform.getConnectedClient(playerUUID);
     }
 }

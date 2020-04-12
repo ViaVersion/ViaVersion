@@ -79,7 +79,7 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
     }
 
     public Map<UUID, UserConnection> getPortedPlayers() {
-        return Via.getManager().getPortedPlayers();
+        return Via.getManager().getConnectedClients();
     }
 
     /**

@@ -71,7 +71,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         registerListener(new Listener() {
             @EventHandler
             public void onPlayerQuit(PlayerQuitEvent e) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
             }
         });
 

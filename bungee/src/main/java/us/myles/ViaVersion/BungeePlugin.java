@@ -22,15 +22,16 @@ import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
 import us.myles.ViaVersion.bungee.platform.*;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
+    private final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
+    private final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private BungeeViaAPI api;
     private BungeeViaConfig config;
     private BungeeCommandHandler commandHandler;
@@ -184,13 +185,44 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         return true;
     }
 
+    @Override
+    public void onLoginSuccess(UserConnection connection) {
+        Objects.requireNonNull(connection, "connection is null!");
+        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        connections.add(connection);
+        clients.put(id, connection);
+    }
+
+    @Override
+    public void onDisconnect(UserConnection connection) {
+        Objects.requireNonNull(connection, "connection is null!");
+        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        connections.remove(connection);
+        clients.remove(id);
+    }
+
+    @Override
+    public Map<UUID, UserConnection> getConnectedClients() {
+        return Collections.unmodifiableMap(clients);
+    }
+
+    @Override
+    public UserConnection getConnectedClient(UUID clientIdentifier) {
+        return clients.get(clientIdentifier);
+    }
+
+    @Override
+    public Set<UserConnection> getConnections() {
+        return Collections.unmodifiableSet(connections);
+    }
+
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
-        UserConnection userConnection = Via.getManager().getPortedPlayers().get(e.getPlayer().getUniqueId());
+        UserConnection userConnection = getConnectedClient(e.getPlayer().getUniqueId());
         if (userConnection != null) {
             // Only remove if the connection is disconnected (eg. relogin)
             if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
             }
         }
 

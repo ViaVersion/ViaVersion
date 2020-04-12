@@ -133,7 +133,7 @@ public class BaseProtocol1_7 extends Protocol {
                         String username = wrapper.passthrough(Type.STRING);
                         info.setUsername(username);
                         // Add to ported clients
-                        Via.getManager().addPortedClient(wrapper.user());
+                        Via.getManager().handleLoginSuccess(wrapper.user());
 
                         if (info.getPipeline().pipes().size() == 2
                                 && info.getPipeline().pipes().get(1).getClass() == BaseProtocol1_7.class
