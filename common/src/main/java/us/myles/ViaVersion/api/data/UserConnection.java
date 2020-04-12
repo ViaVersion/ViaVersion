@@ -36,7 +36,6 @@ public class UserConnection {
     // Used for handling warnings (over time)
     private int secondsObserved = 0;
     private int warnings = 0;
-    private ReadWriteLock velocityLock = new ReentrantReadWriteLock();
 
     public UserConnection(Channel channel) {
         this.channel = channel;

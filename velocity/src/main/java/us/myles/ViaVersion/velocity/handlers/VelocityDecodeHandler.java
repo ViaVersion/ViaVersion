@@ -35,7 +35,6 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
                 if (info.handlePPS())
                     return;
             }
-            info.getVelocityLock().readLock().lock();
             if (info.isActive()) {
                 // Handle ID
                 int id = Type.VAR_INT.read(bytebuf);
@@ -58,13 +57,11 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
                     bytebuf.clear();
                     // Release Packet, be free!
                     newPacket.release();
-                    info.getVelocityLock().readLock().unlock();
                     throw e;
                 }
             } else {
                 bytebuf.retain();
             }
-            info.getVelocityLock().readLock().unlock();
 
             out.add(bytebuf);
         }
