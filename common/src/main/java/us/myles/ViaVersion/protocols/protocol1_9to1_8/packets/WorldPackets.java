@@ -291,7 +291,7 @@ public class WorldPackets {
                         wrapper.clearInputBuffer();
                         // First set this packet ID to Block placement
                         wrapper.setId(0x08);
-                        wrapper.write(Type.POSITION, new Position((long) -1, (long) -1, (long) -1));
+                        wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
                         wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
                         // Write item in hand
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
