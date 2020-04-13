@@ -73,7 +73,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
-        connectionManager = new ViaConnectionManager();
+        connectionManager = new VelocityConnectionManager();
         Via.init(ViaManager.builder()
                 .platform(this)
                 .commandHandler(commandHandler)

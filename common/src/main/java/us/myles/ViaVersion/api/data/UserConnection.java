@@ -18,7 +18,6 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -29,6 +28,7 @@ public class UserConnection {
     private final Channel channel;
     private ProtocolInfo protocolInfo;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    private final boolean clientSide;
     private boolean active = true;
     private boolean pendingDisconnect;
     private Object lastPacket;
@@ -42,8 +42,23 @@ public class UserConnection {
     private int secondsObserved;
     private int warnings;
 
-    public UserConnection(@Nullable Channel channel) {
+    /**
+     * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
+     * @param channel netty channel.
+     * @param clientSide true if it's a client-side connection
+     */
+    public UserConnection(@Nullable Channel channel, boolean clientSide) {
         this.channel = channel;
+        this.clientSide = clientSide;
+    }
+
+    /**
+     *
+     * @see #UserConnection(Channel, boolean)
+     * @param channel
+     */
+    public UserConnection(@Nullable Channel channel) {
+        this(channel, false);
     }
 
     /**
@@ -91,12 +106,24 @@ public class UserConnection {
      * @param packet        The raw packet to send
      * @param currentThread Should it run in the same thread
      */
-    public void sendRawPacket(ByteBuf packet, boolean currentThread) {
-        ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
-        if (currentThread) {
-            channel.pipeline().context(handler).writeAndFlush(packet);
+    public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
+        Runnable act;
+        if (clientSide) {
+            // We'll just assume that Via decoder isn't wrapping the original decoder
+            act = () -> getChannel().pipeline()
+                    .context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
         } else {
-            channel.eventLoop().submit(() -> channel.pipeline().context(handler).writeAndFlush(packet));
+            act = () -> channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+        }
+        if (currentThread) {
+            act.run();
+        } else {
+            try {
+                channel.eventLoop().submit(act);
+            } catch (Throwable e) {
+                packet.release(); // Couldn't schedule
+                e.printStackTrace();
+            }
         }
     }
 
@@ -106,9 +133,23 @@ public class UserConnection {
      * @param packet The raw packet to send
      * @return ChannelFuture of the packet being sent
      */
-    public ChannelFuture sendRawPacketFuture(ByteBuf packet) {
-        ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
+    public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
+        if (clientSide) {
+            return sendRawPacketFutureClientSide(packet);
+        } else {
+            return sendRawPacketFutureServerSide(packet);
+        }
+    }
+
+    private ChannelFuture sendRawPacketFutureServerSide(final ByteBuf packet) {
+        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
         return channel.pipeline().context(handler).writeAndFlush(packet);
+    }
+
+    private ChannelFuture sendRawPacketFutureClientSide(final ByteBuf packet) {
+        // Assume that decoder isn't wrapping
+        getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
+        return getChannel().newSucceededFuture();
     }
 
     /**
@@ -156,6 +197,7 @@ public class UserConnection {
      * @see #incrementReceived()
      */
     public boolean exceedsMaxPPS() {
+        if (clientSide) return false; // Don't apply PPS limiting for client-side
         ViaVersionConfig conf = Via.getConfig();
         // Max PPS Checker
         if (conf.getMaxPPS() > 0) {
@@ -195,14 +237,8 @@ public class UserConnection {
         if (!channel.isOpen() || pendingDisconnect) return;
 
         pendingDisconnect = true;
-        UUID uuid = protocolInfo.getUuid();
-        if (uuid == null) {
-            channel.close(); // Just disconnect, we don't know what the connection is
-            return;
-        }
-
         Via.getPlatform().runSync(() -> {
-            if (!Via.getPlatform().kickPlayer(uuid, ChatColor.translateAlternateColorCodes('&', reason))) {
+            if (!Via.getPlatform().disconnect(this, ChatColor.translateAlternateColorCodes('&', reason))) {
                 channel.close(); // =)
             }
         });
@@ -214,9 +250,20 @@ public class UserConnection {
      * @param packet        Raw packet to be sent
      * @param currentThread If {@code true} executes immediately, {@code false} submits a task to EventLoop
      */
-    public void sendRawPacketToServer(ByteBuf packet, boolean currentThread) {
-        ByteBuf buf = packet.alloc().buffer();
+    public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
+        if (clientSide) {
+            sendRawPacketToServerClientSide(packet, currentThread);
+        } else {
+            sendRawPacketToServerServerSide(packet, currentThread);
+        }
+    }
+
+    private void sendRawPacketToServerServerSide(final ByteBuf packet, boolean currentThread) {
+        final ByteBuf buf = packet.alloc().buffer();
         try {
+            // We'll use passing through because there are some encoder wrappers
+            ChannelHandlerContext context = PipelineUtil
+                    .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
             try {
                 Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
             } catch (Exception e) {
@@ -224,23 +271,18 @@ public class UserConnection {
                 Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
             }
             buf.writeBytes(packet);
-            ChannelHandlerContext context = PipelineUtil
-                    .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
-            if (currentThread) {
+            Runnable act = () -> {
                 if (context != null) {
                     context.fireChannelRead(buf);
                 } else {
                     channel.pipeline().fireChannelRead(buf);
                 }
+            };
+            if (currentThread) {
+                act.run();
             } else {
                 try {
-                    channel.eventLoop().submit(() -> {
-                        if (context != null) {
-                            context.fireChannelRead(buf);
-                        } else {
-                            channel.pipeline().fireChannelRead(buf);
-                        }
-                    });
+                    channel.eventLoop().submit(act);
                 } catch (Throwable t) {
                     // Couldn't schedule
                     buf.release();
@@ -249,6 +291,21 @@ public class UserConnection {
             }
         } finally {
             packet.release();
+        }
+    }
+
+    private void sendRawPacketToServerClientSide(final ByteBuf packet, boolean currentThread) {
+        Runnable act = () -> getChannel().pipeline()
+                .context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+        if (currentThread) {
+            act.run();
+        } else {
+            try {
+                getChannel().eventLoop().submit(act);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                packet.release(); // Couldn't schedule
+            }
         }
     }
 
@@ -262,11 +319,24 @@ public class UserConnection {
     }
 
     /**
-     * Monitors serverbound packets.
+     * Monitors incoming packets
      *
      * @return false if this packet should be cancelled
      */
     public boolean checkIncomingPacket() {
+        if (clientSide) {
+            return checkClientBound();
+        } else {
+            return checkServerBound();
+        }
+    }
+
+    private boolean checkClientBound() {
+        incrementSent();
+        return true;
+    }
+
+    private boolean checkServerBound() {
         // Ignore if pending disconnect
         if (pendingDisconnect) return false;
         // Increment received + Check PPS
@@ -274,10 +344,16 @@ public class UserConnection {
     }
 
     /**
-     * Monitors clientbound packets.
+     * Monitors outgoing packets
+     *
+     * @return false if this packet should be cancelled
      */
-    public void checkOutgoingPacket() {
-        incrementSent();
+    public boolean checkOutgoingPacket() {
+        if (clientSide) {
+            return checkServerBound();
+        } else {
+            return checkClientBound();
+        }
     }
 
     /**
@@ -290,7 +366,8 @@ public class UserConnection {
     }
 
     /**
-     * Transforms the clientbound packet contained in an outgoing ByteBuf.
+     * Transforms the outgoing packet contained in ByteBuf. When clientSide is true, this packet is considered
+     * serverbound.
      *
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
@@ -301,11 +378,12 @@ public class UserConnection {
      */
     public void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
         if (!buf.isReadable()) return;
-        transform(buf, Direction.OUTGOING, cancelSupplier);
+        transform(buf, clientSide ? Direction.INCOMING : Direction.OUTGOING, cancelSupplier);
     }
 
     /**
-     * Transforms the serverbound packet contained in an incoming ByteBuf.
+     * Transforms the incoming packet contained in ByteBuf. When clientSide is true, this packet is considered
+     * clientbound
      *
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
@@ -316,7 +394,7 @@ public class UserConnection {
      */
     public void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
         if (!buf.isReadable()) return;
-        transform(buf, Direction.INCOMING, cancelSupplier);
+        transform(buf, clientSide ? Direction.OUTGOING : Direction.INCOMING, cancelSupplier);
     }
 
     private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
@@ -458,5 +536,13 @@ public class UserConnection {
     @Override
     public int hashCode() {
         return Long.hashCode(id);
+    }
+
+    public boolean isClientSide() {
+        return clientSide;
+    }
+
+    public boolean shouldApplyBlockProtocol() {
+        return !clientSide; // Don't apply protocol blocking on client-side
     }
 }
