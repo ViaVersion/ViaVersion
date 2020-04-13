@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.bukkit.listeners;
 
-import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -22,7 +21,7 @@ public class ViaBukkitListener extends ViaListener implements Listener {
      * @param player Player object
      * @return The UserConnection
      */
-    protected UserConnection getUserConnection(@NonNull Player player) {
+    protected UserConnection getUserConnection(Player player) {
         return getUserConnection(player.getUniqueId());
     }
 

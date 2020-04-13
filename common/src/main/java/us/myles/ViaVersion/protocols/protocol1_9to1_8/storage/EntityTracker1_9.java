@@ -1,10 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
@@ -26,11 +23,15 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-@Getter
 public class EntityTracker1_9 extends EntityTracker {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
@@ -43,16 +44,11 @@ public class EntityTracker1_9 extends EntityTracker {
             .expireAfterAccess(250, TimeUnit.MILLISECONDS)
             .<Position, Boolean>build()
             .asMap());
-    @Setter
     private boolean blocking = false;
-    @Setter
     private boolean autoTeam = false;
-    @Setter
     private Position currentlyDigging = null;
     private boolean teamExists = false;
-    @Setter
     private GameMode gameMode;
-    @Setter
     private String currentTeam;
 
     public EntityTracker1_9(UserConnection user) {
@@ -104,7 +100,7 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public boolean interactedBlockRecently(int x, int y, int z) {
-        return blockInteractions.contains(new Position(x, (short) y , z));
+        return blockInteractions.contains(new Position(x, (short) y, z));
     }
 
     public void addBlockInteraction(Position p) {
@@ -307,5 +303,77 @@ public class EntityTracker1_9 extends EntityTracker {
         } catch (Exception e) {
             return getClientEntityId();
         }
+    }
+
+    public Map<Integer, UUID> getUuidMap() {
+        return uuidMap;
+    }
+
+    public Map<Integer, List<Metadata>> getMetadataBuffer() {
+        return metadataBuffer;
+    }
+
+    public Map<Integer, Integer> getVehicleMap() {
+        return vehicleMap;
+    }
+
+    public Map<Integer, BossBar> getBossBarMap() {
+        return bossBarMap;
+    }
+
+    public Set<Integer> getValidBlocking() {
+        return validBlocking;
+    }
+
+    public Set<Integer> getKnownHolograms() {
+        return knownHolograms;
+    }
+
+    public Set<Position> getBlockInteractions() {
+        return blockInteractions;
+    }
+
+    public boolean isBlocking() {
+        return blocking;
+    }
+
+    public void setBlocking(boolean blocking) {
+        this.blocking = blocking;
+    }
+
+    public boolean isAutoTeam() {
+        return autoTeam;
+    }
+
+    public void setAutoTeam(boolean autoTeam) {
+        this.autoTeam = autoTeam;
+    }
+
+    public Position getCurrentlyDigging() {
+        return currentlyDigging;
+    }
+
+    public void setCurrentlyDigging(Position currentlyDigging) {
+        this.currentlyDigging = currentlyDigging;
+    }
+
+    public boolean isTeamExists() {
+        return teamExists;
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public String getCurrentTeam() {
+        return currentTeam;
+    }
+
+    public void setCurrentTeam(String currentTeam) {
+        this.currentTeam = currentTeam;
     }
 }

@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.sponge.listeners;
 
-import lombok.Getter;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import us.myles.ViaVersion.SpongePlugin;
@@ -13,7 +12,6 @@ import java.lang.reflect.Field;
 public class ViaSpongeListener extends ViaListener {
     private static Field entityIdField;
 
-    @Getter
     private final SpongePlugin plugin;
 
     public ViaSpongeListener(SpongePlugin plugin, Class<? extends Protocol> requiredPipeline) {
@@ -45,5 +43,9 @@ public class ViaSpongeListener extends ViaListener {
 
         Via.getPlatform().getLogger().severe("Could not get the entity id, please report this on our Github");
         return -1;
+    }
+
+    public SpongePlugin getPlugin() {
+        return plugin;
     }
 }

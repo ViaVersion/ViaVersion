@@ -1,15 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 
-@Getter
-@Setter
 public class TabCompleteTracker extends StoredObject {
     private int transactionId;
     private String input;
@@ -32,5 +28,37 @@ public class TabCompleteTracker extends StoredObject {
             e.printStackTrace();
         }
         lastTabComplete = null;
+    }
+
+    public int getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(final String input) {
+        this.input = input;
+    }
+
+    public String getLastTabComplete() {
+        return lastTabComplete;
+    }
+
+    public void setLastTabComplete(String lastTabComplete) {
+        this.lastTabComplete = lastTabComplete;
+    }
+
+    public long getTimeToSend() {
+        return timeToSend;
+    }
+
+    public void setTimeToSend(long timeToSend) {
+        this.timeToSend = timeToSend;
     }
 }

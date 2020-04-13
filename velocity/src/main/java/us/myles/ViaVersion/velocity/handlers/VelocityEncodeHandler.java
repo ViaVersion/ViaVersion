@@ -6,8 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -20,11 +18,13 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.util.List;
 
 @ChannelHandler.Sharable
-@RequiredArgsConstructor
 public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
-    @NonNull
     private final UserConnection info;
-    private boolean handledCompression = false;
+    private boolean handledCompression;
+
+    public VelocityEncodeHandler(UserConnection info) {
+        this.info = info;
+    }
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {

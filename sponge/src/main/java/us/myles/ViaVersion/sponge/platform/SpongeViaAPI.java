@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.sponge.platform;
 
 import io.netty.buffer.ByteBuf;
-import lombok.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
@@ -20,14 +19,14 @@ import java.util.UUID;
 public class SpongeViaAPI implements ViaAPI<Player> {
 
     @Override
-    public int getPlayerVersion(@NonNull Player player) {
+    public int getPlayerVersion(Player player) {
         if (!isPorted(player.getUniqueId()))
             return ProtocolRegistry.SERVER_PROTOCOL;
         return getPortedPlayers().get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
-    public int getPlayerVersion(@NonNull UUID uuid) {
+    public int getPlayerVersion(UUID uuid) {
         if (!isPorted(uuid))
             return ProtocolRegistry.SERVER_PROTOCOL;
         return getPortedPlayers().get(uuid).get(ProtocolInfo.class).getProtocolVersion();
