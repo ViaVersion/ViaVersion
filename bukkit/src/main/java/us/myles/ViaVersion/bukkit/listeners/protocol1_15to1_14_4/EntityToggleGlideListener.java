@@ -36,6 +36,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
                 packet.write(Type.VAR_INT, player.getEntityId());
 
                 byte bitmask = 0;
+                // Collect other metadata for the mitmask
                 if (player.getFireTicks() > 0) {
                     bitmask |= 0x01;
                 }
@@ -46,10 +47,9 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
                 if (player.isSprinting()) {
                     bitmask |= 0x08;
                 }
-                //TODO isswimming
-                /*if (player.isSprinting()) {
+                if (player.isSwimming()) {
                     bitmask |= 0x10;
-                }*/
+                }
                 if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     bitmask |= 0x20;
                 }

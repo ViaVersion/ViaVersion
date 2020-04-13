@@ -1,21 +1,17 @@
 package us.myles.ViaVersion.bukkit.listeners;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.ViaListener;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 
-@Getter(AccessLevel.PROTECTED)
 public class ViaBukkitListener extends ViaListener implements Listener {
     private final Plugin plugin;
 
-    public ViaBukkitListener(ViaVersionPlugin plugin, Class<? extends Protocol> requiredPipeline) {
+    public ViaBukkitListener(Plugin plugin, Class<? extends Protocol> requiredPipeline) {
         super(requiredPipeline);
         this.plugin = plugin;
     }
@@ -49,5 +45,9 @@ public class ViaBukkitListener extends ViaListener implements Listener {
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         setRegistered(true);
+    }
+
+    public Plugin getPlugin() {
+        return plugin;
     }
 }

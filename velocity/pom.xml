@@ -11,13 +11,6 @@
 
     <artifactId>viaversion-velocity</artifactId>
 
-    <repositories>
-        <repository>
-            <id>velocity</id>
-            <url>https://repo.velocitypowered.com/snapshots</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>

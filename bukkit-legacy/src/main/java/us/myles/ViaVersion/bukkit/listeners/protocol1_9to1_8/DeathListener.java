@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import us.myles.ViaVersion.ViaVersionPlugin;
+import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -14,7 +14,8 @@ import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class DeathListener extends ViaBukkitListener {
-    public DeathListener(ViaVersionPlugin plugin) {
+
+    public DeathListener(Plugin plugin) {
         super(plugin, Protocol1_9To1_8.class);
     }
 
