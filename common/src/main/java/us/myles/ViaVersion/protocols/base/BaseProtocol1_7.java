@@ -159,6 +159,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                         int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
                         if (Via.getConfig().getBlockedProtocols().contains(protocol)) {
                             if (!wrapper.user().getChannel().isOpen()) return;
+                            if (!wrapper.user().shouldApplyBlockProtocol()) return;
 
                             PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
                             Protocol1_9To1_8.FIX_JSON.write(disconnectPacket, ChatColor.translateAlternateColorCodes('&', Via.getConfig().getBlockedDisconnectMsg()));

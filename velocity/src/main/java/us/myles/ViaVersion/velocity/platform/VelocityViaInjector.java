@@ -30,13 +30,25 @@ public class VelocityViaInjector implements ViaInjector {
        return (ChannelInitializer) ReflectionUtil.invoke(channelInitializerHolder, "get");
     }
 
+    private ChannelInitializer getBackendInitializer() throws Exception {
+        Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
+        Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getBackendChannelInitializer");
+        return (ChannelInitializer) ReflectionUtil.invoke(channelInitializerHolder, "get");
+    }
+
     @Override
     public void inject() throws Exception {
         Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
         Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getServerChannelInitializer");
         ChannelInitializer originalInitializer = getInitializer();
         channelInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
-                .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalInitializer));
+                .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalInitializer, false));
+
+
+        Object backendInitializerHolder = ReflectionUtil.invoke(connectionManager, "getBackendChannelInitializer");
+        ChannelInitializer backendInitializer = getBackendInitializer();
+        backendInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
+            .invoke(backendInitializerHolder, new VelocityChannelInitializer(backendInitializer, true));
     }
 
     @Override
