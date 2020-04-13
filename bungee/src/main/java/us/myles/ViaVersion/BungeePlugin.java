@@ -30,9 +30,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, Listener {
+    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private BungeeViaAPI api;
     private BungeeViaConfig config;
-    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
 
     @Override
     public void onLoad() {
