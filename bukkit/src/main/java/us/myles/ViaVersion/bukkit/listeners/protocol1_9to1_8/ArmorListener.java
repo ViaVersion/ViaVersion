@@ -36,7 +36,6 @@ public class ArmorListener extends ViaBukkitListener {
         // Ensure that the player is on our pipe
         if (!isOnPipe(player)) return;
 
-
         int armor = 0;
         for (ItemStack stack : player.getInventory().getArmorContents()) {
             armor += ArmorType.findById(stack.getTypeId()).getArmorPoints();
@@ -114,11 +113,6 @@ public class ArmorListener extends ViaBukkitListener {
 
     public void sendDelayedArmorUpdate(final Player player) {
         if (!isOnPipe(player)) return; // Don't start a task if the player is not on the pipe
-        Via.getPlatform().runSync(new Runnable() {
-            @Override
-            public void run() {
-                sendArmorUpdate(player);
-            }
-        });
+        Via.getPlatform().runSync(() -> sendArmorUpdate(player));
     }
 }
