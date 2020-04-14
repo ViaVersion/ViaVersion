@@ -1,11 +1,16 @@
 package us.myles.ViaVersion.bukkit.platform;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.platform.TaskId;
 
-@Getter
-@AllArgsConstructor
 public class BukkitTaskId implements TaskId {
     private final Integer object;
+
+    public BukkitTaskId(Integer object) {
+        this.object = object;
+    }
+
+    @Override
+    public Integer getObject() {
+        return object;
+    }
 }

@@ -4,7 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
-import us.myles.ViaVersion.ViaVersionPlugin;
+import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -12,7 +12,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 public class BlockListener extends ViaBukkitListener {
 
-    public BlockListener(ViaVersionPlugin plugin) {
+    public BlockListener(Plugin plugin) {
         super(plugin, Protocol1_9To1_8.class);
     }
 

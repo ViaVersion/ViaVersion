@@ -2,7 +2,6 @@ package us.myles.ViaVersion.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import lombok.AllArgsConstructor;
 import net.kyori.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -10,9 +9,12 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 
-@AllArgsConstructor
 public class VelocityCommandSender implements ViaCommandSender {
-    private CommandSource source;
+    private final CommandSource source;
+
+    public VelocityCommandSender(CommandSource source) {
+        this.source = source;
+    }
 
     @Override
     public boolean hasPermission(String permission) {

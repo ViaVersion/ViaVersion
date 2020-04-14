@@ -1,12 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-@Getter
 public enum SoundEffect {
 
     MOB_HORSE_ZOMBIE_IDLE("mob.horse.zombie.idle", "entity.zombie_horse.ambient", SoundCategory.NEUTRAL),
@@ -261,7 +258,7 @@ public enum SoundEffect {
     private final SoundCategory category;
     private final boolean breaksound;
 
-    private static Map<String, SoundEffect> effects;
+    private static final Map<String, SoundEffect> effects;
 
     static {
         effects = new HashMap<>();
@@ -289,4 +286,19 @@ public enum SoundEffect {
         return effects.get(name);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public SoundCategory getCategory() {
+        return category;
+    }
+
+    public boolean isBreaksound() {
+        return breaksound;
+    }
 }

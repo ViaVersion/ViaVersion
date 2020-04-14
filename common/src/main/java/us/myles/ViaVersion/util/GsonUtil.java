@@ -2,18 +2,16 @@ package us.myles.ViaVersion.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import lombok.experimental.UtilityClass;
 
-@UtilityClass
-public class GsonUtil {
-    private final Gson gson = getGsonBuilder().create();
+public final class GsonUtil {
+    private static final Gson gson = getGsonBuilder().create();
 
     /**
      * Get google's Gson magic
      *
      * @return Gson instance
      */
-    public Gson getGson() {
+    public static Gson getGson() {
         return gson;
     }
 
@@ -22,8 +20,7 @@ public class GsonUtil {
      *
      * @return GsonBuilder instance
      */
-    public GsonBuilder getGsonBuilder() {
+    public static GsonBuilder getGsonBuilder() {
         return new GsonBuilder();
     }
-
 }

@@ -11,13 +11,6 @@
 
     <artifactId>viaversion-sponge</artifactId>
 
-    <repositories>
-        <repository>
-            <id>sponge</id>
-            <url>https://repo.spongepowered.org/maven</url>
-        </repository>
-    </repositories>
-
     <build>
         <resources>
             <resource>

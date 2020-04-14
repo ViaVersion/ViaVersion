@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
@@ -162,18 +160,27 @@ public class ParticleRewriter {
         Particle handler(Particle particle, Integer[] data);
     }
 
-    @Data
-    @RequiredArgsConstructor
     private static class NewParticle {
         private final int id;
         private final ParticleDataHandler handler;
+
+        public NewParticle(int id, ParticleDataHandler handler) {
+            this.id = id;
+            this.handler = handler;
+        }
 
         public Particle handle(Particle particle, Integer[] data) {
             if (handler != null)
                 return handler.handler(particle, data);
             return particle;
         }
+
+        public int getId() {
+            return id;
+        }
+
+        public ParticleDataHandler getHandler() {
+            return handler;
+        }
     }
-
-
 }

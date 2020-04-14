@@ -2,17 +2,23 @@ package us.myles.ViaVersion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
 public class Item {
     @SerializedName(value = "identifier", alternate = "id")
     private int identifier;
     private byte amount;
     private short data;
     private CompoundTag tag;
+
+    public Item() {
+    }
+
+    public Item(int identifier, byte amount, short data, CompoundTag tag) {
+        this.identifier = identifier;
+        this.amount = amount;
+        this.data = data;
+        this.tag = tag;
+    }
 
     public Item(Item toCopy) {
         this(toCopy.getIdentifier(), toCopy.getAmount(), toCopy.getData(), toCopy.getTag());

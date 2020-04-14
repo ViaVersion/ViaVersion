@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.bukkit.platform;
 
 import io.netty.buffer.ByteBuf;
-import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.ViaVersionPlugin;
@@ -29,12 +28,12 @@ public class BukkitViaAPI implements ViaAPI<Player> {
     }
 
     @Override
-    public int getPlayerVersion(@NonNull Player player) {
+    public int getPlayerVersion(Player player) {
         return getPlayerVersion(player.getUniqueId());
     }
 
     @Override
-    public int getPlayerVersion(@NonNull UUID uuid) {
+    public int getPlayerVersion(UUID uuid) {
         if (!isPorted(uuid))
             return getExternalVersion(Bukkit.getPlayer(uuid));
         return getPortedPlayers().get(uuid).get(ProtocolInfo.class).getProtocolVersion();

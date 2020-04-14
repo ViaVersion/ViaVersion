@@ -1,15 +1,17 @@
 package us.myles.ViaVersion.bungee.commands;
 
-import lombok.AllArgsConstructor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 
-@AllArgsConstructor
 public class BungeeCommandSender implements ViaCommandSender {
-    private CommandSender sender;
+    private final CommandSender sender;
+
+    public BungeeCommandSender(CommandSender sender) {
+        this.sender = sender;
+    }
 
     @Override
     public boolean hasPermission(String permission) {

@@ -2,16 +2,18 @@ package us.myles.ViaVersion.velocity.handlers;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import lombok.AllArgsConstructor;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
-@AllArgsConstructor
 public class VelocityChannelInitializer extends ChannelInitializer {
-    private ChannelInitializer original;
+    private final ChannelInitializer original;
     private static Method initChannel;
+
+    public VelocityChannelInitializer(ChannelInitializer original) {
+        this.original = original;
+    }
 
     static {
         try {

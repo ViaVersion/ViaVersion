@@ -1,8 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.gson.reflect.TypeToken;
-import lombok.Data;
-import lombok.NonNull;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -33,9 +31,7 @@ public class RecipeData {
         }
     }
 
-    @Data
     public static class Recipe {
-        @NonNull
         private String type;
         private String group;
         private int width;
@@ -45,5 +41,77 @@ public class RecipeData {
         private Item[] ingredient;
         private Item[][] ingredients;
         private Item result;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+
+        public void setGroup(String group) {
+            this.group = group;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public float getExperience() {
+            return experience;
+        }
+
+        public void setExperience(float experience) {
+            this.experience = experience;
+        }
+
+        public int getCookingTime() {
+            return cookingTime;
+        }
+
+        public void setCookingTime(int cookingTime) {
+            this.cookingTime = cookingTime;
+        }
+
+        public Item[] getIngredient() {
+            return ingredient;
+        }
+
+        public void setIngredient(Item[] ingredient) {
+            this.ingredient = ingredient;
+        }
+
+        public Item[][] getIngredients() {
+            return ingredients;
+        }
+
+        public void setIngredients(Item[][] ingredients) {
+            this.ingredients = ingredients;
+        }
+
+        public Item getResult() {
+            return result;
+        }
+
+        public void setResult(Item result) {
+            this.result = result;
+        }
     }
 }

@@ -4,7 +4,6 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.InboundConnection;
 import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
-import lombok.NonNull;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
@@ -22,14 +21,14 @@ import java.util.UUID;
 
 public class VelocityViaAPI implements ViaAPI<Player> {
     @Override
-    public int getPlayerVersion(@NonNull Player player) {
+    public int getPlayerVersion(Player player) {
         if (!isPorted(player.getUniqueId()))
             return player.getProtocolVersion().getProtocol();
         return getPortedPlayers().get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
-    public int getPlayerVersion(@NonNull UUID uuid) {
+    public int getPlayerVersion(UUID uuid) {
         if (!isPorted(uuid)) {
             return VelocityPlugin.PROXY.getPlayer(uuid)
                     .map(InboundConnection::getProtocolVersion)

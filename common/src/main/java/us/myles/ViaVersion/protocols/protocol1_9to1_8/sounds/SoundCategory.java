@@ -1,12 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
 public enum SoundCategory {
-
 
     MASTER("master", 0),
     MUSIC("music", 1),
@@ -22,4 +16,16 @@ public enum SoundCategory {
     private final String name;
     private final int id;
 
+    SoundCategory(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

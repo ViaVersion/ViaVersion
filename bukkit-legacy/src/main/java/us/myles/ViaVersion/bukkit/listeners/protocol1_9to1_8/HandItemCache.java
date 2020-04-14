@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HandItemCache extends BukkitRunnable {
+
     private final Map<UUID, Item> handCache = new ConcurrentHashMap<>();
 
     @Override

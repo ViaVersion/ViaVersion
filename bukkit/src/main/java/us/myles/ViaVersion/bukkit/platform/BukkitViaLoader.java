@@ -17,7 +17,12 @@ import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.listeners.UpdateListener;
 import us.myles.ViaVersion.bukkit.listeners.multiversion.PlayerSneakListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.*;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.BlockListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.DeathListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.HandItemCache;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
 import us.myles.ViaVersion.bukkit.providers.BukkitBlockConnectionProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
@@ -96,6 +101,14 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                     Via.getPlatform().getLogger().warning("Could not load hitbox fix - please report this on our GitHub");
                     e.printStackTrace();
                 }
+            }
+        }
+
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_15.getId()) {
+            try {
+                Class.forName("org.bukkit.event.entity.EntityToggleGlideEvent");
+                storeListener(new EntityToggleGlideListener(plugin)).register();
+            } catch (ClassNotFoundException ignored) {
             }
         }
 

@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -68,11 +66,29 @@ public class BlockStorage extends StoredObject {
         return blocks.remove(position);
     }
 
-    @Data
-    @AllArgsConstructor
     public static class ReplacementData {
         private int original;
         private int replacement;
-    }
 
+        public ReplacementData(int original, int replacement) {
+            this.original = original;
+            this.replacement = replacement;
+        }
+
+        public int getOriginal() {
+            return original;
+        }
+
+        public void setOriginal(int original) {
+            this.original = original;
+        }
+
+        public int getReplacement() {
+            return replacement;
+        }
+
+        public void setReplacement(int replacement) {
+            this.replacement = replacement;
+        }
+    }
 }

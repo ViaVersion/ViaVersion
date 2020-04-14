@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import lombok.AllArgsConstructor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
@@ -16,9 +15,12 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.util.List;
 
 @ChannelHandler.Sharable
-@AllArgsConstructor
 public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     private final UserConnection info;
+
+    public VelocityDecodeHandler(UserConnection info) {
+        this.info = info;
+    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {

@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.sponge.commands;
 
-import lombok.AllArgsConstructor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.spongepowered.api.command.CommandSource;
@@ -10,9 +9,12 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 
-@AllArgsConstructor
 public class SpongeCommandSender implements ViaCommandSender {
-    private CommandSource source;
+    private final CommandSource source;
+
+    public SpongeCommandSender(CommandSource source) {
+        this.source = source;
+    }
 
     @Override
     public boolean hasPermission(String permission) {
