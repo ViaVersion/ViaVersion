@@ -46,7 +46,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Inject
     private PluginContainer container;
     @Inject
-    @DefaultConfig(sharedRoot = true)
+    @DefaultConfig(sharedRoot = false)
     private File spongeConfig;
 
     private final ViaConnectionManager connectionManager = new ViaConnectionManager();
