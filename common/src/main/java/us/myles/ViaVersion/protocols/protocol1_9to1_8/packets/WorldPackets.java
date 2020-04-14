@@ -291,8 +291,8 @@ public class WorldPackets {
                         wrapper.clearInputBuffer();
                         // First set this packet ID to Block placement
                         wrapper.setId(0x08);
-                        wrapper.write(Type.LONG, -1L);
-                        wrapper.write(Type.BYTE, (byte) 255);
+                        wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
+                        wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
                         // Write item in hand
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         // Blocking patch
@@ -315,9 +315,9 @@ public class WorldPackets {
                         }
                         wrapper.write(Type.ITEM, item);
 
-                        wrapper.write(Type.BYTE, (byte) 0);
-                        wrapper.write(Type.BYTE, (byte) 0);
-                        wrapper.write(Type.BYTE, (byte) 0);
+                        wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+                        wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+                        wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
                     }
                 });
 
