@@ -46,7 +46,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Inject
     private PluginContainer container;
     @Inject
-    @DefaultConfig(sharedRoot = true)
+    @DefaultConfig(sharedRoot = false)
     private File spongeConfig;
 
     private final ViaConnectionManager connectionManager = new ViaConnectionManager();
@@ -59,7 +59,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
-        conf = new SpongeViaConfig(container, spongeConfig);
+        conf = new SpongeViaConfig(container, spongeConfig.getParentFile());
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
         logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
@@ -196,7 +196,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public File getDataFolder() {
-        return spongeConfig;
+        return spongeConfig.getParentFile();
     }
 
     @Override
