@@ -15,7 +15,6 @@ import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.bukkit.util.ProtocolSupportUtil;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -34,9 +33,9 @@ public class BukkitViaAPI implements ViaAPI<Player> {
 
     @Override
     public int getPlayerVersion(UUID uuid) {
-        if (!isPorted(uuid))
+        if (!isInjected(uuid))
             return getExternalVersion(Bukkit.getPlayer(uuid));
-        return getPortedPlayers().get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+        return Via.getManager().getConnection(uuid).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     private int getExternalVersion(Player player) {
@@ -48,8 +47,8 @@ public class BukkitViaAPI implements ViaAPI<Player> {
     }
 
     @Override
-    public boolean isPorted(UUID playerUUID) {
-        return getPortedPlayers().containsKey(playerUUID);
+    public boolean isInjected(UUID playerUUID) {
+        return Via.getManager().isClientConnected(playerUUID);
     }
 
     @Override
@@ -59,8 +58,8 @@ public class BukkitViaAPI implements ViaAPI<Player> {
 
     @Override
     public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
-        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
-        UserConnection ci = getPortedPlayers().get(uuid);
+        if (!isInjected(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
+        UserConnection ci = Via.getManager().getConnection(uuid);
         ci.sendRawPacket(packet);
     }
 
@@ -70,12 +69,12 @@ public class BukkitViaAPI implements ViaAPI<Player> {
     }
 
     @Override
-    public BossBar createBossBar(String title, BossColor color, BossStyle style) {
+    public BossBar<Player> createBossBar(String title, BossColor color, BossStyle style) {
         return new ViaBossBar(title, 1F, color, style);
     }
 
     @Override
-    public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
+    public BossBar<Player> createBossBar(String title, float health, BossColor color, BossStyle style) {
         return new ViaBossBar(title, health, color, style);
     }
 
@@ -106,7 +105,4 @@ public class BukkitViaAPI implements ViaAPI<Player> {
         return plugin.isProtocolSupport();
     }
 
-    public Map<UUID, UserConnection> getPortedPlayers() {
-        return Via.getManager().getPortedPlayers();
-    }
 }

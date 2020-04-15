@@ -191,7 +191,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     private void sendPacket(UUID uuid, PacketWrapper wrapper) {
-        if (!Via.getAPI().isPorted(uuid) || !(Via.getAPI().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
+        if (!Via.getAPI().isInjected(uuid) || !(Via.getAPI().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
             players.remove(uuid);
             return;
         }

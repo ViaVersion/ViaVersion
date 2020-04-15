@@ -2,7 +2,6 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import lombok.Getter;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.spongepowered.api.Game;
@@ -21,6 +20,7 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.VersionInfo;
@@ -31,9 +31,7 @@ import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Plugin(id = "viaversion",
@@ -42,23 +40,18 @@ import java.util.logging.Logger;
         authors = {"_MylesC", "creeper123123321", "Gerrygames", "KennyTV", "Matsv"},
         description = "Allow newer Minecraft versions to connect to an older server version."
 )
-public class SpongePlugin implements ViaPlatform {
+public class SpongePlugin implements ViaPlatform<Player> {
     @Inject
     private Game game;
-
     @Inject
     private PluginContainer container;
-
     @Inject
     @DefaultConfig(sharedRoot = false)
-    private File defaultConfig;
+    private File spongeConfig;
 
-    @Getter
-    private SpongeViaAPI api = new SpongeViaAPI();
-    @Getter
+    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
+    private final SpongeViaAPI api = new SpongeViaAPI();
     private SpongeViaConfig conf;
-
-    @Getter
     private Logger logger;
 
     @Listener
@@ -66,7 +59,7 @@ public class SpongePlugin implements ViaPlatform {
         // Setup Logger
         logger = new LoggerWrapper(container.getLogger());
         // Setup Plugin
-        conf = new SpongeViaConfig(container, defaultConfig.getParentFile());
+        conf = new SpongeViaConfig(container, spongeConfig.getParentFile());
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
         game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
         logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
@@ -186,7 +179,7 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         return game.getServer().getPlayer(uuid).map(player -> {
-            player.kick(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message));
+            player.kick(TextSerializers.formattingCode('§').deserialize(message));
             return true;
         }).orElse(false);
     }
@@ -203,7 +196,7 @@ public class SpongePlugin implements ViaPlatform {
 
     @Override
     public File getDataFolder() {
-        return defaultConfig.getParentFile();
+        return spongeConfig.getParentFile();
     }
 
     @Override
@@ -233,5 +226,25 @@ public class SpongePlugin implements ViaPlatform {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
+    @Override
+    public SpongeViaAPI getApi() {
+        return api;
+    }
+
+    @Override
+    public SpongeViaConfig getConf() {
+        return conf;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
 }

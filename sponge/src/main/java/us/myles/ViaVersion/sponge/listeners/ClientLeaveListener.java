@@ -7,6 +7,6 @@ import us.myles.ViaVersion.api.Via;
 public class ClientLeaveListener {
     @Listener
     public void onDisconnect(ClientConnectionEvent.Disconnect disconnect) {
-        Via.getManager().removePortedClient(disconnect.getTargetEntity().getUniqueId());
+        Via.getManager().handleDisconnect(disconnect.getTargetEntity().getUniqueId());
     }
 }

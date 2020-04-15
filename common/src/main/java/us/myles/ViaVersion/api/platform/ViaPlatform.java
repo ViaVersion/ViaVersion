@@ -166,4 +166,6 @@ public interface ViaPlatform<T> {
      * @return True if allowed
      */
     boolean isOldClientsAllowed();
+
+    ViaConnectionManager getConnectionManager();
 }

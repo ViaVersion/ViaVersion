@@ -38,10 +38,21 @@ public interface ViaAPI<T> {
      *
      * @param playerUUID UUID of a player
      * @return true if Via has a cached userconnection for this player
-     * @deprecated as of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)}
+     * @deprecated as of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)},
+     * or use {@link #isInjected(UUID)}
      */
     @Deprecated
-    boolean isPorted(UUID playerUUID);
+    default boolean isPorted(UUID playerUUID) {
+        return isInjected(playerUUID);
+    }
+
+    /**
+     * Returns if Via injected into this player connection
+     *
+     * @param playerUUID UUID of a player
+     * @return true if Via has a cached UserConnection for this player
+     */
+    boolean isInjected(UUID playerUUID);
 
     /**
      * Get the version of the plugin

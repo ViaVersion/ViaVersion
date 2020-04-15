@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -15,6 +16,7 @@ import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
@@ -24,16 +26,13 @@ import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
+public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, Listener {
+    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private BungeeViaAPI api;
     private BungeeViaConfig config;
-    private BungeeCommandHandler commandHandler;
 
     @Override
     public void onLoad() {
@@ -51,7 +50,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
-        commandHandler = new BungeeCommandHandler();
+        BungeeCommandHandler commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
 
         // Init platform
@@ -129,13 +128,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        getProxy().getPlayer(uuid).sendMessage(message);
+        getProxy().getPlayer(uuid).sendMessage(TextComponent.fromLegacyText(message));
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         if (getProxy().getPlayer(uuid) != null) {
-            getProxy().getPlayer(uuid).disconnect(message);
+            getProxy().getPlayer(uuid).disconnect(TextComponent.fromLegacyText(message));
             return true;
         }
         return false;
@@ -147,7 +146,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     }
 
     @Override
-    public ViaAPI getApi() {
+    public ViaAPI<ProxiedPlayer> getApi() {
         return api;
     }
 
@@ -172,7 +171,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
         List<PluginInfo> plugins = new ArrayList<>();
         for (Plugin p : ProxyServer.getInstance().getPluginManager().getPlugins())
-            plugins.add(new PluginInfo(true, p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), Arrays.asList(p.getDescription().getAuthor())));
+            plugins.add(new PluginInfo(
+                    true,
+                    p.getDescription().getName(),
+                    p.getDescription().getVersion(),
+                    p.getDescription().getMain(),
+                    Collections.singletonList(p.getDescription().getAuthor())
+            ));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
         platformSpecific.add("servers", GsonUtil.getGson().toJsonTree(ProtocolDetectorService.getDetectedIds()));
@@ -184,13 +189,18 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         return true;
     }
 
+    @Override
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
-        UserConnection userConnection = Via.getManager().getPortedPlayers().get(e.getPlayer().getUniqueId());
+        UserConnection userConnection = getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
         if (userConnection != null) {
             // Only remove if the connection is disconnected (eg. relogin)
             if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
+                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
             }
         }
 
