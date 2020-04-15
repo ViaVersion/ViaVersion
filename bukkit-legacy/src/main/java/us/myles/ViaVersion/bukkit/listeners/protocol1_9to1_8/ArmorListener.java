@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
-import us.myles.ViaVersion.ViaVersionPlugin;
+import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.type.Type;
@@ -28,14 +28,13 @@ public class ArmorListener extends ViaBukkitListener {
 
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
 
-    public ArmorListener(ViaVersionPlugin plugin) {
+    public ArmorListener(Plugin plugin) {
         super(plugin, Protocol1_9To1_8.class);
     }
 
     public void sendArmorUpdate(Player player) {
         // Ensure that the player is on our pipe
         if (!isOnPipe(player)) return;
-
 
         int armor = 0;
         for (ItemStack stack : player.getInventory().getArmorContents()) {
@@ -82,12 +81,7 @@ public class ArmorListener extends ViaBukkitListener {
             if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 final Player player = e.getPlayer();
                 // Due to odd bugs it's 3 ticks later
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
-                    @Override
-                    public void run() {
-                        sendArmorUpdate(player);
-                    }
-                }, 3L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> sendArmorUpdate(player), 3L);
             }
         }
     }
@@ -114,11 +108,6 @@ public class ArmorListener extends ViaBukkitListener {
 
     public void sendDelayedArmorUpdate(final Player player) {
         if (!isOnPipe(player)) return; // Don't start a task if the player is not on the pipe
-        Via.getPlatform().runSync(new Runnable() {
-            @Override
-            public void run() {
-                sendArmorUpdate(player);
-            }
-        });
+        Via.getPlatform().runSync(() -> sendArmorUpdate(player));
     }
 }

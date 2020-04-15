@@ -2,7 +2,6 @@ package us.myles.ViaVersion.velocity.platform;
 
 import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
-import lombok.NonNull;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
@@ -20,15 +19,16 @@ import java.util.UUID;
 
 public class VelocityViaAPI implements ViaAPI<Player> {
     @Override
-    public int getPlayerVersion(@NonNull Player player) {
+    public int getPlayerVersion(Player player) {
         if (!isInjected(player.getUniqueId()))
             return player.getProtocolVersion().getProtocol();
         return Via.getManager().getConnection(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
-    public int getPlayerVersion(@NonNull UUID uuid) {
+    public int getPlayerVersion(UUID uuid) {
         return getPlayerVersion(VelocityPlugin.PROXY.getPlayer(uuid).orElseThrow(NoSuchElementException::new));
+
     }
 
     @Override

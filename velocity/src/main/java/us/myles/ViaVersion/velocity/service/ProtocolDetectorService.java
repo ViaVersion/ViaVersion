@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.velocity.service;
 
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import lombok.Getter;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
@@ -13,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtocolDetectorService implements Runnable {
     private static final Map<String, Integer> detectedProtocolIds = new ConcurrentHashMap<>();
-    @Getter
     private static ProtocolDetectorService instance;
 
     public ProtocolDetectorService() {
@@ -79,4 +77,7 @@ public class ProtocolDetectorService implements Runnable {
         return new HashMap<>(detectedProtocolIds);
     }
 
+    public static ProtocolDetectorService getInstance() {
+        return instance;
+    }
 }

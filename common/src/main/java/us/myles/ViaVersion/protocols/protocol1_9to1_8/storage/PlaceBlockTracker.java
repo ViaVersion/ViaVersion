@@ -1,15 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 
-@Getter
 public class PlaceBlockTracker extends StoredObject {
     private long lastPlaceTimestamp = 0;
-    @Setter
     private Position lastPlacedPosition = null;
 
     public PlaceBlockTracker(UserConnection user) {
@@ -31,5 +27,17 @@ public class PlaceBlockTracker extends StoredObject {
      */
     public void updateTime() {
         lastPlaceTimestamp = System.currentTimeMillis();
+    }
+
+    public long getLastPlaceTimestamp() {
+        return lastPlaceTimestamp;
+    }
+
+    public Position getLastPlacedPosition() {
+        return lastPlacedPosition;
+    }
+
+    public void setLastPlacedPosition(Position lastPlacedPosition) {
+        this.lastPlacedPosition = lastPlacedPosition;
     }
 }

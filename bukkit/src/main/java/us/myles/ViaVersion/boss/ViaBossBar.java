@@ -1,12 +1,10 @@
 package us.myles.ViaVersion.boss;
 
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 
-@Getter
 public class ViaBossBar extends CommonBoss<Player> {
 
     public ViaBossBar(String title, float health, BossColor color, BossStyle style) {

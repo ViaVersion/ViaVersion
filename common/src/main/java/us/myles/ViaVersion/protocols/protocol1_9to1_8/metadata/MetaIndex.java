@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
 
-import lombok.Getter;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.entities.EntityType;
@@ -12,7 +11,6 @@ import java.util.Optional;
 
 import static us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType.*;
 
-@Getter
 public enum MetaIndex {
 
     // entity
@@ -170,6 +168,26 @@ public enum MetaIndex {
         this.oldType = oldType;
         this.newIndex = newIndex;
         this.newType = newType;
+    }
+
+    public Entity1_10Types.EntityType getClazz() {
+        return clazz;
+    }
+
+    public int getNewIndex() {
+        return newIndex;
+    }
+
+    public MetaType1_9 getNewType() {
+        return newType;
+    }
+
+    public MetaType1_8 getOldType() {
+        return oldType;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     private static Optional<MetaIndex> getIndex(EntityType type, int index) {

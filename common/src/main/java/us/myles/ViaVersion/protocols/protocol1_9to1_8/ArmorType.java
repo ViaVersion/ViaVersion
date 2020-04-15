@@ -1,13 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
-@Getter
 public enum ArmorType {
 
     LEATHER_HELMET(1, 298, "minecraft:leather_helmet"),
@@ -32,7 +27,7 @@ public enum ArmorType {
     GOLD_BOOTS(1, 317, "minecraft:gold_boots"),
     NONE(0, 0, "none");
 
-    private static Map<Integer, ArmorType> armor;
+    private static final Map<Integer, ArmorType> armor;
 
     static {
         armor = new HashMap<>();
@@ -44,6 +39,20 @@ public enum ArmorType {
     private final int armorPoints;
     private final int id;
     private final String type;
+
+    ArmorType(int armorPoints, int id, String type) {
+        this.armorPoints = armorPoints;
+        this.id = id;
+        this.type = type;
+    }
+
+    public int getArmorPoints() {
+        return armorPoints;
+    }
+
+    public String getType() {
+        return type;
+    }
 
     /**
      * Find an armour type by the item id

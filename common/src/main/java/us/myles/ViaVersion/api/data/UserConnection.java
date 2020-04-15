@@ -17,8 +17,6 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Data
 public class UserConnection {
@@ -156,12 +154,12 @@ public class UserConnection {
         if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
             if (secondsObserved > conf.getTrackingPeriod()) {
                 // Reset
-                setWarnings(0);
-                setSecondsObserved(1);
+                warnings = 0;
+                secondsObserved = 1;
             } else {
-                setSecondsObserved(secondsObserved + 1);
+                secondsObserved++;
                 if (packetsPerSecond >= conf.getWarningPPS()) {
-                    setWarnings(warnings + 1);
+                    warnings++;
                 }
 
                 if (warnings >= conf.getMaxWarnings()) {

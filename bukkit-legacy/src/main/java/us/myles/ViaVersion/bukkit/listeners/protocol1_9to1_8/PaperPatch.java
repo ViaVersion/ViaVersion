@@ -6,13 +6,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
-import us.myles.ViaVersion.ViaVersionPlugin;
+import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class PaperPatch extends ViaBukkitListener {
 
-    public PaperPatch(ViaVersionPlugin plugin) {
+    public PaperPatch(Plugin plugin) {
         super(plugin, Protocol1_9To1_8.class);
     }
 

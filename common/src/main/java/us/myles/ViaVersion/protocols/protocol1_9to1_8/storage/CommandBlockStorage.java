@@ -2,8 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -14,9 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage extends StoredObject {
-    private Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
-    @Setter
-    @Getter
+    private final Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
     private boolean permissions = false;
 
     public CommandBlockStorage(UserConnection user) {
@@ -70,5 +66,13 @@ public class CommandBlockStorage extends StoredObject {
 
     public void unloadChunks() {
         storedCommandBlocks.clear();
+    }
+
+    public boolean isPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(boolean permissions) {
+        this.permissions = permissions;
     }
 }
