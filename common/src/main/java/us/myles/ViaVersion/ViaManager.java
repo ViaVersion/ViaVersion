@@ -21,11 +21,11 @@ import java.util.UUID;
 public class ViaManager {
     private final ViaPlatform<?> platform;
     private final ViaProviders providers = new ViaProviders();
-    private boolean debug;
     // Internals
     private final ViaInjector injector;
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
+    private boolean debug;
 
     @Builder
     public ViaManager(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
@@ -118,12 +118,16 @@ public class ViaManager {
      * @deprecated use getConnectedClients()
      */
     @Deprecated
-    public Map<UUID, UserConnection> getPortedClients() {
+    public Map<UUID, UserConnection> getPortedPlayers() {
         return getConnectedClients();
     }
 
     public Map<UUID, UserConnection> getConnectedClients() {
         return platform.getConnectionManager().getConnectedClients();
+    }
+
+    public boolean isClientConnected(UUID player) {
+        return platform.getConnectionManager().isClientConnected(player);
     }
 
     public void handleLoginSuccess(UserConnection info) {

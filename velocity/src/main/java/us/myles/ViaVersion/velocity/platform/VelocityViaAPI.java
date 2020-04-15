@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.velocity.platform;
 
-import com.velocitypowered.api.network.ProtocolVersion;
-import com.velocitypowered.api.proxy.InboundConnection;
 import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
 import lombok.NonNull;
@@ -15,7 +13,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -23,25 +21,19 @@ import java.util.UUID;
 public class VelocityViaAPI implements ViaAPI<Player> {
     @Override
     public int getPlayerVersion(@NonNull Player player) {
-        if (!isPorted(player.getUniqueId()))
+        if (!isInjected(player.getUniqueId()))
             return player.getProtocolVersion().getProtocol();
-        return getPortedPlayers().get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
+        return Via.getManager().getConnection(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
     public int getPlayerVersion(@NonNull UUID uuid) {
-        if (!isPorted(uuid)) {
-            return VelocityPlugin.PROXY.getPlayer(uuid)
-                    .map(InboundConnection::getProtocolVersion)
-                    .map(ProtocolVersion::getProtocol)
-                    .orElse(ProtocolRegistry.SERVER_PROTOCOL);
-        }
-        return getPortedPlayers().get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+        return getPlayerVersion(VelocityPlugin.PROXY.getPlayer(uuid).orElseThrow(NoSuchElementException::new));
     }
 
     @Override
-    public boolean isPorted(UUID playerUUID) {
-        return getPortedPlayers().containsKey(playerUUID);
+    public boolean isInjected(UUID playerUUID) {
+        return Via.getManager().isClientConnected(playerUUID);
     }
 
     @Override
@@ -51,8 +43,8 @@ public class VelocityViaAPI implements ViaAPI<Player> {
 
     @Override
     public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
-        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
-        UserConnection ci = getPortedPlayers().get(uuid);
+        if (!isInjected(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
+        UserConnection ci = Via.getManager().getConnection(uuid);
         ci.sendRawPacket(packet);
     }
 
@@ -79,7 +71,4 @@ public class VelocityViaAPI implements ViaAPI<Player> {
         return outputSet;
     }
 
-    private Map<UUID, UserConnection> getPortedPlayers() {
-        return Via.getManager().getConnectedClients();
-    }
 }

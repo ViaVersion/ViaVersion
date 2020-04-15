@@ -12,7 +12,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -21,21 +20,19 @@ public class SpongeViaAPI implements ViaAPI<Player> {
 
     @Override
     public int getPlayerVersion(@NonNull Player player) {
-        if (!isPorted(player.getUniqueId()))
-            return ProtocolRegistry.SERVER_PROTOCOL;
-        return getPortedPlayers().get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
+        return getPlayerVersion(player.getUniqueId());
     }
 
     @Override
     public int getPlayerVersion(@NonNull UUID uuid) {
-        if (!isPorted(uuid))
+        if (!isInjected(uuid))
             return ProtocolRegistry.SERVER_PROTOCOL;
-        return getPortedPlayers().get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+        return Via.getManager().getConnection(uuid).get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
-    public boolean isPorted(UUID playerUUID) {
-        return getPortedPlayers().containsKey(playerUUID);
+    public boolean isInjected(UUID playerUUID) {
+        return Via.getManager().isClientConnected(playerUUID);
     }
 
     @Override
@@ -45,8 +42,8 @@ public class SpongeViaAPI implements ViaAPI<Player> {
 
     @Override
     public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
-        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
-        UserConnection ci = getPortedPlayers().get(uuid);
+        if (!isInjected(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
+        UserConnection ci = Via.getManager().getConnection(uuid);
         ci.sendRawPacket(packet);
     }
 
@@ -71,9 +68,5 @@ public class SpongeViaAPI implements ViaAPI<Player> {
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
 
         return outputSet;
-    }
-
-    private Map<UUID, UserConnection> getPortedPlayers() {
-        return Via.getManager().getConnectedClients();
     }
 }

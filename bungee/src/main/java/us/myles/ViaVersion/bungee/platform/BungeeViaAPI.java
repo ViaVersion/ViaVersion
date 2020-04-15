@@ -15,7 +15,6 @@ import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -23,24 +22,21 @@ import java.util.UUID;
 public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
     @Override
     public int getPlayerVersion(@NonNull ProxiedPlayer player) {
-        if (!isPorted(player.getUniqueId()))
+        UserConnection conn = Via.getManager().getConnection(player.getUniqueId());
+        if (conn == null) {
             return player.getPendingConnection().getVersion();
-        return getPortedPlayers().get(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
+        }
+        return conn.get(ProtocolInfo.class).getProtocolVersion();
     }
 
     @Override
     public int getPlayerVersion(@NonNull UUID uuid) {
-        if (!isPorted(uuid)) {
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-            if (player != null) return player.getPendingConnection().getVersion();
-            return ProtocolRegistry.SERVER_PROTOCOL;
-        }
-        return getPortedPlayers().get(uuid).get(ProtocolInfo.class).getProtocolVersion();
+        return getPlayerVersion(ProxyServer.getInstance().getPlayer(uuid));
     }
 
     @Override
-    public boolean isPorted(UUID playerUUID) {
-        return getPortedPlayers().containsKey(playerUUID);
+    public boolean isInjected(UUID playerUUID) {
+        return Via.getManager().isClientConnected(playerUUID);
     }
 
     @Override
@@ -50,8 +46,10 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
 
     @Override
     public void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException {
-        if (!isPorted(uuid)) throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
-        UserConnection ci = getPortedPlayers().get(uuid);
+        if (!isInjected(uuid)) {
+            throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
+        }
+        UserConnection ci = Via.getManager().getConnection(uuid);
         ci.sendRawPacket(packet);
     }
 
@@ -76,10 +74,6 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
 
         return outputSet;
-    }
-
-    private Map<UUID, UserConnection> getPortedPlayers() {
-        return Via.getManager().getConnectedClients();
     }
 
     /**
