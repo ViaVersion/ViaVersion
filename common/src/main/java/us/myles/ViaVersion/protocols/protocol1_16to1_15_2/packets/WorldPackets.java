@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -92,14 +91,6 @@ public class WorldPackets {
         // Spawn Particle
         blockRewriter.registerSpawnParticle(Type.DOUBLE, 0x24, 0x24, 3, 23, 32,
                 WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
-
-        // Jigsaw
-        protocol.registerIncoming(State.PLAY, 0x27, 0x27, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(PacketWrapper::cancel); //TODO possible to translate?
-            }
-        });
     }
 
     public static int getNewParticleId(int id) {
