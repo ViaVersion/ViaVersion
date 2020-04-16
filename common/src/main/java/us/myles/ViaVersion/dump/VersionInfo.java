@@ -10,8 +10,10 @@ public class VersionInfo {
     private final String platformName;
     private final String platformVersion;
     private final String pluginVersion;
+    private final String implementationVersion;
 
-    public VersionInfo(String javaVersion, String operatingSystem, int serverProtocol, Set<Integer> enabledProtocols, String platformName, String platformVersion, String pluginVersion) {
+    public VersionInfo(String javaVersion, String operatingSystem, int serverProtocol, Set<Integer> enabledProtocols,
+                       String platformName, String platformVersion, String pluginVersion, String implementationVersion) {
         this.javaVersion = javaVersion;
         this.operatingSystem = operatingSystem;
         this.serverProtocol = serverProtocol;
@@ -19,6 +21,7 @@ public class VersionInfo {
         this.platformName = platformName;
         this.platformVersion = platformVersion;
         this.pluginVersion = pluginVersion;
+        this.implementationVersion = implementationVersion;
     }
 
     public String getJavaVersion() {
@@ -47,6 +50,10 @@ public class VersionInfo {
 
     public String getPluginVersion() {
         return pluginVersion;
+    }
+
+    public String getImplementationVersion() {
+        return implementationVersion;
     }
 }
 
