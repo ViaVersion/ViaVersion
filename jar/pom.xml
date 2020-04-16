@@ -40,7 +40,7 @@
                 <artifactId>scriptus</artifactId>
                 <version>0.3.2</version>
                 <configuration>
-                    <format>git-ViaVersion-${project.version}:%s</format>
+                    <format>git-ViaVersion-${project.parent.version}:%s</format>
                 </configuration>
                 <executions>
                     <execution>
