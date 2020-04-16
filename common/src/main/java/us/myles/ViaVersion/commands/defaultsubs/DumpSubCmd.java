@@ -3,6 +3,7 @@ package us.myles.ViaVersion.commands.defaultsubs;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ChatColor;
+import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
@@ -43,7 +44,8 @@ public class DumpSubCmd extends ViaSubCommand {
                 ProtocolRegistry.getSupportedVersions(),
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
-                Via.getPlatform().getPluginVersion()
+                Via.getPlatform().getPluginVersion(),
+                ViaManager.class.getPackage().getImplementationVersion()
         );
 
         Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
