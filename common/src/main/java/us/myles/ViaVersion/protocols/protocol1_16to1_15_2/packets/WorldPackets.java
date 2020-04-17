@@ -61,17 +61,16 @@ public class WorldPackets {
                             StringTag targetUuidTag = blockEntity.remove("target_uuid");
                             if (targetUuidTag == null) continue;
 
-
                             // target_uuid -> Target
                             UUID targetUuid = UUID.fromString(targetUuidTag.getValue());
                             blockEntity.put(new IntArrayTag("Target", UUIDIntArrayType.uuidToIntArray(targetUuid)));
-                        } else if (id.equals("minecraft:skull")) {
+                        } else if (id.equals("minecraft:skull") && blockEntity.get("Owner") instanceof CompoundTag) {
                             CompoundTag ownerTag = blockEntity.remove("Owner");
-                            if (ownerTag == null) continue;
-
                             StringTag ownerUuidTag = ownerTag.remove("Id");
-                            UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
-                            ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+                            if (ownerUuidTag != null) {
+                                UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
+                                ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+                            }
 
                             // Owner -> SkullOwner
                             CompoundTag skullOwnerTag = new CompoundTag("SkullOwner");

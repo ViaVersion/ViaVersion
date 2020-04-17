@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -140,10 +141,14 @@ public class InventoryPackets {
 
         if (item.getIdentifier() == 771 && item.getTag() != null) {
             CompoundTag tag = item.getTag();
-            CompoundTag ownerTag = tag.get("SkullOwner");
-            if (ownerTag != null) {
-                UUID id = UUID.fromString(((StringTag) ownerTag.get("Id")).getValue());
-                ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(id)));
+            Tag ownerTag = tag.get("SkullOwner");
+            if (ownerTag instanceof CompoundTag) {
+                CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
+                Tag idTag = ownerCompundTag.get("Id");
+                if (idTag instanceof StringTag) {
+                    UUID id = UUID.fromString((String) idTag.getValue());
+                    ownerCompundTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(id)));
+                }
             }
         }
 
@@ -157,10 +162,14 @@ public class InventoryPackets {
 
         if (item.getIdentifier() == 771 && item.getTag() != null) {
             CompoundTag tag = item.getTag();
-            CompoundTag ownerTag = tag.get("SkullOwner");
-            if (ownerTag != null && ownerTag.contains("Id")) {
-                UUID id = UUIDIntArrayType.uuidFromIntArray(((IntArrayTag) ownerTag.get("Id")).getValue());
-                ownerTag.put(new StringTag("Id", id.toString()));
+            Tag ownerTag = tag.get("SkullOwner");
+            if (ownerTag instanceof CompoundTag) {
+                CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
+                Tag idTag = ownerCompundTag.get("Id");
+                if (idTag instanceof IntArrayTag) {
+                    UUID id = UUIDIntArrayType.uuidFromIntArray((int[]) idTag.getValue());
+                    ownerCompundTag.put(new StringTag("Id", id.toString()));
+                }
             }
         }
     }

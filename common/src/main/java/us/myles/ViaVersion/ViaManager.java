@@ -14,6 +14,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
 import us.myles.ViaVersion.update.UpdateUtil;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class ViaManager {
     private final ViaInjector injector;
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
+    private final Set<String> subPlatforms = new HashSet<>();
     private boolean debug;
 
     @Builder
@@ -168,6 +170,16 @@ public class ViaManager {
 
     public ViaPlatformLoader getLoader() {
         return loader;
+    }
+
+    /**
+     * Returns a mutable set of self-added subplatform version strings.
+     * This set is expanded by the subplatform itself (e.g. ViaBackwards), and may not contain all running ones.
+     *
+     * @return mutable set of subplatform versions
+     */
+    public Set<String> getSubPlatforms() {
+        return subPlatforms;
     }
 
     public UserConnection getConnection(UUID playerUUID) {
