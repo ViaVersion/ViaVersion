@@ -18,7 +18,7 @@ import java.io.InvalidObjectException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -34,10 +34,9 @@ public class DumpSubCmd extends ViaSubCommand {
         return "Dump information about your server, this is helpful if you report bugs.";
     }
 
-
     @Override
-    public boolean execute(final ViaCommandSender sender, String[] args) {
-        final VersionInfo version = new VersionInfo(
+    public boolean execute(ViaCommandSender sender, String[] args) {
+        VersionInfo version = new VersionInfo(
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
                 ProtocolRegistry.SERVER_PROTOCOL,
@@ -45,12 +44,13 @@ public class DumpSubCmd extends ViaSubCommand {
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion(),
-                ViaManager.class.getPackage().getImplementationVersion()
+                ViaManager.class.getPackage().getImplementationVersion(),
+                Via.getManager().getSubPlatforms()
         );
 
         Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
 
-        final DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump());
+        DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump());
 
         Via.getPlatform().runAsync(new Runnable() {
             @Override
@@ -71,7 +71,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     con.setDoOutput(true);
 
                     OutputStream out = con.getOutputStream();
-                    out.write(GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(Charset.forName("UTF-8")));
+                    out.write(GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(StandardCharsets.UTF_8));
                     out.close();
 
                     if (con.getResponseCode() == 429) {
