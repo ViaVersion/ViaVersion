@@ -99,7 +99,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         teamColourFix = getBoolean("team-colour-fix", true);
         suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
-        serversideBlockConnections = getBoolean("serverside-blockconnections", false);
+        serversideBlockConnections = getBoolean("serverside-blockconnections", true);
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
         flowerStemWhenBlockAbove = getBoolean("flowerstem-when-block-above", false);
         vineClimbFix = getBoolean("vine-climb-fix", false);

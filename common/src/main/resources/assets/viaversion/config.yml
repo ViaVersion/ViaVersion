@@ -136,7 +136,7 @@ fix-1_14-health-nan: true
 use-1_15-instant-respawn: false
 #
 # Enable serverside block-connections for 1.13+ clients - all of the options in this section are built around this option
-serverside-blockconnections: false
+serverside-blockconnections: true
 # Sets the method for the block connections (world for highly experimental (USE AT OWN RISK) world-level or packet for packet-level)
 blockconnection-method: packet
 # When activated, only the most important blocks are stored in the blockstorage. (fences, glass panes etc. won't connect to solid blocks)
