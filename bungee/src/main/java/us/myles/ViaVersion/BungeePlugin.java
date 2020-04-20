@@ -128,13 +128,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        getProxy().getPlayer(uuid).sendMessage(TextComponent.fromLegacyText(message));
+        getProxy().getPlayer(uuid).sendMessage(message);
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         if (getProxy().getPlayer(uuid) != null) {
-            getProxy().getPlayer(uuid).disconnect(TextComponent.fromLegacyText(message));
+            getProxy().getPlayer(uuid).disconnect(message);
             return true;
         }
         return false;
