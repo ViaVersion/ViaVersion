@@ -131,7 +131,7 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
             if (metadata.getId() >= 9) { // New piercing
                 metadata.setId(metadata.getId() + 1);
             }
-        } else if (type.is(Entity1_14Types.EntityType.FIREWORKS_ROCKET)) {
+        } else if (type.is(Entity1_14Types.EntityType.FIREWORK_ROCKET)) {
             if (metadata.getId() == 8) {
                 if (metadata.getValue().equals(0))
                     metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480

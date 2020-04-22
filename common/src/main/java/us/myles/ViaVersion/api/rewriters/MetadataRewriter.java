@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 public abstract class MetadataRewriter {
     private final Class<? extends EntityTracker> entityTrackerClass;
     private final Protocol protocol;
+    private Map<Integer, Integer> typeMapping;
 
     protected MetadataRewriter(Protocol protocol, Class<? extends EntityTracker> entityTrackerClass) {
         this.protocol = protocol;
@@ -175,6 +176,26 @@ public abstract class MetadataRewriter {
         registerMetadataRewriter(oldPacketId, newPacketId, null, metaType);
     }
 
+    public <T extends Enum<T> & EntityType> void mapTypes(EntityType[] oldTypes, Class<T> newTypeClass) {
+        if (typeMapping == null) typeMapping = new HashMap<>(oldTypes.length);
+        for (EntityType oldType : oldTypes) {
+            try {
+                T newType = Enum.valueOf(newTypeClass, oldType.name());
+                typeMapping.put(oldType.getId(), newType.getId());
+            } catch (IllegalArgumentException notFound) {
+                if (!typeMapping.containsKey(oldType.getId())) {
+                    Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
+                                                                  "Old type: " + oldType.getClass().getSimpleName() + " New type: " + newTypeClass.getSimpleName());
+                }
+            }
+        }
+    }
+
+    public void mapType(EntityType oldType, EntityType newType) {
+        if (typeMapping == null) typeMapping = new HashMap<>();
+        typeMapping.put(oldType.getId(), newType.getId());
+    }
+
     public PacketHandler getTracker() {
         return getTrackerAndRewriter(null);
     }
@@ -243,7 +264,7 @@ public abstract class MetadataRewriter {
     }
 
     public int getNewEntityId(int oldId) {
-        return oldId;
+        return typeMapping != null ? typeMapping.getOrDefault(oldId, oldId) : oldId;
     }
 
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
