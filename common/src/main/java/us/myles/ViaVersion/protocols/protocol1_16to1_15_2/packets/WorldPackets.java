@@ -14,6 +14,7 @@ import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.UUID;
@@ -41,7 +42,8 @@ public class WorldPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    Chunk chunk = wrapper.passthrough(new Chunk1_15Type(clientWorld));
+                    Chunk chunk = wrapper.read(new Chunk1_15Type(clientWorld));
+                    wrapper.write(new Chunk1_16Type(clientWorld), chunk);
                     for (int s = 0; s < 16; s++) {
                         ChunkSection section = chunk.getSections()[s];
                         if (section == null) continue;

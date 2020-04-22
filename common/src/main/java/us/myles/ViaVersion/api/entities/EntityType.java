@@ -6,6 +6,8 @@ public interface EntityType {
 
     EntityType getParent();
 
+    String name();
+
     default boolean is(EntityType... types) {
         for (EntityType type : types)
             if (is(type))

@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata;
 
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_15Types;
 import us.myles.ViaVersion.api.entities.Entity1_16Types;
 import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -19,6 +20,8 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
 
     public MetadataRewriter1_16To1_15_2(Protocol1_16To1_15_2 protocol) {
         super(protocol, EntityTracker1_16.class);
+        mapType(Entity1_15Types.EntityType.ZOMBIE_PIGMAN, Entity1_16Types.EntityType.ZOMBIFIED_PIGLIN);
+        mapTypes(Entity1_15Types.EntityType.values(), Entity1_16Types.EntityType.class);
     }
 
     @Override
@@ -49,19 +52,5 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
     @Override
     protected EntityType getTypeFromId(int type) {
         return Entity1_16Types.getTypeFromId(type);
-    }
-
-    @Override
-    public int getNewEntityId(final int oldId) {
-        if (oldId == 57) {
-            return 95;
-        }
-        if (oldId > 57 && oldId < 96) {
-            return oldId - 1;
-        }
-        if (oldId > 102) {
-            return oldId + 1;
-        }
-        return oldId;
     }
 }

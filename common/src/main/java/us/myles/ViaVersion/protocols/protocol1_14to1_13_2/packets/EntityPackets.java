@@ -77,7 +77,7 @@ public class EntityPackets {
                                         typeId = Entity1_14Types.EntityType.HOPPER_MINECART.getId();
                                         break;
                                     case 6:
-                                        typeId = Entity1_14Types.EntityType.COMMANDBLOCK_MINECART.getId();
+                                        typeId = Entity1_14Types.EntityType.COMMAND_BLOCK_MINECART.getId();
                                         break;
                                 }
                             } else if ((type1_14.is(Entity1_14Types.EntityType.ITEM) && data > 0)

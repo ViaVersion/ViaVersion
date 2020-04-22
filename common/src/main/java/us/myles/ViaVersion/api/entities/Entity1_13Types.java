@@ -35,12 +35,12 @@ public class Entity1_13Types {
         ENTITY(-1), // abm
 
         AREA_EFFECT_CLOUD(0, ENTITY), // abk
-        ENDER_CRYSTAL(16, ENTITY), // aho
-        EVOCATION_FANGS(20, ENTITY), // ala
-        XP_ORB(22, ENTITY), // abs
-        EYE_OF_ENDER_SIGNAL(23, ENTITY), // alb
+        END_CRYSTAL(16, ENTITY), // aho
+        EVOKER_FANGS(20, ENTITY), // ala
+        EXPERIENCE_ORB(22, ENTITY), // abs
+        EYE_OF_ENDER(23, ENTITY), // alb
         FALLING_BLOCK(24, ENTITY), // aix
-        FIREWORKS_ROCKET(25, ENTITY), // alc
+        FIREWORK_ROCKET(25, ENTITY), // alc
         ITEM(32, ENTITY), // aiy
         LLAMA_SPIT(37, ENTITY), // ale
         TNT(55, ENTITY), // aiz
@@ -89,15 +89,15 @@ public class Entity1_13Types {
 
         // Golem
         ABSTRACT_GOLEM(-1, ABSTRACT_CREATURE), // agc
-        SNOWMAN(66, ABSTRACT_GOLEM), // ags
-        VILLAGER_GOLEM(80, ABSTRACT_GOLEM), // agw
+        SNOW_GOLEM(66, ABSTRACT_GOLEM), // ags
+        IRON_GOLEM(80, ABSTRACT_GOLEM), // agw
         SHULKER(59, ABSTRACT_GOLEM), // ajx
 
         // Fish
         ABSTRACT_FISHES(-1, ABSTRACT_CREATURE), // agb
         COD_MOB(8, ABSTRACT_FISHES), // agf
-        PUFFER_FISH(52, ABSTRACT_FISHES), // agn
-        SALMON_MOB(57, ABSTRACT_FISHES), // agp
+        PUFFERFISH(52, ABSTRACT_FISHES), // agn
+        SALMON(57, ABSTRACT_FISHES), // agp
         TROPICAL_FISH(72, ABSTRACT_FISHES), // agu
 
 
@@ -116,9 +116,9 @@ public class Entity1_13Types {
         // Illagers
         ABSTRACT_ILLAGER_BASE(-1, ABSTRACT_MONSTER), // ajb
         ABSTRACT_EVO_ILLU_ILLAGER(-1, ABSTRACT_ILLAGER_BASE), // akb
-        EVOCATION_ILLAGER(21, ABSTRACT_EVO_ILLU_ILLAGER), // ajl
-        ILLUSION_ILLAGER(31, ABSTRACT_EVO_ILLU_ILLAGER), // ajq
-        VINDICATION_ILLAGER(81, ABSTRACT_ILLAGER_BASE), // akf
+        EVOKER(21, ABSTRACT_EVO_ILLU_ILLAGER), // ajl
+        ILLUSIONER(31, ABSTRACT_EVO_ILLU_ILLAGER), // ajq
+        VINDICATOR(81, ABSTRACT_ILLAGER_BASE), // akf
 
         // Skeletons
         ABSTRACT_SKELETON(-1, ABSTRACT_MONSTER), // ajc
@@ -185,7 +185,7 @@ public class Entity1_13Types {
         ENDER_PEARL(75, PROJECTILE_ABSTRACT), // aln
         EGG(74, PROJECTILE_ABSTRACT), // alm
         POTION(77, PROJECTILE_ABSTRACT), // alp
-        XP_BOTTLE(76, PROJECTILE_ABSTRACT), // alo
+        EXPERIENCE_BOTTLE(76, PROJECTILE_ABSTRACT), // alo
 
         // Vehicles
         MINECART_ABSTRACT(-1, ENTITY), // alt
@@ -194,7 +194,7 @@ public class Entity1_13Types {
         HOPPER_MINECART(43, CHESTED_MINECART_ABSTRACT), // ama
         MINECART(39, MINECART_ABSTRACT), // alw
         FURNACE_MINECART(42, MINECART_ABSTRACT), // alz
-        COMMANDBLOCK_MINECART(41, MINECART_ABSTRACT), // aly
+        COMMAND_BLOCK_MINECART(41, MINECART_ABSTRACT), // aly
         TNT_MINECART(45, MINECART_ABSTRACT), // amc
         SPAWNER_MINECART(44, MINECART_ABSTRACT), // amb
         BOAT(5, ENTITY); // alv
@@ -230,7 +230,7 @@ public class Entity1_13Types {
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
         MINECART(10, EntityType.MINECART),
         TNT_PRIMED(50, EntityType.TNT),
-        ENDER_CRYSTAL(51, EntityType.ENDER_CRYSTAL),
+        ENDER_CRYSTAL(51, EntityType.END_CRYSTAL),
         TIPPED_ARROW(60, EntityType.ARROW),
         SNOWBALL(61, EntityType.SNOWBALL),
         EGG(62, EntityType.EGG),
@@ -242,13 +242,13 @@ public class Entity1_13Types {
         LIAMA_SPIT(68, EntityType.LLAMA_SPIT),
         FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
         ITEM_FRAME(71, EntityType.ITEM_FRAME),
-        ENDER_SIGNAL(72, EntityType.EYE_OF_ENDER_SIGNAL),
+        EYE_OF_ENDER(72, EntityType.EYE_OF_ENDER),
         POTION(73, EntityType.POTION),
-        THROWN_EXP_BOTTLE(75, EntityType.XP_BOTTLE),
-        FIREWORK(76, EntityType.FIREWORKS_ROCKET),
+        EXPERIENCE_BOTTLE(75, EntityType.EXPERIENCE_BOTTLE),
+        FIREWORK_ROCKET(76, EntityType.FIREWORK_ROCKET),
         LEASH(77, EntityType.LEASH_KNOT),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        EVOCATION_FANGS(79, EntityType.EVOCATION_FANGS),
+        EVOKER_FANGS(79, EntityType.EVOKER_FANGS),
         FISHIHNG_HOOK(90, EntityType.FISHING_BOBBER),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL),
