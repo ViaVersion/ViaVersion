@@ -56,8 +56,8 @@ public class WorldPackets {
                     }
 
                     CompoundTag heightMaps = chunk.getHeightMap();
-                    for (String key : heightMaps.keySet()) {
-                        LongArrayTag heightMap = heightMaps.get(key);
+                    for (Tag heightMapTag : heightMaps) {
+                        LongArrayTag heightMap = (LongArrayTag) heightMapTag;
                         int[] heightMapData = new int[256];
                         CompactArrayUtil.iterateCompactArray(9, heightMapData.length, heightMap.getValue(), (i, v) -> heightMapData[i] = v);
                         heightMap.setValue(CompactArrayUtil.createCompactArrayWithPadding(9, heightMapData.length, i -> heightMapData[i]));
