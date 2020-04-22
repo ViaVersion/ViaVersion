@@ -137,7 +137,10 @@ public class ViaManager {
     }
 
     public void handleDisconnect(UUID id) {
-        handleDisconnect(getConnection(id));
+        UserConnection connection = getConnection(id);
+        if (connection != null) {
+            handleDisconnect(connection);
+        }
     }
 
     public void handleDisconnect(UserConnection info) {
