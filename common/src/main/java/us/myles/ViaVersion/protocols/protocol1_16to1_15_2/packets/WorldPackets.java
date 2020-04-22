@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -16,6 +17,7 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.util.CompactArrayUtil;
 
 import java.util.UUID;
 
@@ -81,6 +83,14 @@ public class WorldPackets {
                             }
                             blockEntity.put(skullOwnerTag);
                         }
+                    }
+
+                    CompoundTag heightMaps = chunk.getHeightMap();
+                    for (String key : heightMaps.keySet()) {
+                        LongArrayTag heightMap = heightMaps.get(key);
+                        int[] heightMapData = new int[256];
+                        CompactArrayUtil.iterateCompactArray(9, heightMapData.length, heightMap.getValue(), (i, v) -> heightMapData[i] = v);
+                        heightMap.setValue(CompactArrayUtil.createCompactArrayWithPadding(9, heightMapData.length, i -> heightMapData[i]));
                     }
                 });
             }

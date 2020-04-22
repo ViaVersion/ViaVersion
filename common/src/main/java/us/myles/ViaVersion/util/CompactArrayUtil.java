@@ -37,7 +37,7 @@ public class CompactArrayUtil {
         long divideMul = Integer.toUnsignedLong(MAGIC[magicIndex]);
         long divideAdd = Integer.toUnsignedLong(MAGIC[magicIndex + 1]);
         int divideShift = MAGIC[magicIndex + 2];
-        int size = (4096 + valuesPerLong - 1) / valuesPerLong;
+        int size = (entries + valuesPerLong - 1) / valuesPerLong;
 
         long[] data = new long[size];
 

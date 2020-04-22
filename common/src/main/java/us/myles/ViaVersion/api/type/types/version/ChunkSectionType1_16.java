@@ -34,7 +34,8 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
         // Read blocks
         long[] blockData = new long[Type.VAR_INT.read(buffer)];
         if (blockData.length > 0) {
-            int expectedLength = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
+            char valuesPerLong = (char) (64 / bitsPerBlock);
+            int expectedLength = (ChunkSection.SIZE + valuesPerLong - 1) / valuesPerLong;
             if (blockData.length != expectedLength) {
                 throw new IllegalStateException("Block data length (" + blockData.length + ") does not match expected length (" + expectedLength + ")! bitsPerBlock=" + bitsPerBlock + ", originalBitsPerBlock=" + originalBitsPerBlock);
             }
