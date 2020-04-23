@@ -27,7 +27,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
     private final boolean is1_14Fix;
     private Map<Player, Boolean> sneaking; // true = 1.14+, else false
     private Set<UUID> sneakingUuids;
-    private Method getHandle;
+    private final Method getHandle;
     private Method setSize;
 
     private boolean useCache;

@@ -5,7 +5,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.Data;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -17,23 +16,25 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
-@Data
 public class UserConnection {
+    private static final AtomicLong IDS = new AtomicLong();
+    private final long id = IDS.incrementAndGet();
     private final Channel channel;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
     private boolean active = true;
-    private boolean pendingDisconnect = false;
+    private boolean pendingDisconnect;
     private Object lastPacket;
-    private long sentPackets = 0L;
-    private long receivedPackets = 0L;
+    private long sentPackets;
+    private long receivedPackets;
     // Used for tracking pps
-    private long startTime = 0L;
-    private long intervalPackets = 0L;
+    private long startTime;
+    private long intervalPackets;
     private long packetsPerSecond = -1L;
     // Used for handling warnings (over time)
-    private int secondsObserved = 0;
-    private int warnings = 0;
+    private int secondsObserved;
+    private int warnings;
 
     public UserConnection(Channel channel) {
         this.channel = channel;
@@ -241,5 +242,110 @@ public class UserConnection {
      */
     public void sendRawPacketToServer(ByteBuf packet) {
         sendRawPacketToServer(packet, false);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public Map<Class, StoredObject> getStoredObjects() {
+        return storedObjects;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isPendingDisconnect() {
+        return pendingDisconnect;
+    }
+
+    public void setPendingDisconnect(boolean pendingDisconnect) {
+        this.pendingDisconnect = pendingDisconnect;
+    }
+
+    public Object getLastPacket() {
+        return lastPacket;
+    }
+
+    public void setLastPacket(Object lastPacket) {
+        this.lastPacket = lastPacket;
+    }
+
+    public long getSentPackets() {
+        return sentPackets;
+    }
+
+    public void setSentPackets(long sentPackets) {
+        this.sentPackets = sentPackets;
+    }
+
+    public long getReceivedPackets() {
+        return receivedPackets;
+    }
+
+    public void setReceivedPackets(long receivedPackets) {
+        this.receivedPackets = receivedPackets;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getIntervalPackets() {
+        return intervalPackets;
+    }
+
+    public void setIntervalPackets(long intervalPackets) {
+        this.intervalPackets = intervalPackets;
+    }
+
+    public long getPacketsPerSecond() {
+        return packetsPerSecond;
+    }
+
+    public void setPacketsPerSecond(long packetsPerSecond) {
+        this.packetsPerSecond = packetsPerSecond;
+    }
+
+    public int getSecondsObserved() {
+        return secondsObserved;
+    }
+
+    public void setSecondsObserved(int secondsObserved) {
+        this.secondsObserved = secondsObserved;
+    }
+
+    public int getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(int warnings) {
+        this.warnings = warnings;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserConnection that = (UserConnection) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(id);
     }
 }

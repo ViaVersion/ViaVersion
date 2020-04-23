@@ -3,7 +3,6 @@ package us.myles.ViaVersion;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
@@ -18,7 +17,6 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
@@ -27,13 +25,19 @@ import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.velocity.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
 import us.myles.ViaVersion.velocity.command.VelocityCommandSender;
-import us.myles.ViaVersion.velocity.platform.*;
+import us.myles.ViaVersion.velocity.platform.VelocityTaskId;
+import us.myles.ViaVersion.velocity.platform.VelocityViaAPI;
+import us.myles.ViaVersion.velocity.platform.VelocityViaConfig;
+import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
+import us.myles.ViaVersion.velocity.platform.VelocityViaLoader;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.util.LoggerWrapper;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(
@@ -80,17 +84,6 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         }
 
         Via.getManager().init();
-    }
-
-    @Subscribe
-    public void onQuit(DisconnectEvent e) {
-        UserConnection userConnection = connectionManager.getConnectedClient(e.getPlayer().getUniqueId());
-        if (userConnection != null) {
-            // Only remove if the connection is disconnected (eg. relogin)
-            if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
-            }
-        }
     }
 
     @Override

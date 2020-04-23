@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.platform;
 
+import io.netty.channel.ChannelFutureListener;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
@@ -18,6 +19,8 @@ public class ViaConnectionManager {
         UUID id = connection.get(ProtocolInfo.class).getUuid();
         connections.add(connection);
         clients.put(id, connection);
+
+        connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
     }
 
     public void onDisconnect(UserConnection connection) {

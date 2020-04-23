@@ -66,4 +66,15 @@ public class ProtocolInfo extends StoredObject {
     public void setPipeline(ProtocolPipeline pipeline) {
         this.pipeline = pipeline;
     }
+
+    @Override
+    public String toString() {
+        return "ProtocolInfo{" +
+                "state=" + state +
+                ", protocolVersion=" + protocolVersion +
+                ", serverProtocolVersion=" + serverProtocolVersion +
+                ", username='" + username + '\'' +
+                ", uuid=" + uuid +
+                '}';
+    }
 }
