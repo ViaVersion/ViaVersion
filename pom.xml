@@ -73,14 +73,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Javassist (Bytecode Library) -->
         <dependency>
             <groupId>org.javassist</groupId>

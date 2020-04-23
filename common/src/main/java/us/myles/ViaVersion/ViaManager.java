@@ -1,6 +1,5 @@
 package us.myles.ViaVersion;
 
-import lombok.Builder;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.ViaInjector;
@@ -29,12 +28,15 @@ public class ViaManager {
     private final Set<String> subPlatforms = new HashSet<>();
     private boolean debug;
 
-    @Builder
     public ViaManager(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
         this.injector = injector;
         this.commandHandler = commandHandler;
         this.loader = loader;
+    }
+
+    public static ViaManagerBuilder builder() {
+        return new ViaManagerBuilder();
     }
 
     public void init() {
@@ -136,17 +138,6 @@ public class ViaManager {
         platform.getConnectionManager().onLoginSuccess(info);
     }
 
-    public void handleDisconnect(UUID id) {
-        UserConnection connection = getConnection(id);
-        if (connection != null) {
-            handleDisconnect(connection);
-        }
-    }
-
-    public void handleDisconnect(UserConnection info) {
-        platform.getConnectionManager().onDisconnect(info);
-    }
-
     public ViaPlatform<?> getPlatform() {
         return platform;
     }
@@ -187,5 +178,36 @@ public class ViaManager {
 
     public UserConnection getConnection(UUID playerUUID) {
         return platform.getConnectionManager().getConnectedClient(playerUUID);
+    }
+
+    public static final class ViaManagerBuilder {
+        private ViaPlatform<?> platform;
+        private ViaInjector injector;
+        private ViaCommandHandler commandHandler;
+        private ViaPlatformLoader loader;
+
+        public ViaManagerBuilder platform(ViaPlatform<?> platform) {
+            this.platform = platform;
+            return this;
+        }
+
+        public ViaManagerBuilder injector(ViaInjector injector) {
+            this.injector = injector;
+            return this;
+        }
+
+        public ViaManagerBuilder loader(ViaPlatformLoader loader) {
+            this.loader = loader;
+            return this;
+        }
+
+        public ViaManagerBuilder commandHandler(ViaCommandHandler commandHandler) {
+            this.commandHandler = commandHandler;
+            return this;
+        }
+
+        public ViaManager build() {
+            return new ViaManager(platform, injector, commandHandler, loader);
+        }
     }
 }

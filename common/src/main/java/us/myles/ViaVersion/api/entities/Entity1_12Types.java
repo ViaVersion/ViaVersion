@@ -10,8 +10,6 @@
 
 package us.myles.ViaVersion.api.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
@@ -37,8 +35,6 @@ public class Entity1_12Types {
         return type.get();
     }
 
-    @AllArgsConstructor
-    @Getter
     public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
         DROPPED_ITEM(1, ENTITY),
@@ -167,6 +163,21 @@ public class Entity1_12Types {
             this.parent = null;
         }
 
+        EntityType(int id, EntityType parent) {
+            this.id = id;
+            this.parent = parent;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getParent() {
+            return parent;
+        }
+
         static {
             for (EntityType type : EntityType.values()) {
                 TYPES.put(type.id, type);
@@ -180,8 +191,6 @@ public class Entity1_12Types {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
     public enum ObjectType implements us.myles.ViaVersion.api.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
@@ -220,6 +229,21 @@ public class Entity1_12Types {
             for (ObjectType type : ObjectType.values()) {
                 TYPES.put(type.id, type);
             }
+        }
+
+        ObjectType(int id, EntityType type) {
+            this.id = id;
+            this.type = type;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getType() {
+            return type;
         }
 
         public static Optional<ObjectType> findById(int id) {

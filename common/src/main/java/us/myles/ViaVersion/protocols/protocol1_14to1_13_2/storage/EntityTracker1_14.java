@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage;
 
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_14Types.EntityType;
@@ -18,14 +16,8 @@ public class EntityTracker1_14 extends EntityTracker {
     // 0x1 = sleeping, 0x2 = riptide
     private final Map<Integer, Byte> sleepingAndRiptideData = new ConcurrentHashMap<>();
     private final Map<Integer, Byte> playerEntityFlags = new ConcurrentHashMap<>();
-    @Getter
-    @Setter
     private int latestTradeWindowId;
-    @Getter
-    @Setter
     private boolean forceSendCenterChunk = true;
-    @Getter
-    @Setter
     private int chunkCenterX, chunkCenterZ;
 
     public EntityTracker1_14(UserConnection user) {
@@ -100,5 +92,37 @@ public class EntityTracker1_14 extends EntityTracker {
 
     public void setEntityFlags(int player, byte data) {
         playerEntityFlags.put(player, data);
+    }
+
+    public int getLatestTradeWindowId() {
+        return latestTradeWindowId;
+    }
+
+    public void setLatestTradeWindowId(int latestTradeWindowId) {
+        this.latestTradeWindowId = latestTradeWindowId;
+    }
+
+    public boolean isForceSendCenterChunk() {
+        return forceSendCenterChunk;
+    }
+
+    public void setForceSendCenterChunk(boolean forceSendCenterChunk) {
+        this.forceSendCenterChunk = forceSendCenterChunk;
+    }
+
+    public int getChunkCenterX() {
+        return chunkCenterX;
+    }
+
+    public void setChunkCenterX(int chunkCenterX) {
+        this.chunkCenterX = chunkCenterX;
+    }
+
+    public int getChunkCenterZ() {
+        return chunkCenterZ;
+    }
+
+    public void setChunkCenterZ(int chunkCenterZ) {
+        this.chunkCenterZ = chunkCenterZ;
     }
 }

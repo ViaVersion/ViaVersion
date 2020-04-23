@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.bungee.platform;
 
 import io.netty.buffer.ByteBuf;
-import lombok.NonNull;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -20,8 +19,9 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
+
     @Override
-    public int getPlayerVersion(@NonNull ProxiedPlayer player) {
+    public int getPlayerVersion(ProxiedPlayer player) {
         UserConnection conn = Via.getManager().getConnection(player.getUniqueId());
         if (conn == null) {
             return player.getPendingConnection().getVersion();
@@ -30,7 +30,7 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
     }
 
     @Override
-    public int getPlayerVersion(@NonNull UUID uuid) {
+    public int getPlayerVersion(UUID uuid) {
         return getPlayerVersion(ProxyServer.getInstance().getPlayer(uuid));
     }
 

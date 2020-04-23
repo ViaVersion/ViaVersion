@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.api.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
@@ -22,9 +20,6 @@ public class Entity1_15Types {
         return type.get();
     }
 
-
-    @AllArgsConstructor
-    @Getter
     public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
 
@@ -209,6 +204,21 @@ public class Entity1_15Types {
         EntityType(int id) {
             this.id = id;
             this.parent = null;
+        }
+
+        EntityType(int id, EntityType parent) {
+            this.id = id;
+            this.parent = parent;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getParent() {
+            return parent;
         }
 
         static {
