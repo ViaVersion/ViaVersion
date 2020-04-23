@@ -20,7 +20,9 @@ public class ViaConnectionManager {
         connections.add(connection);
         clients.put(id, connection);
 
-        connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
+        if (connection.getChannel() != null) {
+            connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
+        }
     }
 
     public void onDisconnect(UserConnection connection) {
