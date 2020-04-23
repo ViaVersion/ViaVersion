@@ -69,7 +69,7 @@ public class ConcurrentList<E> extends ArrayList<E> {
 
                 return clist;
             } catch (ReflectiveOperationException e) {
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             }
         }
     }
