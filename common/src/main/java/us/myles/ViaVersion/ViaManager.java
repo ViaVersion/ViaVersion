@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
@@ -27,6 +28,7 @@ public class ViaManager {
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
+    private TaskId mappingLoadingTask;
     private boolean debug;
 
     public ViaManager(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
@@ -86,6 +88,12 @@ public class ViaManager {
         // Load Platform
         loader.load();
         // Common tasks
+        mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
+            if (ProtocolRegistry.checkForMappingCompletion()) {
+                platform.cancelTask(mappingLoadingTask);
+                mappingLoadingTask = null;
+            }
+        }, 10L);
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
             if (Via.getConfig().isSimulatePlayerTick()) {
                 Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);

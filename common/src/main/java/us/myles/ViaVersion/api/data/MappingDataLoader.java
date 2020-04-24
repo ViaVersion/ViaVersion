@@ -6,6 +6,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.File;
@@ -33,6 +34,7 @@ public class MappingDataLoader {
 
     public static void enableMappingsCache() {
         cacheJsonMappings = true;
+        ProtocolRegistry.setKeepExecutorLoaded(true);
     }
 
     /**
