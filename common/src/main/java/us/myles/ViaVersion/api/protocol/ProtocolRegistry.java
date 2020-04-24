@@ -61,7 +61,6 @@ public class ProtocolRegistry {
     private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
     private static ThreadPoolExecutor mappingLoaderExecutor;
     private static boolean mappingsLoaded;
-    private static boolean keepExecutorLoaded;
 
     static {
         mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>());
@@ -329,7 +328,7 @@ public class ProtocolRegistry {
      */
     public static boolean checkForMappingCompletion() {
         synchronized (MAPPING_LOADER_LOCK) {
-            if (mappingsLoaded || keepExecutorLoaded) return false;
+            if (mappingsLoaded) return false;
 
             for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
                 // Return if any future hasn't completed yet
@@ -361,19 +360,17 @@ public class ProtocolRegistry {
         }
     }
 
+    public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
+        synchronized (MAPPING_LOADER_LOCK) {
+            CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn).whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor);
+            mappingLoaderFutures.put(protocolClass, future);
+        }
+    }
+
     public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
         synchronized (MAPPING_LOADER_LOCK) {
             if (mappingsLoaded) return null;
             return mappingLoaderFutures.get(protocolClass);
         }
-    }
-
-    /**
-     * If set to true, the executor and mappings will stay loaded, even if all current futures have been completed.
-     *
-     * @param keepExecutorLoaded whether to keep the executor and mappings loaded, even if all current futures have been completed
-     */
-    public static void setKeepExecutorLoaded(boolean keepExecutorLoaded) {
-        ProtocolRegistry.keepExecutorLoaded = keepExecutorLoaded;
     }
 }
