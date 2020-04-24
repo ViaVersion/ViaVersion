@@ -47,6 +47,9 @@ public class ViaConnectionManager {
      * Returns null when there isn't a server or connection was not found
      * When ViaVersion is reloaded, this method may not return some players.
      * May not return ProtocolSupport players.
+     * <p>
+     * Note that connections are removed as soon as their channel is closed,
+     * so avoid using this method during player quits for example.
      */
     public UserConnection getConnectedClient(UUID clientIdentifier) {
         return clients.get(clientIdentifier);
@@ -63,6 +66,12 @@ public class ViaConnectionManager {
         return Collections.unmodifiableSet(connections);
     }
 
+    /**
+     * Returns if Via injected into this player connection.
+     *
+     * @param playerId player uuid
+     * @return true if the player is handled by Via
+     */
     public boolean isClientConnected(UUID playerId) {
         return clients.containsKey(playerId);
     }

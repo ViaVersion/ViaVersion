@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
@@ -130,6 +131,9 @@ public class ViaManager {
         return platform.getConnectionManager().getConnectedClients();
     }
 
+    /**
+     * @see ViaConnectionManager#isClientConnected(UUID)
+     */
     public boolean isClientConnected(UUID player) {
         return platform.getConnectionManager().isClientConnected(player);
     }
@@ -176,6 +180,9 @@ public class ViaManager {
         return subPlatforms;
     }
 
+    /**
+     * @see ViaConnectionManager#getConnectedClient(UUID)
+     */
     public UserConnection getConnection(UUID playerUUID) {
         return platform.getConnectionManager().getConnectedClient(playerUUID);
     }

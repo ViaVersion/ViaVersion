@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 public class Via {
     private static ViaPlatform platform;
     private static ViaManager manager;
-    private static boolean cacheJsonMappings;
 
     /**
      * Register the ViaManager associated with the platform.

@@ -38,8 +38,8 @@ public interface ViaAPI<T> {
      *
      * @param playerUUID UUID of a player
      * @return true if Via has a cached userconnection for this player
-     * @deprecated as of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)},
-     * or use {@link #isInjected(UUID)}
+     * @deprecated use {@link #isInjected(UUID)}
+     * @see #isInjected(UUID)
      */
     @Deprecated
     default boolean isPorted(UUID playerUUID) {
@@ -66,18 +66,18 @@ public interface ViaAPI<T> {
      *
      * @param player Platform player object, eg. Bukkit this is Player
      * @param packet The packet, you need a VarInt ID then the packet contents.
-     * @throws IllegalArgumentException If not on 1.9 throws IllegalArg
+     * @throws IllegalArgumentException if the player is not injected by Via
      */
-    void sendRawPacket(T player, ByteBuf packet) throws IllegalArgumentException;
+    void sendRawPacket(T player, ByteBuf packet);
 
     /**
      * Send a raw packet to the player (Use new IDs)
      *
      * @param uuid   The uuid from the player to send packet
      * @param packet The packet, you need a VarInt ID then the packet contents.
-     * @throws IllegalArgumentException If not on 1.9 throws IllegalArg
+     * @throws IllegalArgumentException if the player is not injected by Via
      */
-    void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException;
+    void sendRawPacket(UUID uuid, ByteBuf packet);
 
     /**
      * Create a new bossbar instance
