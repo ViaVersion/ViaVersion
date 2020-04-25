@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.platform;
 
+import io.netty.channel.ChannelFutureListener;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
@@ -18,6 +19,10 @@ public class ViaConnectionManager {
         UUID id = connection.get(ProtocolInfo.class).getUuid();
         connections.add(connection);
         clients.put(id, connection);
+
+        if (connection.getChannel() != null) {
+            connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
+        }
     }
 
     public void onDisconnect(UserConnection connection) {
@@ -42,6 +47,9 @@ public class ViaConnectionManager {
      * Returns null when there isn't a server or connection was not found
      * When ViaVersion is reloaded, this method may not return some players.
      * May not return ProtocolSupport players.
+     * <p>
+     * Note that connections are removed as soon as their channel is closed,
+     * so avoid using this method during player quits for example.
      */
     public UserConnection getConnectedClient(UUID clientIdentifier) {
         return clients.get(clientIdentifier);
@@ -58,6 +66,12 @@ public class ViaConnectionManager {
         return Collections.unmodifiableSet(connections);
     }
 
+    /**
+     * Returns if Via injected into this player connection.
+     *
+     * @param playerId player uuid
+     * @return true if the player is handled by Via
+     */
     public boolean isClientConnected(UUID playerId) {
         return clients.containsKey(playerId);
     }

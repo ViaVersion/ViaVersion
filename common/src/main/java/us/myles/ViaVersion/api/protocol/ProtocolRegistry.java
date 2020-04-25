@@ -70,11 +70,10 @@ public class ProtocolRegistry {
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
         registerBaseProtocol(new BaseProtocol1_7(), Range.all());
 
-        // Register built in protocols
         registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
         registerProtocol(new Protocol1_9_1To1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9.getId());
         registerProtocol(new Protocol1_9_3To1_9_1_2(), ProtocolVersion.v1_9_3, ProtocolVersion.v1_9_2);
-        // Only supported for 1.9.4 server to 1.9 (nothing else)
+
         registerProtocol(new Protocol1_9To1_9_1(), ProtocolVersion.v1_9, ProtocolVersion.v1_9_2);
         registerProtocol(new Protocol1_9_1_2To1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getId(), ProtocolVersion.v1_9_2.getId()), ProtocolVersion.v1_9_3.getId());
         registerProtocol(new Protocol1_10To1_9_3_4(), ProtocolVersion.v1_10, ProtocolVersion.v1_9_3);
@@ -320,15 +319,26 @@ public class ProtocolRegistry {
         if (future == null) return;
 
         future.get();
+    }
 
+    /**
+     * Shuts down the executor and uncaches mappings if all futures have been completed.
+     *
+     * @return true if the executor has now been shut down
+     */
+    public static boolean checkForMappingCompletion() {
         synchronized (MAPPING_LOADER_LOCK) {
-            if (mappingsLoaded) return;
+            if (mappingsLoaded) return false;
 
-            // Remove only after execution to block other potential threads
-            mappingLoaderFutures.remove(protocolClass);
-            if (mappingLoaderFutures.isEmpty()) {
-                shutdownLoaderExecutor();
+            for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
+                // Return if any future hasn't completed yet
+                if (!future.isDone()) {
+                    return false;
+                }
             }
+
+            shutdownLoaderExecutor();
+            return true;
         }
     }
 
@@ -336,6 +346,7 @@ public class ProtocolRegistry {
         mappingsLoaded = true;
         mappingLoaderExecutor.shutdown();
         mappingLoaderExecutor = null;
+        mappingLoaderFutures.clear();
         mappingLoaderFutures = null;
         if (MappingDataLoader.isCacheJsonMappings()) {
             MappingDataLoader.getMappingsCache().clear();
@@ -345,6 +356,13 @@ public class ProtocolRegistry {
     public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
         synchronized (MAPPING_LOADER_LOCK) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor);
+            mappingLoaderFutures.put(protocolClass, future);
+        }
+    }
+
+    public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
+        synchronized (MAPPING_LOADER_LOCK) {
+            CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn).whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor);
             mappingLoaderFutures.put(protocolClass, future);
         }
     }

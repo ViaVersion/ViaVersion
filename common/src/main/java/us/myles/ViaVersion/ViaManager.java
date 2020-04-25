@@ -1,8 +1,9 @@
 package us.myles.ViaVersion;
 
-import lombok.Builder;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
@@ -27,14 +28,18 @@ public class ViaManager {
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
+    private TaskId mappingLoadingTask;
     private boolean debug;
 
-    @Builder
     public ViaManager(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
         this.injector = injector;
         this.commandHandler = commandHandler;
         this.loader = loader;
+    }
+
+    public static ViaManagerBuilder builder() {
+        return new ViaManagerBuilder();
     }
 
     public void init() {
@@ -83,6 +88,12 @@ public class ViaManager {
         // Load Platform
         loader.load();
         // Common tasks
+        mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
+            if (ProtocolRegistry.checkForMappingCompletion()) {
+                platform.cancelTask(mappingLoadingTask);
+                mappingLoadingTask = null;
+            }
+        }, 10L);
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
             if (Via.getConfig().isSimulatePlayerTick()) {
                 Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
@@ -128,23 +139,15 @@ public class ViaManager {
         return platform.getConnectionManager().getConnectedClients();
     }
 
+    /**
+     * @see ViaConnectionManager#isClientConnected(UUID)
+     */
     public boolean isClientConnected(UUID player) {
         return platform.getConnectionManager().isClientConnected(player);
     }
 
     public void handleLoginSuccess(UserConnection info) {
         platform.getConnectionManager().onLoginSuccess(info);
-    }
-
-    public void handleDisconnect(UUID id) {
-        UserConnection connection = getConnection(id);
-        if (connection != null) {
-            handleDisconnect(connection);
-        }
-    }
-
-    public void handleDisconnect(UserConnection info) {
-        platform.getConnectionManager().onDisconnect(info);
     }
 
     public ViaPlatform<?> getPlatform() {
@@ -185,7 +188,41 @@ public class ViaManager {
         return subPlatforms;
     }
 
+    /**
+     * @see ViaConnectionManager#getConnectedClient(UUID)
+     */
     public UserConnection getConnection(UUID playerUUID) {
         return platform.getConnectionManager().getConnectedClient(playerUUID);
+    }
+
+    public static final class ViaManagerBuilder {
+        private ViaPlatform<?> platform;
+        private ViaInjector injector;
+        private ViaCommandHandler commandHandler;
+        private ViaPlatformLoader loader;
+
+        public ViaManagerBuilder platform(ViaPlatform<?> platform) {
+            this.platform = platform;
+            return this;
+        }
+
+        public ViaManagerBuilder injector(ViaInjector injector) {
+            this.injector = injector;
+            return this;
+        }
+
+        public ViaManagerBuilder loader(ViaPlatformLoader loader) {
+            this.loader = loader;
+            return this;
+        }
+
+        public ViaManagerBuilder commandHandler(ViaCommandHandler commandHandler) {
+            this.commandHandler = commandHandler;
+            return this;
+        }
+
+        public ViaManager build() {
+            return new ViaManager(platform, injector, commandHandler, loader);
+        }
     }
 }

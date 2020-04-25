@@ -2,10 +2,8 @@ package us.myles.ViaVersion.bukkit.platform;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
@@ -72,13 +70,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
         // Add ProtocolSupport ConnectListener if necessary.
         ClassGenerator.registerPSConnectListener(plugin);
-
-        registerListener(new Listener() {
-            @EventHandler
-            public void onPlayerQuit(PlayerQuitEvent e) {
-                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
-            }
-        });
 
         /* 1.9 client to 1.8 server */
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {

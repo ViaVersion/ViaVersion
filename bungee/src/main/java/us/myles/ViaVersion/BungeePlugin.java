@@ -2,31 +2,34 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
-import us.myles.ViaVersion.bungee.platform.*;
+import us.myles.ViaVersion.bungee.platform.BungeeTaskId;
+import us.myles.ViaVersion.bungee.platform.BungeeViaAPI;
+import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
+import us.myles.ViaVersion.bungee.platform.BungeeViaInjector;
+import us.myles.ViaVersion.bungee.platform.BungeeViaLoader;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, Listener {
@@ -192,17 +195,5 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     @Override
     public ViaConnectionManager getConnectionManager() {
         return connectionManager;
-    }
-
-    @EventHandler
-    public void onQuit(PlayerDisconnectEvent e) {
-        UserConnection userConnection = getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
-        if (userConnection != null) {
-            // Only remove if the connection is disconnected (eg. relogin)
-            if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().handleDisconnect(e.getPlayer().getUniqueId());
-            }
-        }
-
     }
 }
