@@ -289,12 +289,12 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         int index;
                         int length;
                         // If no input or new word (then it's the start)
-                        if (input.endsWith(" ") || input.length() == 0) {
+                        if (input.endsWith(" ") || input.isEmpty()) {
                             index = input.length();
                             length = 0;
                         } else {
                             // Otherwise find the last space (+1 as we include it)
-                            int lastSpace = input.lastIndexOf(" ") + 1;
+                            int lastSpace = input.lastIndexOf(' ') + 1;
                             index = lastSpace;
                             length = input.length() - lastSpace;
                         }
@@ -1212,7 +1212,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // The Display Name is just colours which overwrites the suffix
         // It also overwrites for ANY colour in name but most plugins
         // will just send colour as 'invisible' character
-        if (ChatColor.stripColor(name).length() == 0) {
+        if (ChatColor.stripColor(name).isEmpty()) {
             StringBuilder newName = new StringBuilder();
             for (int i = 1; i < name.length(); i += 2) {
                 char colorChar = name.charAt(i);

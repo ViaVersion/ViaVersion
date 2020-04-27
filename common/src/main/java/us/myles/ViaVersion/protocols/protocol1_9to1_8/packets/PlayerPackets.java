@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -22,6 +21,7 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProv
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import us.myles.ViaVersion.util.GsonUtil;
 
 public class PlayerPackets {
     public static void register(Protocol protocol) {
@@ -36,7 +36,7 @@ public class PlayerPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         try {
-                            JsonObject obj = (JsonObject) new JsonParser().parse(wrapper.get(Type.STRING, 0));
+                            JsonObject obj = (JsonObject) GsonUtil.getJsonParser().parse(wrapper.get(Type.STRING, 0));
                             ChatRewriter.toClient(obj, wrapper.user());
                             wrapper.set(Type.STRING, 0, obj.toString());
                         } catch (Exception e) {

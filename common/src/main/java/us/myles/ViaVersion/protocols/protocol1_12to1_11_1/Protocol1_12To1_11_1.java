@@ -24,6 +24,7 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import us.myles.ViaVersion.util.GsonUtil;
 
 public class Protocol1_12To1_11_1 extends Protocol {
 
@@ -81,7 +82,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if (!Via.getConfig().is1_12NBTArrayFix()) return;
                         try {
-                            JsonElement obj = new JsonParser().parse(wrapper.get(Type.STRING, 0));
+                            JsonElement obj = GsonUtil.getJsonParser().parse(wrapper.get(Type.STRING, 0));
                             if (!TranslateRewriter.toClient(obj, wrapper.user())) {
                                 wrapper.cancel();
                                 return;

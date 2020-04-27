@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2;
 
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -130,7 +129,7 @@ public class Protocol1_16To1_15_2 extends Protocol {
 
 
         cancelIncoming(State.PLAY, 0x0F); // Generate jisaw
-        cancelIncoming(State.PLAY,  0x28); // Jigsaw update
+        cancelIncoming(State.PLAY, 0x28); // Jigsaw update
 
         registerIncoming(State.PLAY, 0x0F, 0x10);
         registerIncoming(State.PLAY, 0x10, 0x11);
