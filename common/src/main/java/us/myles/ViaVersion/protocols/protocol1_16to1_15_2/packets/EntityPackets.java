@@ -10,6 +10,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class EntityPackets {
 
@@ -32,7 +33,22 @@ public class EntityPackets {
         metadataRewriter.registerEntityDestroy(0x38, 0x38);
 
         // Respawn
-        metadataRewriter.registerRespawn(0x3B, 0x3B);
+        protocol.registerOutgoing(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT);
+                map(Type.LONG);
+                map(Type.BYTE);
+                map(Type.STRING);
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
+
+                    wrapper.write(Type.BOOLEAN, true); // keep all playerdata
+                });
+            }
+        });
 
         // Join Game
         metadataRewriter.registerJoinGame(0x26, 0x26, Entity1_16Types.EntityType.PLAYER);
