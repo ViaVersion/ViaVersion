@@ -21,6 +21,26 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
+        //Window Property
+        protocol.registerOutgoing(State.PLAY, 0x16, 0x16, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(Type.SHORT); // Property
+                map(Type.SHORT); // Value
+
+                handler(wrapper -> {
+                    short property = wrapper.get(Type.SHORT, 0);
+                    if (property >= 4 && property <= 6) { // Enchantment id
+                        short enchantmentId = wrapper.get(Type.SHORT, 1);
+                        if (enchantmentId >= 11) { // soul_speed added with id 11
+                            wrapper.set(Type.SHORT, 1, ++enchantmentId);
+                        }
+                    }
+                });
+            }
+        });
+
         // Set cooldown
         itemRewriter.registerSetCooldown(0x18, 0x18, InventoryPackets::getNewItemId);
 
