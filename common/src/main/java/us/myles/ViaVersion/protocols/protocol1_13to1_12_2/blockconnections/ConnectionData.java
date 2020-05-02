@@ -249,6 +249,7 @@ public class ConnectionData {
         initActions.addAll(ChorusPlantConnectionHandler.init());
         initActions.add(TripwireConnectionHandler.init());
         initActions.add(SnowyGrassConnectionHandler.init());
+        initActions.add(FireConnectionHandler.init());
         if (Via.getConfig().isVineClimbFix()) {
             initActions.add(VineConnectionHandler.init());
         }
