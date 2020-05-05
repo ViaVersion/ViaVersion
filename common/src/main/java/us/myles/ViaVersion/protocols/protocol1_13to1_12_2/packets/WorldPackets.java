@@ -254,6 +254,52 @@ public class WorldPackets {
             }
         });
 
+        // Explosion
+        protocol.registerOutgoing(State.PLAY, 0x1C, 0x1E, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                if (!Via.getConfig().isServersideBlockConnections())
+                    return;
+
+                map(Type.FLOAT); // X
+                map(Type.FLOAT); // Y
+                map(Type.FLOAT); // Z
+                map(Type.FLOAT); // Radius
+                map(Type.INT); // Record Count
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        UserConnection userConnection = wrapper.user();
+                        int x = (int) Math.floor(wrapper.get(Type.FLOAT, 0));
+                        int y = (int) Math.floor(wrapper.get(Type.FLOAT, 1));
+                        int z = (int) Math.floor(wrapper.get(Type.FLOAT, 2));
+                        int recordCount = wrapper.get(Type.INT, 0);
+                        Position[] records = new Position[recordCount];
+
+                        for (int i = 0; i < recordCount; i++) {
+                            Position position = new Position(
+                                    x + wrapper.passthrough(Type.BYTE),
+                                    (short) (y + wrapper.passthrough(Type.BYTE)),
+                                    z + wrapper.passthrough(Type.BYTE));
+                            records[i] = position;
+
+                            // Set to air
+                            ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), 0);
+                        }
+
+                        // Workaround for packet order issue
+                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                        wrapper.cancel();
+
+                        for (int i = 0; i < recordCount; i++) {
+                            ConnectionData.update(userConnection, records[i]);
+                        }
+                    }
+                });
+            }
+        });
+
         // Unload Chunk
         protocol.registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
             @Override
