@@ -18,8 +18,15 @@ import java.util.Arrays;
 
 public class EntityToggleGlideListener extends ViaBukkitListener {
 
+    private boolean swimmingMethodExists;
+
     public EntityToggleGlideListener(ViaVersionPlugin plugin) {
         super(plugin, Protocol1_15To1_14_4.class);
+        try {
+            Player.class.getMethod("isSwimming");
+            swimmingMethodExists = true;
+        } catch (NoSuchMethodException ignored) {
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -47,7 +54,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
                 if (player.isSprinting()) {
                     bitmask |= 0x08;
                 }
-                if (player.isSwimming()) {
+                if (swimmingMethodExists && player.isSwimming()) {
                     bitmask |= 0x10;
                 }
                 if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
