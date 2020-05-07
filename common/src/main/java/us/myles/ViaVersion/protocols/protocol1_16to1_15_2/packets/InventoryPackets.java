@@ -21,7 +21,24 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        //Window Property
+        // Open Window
+        protocol.registerOutgoing(State.PLAY, 0x2F, 0x2F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT);
+                map(Type.VAR_INT);
+                map(Type.STRING);
+
+                handler(wrapper -> {
+                    int windowType = wrapper.get(Type.VAR_INT, 1);
+                    if (windowType >= 20) { // smithing added with id 20
+                        wrapper.set(Type.VAR_INT, 1, ++windowType);
+                    }
+                });
+            }
+        });
+
+        // Window Property
         protocol.registerOutgoing(State.PLAY, 0x16, 0x16, new PacketRemapper() {
             @Override
             public void registerMap() {
