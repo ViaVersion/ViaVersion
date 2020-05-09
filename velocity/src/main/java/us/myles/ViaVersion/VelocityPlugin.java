@@ -2,6 +2,7 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -82,7 +83,10 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         if (proxy.getPluginManager().getPlugin("ViaBackwards").isPresent()) {
             MappingDataLoader.enableMappingsCache();
         }
+    }
 
+    @Subscribe(order = PostOrder.LAST)
+    public void onProxyLateInit(ProxyInitializeEvent e) {
         Via.getManager().init();
     }
 
