@@ -15,7 +15,9 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
 import us.myles.ViaVersion.update.UpdateUtil;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +30,7 @@ public class ViaManager {
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
+    private List<Runnable> enableListeners = new ArrayList<>();
     private TaskId mappingLoadingTask;
     private boolean debug;
 
@@ -48,10 +51,13 @@ public class ViaManager {
             platform.onReload();
         }
         // Check for updates
-        if (platform.getConf().isCheckForUpdates())
+        if (platform.getConf().isCheckForUpdates()) {
             UpdateUtil.sendUpdateMessage();
+        }
+
         // Force class load
         ProtocolRegistry.init();
+
         // Inject
         try {
             injector.inject();
@@ -60,11 +66,17 @@ public class ViaManager {
             e.printStackTrace();
             return;
         }
+
         // Mark as injected
         System.setProperty("ViaVersion", platform.getPluginVersion());
+
+        for (Runnable listener : enableListeners) {
+            listener.run();
+        }
+        enableListeners = null;
+
         // If successful
         platform.runSync(this::onServerLoaded);
-
     }
 
     public void onServerLoaded() {
@@ -193,6 +205,15 @@ public class ViaManager {
      */
     public UserConnection getConnection(UUID playerUUID) {
         return platform.getConnectionManager().getConnectedClient(playerUUID);
+    }
+
+    /**
+     * Adds a runnable to be executed when ViaVersion has finished its init before the full server load.
+     *
+     * @param runnable runnable to be executed
+     */
+    public void addEnableListener(Runnable runnable) {
+        enableListeners.add(runnable);
     }
 
     public static final class ViaManagerBuilder {

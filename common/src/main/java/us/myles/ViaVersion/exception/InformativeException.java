@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class InformativeException extends Exception {
     private final Map<String, Object> info = new HashMap<>();
-    private int sources = 0;
+    private int sources;
 
     public InformativeException(Throwable cause) {
         super(cause);
