@@ -166,6 +166,22 @@ public class Protocol1_16To1_15_2 extends Protocol {
     protected void loadMappingData() {
         MappingData.init();
 
+        int[] wallPostOverrideTag = new int[47];
+        int arrayIndex = 0;
+        wallPostOverrideTag[arrayIndex++] = 140;
+        wallPostOverrideTag[arrayIndex++] = 179;
+        wallPostOverrideTag[arrayIndex++] = 264;
+        for (int i = 153; i <= 158; i++) {
+            wallPostOverrideTag[arrayIndex++] = i;
+        }
+        for (int i = 163; i <= 168; i++) {
+            wallPostOverrideTag[arrayIndex++] = i;
+        }
+        for (int i = 408; i <= 439; i++) {
+            wallPostOverrideTag[arrayIndex++] = i;
+        }
+
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:wall_post_override", wallPostOverrideTag);
         tagRewriter.addTag(TagType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
         tagRewriter.addTag(TagType.BLOCK, "minecraft:climbable", 160, 241, 658);
         tagRewriter.addTag(TagType.BLOCK, "minecraft:fire", 142);
