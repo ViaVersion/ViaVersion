@@ -10,6 +10,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class EntityPackets {
@@ -39,19 +40,45 @@ public class EntityPackets {
                 map(Type.INT);
                 map(Type.LONG);
                 map(Type.BYTE);
-                map(Type.STRING);
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     int dimensionId = wrapper.get(Type.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
 
+                    String levelType = wrapper.read(Type.STRING);
+                    wrapper.write(Type.BOOLEAN, false); // debug
+                    wrapper.write(Type.BOOLEAN, levelType.equals("flat"));
                     wrapper.write(Type.BOOLEAN, true); // keep all playerdata
                 });
             }
         });
 
         // Join Game
-        metadataRewriter.registerJoinGame(0x26, 0x26, Entity1_16Types.EntityType.PLAYER);
+        protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Entity ID
+                map(Type.UNSIGNED_BYTE); //  Gamemode
+                map(Type.INT); // Dimension
+                map(Type.LONG); // Seed
+                map(Type.UNSIGNED_BYTE); // Max players
+                handler(wrapper -> {
+                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientChunks.setEnvironment(dimensionId);
+
+                    wrapper.user().get(EntityTracker1_16.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.EntityType.PLAYER);
+
+                    final String type = wrapper.read(Type.STRING);// level type
+                    wrapper.passthrough(Type.VAR_INT); // View distance
+                    wrapper.passthrough(Type.BOOLEAN); // Reduced debug info
+                    wrapper.passthrough(Type.BOOLEAN); // Show death screen
+
+                    wrapper.write(Type.BOOLEAN, false); // Debug
+                    wrapper.write(Type.BOOLEAN, type.equals("flat"));
+                });
+            }
+        });
 
         // Entity Properties
         protocol.registerOutgoing(State.PLAY, 0x59, 0x59, new PacketRemapper() {
