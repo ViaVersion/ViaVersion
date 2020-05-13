@@ -95,7 +95,7 @@ public class ViaManager {
                 platform.getLogger().warning("Please remember that ViaVersion only adds support for versions newer than the server version.");
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
                 platform.getLogger().warning("In that case please read the ViaVersion resource page carefully, and if you're");
-                platform.getLogger().warning("still unsure, feel free to join our Discord-Server for futher assistance.");
+                platform.getLogger().warning("still unsure, feel free to join our Discord-Server for further assistance.");
             }
         }
         // Load Listeners / Tasks
