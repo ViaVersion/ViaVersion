@@ -20,6 +20,7 @@ import java.util.UUID;
 
 public class Protocol1_16To1_15_2 extends Protocol {
 
+    public static final UUID ZERO_UUID = new UUID(0, 0);
     private TagRewriter tagRewriter;
 
     public Protocol1_16To1_15_2() {
@@ -46,6 +47,16 @@ public class Protocol1_16To1_15_2 extends Protocol {
                     UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
                     wrapper.write(Type.UUID_INT_ARRAY, uuid);
                 });
+            }
+        });
+
+        // Chat Message
+        registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING);
+                map(Type.BYTE);
+                handler(wrapper -> wrapper.write(Type.UUID, ZERO_UUID)); // sender uuid
             }
         });
 

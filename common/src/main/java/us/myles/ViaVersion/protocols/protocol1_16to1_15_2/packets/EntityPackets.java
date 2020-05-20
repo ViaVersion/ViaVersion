@@ -1,9 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_16Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.packets.State;
@@ -14,6 +19,39 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class EntityPackets {
+
+    private static final ValueTransformer<Integer, String> DIMENSION_TRANSFORMER = new ValueTransformer<Integer, String>(Type.INT, Type.STRING) {
+        @Override
+        public String transform(PacketWrapper wrapper, Integer input) throws Exception {
+            switch (input) {
+                case -1:
+                    return "the_nether";
+                case 0:
+                    return "overworld";
+                case 1:
+                    return "the_end";
+                default:
+                    Via.getPlatform().getLogger().warning("Invalid dimension id: " + input);
+                    return "overworld";
+            }
+        }
+    };
+    private static final CompoundTag DIMENSIONS_TAG = new CompoundTag("");
+
+    static {
+        ListTag list = new ListTag("dimension", CompoundTag.class);
+        list.add(createDimensionEntry("minecraft:overworld"));
+        list.add(createDimensionEntry("minecraft:the_nether"));
+        list.add(createDimensionEntry("minecraft:the_end"));
+        DIMENSIONS_TAG.put(list);
+    }
+
+    private static CompoundTag createDimensionEntry(String dimension) {
+        CompoundTag tag = new CompoundTag("");
+        tag.put(new StringTag("key", dimension));
+        tag.put(new StringTag("element", dimension));
+        return tag;
+    }
 
     public static void register(Protocol protocol) {
         MetadataRewriter1_16To1_15_2 metadataRewriter = protocol.get(MetadataRewriter1_16To1_15_2.class);
@@ -37,12 +75,12 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.INT);
+                map(DIMENSION_TRANSFORMER);
                 map(Type.LONG);
                 map(Type.BYTE);
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    String dimensionId = wrapper.get(Type.STRING, 0);
                     clientWorld.setEnvironment(dimensionId);
 
                     String levelType = wrapper.read(Type.STRING);
@@ -59,13 +97,19 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.INT); // Entity ID
                 map(Type.UNSIGNED_BYTE); //  Gamemode
-                map(Type.INT); // Dimension
+                map(Type.NOTHING, new ValueTransformer<Void, CompoundTag>(Type.NBT) { // whatever this is
+                    @Override
+                    public CompoundTag transform(PacketWrapper wrapper, Void input) throws Exception {
+                        return DIMENSIONS_TAG;
+                    }
+                });
+                map(DIMENSION_TRANSFORMER); // Dimension
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Max players
                 handler(wrapper -> {
                     ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
-                    clientChunks.setEnvironment(dimensionId);
+                    String dimension = wrapper.get(Type.STRING, 0);
+                    clientChunks.setEnvironment(dimension);
 
                     wrapper.user().get(EntityTracker1_16.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.EntityType.PLAYER);
 
