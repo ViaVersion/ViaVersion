@@ -31,11 +31,11 @@ public enum Environment {
 
     public static Environment getEnvironmentById(String id) {
         switch (id) {
-            case "the_nether":
+            case "minecraft:the_nether":
                 return NETHER;
-            case "overworld":
+            case "minecraft:overworld":
                 return NORMAL;
-            case "the_end":
+            case "minecraft:the_end":
                 return END;
             default:
                 return CUSTOM;
