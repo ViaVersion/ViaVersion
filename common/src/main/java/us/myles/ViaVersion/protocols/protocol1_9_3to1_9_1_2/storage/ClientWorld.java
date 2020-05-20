@@ -16,12 +16,10 @@ public class ClientWorld extends StoredObject {
     }
 
     public void setEnvironment(int environmentId) {
-        this.environment = getEnvFromId(environmentId);
+        this.environment = Environment.getEnvironmentById(environmentId);
     }
 
-    private Environment getEnvFromId(int id) {
-        Environment output = Environment.getEnvironmentById(id);
-        if (output == null) return Environment.NETHER;
-        return output;
+    public void setEnvironment(String environmentId) {
+        this.environment = Environment.getEnvironmentById(environmentId);
     }
 }
