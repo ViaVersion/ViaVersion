@@ -77,7 +77,7 @@ public class EntityPackets {
             public void registerMap() {
                 map(DIMENSION_TRANSFORMER);
                 map(Type.LONG);
-                map(Type.BYTE);
+                map(Type.UNSIGNED_BYTE);
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     String dimensionId = wrapper.get(Type.STRING, 0);
