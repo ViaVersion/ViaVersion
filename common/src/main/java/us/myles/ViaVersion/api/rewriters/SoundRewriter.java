@@ -6,9 +6,9 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
 public class SoundRewriter {
-    private final Protocol protocol;
+    protected final Protocol protocol;
     // Can't hold the mappings instance here since it's loaded later
-    private final IdRewriteFunction idRewriter;
+    protected final IdRewriteFunction idRewriter;
 
     public SoundRewriter(Protocol protocol, IdRewriteFunction idRewriter) {
         this.protocol = protocol;
