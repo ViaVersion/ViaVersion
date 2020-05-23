@@ -15,6 +15,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
+import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
@@ -759,21 +760,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
         });
         // New 0x4C - Stop Sound
 
-        // Sound Effect packet
-        registerOutgoing(State.PLAY, 0x49, 0x4D, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Sound ID
+        new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(0x49, 0x4D);
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int soundId = wrapper.get(Type.VAR_INT, 0);
-                        wrapper.set(Type.VAR_INT, 0, getNewSoundID(soundId));
-                    }
-                });
-            }
-        });
         // Player list header and footer
         registerOutgoing(State.PLAY, 0x4A, 0x4E, new PacketRemapper() {
             @Override
@@ -1173,10 +1161,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
     protected void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
-    }
-
-    private int getNewSoundID(final int oldID) {
-        return MappingData.soundMappings.getNewId(oldID);
     }
 
     // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java

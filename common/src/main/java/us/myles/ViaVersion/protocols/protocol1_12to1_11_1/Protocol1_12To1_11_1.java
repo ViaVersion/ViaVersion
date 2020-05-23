@@ -4,7 +4,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -14,6 +13,7 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.packets.State;
@@ -183,31 +183,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x44, 0x46);
         registerOutgoing(State.PLAY, 0x45, 0x47);
 
-        // Sound effect
-        registerOutgoing(State.PLAY, 0x46, 0x48, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Sound name
-                map(Type.VAR_INT); // 1 - Sound Category
-                map(Type.INT); // 2 - x
-                map(Type.INT); // 3 - y
-                map(Type.INT); // 4 - z
-                map(Type.FLOAT); // 5 - Volume
-                map(Type.FLOAT); // 6 - Pitch
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.VAR_INT, 0);
-                        id = getNewSoundId(id);
-
-                        if (id == -1) // Removed
-                            wrapper.cancel();
-                        wrapper.set(Type.VAR_INT, 0, id);
-                    }
-                });
-            }
-        });
+        new SoundRewriter(this, this::getNewSoundId).registerSound(0x46, 0x48);
 
         registerOutgoing(State.PLAY, 0x47, 0x49);
         registerOutgoing(State.PLAY, 0x48, 0x4a);
