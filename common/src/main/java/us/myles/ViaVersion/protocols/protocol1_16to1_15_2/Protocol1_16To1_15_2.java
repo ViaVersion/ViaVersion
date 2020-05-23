@@ -4,6 +4,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.rewriters.TagType;
 import us.myles.ViaVersion.api.type.Type;
@@ -60,23 +61,9 @@ public class Protocol1_16To1_15_2 extends Protocol {
             }
         });
 
-        // Entity Sound Effect
-        registerOutgoing(State.PLAY, 0x51, 0x51, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Sound Id
-                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, MappingData.soundMappings.getNewId(wrapper.get(Type.VAR_INT, 0))));
-            }
-        });
-
-        // Sound Effect
-        registerOutgoing(State.PLAY, 0x52, 0x52, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Sound Id
-                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, MappingData.soundMappings.getNewId(wrapper.get(Type.VAR_INT, 0))));
-            }
-        });
+        SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
+        soundRewriter.registerSound(0x51, 0x51);
+        soundRewriter.registerSound(0x52, 0x52);
 
         // Edit Book
         registerIncoming(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {

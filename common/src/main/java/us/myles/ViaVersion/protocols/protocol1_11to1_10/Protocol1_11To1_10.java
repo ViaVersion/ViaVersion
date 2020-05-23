@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
+import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
@@ -86,31 +87,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Sound effect
-        registerOutgoing(State.PLAY, 0x46, 0x46, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Sound name
-                map(Type.VAR_INT); // 1 - Sound Category
-                map(Type.INT); // 2 - x
-                map(Type.INT); // 3 - y
-                map(Type.INT); // 4 - z
-                map(Type.FLOAT); // 5 - Volume
-                map(Type.FLOAT); // 6 - Pitch
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.VAR_INT, 0);
-                        id = getNewSoundId(id);
-
-                        if (id == -1) // Removed
-                            wrapper.cancel();
-                        wrapper.set(Type.VAR_INT, 0, id);
-                    }
-                });
-            }
-        });
+        new SoundRewriter(this, this::getNewSoundId).registerSound(0x46, 0x46);
 
         // Collect item packet
         registerOutgoing(State.PLAY, 0x48, 0x48, new PacketRemapper() {

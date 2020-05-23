@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
@@ -80,19 +81,8 @@ public class Protocol1_14To1_13_2 extends Protocol {
         registerOutgoing(State.PLAY, 0x4B, 0x4F);
         registerOutgoing(State.PLAY, 0x4C, 0x52);
 
-        // Sound Effect
-        registerOutgoing(State.PLAY, 0x4D, 0x51, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Sound Id
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0, getNewSoundId(wrapper.get(Type.VAR_INT, 0)));
-                    }
-                });
-            }
-        });
+        new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(0x4D, 0x51);
+
         registerOutgoing(State.PLAY, 0x4E, 0x53);
         registerOutgoing(State.PLAY, 0x4F, 0x55);
         registerOutgoing(State.PLAY, 0x50, 0x56);
@@ -260,15 +250,6 @@ public class Protocol1_14To1_13_2 extends Protocol {
         WorldPackets.air = MappingData.blockStateMappings.getNewId(0);
         WorldPackets.voidAir = MappingData.blockStateMappings.getNewId(8591);
         WorldPackets.caveAir = MappingData.blockStateMappings.getNewId(8592);
-    }
-
-    public static int getNewSoundId(int id) {
-        int newId = MappingData.soundMappings.getNewId(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.14 sound for 1.13.2 sound " + id);
-            return 0;
-        }
-        return newId;
     }
 
     public static int getNewBlockStateId(int id) {
