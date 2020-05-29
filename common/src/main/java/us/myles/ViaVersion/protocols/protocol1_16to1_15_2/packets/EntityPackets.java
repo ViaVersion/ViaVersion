@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_16Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
@@ -20,23 +21,29 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class EntityPackets {
 
-    private static final ValueTransformer<Integer, String> DIMENSION_TRANSFORMER = new ValueTransformer<Integer, String>(Type.INT, Type.STRING) {
-        @Override
-        public String transform(PacketWrapper wrapper, Integer input) throws Exception {
-            switch (input) {
-                case -1:
-                    return "the_nether";
-                case 0:
-                    return "overworld";
-                case 1:
-                    return "the_end";
-                default:
-                    Via.getPlatform().getLogger().warning("Invalid dimension id: " + input);
-                    return "overworld";
-            }
+    private static final PacketHandler DIMENSION_HANDLER = wrapper -> {
+        int dimension = wrapper.read(Type.INT);
+        String dimensionName;
+        switch (dimension) {
+            case -1:
+                dimensionName = "minecraft:the_nether";
+                break;
+            case 0:
+                dimensionName = "minecraft:overworld";
+                break;
+            case 1:
+                dimensionName = "minecraft:the_end";
+                break;
+            default:
+                Via.getPlatform().getLogger().warning("Invalid dimension id: " + dimension);
+                dimensionName = "minecraft:overworld";
         }
+
+        wrapper.write(Type.STRING, dimensionName); // dimension type
+        wrapper.write(Type.STRING, dimensionName); // dimension
     };
     private static final CompoundTag DIMENSIONS_TAG = new CompoundTag("");
+    private static final String[] STRINGS = new String[0];
 
     static {
         ListTag list = new ListTag("dimension", CompoundTag.class);
@@ -75,7 +82,7 @@ public class EntityPackets {
         protocol.registerOutgoing(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(DIMENSION_TRANSFORMER);
+                handler(DIMENSION_HANDLER);
                 map(Type.LONG);
                 map(Type.UNSIGNED_BYTE);
                 handler(wrapper -> {
@@ -97,13 +104,19 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.INT); // Entity ID
                 map(Type.UNSIGNED_BYTE); //  Gamemode
+                map(Type.NOTHING, new ValueTransformer<Void, String[]>(Type.STRING_ARRAY) { // World list
+                    @Override
+                    public String[] transform(PacketWrapper wrapper, Void input) throws Exception {
+                        return STRINGS;
+                    }
+                });
                 map(Type.NOTHING, new ValueTransformer<Void, CompoundTag>(Type.NBT) { // whatever this is
                     @Override
                     public CompoundTag transform(PacketWrapper wrapper, Void input) throws Exception {
                         return DIMENSIONS_TAG;
                     }
                 });
-                map(DIMENSION_TRANSFORMER); // Dimension
+                handler(DIMENSION_HANDLER); // Dimension
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Max players
                 handler(wrapper -> {
