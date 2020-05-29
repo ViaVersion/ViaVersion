@@ -184,6 +184,8 @@ public class Protocol1_16To1_15_2 extends Protocol {
         tagRewriter.addTag(TagType.BLOCK, "minecraft:climbable", 160, 241, 658);
         tagRewriter.addTag(TagType.BLOCK, "minecraft:fire", 142);
         tagRewriter.addTag(TagType.BLOCK, "minecraft:campfires", 679);
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:fence_gates", 242, 467, 468, 469, 470, 471);
+        tagRewriter.addTag(TagType.BLOCK, "minecraft:unstable_bottom_center", 242, 467, 468, 469, 470, 471);
         tagRewriter.addTag(TagType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
         // The client crashes if we don't send all tags it may use
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:guarded_by_piglins");

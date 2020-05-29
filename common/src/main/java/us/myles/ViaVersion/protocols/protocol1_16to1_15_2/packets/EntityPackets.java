@@ -104,7 +104,7 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.INT); // Entity ID
                 map(Type.UNSIGNED_BYTE); //  Gamemode
-                map(Type.NOTHING, new ValueTransformer<Void, String[]>(Type.STRING_ARRAY) { // World list
+                map(Type.NOTHING, new ValueTransformer<Void, String[]>(Type.STRING_ARRAY) { // World list - only used for command completion
                     @Override
                     public String[] transform(PacketWrapper wrapper, Void input) throws Exception {
                         return STRINGS;
