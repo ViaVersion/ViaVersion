@@ -103,11 +103,15 @@ public class VelocityServerHandler {
 
                     if (protocolId <= ProtocolVersion.MINECRAFT_1_8.getProtocol()) { // 1.8 doesn't have BossBar packet
                         if (storage.getBossbar() != null) {
-                            for (UUID uuid : storage.getBossbar()) {
-                                PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
-                                wrapper.write(Type.UUID, uuid);
-                                wrapper.write(Type.VAR_INT, 1); // remove
-                                wrapper.send(Protocol1_9To1_8.class, true, true);
+                            // TODO: Verify whether this packet needs to be sent when 1.8 -> 1.9 protocol isn't present in the pipeline
+                            // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
+                            if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9To1_8.class)) {
+                                for (UUID uuid : storage.getBossbar()) {
+                                    PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
+                                    wrapper.write(Type.UUID, uuid);
+                                    wrapper.write(Type.VAR_INT, 1); // remove
+                                    wrapper.send(Protocol1_9To1_8.class, true, true);
+                                }
                             }
                             storage.getBossbar().clear();
                         }
