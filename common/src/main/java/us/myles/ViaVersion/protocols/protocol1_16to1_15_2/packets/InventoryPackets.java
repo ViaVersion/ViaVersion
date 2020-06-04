@@ -22,7 +22,7 @@ public class InventoryPackets {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
         // Open Window
-        protocol.registerOutgoing(State.PLAY, 0x2F, 0x2F, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x2F, 0x2E, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -39,7 +39,7 @@ public class InventoryPackets {
         });
 
         // Window Property
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x16, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x16, 0x15, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window id
@@ -59,13 +59,13 @@ public class InventoryPackets {
         });
 
         // Set cooldown
-        itemRewriter.registerSetCooldown(0x18, 0x18, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetCooldown(0x18, 0x17, InventoryPackets::getNewItemId);
 
         // Window items packet
-        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, 0x15, 0x15);
+        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, 0x15, 0x14);
 
         // Trade list packet
-        protocol.registerOutgoing(State.PLAY, 0x28, 0x28, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x28, 0x27, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -101,13 +101,13 @@ public class InventoryPackets {
         });
 
         // Set slot packet
-        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, 0x17, 0x17);
+        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, 0x17, 0x16);
 
         // Entity Equipment Packet
-        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x47, 0x48);
+        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x47, 0x47);
 
         // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x5B, 0x5B, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x5B, 0x5A, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -171,6 +171,14 @@ public class InventoryPackets {
 
         // Creative Inventory Action
         itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, 0x26, 0x27);
+
+        // Edit Book
+        protocol.registerIncoming(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+            }
+        });
     }
 
     public static void toClient(Item item) {
