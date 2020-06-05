@@ -89,8 +89,8 @@ public class WorldPackets {
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
-        blockRewriter.registerSpawnParticle(Type.DOUBLE, ClientboundPackets1_15.SPAWN_PARTICLE, 3, 23, 32,
-                WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
+        blockRewriter.registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, 3, 23, 32,
+                WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
 
     public static int getNewParticleId(int id) {

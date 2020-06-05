@@ -18,7 +18,7 @@ public class InventoryPackets {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
         itemRewriter.registerSetCooldown(ClientboundPackets1_14.COOLDOWN, InventoryPackets::getNewItemId);
-        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, ClientboundPackets1_14.WINDOW_ITEMS);
+        itemRewriter.registerWindowItems(ClientboundPackets1_14.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
 
         protocol.registerOutgoing(ClientboundPackets1_14.TRADE_LIST, new PacketRemapper() {
             @Override
@@ -59,8 +59,8 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_14.SET_SLOT);
-        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_14.ENTITY_EQUIPMENT);
+        itemRewriter.registerSetSlot(ClientboundPackets1_14.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        itemRewriter.registerEntityEquipment(ClientboundPackets1_14.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerOutgoing(ClientboundPackets1_14.DECLARE_RECIPES, new PacketRemapper() {
             @Override
@@ -128,8 +128,8 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_14.CLICK_WINDOW);
-        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
+        itemRewriter.registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        itemRewriter.registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
     }
 
     public static void toClient(Item item) {

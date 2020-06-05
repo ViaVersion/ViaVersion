@@ -87,13 +87,13 @@ public class BlockRewriter {
         });
     }
 
-    public void registerSpawnParticle(Type<?> coordType, ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
-                                      ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType) {
-        registerSpawnParticle(coordType, packetType, blockId, fallingDustId, itemId, null, itemRewriteFunction, itemType);
+    public void registerSpawnParticle(ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
+                                      ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType, Type<?> coordType) {
+        registerSpawnParticle(packetType, blockId, fallingDustId, itemId, null, itemRewriteFunction, itemType, coordType);
     }
 
-    public void registerSpawnParticle(Type<?> coordType, ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
-                                      IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType) {
+    public void registerSpawnParticle(ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
+                                      IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType, Type<?> coordType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {

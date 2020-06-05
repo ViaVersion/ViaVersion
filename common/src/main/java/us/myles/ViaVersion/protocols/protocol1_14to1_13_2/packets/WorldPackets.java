@@ -274,8 +274,8 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerSpawnParticle(Type.FLOAT, ClientboundPackets1_13.SPAWN_PARTICLE, 3, 20, 27,
-                MetadataRewriter1_14To1_13_2::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
+        blockRewriter.registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, 3, 20, 27,
+                MetadataRewriter1_14To1_13_2::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.FLOAT);
 
         protocol.registerOutgoing(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override

@@ -87,7 +87,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        new SoundRewriter(this, this::getNewSoundId).registerSound(0x46, 0x46);
+        //new SoundRewriter(this, this::getNewSoundId).registerSound(0x46, 0x46); //TODO _------------------------------------------------------
 
         // Collect item packet
         registerOutgoing(State.PLAY, 0x48, 0x48, new PacketRemapper() {

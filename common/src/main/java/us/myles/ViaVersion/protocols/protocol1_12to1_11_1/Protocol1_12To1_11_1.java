@@ -16,7 +16,8 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.ClientboundPackets1_11;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.ServerboundPackets1_11;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
@@ -28,14 +29,17 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 public class Protocol1_12To1_11_1 extends Protocol {
 
+    public Protocol1_12To1_11_1() {
+        super(ClientboundPackets1_11.class, ClientboundPackets1_12.class, ServerboundPackets1_11.class, ServerboundPackets1_12.class);
+    }
+
     @Override
     protected void registerPackets() {
         MetadataRewriter1_12To1_11_1 metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
 
         InventoryPackets.register(this);
-        // Outgoing
-        // Spawn Object
-        registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+
+        registerOutgoing(ClientboundPackets1_11.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -47,8 +51,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        // Spawn mob packet
-        registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_11.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -70,8 +73,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        // Chat message packet
-        registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_11.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
@@ -97,8 +99,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        // Chunk Data
-        registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_11.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -141,66 +142,19 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        // Join Packet
-        metadataRewriter.registerJoinGame(0x23, 0x23, null);
+        metadataRewriter.registerJoinGame(ClientboundPackets1_11.JOIN_GAME, null);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_11.DESTROY_ENTITIES);
+        metadataRewriter.registerRespawn(ClientboundPackets1_11.RESPAWN);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_11.ENTITY_METADATA, Types1_12.METADATA_LIST);
 
-        // 0x28 moved to 0x25
-        registerOutgoing(State.PLAY, 0x28, 0x25);
-        registerOutgoing(State.PLAY, 0x25, 0x26);
-        registerOutgoing(State.PLAY, 0x26, 0x27);
-        registerOutgoing(State.PLAY, 0x27, 0x28);
+        new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_11.SOUND);
 
-        // New packet at 0x30
-        // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x30, 0x31);
 
-        registerOutgoing(State.PLAY, 0x31, 0x32);
-        registerOutgoing(State.PLAY, 0x32, 0x33);
-
-        // Respawn Packet
-        metadataRewriter.registerRespawn(0x33, 0x34);
-
-        registerOutgoing(State.PLAY, 0x34, 0x35);
-        // New packet at 0x36
-        registerOutgoing(State.PLAY, 0x35, 0x37);
-        registerOutgoing(State.PLAY, 0x36, 0x38);
-        registerOutgoing(State.PLAY, 0x37, 0x39);
-        registerOutgoing(State.PLAY, 0x38, 0x3a);
-
-        // Metadata packet
-        metadataRewriter.registerMetadataRewriter(0x39, 0x3b, null, Types1_12.METADATA_LIST);
-
-        registerOutgoing(State.PLAY, 0x3a, 0x3c);
-        registerOutgoing(State.PLAY, 0x3b, 0x3d);
-        // registerOutgoing(State.PLAY, 0x3c, 0x3e); - Handled in InventoryPackets
-        registerOutgoing(State.PLAY, 0x3d, 0x3f);
-        registerOutgoing(State.PLAY, 0x3e, 0x40);
-        registerOutgoing(State.PLAY, 0x3f, 0x41);
-        registerOutgoing(State.PLAY, 0x40, 0x42);
-        registerOutgoing(State.PLAY, 0x41, 0x43);
-        registerOutgoing(State.PLAY, 0x42, 0x44);
-        registerOutgoing(State.PLAY, 0x43, 0x45);
-        registerOutgoing(State.PLAY, 0x44, 0x46);
-        registerOutgoing(State.PLAY, 0x45, 0x47);
-
-        new SoundRewriter(this, this::getNewSoundId).registerSound(0x46, 0x48);
-
-        registerOutgoing(State.PLAY, 0x47, 0x49);
-        registerOutgoing(State.PLAY, 0x48, 0x4a);
-        registerOutgoing(State.PLAY, 0x49, 0x4b);
-        // New packet at 0x4c
-        registerOutgoing(State.PLAY, 0x4a, 0x4d);
-        registerOutgoing(State.PLAY, 0x4b, 0x4e);
-
-        // Incoming
         // New packet at 0x01
-        cancelIncoming(State.PLAY, 0x01, 0x01);
+        cancelIncoming(ServerboundPackets1_12.PREPARE_CRAFTING_GRID);
 
-        registerIncoming(State.PLAY, 0x01, 0x02);
-        registerIncoming(State.PLAY, 0x02, 0x03);
-        registerIncoming(State.PLAY, 0x03, 0x04);
         // Client Settings (max length changed)
-        registerIncoming(State.PLAY, 0x04, 0x05, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_12.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Locale
@@ -229,41 +183,12 @@ public class Protocol1_12To1_11_1 extends Protocol {
                 });
             }
         });
-        registerIncoming(State.PLAY, 0x05, 0x06);
-        registerIncoming(State.PLAY, 0x06, 0x07);
-        // registerIncoming(State.PLAY, 0x07, 0x08); - Handled in InventoryPackets
-        registerIncoming(State.PLAY, 0x08, 0x09);
-        registerIncoming(State.PLAY, 0x09, 0x0a);
-        registerIncoming(State.PLAY, 0x0a, 0x0b);
-        registerIncoming(State.PLAY, 0x0b, 0x0c);
-        // Mojang swapped 0x0F to 0x0D
-        registerIncoming(State.PLAY, 0x0f, 0x0d);
-        registerIncoming(State.PLAY, 0x0c, 0x0e);
-        // Mojang swapped 0x0F to 0x0D
-        registerIncoming(State.PLAY, 0x0d, 0x0f);
-        registerIncoming(State.PLAY, 0x0e, 0x10);
-        registerIncoming(State.PLAY, 0x10, 0x11);
-        registerIncoming(State.PLAY, 0x11, 0x12);
-        registerIncoming(State.PLAY, 0x12, 0x13);
-        registerIncoming(State.PLAY, 0x13, 0x14);
-        registerIncoming(State.PLAY, 0x14, 0x15);
-        registerIncoming(State.PLAY, 0x15, 0x16);
 
         // New packet at 0x17
-        cancelIncoming(State.PLAY, 0x17, 0x17);
-
-        registerIncoming(State.PLAY, 0x16, 0x18);
+        cancelIncoming(ServerboundPackets1_12.RECIPE_BOOK_DATA);
 
         // New packet 0x19
-        cancelIncoming(State.PLAY, 0x19, 0x19);
-
-        registerIncoming(State.PLAY, 0x17, 0x1a);
-        // registerIncoming(State.PLAY, 0x18, 0x1b); - Handled in InventoryPackets
-        registerIncoming(State.PLAY, 0x19, 0x1c);
-        registerIncoming(State.PLAY, 0x1a, 0x1d);
-        registerIncoming(State.PLAY, 0x1b, 0x1e);
-        registerIncoming(State.PLAY, 0x1c, 0x1f);
-        registerIncoming(State.PLAY, 0x1d, 0x20);
+        cancelIncoming(ServerboundPackets1_12.ADVANCEMENT_TAB);
     }
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.

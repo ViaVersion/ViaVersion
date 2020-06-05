@@ -108,8 +108,8 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, ClientboundPackets1_13.WINDOW_ITEMS);
-        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_13.SET_SLOT);
+        itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
@@ -163,7 +163,7 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_13.ENTITY_EQUIPMENT);
+        itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
@@ -215,7 +215,7 @@ public class InventoryPackets {
         });
 
 
-        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_14.CLICK_WINDOW);
+        itemRewriter.registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerIncoming(ServerboundPackets1_14.SELECT_TRADE, new PacketRemapper() {
             @Override
@@ -239,7 +239,7 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
+        itemRewriter.registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
     }
 
     public static void toClient(Item item) {

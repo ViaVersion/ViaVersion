@@ -77,6 +77,6 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerSpawnParticle(Type.FLOAT, ClientboundPackets1_13.SPAWN_PARTICLE, 3, 20, 27, InventoryPackets::toClient, Type.FLAT_ITEM);
+        blockRewriter.registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, 3, 20, 27, InventoryPackets::toClient, Type.FLAT_ITEM, Type.FLOAT);
     }
 }

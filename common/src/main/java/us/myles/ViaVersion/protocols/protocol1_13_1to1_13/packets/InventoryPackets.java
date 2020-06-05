@@ -16,8 +16,8 @@ public class InventoryPackets {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
         itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN, InventoryPackets::getNewItemId);
-        itemRewriter.registerSetSlot(Type.FLAT_ITEM, ClientboundPackets1_13.SET_SLOT);
-        itemRewriter.registerWindowItems(Type.FLAT_ITEM_ARRAY, ClientboundPackets1_13.WINDOW_ITEMS);
+        itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_ITEM);
+        itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_ITEM_ARRAY);
 
         protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
@@ -53,7 +53,7 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerEntityEquipment(Type.FLAT_ITEM, ClientboundPackets1_13.ENTITY_EQUIPMENT);
+        itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
 
         protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
@@ -103,8 +103,8 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerClickWindow(Type.FLAT_ITEM, ServerboundPackets1_13.CLICK_WINDOW);
-        itemRewriter.registerCreativeInvAction(Type.FLAT_ITEM, ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION);
+        itemRewriter.registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW, Type.FLAT_ITEM);
+        itemRewriter.registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, Type.FLAT_ITEM);
     }
 
     public static void toClient(Item item) {

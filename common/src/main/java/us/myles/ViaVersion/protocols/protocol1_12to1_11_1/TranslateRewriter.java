@@ -5,13 +5,13 @@ import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 
 public class TranslateRewriter {
+
     public static boolean toClient(JsonElement element, UserConnection user) {
         if (element instanceof JsonObject) {
             JsonObject obj = (JsonObject) element;
-            if (obj.has("translate")) {
-                if (obj.get("translate").getAsString().equals("chat.type.achievement")) {
-                    return false;
-                }
+            JsonElement translate = obj.get("translate");
+            if (translate != null) {
+                return !translate.getAsString().equals("chat.type.achievement");
             }
         }
         return true;

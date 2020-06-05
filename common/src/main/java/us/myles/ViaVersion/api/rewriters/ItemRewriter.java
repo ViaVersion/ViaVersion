@@ -21,7 +21,7 @@ public class ItemRewriter {
         this.toServer = toServer;
     }
 
-    public void registerWindowItems(Type<Item[]> type, ClientboundPacketType packetType) {
+    public void registerWindowItems(ClientboundPacketType packetType, Type<Item[]> type) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -33,7 +33,7 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetSlot(Type<Item> type, ClientboundPacketType packetType) {
+    public void registerSetSlot(ClientboundPacketType packetType, Type<Item> type) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -46,7 +46,7 @@ public class ItemRewriter {
         });
     }
 
-    public void registerEntityEquipment(Type<Item> type, ClientboundPacketType packetType) {
+    public void registerEntityEquipment(ClientboundPacketType packetType, Type<Item> type) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -59,7 +59,7 @@ public class ItemRewriter {
         });
     }
 
-    public void registerCreativeInvAction(Type<Item> type, ServerboundPacketType packetType) {
+    public void registerCreativeInvAction(ServerboundPacketType packetType, Type<Item> type) {
         protocol.registerIncoming(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -71,7 +71,7 @@ public class ItemRewriter {
         });
     }
 
-    public void registerClickWindow(Type<Item> type, ServerboundPacketType packetType) {
+    public void registerClickWindow(ServerboundPacketType packetType, Type<Item> type) {
         protocol.registerIncoming(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
