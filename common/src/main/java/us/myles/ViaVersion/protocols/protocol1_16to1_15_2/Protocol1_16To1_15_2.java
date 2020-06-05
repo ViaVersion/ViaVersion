@@ -37,7 +37,7 @@ public class Protocol1_16To1_15_2 extends Protocol {
         InventoryPackets.register(this);
 
         tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
-        tagRewriter.register(0x5C, 0x5C);
+        tagRewriter.register(0x5C, 0x5B);
 
         // Login Success
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
@@ -52,7 +52,7 @@ public class Protocol1_16To1_15_2 extends Protocol {
         });
 
         // Chat Message
-        registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x0F, 0x0E, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -62,19 +62,11 @@ public class Protocol1_16To1_15_2 extends Protocol {
         });
 
         SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
-        soundRewriter.registerSound(0x51, 0x51);
-        soundRewriter.registerSound(0x52, 0x52);
-
-        // Edit Book
-        registerIncoming(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
-            }
-        });
+        soundRewriter.registerSound(0x51, 0x50);
+        soundRewriter.registerSound(0x52, 0x51);
 
         // Advancements
-        registerOutgoing(State.PLAY, 0x58, 0x58, new PacketRemapper() {
+        registerOutgoing(State.PLAY, 0x58, 0x57, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -112,23 +104,63 @@ public class Protocol1_16To1_15_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x43, 0x44);
-
-        registerOutgoing(State.PLAY, 0x45, 0x46);
-        registerOutgoing(State.PLAY, 0x46, 0x47);
-
-        registerOutgoing(State.PLAY, 0x48, 0x49);
-        registerOutgoing(State.PLAY, 0x49, 0x4A);
-        registerOutgoing(State.PLAY, 0x4A, 0x4B);
-        registerOutgoing(State.PLAY, 0x4B, 0x4C);
-        registerOutgoing(State.PLAY, 0x4C, 0x4D);
-        registerOutgoing(State.PLAY, 0x4D, 0x4E);
-        registerOutgoing(State.PLAY, 0x4E, 0x43);
-
+        registerOutgoing(State.PLAY, 0x04, 0x03);
+        registerOutgoing(State.PLAY, 0x06, 0x05);
+        registerOutgoing(State.PLAY, 0x07, 0x06);
+        registerOutgoing(State.PLAY, 0x09, 0x08);
+        registerOutgoing(State.PLAY, 0x0A, 0x09);
+        registerOutgoing(State.PLAY, 0x0D, 0x0C);
+        registerOutgoing(State.PLAY, 0x0E, 0x0D);
+        registerOutgoing(State.PLAY, 0x11, 0x10);
+        registerOutgoing(State.PLAY, 0x12, 0x11);
+        registerOutgoing(State.PLAY, 0x13, 0x12);
+        registerOutgoing(State.PLAY, 0x14, 0x13);
+        registerOutgoing(State.PLAY, 0x19, 0x18);
+        registerOutgoing(State.PLAY, 0x1A, 0x19);
+        registerOutgoing(State.PLAY, 0x1B, 0x1A);
+        registerOutgoing(State.PLAY, 0x1C, 0x1B);
+        registerOutgoing(State.PLAY, 0x1D, 0x1C);
+        registerOutgoing(State.PLAY, 0x1E, 0x1D);
+        registerOutgoing(State.PLAY, 0x1F, 0x1E);
+        registerOutgoing(State.PLAY, 0x20, 0x1F);
+        registerOutgoing(State.PLAY, 0x21, 0x20);
+        registerOutgoing(State.PLAY, 0x25, 0x24);
+        registerOutgoing(State.PLAY, 0x27, 0x26);
+        registerOutgoing(State.PLAY, 0x29, 0x28);
+        registerOutgoing(State.PLAY, 0x2A, 0x29);
+        registerOutgoing(State.PLAY, 0x2B, 0x2A);
+        registerOutgoing(State.PLAY, 0x2C, 0x2B);
+        registerOutgoing(State.PLAY, 0x2D, 0x2C);
+        registerOutgoing(State.PLAY, 0x2E, 0x2D);
+        registerOutgoing(State.PLAY, 0x30, 0x2F);
+        registerOutgoing(State.PLAY, 0x31, 0x30);
+        registerOutgoing(State.PLAY, 0x32, 0x31);
+        registerOutgoing(State.PLAY, 0x33, 0x32);
+        registerOutgoing(State.PLAY, 0x34, 0x33);
+        registerOutgoing(State.PLAY, 0x35, 0x34);
+        registerOutgoing(State.PLAY, 0x36, 0x35);
+        registerOutgoing(State.PLAY, 0x37, 0x36);
+        registerOutgoing(State.PLAY, 0x39, 0x38);
+        registerOutgoing(State.PLAY, 0x3A, 0x39);
+        registerOutgoing(State.PLAY, 0x3C, 0x3B);
+        registerOutgoing(State.PLAY, 0x3D, 0x3C);
+        registerOutgoing(State.PLAY, 0x3E, 0x3D);
+        registerOutgoing(State.PLAY, 0x3F, 0x3E);
+        registerOutgoing(State.PLAY, 0x40, 0x3F);
+        registerOutgoing(State.PLAY, 0x41, 0x40);
+        registerOutgoing(State.PLAY, 0x42, 0x41);
+        registerOutgoing(State.PLAY, 0x4E, 0x42);
+        registerOutgoing(State.PLAY, 0x4F, 0x4E);
+        registerOutgoing(State.PLAY, 0x50, 0x4F);
+        registerOutgoing(State.PLAY, 0x53, 0x52);
+        registerOutgoing(State.PLAY, 0x54, 0x53);
+        registerOutgoing(State.PLAY, 0x55, 0x54);
+        registerOutgoing(State.PLAY, 0x56, 0x55);
+        registerOutgoing(State.PLAY, 0x57, 0x56);
+        registerOutgoing(State.PLAY, 0x5A, 0x59);
 
         cancelIncoming(State.PLAY, 0x0F); // Generate jisaw
         cancelIncoming(State.PLAY, 0x28); // Jigsaw update
-
         registerIncoming(State.PLAY, 0x0F, 0x10);
         registerIncoming(State.PLAY, 0x10, 0x11);
         registerIncoming(State.PLAY, 0x11, 0x12);
@@ -151,7 +183,6 @@ public class Protocol1_16To1_15_2 extends Protocol {
         registerIncoming(State.PLAY, 0x22, 0x23);
         registerIncoming(State.PLAY, 0x23, 0x24);
         registerIncoming(State.PLAY, 0x24, 0x25);
-
         registerIncoming(State.PLAY, 0x28, 0x29);
         registerIncoming(State.PLAY, 0x29, 0x2A);
         registerIncoming(State.PLAY, 0x2A, 0x2B);

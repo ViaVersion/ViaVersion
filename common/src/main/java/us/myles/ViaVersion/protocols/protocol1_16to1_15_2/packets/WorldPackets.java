@@ -27,19 +27,19 @@ public class WorldPackets {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_16To1_15_2::getNewBlockStateId, Protocol1_16To1_15_2::getNewBlockId);
 
         // Block action
-        blockRewriter.registerBlockAction(0x0B, 0x0B);
+        blockRewriter.registerBlockAction(0x0B, 0x0A);
 
         // Block Change
-        blockRewriter.registerBlockChange(0x0C, 0x0C);
+        blockRewriter.registerBlockChange(0x0C, 0x0B);
 
         // Multi Block Change
-        blockRewriter.registerMultiBlockChange(0x10, 0x10);
+        blockRewriter.registerMultiBlockChange(0x10, 0x0F);
 
         // Acknowledge player digging
-        blockRewriter.registerAcknowledgePlayerDigging(0x08, 0x08);
+        blockRewriter.registerAcknowledgePlayerDigging(0x08, 0x07);
 
         // Chunk Data
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, 0x22, 0x21, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -97,10 +97,10 @@ public class WorldPackets {
         });
 
         // Effect
-        blockRewriter.registerEffect(0x23, 0x23, 1010, 2001, InventoryPackets::getNewItemId);
+        blockRewriter.registerEffect(0x23, 0x22, 1010, 2001, InventoryPackets::getNewItemId);
 
         // Spawn Particle
-        blockRewriter.registerSpawnParticle(Type.DOUBLE, 0x24, 0x24, 3, 23, 32,
+        blockRewriter.registerSpawnParticle(Type.DOUBLE, 0x24, 0x23, 3, 23, 32,
                 WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
     }
 
