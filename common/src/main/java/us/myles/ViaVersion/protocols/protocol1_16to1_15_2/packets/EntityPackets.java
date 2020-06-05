@@ -48,7 +48,7 @@ public class EntityPackets {
         wrapper.write(Type.STRING, dimensionName); // dimension
     };
     private static final CompoundTag DIMENSIONS_TAG = new CompoundTag("");
-    private static final String[] STRINGS = new String[0];
+    private static final String[] WORLD_NAMES = {"minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"};
 
     static {
         ListTag list = new ListTag("dimension", CompoundTag.class);
@@ -89,10 +89,10 @@ public class EntityPackets {
 
     private static CompoundTag createEndEntry() {
         CompoundTag tag = new CompoundTag("");
-        tag.put(new StringTag("key", "minecraft:the_nether"));
+        tag.put(new StringTag("key", "minecraft:the_end"));
         CompoundTag elementTag = new CompoundTag("element");
         elementTag.put(new ByteTag("natural", (byte) 0));
-        elementTag.put(new LongTag("fixed_time", 60000));
+        elementTag.put(new LongTag("fixed_time", 6000));
         elementTag.put(new FloatTag("ambient_light", 0));
         elementTag.put(new ByteTag("shrunk", (byte) 0));
         elementTag.put(new ByteTag("ultrawarm", (byte) 0));
@@ -175,7 +175,7 @@ public class EntityPackets {
                 map(Type.NOTHING, new ValueTransformer<Void, String[]>(Type.STRING_ARRAY) { // World list - only used for command completion
                     @Override
                     public String[] transform(PacketWrapper wrapper, Void input) throws Exception {
-                        return STRINGS;
+                        return WORLD_NAMES;
                     }
                 });
                 map(Type.NOTHING, new ValueTransformer<Void, CompoundTag>(Type.NBT) { // whatever this is
