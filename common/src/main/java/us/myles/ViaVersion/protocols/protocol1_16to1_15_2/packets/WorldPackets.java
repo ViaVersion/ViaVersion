@@ -12,7 +12,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
@@ -26,20 +26,12 @@ public class WorldPackets {
     public static void register(Protocol protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_16To1_15_2::getNewBlockStateId, Protocol1_16To1_15_2::getNewBlockId);
 
-        // Block action
-        blockRewriter.registerBlockAction(0x0B, 0x0A);
+        blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_ACTION);
+        blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_CHANGE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_15.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_15.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        // Block Change
-        blockRewriter.registerBlockChange(0x0C, 0x0B);
-
-        // Multi Block Change
-        blockRewriter.registerMultiBlockChange(0x10, 0x0F);
-
-        // Acknowledge player digging
-        blockRewriter.registerAcknowledgePlayerDigging(0x08, 0x07);
-
-        // Chunk Data
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x21, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -96,11 +88,8 @@ public class WorldPackets {
             }
         });
 
-        // Effect
-        blockRewriter.registerEffect(0x23, 0x22, 1010, 2001, InventoryPackets::getNewItemId);
-
-        // Spawn Particle
-        blockRewriter.registerSpawnParticle(Type.DOUBLE, 0x24, 0x23, 3, 23, 32,
+        blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
+        blockRewriter.registerSpawnParticle(Type.DOUBLE, ClientboundPackets1_15.SPAWN_PARTICLE, 3, 23, 32,
                 WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
     }
 

@@ -8,7 +8,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
@@ -19,20 +19,12 @@ public class WorldPackets {
     public static void register(Protocol protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_15To1_14_4::getNewBlockStateId, Protocol1_15To1_14_4::getNewBlockId);
 
-        // Block action
-        blockRewriter.registerBlockAction(0x0A, 0x0B);
+        blockRewriter.registerBlockAction(ClientboundPackets1_14.BLOCK_ACTION);
+        blockRewriter.registerBlockChange(ClientboundPackets1_14.BLOCK_CHANGE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_14.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        // Block Change
-        blockRewriter.registerBlockChange(0x0B, 0x0C);
-
-        // Multi Block Change
-        blockRewriter.registerMultiBlockChange(0x0F, 0x10);
-
-        // Acknowledge player digging
-        blockRewriter.registerAcknowledgePlayerDigging(0x5C, 0x08);
-
-        // Chunk Data
-        protocol.registerOutgoing(State.PLAY, 0x21, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -78,11 +70,8 @@ public class WorldPackets {
             }
         });
 
-        // Effect
-        blockRewriter.registerEffect(0x22, 0x23, 1010, 2001, InventoryPackets::getNewItemId);
-
-        // Spawn Particle
-        protocol.registerOutgoing(State.PLAY, 0x23, 0x24, new PacketRemapper() {
+        blockRewriter.registerEffect(ClientboundPackets1_14.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
+        protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID

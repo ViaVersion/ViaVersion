@@ -1,20 +1,19 @@
 package us.myles.ViaVersion.protocols.protocol1_14_1to1_14.packets;
 
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.Protocol1_14_1To1_14;
 import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.metadata.MetadataRewriter1_14_1To1_14;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 
 public class EntityPackets {
 
-    public static void register(final Protocol protocol) {
+    public static void register(Protocol1_14_1To1_14 protocol) {
         MetadataRewriter1_14_1To1_14 metadataRewriter = protocol.get(MetadataRewriter1_14_1To1_14.class);
 
-        // Spawn Mob
-        protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -35,11 +34,9 @@ public class EntityPackets {
             }
         });
 
-        // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x37, 0x37);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_14.DESTROY_ENTITIES);
 
-        // Spawn Player
-        protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -55,7 +52,6 @@ public class EntityPackets {
             }
         });
 
-        // Entity Metadata
-        metadataRewriter.registerMetadataRewriter(0x43, 0x43, Types1_14.METADATA_LIST);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.ENTITY_METADATA, Types1_14.METADATA_LIST);
     }
 }

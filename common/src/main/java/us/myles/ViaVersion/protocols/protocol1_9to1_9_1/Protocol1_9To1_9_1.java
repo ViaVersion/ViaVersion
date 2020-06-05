@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
 public class Protocol1_9To1_9_1 extends Protocol {
+
     @Override
     protected void registerPackets() {
         // Currently supports 1.9.1 and 1.9.2

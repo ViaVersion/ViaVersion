@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
 public class Protocol1_12_1To1_12 extends Protocol {
+
     @Override
     protected void registerPackets() {
         registerOutgoing(State.PLAY, -1, 0x2B); // TODO new packet?

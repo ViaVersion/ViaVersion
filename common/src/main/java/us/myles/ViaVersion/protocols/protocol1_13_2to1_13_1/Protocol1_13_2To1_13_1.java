@@ -6,12 +6,17 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 
 public class Protocol1_13_2To1_13_1 extends Protocol {
+
+    public Protocol1_13_2To1_13_1() {
+        super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
+    }
 
     @Override
     protected void registerPackets() {
@@ -19,16 +24,14 @@ public class Protocol1_13_2To1_13_1 extends Protocol {
         WorldPackets.register(this);
         EntityPackets.register(this);
 
-        //Edit Book
-        registerIncoming(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM);
             }
         });
 
-        // Advancements
-        registerOutgoing(State.PLAY, 0x51, 0x51, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.ADVANCEMENTS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

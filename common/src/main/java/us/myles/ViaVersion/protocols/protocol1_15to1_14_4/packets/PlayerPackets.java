@@ -5,15 +5,14 @@ import us.myles.ViaVersion.api.entities.Entity1_15Types;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class PlayerPackets {
 
     public static void register(Protocol protocol) {
-        // Respawn
-        protocol.registerOutgoing(State.PLAY, 0x3A, 0x3B, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT);
@@ -28,8 +27,7 @@ public class PlayerPackets {
             }
         });
 
-        // Join Game
-        protocol.registerOutgoing(State.PLAY, 0x25, 0x26, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID

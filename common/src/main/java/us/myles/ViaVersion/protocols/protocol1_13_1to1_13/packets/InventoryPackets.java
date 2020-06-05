@@ -7,24 +7,19 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        // Set cooldown
-        itemRewriter.registerSetCooldown(0x18, 0x18, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetSlot(Type.FLAT_ITEM, ClientboundPackets1_13.SET_SLOT);
+        itemRewriter.registerWindowItems(Type.FLAT_ITEM_ARRAY, ClientboundPackets1_13.WINDOW_ITEMS);
 
-        // Set slot packet
-        itemRewriter.registerSetSlot(Type.FLAT_ITEM, 0x17, 0x17);
-
-        // Window items packet
-        itemRewriter.registerWindowItems(Type.FLAT_ITEM_ARRAY, 0x15, 0x15);
-
-        // Plugin message
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -58,11 +53,9 @@ public class InventoryPackets {
             }
         });
 
-        // Entity Equipment Packet
-        itemRewriter.registerEntityEquipment(Type.FLAT_ITEM, 0x42, 0x42);
+        itemRewriter.registerEntityEquipment(Type.FLAT_ITEM, ClientboundPackets1_13.ENTITY_EQUIPMENT);
 
-        // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x54, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -77,8 +70,8 @@ public class InventoryPackets {
                                 int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
                                 for (int i1 = 0; i1 < ingredientsNo; i1++) {
                                     Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                    for (int i2 = 0; i2 < items.length; i2++) {
-                                        InventoryPackets.toClient(items[i2]);
+                                    for (Item item : items) {
+                                        InventoryPackets.toClient(item);
                                     }
                                 }
                                 InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
@@ -87,8 +80,8 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.STRING); // Group
                                 for (int i1 = 0; i1 < ingredientsNo; i1++) {
                                     Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                    for (int i2 = 0; i2 < items.length; i2++) {
-                                        InventoryPackets.toClient(items[i2]);
+                                    for (Item item : items) {
+                                        InventoryPackets.toClient(item);
                                     }
                                 }
                                 InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
@@ -96,8 +89,8 @@ public class InventoryPackets {
                                 wrapper.passthrough(Type.STRING); // Group
                                 // Ingredient start
                                 Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                for (int i2 = 0; i2 < items.length; i2++) {
-                                    InventoryPackets.toClient(items[i2]);
+                                for (Item item : items) {
+                                    InventoryPackets.toClient(item);
                                 }
                                 // Ingredient end
                                 InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
@@ -110,12 +103,8 @@ public class InventoryPackets {
             }
         });
 
-
-        // Click window packet
-        itemRewriter.registerClickWindow(Type.FLAT_ITEM, 0x08, 0x08);
-
-        // Creative Inventory Action
-        itemRewriter.registerCreativeInvAction(Type.FLAT_ITEM, 0x24, 0x24);
+        itemRewriter.registerClickWindow(Type.FLAT_ITEM, ServerboundPackets1_13.CLICK_WINDOW);
+        itemRewriter.registerCreativeInvAction(Type.FLAT_ITEM, ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION);
     }
 
     public static void toClient(Item item) {

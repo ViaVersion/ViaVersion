@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.Triple;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
@@ -30,7 +29,7 @@ public class EntityPackets {
         }
     };
 
-    public static void register(final Protocol protocol) {
+    public static void register(Protocol1_9To1_8 protocol) {
         // Attach Entity Packet
         protocol.registerOutgoing(State.PLAY, 0x1B, 0x3A, new PacketRemapper() {
 

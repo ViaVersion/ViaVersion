@@ -1,7 +1,9 @@
 package us.myles.ViaVersion.api.rewriters;
 
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.protocol.ServerboundPacketType;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -19,8 +21,8 @@ public class ItemRewriter {
         this.toServer = toServer;
     }
 
-    public void registerWindowItems(Type<Item[]> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerWindowItems(Type<Item[]> type, ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -31,8 +33,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetSlot(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerSetSlot(Type<Item> type, ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -44,8 +46,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerEntityEquipment(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerEntityEquipment(Type<Item> type, ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -57,8 +59,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerCreativeInvAction(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerCreativeInvAction(Type<Item> type, ServerboundPacketType packetType) {
+        protocol.registerIncoming(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.SHORT); // 0 - Slot
@@ -69,8 +71,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerClickWindow(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerClickWindow(Type<Item> type, ServerboundPacketType packetType) {
+        protocol.registerIncoming(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -85,8 +87,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetCooldown(int oldPacketId, int newPacketId, IdRewriteFunction itemIDRewriteFunction) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerSetCooldown(ClientboundPacketType packetType, IdRewriteFunction itemIDRewriteFunction) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -113,6 +115,77 @@ public class ItemRewriter {
 
     public PacketHandler itemToServerHandler(Type<Item> type) {
         return wrapper -> toServer.rewrite(wrapper.get(type, 0));
+    }
+
+    @Deprecated
+    public void registerWindowItems(Type<Item[]> type, int oldPacketId, int newPacketId) {
+        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                map(type); // 1 - Window Values
+
+                handler(itemArrayHandler(type));
+            }
+        });
+    }
+
+    @Deprecated
+    public void registerSetSlot(Type<Item> type, int oldPacketId, int newPacketId) {
+        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.BYTE); // 0 - Window ID
+                map(Type.SHORT); // 1 - Slot ID
+                map(type); // 2 - Slot Value
+
+                handler(itemToClientHandler(type));
+            }
+        });
+    }
+
+    @Deprecated
+    public void registerEntityEquipment(Type<Item> type, int oldPacketId, int newPacketId) {
+        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.VAR_INT); // 1 - Slot ID
+                map(type); // 2 - Item
+
+                handler(itemToClientHandler(type));
+            }
+        });
+    }
+
+    @Deprecated
+    public void registerCreativeInvAction(Type<Item> type, int oldPacketId, int newPacketId) {
+        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.SHORT); // 0 - Slot
+                map(type); // 1 - Clicked Item
+
+                handler(itemToServerHandler(type));
+            }
+        });
+    }
+
+    @Deprecated
+    public void registerClickWindow(Type<Item> type, int oldPacketId, int newPacketId) {
+        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                map(Type.SHORT); // 1 - Slot
+                map(Type.BYTE); // 2 - Button
+                map(Type.SHORT); // 3 - Action number
+                map(Type.VAR_INT); // 4 - Mode
+                map(type); // 5 - Clicked Item
+
+                handler(itemToServerHandler(type));
+            }
+        });
     }
 
     @FunctionalInterface

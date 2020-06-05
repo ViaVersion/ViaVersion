@@ -11,7 +11,8 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 
 import java.util.UUID;
@@ -21,8 +22,7 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        // Open Window
-        protocol.registerOutgoing(State.PLAY, 0x2F, 0x2E, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -37,9 +37,7 @@ public class InventoryPackets {
                 });
             }
         });
-
-        // Window Property
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x15, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window id
@@ -58,14 +56,10 @@ public class InventoryPackets {
             }
         });
 
-        // Set cooldown
-        itemRewriter.registerSetCooldown(0x18, 0x17, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetCooldown(ClientboundPackets1_15.COOLDOWN, InventoryPackets::getNewItemId);
+        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, ClientboundPackets1_15.WINDOW_ITEMS);
 
-        // Window items packet
-        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, 0x15, 0x14);
-
-        // Trade list packet
-        protocol.registerOutgoing(State.PLAY, 0x28, 0x27, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.TRADE_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -100,14 +94,10 @@ public class InventoryPackets {
             }
         });
 
-        // Set slot packet
-        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, 0x17, 0x16);
+        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_15.SET_SLOT);
+        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_15.ENTITY_EQUIPMENT);
 
-        // Entity Equipment Packet
-        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x47, 0x47);
-
-        // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x5B, 0x5A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -166,14 +156,10 @@ public class InventoryPackets {
             }
         });
 
-        // Click window packet
-        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, 0x09, 0x09);
+        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_16.CLICK_WINDOW);
+        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION);
 
-        // Creative Inventory Action
-        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, 0x26, 0x27);
-
-        // Edit Book
-        protocol.registerIncoming(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));

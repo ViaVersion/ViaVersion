@@ -9,13 +9,13 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_16Types;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
@@ -102,11 +102,11 @@ public class EntityPackets {
         return tag;
     }
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_16To1_15_2 protocol) {
         MetadataRewriter1_16To1_15_2 metadataRewriter = protocol.get(MetadataRewriter1_16To1_15_2.class);
 
         // Spawn lightning -> Spawn entity
-        protocol.registerOutgoing(State.PLAY, 0x02, 0x00, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -131,23 +131,13 @@ public class EntityPackets {
             }
         });
 
-        // Spawn entity
-        metadataRewriter.registerSpawnTrackerWithData(0x00, 0x00, Entity1_16Types.EntityType.FALLING_BLOCK, Protocol1_16To1_15_2::getNewBlockStateId);
+        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.EntityType.FALLING_BLOCK, Protocol1_16To1_15_2::getNewBlockStateId);
+        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_MOB);
+        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, Entity1_16Types.EntityType.PLAYER);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_15.DESTROY_ENTITIES);
 
-        // Spawn mob packet
-        metadataRewriter.registerTracker(0x03, 0x02);
-
-        // Spawn player packet
-        metadataRewriter.registerTracker(0x05, 0x04, Entity1_16Types.EntityType.PLAYER);
-
-        // Metadata
-        metadataRewriter.registerMetadataRewriter(0x44, 0x44, Types1_14.METADATA_LIST);
-
-        // Entity Destroy
-        metadataRewriter.registerEntityDestroy(0x38, 0x37);
-
-        // Respawn
-        protocol.registerOutgoing(State.PLAY, 0x3B, 0x3A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(DIMENSION_HANDLER);
@@ -166,8 +156,7 @@ public class EntityPackets {
             }
         });
 
-        // Join Game
-        protocol.registerOutgoing(State.PLAY, 0x26, 0x25, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Entity ID
@@ -205,8 +194,7 @@ public class EntityPackets {
             }
         });
 
-        // Entity Properties
-        protocol.registerOutgoing(State.PLAY, 0x59, 0x58, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_15.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

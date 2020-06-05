@@ -3,11 +3,10 @@ package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_15Types;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
@@ -16,14 +15,12 @@ import java.util.List;
 
 public class EntityPackets {
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_15To1_14_4 protocol) {
         MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
 
-        // Spawn entity
-        metadataRewriter.registerSpawnTrackerWithData(0x00, 0x00, Entity1_15Types.EntityType.FALLING_BLOCK, Protocol1_15To1_14_4::getNewBlockStateId);
+        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_14.SPAWN_ENTITY, Entity1_15Types.EntityType.FALLING_BLOCK, Protocol1_15To1_14_4::getNewBlockStateId);
 
-        // Spawn mob packet
-        protocol.registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -52,8 +49,7 @@ public class EntityPackets {
             }
         });
 
-        // Spawn player packet
-        protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -79,10 +75,8 @@ public class EntityPackets {
             }
         });
 
-        // Metadata packet
-        metadataRewriter.registerMetadataRewriter(0x43, 0x44, Types1_14.METADATA_LIST);
-
-        metadataRewriter.registerEntityDestroy(0x37, 0x38);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.ENTITY_METADATA, Types1_14.METADATA_LIST);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_14.DESTROY_ENTITIES);
     }
 
     public static int getNewEntityId(int oldId) {

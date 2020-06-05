@@ -8,8 +8,8 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -18,8 +18,7 @@ public class WorldPackets {
     public static void register(Protocol protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION, Protocol1_13_1To1_13::getNewBlockStateId, Protocol1_13_1To1_13::getNewBlockId);
 
-        //Chunk
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -39,20 +38,12 @@ public class WorldPackets {
             }
         });
 
-        // Block action
-        blockRewriter.registerBlockAction(0x0A, 0x0A);
+        blockRewriter.registerBlockAction(ClientboundPackets1_13.BLOCK_ACTION);
+        blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_CHANGE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerEffect(ClientboundPackets1_13.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
 
-        // Block Change
-        blockRewriter.registerBlockChange(0xB, 0xB);
-
-        // Multi Block Change
-        blockRewriter.registerMultiBlockChange(0xF, 0xF);
-
-        // Effect packet
-        blockRewriter.registerEffect(0x23, 0x23, 1010, 2001, InventoryPackets::getNewItemId);
-
-        //join game
-        protocol.registerOutgoing(State.PLAY, 0x25, 0x25, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -71,8 +62,7 @@ public class WorldPackets {
             }
         });
 
-        //respawn
-        protocol.registerOutgoing(State.PLAY, 0x38, 0x38, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -87,7 +77,6 @@ public class WorldPackets {
             }
         });
 
-        //spawn particle
-        blockRewriter.registerSpawnParticle(Type.FLOAT, 0x24, 0x24, 3, 20, 27, InventoryPackets::toClient, Type.FLAT_ITEM);
+        blockRewriter.registerSpawnParticle(Type.FLOAT, ClientboundPackets1_13.SPAWN_PARTICLE, 3, 20, 27, InventoryPackets::toClient, Type.FLAT_ITEM);
     }
 }

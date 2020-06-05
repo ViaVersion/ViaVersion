@@ -5,13 +5,13 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {
-        // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -19,9 +19,7 @@ public class InventoryPackets {
                 map(Type.FLAT_ITEM, Type.FLAT_VAR_INT_ITEM); // 2 - Slot Value
             }
         });
-
-        // Window items packet
-        protocol.registerOutgoing(State.PLAY, 0x15, 0x15, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.WINDOW_ITEMS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -29,8 +27,7 @@ public class InventoryPackets {
             }
         });
 
-        // Plugin message
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -63,8 +60,7 @@ public class InventoryPackets {
             }
         });
 
-        // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x42, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.ENTITY_EQUIPMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -73,8 +69,7 @@ public class InventoryPackets {
             }
         });
 
-        // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x54, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -113,28 +108,23 @@ public class InventoryPackets {
             }
         });
 
-        // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x08, 0x08, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                        map(Type.SHORT); // 1 - Slot
-                        map(Type.BYTE); // 2 - Button
-                        map(Type.SHORT); // 3 - Action number
-                        map(Type.VAR_INT); // 4 - Mode
-                        map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM); // 5 - Clicked Item
-                    }
-                }
-        );
-
-        // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x24, 0x24, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.SHORT); // 0 - Slot
-                        map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM); // 1 - Clicked Item
-                    }
-                }
-        );
+        protocol.registerIncoming(ServerboundPackets1_13.CLICK_WINDOW, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                map(Type.SHORT); // 1 - Slot
+                map(Type.BYTE); // 2 - Button
+                map(Type.SHORT); // 3 - Action number
+                map(Type.VAR_INT); // 4 - Mode
+                map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM); // 5 - Clicked Item
+            }
+        });
+        protocol.registerIncoming(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.SHORT); // 0 - Slot
+                map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM); // 1 - Clicked Item
+            }
+        });
     }
 }

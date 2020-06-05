@@ -8,7 +8,8 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.EntityPackets;
@@ -21,7 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 public class Protocol1_14To1_13_2 extends Protocol {
 
     public Protocol1_14To1_13_2() {
-        super(true);
+        super(ClientboundPackets1_13.class, ClientboundPackets1_14.class, ServerboundPackets1_13.class, ServerboundPackets1_14.class, true);
     }
 
     @Override
@@ -33,61 +34,9 @@ public class Protocol1_14To1_13_2 extends Protocol {
         WorldPackets.register(this);
         PlayerPackets.register(this);
 
-        registerOutgoing(State.PLAY, 0x16, 0x15);
+        new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(ClientboundPackets1_13.SOUND);
 
-        registerOutgoing(State.PLAY, 0x1A, 0x19);
-        registerOutgoing(State.PLAY, 0x1B, 0x1A);
-        registerOutgoing(State.PLAY, 0x1C, 0x1B);
-        registerOutgoing(State.PLAY, 0x1D, 0x54);
-        registerOutgoing(State.PLAY, 0x1F, 0x1D);
-        registerOutgoing(State.PLAY, 0x20, 0x1E);
-        registerOutgoing(State.PLAY, 0x21, 0x20);
-
-        registerOutgoing(State.PLAY, 0x27, 0x2B);
-
-        registerOutgoing(State.PLAY, 0x2B, 0x2C);
-
-        registerOutgoing(State.PLAY, 0x2D, 0x30);
-        registerOutgoing(State.PLAY, 0x2E, 0x31);
-        registerOutgoing(State.PLAY, 0x2F, 0x32);
-        registerOutgoing(State.PLAY, 0x30, 0x33);
-        registerOutgoing(State.PLAY, 0x31, 0x34);
-        // Position and look
-        registerOutgoing(State.PLAY, 0x32, 0x35);
-
-        registerOutgoing(State.PLAY, 0x34, 0x36);
-
-        registerOutgoing(State.PLAY, 0x36, 0x38);
-        registerOutgoing(State.PLAY, 0x37, 0x39);
-
-        registerOutgoing(State.PLAY, 0x39, 0x3B);
-        registerOutgoing(State.PLAY, 0x3A, 0x3C);
-        registerOutgoing(State.PLAY, 0x3B, 0x3D);
-        registerOutgoing(State.PLAY, 0x3C, 0x3E);
-        registerOutgoing(State.PLAY, 0x3D, 0x3F);
-        registerOutgoing(State.PLAY, 0x3E, 0x42);
-
-        registerOutgoing(State.PLAY, 0x40, 0x44);
-        registerOutgoing(State.PLAY, 0x41, 0x45);
-
-        registerOutgoing(State.PLAY, 0x43, 0x47);
-        registerOutgoing(State.PLAY, 0x44, 0x48);
-        registerOutgoing(State.PLAY, 0x45, 0x49);
-        registerOutgoing(State.PLAY, 0x46, 0x4A);
-        registerOutgoing(State.PLAY, 0x47, 0x4B);
-        registerOutgoing(State.PLAY, 0x48, 0x4C);
-
-        registerOutgoing(State.PLAY, 0x4A, 0x4E);
-        registerOutgoing(State.PLAY, 0x4B, 0x4F);
-        registerOutgoing(State.PLAY, 0x4C, 0x52);
-
-        new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(0x4D, 0x51);
-
-        registerOutgoing(State.PLAY, 0x4E, 0x53);
-        registerOutgoing(State.PLAY, 0x4F, 0x55);
-        registerOutgoing(State.PLAY, 0x50, 0x56);
-
-        registerOutgoing(State.PLAY, 0x51, 0x57, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.ADVANCEMENTS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -128,10 +77,7 @@ public class Protocol1_14To1_13_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x52, 0x58);
-        registerOutgoing(State.PLAY, 0x53, 0x59);
-
-        registerOutgoing(State.PLAY, 0x55, 0x5B, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -194,54 +140,12 @@ public class Protocol1_14To1_13_2 extends Protocol {
             }
         });
 
-        //Set Difficulty packet added in 19w11a
-        cancelIncoming(State.PLAY, 0x02);
-
-        registerIncoming(State.PLAY, 0x02, 0x03);
-        registerIncoming(State.PLAY, 0x03, 0x04);
-        registerIncoming(State.PLAY, 0x04, 0x05);
-        registerIncoming(State.PLAY, 0x05, 0x06);
-        registerIncoming(State.PLAY, 0x06, 0x07);
-        registerIncoming(State.PLAY, 0x07, 0x08);
-
-        registerIncoming(State.PLAY, 0x09, 0x0A);
-        registerIncoming(State.PLAY, 0x0A, 0x0B);
-
-        registerIncoming(State.PLAY, 0x0C, 0x0D);
-        registerIncoming(State.PLAY, 0x0D, 0x0E);
-
-        //Lock Difficulty packet added in 19w11a
-        cancelIncoming(State.PLAY, 0x10);
-
-        registerIncoming(State.PLAY, 0x0E, 0x0F);
-        registerIncoming(State.PLAY, 0x0F, 0x14);
-        registerIncoming(State.PLAY, 0x10, 0x11);
-        registerIncoming(State.PLAY, 0x11, 0x12);
-        registerIncoming(State.PLAY, 0x12, 0x13);
-        registerIncoming(State.PLAY, 0x13, 0x15);
-        registerIncoming(State.PLAY, 0x14, 0x16);
-        registerIncoming(State.PLAY, 0x15, 0x17);
-        registerIncoming(State.PLAY, 0x16, 0x18);
-        registerIncoming(State.PLAY, 0x17, 0x19);
-
-        registerIncoming(State.PLAY, 0x19, 0x1B);
-        registerIncoming(State.PLAY, 0x1A, 0x1C);
-
-        registerIncoming(State.PLAY, 0x1C, 0x1E);
-        registerIncoming(State.PLAY, 0x1D, 0x1F);
-        registerIncoming(State.PLAY, 0x1E, 0x20);
-        registerIncoming(State.PLAY, 0x20, 0x22);
-        registerIncoming(State.PLAY, 0x21, 0x23);
-
-        registerIncoming(State.PLAY, 0x23, 0x25);
-
-        //Unknown packet added in 19w13a
-        cancelIncoming(State.PLAY, 0x27);
-
-        registerIncoming(State.PLAY, 0x27, 0x2A);
-        registerIncoming(State.PLAY, 0x28, 0x2B);
-
-        registerIncoming(State.PLAY, 0x2A, 0x2D);
+        // Set Difficulty packet added in 19w11a
+        cancelIncoming(ServerboundPackets1_14.SET_DIFFICULTY);
+        // Lock Difficulty packet added in 19w11a
+        cancelIncoming(ServerboundPackets1_14.LOCK_DIFFICULTY);
+        // Unknown packet added in 19w13a
+        cancelIncoming(ServerboundPackets1_14.UPDATE_JIGSAW_BLOCK);
     }
 
     @Override

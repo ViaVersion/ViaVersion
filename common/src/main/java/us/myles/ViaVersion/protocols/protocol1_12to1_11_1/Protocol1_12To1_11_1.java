@@ -168,7 +168,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
         registerOutgoing(State.PLAY, 0x38, 0x3a);
 
         // Metadata packet
-        metadataRewriter.registerMetadataRewriter(0x39, 0x3b, Types1_12.METADATA_LIST);
+        metadataRewriter.registerMetadataRewriter(0x39, 0x3b, null, Types1_12.METADATA_LIST);
 
         registerOutgoing(State.PLAY, 0x3a, 0x3c);
         registerOutgoing(State.PLAY, 0x3b, 0x3d);

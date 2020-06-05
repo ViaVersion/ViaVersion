@@ -8,15 +8,20 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_13_1To1_13 extends Protocol {
+
+    public Protocol1_13_1To1_13() {
+        super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
+    }
 
     @Override
     protected void registerPackets() {
@@ -26,8 +31,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
         InventoryPackets.register(this);
         WorldPackets.register(this);
 
-        //Tab complete
-        registerIncoming(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -41,8 +45,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        //Edit Book
-        registerIncoming(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLAT_ITEM);
@@ -66,8 +69,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Tab complete
-        registerOutgoing(State.PLAY, 0x10, 0x10, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Transaction id
@@ -93,8 +95,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Boss bar
-        registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.BOSSBAR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UUID);
@@ -117,8 +118,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Advancements
-        registerOutgoing(State.PLAY, 0x51, 0x51, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.ADVANCEMENTS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -160,9 +160,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-
-        //Tags
-        registerOutgoing(State.PLAY, 0x55, 0x55, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -193,8 +191,9 @@ public class Protocol1_13_1To1_13 extends Protocol {
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_13(userConnection));
-        if (!userConnection.has(ClientWorld.class))
+        if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
     }
 
 

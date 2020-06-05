@@ -31,7 +31,7 @@ public class SpawnPackets {
         }
     };
 
-    public static void register(final Protocol protocol) {
+    public static void register(Protocol1_9To1_8 protocol) {
         // Spawn Object Packet
         protocol.registerOutgoing(State.PLAY, 0x0E, 0x00, new PacketRemapper() {
             @Override

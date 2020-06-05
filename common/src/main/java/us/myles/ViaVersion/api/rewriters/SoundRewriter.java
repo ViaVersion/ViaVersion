@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -17,7 +18,15 @@ public class SoundRewriter {
 
     // The same for entity sound effect
     public void registerSound(int oldId, int newId) {
-        protocol.registerOutgoing(State.PLAY, oldId, newId, new PacketRemapper() {
+        protocol.registerOutgoing(State.PLAY, oldId, newId, getRemapper());
+    }
+
+    public void registerSound(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, getRemapper());
+    }
+
+    protected PacketRemapper getRemapper() {
+        return new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Sound Id
@@ -31,6 +40,6 @@ public class SoundRewriter {
                     }
                 });
             }
-        });
+        };
     }
 }

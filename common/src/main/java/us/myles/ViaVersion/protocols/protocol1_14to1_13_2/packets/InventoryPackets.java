@@ -1,7 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Sets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -11,10 +15,11 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.InventoryNameRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
@@ -28,11 +33,9 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        // Set cooldown
-        itemRewriter.registerSetCooldown(0x18, 0x17, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN, InventoryPackets::getNewItemId);
 
-        // Open Inventory
-        protocol.registerOutgoing(State.PLAY, 0x14, -1, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -105,14 +108,10 @@ public class InventoryPackets {
             }
         });
 
-        // Window items packet
-        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, 0x15, 0x14);
+        itemRewriter.registerWindowItems(Type.FLAT_VAR_INT_ITEM_ARRAY, ClientboundPackets1_13.WINDOW_ITEMS);
+        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_13.SET_SLOT);
 
-        // Set slot packet
-        itemRewriter.registerSetSlot(Type.FLAT_VAR_INT_ITEM, 0x17, 0x16);
-
-        // Plugin message
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x18, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -164,11 +163,9 @@ public class InventoryPackets {
             }
         });
 
-        // Entity Equipment Packet
-        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, 0x42, 0x46);
+        itemRewriter.registerEntityEquipment(Type.FLAT_VAR_INT_ITEM, ClientboundPackets1_13.ENTITY_EQUIPMENT);
 
-        // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x5A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -218,11 +215,9 @@ public class InventoryPackets {
         });
 
 
-        // Click window packet
-        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, 0x08, 0x09);
+        itemRewriter.registerClickWindow(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_14.CLICK_WINDOW);
 
-        // Select trade
-        protocol.registerIncoming(State.PLAY, 0x1F, 0x21, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.SELECT_TRADE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -244,10 +239,8 @@ public class InventoryPackets {
             }
         });
 
-        // Creative Inventory Action
-        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, 0x24, 0x26);
+        itemRewriter.registerCreativeInvAction(Type.FLAT_VAR_INT_ITEM, ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
     }
-
 
     public static void toClient(Item item) {
         if (item == null) return;

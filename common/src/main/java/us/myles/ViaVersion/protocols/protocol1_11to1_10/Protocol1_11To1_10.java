@@ -106,7 +106,7 @@ public class Protocol1_11To1_10 extends Protocol {
         });
 
         // Metadata packet
-        metadataRewriter.registerMetadataRewriter(0x39, 0x39, Types1_9.METADATA_LIST);
+        metadataRewriter.registerMetadataRewriter(0x39, 0x39, null, Types1_9.METADATA_LIST);
 
         // Entity teleport
         registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
