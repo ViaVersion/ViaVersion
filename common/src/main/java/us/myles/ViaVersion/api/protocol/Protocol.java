@@ -76,9 +76,14 @@ public abstract class Protocol {
 
         for (ClientboundPacketType packet : oldClientboundPacketEnum.getEnumConstants()) {
             ClientboundPacketType mappedPacket = newClientboundPackets.get(packet.name());
-            if (mappedPacket == null) continue; // Packet doesn't exist on new client
-
             int oldId = packet.ordinal();
+            if (mappedPacket == null) {
+                // Packet doesn't exist on new client
+                Preconditions.checkArgument(hasRegisteredOutgoing(State.PLAY, oldId),
+                        "Packet " + mappedPacket + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
+                continue;
+            }
+
             int newId = mappedPacket.ordinal();
             if (!hasRegisteredOutgoing(State.PLAY, oldId)) {
                 registerOutgoing(State.PLAY, oldId, newId);
@@ -95,10 +100,15 @@ public abstract class Protocol {
 
         for (ServerboundPacketType packet : newServerboundPacketEnum.getEnumConstants()) {
             ServerboundPacketType mappedPacket = oldServerboundConstants.get(packet.name());
-            if (mappedPacket == null) continue; // Packet doesn't exist on old server
+            int newId = packet.ordinal();
+            if (mappedPacket == null) {
+                // Packet doesn't exist on old server
+                Preconditions.checkArgument(hasRegisteredIncoming(State.PLAY, newId),
+                        "Packet " + mappedPacket + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
+                continue;
+            }
 
             int oldId = mappedPacket.ordinal();
-            int newId = packet.ordinal();
             if (!hasRegisteredIncoming(State.PLAY, newId)) {
                 registerIncoming(State.PLAY, oldId, newId);
             }
@@ -276,14 +286,14 @@ public abstract class Protocol {
     /**
      * Registers an outgoing protocol.
      *
-     * @param oldPacketType  packet type the server sends
-     * @param newPacketType  new packet type
-     * @param packetRemapper remapper
+     * @param packetType       packet type the server initially sends
+     * @param mappedPacketType packet type after transforming for the client
+     * @param packetRemapper   remapper
      */
-    public void registerOutgoing(ClientboundPacketType oldPacketType, ClientboundPacketType newPacketType, PacketRemapper packetRemapper) {
-        Preconditions.checkArgument(oldPacketType.getClass() == oldClientboundPacketEnum);
-        Preconditions.checkArgument(newPacketType == null || newPacketType.getClass() == newClientboundPacketEnum);
-        registerOutgoing(State.PLAY, oldPacketType.ordinal(), newPacketType != null ? newPacketType.ordinal() : -1, packetRemapper);
+    public void registerOutgoing(ClientboundPacketType packetType, ClientboundPacketType mappedPacketType, PacketRemapper packetRemapper) {
+        Preconditions.checkArgument(packetType.getClass() == oldClientboundPacketEnum);
+        Preconditions.checkArgument(mappedPacketType == null || mappedPacketType.getClass() == newClientboundPacketEnum);
+        registerOutgoing(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
     }
 
     public void registerOutgoing(ClientboundPacketType oldPacketType, ClientboundPacketType newPacketType) {
@@ -316,14 +326,14 @@ public abstract class Protocol {
     /**
      * Registers an incoming protocol.
      *
-     * @param oldPacketType  packet type for the server
-     * @param newPacketType  packet type the client sends
-     * @param packetRemapper remapper
+     * @param packetType       packet type initially sent by the client
+     * @param mappedPacketType packet type after transforming for the server
+     * @param packetRemapper   remapper
      */
-    public void registerIncoming(ServerboundPacketType oldPacketType, ServerboundPacketType newPacketType, PacketRemapper packetRemapper) {
-        Preconditions.checkArgument(oldPacketType == null || oldPacketType.getClass() == oldServerboundPacketEnum);
-        Preconditions.checkArgument(newPacketType.getClass() == newServerboundPacketEnum);
-        registerIncoming(State.PLAY, oldPacketType != null ? oldPacketType.ordinal() : -1, newPacketType.ordinal(), packetRemapper);
+    public void registerIncoming(ServerboundPacketType packetType, ServerboundPacketType mappedPacketType, PacketRemapper packetRemapper) {
+        Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
+        Preconditions.checkArgument(mappedPacketType == null || mappedPacketType.getClass() == oldServerboundPacketEnum);
+        registerIncoming(State.PLAY, mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetType.ordinal(), packetRemapper);
     }
 
     public void cancelIncoming(ServerboundPacketType packetType) {

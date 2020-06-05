@@ -1,7 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.ShortTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -12,9 +17,10 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.BlockIdData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SoundSource;
@@ -32,8 +38,7 @@ public class InventoryPackets {
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x17, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -43,9 +48,7 @@ public class InventoryPackets {
                 handler(itemRewriter.itemToClientHandler(Type.FLAT_ITEM));
             }
         });
-
-        // Window items packet
-        protocol.registerOutgoing(State.PLAY, 0x14, 0x15, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -54,9 +57,7 @@ public class InventoryPackets {
                 handler(itemRewriter.itemArrayHandler(Type.FLAT_ITEM_ARRAY));
             }
         });
-
-        // Window property
-        protocol.registerOutgoing(State.PLAY, 0x15, 0x16, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.WINDOW_PROPERTY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window id
@@ -76,7 +77,7 @@ public class InventoryPackets {
         });
 
         // Plugin message Packet -> Trading
-        protocol.registerOutgoing(State.PLAY, 0x18, 0x19, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Channel
@@ -178,8 +179,7 @@ public class InventoryPackets {
             }
         });
 
-        // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x3F, 0x42, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.ENTITY_EQUIPMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -191,8 +191,7 @@ public class InventoryPackets {
         });
 
 
-        // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x07, 0x08, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_13.CLICK_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -206,8 +205,7 @@ public class InventoryPackets {
             }
         });
 
-        // Plugin message
-        protocol.registerIncoming(State.PLAY, 0x09, 0x0A, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -242,8 +240,7 @@ public class InventoryPackets {
             }
         });
 
-        // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x1B, 0x24, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.SHORT); // 0 - Slot
