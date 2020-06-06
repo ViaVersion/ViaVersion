@@ -7,17 +7,17 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {
-        // Window Property Packet
-        protocol.registerOutgoing(State.PLAY, 0x31, 0x15, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -56,8 +56,7 @@ public class InventoryPackets {
                 });
             }
         });
-        // Window Open Packet
-        protocol.registerOutgoing(State.PLAY, 0x2D, 0x13, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.OPEN_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -87,12 +86,9 @@ public class InventoryPackets {
                 });
             }
         });
-        // Window Set Slot Packet
-        protocol.registerOutgoing(State.PLAY, 0x2F, 0x16, new PacketRemapper() {
-
+        protocol.registerOutgoing(ClientboundPackets1_8.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
-
                 map(Type.BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM); // 2 - Slot Value
@@ -121,8 +117,7 @@ public class InventoryPackets {
                 });
             }
         });
-        // Window Set Slots Packet
-        protocol.registerOutgoing(State.PLAY, 0x30, 0x14, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.WINDOW_ITEMS, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -162,8 +157,7 @@ public class InventoryPackets {
                 });
             }
         });
-        // Close Window Packet
-        protocol.registerOutgoing(State.PLAY, 0x2E, 0x12, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.CLOSE_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -179,8 +173,7 @@ public class InventoryPackets {
             }
         });
 
-        // Map Packet
-        protocol.registerOutgoing(State.PLAY, 0x34, 0x24, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.MAP_DATA, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -196,14 +189,9 @@ public class InventoryPackets {
             }
         });
 
-        /* Packets which do not have any field remapping or handlers */
-        protocol.registerOutgoing(State.PLAY, 0x09, 0x37); // Held Item Change Packet
-        protocol.registerOutgoing(State.PLAY, 0x32, 0x11); // Confirm Transaction Packet
 
         /* Incoming Packets */
-
-        // Creative Inventory Slot Action Packet
-        protocol.registerIncoming(State.PLAY, 0x10, 0x18, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -240,8 +228,7 @@ public class InventoryPackets {
             }
         });
 
-        // Player Click Window Packet
-        protocol.registerIncoming(State.PLAY, 0x0E, 0x07, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.CLICK_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -297,8 +284,7 @@ public class InventoryPackets {
             }
         });
 
-        // Close Window Incoming Packet
-        protocol.registerIncoming(State.PLAY, 0x0D, 0x08, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.CLOSE_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -313,8 +299,7 @@ public class InventoryPackets {
             }
         });
 
-        // Held Item Change Packet
-        protocol.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 // Blocking patch
@@ -330,10 +315,5 @@ public class InventoryPackets {
                 });
             }
         });
-
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerIncoming(State.PLAY, 0x0F, 0x05); // Confirm Transaction Packet
-        protocol.registerIncoming(State.PLAY, 0x11, 0x06); // Enchant Item Packet
     }
 }

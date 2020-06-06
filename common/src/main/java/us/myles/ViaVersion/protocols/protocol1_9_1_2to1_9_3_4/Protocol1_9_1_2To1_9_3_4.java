@@ -9,27 +9,25 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks.BlockEntity;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
-public class Protocol1_9_1_2To1_9_3_4 extends Protocol {
+// Goes BACKWARDS from 1.9.3/4 to 1.9.1/2
+public class Protocol1_9_1_2To1_9_3_4 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_9, ServerboundPackets1_9_3, ServerboundPackets1_9> {
+
+    public Protocol1_9_1_2To1_9_3_4() {
+        super(ClientboundPackets1_9_3.class, ClientboundPackets1_9.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9.class);
+    }
 
     @Override
     protected void registerPackets() {
-
-        //Unchanged packet structure
-        registerOutgoing(State.PLAY, 0x46, 0x47); //Sound effect
-        registerOutgoing(State.PLAY, 0x47, 0x48); //Player list header and footer
-        registerOutgoing(State.PLAY, 0x48, 0x49); //Collect item
-        registerOutgoing(State.PLAY, 0x49, 0x4A); //Entity teleport
-        registerOutgoing(State.PLAY, 0x4A, 0x4B); //Entity properties
-        registerOutgoing(State.PLAY, 0x4B, 0x4C); //Entity effect
-
-        //Update block entity
-        registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); //Position
@@ -54,8 +52,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends Protocol {
             }
         });
 
-        // Chunk Packet
-        registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -74,8 +71,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends Protocol {
             }
         });
 
-        // Join (save dimension id)
-        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -94,8 +90,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends Protocol {
             }
         });
 
-        // Respawn (save dimension id)
-        registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -115,7 +110,8 @@ public class Protocol1_9_1_2To1_9_3_4 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        if (!userConnection.has(ClientWorld.class))
+        if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
     }
 }

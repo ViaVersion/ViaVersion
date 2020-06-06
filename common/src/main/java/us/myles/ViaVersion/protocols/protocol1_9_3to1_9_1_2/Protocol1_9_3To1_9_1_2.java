@@ -12,30 +12,26 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntity;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
 import java.util.List;
 
-public class Protocol1_9_3To1_9_1_2 extends Protocol {
+public class Protocol1_9_3To1_9_1_2 extends Protocol<ClientboundPackets1_9, ClientboundPackets1_9_3, ServerboundPackets1_9, ServerboundPackets1_9_3> {
+
+    public Protocol1_9_3To1_9_1_2() {
+        super(ClientboundPackets1_9.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9.class, ServerboundPackets1_9_3.class);
+    }
+
     @Override
     protected void registerPackets() {
-
-        //Unchanged packet structure
-        registerOutgoing(State.PLAY, 0x47, 0x46); //Sound effect
-        registerOutgoing(State.PLAY, 0x48, 0x47); //Player list header and footer
-        registerOutgoing(State.PLAY, 0x49, 0x48); //Collect item
-        registerOutgoing(State.PLAY, 0x4A, 0x49); //Entity teleport
-        registerOutgoing(State.PLAY, 0x4B, 0x4A); //Entity properties
-        registerOutgoing(State.PLAY, 0x4C, 0x4B); //Entity effect
-
         // Sign update packet
-        registerOutgoing(State.PLAY, 0x46, -1, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9.UPDATE_SIGN, null, new PacketRemapper() {
             @Override
             public void registerMap() {
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -67,8 +63,7 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol {
             }
         });
 
-        // Chunk packet
-        registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -104,8 +99,7 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol {
             }
         });
 
-        // Join (save dimension id)
-        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -123,8 +117,7 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol {
             }
         });
 
-        // Respawn (save dimension id)
-        registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -142,7 +135,8 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol {
 
     @Override
     public void init(UserConnection user) {
-        if (!user.has(ClientWorld.class))
+        if (!user.has(ClientWorld.class)) {
             user.put(new ClientWorld(user));
+        }
     }
 }

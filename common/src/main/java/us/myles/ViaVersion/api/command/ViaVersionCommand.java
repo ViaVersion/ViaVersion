@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api.command;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public interface ViaVersionCommand {
@@ -25,6 +27,7 @@ public interface ViaVersionCommand {
      * @param name subcommand name
      * @return ViaSubCommand instance
      */
+    @Nullable
     ViaSubCommand getSubCommand(String name);
 
     /**

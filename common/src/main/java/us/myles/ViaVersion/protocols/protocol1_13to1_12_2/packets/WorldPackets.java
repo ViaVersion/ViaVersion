@@ -13,7 +13,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
@@ -57,9 +57,7 @@ public class WorldPackets {
 
     public static void register(Protocol protocol) {
         // Outgoing packets
-
-        // Spawn Painting
-        protocol.registerOutgoing(State.PLAY, 0x04, 0x04, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -82,8 +80,7 @@ public class WorldPackets {
             }
         });
 
-        // Update Block Entity
-        protocol.registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Location
@@ -113,8 +110,7 @@ public class WorldPackets {
             }
         });
 
-        // Block action
-        protocol.registerOutgoing(State.PLAY, 0xA, 0xA, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // Location
@@ -162,8 +158,7 @@ public class WorldPackets {
             }
         });
 
-        // Block Change
-        protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION);
@@ -193,8 +188,7 @@ public class WorldPackets {
             }
         });
 
-        // Multi Block Change
-        protocol.registerOutgoing(State.PLAY, 0x10, 0xF, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
@@ -254,8 +248,7 @@ public class WorldPackets {
             }
         });
 
-        // Explosion
-        protocol.registerOutgoing(State.PLAY, 0x1C, 0x1E, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.EXPLOSION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 if (!Via.getConfig().isServersideBlockConnections())
@@ -300,8 +293,7 @@ public class WorldPackets {
             }
         });
 
-        // Unload Chunk
-        protocol.registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 if (Via.getConfig().isServersideBlockConnections()) {
@@ -317,8 +309,7 @@ public class WorldPackets {
             }
         });
 
-        // Named Sound Effect TODO String -> Identifier? Check if identifier is present?
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.NAMED_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -332,8 +323,7 @@ public class WorldPackets {
             }
         });
 
-        // Chunk Data
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -464,8 +454,7 @@ public class WorldPackets {
             }
         });
 
-        // Particle
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x24, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID

@@ -15,7 +15,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
@@ -41,8 +41,7 @@ public class WorldPackets {
     public static void register(final Protocol protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, null, Protocol1_14To1_13_2::getNewBlockStateId, Protocol1_14To1_13_2::getNewBlockId);
 
-        // Block Break Animation
-        protocol.registerOutgoing(State.PLAY, 0x08, 0x08, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -50,17 +49,13 @@ public class WorldPackets {
                 map(Type.BYTE);
             }
         });
-
-        // Update Block Entity
-        protocol.registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
-
-        // Block Action
-        protocol.registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14); // Location
@@ -75,9 +70,7 @@ public class WorldPackets {
                 });
             }
         });
-
-        // Block Change
-        protocol.registerOutgoing(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
@@ -93,8 +86,7 @@ public class WorldPackets {
             }
         });
 
-        // Server Difficulty
-        protocol.registerOutgoing(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.SERVER_DIFFICULTY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE);
@@ -107,11 +99,9 @@ public class WorldPackets {
             }
         });
 
-        // Multi Block Change
-        blockRewriter.registerMultiBlockChange(0x0F, 0x0F);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
 
-        // Explosion
-        protocol.registerOutgoing(State.PLAY, 0x1E, 0x1C, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.EXPLOSION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLOAT); // X
@@ -134,8 +124,7 @@ public class WorldPackets {
             }
         });
 
-        // Chunk
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x21, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -264,8 +253,7 @@ public class WorldPackets {
             }
         });
 
-        // Effect
-        protocol.registerOutgoing(State.PLAY, 0x23, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id
@@ -286,12 +274,10 @@ public class WorldPackets {
             }
         });
 
-        // Spawn particle
-        blockRewriter.registerSpawnParticle(Type.FLOAT, 0x24, 0x23, 3, 20, 27,
-                MetadataRewriter1_14To1_13_2::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM);
+        blockRewriter.registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, 3, 20, 27,
+                MetadataRewriter1_14To1_13_2::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.FLOAT);
 
-        // Join Game
-        protocol.registerOutgoing(State.PLAY, 0x25, 0x25, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -334,8 +320,7 @@ public class WorldPackets {
             }
         });
 
-        // Map Data
-        protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -350,8 +335,7 @@ public class WorldPackets {
             }
         });
 
-        // Respawn
-        protocol.registerOutgoing(State.PLAY, 0x38, 0x3A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -379,8 +363,7 @@ public class WorldPackets {
             }
         });
 
-        // Spawn Position
-        protocol.registerOutgoing(State.PLAY, 0x49, 0x4D, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_POSITION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);

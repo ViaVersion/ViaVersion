@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import net.md_5.bungee.api.ChatColor;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
@@ -36,7 +37,7 @@ public class UserConnection {
     private int secondsObserved;
     private int warnings;
 
-    public UserConnection(Channel channel) {
+    public UserConnection(@Nullable Channel channel) {
         this.channel = channel;
     }
 
@@ -47,6 +48,7 @@ public class UserConnection {
      * @param <T>         The type of the class you want to get.
      * @return The requested object
      */
+    @Nullable
     public <T extends StoredObject> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
@@ -84,8 +86,8 @@ public class UserConnection {
      * @param packet        The raw packet to send
      * @param currentThread Should it run in the same thread
      */
-    public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
-        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
+    public void sendRawPacket(ByteBuf packet, boolean currentThread) {
+        ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
         if (currentThread) {
             channel.pipeline().context(handler).writeAndFlush(packet);
         } else {
@@ -99,8 +101,8 @@ public class UserConnection {
      * @param packet The raw packet to send
      * @return ChannelFuture of the packet being sent
      */
-    public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
-        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
+    public ChannelFuture sendRawPacketFuture(ByteBuf packet) {
+        ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
         return channel.pipeline().context(handler).writeAndFlush(packet);
     }
 
@@ -109,7 +111,7 @@ public class UserConnection {
      *
      * @param packet The packet to send
      */
-    public void sendRawPacket(final ByteBuf packet) {
+    public void sendRawPacket(ByteBuf packet) {
         sendRawPacket(packet, false);
     }
 
@@ -177,12 +179,12 @@ public class UserConnection {
      *
      * @param reason The reason to use, not used if player is not active.
      */
-    public void disconnect(final String reason) {
+    public void disconnect(String reason) {
         if (!channel.isOpen()) return;
         if (pendingDisconnect) return;
         pendingDisconnect = true;
         if (get(ProtocolInfo.class).getUuid() != null) {
-            final UUID uuid = get(ProtocolInfo.class).getUuid();
+            UUID uuid = get(ProtocolInfo.class).getUuid();
             Via.getPlatform().runSync(() -> {
                 if (!Via.getPlatform().kickPlayer(uuid, ChatColor.translateAlternateColorCodes('&', reason))) {
                     channel.close(); // =)
@@ -197,8 +199,8 @@ public class UserConnection {
      * @param packet        Raw packet to be sent
      * @param currentThread If {@code true} executes immediately, {@code false} submits a task to EventLoop
      */
-    public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
-        final ByteBuf buf = packet.alloc().buffer();
+    public void sendRawPacketToServer(ByteBuf packet, boolean currentThread) {
+        ByteBuf buf = packet.alloc().buffer();
         try {
             try {
                 Type.VAR_INT.write(buf, PacketWrapper.PASSTHROUGH_ID);
@@ -207,7 +209,7 @@ public class UserConnection {
                 Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
             }
             buf.writeBytes(packet);
-            final ChannelHandlerContext context = PipelineUtil
+            ChannelHandlerContext context = PipelineUtil
                     .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
             if (currentThread) {
                 if (context != null) {
@@ -248,6 +250,7 @@ public class UserConnection {
         return id;
     }
 
+    @Nullable
     public Channel getChannel() {
         return channel;
     }
@@ -272,11 +275,12 @@ public class UserConnection {
         this.pendingDisconnect = pendingDisconnect;
     }
 
+    @Nullable
     public Object getLastPacket() {
         return lastPacket;
     }
 
-    public void setLastPacket(Object lastPacket) {
+    public void setLastPacket(@Nullable Object lastPacket) {
         this.lastPacket = lastPacket;
     }
 

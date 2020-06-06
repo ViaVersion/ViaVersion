@@ -1,5 +1,6 @@
 package us.myles.ViaVersion;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
@@ -207,6 +208,7 @@ public class ViaManager {
     /**
      * @see ViaConnectionManager#getConnectedClient(UUID)
      */
+    @Nullable
     public UserConnection getConnection(UUID playerUUID) {
         return platform.getConnectionManager().getConnectedClient(playerUUID);
     }

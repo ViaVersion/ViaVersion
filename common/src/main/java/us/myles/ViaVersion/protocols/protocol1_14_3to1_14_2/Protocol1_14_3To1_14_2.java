@@ -5,14 +5,18 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 
-public class Protocol1_14_3To1_14_2 extends Protocol {
+public class Protocol1_14_3To1_14_2 extends Protocol<ClientboundPackets1_14, ClientboundPackets1_14, ServerboundPackets1_14, ServerboundPackets1_14> {
+
+    public Protocol1_14_3To1_14_2() {
+        super(ClientboundPackets1_14.class, ClientboundPackets1_14.class, null, null);
+    }
 
     @Override
     protected void registerPackets() {
-        // Trade list
-        registerOutgoing(State.PLAY, 0x27, 0x27, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_14.TRADE_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

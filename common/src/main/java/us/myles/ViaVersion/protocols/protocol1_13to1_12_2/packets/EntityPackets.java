@@ -2,22 +2,22 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 
 public class EntityPackets {
-    public static void register(final Protocol protocol) {
+
+    public static void register(Protocol1_13To1_12_2 protocol) {
         MetadataRewriter1_13To1_12_2 metadataRewriter = protocol.get(MetadataRewriter1_13To1_12_2.class);
 
-        // Spawn Object
-        protocol.registerOutgoing(State.PLAY, 0x0, 0x0, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -76,8 +76,7 @@ public class EntityPackets {
             }
         });
 
-        // Spawn mob packet
-        protocol.registerOutgoing(State.PLAY, 0x3, 0x3, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -98,8 +97,7 @@ public class EntityPackets {
             }
         });
 
-        // Spawn player packet
-        protocol.registerOutgoing(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -115,10 +113,7 @@ public class EntityPackets {
             }
         });
 
-        // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x32, 0x35);
-
-        // Metadata packet
-        metadataRewriter.registerMetadataRewriter(0x3C, 0x3F, Types1_12.METADATA_LIST, Types1_13.METADATA_LIST);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_12_1.DESTROY_ENTITIES);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_12_1.ENTITY_METADATA, Types1_12.METADATA_LIST, Types1_13.METADATA_LIST);
     }
 }

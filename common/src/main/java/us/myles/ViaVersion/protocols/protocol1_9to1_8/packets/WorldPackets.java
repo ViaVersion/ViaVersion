@@ -13,9 +13,10 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
@@ -31,8 +32,7 @@ import java.util.Optional;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {
-        // Sign Update Packet
-        protocol.registerOutgoing(State.PLAY, 0x33, 0x46, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Sign Position
@@ -43,8 +43,7 @@ public class WorldPackets {
             }
         });
 
-        // Play Effect Packet
-        protocol.registerOutgoing(State.PLAY, 0x28, 0x21, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Effect ID
@@ -76,8 +75,7 @@ public class WorldPackets {
             }
         });
 
-        // Play Named Sound Effect Packet
-        protocol.registerOutgoing(State.PLAY, 0x29, 0x19, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.NAMED_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Sound Name
@@ -105,7 +103,6 @@ public class WorldPackets {
                             int z = wrapper.passthrough(Type.INT); //Position Z
                             if (tracker.interactedBlockRecently((int) Math.floor(x / 8.0), (int) Math.floor(y / 8.0), (int) Math.floor(z / 8.0))) {
                                 wrapper.cancel();
-                                return;
                             }
                         }
                     }
@@ -113,8 +110,7 @@ public class WorldPackets {
             }
         });
 
-        // Chunk Packet
-        protocol.registerOutgoing(State.PLAY, 0x21, 0x20, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -141,8 +137,7 @@ public class WorldPackets {
             }
         });
 
-        // Bulk Chunk Packet
-        protocol.registerOutgoing(State.PLAY, 0x26, -1, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -176,8 +171,7 @@ public class WorldPackets {
             }
         });
 
-        // Update Block Entity Packet
-        protocol.registerOutgoing(State.PLAY, 0x35, 0x09, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Block Position
@@ -214,29 +208,17 @@ public class WorldPackets {
             }
         });
 
-        // Block Change Packet
-        protocol.registerOutgoing(State.PLAY, 0x23, 0x0B, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION);
                 map(Type.VAR_INT);
             }
         });
-        /* Packets which do not have any field remapping or handlers */
 
-        protocol.registerOutgoing(State.PLAY, 0x25, 0x08); // Block Break Animation Packet
-        protocol.registerOutgoing(State.PLAY, 0x24, 0x0A); // Block Action Packet
-        protocol.registerOutgoing(State.PLAY, 0x41, 0x0D); // Server Difficulty Packet
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x10); // Multi Block Change Packet
-        protocol.registerOutgoing(State.PLAY, 0x27, 0x1C); // Explosion Packet
-        protocol.registerOutgoing(State.PLAY, 0x2A, 0x22); // Particle Packet
-        protocol.registerOutgoing(State.PLAY, 0x03, 0x44); // Update Time Packet
-        protocol.registerOutgoing(State.PLAY, 0x44, 0x35); // World Border Packet
 
         /* Incoming Packets */
-
-        // Sign Update Request Packet
-        protocol.registerIncoming(State.PLAY, 0x12, 0x19, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Sign Position
@@ -247,8 +229,7 @@ public class WorldPackets {
             }
         });
 
-        // Player Digging Packet
-        protocol.registerIncoming(State.PLAY, 0x07, 0x13, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 0 - Status
@@ -279,8 +260,7 @@ public class WorldPackets {
             }
         });
 
-        // Use Item Packet
-        protocol.registerIncoming(State.PLAY, -1, 0x1D, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.USE_ITEM, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -324,8 +304,7 @@ public class WorldPackets {
             }
         });
 
-        // Block Placement Packet
-        protocol.registerIncoming(State.PLAY, 0x08, 0x1C, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position

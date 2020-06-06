@@ -3,6 +3,7 @@ package us.myles.ViaVersion.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -40,6 +41,7 @@ public class UpdateUtil {
         });
     }
 
+    @Nullable
     private static String getUpdateMessage(boolean console) {
         if (Via.getPlatform().getPluginVersion().equals("${project.version}")) {
             return "You are using a debug/custom version, consider updating.";
@@ -71,6 +73,7 @@ public class UpdateUtil {
         return null;
     }
 
+    @Nullable
     private static String getNewestVersion() {
         try {
             URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());

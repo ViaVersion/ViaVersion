@@ -1,11 +1,12 @@
 package us.myles.ViaVersion.api.rewriters;
 
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.protocol.ServerboundPacketType;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 
 // If any of these methods become outdated, just create a new rewriter overriding the methods
 public class ItemRewriter {
@@ -19,8 +20,8 @@ public class ItemRewriter {
         this.toServer = toServer;
     }
 
-    public void registerWindowItems(Type<Item[]> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerWindowItems(ClientboundPacketType packetType, Type<Item[]> type) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -31,8 +32,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetSlot(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerSetSlot(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -44,8 +45,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerEntityEquipment(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerEntityEquipment(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -57,8 +58,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerCreativeInvAction(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerCreativeInvAction(ServerboundPacketType packetType, Type<Item> type) {
+        protocol.registerIncoming(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.SHORT); // 0 - Slot
@@ -69,8 +70,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerClickWindow(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerClickWindow(ServerboundPacketType packetType, Type<Item> type) {
+        protocol.registerIncoming(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -85,8 +86,8 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetCooldown(int oldPacketId, int newPacketId, IdRewriteFunction itemIDRewriteFunction) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerSetCooldown(ClientboundPacketType packetType, IdRewriteFunction itemIDRewriteFunction) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

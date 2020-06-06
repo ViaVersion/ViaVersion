@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.storage;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -30,6 +31,7 @@ public abstract class EntityTracker extends StoredObject implements ExternalJoin
         return clientEntityTypes.containsKey(entityId);
     }
 
+    @Nullable
     public EntityType getEntity(int entityId) {
         return clientEntityTypes.get(entityId);
     }

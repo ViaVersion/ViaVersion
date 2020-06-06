@@ -7,9 +7,10 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.ServerboundPackets1_12;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 
 public class InventoryPackets {
@@ -17,17 +18,12 @@ public class InventoryPackets {
     public static void register(Protocol1_12To1_11_1 protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, BedRewriter::toClientItem, BedRewriter::toServerItem);
 
-        // Set slot packet
-        itemRewriter.registerSetSlot(Type.ITEM, 0x16, 0x16);
-
-        // Window items packet
-        itemRewriter.registerWindowItems(Type.ITEM_ARRAY, 0x14, 0x14);
-
-        // Entity Equipment Packet
-        itemRewriter.registerEntityEquipment(Type.ITEM, 0x3C, 0x3E);
+        itemRewriter.registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
+        itemRewriter.registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
+        itemRewriter.registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
 
         // Plugin message Packet -> Trading
-        protocol.registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Channel
@@ -44,8 +40,9 @@ public class InventoryPackets {
                                 BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Output Item
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
-                                if (secondItem)
+                                if (secondItem) {
                                     BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Second Item
+                                }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                                 wrapper.passthrough(Type.INT); // Number of tools uses
@@ -58,8 +55,7 @@ public class InventoryPackets {
         });
 
 
-        // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x07, 0x08, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_12.CLICK_WINDOW, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -100,6 +96,6 @@ public class InventoryPackets {
         );
 
         // Creative Inventory Action
-        itemRewriter.registerCreativeInvAction(Type.ITEM, 0x18, 0x1b);
+        itemRewriter.registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM);
     }
 }

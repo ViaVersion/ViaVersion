@@ -11,22 +11,20 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 
 public class PlayerPackets {
 
     public static void register(Protocol protocol) {
-
-        // Open Sign Editor
-        protocol.registerOutgoing(State.PLAY, 0x2C, 0x2F, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.OPEN_SIGN_EDITOR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
 
-        // Query Block NBT
-        protocol.registerIncoming(State.PLAY, 0x01, 0x01, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.QUERY_BLOCK_NBT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -34,14 +32,13 @@ public class PlayerPackets {
             }
         });
 
-        // Edit Book
-        protocol.registerIncoming(State.PLAY, 0x0B, 0x0C, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        final Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                        Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
                         InventoryPackets.toServer(item);
 
                         // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
@@ -63,8 +60,7 @@ public class PlayerPackets {
             }
         });
 
-        // Player Digging
-        protocol.registerIncoming(State.PLAY, 0x18, 0x1A, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -73,8 +69,7 @@ public class PlayerPackets {
             }
         });
 
-        // Recipe Book Data
-        protocol.registerIncoming(State.PLAY, 0x1B, 0x1D, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.RECIPE_BOOK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -101,32 +96,26 @@ public class PlayerPackets {
             }
         });
 
-        // Update Command Block
-        protocol.registerIncoming(State.PLAY, 0x22, 0x24, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.UPDATE_COMMAND_BLOCK, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION1_14, Type.POSITION);
+            }
+        });
+        protocol.registerIncoming(ServerboundPackets1_14.UPDATE_STRUCTURE_BLOCK, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION1_14, Type.POSITION);
+            }
+        });
+        protocol.registerIncoming(ServerboundPackets1_14.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14, Type.POSITION);
             }
         });
 
-        // Update Structure Block
-        protocol.registerIncoming(State.PLAY, 0x25, 0x28, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.POSITION1_14, Type.POSITION);
-            }
-        });
-
-        // Update Sign
-        protocol.registerIncoming(State.PLAY, 0x26, 0x29, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.POSITION1_14, Type.POSITION);
-            }
-        });
-
-        // Player Block Placement
-        protocol.registerIncoming(State.PLAY, 0x29, 0x2C, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_14.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

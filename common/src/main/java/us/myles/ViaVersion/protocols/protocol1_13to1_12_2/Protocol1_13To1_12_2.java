@@ -18,6 +18,8 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
+import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
@@ -41,10 +43,10 @@ import us.myles.ViaVersion.util.GsonUtil;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class Protocol1_13To1_12_2 extends Protocol {
+public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
     public Protocol1_13To1_12_2() {
-        super(true);
+        super(ClientboundPackets1_12_1.class, ClientboundPackets1_13.class, ServerboundPackets1_12_1.class, ServerboundPackets1_13.class, true);
     }
 
     public static final PacketHandler POS_TO_3_INT = wrapper -> {
@@ -145,8 +147,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
         WorldPackets.register(this);
         InventoryPackets.register(this);
 
-        // Outgoing packets
-
         registerOutgoing(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -185,7 +185,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // New packet 0x04 - Login Plugin Message
 
         // Statistics
-        registerOutgoing(State.PLAY, 0x07, 0x07, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.STATISTICS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -244,8 +244,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        // Boss bar
-        registerOutgoing(State.PLAY, 0xC, 0xC, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.BOSSBAR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UUID);
@@ -261,8 +260,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        // Chat message
-        registerOutgoing(State.PLAY, 0xF, 0xE, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -274,10 +272,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        // WorldPackets 0x10 -> 0x0F
-
-        // Tab-Complete
-        registerOutgoing(State.PLAY, 0xE, 0x10, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -318,31 +313,17 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        // New packet 0x11, declare commands
-        registerOutgoing(State.PLAY, 0x11, 0x12);
-        registerOutgoing(State.PLAY, 0x12, 0x13);
-        // Open window
-        registerOutgoing(State.PLAY, 0x13, 0x14, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.OPEN_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Id
                 map(Type.STRING); // Window type
                 map(Type.STRING); // Title
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.STRING, 1, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 1)));
-                    }
-                });
+                handler(wrapper -> wrapper.set(Type.STRING, 1, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 1))));
             }
         });
 
-        // InventoryPackets 0x14 -> 0x15
-        // InventoryPackets 0x15 -> 0x16
-        // InventoryPackets 0x16 -> 0x17
-
-        // Set cooldown
-        registerOutgoing(State.PLAY, 0x17, 0x18, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.COOLDOWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -380,29 +361,16 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        // WorldPackets 0x18 -> 0x19
-        // Disconnect
-        registerOutgoing(State.PLAY, 0x1A, 0x1B, new PacketRemapper() {
+
+        registerOutgoing(ClientboundPackets1_12_1.DISCONNECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
-                    }
-                });
+                handler(wrapper -> wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0))));
             }
         });
-        registerOutgoing(State.PLAY, 0x1B, 0x1C);
-        // New packet 0x1D - NBT Query
-        // WorldPackets 0x1C -> 0x1E
-        registerOutgoing(State.PLAY, 0x1E, 0x20);
-        registerOutgoing(State.PLAY, 0x1F, 0x21);
-        // WorldPackets 0x20 -> 0x22
 
-        // Effect packet
-        registerOutgoing(State.PLAY, 0x21, 0x23, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id
@@ -425,9 +393,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        // WorldPackets 0x22 -> 0x24
-        // Join (save dimension id)
-        registerOutgoing(State.PLAY, 0x23, 0x25, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -450,8 +416,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        // Map packet
-        registerOutgoing(State.PLAY, 0x24, 0x26, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Map id
@@ -475,28 +440,15 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x25, 0x27);
-        registerOutgoing(State.PLAY, 0x26, 0x28);
-        registerOutgoing(State.PLAY, 0x27, 0x29);
-        registerOutgoing(State.PLAY, 0x28, 0x2A);
-        registerOutgoing(State.PLAY, 0x29, 0x2B);
-        registerOutgoing(State.PLAY, 0x2A, 0x2C);
-        // Craft recipe response
-        registerOutgoing(State.PLAY, 0x2B, 0x2D, new PacketRemapper() {
+
+        registerOutgoing(ClientboundPackets1_12_1.CRAFT_RECIPE_RESPONSE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.STRING, "viaversion:legacy/" + wrapper.read(Type.VAR_INT));
-                    }
-                });
+                handler(wrapper -> wrapper.write(Type.STRING, "viaversion:legacy/" + wrapper.read(Type.VAR_INT)));
             }
         });
-        registerOutgoing(State.PLAY, 0x2C, 0x2E);
-        // Combat event
-        registerOutgoing(State.PLAY, 0x2D, 0x2F, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.COMBAT_EVENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Event
@@ -512,12 +464,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x2E, 0x30);
-        // New 0x31 - Face Player
-        registerOutgoing(State.PLAY, 0x2F, 0x32);
-        registerOutgoing(State.PLAY, 0x30, 0x33);
-        // Unlock recipes
-        registerOutgoing(State.PLAY, 0x31, 0x34, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.UNLOCK_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // action
@@ -603,12 +550,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        // EntityPackets 0x32 -> 0x35
-        registerOutgoing(State.PLAY, 0x33, 0x36);
-        registerOutgoing(State.PLAY, 0x34, 0x37);
-
-        // Respawn (save dimension id)
-        registerOutgoing(State.PLAY, 0x35, 0x38, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -628,20 +570,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x36, 0x39);
-        registerOutgoing(State.PLAY, 0x37, 0x3A);
-        registerOutgoing(State.PLAY, 0x38, 0x3B);
-        registerOutgoing(State.PLAY, 0x39, 0x3C);
-        registerOutgoing(State.PLAY, 0x3A, 0x3D);
-        registerOutgoing(State.PLAY, 0x3B, 0x3E);
-        // EntityPackets 0x3C -> 0x3F
-        registerOutgoing(State.PLAY, 0x3D, 0x40);
-        registerOutgoing(State.PLAY, 0x3E, 0x41);
-        // InventoryPackets 0x3F -> 0x42
-        registerOutgoing(State.PLAY, 0x40, 0x43);
-        registerOutgoing(State.PLAY, 0x41, 0x44);
-        // Scoreboard Objective
-        registerOutgoing(State.PLAY, 0x42, 0x45, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.SCOREBOARD_OBJECTIVE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Objective name
@@ -665,9 +594,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        registerOutgoing(State.PLAY, 0x43, 0x46);
-        // Team packet
-        registerOutgoing(State.PLAY, 0x44, 0x47, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.TEAMS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Team Name
@@ -720,7 +647,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
 
             }
         });
-        registerOutgoing(State.PLAY, 0x45, 0x48, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.UPDATE_SCORE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -740,10 +667,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x46, 0x49);
-        registerOutgoing(State.PLAY, 0x47, 0x4A);
-        // Title
-        registerOutgoing(State.PLAY, 0x48, 0x4B, new PacketRemapper() {
+
+        registerOutgoing(ClientboundPackets1_12_1.TITLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Action
@@ -760,10 +685,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
         });
         // New 0x4C - Stop Sound
 
-        new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(0x49, 0x4D);
+        new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(ClientboundPackets1_12_1.SOUND);
 
-        // Player list header and footer
-        registerOutgoing(State.PLAY, 0x4A, 0x4E, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_12_1.TAB_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -777,10 +701,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4B, 0x4F);
-        registerOutgoing(State.PLAY, 0x4C, 0x50);
-        // Advancements
-        registerOutgoing(State.PLAY, 0x4D, 0x51, new PacketRemapper() {
+
+        registerOutgoing(ClientboundPackets1_12_1.ADVANCEMENTS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -822,21 +744,17 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        registerOutgoing(State.PLAY, 0x4E, 0x52);
-        registerOutgoing(State.PLAY, 0x4F, 0x53);
-        // New packet 0x54 - Declare Recipes
-        // New packet 0x55 - Tags
+
 
         // Incoming packets
-
         // New packet 0x02 - Login Plugin Message
         cancelIncoming(State.LOGIN, 0x02);
 
         // New 0x01 - Query Block NBT
-        cancelIncoming(State.PLAY, 0x01);
+        cancelIncoming(ServerboundPackets1_13.QUERY_BLOCK_NBT);
 
         // Tab-Complete
-        registerIncoming(State.PLAY, 0x1, 0x5, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -868,7 +786,7 @@ public class Protocol1_13To1_12_2 extends Protocol {
                         if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                             TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
                             wrapper.cancel();
-                            tracker.setTimeToSend(System.currentTimeMillis() + Via.getConfig().get1_13TabCompleteDelay() * 50);
+                            tracker.setTimeToSend(System.currentTimeMillis() + Via.getConfig().get1_13TabCompleteDelay() * 50L);
                             tracker.setLastTabComplete(wrapper.get(Type.STRING, 0));
                         }
                     }
@@ -876,14 +794,8 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        registerIncoming(State.PLAY, 0x05, 0x06);
-        registerIncoming(State.PLAY, 0x06, 0x07);
-        // InventoryPackets 0x07, 0x08
-        registerIncoming(State.PLAY, 0x08, 0x09);
-        // InventoryPackets 0x09 -> 0x0A
-
         // New 0x0A - Edit book -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x0B, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -900,19 +812,12 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-        // New 0x0C - Query Entity NBT
-        cancelIncoming(State.PLAY, 0x0C);
 
-        registerIncoming(State.PLAY, 0x0A, 0x0D);
-        registerIncoming(State.PLAY, 0x0B, 0x0E);
-        registerIncoming(State.PLAY, 0x0C, 0x0F);
-        registerIncoming(State.PLAY, 0x0D, 0x10);
-        registerIncoming(State.PLAY, 0x0E, 0x11);
-        registerIncoming(State.PLAY, 0x0F, 0x12);
-        registerIncoming(State.PLAY, 0x10, 0x13);
-        registerIncoming(State.PLAY, 0x11, 0x14);
+        // New 0x0C - Query Entity NBT
+        cancelIncoming(ServerboundPackets1_13.ENTITY_NBT_REQUEST);
+
         // New 0x15 - Pick Item -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x15, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.PICK_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -924,26 +829,15 @@ public class Protocol1_13To1_12_2 extends Protocol {
             }
         });
 
-        // Craft recipe request
-        registerIncoming(State.PLAY, 0x12, 0x16, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.CRAFT_RECIPE_REQUEST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // Window id
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
-                    }
-                });
+                handler(wrapper -> wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18))));
             }
         });
 
-        registerIncoming(State.PLAY, 0x13, 0x17);
-        registerIncoming(State.PLAY, 0x14, 0x18);
-        registerIncoming(State.PLAY, 0x15, 0x19);
-        registerIncoming(State.PLAY, 0x16, 0x1A);
-        // Recipe Book Data
-        registerIncoming(State.PLAY, 0x17, 0x1B, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.RECIPE_BOOK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Type
@@ -968,53 +862,40 @@ public class Protocol1_13To1_12_2 extends Protocol {
         });
 
         // New 0x1C - Name Item -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x1C, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.RENAME_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                create(new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.STRING, "MC|ItemName"); // Channel
-                    }
+                create(wrapper -> {
+                    wrapper.write(Type.STRING, "MC|ItemName"); // Channel
                 });
             }
         });
 
-        registerIncoming(State.PLAY, 0x18, 0x1D);
-        registerIncoming(State.PLAY, 0x19, 0x1E);
-
         // New 0x1F - Select Trade -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x1F, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                create(new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.STRING, "MC|TrSel"); // Channel
-                    }
+                create(wrapper -> {
+                    wrapper.write(Type.STRING, "MC|TrSel"); // Channel
                 });
                 map(Type.VAR_INT, Type.INT); // Slot
             }
         });
+
         // New 0x20 - Set Beacon Effect -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x20, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.SET_BEACON_EFFECT, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                create(new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.STRING, "MC|Beacon"); // Channel
-                    }
+                create(wrapper -> {
+                    wrapper.write(Type.STRING, "MC|Beacon"); // Channel
                 });
                 map(Type.VAR_INT, Type.INT); // Primary Effect
                 map(Type.VAR_INT, Type.INT); // Secondary Effect
             }
         });
 
-        registerIncoming(State.PLAY, 0x1A, 0x21);
-
         // New 0x22 - Update Command Block -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x22, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -1043,8 +924,9 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
+
         // New 0x23 - Update Command Block Minecart -> Plugin Message
-        registerIncoming(State.PLAY, 0x09, 0x23, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK_MINECART, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -1061,14 +943,11 @@ public class Protocol1_13To1_12_2 extends Protocol {
         // 0x1B -> 0x24 in InventoryPackets
 
         // New 0x25 - Update Structure Block -> Message Channel
-        registerIncoming(State.PLAY, 0x09, 0x25, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.UPDATE_STRUCTURE_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                create(new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.STRING, "MC|Struct"); // Channel
-                    }
+                create(wrapper -> {
+                    wrapper.write(Type.STRING, "MC|Struct"); // Channel
                 });
                 handler(POS_TO_3_INT);
                 map(Type.VAR_INT, new ValueTransformer<Integer, Byte>(Type.BYTE) { // Action
@@ -1127,12 +1006,6 @@ public class Protocol1_13To1_12_2 extends Protocol {
                 });
             }
         });
-
-        registerIncoming(State.PLAY, 0x1C, 0x26);
-        registerIncoming(State.PLAY, 0x1D, 0x27);
-        registerIncoming(State.PLAY, 0x1E, 0x28);
-        registerIncoming(State.PLAY, 0x1F, 0x29);
-        registerIncoming(State.PLAY, 0x20, 0x2A);
     }
 
     @Override

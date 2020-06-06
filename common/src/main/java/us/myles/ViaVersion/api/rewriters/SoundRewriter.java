@@ -1,9 +1,9 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 
 public class SoundRewriter {
     protected final Protocol protocol;
@@ -15,9 +15,9 @@ public class SoundRewriter {
         this.idRewriter = idRewriter;
     }
 
-    // The same for entity sound effect
-    public void registerSound(int oldId, int newId) {
-        protocol.registerOutgoing(State.PLAY, oldId, newId, new PacketRemapper() {
+    // The same for entity sound
+    public void registerSound(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Sound Id

@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -20,6 +21,7 @@ public abstract class ViaListener {
      * @param uuid UUID object
      * @return The UserConnection
      */
+    @Nullable
     protected UserConnection getUserConnection(UUID uuid) {
         return Via.getManager().getConnection(uuid);
     }

@@ -1,12 +1,13 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 
 // If any of these methods become outdated, just create a new rewriter overriding the methods
 public class BlockRewriter {
@@ -22,8 +23,8 @@ public class BlockRewriter {
         this.blockRewriter = blockRewriter;
     }
 
-    public void registerBlockAction(int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerBlockAction(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(positionType); // Location
@@ -35,8 +36,8 @@ public class BlockRewriter {
         });
     }
 
-    public void registerBlockChange(int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerBlockChange(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(positionType);
@@ -46,8 +47,8 @@ public class BlockRewriter {
         });
     }
 
-    public void registerMultiBlockChange(int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerMultiBlockChange(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
@@ -62,13 +63,13 @@ public class BlockRewriter {
         });
     }
 
-    public void registerAcknowledgePlayerDigging(int oldPacketId, int newPacketId) {
+    public void registerAcknowledgePlayerDigging(ClientboundPacketType packetType) {
         // Same exact handler
-        registerBlockChange(oldPacketId, newPacketId);
+        registerBlockChange(packetType);
     }
 
-    public void registerEffect(int oldPacketId, int newPacketId, int playRecordId, int blockBreakId, IdRewriteFunction itemIdRewriteFunction) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerEffect(ClientboundPacketType packetType, int playRecordId, int blockBreakId, IdRewriteFunction itemIdRewriteFunction) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id
@@ -87,14 +88,14 @@ public class BlockRewriter {
         });
     }
 
-    public void registerSpawnParticle(Type<?> coordType, int oldPacketId, int newPacketId, int blockId, int fallingDustId, int itemId,
-                                      ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType) {
-        registerSpawnParticle(coordType, oldPacketId, newPacketId, blockId, fallingDustId, itemId, null, itemRewriteFunction, itemType);
+    public void registerSpawnParticle(ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
+                                      ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType, Type<?> coordType) {
+        registerSpawnParticle(packetType, blockId, fallingDustId, itemId, null, itemRewriteFunction, itemType, coordType);
     }
 
-    public void registerSpawnParticle(Type<?> coordType, int oldPacketId, int newPacketId, int blockId, int fallingDustId, int itemId,
-                                      IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
+    public void registerSpawnParticle(ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
+                                      @Nullable IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType, Type<?> coordType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID
