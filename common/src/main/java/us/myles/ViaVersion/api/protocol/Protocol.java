@@ -406,15 +406,36 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
             return;
         }
 
-        // write packet id
-        int newID = direction == Direction.OUTGOING ? protocolPacket.getNewID() : protocolPacket.getOldID();
-        packetWrapper.setId(newID);
-        // remap
-        if (protocolPacket.getRemapper() != null) {
+        // Write packet id
+        int oldId = packetWrapper.getId();
+        int newId = direction == Direction.OUTGOING ? protocolPacket.getNewID() : protocolPacket.getOldID();
+        packetWrapper.setId(newId);
+        if (protocolPacket.getRemapper() == null) {
+            return;
+        }
+
+        // Remap
+        try {
             protocolPacket.getRemapper().remap(packetWrapper);
-            if (packetWrapper.isCancelled()) {
-                throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
+        } catch (Exception e) {
+            if (e instanceof CancelException) {
+                throw e;
             }
+
+            Class<? extends PacketType> packetTypeClass = direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum;
+            if (packetTypeClass != null) {
+                PacketType[] enumConstants = packetTypeClass.getEnumConstants();
+                PacketType packetType = oldId < enumConstants.length && oldId >= 0 ? enumConstants[oldId] : null;
+                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + oldId + ")");
+            } else {
+                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
+                        + " IN REMAP OF 0x" + Integer.toHexString(oldId) + "->0x" + Integer.toHexString(newId));
+            }
+            throw e;
+        }
+
+        if (packetWrapper.isCancelled()) {
+            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
         }
     }
 
