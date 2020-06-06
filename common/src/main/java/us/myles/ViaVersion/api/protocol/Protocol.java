@@ -91,7 +91,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
             if (mappedPacket == null) {
                 // Packet doesn't exist on new client
                 Preconditions.checkArgument(hasRegisteredOutgoing(State.PLAY, oldId),
-                        "Packet " + mappedPacket + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
+                        "Packet " + packet + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
                 continue;
             }
 
@@ -115,7 +115,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
             if (mappedPacket == null) {
                 // Packet doesn't exist on old server
                 Preconditions.checkArgument(hasRegisteredIncoming(State.PLAY, newId),
-                        "Packet " + mappedPacket + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
+                        "Packet " + packet + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
                 continue;
             }
 
