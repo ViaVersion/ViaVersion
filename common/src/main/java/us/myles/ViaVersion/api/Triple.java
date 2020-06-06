@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
 public class Triple<A, B, C> {
@@ -7,20 +9,23 @@ public class Triple<A, B, C> {
     private final B second;
     private final C third;
 
-    public Triple(A first, B second, C third) {
+    public Triple(@Nullable A first, @Nullable B second, @Nullable C third) {
         this.first = first;
         this.second = second;
         this.third = third;
     }
 
+    @Nullable
     public A getFirst() {
         return first;
     }
 
+    @Nullable
     public B getSecond() {
         return second;
     }
 
+    @Nullable
     public C getThird() {
         return third;
     }

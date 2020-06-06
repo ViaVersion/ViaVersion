@@ -2,6 +2,9 @@ package us.myles.ViaVersion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public class Item {
     @SerializedName(value = "identifier", alternate = "id")
@@ -13,7 +16,7 @@ public class Item {
     public Item() {
     }
 
-    public Item(int identifier, byte amount, short data, CompoundTag tag) {
+    public Item(int identifier, byte amount, short data, @Nullable CompoundTag tag) {
         this.identifier = identifier;
         this.amount = amount;
         this.data = data;
@@ -48,11 +51,12 @@ public class Item {
         this.data = data;
     }
 
+    @Nullable
     public CompoundTag getTag() {
         return tag;
     }
 
-    public void setTag(CompoundTag tag) {
+    public void setTag(@Nullable CompoundTag tag) {
         this.tag = tag;
     }
 
@@ -64,7 +68,7 @@ public class Item {
         if (identifier != item.identifier) return false;
         if (amount != item.amount) return false;
         if (data != item.data) return false;
-        return tag != null ? tag.equals(item.tag) : item.tag == null;
+        return Objects.equals(tag, item.tag);
     }
 
     @Override

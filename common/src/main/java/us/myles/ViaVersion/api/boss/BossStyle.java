@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.boss;
 
 public enum BossStyle {
+
     SOLID(0),
     SEGMENTED_6(1),
     SEGMENTED_10(2),

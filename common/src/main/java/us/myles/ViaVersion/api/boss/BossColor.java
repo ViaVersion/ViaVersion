@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.boss;
 
 public enum BossColor {
+
     PINK(0),
     BLUE(1),
     RED(2),

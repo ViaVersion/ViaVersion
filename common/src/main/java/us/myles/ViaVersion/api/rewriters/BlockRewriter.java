@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -93,7 +94,7 @@ public class BlockRewriter {
     }
 
     public void registerSpawnParticle(ClientboundPacketType packetType, int blockId, int fallingDustId, int itemId,
-                                      IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType, Type<?> coordType) {
+                                      @Nullable IdRewriteFunction particleRewriteFunction, ItemRewriter.RewriteFunction itemRewriteFunction, Type<Item> itemType, Type<?> coordType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {

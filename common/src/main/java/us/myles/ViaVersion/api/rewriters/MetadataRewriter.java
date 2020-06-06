@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.EntityType;
@@ -58,7 +59,7 @@ public abstract class MetadataRewriter {
         }
     }
 
-    public void registerJoinGame(ClientboundPacketType packetType, EntityType playerType) {
+    public void registerJoinGame(ClientboundPacketType packetType, @Nullable EntityType playerType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -157,7 +158,7 @@ public abstract class MetadataRewriter {
         });
     }
 
-    public void registerMetadataRewriter(ClientboundPacketType packetType, Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
+    public void registerMetadataRewriter(ClientboundPacketType packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -213,7 +214,7 @@ public abstract class MetadataRewriter {
      * @param metaType type of the metadata list
      * @return handler for tracking and rewriting entities
      */
-    public PacketHandler getTrackerAndRewriter(Type<List<Metadata>> metaType) {
+    public PacketHandler getTrackerAndRewriter(@Nullable Type<List<Metadata>> metaType) {
         return wrapper -> {
             int entityId = wrapper.get(Type.VAR_INT, 0);
             int type = wrapper.get(Type.VAR_INT, 1);
@@ -233,7 +234,7 @@ public abstract class MetadataRewriter {
         };
     }
 
-    public PacketHandler getTrackerAndRewriter(Type<List<Metadata>> metaType, EntityType entityType) {
+    public PacketHandler getTrackerAndRewriter(@Nullable Type<List<Metadata>> metaType, EntityType entityType) {
         return wrapper -> {
             int entityId = wrapper.get(Type.VAR_INT, 0);
             // Register Type ID

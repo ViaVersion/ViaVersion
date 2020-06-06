@@ -1,12 +1,14 @@
 package us.myles.ViaVersion.api;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
 public class Pair<X, Y> {
     private final X key;
     private Y value;
 
-    public Pair(X key, Y value) {
+    public Pair(@Nullable X key, @Nullable Y value) {
         this.key = key;
         this.value = value;
     }
@@ -19,7 +21,7 @@ public class Pair<X, Y> {
         return value;
     }
 
-    public void setValue(Y value) {
+    public void setValue(@Nullable Y value) {
         this.value = value;
     }
 

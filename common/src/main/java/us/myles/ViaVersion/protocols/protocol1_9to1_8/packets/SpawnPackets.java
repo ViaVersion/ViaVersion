@@ -6,7 +6,6 @@ import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
@@ -14,7 +13,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -32,8 +31,7 @@ public class SpawnPackets {
     };
 
     public static void register(Protocol1_9To1_8 protocol) {
-        // Spawn Object Packet
-        protocol.registerOutgoing(State.PLAY, 0x0E, 0x00, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -118,8 +116,7 @@ public class SpawnPackets {
             }
         });
 
-        // Spawn XP Packet
-        protocol.registerOutgoing(State.PLAY, 0x11, 0x01, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_EXPERIENCE_ORB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -143,8 +140,7 @@ public class SpawnPackets {
             }
         });
 
-        // Spawn Global Entity Packet
-        protocol.registerOutgoing(State.PLAY, 0x2C, 0x02, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_GLOBAL_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -167,8 +163,7 @@ public class SpawnPackets {
             }
         });
 
-        // Spawn Mob Packet
-        protocol.registerOutgoing(State.PLAY, 0x0F, 0x03, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -235,8 +230,7 @@ public class SpawnPackets {
             }
         });
 
-        // Spawn Painting Packet
-        protocol.registerOutgoing(State.PLAY, 0x10, 0x04, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_PAINTING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -251,8 +245,6 @@ public class SpawnPackets {
                         tracker.sendMetadataBuffer(entityID);
                     }
                 });
-
-
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
@@ -268,8 +260,7 @@ public class SpawnPackets {
             }
         });
 
-        // Spawn Player Packet
-        protocol.registerOutgoing(State.PLAY, 0x0C, 0x05, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -341,8 +332,7 @@ public class SpawnPackets {
             }
         });
 
-        // Entity Destroy Packet
-        protocol.registerOutgoing(State.PLAY, 0x13, 0x30, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketRemapper() {
 
             @Override
             public void registerMap() {

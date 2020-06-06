@@ -247,6 +247,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     private enum UpdateAction {
+
         ADD(0),
         REMOVE(1),
         UPDATE_HEALTH(2),

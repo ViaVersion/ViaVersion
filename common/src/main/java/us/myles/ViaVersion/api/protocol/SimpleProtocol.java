@@ -1,8 +1,8 @@
 package us.myles.ViaVersion.api.protocol;
 
 /**
- * Dummy protocol class for when you do not need any of the existing packet type enums
- * or automated channel mappings.
+ * Dummy protocol class for when you do not need any of the
+ * existing packet type enums or automated channel mappings.
  *
  * @see Protocol
  */
@@ -16,9 +16,5 @@ public abstract class SimpleProtocol extends Protocol<SimpleProtocol.DummyPacket
     }
 
     public enum DummyPacketTypes implements ClientboundPacketType, ServerboundPacketType {
-    }
-
-    @Override
-    protected void registerPackets() {
     }
 }

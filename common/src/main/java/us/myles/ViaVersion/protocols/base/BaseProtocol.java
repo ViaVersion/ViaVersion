@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -16,7 +17,7 @@ import us.myles.ViaVersion.packets.State;
 
 import java.util.List;
 
-public class BaseProtocol extends Protocol {
+public class BaseProtocol extends SimpleProtocol {
 
     @Override
     protected void registerPackets() {

@@ -13,13 +13,18 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class EntityPackets {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
@@ -31,7 +36,7 @@ public class EntityPackets {
 
     public static void register(Protocol1_9To1_8 protocol) {
         // Attach Entity Packet
-        protocol.registerOutgoing(State.PLAY, 0x1B, 0x3A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ATTACH_ENTITY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -67,8 +72,7 @@ public class EntityPackets {
                 });
             }
         });
-        // Entity Teleport Packet
-        protocol.registerOutgoing(State.PLAY, 0x18, 0x4A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -100,8 +104,7 @@ public class EntityPackets {
 
             }
         });
-        // Entity Look Move Packet
-        protocol.registerOutgoing(State.PLAY, 0x17, 0x26, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -116,8 +119,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 6 - On Ground
             }
         });
-        // Entity Relative Move Packet
-        protocol.registerOutgoing(State.PLAY, 0x15, 0x25, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_POSITION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -129,8 +131,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 4 - On Ground
             }
         });
-        // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x04, 0x3C, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -178,8 +179,7 @@ public class EntityPackets {
                 });
             }
         });
-        // Entity Metadata Packet
-        protocol.registerOutgoing(State.PLAY, 0x1C, 0x39, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_METADATA, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -217,7 +217,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        if (metadataList.size() == 0) {
+                        if (metadataList.isEmpty()) {
                             wrapper.cancel();
                         }
                     }
@@ -225,9 +225,7 @@ public class EntityPackets {
             }
         });
 
-        // Entity Effect Packet
-        protocol.registerOutgoing(State.PLAY, 0x1D, 0x4C, new PacketRemapper() {
-
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -246,16 +244,12 @@ public class EntityPackets {
             }
         });
 
+        protocol.cancelOutgoing(ClientboundPackets1_8.UPDATE_ENTITY_NBT);
 
-        // Update Entity NBT
-        protocol.cancelOutgoing(State.PLAY, 0x49, 0x49);
-
-        // Combat Event Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x2C, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.COMBAT_EVENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); //Event id
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -269,8 +263,7 @@ public class EntityPackets {
             }
         });
 
-        // Entity Properties Packet
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x4B, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -326,22 +319,8 @@ public class EntityPackets {
         });
 
 
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerOutgoing(State.PLAY, 0x1A, 0x1B); // Entity Status Packet
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x27); // Entity Look Packet
-        protocol.registerOutgoing(State.PLAY, 0x14, 0x28); // Entity Packet
-
-        protocol.registerOutgoing(State.PLAY, 0x0A, 0x2F); // Use Bed Packet
-
-        protocol.registerOutgoing(State.PLAY, 0x1E, 0x31); // Remove Entity Effect Packet
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x34); // Entity Head Look Packet
-        protocol.registerOutgoing(State.PLAY, 0x12, 0x3B); // Entity Velocity Packet
-
         /* Incoming Packets */
-
-        // Entity Action Packet
-        protocol.registerIncoming(State.PLAY, 0x0B, 0x14, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.ENTITY_ACTION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -362,9 +341,7 @@ public class EntityPackets {
             }
         });
 
-
-        // Use Entity Packet
-        protocol.registerIncoming(State.PLAY, 0x02, 0x0A, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.INTERACT_ENTITY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -391,11 +368,5 @@ public class EntityPackets {
                 });
             }
         });
-
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerIncoming(State.PLAY, 0x0C, 0x15); // Steer Vehicle Packet
-        protocol.registerIncoming(State.PLAY, 0x18, 0x1B); // Spectate Packet
-
     }
 }

@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -47,8 +48,8 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     /**
      * Creates a protocol with automated id mapping if the respective enums are not null.
      */
-    protected Protocol(Class<C1> oldClientboundPacketEnum, Class<C2> clientboundPacketEnum,
-                       Class<S1> oldServerboundPacketEnum, Class<S2> serverboundPacketEnum) {
+    protected Protocol(@Nullable Class<C1> oldClientboundPacketEnum, @Nullable Class<C2> clientboundPacketEnum,
+                       @Nullable Class<S1> oldServerboundPacketEnum, @Nullable Class<S2> serverboundPacketEnum) {
         this(oldClientboundPacketEnum, clientboundPacketEnum, oldServerboundPacketEnum, serverboundPacketEnum, false);
     }
 
@@ -57,8 +58,8 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      *
      * @param hasMappingDataToLoad whether an async executor should call the {@Link #loadMappingData} method
      */
-    protected Protocol(Class<C1> oldClientboundPacketEnum, Class<C2> clientboundPacketEnum,
-                       Class<S1> oldServerboundPacketEnum, Class<S2> serverboundPacketEnum, boolean hasMappingDataToLoad) {
+    protected Protocol(@Nullable Class<C1> oldClientboundPacketEnum, @Nullable Class<C2> clientboundPacketEnum,
+                       @Nullable Class<S1> oldServerboundPacketEnum, @Nullable Class<S2> serverboundPacketEnum, boolean hasMappingDataToLoad) {
         this.oldClientboundPacketEnum = oldClientboundPacketEnum;
         this.newClientboundPacketEnum = clientboundPacketEnum;
         this.oldServerboundPacketEnum = oldServerboundPacketEnum;
@@ -282,7 +283,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetType     clientbound packet type the server sends
      * @param packetRemapper remapper
      */
-    public void registerOutgoing(C1 packetType, PacketRemapper packetRemapper) {
+    public void registerOutgoing(C1 packetType, @Nullable PacketRemapper packetRemapper) {
         ClientboundPacketType mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? packetType
                 : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.name().equals(packetType.name())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
@@ -299,7 +300,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param mappedPacketType clientbound packet type after transforming for the client
      * @param packetRemapper   remapper
      */
-    public void registerOutgoing(C1 packetType, C2 mappedPacketType, PacketRemapper packetRemapper) {
+    public void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
         registerOutgoing(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
     }
 
@@ -310,7 +311,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetType       clientbound packet type the server initially sends
      * @param mappedPacketType clientbound packet type after transforming for the client
      */
-    public void registerOutgoing(C1 packetType, C2 mappedPacketType) {
+    public void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType) {
         registerOutgoing(packetType, mappedPacketType, null);
     }
 
@@ -324,7 +325,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetType     serverbound packet type the client sends
      * @param packetRemapper remapper
      */
-    public void registerIncoming(S2 packetType, PacketRemapper packetRemapper) {
+    public void registerIncoming(S2 packetType, @Nullable PacketRemapper packetRemapper) {
         Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
 
         ServerboundPacketType mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? packetType
@@ -343,7 +344,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param mappedPacketType serverbound packet type after transforming for the server
      * @param packetRemapper   remapper
      */
-    public void registerIncoming(S2 packetType, S1 mappedPacketType, PacketRemapper packetRemapper) {
+    public void registerIncoming(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
         registerIncoming(State.PLAY, mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetType.ordinal(), packetRemapper);
     }
 
@@ -409,7 +410,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
     }
 
-    public <T> T get(Class<T> objectClass) {
+    public @Nullable <T> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
@@ -466,7 +467,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         private final int newID;
         private final PacketRemapper remapper;
 
-        public ProtocolPacket(State state, int oldID, int newID, PacketRemapper remapper) {
+        public ProtocolPacket(State state, int oldID, int newID, @Nullable PacketRemapper remapper) {
             this.state = state;
             this.oldID = oldID;
             this.newID = newID;
@@ -485,6 +486,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
             return newID;
         }
 
+        @Nullable
         public PacketRemapper getRemapper() {
             return remapper;
         }

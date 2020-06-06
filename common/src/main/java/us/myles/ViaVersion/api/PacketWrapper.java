@@ -16,7 +16,11 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class PacketWrapper {
     public static final int PASSTHROUGH_ID = 1000;
@@ -249,8 +253,9 @@ public class PacketWrapper {
      * Clear the input buffer / readable objects
      */
     public void clearInputBuffer() {
-        if (inputBuffer != null)
+        if (inputBuffer != null) {
             inputBuffer.clear();
+        }
         readableObjects.clear(); // :(
     }
 

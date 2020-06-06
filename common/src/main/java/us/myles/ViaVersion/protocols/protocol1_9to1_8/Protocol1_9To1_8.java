@@ -6,11 +6,13 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.SimpleProtocol;
+import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
+import us.myles.ViaVersion.protocols.protocol1_8.ServerboundPackets1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.*;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.*;
@@ -19,13 +21,17 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.List;
 
-public class Protocol1_9To1_8 extends SimpleProtocol {
+public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
     public static final ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
         public String transform(PacketWrapper wrapper, String line) {
             return fixJson(line);
         }
     };
+
+    public Protocol1_9To1_8() {
+        super(ClientboundPackets1_8.class, ClientboundPackets1_9.class, ServerboundPackets1_8.class, ServerboundPackets1_9.class);
+    }
 
     public static String fixJson(String line) {
         if (line == null || line.equalsIgnoreCase("null")) {

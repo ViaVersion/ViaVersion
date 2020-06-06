@@ -1,9 +1,12 @@
 package us.myles.ViaVersion.api.entities;
 
+import org.jetbrains.annotations.Nullable;
+
 public interface EntityType {
 
     int getId();
 
+    @Nullable
     EntityType getParent();
 
     String name();

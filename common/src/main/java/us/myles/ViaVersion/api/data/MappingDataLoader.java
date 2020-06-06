@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -127,6 +128,7 @@ public class MappingDataLoader {
         }
     }
 
+    @Nullable
     private static Map.Entry<String, JsonElement> mapIdentifierEntry(Map.Entry<String, JsonElement> entry, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
         Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
         if (value == null) {
@@ -181,6 +183,7 @@ public class MappingDataLoader {
         }
     }
 
+    @Nullable
     public static Map.Entry<String, JsonElement> findValue(JsonObject object, String needle) {
         for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
             String value = entry.getValue().getAsString();
@@ -191,6 +194,7 @@ public class MappingDataLoader {
         return null;
     }
 
+    @Nullable
     public static Integer findIndex(JsonArray array, String value) {
         for (int i = 0; i < array.size(); i++) {
             JsonElement v = array.get(i);

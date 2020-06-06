@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
@@ -124,6 +125,7 @@ public abstract class Config implements ConfigurationProvider {
         return this.config;
     }
 
+    @Nullable
     public <T> T get(String key, Class<T> clazz, T def) {
         Object o = this.config.get(key);
         if (o != null) {
@@ -142,7 +144,8 @@ public abstract class Config implements ConfigurationProvider {
         }
     }
 
-    public String getString(String key, String def) {
+    @Nullable
+    public String getString(String key, @Nullable String def) {
         final Object o = this.config.get(key);
         if (o != null) {
             return (String) o;

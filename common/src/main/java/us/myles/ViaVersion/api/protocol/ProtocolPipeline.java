@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
-public class ProtocolPipeline extends Protocol {
+public class ProtocolPipeline extends SimpleProtocol {
     private List<Protocol> protocolList;
     private UserConnection userConnection;
 

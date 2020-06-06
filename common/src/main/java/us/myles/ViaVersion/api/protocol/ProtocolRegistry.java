@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
@@ -224,6 +225,7 @@ public class ProtocolRegistry {
      * @param serverVersion The desired output version
      * @return The path which has been generated, null if failed.
      */
+    @Nullable
     private static List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
         if (clientVersion == serverVersion) return null; // We're already there
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
@@ -273,6 +275,7 @@ public class ProtocolRegistry {
      * @param serverVersion The desired output server version
      * @return The path it generated, null if it failed.
      */
+    @Nullable
     public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
         Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
         // Check cache
@@ -367,6 +370,7 @@ public class ProtocolRegistry {
         }
     }
 
+    @Nullable
     public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
         synchronized (MAPPING_LOADER_LOCK) {
             if (mappingsLoaded) return null;

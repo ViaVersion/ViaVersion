@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.platform;
 
 import io.netty.channel.ChannelFutureListener;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
@@ -51,6 +52,7 @@ public class ViaConnectionManager {
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
      */
+    @Nullable
     public UserConnection getConnectedClient(UUID clientIdentifier) {
         return clients.get(clientIdentifier);
     }
