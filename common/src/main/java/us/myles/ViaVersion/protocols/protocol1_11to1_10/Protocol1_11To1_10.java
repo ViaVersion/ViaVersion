@@ -15,14 +15,15 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol1_11To1_10 extends Protocol {
+public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
         @Override
         public Short transform(PacketWrapper wrapper, Float inputValue) throws Exception {
@@ -30,14 +31,17 @@ public class Protocol1_11To1_10 extends Protocol {
         }
     };
 
+    public Protocol1_11To1_10() {
+        super(ClientboundPackets1_9_3.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9_3.class);
+    }
+
     @Override
     protected void registerPackets() {
         MetadataRewriter1_11To1_10 metadataRewriter = new MetadataRewriter1_11To1_10(this);
 
         InventoryPackets.register(this);
 
-        // Spawn Object
-        registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -49,8 +53,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Spawn mob packet
-        registerOutgoing(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -87,10 +90,9 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        //new SoundRewriter(this, this::getNewSoundId).registerSound(0x46, 0x46); //TODO _------------------------------------------------------
+        new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
 
-        // Collect item packet
-        registerOutgoing(State.PLAY, 0x48, 0x48, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.COLLECT_ITEM, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Collected entity id
@@ -105,11 +107,9 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Metadata packet
-        metadataRewriter.registerMetadataRewriter(0x39, 0x39, null, Types1_9.METADATA_LIST);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_9.METADATA_LIST);
 
-        // Entity teleport
-        registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.ENTITY_TELEPORT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -137,11 +137,9 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Destroy entities
-        metadataRewriter.registerEntityDestroy(0x30, 0x30);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
 
-        // Title packet
-        registerOutgoing(State.PLAY, 0x45, 0x45, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.TITLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Action
@@ -161,8 +159,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Block action packet
-        registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position
@@ -185,8 +182,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Update Block Entity
-        registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position
@@ -209,8 +205,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Chunk Data
-        registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -240,18 +235,15 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Join (save dimension id)
-        metadataRewriter.registerJoinGame(0x23, 0x23, null);
+        metadataRewriter.registerJoinGame(ClientboundPackets1_9_3.JOIN_GAME, null);
 
-        // Respawn (save dimension id)
-        metadataRewriter.registerRespawn(0x33, 0x33);
+        metadataRewriter.registerRespawn(ClientboundPackets1_9_3.RESPAWN);
 
         /*
             INCOMING PACKETS
-         */
+        */
 
-        // Block placement
-        registerIncoming(State.PLAY, 0x1C, 0x1C, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_9_3.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Location
@@ -264,8 +256,7 @@ public class Protocol1_11To1_10 extends Protocol {
             }
         });
 
-        // Chat Message Incoming
-        registerIncoming(State.PLAY, 0x02, 0x02, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Message

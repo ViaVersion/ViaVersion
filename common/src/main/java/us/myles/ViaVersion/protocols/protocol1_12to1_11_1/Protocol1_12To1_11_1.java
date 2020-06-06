@@ -16,8 +16,8 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.ClientboundPackets1_11;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.ServerboundPackets1_11;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
@@ -27,10 +27,10 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.util.GsonUtil;
 
-public class Protocol1_12To1_11_1 extends Protocol {
+public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
     public Protocol1_12To1_11_1() {
-        super(ClientboundPackets1_11.class, ClientboundPackets1_12.class, ServerboundPackets1_11.class, ServerboundPackets1_12.class);
+        super(ClientboundPackets1_9_3.class, ClientboundPackets1_12.class, ServerboundPackets1_9_3.class, ServerboundPackets1_12.class);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
 
         InventoryPackets.register(this);
 
-        registerOutgoing(ClientboundPackets1_11.SPAWN_ENTITY, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -51,7 +51,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        registerOutgoing(ClientboundPackets1_11.SPAWN_MOB, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -73,7 +73,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        registerOutgoing(ClientboundPackets1_11.CHAT_MESSAGE, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
@@ -99,7 +99,7 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        registerOutgoing(ClientboundPackets1_11.CHUNK_DATA, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -142,12 +142,12 @@ public class Protocol1_12To1_11_1 extends Protocol {
             }
         });
 
-        metadataRewriter.registerJoinGame(ClientboundPackets1_11.JOIN_GAME, null);
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_11.DESTROY_ENTITIES);
-        metadataRewriter.registerRespawn(ClientboundPackets1_11.RESPAWN);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_11.ENTITY_METADATA, Types1_12.METADATA_LIST);
+        metadataRewriter.registerJoinGame(ClientboundPackets1_9_3.JOIN_GAME, null);
+        metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
+        metadataRewriter.registerRespawn(ClientboundPackets1_9_3.RESPAWN);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_12.METADATA_LIST);
 
-        new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_11.SOUND);
+        new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
 
 
         // New packet at 0x01

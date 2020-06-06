@@ -1,8 +1,8 @@
-package us.myles.ViaVersion.protocols.protocol1_11to1_10;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 
 import us.myles.ViaVersion.api.protocol.ServerboundPacketType;
 
-public enum ServerboundPackets1_11 implements ServerboundPacketType {
+public enum ServerboundPackets1_9_3 implements ServerboundPacketType {
 
     TELEPORT_CONFIRM, // 0x00
     TAB_COMPLETE, // 0x01

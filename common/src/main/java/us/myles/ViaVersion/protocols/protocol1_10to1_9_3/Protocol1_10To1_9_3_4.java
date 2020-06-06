@@ -8,28 +8,24 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Metadata1_9Type;
-import us.myles.ViaVersion.api.type.types.version.MetadataList1_9Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Protocol1_10To1_9_3_4 extends Protocol {
-    @Deprecated
-    public static final Type<List<Metadata>> METADATA_LIST = new MetadataList1_9Type();
-    @Deprecated
-    public static final Type<Metadata> METADATA = new Metadata1_9Type();
+public class Protocol1_10To1_9_3_4 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
-    public static final ValueTransformer<Short, Float> toNewPitch = new ValueTransformer<Short, Float>(Type.FLOAT) {
+    public static final ValueTransformer<Short, Float> TO_NEW_PITCH = new ValueTransformer<Short, Float>(Type.FLOAT) {
         @Override
         public Float transform(PacketWrapper wrapper, Short inputValue) throws Exception {
             return inputValue / 63.5F;
         }
     };
-    public static final ValueTransformer<List<Metadata>, List<Metadata>> transformMetadata = new ValueTransformer<List<Metadata>, List<Metadata>>(Types1_9.METADATA_LIST) {
+    public static final ValueTransformer<List<Metadata>, List<Metadata>> TRANSFORM_METADATA = new ValueTransformer<List<Metadata>, List<Metadata>>(Types1_9.METADATA_LIST) {
         @Override
         public List<Metadata> transform(PacketWrapper wrapper, List<Metadata> inputValue) throws Exception {
             List<Metadata> metaList = new CopyOnWriteArrayList<>(inputValue);
@@ -40,6 +36,10 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
             return metaList;
         }
     };
+
+    public Protocol1_10To1_9_3_4() {
+        super(ClientboundPackets1_9_3.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9_3.class);
+    }
 
     @Override
     protected void registerPackets() {
@@ -53,7 +53,7 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
                 map(Type.INT); // 3 - y
                 map(Type.INT); // 4 - z
                 map(Type.FLOAT); // 5 - Volume
-                map(Type.UNSIGNED_BYTE, toNewPitch); // 6 - Pitch
+                map(Type.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
             }
         });
 
@@ -67,7 +67,7 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
                 map(Type.INT); // 3 - y
                 map(Type.INT); // 4 - z
                 map(Type.FLOAT); // 5 - Volume
-                map(Type.UNSIGNED_BYTE, toNewPitch); // 6 - Pitch
+                map(Type.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
 
                 handler(new PacketHandler() {
                     @Override
@@ -84,7 +84,7 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
-                map(Types1_9.METADATA_LIST, transformMetadata); // 1 - Metadata list
+                map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 1 - Metadata list
             }
         });
 
@@ -104,7 +104,7 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
                 map(Type.SHORT); // 9 - Velocity X
                 map(Type.SHORT); // 10 - Velocity Y
                 map(Type.SHORT); // 11 - Velocity Z
-                map(Types1_9.METADATA_LIST, transformMetadata); // 12 - Metadata
+                map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 12 - Metadata
             }
         });
 
@@ -119,7 +119,7 @@ public class Protocol1_10To1_9_3_4 extends Protocol {
                 map(Type.DOUBLE); // 4 - Z
                 map(Type.BYTE); // 5 - Yaw
                 map(Type.BYTE); // 6 - Pitch
-                map(Types1_9.METADATA_LIST, transformMetadata); // 7 - Metadata list
+                map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 7 - Metadata list
             }
         });
 

@@ -21,7 +21,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.UUID;
 
-public class Protocol1_16To1_15_2 extends Protocol {
+public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, ClientboundPackets1_16, ServerboundPackets1_14, ServerboundPackets1_16> {
 
     public static final UUID ZERO_UUID = new UUID(0, 0);
     private TagRewriter tagRewriter;

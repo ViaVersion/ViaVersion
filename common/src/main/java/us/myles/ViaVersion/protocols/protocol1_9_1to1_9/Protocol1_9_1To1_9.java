@@ -5,15 +5,20 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
-public class Protocol1_9_1To1_9 extends Protocol {
+public class Protocol1_9_1To1_9 extends Protocol<ClientboundPackets1_9, ClientboundPackets1_9, ServerboundPackets1_9, ServerboundPackets1_9> {
+
+    public Protocol1_9_1To1_9() {
+        super(ClientboundPackets1_9.class, ClientboundPackets1_9.class, ServerboundPackets1_9.class, ServerboundPackets1_9.class);
+    }
 
     @Override
     protected void registerPackets() {
         // Currently supports 1.9.1 and 1.9.2
-        // Join Game Packet
-        registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+
+        registerOutgoing(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Player ID
@@ -27,8 +32,7 @@ public class Protocol1_9_1To1_9 extends Protocol {
             }
         });
 
-        // Sound Effect Packet
-        registerOutgoing(State.PLAY, 0x47, 0x47, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_9.SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Sound ID

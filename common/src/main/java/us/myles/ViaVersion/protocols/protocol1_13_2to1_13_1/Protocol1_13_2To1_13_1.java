@@ -12,7 +12,7 @@ import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets.WorldPackets
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 
-public class Protocol1_13_2To1_13_1 extends Protocol {
+public class Protocol1_13_2To1_13_1 extends Protocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
 
     public Protocol1_13_2To1_13_1() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);

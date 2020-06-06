@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.ClientboundPackets1_11;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.ServerboundPackets1_12;
@@ -18,12 +18,12 @@ public class InventoryPackets {
     public static void register(Protocol1_12To1_11_1 protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, BedRewriter::toClientItem, BedRewriter::toServerItem);
 
-        itemRewriter.registerSetSlot(ClientboundPackets1_11.SET_SLOT, Type.ITEM);
-        itemRewriter.registerWindowItems(ClientboundPackets1_11.WINDOW_ITEMS, Type.ITEM_ARRAY);
-        itemRewriter.registerEntityEquipment(ClientboundPackets1_11.ENTITY_EQUIPMENT, Type.ITEM);
+        itemRewriter.registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
+        itemRewriter.registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
+        itemRewriter.registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
 
         // Plugin message Packet -> Trading
-        protocol.registerOutgoing(ClientboundPackets1_11.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Channel

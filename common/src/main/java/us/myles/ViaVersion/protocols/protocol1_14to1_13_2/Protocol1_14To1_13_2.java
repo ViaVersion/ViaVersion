@@ -19,7 +19,7 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol1_14To1_13_2 extends Protocol {
+public class Protocol1_14To1_13_2 extends Protocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {
 
     public Protocol1_14To1_13_2() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_14.class, ServerboundPackets1_13.class, ServerboundPackets1_14.class, true);

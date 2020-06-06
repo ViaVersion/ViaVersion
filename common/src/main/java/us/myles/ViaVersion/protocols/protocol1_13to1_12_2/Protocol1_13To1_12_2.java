@@ -43,7 +43,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class Protocol1_13To1_12_2 extends Protocol {
+public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
     public Protocol1_13To1_12_2() {
         super(ClientboundPackets1_12_1.class, ClientboundPackets1_13.class, ServerboundPackets1_12_1.class, ServerboundPackets1_13.class, true);

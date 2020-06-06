@@ -1,8 +1,8 @@
-package us.myles.ViaVersion.protocols.protocol1_11to1_10;
+package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 
-public enum ClientboundPackets1_11 implements ClientboundPacketType {
+public enum ClientboundPackets1_9_3 implements ClientboundPacketType {
 
     SPAWN_ENTITY, // 0x00
     SPAWN_EXPERIENCE_ORB, // 0x01
@@ -78,6 +78,6 @@ public enum ClientboundPackets1_11 implements ClientboundPacketType {
     TAB_LIST, // 0x49
     COLLECT_ITEM, // 0x4A
     ENTITY_TELEPORT, // 0x4B
-    ENTITY_PROPERTIES, // 0x4D
-    ENTITY_EFFECT, // 0x4E
+    ENTITY_PROPERTIES, // 0x4C
+    ENTITY_EFFECT, // 0x4D
 }

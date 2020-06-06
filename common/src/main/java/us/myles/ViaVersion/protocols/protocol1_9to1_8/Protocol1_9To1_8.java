@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
@@ -19,7 +19,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.List;
 
-public class Protocol1_9To1_8 extends Protocol {
+public class Protocol1_9To1_8 extends SimpleProtocol {
     public static final ValueTransformer<String, String> FIX_JSON = new ValueTransformer<String, String>(Type.STRING) {
         @Override
         public String transform(PacketWrapper wrapper, String line) {

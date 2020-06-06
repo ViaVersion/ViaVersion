@@ -16,14 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public abstract class Protocol {
+/**
+ * Abstract protocol class handling packet transformation between two protocol versions.
+ * Clientbound and serverbount packet types can be set to enforce correct usage of them.
+ *
+ * @param <C1> old clientbound packet types
+ * @param <C2> new clientbound packet types
+ * @param <S1> old serverbound packet types
+ * @param <S2> new serverbound packet types
+ * @see SimpleProtocol for a helper class if you do not want to define any of the types above
+ */
+public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType> {
     private final Map<Packet, ProtocolPacket> incoming = new HashMap<>();
     private final Map<Packet, ProtocolPacket> outgoing = new HashMap<>();
     private final Map<Class, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
-    protected final Class<? extends ClientboundPacketType> oldClientboundPacketEnum;
-    protected final Class<? extends ClientboundPacketType> newClientboundPacketEnum;
-    protected final Class<? extends ServerboundPacketType> oldServerboundPacketEnum;
-    protected final Class<? extends ServerboundPacketType> newServerboundPacketEnum;
+    protected final Class<C1> oldClientboundPacketEnum;
+    protected final Class<C2> newClientboundPacketEnum;
+    protected final Class<S1> oldServerboundPacketEnum;
+    protected final Class<S2> newServerboundPacketEnum;
     protected final boolean hasMappingDataToLoad;
 
     protected Protocol() {
@@ -37,8 +47,8 @@ public abstract class Protocol {
     /**
      * Creates a protocol with automated id mapping if the respective enums are not null.
      */
-    protected Protocol(Class<? extends ClientboundPacketType> oldClientboundPacketEnum, Class<? extends ClientboundPacketType> clientboundPacketEnum,
-                       Class<? extends ServerboundPacketType> oldServerboundPacketEnum, Class<? extends ServerboundPacketType> serverboundPacketEnum) {
+    protected Protocol(Class<C1> oldClientboundPacketEnum, Class<C2> clientboundPacketEnum,
+                       Class<S1> oldServerboundPacketEnum, Class<S2> serverboundPacketEnum) {
         this(oldClientboundPacketEnum, clientboundPacketEnum, oldServerboundPacketEnum, serverboundPacketEnum, false);
     }
 
@@ -47,8 +57,8 @@ public abstract class Protocol {
      *
      * @param hasMappingDataToLoad whether an async executor should call the {@Link #loadMappingData} method
      */
-    protected Protocol(Class<? extends ClientboundPacketType> oldClientboundPacketEnum, Class<? extends ClientboundPacketType> clientboundPacketEnum,
-                       Class<? extends ServerboundPacketType> oldServerboundPacketEnum, Class<? extends ServerboundPacketType> serverboundPacketEnum, boolean hasMappingDataToLoad) {
+    protected Protocol(Class<C1> oldClientboundPacketEnum, Class<C2> clientboundPacketEnum,
+                       Class<S1> oldServerboundPacketEnum, Class<S2> serverboundPacketEnum, boolean hasMappingDataToLoad) {
         this.oldClientboundPacketEnum = oldClientboundPacketEnum;
         this.newClientboundPacketEnum = clientboundPacketEnum;
         this.oldServerboundPacketEnum = oldServerboundPacketEnum;
@@ -139,9 +149,10 @@ public abstract class Protocol {
     }
 
     /**
-     * Register the packets for this protocol.
+     * Register the packets for this protocol. To be overriden.
      */
-    protected abstract void registerPackets();
+    protected void registerPackets() {
+    }
 
     /**
      * Load mapping data for the protocol.
@@ -254,7 +265,6 @@ public abstract class Protocol {
         cancelOutgoing(state, oldPacketID, -1);
     }
 
-
     public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
         Packet packet = new Packet(state, oldPacketID);
@@ -265,15 +275,14 @@ public abstract class Protocol {
         outgoing.put(packet, protocolPacket);
     }
 
+
     /**
      * Registers an outgoing protocol and automatically maps it to the new id.
      *
-     * @param packetType     packet type the server sends
+     * @param packetType     clientbound packet type the server sends
      * @param packetRemapper remapper
      */
-    public void registerOutgoing(ClientboundPacketType packetType, PacketRemapper packetRemapper) {
-        Preconditions.checkArgument(packetType.getClass() == oldClientboundPacketEnum);
-
+    public void registerOutgoing(C1 packetType, PacketRemapper packetRemapper) {
         ClientboundPacketType mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? packetType
                 : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.name().equals(packetType.name())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
@@ -286,32 +295,36 @@ public abstract class Protocol {
     /**
      * Registers an outgoing protocol.
      *
-     * @param packetType       packet type the server initially sends
-     * @param mappedPacketType packet type after transforming for the client
+     * @param packetType       clientbound packet type the server initially sends
+     * @param mappedPacketType clientbound packet type after transforming for the client
      * @param packetRemapper   remapper
      */
-    public void registerOutgoing(ClientboundPacketType packetType, ClientboundPacketType mappedPacketType, PacketRemapper packetRemapper) {
-        Preconditions.checkArgument(packetType.getClass() == oldClientboundPacketEnum);
-        Preconditions.checkArgument(mappedPacketType == null || mappedPacketType.getClass() == newClientboundPacketEnum);
+    public void registerOutgoing(C1 packetType, C2 mappedPacketType, PacketRemapper packetRemapper) {
         registerOutgoing(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
     }
 
-    public void registerOutgoing(ClientboundPacketType oldPacketType, ClientboundPacketType newPacketType) {
-        registerOutgoing(oldPacketType, newPacketType, null);
+    /**
+     * Maps a packet type to another packet type without a packet handler.
+     * Note that this should not be called for simple channel mappings of the same packet; this is already done automatically.
+     *
+     * @param packetType       clientbound packet type the server initially sends
+     * @param mappedPacketType clientbound packet type after transforming for the client
+     */
+    public void registerOutgoing(C1 packetType, C2 mappedPacketType) {
+        registerOutgoing(packetType, mappedPacketType, null);
     }
 
-    public void cancelOutgoing(ClientboundPacketType packetType) {
-        Preconditions.checkArgument(packetType.getClass() == oldClientboundPacketEnum);
+    public void cancelOutgoing(C1 packetType) {
         cancelOutgoing(State.PLAY, packetType.ordinal(), packetType.ordinal());
     }
 
     /**
      * Registers an incoming protocol and automatically maps it to the server's id.
      *
-     * @param packetType     packet type the client sends
+     * @param packetType     serverbound packet type the client sends
      * @param packetRemapper remapper
      */
-    public void registerIncoming(ServerboundPacketType packetType, PacketRemapper packetRemapper) {
+    public void registerIncoming(S2 packetType, PacketRemapper packetRemapper) {
         Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
 
         ServerboundPacketType mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? packetType
@@ -326,17 +339,15 @@ public abstract class Protocol {
     /**
      * Registers an incoming protocol.
      *
-     * @param packetType       packet type initially sent by the client
-     * @param mappedPacketType packet type after transforming for the server
+     * @param packetType       serverbound packet type initially sent by the client
+     * @param mappedPacketType serverbound packet type after transforming for the server
      * @param packetRemapper   remapper
      */
-    public void registerIncoming(ServerboundPacketType packetType, ServerboundPacketType mappedPacketType, PacketRemapper packetRemapper) {
-        Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
-        Preconditions.checkArgument(mappedPacketType == null || mappedPacketType.getClass() == oldServerboundPacketEnum);
+    public void registerIncoming(S2 packetType, S1 mappedPacketType, PacketRemapper packetRemapper) {
         registerIncoming(State.PLAY, mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetType.ordinal(), packetRemapper);
     }
 
-    public void cancelIncoming(ServerboundPacketType packetType) {
+    public void cancelIncoming(S2 packetType) {
         Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
         cancelIncoming(State.PLAY, -1, packetType.ordinal());
     }

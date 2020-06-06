@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.protocol.ServerboundPacketType;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
 
 // If any of these methods become outdated, just create a new rewriter overriding the methods
 public class ItemRewriter {
@@ -115,77 +114,6 @@ public class ItemRewriter {
 
     public PacketHandler itemToServerHandler(Type<Item> type) {
         return wrapper -> toServer.rewrite(wrapper.get(type, 0));
-    }
-
-    @Deprecated
-    public void registerWindowItems(Type<Item[]> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(type); // 1 - Window Values
-
-                handler(itemArrayHandler(type));
-            }
-        });
-    }
-
-    @Deprecated
-    public void registerSetSlot(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(type); // 2 - Slot Value
-
-                handler(itemToClientHandler(type));
-            }
-        });
-    }
-
-    @Deprecated
-    public void registerEntityEquipment(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerOutgoing(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.VAR_INT); // 1 - Slot ID
-                map(type); // 2 - Item
-
-                handler(itemToClientHandler(type));
-            }
-        });
-    }
-
-    @Deprecated
-    public void registerCreativeInvAction(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.SHORT); // 0 - Slot
-                map(type); // 1 - Clicked Item
-
-                handler(itemToServerHandler(type));
-            }
-        });
-    }
-
-    @Deprecated
-    public void registerClickWindow(Type<Item> type, int oldPacketId, int newPacketId) {
-        protocol.registerIncoming(State.PLAY, oldPacketId, newPacketId, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot
-                map(Type.BYTE); // 2 - Button
-                map(Type.SHORT); // 3 - Action number
-                map(Type.VAR_INT); // 4 - Mode
-                map(type); // 5 - Clicked Item
-
-                handler(itemToServerHandler(type));
-            }
-        });
     }
 
     @FunctionalInterface
