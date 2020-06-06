@@ -284,6 +284,8 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetRemapper remapper
      */
     public void registerOutgoing(C1 packetType, @Nullable PacketRemapper packetRemapper) {
+        checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
+
         ClientboundPacketType mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? packetType
                 : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.name().equals(packetType.name())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
@@ -301,6 +303,9 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetRemapper   remapper
      */
     public void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
+        checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
+        checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == newClientboundPacketEnum);
+
         registerOutgoing(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
     }
 
@@ -326,7 +331,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetRemapper remapper
      */
     public void registerIncoming(S2 packetType, @Nullable PacketRemapper packetRemapper) {
-        Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
+        checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
 
         ServerboundPacketType mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? packetType
                 : Arrays.stream(oldServerboundPacketEnum.getEnumConstants()).filter(en -> en.name().equals(packetType.name())).findAny().orElse(null);
@@ -345,6 +350,9 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * @param packetRemapper   remapper
      */
     public void registerIncoming(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
+        checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
+        checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == oldServerboundPacketEnum);
+
         registerIncoming(State.PLAY, mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetType.ordinal(), packetRemapper);
     }
 
@@ -407,6 +415,17 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
             if (packetWrapper.isCancelled()) {
                 throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
             }
+        }
+    }
+
+    /**
+     * @param packetType packet type
+     * @param isValid    expression to check the packet's validity
+     * @throws IllegalArgumentException if the given expression is not met
+     */
+    private void checkPacketType(PacketType packetType, boolean isValid) {
+        if (!isValid) {
+            throw new IllegalArgumentException("Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " is taken from the wrong enum");
         }
     }
 
