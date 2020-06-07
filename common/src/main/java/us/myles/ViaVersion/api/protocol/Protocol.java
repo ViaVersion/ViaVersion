@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.base.Preconditions;
-import jdk.nashorn.internal.ir.CallNode;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
