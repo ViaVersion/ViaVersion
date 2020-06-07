@@ -4,12 +4,12 @@ import io.netty.handler.codec.EncoderException;
 import us.myles.ViaVersion.api.Via;
 
 /**
- * Used for cancelling packets in encode handlers
+ * Used for cancelling packets in encode handlers.
  */
 public class CancelEncoderException extends EncoderException {
     public static final CancelEncoderException CACHED = new CancelEncoderException("CACHED") {
         @Override
-        public synchronized Throwable fillInStackTrace() {
+        public Throwable fillInStackTrace() {
             return this;
         }
     };
@@ -31,12 +31,12 @@ public class CancelEncoderException extends EncoderException {
     }
 
     /**
-     * Returns a cached CancelEncoderException or a new instance when {@link us.myles.ViaVersion.ViaManager}#isDebug() is true
+     * Returns a cached CancelEncoderException or a new instance when {@link us.myles.ViaVersion.ViaManager#isDebug()} is true.
+     *
      * @param cause cause for being used when a new instance is creeated
      * @return a CancelEncoderException instance
      */
     public static CancelEncoderException generate(Throwable cause) {
-        if (Via.getManager().isDebug()) return new CancelEncoderException(cause);
-        return CACHED;
+        return Via.getManager().isDebug() ? new CancelEncoderException(cause) : CACHED;
     }
 }

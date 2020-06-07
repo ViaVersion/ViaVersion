@@ -56,6 +56,7 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
         transform(bytebuf);
     }
 
+    @Override
     public void transform(ByteBuf bytebuf) throws Exception {
         info.checkOutgoingPacket();
         if (!info.shouldTransformPacket()) return;

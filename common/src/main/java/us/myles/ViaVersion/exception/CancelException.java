@@ -3,12 +3,12 @@ package us.myles.ViaVersion.exception;
 import us.myles.ViaVersion.api.Via;
 
 /**
- * Used for cancelling packets
+ * Used for cancelling packets.
  */
 public class CancelException extends Exception {
     public static final CancelException CACHED = new CancelException("Cached - Enable /viaver debug to not use cached exception") {
         @Override
-        public synchronized Throwable fillInStackTrace() {
+        public Throwable fillInStackTrace() {
             return this;
         }
     };
@@ -33,11 +33,11 @@ public class CancelException extends Exception {
     }
 
     /**
-     * Returns a cached CancelException or a new instance when {@link us.myles.ViaVersion.ViaManager}#isDebug() is true
+     * Returns a cached CancelException or a new instance when {@link us.myles.ViaVersion.ViaManager#isDebug()} is true.
+     *
      * @return a CancelException instance
      */
     public static CancelException generate() {
-        if (Via.getManager().isDebug()) return new CancelException();
-        return CACHED;
+        return Via.getManager().isDebug() ? new CancelException() : CACHED;
     }
 }
