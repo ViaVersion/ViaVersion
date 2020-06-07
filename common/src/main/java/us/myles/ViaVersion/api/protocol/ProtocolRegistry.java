@@ -53,10 +53,11 @@ public class ProtocolRegistry {
     public static int SERVER_PROTOCOL = -1;
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private static final Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
+    private static final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
     private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
-    private static final List<Protocol> registerList = new ArrayList<>();
     private static final Set<Integer> supportedVersions = new HashSet<>();
     private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
+    private static final List<Protocol> registerList = new ArrayList<>();
 
     private static final Object MAPPING_LOADER_LOCK = new Object();
     private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
@@ -131,7 +132,9 @@ public class ProtocolRegistry {
             pathCache.clear();
         }
 
-        for (Integer version : supported) {
+        protocols.put(protocol.getClass(), protocol);
+
+        for (int version : supported) {
             Map<Integer, Protocol> protocolMap = registryMap.computeIfAbsent(version, k -> new HashMap<>());
             protocolMap.put(output, protocol);
         }
@@ -269,7 +272,7 @@ public class ProtocolRegistry {
     }
 
     /**
-     * Calculate a path from a client version to server version
+     * Calculate a path from a client version to server version.
      *
      * @param clientVersion The input client version
      * @param serverVersion The desired output server version
@@ -290,6 +293,17 @@ public class ProtocolRegistry {
             pathCache.put(protocolKey, outputPath);
         }
         return outputPath;
+    }
+
+    /**
+     * Returns a protocol instance by its class.
+     *
+     * @param protocolClass class of the protocol
+     * @return protocol if present
+     */
+    @Nullable
+    public static Protocol getProtocol(Class<? extends Protocol> protocolClass) {
+        return protocols.get(protocolClass);
     }
 
     public static Protocol getBaseProtocol(int serverVersion) {
