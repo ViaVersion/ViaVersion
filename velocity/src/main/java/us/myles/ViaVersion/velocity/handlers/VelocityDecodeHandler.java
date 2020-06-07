@@ -4,13 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.util.PipelineUtil;
+import us.myles.ViaVersion.exception.CancelDecoderException;
 
 import java.util.List;
 
@@ -24,54 +19,24 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
-        // use transformers
-        if (bytebuf.readableBytes() > 0) {
-            // Ignore if pending disconnect
-            if (info.isPendingDisconnect()) {
-                return;
-            }
-            // Increment received
-            boolean second = info.incrementReceived();
-            // Check PPS
-            if (second) {
-                if (info.handlePPS())
-                    return;
-            }
-            if (info.isActive()) {
-                // Handle ID
-                int id = Type.VAR_INT.read(bytebuf);
-                // Transform
-                ByteBuf newPacket = ctx.alloc().buffer();
-                try {
-                    if (id == PacketWrapper.PASSTHROUGH_ID) {
-                        newPacket.writeBytes(bytebuf);
-                    } else {
-                        PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);
-                        ProtocolInfo protInfo = info.get(ProtocolInfo.class);
-                        protInfo.getPipeline().transform(Direction.INCOMING, protInfo.getState(), wrapper);
-                        wrapper.writeToBuffer(newPacket);
-                    }
+        if (!info.checkIncomingPacket()) throw CancelDecoderException.generate(null);
+        if (!info.shouldTransformPacket()) {
+            out.add(bytebuf.retain());
+            return;
+        }
 
-                    bytebuf.clear();
-                    bytebuf = newPacket;
-                } catch (Throwable e) {
-                    // Clear Buffer
-                    bytebuf.clear();
-                    // Release Packet, be free!
-                    newPacket.release();
-                    throw e;
-                }
-            } else {
-                bytebuf.retain();
-            }
-
-            out.add(bytebuf);
+        ByteBuf draft = ctx.alloc().buffer().writeBytes(bytebuf);
+        try {
+            info.transformIncoming(draft, CancelDecoderException::generate);
+            out.add(draft.retain());
+        } finally {
+            draft.release();
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelException.class)) return;
+        if (cause instanceof CancelDecoderException) return;
         super.exceptionCaught(ctx, cause);
     }
 }

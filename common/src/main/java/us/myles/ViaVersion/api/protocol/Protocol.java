@@ -435,7 +435,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
 
         if (packetWrapper.isCancelled()) {
-            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
+            throw CancelException.generate();
         }
     }
 

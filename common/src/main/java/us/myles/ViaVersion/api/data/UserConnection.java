@@ -11,6 +11,8 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.CancelException;
+import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 public class UserConnection {
     private static final AtomicLong IDS = new AtomicLong();
@@ -190,6 +193,8 @@ public class UserConnection {
                     channel.close(); // =)
                 }
             });
+        } else {
+            getChannel().close(); // Just disconnect, we don't know what the connection is
         }
     }
 
@@ -338,6 +343,81 @@ public class UserConnection {
 
     public void setWarnings(int warnings) {
         this.warnings = warnings;
+    }
+
+    /**
+     * Monitors serverbound packets.
+     *
+     * @return false if this packet should be cancelled
+     */
+    public boolean checkIncomingPacket() {
+        // Ignore if pending disconnect
+        if (pendingDisconnect) return false;
+        // Increment received + Check PPS
+        return !incrementReceived() || !handlePPS();
+    }
+
+    /**
+     * Monitors clientbound packets.
+     */
+    public void checkOutgoingPacket() {
+        incrementSent();
+    }
+
+    /**
+     * Checks if packets needs transforming.
+     *
+     * @return if packets should be passed through
+     */
+    public boolean shouldTransformPacket() {
+        return active;
+    }
+
+    /**
+     * Transforms the clientbound packet contained in draft ByteBuf.
+     *
+     * @param draft          ByteBuf with packet id and packet contents
+     * @param cancelSupplier Function called with original CancelException for generating the Exception used when
+     *                       packet is cancelled
+     * @throws Exception when transforming failed or this packet is cancelled
+     */
+    public void transformOutgoing(ByteBuf draft, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!draft.isReadable()) return;
+        transform(draft, Direction.OUTGOING, cancelSupplier);
+    }
+
+    /**
+     * Transforms the serverbound packet contained in draft ByteBuf.
+     *
+     * @param draft          ByteBuf with packet id and packet contents
+     * @param cancelSupplier Function called with original CancelException for generating the Exception used when
+     *                       packet is cancelled
+     * @throws Exception when transforming failed or this packet is cancelled
+     */
+    public void transformIncoming(ByteBuf draft, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!draft.isReadable()) return;
+        transform(draft, Direction.INCOMING, cancelSupplier);
+    }
+
+    private void transform(ByteBuf draft, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        int id = Type.VAR_INT.read(draft);
+        if (id == PacketWrapper.PASSTHROUGH_ID) return;
+
+        PacketWrapper wrapper = new PacketWrapper(id, draft, this);
+        ProtocolInfo protInfo = get(ProtocolInfo.class);
+        try {
+            protInfo.getPipeline().transform(direction, protInfo.getState(), wrapper);
+        } catch (CancelException ex) {
+            throw cancelSupplier.apply(ex);
+        }
+
+        ByteBuf transformed = draft.alloc().buffer();
+        try {
+            wrapper.writeToBuffer(transformed);
+            draft.clear().writeBytes(transformed);
+        } finally {
+            transformed.release();
+        }
     }
 
     @Override
