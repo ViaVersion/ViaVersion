@@ -77,13 +77,13 @@ public class BungeeServerHandler implements Listener {
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
-        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
+        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
 
         // Check if ViaVersion can support that version
         try {
             //Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
             Object handshake = getHandshake.invoke(e.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
+            setProtocol.invoke(handshake, protocols == null ? user.getProtocolInfo().getProtocolVersion() : protocolId);
         } catch (InvocationTargetException | IllegalAccessException e1) {
             e1.printStackTrace();
         }
@@ -145,7 +145,7 @@ public class BungeeServerHandler implements Listener {
                         if (storage.getBossbar() != null) {
                             // TODO: Verify whether this packet needs to be sent when 1.8 -> 1.9 protocol isn't present in the pipeline
                             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
-                            if (user.get(ProtocolInfo.class).getPipeline().contains(Protocol1_9To1_8.class)) {
+                            if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                                 for (UUID uuid : storage.getBossbar()) {
                                     PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
                                     wrapper.write(Type.UUID, uuid);
@@ -157,12 +157,12 @@ public class BungeeServerHandler implements Listener {
                         }
                     }
 
-                    ProtocolInfo info = user.get(ProtocolInfo.class);
+                    ProtocolInfo info = user.getProtocolInfo();
                     int previousServerProtocol = info.getServerProtocolVersion();
 
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
-                    ProtocolPipeline pipeline = user.get(ProtocolInfo.class).getPipeline();
+                    ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
                     user.clearStoredObjects();
                     pipeline.cleanPipes();
                     if (protocols == null) {

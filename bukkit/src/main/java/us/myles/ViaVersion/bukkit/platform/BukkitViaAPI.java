@@ -35,7 +35,7 @@ public class BukkitViaAPI implements ViaAPI<Player> {
     public int getPlayerVersion(UUID uuid) {
         if (!isInjected(uuid))
             return getExternalVersion(Bukkit.getPlayer(uuid));
-        return Via.getManager().getConnection(uuid).get(ProtocolInfo.class).getProtocolVersion();
+        return Via.getManager().getConnection(uuid).getProtocolInfo().getProtocolVersion();
     }
 
     private int getExternalVersion(Player player) {

@@ -63,7 +63,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
                 }
             }
         }
-        ProtocolInfo info = userConnection.get(ProtocolInfo.class);
+        ProtocolInfo info = userConnection.getProtocolInfo();
         UUID uuid = info.getUuid();
         BukkitInventoryUpdateTask updateTask = updateTasks.get(uuid);
         final boolean registered = updateTask != null;

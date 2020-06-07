@@ -17,7 +17,7 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
 
     @Override
     public int getWorldBlockData(UserConnection user, int bx, int by, int bz) {
-        UUID uuid = user.get(ProtocolInfo.class).getUuid();
+        UUID uuid = user.getProtocolInfo().getUuid();
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             World world = player.getWorld();

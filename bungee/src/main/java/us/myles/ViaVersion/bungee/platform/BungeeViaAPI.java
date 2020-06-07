@@ -26,7 +26,7 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
         if (conn == null) {
             return player.getPendingConnection().getVersion();
         }
-        return conn.get(ProtocolInfo.class).getProtocolVersion();
+        return conn.getProtocolInfo().getProtocolVersion();
     }
 
     @Override

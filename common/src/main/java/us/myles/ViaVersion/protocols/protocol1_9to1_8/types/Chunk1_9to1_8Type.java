@@ -48,7 +48,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
 
     @Override
     public Chunk read(ByteBuf input, ClientChunks param) throws Exception {
-        boolean replacePistons = param.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && Via.getConfig().isReplacePistons();
+        boolean replacePistons = param.getUser().getProtocolInfo().getPipeline().contains(Protocol1_10To1_9_3_4.class) && Via.getConfig().isReplacePistons();
         int replacementId = Via.getConfig().getPistonReplacementId();
 
         int chunkX = input.readInt();

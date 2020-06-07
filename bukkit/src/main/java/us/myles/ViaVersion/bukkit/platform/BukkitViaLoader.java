@@ -120,11 +120,11 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 @Override
                 public Item getHandItem(final UserConnection info) {
                     if (handItemCache != null) {
-                        return handItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
+                        return handItemCache.getHandItem(info.getProtocolInfo().getUuid());
                     }
                     try {
                         return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
-                            UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
+                            UUID playerUUID = info.getProtocolInfo().getUuid();
                             Player player = Bukkit.getPlayer(playerUUID);
                             if (player != null) {
                                 return HandItemCache.convert(player.getItemInHand());

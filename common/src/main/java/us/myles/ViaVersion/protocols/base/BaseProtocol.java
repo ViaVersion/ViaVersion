@@ -38,7 +38,7 @@ public class BaseProtocol extends SimpleProtocol {
                         int protVer = wrapper.get(Type.VAR_INT, 0);
                         int state = wrapper.get(Type.VAR_INT, 1);
 
-                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
+                        ProtocolInfo info = wrapper.user().getProtocolInfo();
                         info.setProtocolVersion(protVer);
                         // Ensure the server has a version provider
                         if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
@@ -55,7 +55,7 @@ public class BaseProtocol extends SimpleProtocol {
                             protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
                         }
 
-                        ProtocolPipeline pipeline = wrapper.user().get(ProtocolInfo.class).getPipeline();
+                        ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
                         if (protocols != null) {
                             for (Pair<Integer, Protocol> prot : protocols) {
                                 pipeline.add(prot.getValue());

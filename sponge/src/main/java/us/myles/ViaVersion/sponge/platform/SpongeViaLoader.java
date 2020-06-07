@@ -76,7 +76,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
                 @Override
                 public Item getHandItem(final UserConnection info) {
                     if (HandItemCache.CACHE) {
-                        return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
+                        return HandItemCache.getHandItem(info.getProtocolInfo().getUuid());
                     } else {
                         return super.getHandItem(info);
                     }

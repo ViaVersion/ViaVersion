@@ -26,6 +26,7 @@ public class UserConnection {
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
     private final Channel channel;
+    private ProtocolInfo protocolInfo;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
     private boolean active = true;
     private boolean pendingDisconnect;
@@ -193,7 +194,7 @@ public class UserConnection {
         if (!channel.isOpen() || pendingDisconnect) return;
 
         pendingDisconnect = true;
-        UUID uuid = get(ProtocolInfo.class).getUuid();
+        UUID uuid = protocolInfo.getUuid();
         if (uuid == null) {
             channel.close(); // Just disconnect, we don't know what the connection is
             return;
@@ -318,9 +319,8 @@ public class UserConnection {
         if (id == PacketWrapper.PASSTHROUGH_ID) return;
 
         PacketWrapper wrapper = new PacketWrapper(id, draft, this);
-        ProtocolInfo protInfo = get(ProtocolInfo.class);
         try {
-            protInfo.getPipeline().transform(direction, protInfo.getState(), wrapper);
+            protocolInfo.getPipeline().transform(direction, protocolInfo.getState(), wrapper);
         } catch (CancelException ex) {
             throw cancelSupplier.apply(ex);
         }
@@ -341,6 +341,20 @@ public class UserConnection {
     @Nullable
     public Channel getChannel() {
         return channel;
+    }
+
+    @Nullable
+    public ProtocolInfo getProtocolInfo() {
+        return protocolInfo;
+    }
+
+    public void setProtocolInfo(@Nullable ProtocolInfo protocolInfo) {
+        this.protocolInfo = protocolInfo;
+        if (protocolInfo != null) {
+            storedObjects.put(ProtocolInfo.class, protocolInfo);
+        } else {
+            storedObjects.remove(ProtocolInfo.class);
+        }
     }
 
     public Map<Class, StoredObject> getStoredObjects() {

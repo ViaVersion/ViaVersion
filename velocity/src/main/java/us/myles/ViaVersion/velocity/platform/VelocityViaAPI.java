@@ -22,7 +22,7 @@ public class VelocityViaAPI implements ViaAPI<Player> {
     public int getPlayerVersion(Player player) {
         if (!isInjected(player.getUniqueId()))
             return player.getProtocolVersion().getProtocol();
-        return Via.getManager().getConnection(player.getUniqueId()).get(ProtocolInfo.class).getProtocolVersion();
+        return Via.getManager().getConnection(player.getUniqueId()).getProtocolInfo().getProtocolVersion();
     }
 
     @Override

@@ -319,7 +319,7 @@ public class PacketWrapper {
      */
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
         // Apply current pipeline
-        List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
+        List<Protocol> protocols = new ArrayList<>(user().getProtocolInfo().getPipeline().pipes());
         if (direction == Direction.OUTGOING) {
             // Other way if outgoing
             Collections.reverse(protocols);
@@ -337,7 +337,7 @@ public class PacketWrapper {
         resetReader();
 
         // Apply other protocols
-        apply(direction, user().get(ProtocolInfo.class).getState(), index, protocols);
+        apply(direction, user().getProtocolInfo().getState(), index, protocols);
         // Send
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         writeToBuffer(output);

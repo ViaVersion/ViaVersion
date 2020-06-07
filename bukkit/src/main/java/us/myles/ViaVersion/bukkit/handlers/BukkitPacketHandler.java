@@ -24,7 +24,7 @@ public class BukkitPacketHandler extends MessageToMessageEncoder {
             info.setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
             if (info.isActive()) {
-                if (info.get(ProtocolInfo.class).getPipeline().filter(o, list)) {
+                if (info.getProtocolInfo().getPipeline().filter(o, list)) {
                     return;
                 }
             }

@@ -191,7 +191,7 @@ public class EntityTracker1_9 extends EntityTracker {
                     }
                 }
             }
-            UUID uuid = getUser().get(ProtocolInfo.class).getUuid();
+            UUID uuid = getUser().getProtocolInfo().getUuid();
             // Boss bar
             if (Via.getConfig().isBossbarPatch()) {
                 if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
@@ -256,7 +256,7 @@ public class EntityTracker1_9 extends EntityTracker {
             } else {
                 wrapper.write(Type.BYTE, (byte) 3);
             }
-            wrapper.write(Type.STRING_ARRAY, new String[]{getUser().get(ProtocolInfo.class).getUsername()});
+            wrapper.write(Type.STRING_ARRAY, new String[]{getUser().getProtocolInfo().getUsername()});
         } else {
             wrapper.write(Type.BYTE, (byte) 1); // remove team
         }
@@ -283,7 +283,7 @@ public class EntityTracker1_9 extends EntityTracker {
             PacketWrapper wrapper = new PacketWrapper(0x39, null, getUser());
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
-            getUser().get(ProtocolInfo.class).getPipeline().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
+            getUser().getProtocolInfo().getPipeline().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
                     .handleMetadata(entityId, metadataList, getUser());
             handleMetadata(entityId, metadataList);
             if (!metadataList.isEmpty()) {

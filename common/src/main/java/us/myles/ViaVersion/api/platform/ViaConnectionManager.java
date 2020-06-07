@@ -17,7 +17,7 @@ public class ViaConnectionManager {
 
     public void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        UUID id = connection.getProtocolInfo().getUuid();
         connections.add(connection);
         clients.put(id, connection);
 
@@ -28,7 +28,7 @@ public class ViaConnectionManager {
 
     public void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.get(ProtocolInfo.class).getUuid();
+        UUID id = connection.getProtocolInfo().getUuid();
         connections.remove(connection);
         clients.remove(id);
     }

@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import jdk.nashorn.internal.ir.CallNode;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -422,14 +423,14 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
                 throw e;
             }
 
-            Class<? extends PacketType> packetTypeClass = direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum;
+            Class<? extends PacketType> packetTypeClass = state == State.PLAY ? (direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum) : null;
             if (packetTypeClass != null) {
                 PacketType[] enumConstants = packetTypeClass.getEnumConstants();
                 PacketType packetType = oldId < enumConstants.length && oldId >= 0 ? enumConstants[oldId] : null;
-                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + oldId + ")");
+                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(oldId) + ")");
             } else {
                 Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                        + " IN REMAP OF 0x" + Integer.toHexString(oldId) + "->0x" + Integer.toHexString(newId));
+                        + " IN REMAP OF 0x" + toNiceHex(oldId) + "->0x" + toNiceHex(newId));
             }
             throw e;
         }
@@ -437,6 +438,11 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         if (packetWrapper.isCancelled()) {
             throw CancelException.generate();
         }
+    }
+
+    private String toNiceHex(int id) {
+        String hex = Integer.toHexString(id).toUpperCase();
+        return (hex.length() == 1 ? "0x0" : "0x") + hex;
     }
 
     /**
