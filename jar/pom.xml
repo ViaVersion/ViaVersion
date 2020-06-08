@@ -73,7 +73,44 @@
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <minimizeJar>false</minimizeJar>
+                    <filters>
+                        <filter>
+                            <artifact>it.unimi.dsi:fastutil</artifact>
+                            <includes>
+                                <!-- We only want int and Object maps -->
+                                <include>it/unimi/dsi/fastutil/ints/*</include>
+                                <include>it/unimi/dsi/fastutil/objects/*</include>
+                                <include>it/unimi/dsi/fastutil/*.class</include>
+                            </includes>
+                            <excludes>
+                                <!-- Object types -->
+                                <exclude>it/unimi/dsi/fastutil/*/*Reference*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Boolean*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Byte*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Short*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Float*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Double*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Long*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Char*</exclude>
+                                <!-- Map types -->
+                                <exclude>it/unimi/dsi/fastutil/*/*Custom*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Linked*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Sorted*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Tree*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Heap*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Queue*</exclude>
+                                <!-- Crossing fingers -->
+                                <exclude>it/unimi/dsi/fastutil/*/*Big*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Synchronized*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Unmodifiable*</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <relocations>
+                        <relocation>
+                            <pattern>it.unimi.dsi.fastutil</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.fastutil</shadedPattern>
+                        </relocation>
                         <relocation>
                             <pattern>com.github.steveice10.opennbt</pattern>
                             <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>

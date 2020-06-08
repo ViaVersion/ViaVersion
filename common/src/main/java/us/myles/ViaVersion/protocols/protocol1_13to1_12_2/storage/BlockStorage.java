@@ -1,16 +1,16 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntSet;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockStorage extends StoredObject {
-    private static final IntSet WHITELIST = CollectionUtil.createIntSet(46);
+    private static final IntSet WHITELIST = new IntOpenHashSet(46);
     private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     static {

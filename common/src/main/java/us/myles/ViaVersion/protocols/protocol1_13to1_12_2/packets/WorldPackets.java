@@ -1,6 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -26,14 +28,12 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntSet;
 
 import java.util.List;
 import java.util.Optional;
 
 public class WorldPackets {
-    private static final IntSet VALID_BIOMES = CollectionUtil.createIntSet(70);
+    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70);
 
     static {
         // Client will crash if it receives a invalid biome id

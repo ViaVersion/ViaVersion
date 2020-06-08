@@ -1,10 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class EntityTypeRewriter {
-    private static final IntMap ENTITY_TYPES = CollectionUtil.createIntMap(93);
+    private static final Int2IntOpenHashMap ENTITY_TYPES = new Int2IntOpenHashMap(93);
 
     static {
         registerEntity(1, 32); // item - ajl

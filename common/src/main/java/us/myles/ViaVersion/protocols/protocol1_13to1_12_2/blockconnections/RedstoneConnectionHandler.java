@@ -1,18 +1,17 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntMap;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class RedstoneConnectionHandler extends ConnectionHandler {
     private static final Set<Integer> redstone = new HashSet<>();
-    private static final IntMap connectedBlockStates = CollectionUtil.createIntMap(1296);
-    private static final IntMap powerMappings = CollectionUtil.createIntMap(1296);
+    private static final Int2IntOpenHashMap connectedBlockStates = new Int2IntOpenHashMap(1296);
+    private static final Int2IntOpenHashMap powerMappings = new Int2IntOpenHashMap(1296);
 
     static ConnectionData.ConnectorInitAction init() {
         final RedstoneConnectionHandler connectionHandler = new RedstoneConnectionHandler();

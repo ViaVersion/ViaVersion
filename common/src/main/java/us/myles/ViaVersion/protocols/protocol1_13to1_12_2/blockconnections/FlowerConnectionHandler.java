@@ -1,18 +1,17 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntMap;
 
 import java.util.HashSet;
 import java.util.Set;
 
 
 public class FlowerConnectionHandler extends ConnectionHandler {
-    private static final IntMap flowers = CollectionUtil.createIntMap();
+    private static final Int2IntOpenHashMap flowers = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> baseFlower = new HashSet<>();

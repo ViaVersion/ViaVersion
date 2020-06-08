@@ -1,11 +1,11 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class Effect {
 
-    private static final IntMap EFFECTS = CollectionUtil.createIntMap(17);
+    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(17);
 
     static {
         addRewrite(1005, 1010); //Play music disc

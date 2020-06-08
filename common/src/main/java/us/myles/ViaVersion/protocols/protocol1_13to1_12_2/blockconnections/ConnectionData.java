@@ -3,6 +3,10 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
@@ -16,9 +20,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
-import us.myles.ViaVersion.util.fastutil.CollectionUtil;
-import us.myles.ViaVersion.util.fastutil.IntObjectMap;
-import us.myles.ViaVersion.util.fastutil.IntSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,11 +31,11 @@ import java.util.Map.Entry;
 public class ConnectionData {
     private static final BlockChangeRecord[] A = new BlockChangeRecord[0];
     public static BlockConnectionProvider blockConnectionProvider;
-    static IntObjectMap<String> idToKey = CollectionUtil.createIntObjectMap(8582);
+    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582);
     static Map<String, Integer> keyToId = new HashMap<>(8582);
-    static IntObjectMap<ConnectionHandler> connectionHandlerMap = CollectionUtil.createIntObjectMap(1);
-    static IntObjectMap<BlockData> blockConnectionData = CollectionUtil.createIntObjectMap(1);
-    static IntSet occludingStates = CollectionUtil.createIntSet(377);
+    static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>(1);
+    static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>(1);
+    static IntSet occludingStates = new IntOpenHashSet(377);
 
     public static void update(UserConnection user, Position position) {
         for (BlockFace face : BlockFace.values()) {
@@ -212,10 +213,10 @@ public class ConnectionData {
             keyToId.put(key, id);
         }
 
-        connectionHandlerMap = CollectionUtil.createIntObjectMap(3650);
+        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650);
 
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
-            blockConnectionData = CollectionUtil.createIntObjectMap(1146);
+            blockConnectionData = new Int2ObjectOpenHashMap<>(1146);
             JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());
