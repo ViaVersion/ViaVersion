@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 
 public class FlowerConnectionHandler extends ConnectionHandler {
-    private static final Int2IntOpenHashMap flowers = new Int2IntOpenHashMap();
+    private static final Int2IntMap flowers = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> baseFlower = new HashSet<>();
@@ -38,7 +39,7 @@ public class FlowerConnectionHandler extends ConnectionHandler {
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
         int connectBelow = flowers.get(blockBelowId);
-        if (connectBelow != -1) {
+        if (connectBelow != 0) {
             int blockAboveId = getBlockData(user, position.getRelative(BlockFace.TOP));
             if (Via.getConfig().isStemWhenBlockAbove()) {
                 if (blockAboveId == 0) {

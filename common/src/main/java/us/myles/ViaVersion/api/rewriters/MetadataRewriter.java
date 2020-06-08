@@ -184,7 +184,10 @@ public abstract class MetadataRewriter {
     }
 
     public <T extends Enum<T> & EntityType> void mapTypes(EntityType[] oldTypes, Class<T> newTypeClass) {
-        if (typeMapping == null) typeMapping = new Int2IntOpenHashMap(oldTypes.length);
+        if (typeMapping == null) {
+            typeMapping = new Int2IntOpenHashMap(oldTypes.length);
+            typeMapping.defaultReturnValue(-1);
+        }
         for (EntityType oldType : oldTypes) {
             try {
                 T newType = Enum.valueOf(newTypeClass, oldType.name());
@@ -199,7 +202,10 @@ public abstract class MetadataRewriter {
     }
 
     public void mapType(EntityType oldType, EntityType newType) {
-        if (typeMapping == null) typeMapping = new Int2IntOpenHashMap();
+        if (typeMapping == null) {
+            typeMapping = new Int2IntOpenHashMap();
+            typeMapping.defaultReturnValue(-1);
+        }
         typeMapping.put(oldType.getId(), newType.getId());
     }
 

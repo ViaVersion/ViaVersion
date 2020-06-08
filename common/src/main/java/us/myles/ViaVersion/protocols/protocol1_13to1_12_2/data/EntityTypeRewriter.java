@@ -1,11 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class EntityTypeRewriter {
-    private static final Int2IntOpenHashMap ENTITY_TYPES = new Int2IntOpenHashMap(93);
+    private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(93);
 
     static {
+        ENTITY_TYPES.defaultReturnValue(-1);
         registerEntity(1, 32); // item - ajl
         registerEntity(2, 22); // xp_orb - abx
         registerEntity(3, 0); // area_effect_cloud - abp

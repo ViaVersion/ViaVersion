@@ -47,7 +47,7 @@ public class MappingData {
             if (id == null) {
                 Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
             } else {
-                MappingData.motionBlocking.add(id);
+                MappingData.motionBlocking.add(id.intValue());
             }
         }
 

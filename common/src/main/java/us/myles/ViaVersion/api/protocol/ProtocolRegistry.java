@@ -137,12 +137,7 @@ public class ProtocolRegistry {
         protocols.put(protocol.getClass(), protocol);
 
         for (int version : supported) {
-            Int2ObjectMap<Protocol> protocolMap = registryMap.get(version);
-            if (protocolMap == null) {
-                protocolMap = new Int2ObjectOpenHashMap<>(1);
-                registryMap.put(version, protocolMap);
-            }
-
+            Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(version, s -> new Int2ObjectOpenHashMap<>(1));
             protocolMap.put(output, protocol);
         }
 
