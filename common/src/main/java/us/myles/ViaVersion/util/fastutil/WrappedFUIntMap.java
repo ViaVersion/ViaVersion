@@ -35,4 +35,9 @@ final class WrappedFUIntMap implements IntMap {
     public int remove(int key) {
         return map.remove(key);
     }
+
+    @Override
+    public Map<Integer, Integer> getMap() {
+        return map;
+    }
 }

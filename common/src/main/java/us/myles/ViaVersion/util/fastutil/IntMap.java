@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.util.fastutil;
 
+import java.util.Map;
+
 /**
  * Very simple wrapping interface to either be implemented by a HashMap or FastUtil's OpenHashMap.
  */
@@ -32,4 +34,13 @@ public interface IntMap {
      * @see java.util.HashMap#remove(Object)
      */
     int remove(int key);
+
+    /**
+     * Returns the underlying map for usage of not implemented methods of this class.
+     *
+     * @return original map
+     * @deprecated will cause wrapping if it is a FastUtil collection
+     */
+    @Deprecated
+    Map<Integer, Integer> getMap();
 }

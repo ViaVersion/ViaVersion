@@ -32,6 +32,12 @@ final class WrappedIntMap implements IntMap {
 
     @Override
     public int remove(int key) {
-        return map.remove(key);
+        Integer removed = map.remove(key);
+        return removed != null ? removed : -1;
+    }
+
+    @Override
+    public Map<Integer, Integer> getMap() {
+        return map;
     }
 }

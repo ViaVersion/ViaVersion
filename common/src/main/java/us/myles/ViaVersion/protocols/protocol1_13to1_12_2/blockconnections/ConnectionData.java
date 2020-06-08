@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 public class ConnectionData {
     private static final BlockChangeRecord[] A = new BlockChangeRecord[0];
     public static BlockConnectionProvider blockConnectionProvider;
-    static IntObjectMap<String> idToKey = CollectionUtil.createIntObjectMap(8581);
-    static Map<String, Integer> keyToId = new HashMap<>(8581);
+    static IntObjectMap<String> idToKey = CollectionUtil.createIntObjectMap(8582);
+    static Map<String, Integer> keyToId = new HashMap<>(8582);
     static IntObjectMap<ConnectionHandler> connectionHandlerMap = CollectionUtil.createIntObjectMap(1);
     static IntObjectMap<BlockData> blockConnectionData = CollectionUtil.createIntObjectMap(1);
     static IntSet occludingStates = CollectionUtil.createIntSet(377);
