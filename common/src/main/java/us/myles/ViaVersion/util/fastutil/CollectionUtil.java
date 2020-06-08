@@ -15,7 +15,7 @@ public class CollectionUtil {
 
     private static boolean checkForFastUtil() {
         try {
-            Class.forName("Int2IntMap");
+            Class.forName("it.unimi.dsi.fastutil.ints.Int2IntMap");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
