@@ -8,19 +8,19 @@ import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntSet;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class MappingData {
     public static final BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
     public static Mappings blockStateMappings;
     public static Mappings blockMappings;
     public static Mappings soundMappings;
-    public static Set<Integer> motionBlocking;
-    public static Set<Integer> nonFullBlocks;
+    public static IntSet motionBlocking;
+    public static IntSet nonFullBlocks;
 
     public static void init() {
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 mappings...");
@@ -40,19 +40,19 @@ public class MappingData {
 
         JsonObject heightMapData = MappingDataLoader.loadData("heightMapData-1.14.json");
         JsonArray motionBlocking = heightMapData.getAsJsonArray("MOTION_BLOCKING");
-        us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking = new HashSet<>(motionBlocking.size());
+        MappingData.motionBlocking = CollectionUtil.createIntSet(motionBlocking.size());
         for (JsonElement blockState : motionBlocking) {
             String key = blockState.getAsString();
             Integer id = blockStateMap.get(key);
             if (id == null) {
                 Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
             } else {
-                us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking.add(id);
+                MappingData.motionBlocking.add(id);
             }
         }
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
-            nonFullBlocks = new HashSet<>();
+            nonFullBlocks = CollectionUtil.createIntSet(1611);
             for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
                 final String state = blockstates.getValue().getAsString();
                 if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))

@@ -4,15 +4,15 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntMap;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
 public class FlowerConnectionHandler extends ConnectionHandler {
-    private static final Map<Integer, Integer> flowers = new HashMap<>();
+    private static final IntMap flowers = CollectionUtil.createIntMap();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> baseFlower = new HashSet<>();
@@ -38,8 +38,8 @@ public class FlowerConnectionHandler extends ConnectionHandler {
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
-        Integer connectBelow = flowers.get(blockBelowId);
-        if (connectBelow != null) {
+        int connectBelow = flowers.get(blockBelowId);
+        if (connectBelow != -1) {
             int blockAboveId = getBlockData(user, position.getRelative(BlockFace.TOP));
             if (Via.getConfig().isStemWhenBlockAbove()) {
                 if (blockAboveId == 0) {

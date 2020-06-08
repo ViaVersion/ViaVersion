@@ -3,16 +3,16 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntMap;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class RedstoneConnectionHandler extends ConnectionHandler {
     private static final Set<Integer> redstone = new HashSet<>();
-    private static final Map<Short, Integer> connectedBlockStates = new HashMap<>();
-    private static final Map<Integer, Integer> powerMappings = new HashMap<>();
+    private static final IntMap connectedBlockStates = CollectionUtil.createIntMap(1296);
+    private static final IntMap powerMappings = CollectionUtil.createIntMap(1296);
 
     static ConnectionData.ConnectorInitAction init() {
         final RedstoneConnectionHandler connectionHandler = new RedstoneConnectionHandler();
@@ -22,7 +22,7 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
             redstone.add(blockData.getSavedBlockStateId());
             ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
             connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
-            powerMappings.put(blockData.getSavedBlockStateId(), Integer.valueOf(blockData.getValue("power")));
+            powerMappings.put(blockData.getSavedBlockStateId(), Integer.parseInt(blockData.getValue("power")));
         };
     }
 
@@ -57,8 +57,7 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
         b |= connects(user, position, BlockFace.SOUTH) << 4;
         b |= connects(user, position, BlockFace.WEST) << 6;
         b |= powerMappings.get(blockState) << 8;
-        final Integer newBlockState = connectedBlockStates.get(b);
-        return newBlockState == null ? blockState : newBlockState;
+        return connectedBlockStates.getOrDefault(b, blockState);
     }
 
     private int connects(UserConnection user, Position position, BlockFace side) {

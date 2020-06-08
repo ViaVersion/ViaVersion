@@ -14,7 +14,6 @@ import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.EntityTypeRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
@@ -50,7 +49,7 @@ public class EntityPackets {
                         int typeId = wrapper.get(Type.VAR_INT, 1);
 
                         Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
-                        typeId = EntityTypeRewriter.getNewId(type1_13.getId()).orElse(type1_13.getId());
+                        typeId = metadataRewriter.getNewEntityId(type1_13.getId());
                         Entity1_14Types.EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
 
                         if (type1_14 != null) {

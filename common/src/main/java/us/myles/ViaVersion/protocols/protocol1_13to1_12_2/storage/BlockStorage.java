@@ -3,36 +3,39 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntSet;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockStorage extends StoredObject {
-    private static final Set<Integer> whitelist = new HashSet<>();
+    private static final IntSet WHITELIST = CollectionUtil.createIntSet(46);
     private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     static {
         // Flower pots
-        whitelist.add(5266);
+        WHITELIST.add(5266);
 
         // Add those red beds
-        for (int i = 0; i < 16; i++)
-            whitelist.add(972 + i);
+        for (int i = 0; i < 16; i++) {
+            WHITELIST.add(972 + i);
+        }
 
         // Add the white banners
-        for (int i = 0; i < 20; i++)
-            whitelist.add(6854 + i);
+        for (int i = 0; i < 20; i++) {
+            WHITELIST.add(6854 + i);
+        }
 
         // Add the white wall banners
         for (int i = 0; i < 4; i++) {
-            whitelist.add(7110 + i);
+            WHITELIST.add(7110 + i);
         }
 
         // Skeleton skulls
-        for (int i = 0; i < 5; i++)
-            whitelist.add(5447 + i);
+        for (int i = 0; i < 5; i++) {
+            WHITELIST.add(5447 + i);
+        }
     }
 
     public BlockStorage(UserConnection user) {
@@ -44,14 +47,14 @@ public class BlockStorage extends StoredObject {
     }
 
     public void store(Position position, int block, int replacementId) {
-        if (!whitelist.contains(block))
+        if (!WHITELIST.contains(block))
             return;
 
         blocks.put(position, new ReplacementData(block, replacementId));
     }
 
     public boolean isWelcome(int block) {
-        return whitelist.contains(block);
+        return WHITELIST.contains(block);
     }
 
     public boolean contains(Position position) {

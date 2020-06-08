@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.VillagerData;
@@ -13,7 +14,6 @@ import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.EntityTypeRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
@@ -23,6 +23,7 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
 
     public MetadataRewriter1_14To1_13_2(Protocol1_14To1_13_2 protocol) {
         super(protocol, EntityTracker1_14.class);
+        mapTypes(Entity1_13Types.EntityType.values(), Entity1_14Types.EntityType.class);
     }
 
     @Override
@@ -166,11 +167,6 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
                 metadata.setId(metadata.getId() + 1);
             }
         }
-    }
-
-    @Override
-    public int getNewEntityId(final int oldId) {
-        return EntityTypeRewriter.getNewId(oldId).orElse(oldId);
     }
 
     @Override

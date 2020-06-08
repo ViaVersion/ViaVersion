@@ -5,6 +5,8 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntMap;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,7 +19,7 @@ public class ItemRewriter {
     private static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     private static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
-    private static final Map<Integer, Integer> POTION_INDEX = new HashMap<>();
+    private static final IntMap POTION_INDEX = CollectionUtil.createIntMap(36);
 
     static {
         /* Entities */
@@ -381,13 +383,13 @@ public class ItemRewriter {
             oldID -= 8192;
         }
 
-        Integer index = POTION_INDEX.get(oldID);
-        if (index != null) {
+        int index = POTION_INDEX.get(oldID);
+        if (index != -1) {
             return index;
         }
 
         oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short) oldID));
-        return (index = POTION_INDEX.get(oldID)) != null ? index : 0;
+        return (index = POTION_INDEX.get(oldID)) != -1 ? index : 0;
     }
 
     private static void registerEntity(Integer id, String name) {
