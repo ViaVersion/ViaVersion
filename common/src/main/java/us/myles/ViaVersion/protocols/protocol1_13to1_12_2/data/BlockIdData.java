@@ -26,7 +26,7 @@ public class BlockIdData {
                     reader,
                     new TypeToken<Map<String, String[]>>() {
                     }.getType()
-            ));
+            ), 1F);
             fallbackReverseMapping = new HashMap<>();
             for (Map.Entry<String, String[]> entry : blockIdMapping.entrySet()) {
                 for (String val : entry.getValue()) {

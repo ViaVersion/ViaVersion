@@ -185,7 +185,7 @@ public abstract class MetadataRewriter {
 
     public <T extends Enum<T> & EntityType> void mapTypes(EntityType[] oldTypes, Class<T> newTypeClass) {
         if (typeMapping == null) {
-            typeMapping = new Int2IntOpenHashMap(oldTypes.length);
+            typeMapping = new Int2IntOpenHashMap(oldTypes.length, 1F);
             typeMapping.defaultReturnValue(-1);
         }
         for (EntityType oldType : oldTypes) {

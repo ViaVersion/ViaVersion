@@ -31,11 +31,11 @@ import java.util.Map.Entry;
 public class ConnectionData {
     private static final BlockChangeRecord[] A = new BlockChangeRecord[0];
     public static BlockConnectionProvider blockConnectionProvider;
-    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582);
-    static Map<String, Integer> keyToId = new HashMap<>(8582);
+    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, 1F);
+    static Map<String, Integer> keyToId = new HashMap<>(8582, 1F);
     static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>(1);
     static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>(1);
-    static IntSet occludingStates = new IntOpenHashSet(377);
+    static IntSet occludingStates = new IntOpenHashSet(377, 1F);
 
     public static void update(UserConnection user, Position position) {
         for (BlockFace face : BlockFace.values()) {
@@ -213,10 +213,10 @@ public class ConnectionData {
             keyToId.put(key, id);
         }
 
-        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650);
+        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650, 1F);
 
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
-            blockConnectionData = new Int2ObjectOpenHashMap<>(1146);
+            blockConnectionData = new Int2ObjectOpenHashMap<>(1146, 1F);
             JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());
@@ -243,7 +243,7 @@ public class ConnectionData {
         JsonObject blockData = MappingDataLoader.loadData("blockData.json");
         JsonArray occluding = blockData.getAsJsonArray("occluding");
         for (JsonElement jsonElement : occluding) {
-            occludingStates.add(keyToId.get(jsonElement.getAsString()));
+            occludingStates.add(keyToId.get(jsonElement.getAsString()).intValue());
         }
 
         List<ConnectorInitAction> initActions = new ArrayList<>();

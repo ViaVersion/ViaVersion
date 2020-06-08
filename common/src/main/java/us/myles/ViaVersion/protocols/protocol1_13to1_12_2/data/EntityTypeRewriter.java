@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class EntityTypeRewriter {
-    private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(93);
+    private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(83, 1F);
 
     static {
         ENTITY_TYPES.defaultReturnValue(-1);
