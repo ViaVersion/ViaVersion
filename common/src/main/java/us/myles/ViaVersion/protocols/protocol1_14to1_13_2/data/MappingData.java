@@ -1,7 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,12 +8,13 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
+import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static final BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static final Int2IntBiMap oldToNewItems = new Int2IntBiMap();
     public static Mappings blockStateMappings;
     public static Mappings blockMappings;
     public static Mappings soundMappings;
@@ -27,6 +26,7 @@ public class MappingData {
         JsonObject mapping1_13_2 = MappingDataLoader.loadData("mapping-1.13.2.json", true);
         JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json", true);
 
+        oldToNewItems.defaultReturnValue(-1);
         blockStateMappings = new Mappings(mapping1_13_2.getAsJsonObject("blockstates"), mapping1_14.getAsJsonObject("blockstates"));
         blockMappings = new Mappings(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_13_2.getAsJsonObject("items"), mapping1_14.getAsJsonObject("items"));

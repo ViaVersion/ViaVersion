@@ -1,17 +1,16 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
+import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static Int2IntBiMap oldToNewItems = new Int2IntBiMap();
     public static Map<String, String> attributeMappings = new HashMap<>();
     public static Mappings blockMappings;
     public static Mappings blockStateMappings;
@@ -23,6 +22,7 @@ public class MappingData {
         JsonObject mapping1_15 = MappingDataLoader.loadData("mapping-1.15.json", true);
         JsonObject mapping1_16 = MappingDataLoader.loadData("mapping-1.16.json", true);
 
+        oldToNewItems.defaultReturnValue(-1);
         blockStateMappings = new Mappings(mapping1_15.getAsJsonObject("blockstates"), mapping1_16.getAsJsonObject("blockstates"), diffmapping.getAsJsonObject("blockstates"));
         blockMappings = new Mappings(mapping1_15.getAsJsonObject("blocks"), mapping1_16.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_15.getAsJsonObject("items"), mapping1_16.getAsJsonObject("items"), diffmapping.getAsJsonObject("items"));

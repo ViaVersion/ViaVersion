@@ -271,8 +271,8 @@ public class InventoryPackets {
     }
 
     public static int getNewItemId(int id) {
-        Integer newId = MappingData.oldToNewItems.get(id);
-        if (newId == null) {
+        int newId = MappingData.oldToNewItems.get(id);
+        if (newId == -1) {
             Via.getPlatform().getLogger().warning("Missing 1.14 item for 1.13.2 item " + id);
             return 1;
         }
@@ -313,7 +313,7 @@ public class InventoryPackets {
     }
 
     public static int getOldItemId(int id) {
-        Integer oldId = MappingData.oldToNewItems.inverse().get(id);
-        return oldId != null ? oldId : 1;
+        int oldId = MappingData.oldToNewItems.inverse().get(id);
+        return oldId != -1 ? oldId : 1;
     }
 }

@@ -346,8 +346,8 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                             }
                         } else {
                             for (int i = 0; i < 16; i++) {
-                                Integer newItem = MappingData.oldToNewItems.get(item << 4 | i);
-                                if (newItem != null) {
+                                int newItem = MappingData.oldToNewItems.get(item << 4 | i);
+                                if (newItem != -1) {
                                     PacketWrapper packet = wrapper.create(0x18);
                                     packet.write(Type.VAR_INT, newItem);
                                     packet.write(Type.VAR_INT, ticks);
