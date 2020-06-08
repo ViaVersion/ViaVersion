@@ -31,7 +31,17 @@ public class BlockRewriter {
                 map(Type.UNSIGNED_BYTE); // Action id
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
-                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, blockRewriter.rewrite(wrapper.get(Type.VAR_INT, 0))));
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.VAR_INT, 0);
+                    int mappedId = blockRewriter.rewrite(id);
+                    if (mappedId == -1) {
+                        // Block (action) has been removed
+                        wrapper.cancel();
+                        return;
+                    }
+
+                    wrapper.set(Type.VAR_INT, 0, mappedId);
+                });
             }
         });
     }
