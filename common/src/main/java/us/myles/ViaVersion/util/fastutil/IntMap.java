@@ -14,7 +14,7 @@ public interface IntMap {
     }
 
     /**
-     * @see java.util.HashMap#getOrDefault(Object, Object) (Object)
+     * @see java.util.HashMap#getOrDefault(Object, Object)
      */
     int getOrDefault(int key, int def);
 

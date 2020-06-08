@@ -1,11 +1,8 @@
 package us.myles.ViaVersion.util.fastutil;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import com.google.common.base.Preconditions;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,9 +11,9 @@ import java.util.Set;
  * These should only be used for high access and low/no change collections, since resizing FastUtil collections is expensive.
  */
 public class CollectionUtil {
-    private static final boolean FAST_UTIL = hasFastUtil();
+    private static final boolean FAST_UTIL = checkForFastUtil();
 
-    private static boolean hasFastUtil() {
+    private static boolean checkForFastUtil() {
         try {
             Class.forName("Int2IntMap");
             return true;
@@ -32,7 +29,8 @@ public class CollectionUtil {
      * @return wrapped int map
      */
     public static IntMap createIntMap(Map<Integer, Integer> originalMap) {
-        return FAST_UTIL ? new WrappedFUIntMap(new Int2IntOpenHashMap(originalMap)) : new WrappedIntMap(originalMap);
+        Preconditions.checkNotNull(originalMap);
+        return FAST_UTIL ? new WrappedFUIntMap(originalMap) : new WrappedIntMap(originalMap);
     }
 
     /**
@@ -42,11 +40,32 @@ public class CollectionUtil {
      * @return wrapped int map
      */
     public static IntMap createIntMap(int size) {
-        return FAST_UTIL ? new WrappedFUIntMap(new Int2IntOpenHashMap(size)) : new WrappedIntMap(new HashMap<>(size));
+        return FAST_UTIL ? new WrappedFUIntMap(size) : new WrappedIntMap(size);
     }
 
     public static IntMap createIntMap() {
-        return FAST_UTIL ? new WrappedFUIntMap(new Int2IntOpenHashMap()) : new WrappedIntMap(new HashMap<>());
+        return FAST_UTIL ? new WrappedFUIntMap(16) : new WrappedIntMap(new HashMap<>());
+    }
+
+    /**
+     * Creates a new FastUtil collection from the given map if present, else simply wraps the original.
+     *
+     * @param originalMap map to be reflected
+     * @return wrapped int map
+     */
+    public static <V> IntObjectMap<V> createIntObjectMap(Map<Integer, V> originalMap) {
+        Preconditions.checkNotNull(originalMap);
+        return FAST_UTIL ? new WrappedFUIntObjectMap<>(originalMap) : new WrappedIntObjectMap<>(originalMap);
+    }
+
+    /**
+     * Creates a new FastUtil collection if present, else simply wraps a normal HashMap.
+     *
+     * @param size expected size of the collection
+     * @return wrapped int map
+     */
+    public static <V> IntObjectMap<V> createIntObjectMap(int size) {
+        return FAST_UTIL ? new WrappedFUIntObjectMap<>(size) : new WrappedIntObjectMap<>(size);
     }
 
     /**
@@ -56,7 +75,8 @@ public class CollectionUtil {
      * @return wrapped int set
      */
     public static IntSet createIntSet(Set<Integer> originalSet) {
-        return FAST_UTIL ? new WrappedFUIntSet(new IntOpenHashSet(originalSet)) : new WrappedIntSet(originalSet);
+        Preconditions.checkNotNull(originalSet);
+        return FAST_UTIL ? new WrappedFUIntSet(originalSet) : new WrappedIntSet(originalSet);
     }
 
     /**
@@ -66,108 +86,10 @@ public class CollectionUtil {
      * @return wrapped int set
      */
     public static IntSet createIntSet(int size) {
-        return FAST_UTIL ? new WrappedFUIntSet(new IntOpenHashSet(size)) : new WrappedIntSet(new HashSet<>(size));
+        return FAST_UTIL ? new WrappedFUIntSet(size) : new WrappedIntSet(size);
     }
 
-    private static final class WrappedFUIntMap implements IntMap {
-        private final Int2IntMap map;
-
-        private WrappedFUIntMap(Int2IntMap map) {
-            this.map = map;
-        }
-
-        @Override
-        public int getOrDefault(int key, int def) {
-            return map.getOrDefault(key, def);
-        }
-
-        @Override
-        public boolean containsKey(int key) {
-            return map.containsKey(key);
-        }
-
-        @Override
-        public int put(int key, int value) {
-            return map.put(key, value);
-        }
-
-        @Override
-        public int remove(int key) {
-            return map.remove(key);
-        }
-    }
-
-    private static final class WrappedIntMap implements IntMap {
-        private final Map<Integer, Integer> map;
-
-        private WrappedIntMap(Map<Integer, Integer> map) {
-            this.map = map;
-        }
-
-        @Override
-        public int getOrDefault(int key, int def) {
-            return map.getOrDefault(key, def);
-        }
-
-        @Override
-        public boolean containsKey(int key) {
-            return map.containsKey(key);
-        }
-
-        @Override
-        public int put(int key, int value) {
-            return map.put(key, value);
-        }
-
-        @Override
-        public int remove(int key) {
-            return map.remove(key);
-        }
-    }
-
-    private static final class WrappedFUIntSet implements IntSet {
-        private final it.unimi.dsi.fastutil.ints.IntSet set;
-
-        private WrappedFUIntSet(it.unimi.dsi.fastutil.ints.IntSet set) {
-            this.set = set;
-        }
-
-        @Override
-        public boolean contains(int key) {
-            return set.contains(key);
-        }
-
-        @Override
-        public boolean add(int key) {
-            return set.add(key);
-        }
-
-        @Override
-        public boolean remove(int key) {
-            return set.remove(key);
-        }
-    }
-
-    private static final class WrappedIntSet implements IntSet {
-        private final Set<Integer> set;
-
-        private WrappedIntSet(Set<Integer> set) {
-            this.set = set;
-        }
-
-        @Override
-        public boolean contains(int key) {
-            return set.contains(key);
-        }
-
-        @Override
-        public boolean add(int key) {
-            return set.add(key);
-        }
-
-        @Override
-        public boolean remove(int key) {
-            return set.remove(key);
-        }
+    public static boolean hasFastUtil() {
+        return FAST_UTIL;
     }
 }

@@ -192,7 +192,7 @@ public abstract class MetadataRewriter {
             } catch (IllegalArgumentException notFound) {
                 if (!typeMapping.containsKey(oldType.getId())) {
                     Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
-                            "Old type: " + oldType.getClass().getSimpleName() + " New type: " + newTypeClass.getSimpleName());
+                            "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
                 }
             }
         }

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8581];
+    private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8582];
     private static Constructor<?> fastUtilLongObjectHashMap;
 
     private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();

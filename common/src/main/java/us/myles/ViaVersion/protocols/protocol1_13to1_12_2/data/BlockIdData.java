@@ -3,6 +3,8 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.reflect.TypeToken;
 import us.myles.ViaVersion.util.GsonUtil;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntObjectMap;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +15,14 @@ import java.util.Map;
 public class BlockIdData {
     public static Map<String, String[]> blockIdMapping;
     public static Map<String, String[]> fallbackReverseMapping;
-    public static Map<Integer, String> numberIdToString;
+    public static IntObjectMap<String> numberIdToString;
 
     public static void init() {
         InputStream stream = MappingData.class.getClassLoader()
                 .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
         InputStreamReader reader = new InputStreamReader(stream);
         try {
-            blockIdMapping = new HashMap<>((Map<String, String[]>) GsonUtil.getGson().fromJson(
+            blockIdMapping = new HashMap<>(GsonUtil.getGson().fromJson(
                     reader,
                     new TypeToken<Map<String, String[]>>() {
                     }.getType()
@@ -45,11 +47,11 @@ public class BlockIdData {
                 .getResourceAsStream("assets/viaversion/data/blockNumberToString1.12.json");
         InputStreamReader blockR = new InputStreamReader(blockS);
         try {
-            numberIdToString = new HashMap<>((Map<Integer, String>) GsonUtil.getGson().fromJson(
+            numberIdToString = CollectionUtil.createIntObjectMap(new HashMap<>(GsonUtil.getGson().fromJson(
                     blockR,
                     new TypeToken<Map<Integer, String>>() {
                     }.getType()
-            ));
+            )));
         } finally {
             try {
                 blockR.close();

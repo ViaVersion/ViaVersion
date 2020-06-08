@@ -17,18 +17,23 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntObjectMap;
 import us.myles.ViaVersion.util.fastutil.IntSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class ConnectionData {
     private static final BlockChangeRecord[] A = new BlockChangeRecord[0];
     public static BlockConnectionProvider blockConnectionProvider;
-    static Map<Integer, String> idToKey = new HashMap<>();
-    static Map<String, Integer> keyToId = new HashMap<>();
-    static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
-    static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
+    static IntObjectMap<String> idToKey = CollectionUtil.createIntObjectMap(8581);
+    static Map<String, Integer> keyToId = new HashMap<>(8581);
+    static IntObjectMap<ConnectionHandler> connectionHandlerMap = CollectionUtil.createIntObjectMap(1);
+    static IntObjectMap<BlockData> blockConnectionData = CollectionUtil.createIntObjectMap(1);
     static IntSet occludingStates = CollectionUtil.createIntSet(377);
 
     public static void update(UserConnection user, Position position) {
@@ -196,17 +201,21 @@ public class ConnectionData {
 
     public static void init() {
         if (!Via.getConfig().isServersideBlockConnections()) return;
+
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
         JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
         JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
         for (Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {
-            Integer id = Integer.parseInt(blockState.getKey());
+            int id = Integer.parseInt(blockState.getKey());
             String key = blockState.getValue().getAsString();
             idToKey.put(id, key);
             keyToId.put(key, id);
         }
 
+        connectionHandlerMap = CollectionUtil.createIntObjectMap(3650);
+
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
+            blockConnectionData = CollectionUtil.createIntObjectMap(1146);
             JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());

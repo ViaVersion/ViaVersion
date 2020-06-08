@@ -31,6 +31,8 @@ import us.myles.ViaVersion.protocols.protocol1_9_1to1_9.Protocol1_9_1To1_9;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3To1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
+import us.myles.ViaVersion.util.fastutil.CollectionUtil;
+import us.myles.ViaVersion.util.fastutil.IntObjectMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +54,7 @@ public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
     public static int SERVER_PROTOCOL = -1;
     // Input Version -> Output Version & Protocol (Allows fast lookup)
-    private static final Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
+    private static final IntObjectMap<IntObjectMap<Protocol>> registryMap = CollectionUtil.createIntObjectMap(32);
     private static final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
     private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
     private static final Set<Integer> supportedVersions = new HashSet<>();
@@ -135,7 +137,12 @@ public class ProtocolRegistry {
         protocols.put(protocol.getClass(), protocol);
 
         for (int version : supported) {
-            Map<Integer, Protocol> protocolMap = registryMap.computeIfAbsent(version, k -> new HashMap<>());
+            IntObjectMap<Protocol> protocolMap = registryMap.get(version);
+            if (protocolMap == null) {
+                protocolMap = CollectionUtil.createIntObjectMap(1);
+                registryMap.put(version, protocolMap);
+            }
+
             protocolMap.put(output, protocol);
         }
 
@@ -204,7 +211,7 @@ public class ProtocolRegistry {
      * @return True if there is a useful pipe
      */
     public static boolean isWorkingPipe() {
-        for (Map<Integer, Protocol> maps : registryMap.values()) {
+        for (IntObjectMap<Protocol> maps : registryMap.getMap().values()) {
             if (maps.containsKey(SERVER_PROTOCOL)) return true;
         }
         return false; // No destination for protocol
@@ -234,20 +241,22 @@ public class ProtocolRegistry {
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
-        Map<Integer, Protocol> inputMap = registryMap.get(clientVersion);
+        IntObjectMap<Protocol> inputMap = registryMap.get(clientVersion);
         if (inputMap == null) {
             return null; // Not supported
         }
+
         // Next check there isn't an obvious path
         Protocol protocol = inputMap.get(serverVersion);
         if (protocol != null) {
             current.add(new Pair<>(serverVersion, protocol));
             return current; // Easy solution
         }
+
         // There might be a more advanced solution... So we'll see if any of the others can get us there
         List<Pair<Integer, Protocol>> shortest = null;
 
-        for (Map.Entry<Integer, Protocol> entry : inputMap.entrySet()) {
+        for (Map.Entry<Integer, Protocol> entry : inputMap.getMap().entrySet()) {
             // Ensure it wasn't caught by the other loop
             if (!entry.getKey().equals(serverVersion)) {
                 Pair<Integer, Protocol> pair = new Pair<>(entry.getKey(), entry.getValue());
