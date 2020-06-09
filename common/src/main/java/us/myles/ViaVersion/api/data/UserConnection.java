@@ -289,7 +289,7 @@ public class UserConnection {
     }
 
     /**
-     * Transforms the clientbound packet contained in draft ByteBuf.
+     * Transforms the clientbound packet contained in an outgoing ByteBuf.
      *
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
@@ -302,7 +302,7 @@ public class UserConnection {
     }
 
     /**
-     * Transforms the serverbound packet contained in draft ByteBuf.
+     * Transforms the serverbound packet contained in an incoming ByteBuf.
      *
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
