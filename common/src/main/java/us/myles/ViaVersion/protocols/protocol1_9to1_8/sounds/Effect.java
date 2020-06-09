@@ -1,14 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
-import java.util.HashMap;
-import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class Effect {
 
-    private static final Map<Integer, Integer> effects;
+    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(17, 1F);
 
     static {
-        effects = new HashMap<>();
         addRewrite(1005, 1010); //Play music disc
         addRewrite(1003, 1005); //Iron door open
         addRewrite(1006, 1011); //Iron door close
@@ -26,19 +25,17 @@ public class Effect {
         addRewrite(1020, 1029); //Anvil break
         addRewrite(1021, 1030); //Anvil use
         addRewrite(1022, 1031); //Anvil land
-
     }
 
     public static int getNewId(int id) {
-        Integer newId = effects.get(id);
-        return newId != null ? newId : id;
+        return EFFECTS.getOrDefault(id, id);
     }
 
     public static boolean contains(int oldId) {
-        return effects.containsKey(oldId);
+        return EFFECTS.containsKey(oldId);
     }
 
     private static void addRewrite(int oldId, int newId) {
-        effects.put(oldId, newId);
+        EFFECTS.put(oldId, newId);
     }
 }

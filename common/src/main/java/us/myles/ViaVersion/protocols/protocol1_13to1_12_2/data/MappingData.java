@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
 import us.myles.ViaVersion.util.GsonUtil;
+import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static final BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static final Int2IntBiMap oldToNewItems = new Int2IntBiMap();
     public static final Map<String, Integer[]> blockTags = new HashMap<>();
     public static final Map<String, Integer[]> itemTags = new HashMap<>();
     public static final Map<String, Integer[]> fluidTags = new HashMap<>();
@@ -37,6 +38,7 @@ public class MappingData {
         JsonObject mapping1_12 = MappingDataLoader.loadData("mapping-1.12.json", true);
         JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
 
+        oldToNewItems.defaultReturnValue(-1);
         blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
         loadTags(blockTags, mapping1_13.getAsJsonObject("block_tags"));

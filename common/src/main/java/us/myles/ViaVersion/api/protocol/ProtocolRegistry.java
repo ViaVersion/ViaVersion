@@ -2,6 +2,8 @@ package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -52,7 +54,7 @@ public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
     public static int SERVER_PROTOCOL = -1;
     // Input Version -> Output Version & Protocol (Allows fast lookup)
-    private static final Map<Integer, Map<Integer, Protocol>> registryMap = new ConcurrentHashMap<>();
+    private static final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
     private static final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
     private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
     private static final Set<Integer> supportedVersions = new HashSet<>();
@@ -126,7 +128,7 @@ public class ProtocolRegistry {
      * @param supported Supported client versions.
      * @param output    The output server version it converts to.
      */
-    public static void registerProtocol(Protocol protocol, List<Integer> supported, Integer output) {
+    public static void registerProtocol(Protocol protocol, List<Integer> supported, int output) {
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
             pathCache.clear();
@@ -135,7 +137,7 @@ public class ProtocolRegistry {
         protocols.put(protocol.getClass(), protocol);
 
         for (int version : supported) {
-            Map<Integer, Protocol> protocolMap = registryMap.computeIfAbsent(version, k -> new HashMap<>());
+            Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(version, s -> new Int2ObjectOpenHashMap<>(2));
             protocolMap.put(output, protocol);
         }
 
@@ -204,8 +206,8 @@ public class ProtocolRegistry {
      * @return True if there is a useful pipe
      */
     public static boolean isWorkingPipe() {
-        for (Map<Integer, Protocol> maps : registryMap.values()) {
-            if (maps.containsKey(SERVER_PROTOCOL)) return true;
+        for (Int2ObjectMap<Protocol> map : registryMap.values()) {
+            if (map.containsKey(SERVER_PROTOCOL)) return true;
         }
         return false; // No destination for protocol
     }
@@ -234,36 +236,37 @@ public class ProtocolRegistry {
         if (current.size() > 50) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
-        Map<Integer, Protocol> inputMap = registryMap.get(clientVersion);
+        Int2ObjectMap<Protocol> inputMap = registryMap.get(clientVersion);
         if (inputMap == null) {
             return null; // Not supported
         }
+
         // Next check there isn't an obvious path
         Protocol protocol = inputMap.get(serverVersion);
         if (protocol != null) {
             current.add(new Pair<>(serverVersion, protocol));
             return current; // Easy solution
         }
+
         // There might be a more advanced solution... So we'll see if any of the others can get us there
         List<Pair<Integer, Protocol>> shortest = null;
-
-        for (Map.Entry<Integer, Protocol> entry : inputMap.entrySet()) {
+        for (Int2ObjectMap.Entry<Protocol> entry : inputMap.int2ObjectEntrySet()) {
             // Ensure it wasn't caught by the other loop
-            if (!entry.getKey().equals(serverVersion)) {
-                Pair<Integer, Protocol> pair = new Pair<>(entry.getKey(), entry.getValue());
-                // Ensure no recursion
-                if (!current.contains(pair)) {
-                    // Create a copy
-                    List<Pair<Integer, Protocol>> newCurrent = new ArrayList<>(current);
-                    newCurrent.add(pair);
-                    // Calculate the rest of the protocol using the current
-                    newCurrent = getProtocolPath(newCurrent, entry.getKey(), serverVersion);
-                    if (newCurrent != null) {
-                        // If it's shorter then choose it
-                        if (shortest == null || shortest.size() > newCurrent.size()) {
-                            shortest = newCurrent;
-                        }
-                    }
+            if (entry.getIntKey() == (serverVersion)) continue;
+
+            Pair<Integer, Protocol> pair = new Pair<>(entry.getIntKey(), entry.getValue());
+            // Ensure no recursion
+            if (current.contains(pair)) continue;
+
+            // Create a copy
+            List<Pair<Integer, Protocol>> newCurrent = new ArrayList<>(current);
+            newCurrent.add(pair);
+            // Calculate the rest of the protocol using the current
+            newCurrent = getProtocolPath(newCurrent, entry.getKey(), serverVersion);
+            if (newCurrent != null) {
+                // If it's shorter then choose it
+                if (shortest == null || shortest.size() > newCurrent.size()) {
+                    shortest = newCurrent;
                 }
             }
         }

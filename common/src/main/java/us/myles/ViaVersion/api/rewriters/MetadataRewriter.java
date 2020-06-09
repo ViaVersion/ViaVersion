@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -23,7 +25,7 @@ import java.util.logging.Logger;
 public abstract class MetadataRewriter {
     private final Class<? extends EntityTracker> entityTrackerClass;
     private final Protocol protocol;
-    private Map<Integer, Integer> typeMapping;
+    private Int2IntMap typeMapping;
 
     protected MetadataRewriter(Protocol protocol, Class<? extends EntityTracker> entityTrackerClass) {
         this.protocol = protocol;
@@ -182,7 +184,10 @@ public abstract class MetadataRewriter {
     }
 
     public <T extends Enum<T> & EntityType> void mapTypes(EntityType[] oldTypes, Class<T> newTypeClass) {
-        if (typeMapping == null) typeMapping = new HashMap<>(oldTypes.length);
+        if (typeMapping == null) {
+            typeMapping = new Int2IntOpenHashMap(oldTypes.length, 1F);
+            typeMapping.defaultReturnValue(-1);
+        }
         for (EntityType oldType : oldTypes) {
             try {
                 T newType = Enum.valueOf(newTypeClass, oldType.name());
@@ -190,14 +195,17 @@ public abstract class MetadataRewriter {
             } catch (IllegalArgumentException notFound) {
                 if (!typeMapping.containsKey(oldType.getId())) {
                     Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
-                            "Old type: " + oldType.getClass().getSimpleName() + " New type: " + newTypeClass.getSimpleName());
+                            "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
                 }
             }
         }
     }
 
     public void mapType(EntityType oldType, EntityType newType) {
-        if (typeMapping == null) typeMapping = new HashMap<>();
+        if (typeMapping == null) {
+            typeMapping = new Int2IntOpenHashMap();
+            typeMapping.defaultReturnValue(-1);
+        }
         typeMapping.put(oldType.getId(), newType.getId());
     }
 

@@ -1,14 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class EntityTypeRewriter {
-    private static final Map<Integer, Integer> entityTypes = new HashMap<>();
+    private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(83, 1F);
 
     static {
+        ENTITY_TYPES.defaultReturnValue(-1);
         registerEntity(1, 32); // item - ajl
         registerEntity(2, 22); // xp_orb - abx
         registerEntity(3, 0); // area_effect_cloud - abp
@@ -92,16 +91,13 @@ public class EntityTypeRewriter {
         registerEntity(104, 37); // llama_spit - alr
         registerEntity(105, 50); // parrot - agx
         registerEntity(120, 79); // villager - ala
-
-        // OBJECTS
-        // Couldn't find any object id change with mapped values
     }
 
     private static void registerEntity(int type1_12, int type1_13) {
-        entityTypes.put(type1_12, type1_13);
+        ENTITY_TYPES.put(type1_12, type1_13);
     }
 
-    public static Optional<Integer> getNewId(int type1_12) {
-        return Optional.ofNullable(entityTypes.get(type1_12));
+    public static int getNewId(int type1_12) {
+        return ENTITY_TYPES.getOrDefault(type1_12, type1_12);
     }
 }

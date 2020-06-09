@@ -91,11 +91,10 @@ public class Entity1_13Types {
 
         // Fish
         ABSTRACT_FISHES(-1, ABSTRACT_CREATURE), // agb
-        COD_MOB(8, ABSTRACT_FISHES), // agf
+        COD(8, ABSTRACT_FISHES), // agf
         PUFFERFISH(52, ABSTRACT_FISHES), // agn
         SALMON(57, ABSTRACT_FISHES), // agp
         TROPICAL_FISH(72, ABSTRACT_FISHES), // agu
-
 
         // Monsters
         ABSTRACT_MONSTER(-1, ABSTRACT_CREATURE), // ajs
@@ -248,7 +247,7 @@ public class Entity1_13Types {
         ENDER_PEARL(65, EntityType.ENDER_PEARL),
         WITHER_SKULL(66, EntityType.WITHER_SKULL),
         SHULKER_BULLET(67, EntityType.SHULKER_BULLET),
-        LIAMA_SPIT(68, EntityType.LLAMA_SPIT),
+        LLAMA_SPIT(68, EntityType.LLAMA_SPIT),
         FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
         ITEM_FRAME(71, EntityType.ITEM_FRAME),
         EYE_OF_ENDER(72, EntityType.EYE_OF_ENDER),

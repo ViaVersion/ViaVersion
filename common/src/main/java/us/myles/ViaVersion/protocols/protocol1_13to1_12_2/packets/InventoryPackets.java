@@ -435,7 +435,7 @@ public class InventoryPackets {
             }
         }
 
-        item.setIdentifier(MappingData.oldToNewItems.get(rawId).shortValue());
+        item.setIdentifier(MappingData.oldToNewItems.get(rawId));
         item.setData((short) 0);
     }
 
@@ -487,8 +487,8 @@ public class InventoryPackets {
         }
 
         if (rawId == null) {
-            Integer oldId = MappingData.oldToNewItems.inverse().get(item.getIdentifier());
-            if (oldId != null) {
+            int oldId = MappingData.oldToNewItems.inverse().get(item.getIdentifier());
+            if (oldId != -1) {
                 // Handle spawn eggs
                 Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
                 if (eggEntityId.isPresent()) {

@@ -1,6 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -27,31 +29,29 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class WorldPackets {
-    private static final Set<Integer> validBiomes = new HashSet<>();
+    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, 1F);
 
     static {
         // Client will crash if it receives a invalid biome id
         for (int i = 0; i < 50; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
-        validBiomes.add(127);
+        VALID_BIOMES.add(127);
         for (int i = 129; i <= 134; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
-        validBiomes.add(140);
-        validBiomes.add(149);
-        validBiomes.add(151);
+        VALID_BIOMES.add(140);
+        VALID_BIOMES.add(149);
+        VALID_BIOMES.add(151);
         for (int i = 155; i <= 158; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
         for (int i = 160; i <= 167; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
     }
 
@@ -407,7 +407,7 @@ public class WorldPackets {
                             int latestBiomeWarn = Integer.MIN_VALUE;
                             for (int i = 0; i < 256; i++) {
                                 int biome = chunk.getBiomeData()[i];
-                                if (!validBiomes.contains(biome)) {
+                                if (!VALID_BIOMES.contains(biome)) {
                                     if (biome != 255 // is it generated naturally? *shrug*
                                             && latestBiomeWarn != biome) {
                                         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {

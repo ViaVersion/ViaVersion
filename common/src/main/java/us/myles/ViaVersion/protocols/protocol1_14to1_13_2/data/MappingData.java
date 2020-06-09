@@ -1,32 +1,32 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
+import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class MappingData {
-    public static final BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
+    public static final Int2IntBiMap oldToNewItems = new Int2IntBiMap();
     public static Mappings blockStateMappings;
     public static Mappings blockMappings;
     public static Mappings soundMappings;
-    public static Set<Integer> motionBlocking;
-    public static Set<Integer> nonFullBlocks;
+    public static IntSet motionBlocking;
+    public static IntSet nonFullBlocks;
 
     public static void init() {
         Via.getPlatform().getLogger().info("Loading 1.13.2 -> 1.14 mappings...");
         JsonObject mapping1_13_2 = MappingDataLoader.loadData("mapping-1.13.2.json", true);
         JsonObject mapping1_14 = MappingDataLoader.loadData("mapping-1.14.json", true);
 
+        oldToNewItems.defaultReturnValue(-1);
         blockStateMappings = new Mappings(mapping1_13_2.getAsJsonObject("blockstates"), mapping1_14.getAsJsonObject("blockstates"));
         blockMappings = new Mappings(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_13_2.getAsJsonObject("items"), mapping1_14.getAsJsonObject("items"));
@@ -40,19 +40,19 @@ public class MappingData {
 
         JsonObject heightMapData = MappingDataLoader.loadData("heightMapData-1.14.json");
         JsonArray motionBlocking = heightMapData.getAsJsonArray("MOTION_BLOCKING");
-        us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking = new HashSet<>(motionBlocking.size());
+        MappingData.motionBlocking = new IntOpenHashSet(motionBlocking.size(), 1F);
         for (JsonElement blockState : motionBlocking) {
             String key = blockState.getAsString();
             Integer id = blockStateMap.get(key);
             if (id == null) {
                 Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
             } else {
-                us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData.motionBlocking.add(id);
+                MappingData.motionBlocking.add(id.intValue());
             }
         }
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
-            nonFullBlocks = new HashSet<>();
+            nonFullBlocks = new IntOpenHashSet(1611, 1F);
             for (Map.Entry<String, JsonElement> blockstates : mapping1_13_2.getAsJsonObject("blockstates").entrySet()) {
                 final String state = blockstates.getValue().getAsString();
                 if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall["))

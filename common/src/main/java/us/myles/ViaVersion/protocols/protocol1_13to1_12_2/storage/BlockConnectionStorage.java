@@ -11,14 +11,15 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
-
-    private static final Map<Short, Short> reverseBlockMappings;
+    private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8582];
     private static Constructor<?> fastUtilLongObjectHashMap;
+
+    private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
 
     static {
         try {
@@ -26,10 +27,13 @@ public class BlockConnectionStorage extends StoredObject {
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
-        reverseBlockMappings = new HashMap<>();
+
+        Arrays.fill(REVERSE_BLOCK_MAPPINGS, (short) -1);
         for (int i = 0; i < 4096; i++) {
             int newBlock = MappingData.blockMappings.getNewId(i);
-            if (newBlock != -1) reverseBlockMappings.put((short) newBlock, (short) i);
+            if (newBlock != -1) {
+                REVERSE_BLOCK_MAPPINGS[newBlock] = (short) i;
+            }
         }
     }
 
@@ -38,15 +42,18 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     public void store(int x, int y, int z, int blockState) {
-        Short mapping = reverseBlockMappings.get((short) blockState);
-        if (mapping == null) return;
+        short mapping = REVERSE_BLOCK_MAPPINGS[blockState];
+        if (mapping == -1) return;
+
         blockState = mapping;
         long pair = getChunkSectionIndex(x, y, z);
         Pair<byte[], NibbleArray> map = getChunkSection(pair, (blockState & 0xF) != 0);
         int blockIndex = encodeBlockPos(x, y, z);
         map.getKey()[blockIndex] = (byte) (blockState >> 4);
         NibbleArray nibbleArray = map.getValue();
-        if (nibbleArray != null) nibbleArray.set(blockIndex, blockState);
+        if (nibbleArray != null) {
+            nibbleArray.set(blockIndex, blockState);
+        }
     }
 
     public int get(int x, int y, int z) {

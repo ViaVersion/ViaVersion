@@ -4,6 +4,8 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
 import java.util.Collections;
@@ -17,7 +19,7 @@ public class ItemRewriter {
     private static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     private static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
-    private static final Map<Integer, Integer> POTION_INDEX = new HashMap<>();
+    private static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36, 1F);
 
     static {
         /* Entities */
@@ -218,7 +220,7 @@ public class ItemRewriter {
             return str;
         }
         // hacky but it works :)
-        str = "\u00A7r" + str;
+        str = "§r" + str;
         return str;
     }
 
@@ -381,21 +383,21 @@ public class ItemRewriter {
             oldID -= 8192;
         }
 
-        Integer index = POTION_INDEX.get(oldID);
-        if (index != null) {
+        int index = POTION_INDEX.get(oldID);
+        if (index != -1) {
             return index;
         }
 
         oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short) oldID));
-        return (index = POTION_INDEX.get(oldID)) != null ? index : 0;
+        return (index = POTION_INDEX.get(oldID)) != -1 ? index : 0;
     }
 
-    private static void registerEntity(Integer id, String name) {
+    private static void registerEntity(int id, String name) {
         ENTTIY_ID_TO_NAME.put(id, name);
         ENTTIY_NAME_TO_ID.put(name, id);
     }
 
-    private static void registerPotion(Integer id, String name) {
+    private static void registerPotion(int id, String name) {
         POTION_INDEX.put(id, POTION_ID_TO_NAME.size());
         POTION_ID_TO_NAME.put(id, name);
         POTION_NAME_TO_ID.put(name, id);
