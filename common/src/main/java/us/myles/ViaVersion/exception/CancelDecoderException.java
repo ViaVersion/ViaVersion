@@ -4,7 +4,8 @@ import io.netty.handler.codec.DecoderException;
 import us.myles.ViaVersion.api.Via;
 
 /**
- * Used for cancelling packets in decode handlers.
+ * Thrown during packet decoding when an incoming packet should be cancelled.
+ * Specifically extends {@link DecoderException} to prevent netty from wrapping the exception.
  */
 public class CancelDecoderException extends DecoderException {
     public static final CancelDecoderException CACHED = new CancelDecoderException("CACHED") {

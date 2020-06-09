@@ -30,29 +30,29 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             return;
         }
 
-        ByteBuf draft = ctx.alloc().buffer().writeBytes(bytebuf);
+        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
-            boolean needsCompress = handleCompressionOrder(ctx, draft);
+            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
 
-            info.transformOutgoing(draft, CancelEncoderException::generate);
+            info.transformOutgoing(transformedBuf, CancelEncoderException::generate);
 
             if (needsCompress) {
-                recompress(ctx, draft);
+                recompress(ctx, transformedBuf);
             }
-            out.add(draft.retain());
+            out.add(transformedBuf.retain());
         } finally {
-            draft.release();
+            transformedBuf.release();
         }
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf draft) throws InvocationTargetException {
+    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) throws InvocationTargetException {
         boolean needsCompress = false;
         if (!handledCompression
                 && ctx.pipeline().names().indexOf("compression-encoder") > ctx.pipeline().names().indexOf("via-encoder")) {
             // Need to decompress this packet due to bad order
-            ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((MessageToMessageDecoder<?>) ctx.pipeline().get("compression-decoder"), ctx, draft).get(0);
+            ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((MessageToMessageDecoder<?>) ctx.pipeline().get("compression-decoder"), ctx, buf).get(0);
             try {
-                draft.clear().writeBytes(decompressed);
+                buf.clear().writeBytes(decompressed);
             } finally {
                 decompressed.release();
             }
@@ -68,11 +68,11 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         return needsCompress;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf draft) throws InvocationTargetException {
+    private void recompress(ChannelHandlerContext ctx, ByteBuf buf) throws InvocationTargetException {
         ByteBuf compressed = ctx.alloc().buffer();
         try {
-            PipelineUtil.callEncode((MessageToByteEncoder<?>) ctx.pipeline().get("compression-encoder"), ctx, draft, compressed);
-            draft.clear().writeBytes(compressed);
+            PipelineUtil.callEncode((MessageToByteEncoder<?>) ctx.pipeline().get("compression-encoder"), ctx, buf, compressed);
+            buf.clear().writeBytes(compressed);
         } finally {
             compressed.release();
         }

@@ -27,29 +27,29 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             return;
         }
 
-        ByteBuf draft = ctx.alloc().buffer().writeBytes(bytebuf);
+        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
-            boolean needsCompress = handleCompressionOrder(ctx, draft);
-            info.transformOutgoing(draft, CancelEncoderException::generate);
+            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
+            info.transformOutgoing(transformedBuf, CancelEncoderException::generate);
 
             if (needsCompress) {
-                recompress(ctx, draft);
+                recompress(ctx, transformedBuf);
             }
 
-            out.add(draft.retain());
+            out.add(transformedBuf.retain());
         } finally {
-            draft.release();
+            transformedBuf.release();
         }
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf draft) {
+    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) {
         boolean needsCompress = false;
         if (!handledCompression) {
             if (ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
                 // Need to decompress this packet due to bad order
-                ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, draft);
+                ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, buf);
                 try {
-                    draft.clear().writeBytes(decompressed);
+                    buf.clear().writeBytes(decompressed);
                 } finally {
                     decompressed.release();
                 }
@@ -66,10 +66,10 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         return needsCompress;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf draft) {
-        ByteBuf compressed = BungeePipelineUtil.compress(ctx, draft);
+    private void recompress(ChannelHandlerContext ctx, ByteBuf buf) {
+        ByteBuf compressed = BungeePipelineUtil.compress(ctx, buf);
         try {
-            draft.clear().writeBytes(compressed);
+            buf.clear().writeBytes(compressed);
         } finally {
             compressed.release();
         }

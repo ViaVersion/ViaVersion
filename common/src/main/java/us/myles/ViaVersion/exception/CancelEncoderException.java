@@ -4,7 +4,8 @@ import io.netty.handler.codec.EncoderException;
 import us.myles.ViaVersion.api.Via;
 
 /**
- * Used for cancelling packets in encode handlers.
+ * Thrown during packet encoding when an outgoing packet should be cancelled.
+ * Specifically extends {@link EncoderException} to prevent netty from wrapping the exception.
  */
 public class CancelEncoderException extends EncoderException {
     public static final CancelEncoderException CACHED = new CancelEncoderException("CACHED") {

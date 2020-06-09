@@ -27,15 +27,15 @@ public class SpongeDecodeHandler extends ByteToMessageDecoder {
             throw CancelDecoderException.generate(null);
         }
 
-        ByteBuf draft = null;
+        ByteBuf transformedBuf = null;
         try {
             if (info.shouldTransformPacket()) {
-                draft = ctx.alloc().buffer().writeBytes(bytebuf);
-                info.transformIncoming(draft, CancelDecoderException::generate);
+                transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+                info.transformIncoming(transformedBuf, CancelDecoderException::generate);
             }
 
             try {
-                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, draft == null ? bytebuf : draft));
+                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, transformedBuf == null ? bytebuf : transformedBuf));
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
@@ -44,8 +44,8 @@ public class SpongeDecodeHandler extends ByteToMessageDecoder {
                 }
             }
         } finally {
-            if (draft != null) {
-                draft.release();
+            if (transformedBuf != null) {
+                transformedBuf.release();
             }
         }
     }

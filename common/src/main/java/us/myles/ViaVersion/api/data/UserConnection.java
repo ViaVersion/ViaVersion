@@ -291,44 +291,44 @@ public class UserConnection {
     /**
      * Transforms the clientbound packet contained in draft ByteBuf.
      *
-     * @param draft          ByteBuf with packet id and packet contents
+     * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
      *                       packet is cancelled
      * @throws Exception when transforming failed or this packet is cancelled
      */
-    public void transformOutgoing(ByteBuf draft, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        if (!draft.isReadable()) return;
-        transform(draft, Direction.OUTGOING, cancelSupplier);
+    public void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!buf.isReadable()) return;
+        transform(buf, Direction.OUTGOING, cancelSupplier);
     }
 
     /**
      * Transforms the serverbound packet contained in draft ByteBuf.
      *
-     * @param draft          ByteBuf with packet id and packet contents
+     * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
      *                       packet is cancelled
      * @throws Exception when transforming failed or this packet is cancelled
      */
-    public void transformIncoming(ByteBuf draft, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        if (!draft.isReadable()) return;
-        transform(draft, Direction.INCOMING, cancelSupplier);
+    public void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!buf.isReadable()) return;
+        transform(buf, Direction.INCOMING, cancelSupplier);
     }
 
-    private void transform(ByteBuf draft, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        int id = Type.VAR_INT.read(draft);
+    private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        int id = Type.VAR_INT.read(buf);
         if (id == PacketWrapper.PASSTHROUGH_ID) return;
 
-        PacketWrapper wrapper = new PacketWrapper(id, draft, this);
+        PacketWrapper wrapper = new PacketWrapper(id, buf, this);
         try {
             protocolInfo.getPipeline().transform(direction, protocolInfo.getState(), wrapper);
         } catch (CancelException ex) {
             throw cancelSupplier.apply(ex);
         }
 
-        ByteBuf transformed = draft.alloc().buffer();
+        ByteBuf transformed = buf.alloc().buffer();
         try {
             wrapper.writeToBuffer(transformed);
-            draft.clear().writeBytes(transformed);
+            buf.clear().writeBytes(transformed);
         } finally {
             transformed.release();
         }

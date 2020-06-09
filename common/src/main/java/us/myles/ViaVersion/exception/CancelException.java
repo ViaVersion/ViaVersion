@@ -1,9 +1,11 @@
 package us.myles.ViaVersion.exception;
 
+import io.netty.handler.codec.CodecException;
 import us.myles.ViaVersion.api.Via;
 
 /**
- * Used for cancelling packets.
+ * Thrown during packet transformation to cancel the packet.
+ * Internally catched to then throw the appropriate {@link CodecException} for Netty's handler.
  */
 public class CancelException extends Exception {
     public static final CancelException CACHED = new CancelException("Cached - Enable /viaver debug to not use cached exception") {

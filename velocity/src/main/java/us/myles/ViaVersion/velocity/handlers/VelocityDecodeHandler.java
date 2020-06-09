@@ -25,12 +25,12 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
             return;
         }
 
-        ByteBuf draft = ctx.alloc().buffer().writeBytes(bytebuf);
+        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
-            info.transformIncoming(draft, CancelDecoderException::generate);
-            out.add(draft.retain());
+            info.transformIncoming(transformedBuf, CancelDecoderException::generate);
+            out.add(transformedBuf.retain());
         } finally {
-            draft.release();
+            transformedBuf.release();
         }
     }
 
