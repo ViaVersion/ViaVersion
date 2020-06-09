@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.Via;
  * Thrown during packet decoding when an incoming packet should be cancelled.
  * Specifically extends {@link DecoderException} to prevent netty from wrapping the exception.
  */
-public class CancelDecoderException extends DecoderException {
+public class CancelDecoderException extends DecoderException implements ViaCodecException {
     public static final CancelDecoderException CACHED = new CancelDecoderException("This packet is supposed to be cancelled; If you have debug enabled, you can ignore these") {
         @Override
         public Throwable fillInStackTrace() {

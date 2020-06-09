@@ -8,6 +8,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.exception.CancelEncoderException;
+import us.myles.ViaVersion.exception.ViaCodecException;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -80,7 +81,7 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof CancelEncoderException) return;
+        if (cause instanceof ViaCodecException) return;
         super.exceptionCaught(ctx, cause);
     }
 }

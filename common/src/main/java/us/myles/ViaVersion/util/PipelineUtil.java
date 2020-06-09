@@ -91,13 +91,14 @@ public class PipelineUtil {
      * @param c The exception to look for
      * @return True if the stack trace contained it as its cause or if t is an instance of c.
      */
-    public static boolean containsCause(Throwable t, Class<? extends Throwable> c) {
-        do {
-            if (t != null) {
-                if (c.isAssignableFrom(t.getClass())) return true;
-                t = t.getCause();
+    public static boolean containsCause(Throwable t, Class<?> c) {
+        while (t != null) {
+            if (c.isAssignableFrom(t.getClass())) {
+                return true;
             }
-        } while (t != null);
+
+            t = t.getCause();
+        }
         return false;
     }
 
