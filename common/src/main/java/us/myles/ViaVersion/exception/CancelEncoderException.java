@@ -8,7 +8,7 @@ import us.myles.ViaVersion.api.Via;
  * Specifically extends {@link EncoderException} to prevent netty from wrapping the exception.
  */
 public class CancelEncoderException extends EncoderException {
-    public static final CancelEncoderException CACHED = new CancelEncoderException("CACHED") {
+    public static final CancelEncoderException CACHED = new CancelEncoderException("This packet is supposed to be cancelled; If you have debug enabled, you can ignore these") {
         @Override
         public Throwable fillInStackTrace() {
             return this;
