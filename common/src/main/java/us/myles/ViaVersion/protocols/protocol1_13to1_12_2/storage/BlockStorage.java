@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockStorage extends StoredObject {
-    private static final IntSet WHITELIST = new IntOpenHashSet(46);
+    private static final IntSet WHITELIST = new IntOpenHashSet(46, 1F);
     private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     static {

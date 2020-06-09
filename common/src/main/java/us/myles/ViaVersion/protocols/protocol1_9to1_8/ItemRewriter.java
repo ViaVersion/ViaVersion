@@ -19,7 +19,7 @@ public class ItemRewriter {
     private static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     private static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
-    private static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36);
+    private static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36, 1F);
 
     static {
         /* Entities */

@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class Effect {
 
-    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(17);
+    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(17, 1F);
 
     static {
         addRewrite(1005, 1010); //Play music disc
