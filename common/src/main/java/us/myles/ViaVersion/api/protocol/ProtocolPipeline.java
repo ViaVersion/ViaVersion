@@ -37,7 +37,7 @@ public class ProtocolPipeline extends SimpleProtocol {
         ProtocolInfo protocolInfo = new ProtocolInfo(userConnection);
         protocolInfo.setPipeline(this);
 
-        userConnection.put(protocolInfo);
+        userConnection.setProtocolInfo(protocolInfo);
 
         /* Init through all our pipes */
         for (Protocol protocol : protocolList) {
@@ -83,11 +83,11 @@ public class ProtocolPipeline extends SimpleProtocol {
 
         if (Via.getManager().isDebug()) {
             // Debug packet
-            int serverProtocol = userConnection.get(ProtocolInfo.class).getServerProtocolVersion();
-            int clientProtocol = userConnection.get(ProtocolInfo.class).getProtocolVersion();
+            int serverProtocol = userConnection.getProtocolInfo().getServerProtocolVersion();
+            int clientProtocol = userConnection.getProtocolInfo().getProtocolVersion();
             ViaPlatform platform = Via.getPlatform();
 
-            String actualUsername = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+            String actualUsername = packetWrapper.user().getProtocolInfo().getUsername();
             String username = actualUsername != null ? actualUsername + " " : "";
 
             platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} (0x{4}) -> {5} (0x{6}) [{7}] {8}",

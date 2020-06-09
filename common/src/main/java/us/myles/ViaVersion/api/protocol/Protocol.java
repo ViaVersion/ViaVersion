@@ -422,21 +422,26 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
                 throw e;
             }
 
-            Class<? extends PacketType> packetTypeClass = direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum;
+            Class<? extends PacketType> packetTypeClass = state == State.PLAY ? (direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum) : null;
             if (packetTypeClass != null) {
                 PacketType[] enumConstants = packetTypeClass.getEnumConstants();
                 PacketType packetType = oldId < enumConstants.length && oldId >= 0 ? enumConstants[oldId] : null;
-                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + oldId + ")");
+                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(oldId) + ")");
             } else {
                 Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                        + " IN REMAP OF 0x" + Integer.toHexString(oldId) + "->0x" + Integer.toHexString(newId));
+                        + " IN REMAP OF 0x" + toNiceHex(oldId) + "->0x" + toNiceHex(newId));
             }
             throw e;
         }
 
         if (packetWrapper.isCancelled()) {
-            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
+            throw CancelException.generate();
         }
+    }
+
+    private String toNiceHex(int id) {
+        String hex = Integer.toHexString(id).toUpperCase();
+        return (hex.length() == 1 ? "0x0" : "0x") + hex;
     }
 
     /**

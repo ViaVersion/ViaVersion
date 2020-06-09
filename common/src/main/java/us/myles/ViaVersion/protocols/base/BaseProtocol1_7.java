@@ -38,7 +38,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
+                        ProtocolInfo info = wrapper.user().getProtocolInfo();
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
                             JsonElement json = GsonUtil.getGson().fromJson(originalStatus, JsonElement.class);
@@ -113,7 +113,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
+                        ProtocolInfo info = wrapper.user().getProtocolInfo();
                         info.setState(State.PLAY);
 
                         if (info.getServerProtocolVersion() >= ProtocolVersion.v1_16.getId()) {
@@ -170,7 +170,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(final PacketWrapper wrapper) throws Exception {
-                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
                         if (Via.getConfig().getBlockedProtocols().contains(protocol)) {
                             if (!wrapper.user().getChannel().isOpen()) return;
 

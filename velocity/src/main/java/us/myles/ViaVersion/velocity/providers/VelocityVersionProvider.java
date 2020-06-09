@@ -4,7 +4,6 @@ import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
 
@@ -15,7 +14,7 @@ public class VelocityVersionProvider extends VersionProvider {
 
     @Override
     public int getServerProtocol(UserConnection user) throws Exception {
-        int playerVersion = user.get(ProtocolInfo.class).getProtocolVersion();
+        int playerVersion = user.getProtocolInfo().getProtocolVersion();
 
         IntStream versions = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()
                 .mapToInt(com.velocitypowered.api.network.ProtocolVersion::getProtocol);

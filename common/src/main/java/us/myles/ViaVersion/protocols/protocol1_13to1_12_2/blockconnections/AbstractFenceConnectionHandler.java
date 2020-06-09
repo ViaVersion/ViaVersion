@@ -44,7 +44,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
 
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = 0;
-        boolean pre1_12 = user.get(ProtocolInfo.class).getServerProtocolVersion() < ProtocolVersion.v1_12.getId();
+        boolean pre1_12 = user.getProtocolInfo().getServerProtocolVersion() < ProtocolVersion.v1_12.getId();
         if (connects(BlockFace.EAST, getBlockData(user, position.getRelative(BlockFace.EAST)), pre1_12)) states |= 1;
         if (connects(BlockFace.NORTH, getBlockData(user, position.getRelative(BlockFace.NORTH)), pre1_12)) states |= 2;
         if (connects(BlockFace.SOUTH, getBlockData(user, position.getRelative(BlockFace.SOUTH)), pre1_12)) states |= 4;

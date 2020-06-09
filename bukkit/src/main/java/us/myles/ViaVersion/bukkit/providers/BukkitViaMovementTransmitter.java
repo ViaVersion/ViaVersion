@@ -81,7 +81,7 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
     @Override
     public void sendPlayer(UserConnection info) {
         if (USE_NMS) {
-            Player player = Bukkit.getPlayer(info.get(ProtocolInfo.class).getUuid());
+            Player player = Bukkit.getPlayer(info.getProtocolInfo().getUuid());
             if (player != null) {
                 try {
                     // Tick player

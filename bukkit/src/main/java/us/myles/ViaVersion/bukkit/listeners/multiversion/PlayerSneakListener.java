@@ -75,7 +75,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
         Player player = event.getPlayer();
         UserConnection userConnection = getUserConnection(player);
         if (userConnection == null) return;
-        ProtocolInfo info = userConnection.get(ProtocolInfo.class);
+        ProtocolInfo info = userConnection.getProtocolInfo();
         if (info == null) return;
 
         int protocolVersion = info.getProtocolVersion();

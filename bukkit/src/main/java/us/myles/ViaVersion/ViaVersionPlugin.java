@@ -17,12 +17,18 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
-import us.myles.ViaVersion.bukkit.platform.*;
+import us.myles.ViaVersion.bukkit.platform.BukkitTaskId;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaConfig;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaInjector;
+import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static ViaVersionPlugin instance;
@@ -54,15 +60,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Check if we're using protocol support too
         protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
-
-        if (protocolSupport) {
-            getLogger().info("Hooking into ProtocolSupport, to prevent issues!");
-            try {
-                BukkitViaInjector.patchLists();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override

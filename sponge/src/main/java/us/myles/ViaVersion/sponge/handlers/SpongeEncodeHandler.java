@@ -3,26 +3,22 @@ package us.myles.ViaVersion.sponge.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.exception.CancelEncoderException;
+import us.myles.ViaVersion.handlers.ChannelHandlerContextWrapper;
+import us.myles.ViaVersion.handlers.ViaHandler;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class SpongeEncodeHandler extends MessageToByteEncoder {
+public class SpongeEncodeHandler extends MessageToByteEncoder<Object> implements ViaHandler {
     private final UserConnection info;
-    private final MessageToByteEncoder minecraftEncoder;
+    private final MessageToByteEncoder<?> minecraftEncoder;
 
-    public SpongeEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
+    public SpongeEncodeHandler(UserConnection info, MessageToByteEncoder<?> minecraftEncoder) {
         this.info = info;
         this.minecraftEncoder = minecraftEncoder;
     }
-
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
@@ -30,42 +26,29 @@ public class SpongeEncodeHandler extends MessageToByteEncoder {
         if (!(o instanceof ByteBuf)) {
             // call minecraft encoder
             try {
-                PipelineUtil.callEncode(this.minecraftEncoder, ctx, o, bytebuf);
+                PipelineUtil.callEncode(this.minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, bytebuf);
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
+                } else if (e.getCause() instanceof Error) {
+                    throw (Error) e.getCause();
                 }
             }
         }
-        if (bytebuf.readableBytes() == 0) {
-            throw Via.getManager().isDebug() ? new CancelException() : CancelException.CACHED;
-        }
-        // Increment sent
-        info.incrementSent();
-        if (info.isActive()) {
-            // Handle ID
-            int id = Type.VAR_INT.read(bytebuf);
-            // Transform
-            ByteBuf oldPacket = bytebuf.copy();
-            bytebuf.clear();
 
-            try {
-                PacketWrapper wrapper = new PacketWrapper(id, oldPacket, info);
-                ProtocolInfo protInfo = info.get(ProtocolInfo.class);
-                protInfo.getPipeline().transform(Direction.OUTGOING, protInfo.getState(), wrapper);
-                wrapper.writeToBuffer(bytebuf);
-            } catch (Throwable e) {
-                bytebuf.clear();
-                throw e;
-            } finally {
-                oldPacket.release();
-            }
-        }
+        transform(bytebuf);
+    }
+
+    @Override
+    public void transform(ByteBuf bytebuf) throws Exception {
+        info.checkOutgoingPacket();
+        if (!info.shouldTransformPacket()) return;
+        info.transformOutgoing(bytebuf, CancelEncoderException::generate);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelException.class)) return;
+        if (cause instanceof CancelEncoderException) return;
         super.exceptionCaught(ctx, cause);
     }
 }

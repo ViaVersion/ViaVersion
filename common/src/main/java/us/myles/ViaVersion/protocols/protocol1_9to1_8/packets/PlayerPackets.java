@@ -126,7 +126,7 @@ public class PlayerPackets {
                         if (mode == 0 || mode == 3 || mode == 4) {
                             String[] players = wrapper.passthrough(Type.STRING_ARRAY); // Players
                             final EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
-                            String myName = wrapper.user().get(ProtocolInfo.class).getUsername();
+                            String myName = wrapper.user().getProtocolInfo().getUsername();
                             String teamName = wrapper.get(Type.STRING, 0);
                             for (String player : players) {
                                 if (entityTracker.isAutoTeam() && player.equalsIgnoreCase(myName)) {

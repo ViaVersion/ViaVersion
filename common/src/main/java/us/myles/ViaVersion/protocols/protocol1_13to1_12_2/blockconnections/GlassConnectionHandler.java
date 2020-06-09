@@ -41,7 +41,7 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
         byte states = super.getStates(user, position, blockState);
         if (states != 0) return states;
 
-        ProtocolInfo protocolInfo = user.get(ProtocolInfo.class);
+        ProtocolInfo protocolInfo = user.getProtocolInfo();
         return protocolInfo.getServerProtocolVersion() <= 47
                 && protocolInfo.getServerProtocolVersion() != -1 ? 0xF : states;
     }

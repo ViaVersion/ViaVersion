@@ -26,7 +26,7 @@ public class SpongeViaAPI implements ViaAPI<Player> {
     public int getPlayerVersion(UUID uuid) {
         if (!isInjected(uuid))
             return ProtocolRegistry.SERVER_PROTOCOL;
-        return Via.getManager().getConnection(uuid).get(ProtocolInfo.class).getProtocolVersion();
+        return Via.getManager().getConnection(uuid).getProtocolInfo().getProtocolVersion();
     }
 
     @Override
