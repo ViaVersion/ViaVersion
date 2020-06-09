@@ -429,7 +429,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
                 Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(oldId) + ")");
             } else {
                 Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                        + " IN REMAP OF 0x" + toNiceHex(oldId) + "->0x" + toNiceHex(newId));
+                        + " IN REMAP OF " + toNiceHex(oldId) + "->" + toNiceHex(newId));
             }
             throw e;
         }
