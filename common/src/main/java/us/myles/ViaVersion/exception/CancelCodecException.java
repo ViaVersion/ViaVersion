@@ -6,5 +6,5 @@ package us.myles.ViaVersion.exception;
  * @see CancelEncoderException
  * @see CancelDecoderException
  */
-public interface ViaCodecException {
+public interface CancelCodecException {
 }

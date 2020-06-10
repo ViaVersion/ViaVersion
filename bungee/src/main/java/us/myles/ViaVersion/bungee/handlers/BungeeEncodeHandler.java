@@ -7,7 +7,7 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
 import us.myles.ViaVersion.exception.CancelEncoderException;
-import us.myles.ViaVersion.exception.ViaCodecException;
+import us.myles.ViaVersion.exception.CancelCodecException;
 
 import java.util.List;
 
@@ -78,7 +78,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof ViaCodecException) return;
+        if (cause instanceof CancelCodecException) return;
         super.exceptionCaught(ctx, cause);
     }
 }
