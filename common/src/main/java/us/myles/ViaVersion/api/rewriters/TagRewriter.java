@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TagRewriter {
-    public static final int[] EMPTY_ARRAY = {};
+    private static final int[] EMPTY_ARRAY = {-1};
     private final Protocol protocol;
     private final IdRewriteFunction blockRewriter;
     private final IdRewriteFunction itemRewriter;
@@ -26,6 +26,9 @@ public class TagRewriter {
         this.entityRewriter = entityRewriter;
     }
 
+    /**
+     * Adds an empty tag (since the client crashes if a checked tag is not registered.)
+     */
     public void addEmptyTag(TagType tagType, String id) {
         getNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
     }

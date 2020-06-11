@@ -104,6 +104,29 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             }
         });
 
+        registerIncoming(ServerboundPackets1_16.INTERACT_ENTITY, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.VAR_INT); // Entity Id
+                    int action =  wrapper.passthrough(Type.VAR_INT);
+                    if (action == 0 || action == 2) {
+                        if (action == 2) {
+                            // Location
+                            wrapper.passthrough(Type.FLOAT);
+                            wrapper.passthrough(Type.FLOAT);
+                            wrapper.passthrough(Type.FLOAT);
+                        }
+
+                        wrapper.passthrough(Type.VAR_INT); // Hand
+
+                        // New boolean: Whether the client is sneaking/pressing shift
+                        wrapper.read(Type.BOOLEAN);
+                    }
+                });
+            }
+        });
+
         cancelIncoming(ServerboundPackets1_16.GENERATE_JIGSAW);
         cancelIncoming(ServerboundPackets1_16.UPDATE_JIGSAW_BLOCK);
     }
@@ -164,7 +187,8 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_16(userConnection));
-        if (!userConnection.has(ClientWorld.class))
+        if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
     }
 }
