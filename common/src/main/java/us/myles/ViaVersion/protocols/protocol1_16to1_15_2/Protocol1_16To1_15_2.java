@@ -109,7 +109,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             public void registerMap() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.VAR_INT); // Entity Id
-                    int action =  wrapper.passthrough(Type.VAR_INT);
+                    int action = wrapper.passthrough(Type.VAR_INT);
                     if (action == 0 || action == 2) {
                         if (action == 2) {
                             // Location
@@ -123,6 +123,18 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                         // New boolean: Whether the client is sneaking/pressing shift
                         wrapper.read(Type.BOOLEAN);
                     }
+                });
+            }
+        });
+
+        registerIncoming(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.BYTE);
+                    // Flying and walking speed - not important anyways
+                    wrapper.write(Type.FLOAT, 0.05F);
+                    wrapper.write(Type.FLOAT, 0.1F);
                 });
             }
         });
