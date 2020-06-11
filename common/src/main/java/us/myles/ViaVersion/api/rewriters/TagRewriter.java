@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TagRewriter {
-    private static final int[] EMPTY_ARRAY = {-1};
+    private static final int[] EMPTY_ARRAY = {};
     private final Protocol protocol;
     private final IdRewriteFunction blockRewriter;
     private final IdRewriteFunction itemRewriter;
