@@ -119,10 +119,10 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                         }
 
                         wrapper.passthrough(Type.VAR_INT); // Hand
-
-                        // New boolean: Whether the client is sneaking/pressing shift
-                        wrapper.read(Type.BOOLEAN);
                     }
+
+                    // New boolean: Whether the client is sneaking/pressing shift
+                    wrapper.read(Type.BOOLEAN);
                 });
             }
         });
