@@ -165,9 +165,11 @@ public class EntityPackets {
             @Override
             public void registerMap() {
                 handler(DIMENSION_HANDLER);
-                map(Type.LONG);
-                map(Type.UNSIGNED_BYTE);
+                map(Type.LONG); // Seed
+                map(Type.UNSIGNED_BYTE); // Gamemode
                 handler(wrapper -> {
+                    wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
+
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     String dimensionId = wrapper.get(Type.STRING, 0);
                     clientWorld.setEnvironment(dimensionId);
@@ -186,6 +188,7 @@ public class EntityPackets {
                 map(Type.INT); // Entity ID
                 map(Type.UNSIGNED_BYTE); //  Gamemode
                 handler(wrapper -> {
+                    wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
                     wrapper.write(Type.STRING_ARRAY, WORLD_NAMES); // World list - only used for command completion
                     wrapper.write(Type.NBT, DIMENSIONS_TAG); // Dimension registry
                 });
