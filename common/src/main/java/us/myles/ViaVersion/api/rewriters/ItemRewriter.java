@@ -69,7 +69,7 @@ public class ItemRewriter {
                 handler(wrapper -> {
                     byte slot;
                     do {
-                        slot = wrapper.read(Type.BYTE);
+                        slot = wrapper.passthrough(Type.BYTE);
                          // & 0x7F into an extra variable if slot is needed
                         toClient.rewrite(wrapper.passthrough(type));
                     } while ((slot & 0xFFFFFF80) != 0);

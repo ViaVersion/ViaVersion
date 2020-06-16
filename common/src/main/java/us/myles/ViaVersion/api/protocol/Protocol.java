@@ -455,7 +455,8 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
     }
 
-    public @Nullable <T> T get(Class<T> objectClass) {
+    @Nullable
+    public <T> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
