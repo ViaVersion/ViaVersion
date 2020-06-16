@@ -95,7 +95,19 @@ public class InventoryPackets {
         });
 
         itemRewriter.registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerEntityEquipment(ClientboundPackets1_15.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+
+        protocol.registerOutgoing(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+
+                handler(wrapper -> {
+                    int slot = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.BYTE, (byte) slot);
+                    InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                });
+            }
+        });
 
         protocol.registerOutgoing(ClientboundPackets1_15.DECLARE_RECIPES, new PacketRemapper() {
             @Override

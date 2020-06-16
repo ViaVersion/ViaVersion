@@ -62,7 +62,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, fullChunk, primaryBitmask, sections, biomeData, nbtData);
+        return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, nbtData);
     }
 
     @Override

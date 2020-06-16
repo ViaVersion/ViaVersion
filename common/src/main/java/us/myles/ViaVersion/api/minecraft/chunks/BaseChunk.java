@@ -8,16 +8,18 @@ public class BaseChunk implements Chunk {
     protected final int x;
     protected final int z;
     protected final boolean fullChunk;
+    protected boolean ignoreOldLightData;
     protected final int bitmask;
     protected final ChunkSection[] sections;
     protected int[] biomeData;
     protected CompoundTag heightMap;
     protected final List<CompoundTag> blockEntities;
 
-    public BaseChunk(int x, int z, boolean fullChunk, int bitmask, ChunkSection[] sections, int[] biomeData, CompoundTag heightMap, List<CompoundTag> blockEntities) {
+    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, int bitmask, ChunkSection[] sections, int[] biomeData, CompoundTag heightMap, List<CompoundTag> blockEntities) {
         this.x = x;
         this.z = z;
         this.fullChunk = fullChunk;
+        this.ignoreOldLightData = ignoreOldLightData;
         this.bitmask = bitmask;
         this.sections = sections;
         this.biomeData = biomeData;
@@ -25,8 +27,8 @@ public class BaseChunk implements Chunk {
         this.blockEntities = blockEntities;
     }
 
-    public BaseChunk(int x, int z, boolean fullChunk, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
-        this(x, z, fullChunk, bitmask, sections, biomeData, null, blockEntities);
+    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
+        this(x, z, fullChunk, ignoreOldLightData, bitmask, sections, biomeData, null, blockEntities);
     }
 
     @Override
@@ -47,6 +49,16 @@ public class BaseChunk implements Chunk {
     @Override
     public boolean isFullChunk() {
         return fullChunk;
+    }
+
+    @Override
+    public boolean isIgnoreOldLightData() {
+        return ignoreOldLightData;
+    }
+
+    @Override
+    public void setIgnoreOldLightData(boolean ignoreOldLightData) {
+        this.ignoreOldLightData = ignoreOldLightData;
     }
 
     @Override

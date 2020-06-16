@@ -47,6 +47,9 @@ public class WorldPackets {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     Chunk chunk = wrapper.read(new Chunk1_15Type(clientWorld));
                     wrapper.write(new Chunk1_16Type(clientWorld), chunk);
+
+                    chunk.setIgnoreOldLightData(chunk.isFullChunk());
+
                     for (int s = 0; s < 16; s++) {
                         ChunkSection section = chunk.getSections()[s];
                         if (section == null) continue;

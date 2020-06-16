@@ -9,7 +9,7 @@ public class Chunk1_8 extends BaseChunk {
     private boolean unloadPacket;
 
     public Chunk1_8(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
-        super(x, z, groundUp, bitmask, sections, biomeData, blockEntities);
+        super(x, z, groundUp, false, bitmask, sections, biomeData, blockEntities);
     }
 
     /**
