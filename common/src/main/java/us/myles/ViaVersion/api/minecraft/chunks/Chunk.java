@@ -19,6 +19,10 @@ public interface Chunk {
         return isFullChunk();
     }
 
+    boolean isIgnoreOldLightData();
+
+    void setIgnoreOldLightData(boolean ignoreOldLightData);
+
     int getBitmask();
 
     ChunkSection[] getSections();

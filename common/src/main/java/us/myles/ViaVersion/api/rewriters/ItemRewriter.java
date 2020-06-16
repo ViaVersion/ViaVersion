@@ -45,6 +45,7 @@ public class ItemRewriter {
         });
     }
 
+    // Sub 1.16
     public void registerEntityEquipment(ClientboundPacketType packetType, Type<Item> type) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
@@ -54,6 +55,25 @@ public class ItemRewriter {
                 map(type); // 2 - Item
 
                 handler(itemToClientHandler(type));
+            }
+        });
+    }
+
+    // 1.16+
+    public void registerEntityEquipmentArray(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+
+                handler(wrapper -> {
+                    byte slot;
+                    do {
+                        slot = wrapper.read(Type.BYTE);
+                         // & 0x7F into an extra variable if slot is needed
+                        toClient.rewrite(wrapper.passthrough(type));
+                    } while ((slot & 0xFFFFFF80) != 0);
+                });
             }
         });
     }
