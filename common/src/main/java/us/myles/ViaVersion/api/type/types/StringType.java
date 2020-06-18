@@ -17,7 +17,7 @@ public class StringType extends Type<String> {
 
     @Override
     public String read(ByteBuf buffer) throws Exception {
-        int len = Type.VAR_INT.read(buffer);
+        int len = Type.VAR_INT.readPrimitive(buffer);
 
         Preconditions.checkArgument(len <= Short.MAX_VALUE * maxJavaCharUtf8Length,
                 "Cannot receive string longer than Short.MAX_VALUE * "  + maxJavaCharUtf8Length + " bytes (got %s bytes)", len);
@@ -36,7 +36,7 @@ public class StringType extends Type<String> {
         Preconditions.checkArgument(object.length() <= Short.MAX_VALUE, "Cannot send string longer than Short.MAX_VALUE (got %s characters)", object.length());
 
         byte[] b = object.getBytes(StandardCharsets.UTF_8);
-        Type.VAR_INT.write(buffer, b.length);
+        Type.VAR_INT.writePrimitive(buffer, b.length);
         buffer.writeBytes(b);
     }
 }

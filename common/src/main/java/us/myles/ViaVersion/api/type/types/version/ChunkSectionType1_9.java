@@ -29,19 +29,19 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
         if (bitsPerBlock > 8) {
             bitsPerBlock = GLOBAL_PALETTE;
         }
-        int paletteLength = Type.VAR_INT.read(buffer);
+        int paletteLength = Type.VAR_INT.readPrimitive(buffer);
         // Read palette
         chunkSection.clearPalette();
         for (int i = 0; i < paletteLength; i++) {
             if (bitsPerBlock != GLOBAL_PALETTE) {
-                chunkSection.addPaletteEntry(Type.VAR_INT.read(buffer));
+                chunkSection.addPaletteEntry(Type.VAR_INT.readPrimitive(buffer));
             } else {
-                Type.VAR_INT.read(buffer);
+                Type.VAR_INT.readPrimitive(buffer);
             }
         }
 
         // Read blocks
-        long[] blockData = new long[Type.VAR_INT.read(buffer)];
+        long[] blockData = new long[Type.VAR_INT.readPrimitive(buffer)];
         if (blockData.length > 0) {
             int expectedLength = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
             if (blockData.length != expectedLength) {
@@ -75,17 +75,17 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
 
         // Write pallet (or not)
         if (bitsPerBlock != GLOBAL_PALETTE) {
-            Type.VAR_INT.write(buffer, chunkSection.getPaletteSize());
+            Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteSize());
             for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
-                Type.VAR_INT.write(buffer, chunkSection.getPaletteEntry(i));
+                Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteEntry(i));
             }
         } else {
-            Type.VAR_INT.write(buffer, 0);
+            Type.VAR_INT.writePrimitive(buffer, 0);
         }
 
         long[] data = CompactArrayUtil.createCompactArray(bitsPerBlock, ChunkSection.SIZE,
                 bitsPerBlock == GLOBAL_PALETTE ? chunkSection::getFlatBlock : chunkSection::getPaletteIndex);
-        Type.VAR_INT.write(buffer, data.length);
+        Type.VAR_INT.writePrimitive(buffer, data.length);
         for (long l : data) {
             buffer.writeLong(l);
         }

@@ -13,7 +13,7 @@ public class BlockChangeRecordType extends Type<BlockChangeRecord> {
     public BlockChangeRecord read(ByteBuf buffer) throws Exception {
         short horizontal = Type.UNSIGNED_BYTE.read(buffer);
         short y = Type.UNSIGNED_BYTE.read(buffer);
-        int blockId = Type.VAR_INT.read(buffer);
+        int blockId = Type.VAR_INT.readPrimitive(buffer);
 
         return new BlockChangeRecord(horizontal, y, blockId);
     }
@@ -22,6 +22,6 @@ public class BlockChangeRecordType extends Type<BlockChangeRecord> {
     public void write(ByteBuf buffer, BlockChangeRecord object) throws Exception {
         Type.UNSIGNED_BYTE.write(buffer, object.getHorizontal());
         Type.UNSIGNED_BYTE.write(buffer, object.getY());
-        Type.VAR_INT.write(buffer, object.getBlockId());
+        Type.VAR_INT.writePrimitive(buffer, object.getBlockId());
     }
 }

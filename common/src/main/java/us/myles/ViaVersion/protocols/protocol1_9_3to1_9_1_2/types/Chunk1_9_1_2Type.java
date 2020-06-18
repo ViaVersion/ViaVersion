@@ -32,9 +32,9 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
         int chunkZ = input.readInt();
 
         boolean groundUp = input.readBoolean();
-        int primaryBitmask = Type.VAR_INT.read(input);
+        int primaryBitmask = Type.VAR_INT.readPrimitive(input);
         // Size (unused)
-        Type.VAR_INT.read(input);
+        Type.VAR_INT.readPrimitive(input);
 
         BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
@@ -75,7 +75,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
         output.writeInt(chunk.getZ());
 
         output.writeBoolean(chunk.isFullChunk());
-        Type.VAR_INT.write(output, chunk.getBitmask());
+        Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
 
         ByteBuf buf = output.alloc().buffer();
         try {
@@ -90,7 +90,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
             }
             buf.readerIndex(0);
-            Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
+            Type.VAR_INT.writePrimitive(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
             output.writeBytes(buf);
         } finally {
             buf.release(); // release buffer

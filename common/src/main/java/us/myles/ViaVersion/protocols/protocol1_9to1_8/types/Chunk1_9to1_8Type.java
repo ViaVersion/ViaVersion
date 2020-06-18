@@ -56,7 +56,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         long chunkHash = toLong(chunkX, chunkZ);
         boolean fullChunk = input.readByte() != 0;
         int bitmask = input.readUnsignedShort();
-        int dataLength = Type.VAR_INT.read(input);
+        int dataLength = Type.VAR_INT.readPrimitive(input);
 
         // Data to be read
         BitSet usedSections = new BitSet(16);
@@ -138,7 +138,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         output.writeInt(chunk.getZ());
         if (chunk.isUnloadPacket()) return;
         output.writeByte(chunk.isFullChunk() ? 0x01 : 0x00);
-        Type.VAR_INT.write(output, chunk.getBitmask());
+        Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
 
         ByteBuf buf = output.alloc().buffer();
         try {
@@ -152,7 +152,7 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
                 section.writeSkyLight(buf);
             }
             buf.readerIndex(0);
-            Type.VAR_INT.write(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
+            Type.VAR_INT.writePrimitive(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
             output.writeBytes(buf);
         } finally {
             buf.release(); // release buffer

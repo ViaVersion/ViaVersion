@@ -56,14 +56,14 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Long[]> LONG_ARRAY = new ArrayType<>(Type.LONG);
 
-    public static final Type<Float> FLOAT = new FloatType();
+    public static final FloatType FLOAT = new FloatType();
     /**
      * @deprecated unreasonable overhead
      */
     @Deprecated
     public static final Type<Float[]> FLOAT_ARRAY = new ArrayType<>(Type.FLOAT);
 
-    public static final Type<Short> SHORT = new ShortType();
+    public static final ShortType SHORT = new ShortType();
     /**
      * @deprecated unreasonable overhead
      */
@@ -84,7 +84,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<UUID> UUID_INT_ARRAY = new UUIDIntArrayType();
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
     /* Variable Types */
-    public static final Type<Integer> VAR_INT = new VarIntType();
+    public static final VarIntType VAR_INT = new VarIntType();
     /**
      * @deprecated unreasonable overhead, use VAR_INT_ARRAY_PRIMITIVE
      */
