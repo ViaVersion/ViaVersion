@@ -219,7 +219,7 @@ public class PacketWrapper {
      */
     public void writeToBuffer(ByteBuf buffer) throws Exception {
         if (id != -1) {
-            Type.VAR_INT.write(buffer, id);
+            Type.VAR_INT.writePrimitive(buffer, id);
         }
         if (!readableObjects.isEmpty()) {
             packetValues.addAll(readableObjects);

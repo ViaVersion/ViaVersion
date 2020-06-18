@@ -16,7 +16,7 @@ public class FlatVarIntItemType extends BaseItemType {
             return null;
         } else {
             Item item = new Item();
-            item.setIdentifier(Type.VAR_INT.read(buffer));
+            item.setIdentifier(Type.VAR_INT.readPrimitive(buffer));
             item.setAmount(buffer.readByte());
             item.setTag(Type.NBT.read(buffer));
             return item;
@@ -29,7 +29,7 @@ public class FlatVarIntItemType extends BaseItemType {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            Type.VAR_INT.write(buffer, object.getIdentifier());
+            Type.VAR_INT.writePrimitive(buffer, object.getIdentifier());
             buffer.writeByte(object.getAmount());
             Type.NBT.write(buffer, object.getTag());
         }

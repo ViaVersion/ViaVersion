@@ -24,15 +24,15 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
             bitsPerBlock = GLOBAL_PALETTE;
         }
 
-        int paletteLength = bitsPerBlock == GLOBAL_PALETTE ? 0 : Type.VAR_INT.read(buffer);
+        int paletteLength = bitsPerBlock == GLOBAL_PALETTE ? 0 : Type.VAR_INT.readPrimitive(buffer);
         // Read palette
         chunkSection.clearPalette();
         for (int i = 0; i < paletteLength; i++) {
-            chunkSection.addPaletteEntry(Type.VAR_INT.read(buffer));
+            chunkSection.addPaletteEntry(Type.VAR_INT.readPrimitive(buffer));
         }
 
         // Read blocks
-        long[] blockData = new long[Type.VAR_INT.read(buffer)];
+        long[] blockData = new long[Type.VAR_INT.readPrimitive(buffer)];
         if (blockData.length > 0) {
             int expectedLength = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
             if (blockData.length != expectedLength) {
@@ -64,15 +64,15 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
 
         // Write pallet (or not)
         if (bitsPerBlock != GLOBAL_PALETTE) {
-            Type.VAR_INT.write(buffer, chunkSection.getPaletteSize());
+            Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteSize());
             for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
-                Type.VAR_INT.write(buffer, chunkSection.getPaletteEntry(i));
+                Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteEntry(i));
             }
         }
 
         long[] data = CompactArrayUtil.createCompactArray(bitsPerBlock, ChunkSection.SIZE,
                 bitsPerBlock == GLOBAL_PALETTE ? chunkSection::getFlatBlock : chunkSection::getPaletteIndex);
-        Type.VAR_INT.write(buffer, data.length);
+        Type.VAR_INT.writePrimitive(buffer, data.length);
         for (long l : data) {
             buffer.writeLong(l);
         }

@@ -217,7 +217,7 @@ public class UserConnection {
         ByteBuf buf = packet.alloc().buffer();
         try {
             try {
-                Type.VAR_INT.write(buf, PacketWrapper.PASSTHROUGH_ID);
+                Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
             } catch (Exception e) {
                 // Should not happen
                 Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
@@ -315,7 +315,7 @@ public class UserConnection {
     }
 
     private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        int id = Type.VAR_INT.read(buf);
+        int id = Type.VAR_INT.readPrimitive(buf);
         if (id == PacketWrapper.PASSTHROUGH_ID) return;
 
         PacketWrapper wrapper = new PacketWrapper(id, buf, this);
