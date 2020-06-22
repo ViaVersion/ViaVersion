@@ -274,12 +274,18 @@ public class InventoryPackets {
 
         // NBT Changes
         if (tag != null) {
-            // Invert shield color id
-            if (item.getIdentifier() == 442 || item.getIdentifier() == 425) {
+            // Invert banner/shield color id
+            boolean banner = item.getIdentifier() == 425;
+            if (banner || item.getIdentifier() == 442) {
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
                         IntTag base = blockEntityTag.get("Base");
+                        // Set banner item id according to nbt
+                        if (banner) {
+                            rawId = 6800 + base.getValue();
+                        }
+
                         base.setValue(15 - base.getValue());
                     }
                     if (blockEntityTag.get("Patterns") instanceof ListTag) {
