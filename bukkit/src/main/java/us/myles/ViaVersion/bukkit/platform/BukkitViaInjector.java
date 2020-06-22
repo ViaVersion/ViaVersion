@@ -12,12 +12,14 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.bukkit.handlers.BukkitChannelInitializer;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
+import us.myles.ViaVersion.util.ConcurrentList;
 import us.myles.ViaVersion.util.ListWrapper;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class BukkitViaInjector implements ViaInjector {
@@ -33,7 +35,7 @@ public class BukkitViaInjector implements ViaInjector {
             }
             for (Field field : connection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
-                final Object value = field.get(connection);
+                Object value = field.get(connection);
                 if (value instanceof List) {
                     // Inject the list
                     List wrapper = new ListWrapper((List) value) {
@@ -317,5 +319,24 @@ public class BukkitViaInjector implements ViaInjector {
 
         data.addProperty("binded", isBinded());
         return data;
+    }
+
+    public static void patchLists() throws Exception {
+        Object connection = getServerConnection();
+        if (connection == null) {
+            Via.getPlatform().getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
+            return;
+        }
+
+        for (Field field : connection.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = field.get(connection);
+            if (!(value instanceof List)) continue;
+            if (value instanceof ConcurrentList) continue;
+
+            ConcurrentList list = new ConcurrentList();
+            list.addAll((Collection) value);
+            field.set(connection, list);
+        }
     }
 }

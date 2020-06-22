@@ -60,6 +60,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Check if we're using protocol support too
         protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
+        if (protocolSupport) {
+            getLogger().info("Hooking into ProtocolSupport, to prevent issues!");
+            try {
+                BukkitViaInjector.patchLists();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
