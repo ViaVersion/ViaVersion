@@ -11,7 +11,6 @@ import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -116,20 +115,8 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                         ProtocolInfo info = wrapper.user().getProtocolInfo();
                         info.setState(State.PLAY);
 
-                        if (info.getServerProtocolVersion() >= ProtocolVersion.v1_16.getId()) {
-                            // 1.16+ uses int arrays
-                            UUID uuid = wrapper.passthrough(Type.UUID_INT_ARRAY);
-                            info.setUuid(uuid);
-                        } else {
-                            // Save other info
-                            String stringUUID = wrapper.passthrough(Type.STRING);
-                            if (stringUUID.length() == 32) { // Trimmed UUIDs are 32 characters
-                                // Trimmed
-                                stringUUID = addDashes(stringUUID);
-                            }
-                            UUID uuid = UUID.fromString(stringUUID);
-                            info.setUuid(uuid);
-                        }
+                        UUID uuid = passthroughLoginUUID(wrapper);
+                        info.setUuid(uuid);
 
                         String username = wrapper.passthrough(Type.STRING);
                         info.setUsername(username);
@@ -137,7 +124,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                         Via.getManager().handleLoginSuccess(wrapper.user());
 
                         if (info.getPipeline().pipes().size() == 2
-                                && info.getPipeline().pipes().get(1).getClass() == BaseProtocol1_7.class
+                                && info.getPipeline().pipes().get(1).getClass().isAssignableFrom(BaseProtocol1_7.class)
                                 && info.getPipeline().pipes().get(0).getClass() == BaseProtocol.class) // Only base protocol
                             wrapper.user().setActive(false);
 
@@ -197,5 +184,14 @@ public class BaseProtocol1_7 extends SimpleProtocol {
         idBuff.insert(12, '-');
         idBuff.insert(8, '-');
         return idBuff.toString();
+    }
+
+    protected UUID passthroughLoginUUID(PacketWrapper wrapper) throws Exception {
+        String uuidString = wrapper.passthrough(Type.STRING);
+        if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
+            // Trimmed
+            uuidString = addDashes(uuidString);
+        }
+        return UUID.fromString(uuidString);
     }
 }
