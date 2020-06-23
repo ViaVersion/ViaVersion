@@ -172,6 +172,8 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
         tagRewriter.addTag(TagType.BLOCK, "minecraft:wooden_trapdoors", 193, 194, 195, 196, 197, 198);
         tagRewriter.addTag(TagType.ITEM, "minecraft:wooden_trapdoors", 215, 216, 217, 218, 219, 220);
         tagRewriter.addTag(TagType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
+        tagRewriter.addTag(TagType.ENTITY, "minecraft:impact_projectiles", 2, 72, 71, 37, 69, 79, 83, 15, 93);
+
         // The client crashes if we don't send all tags it may use
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:guarded_by_piglins");
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_speed_blocks");

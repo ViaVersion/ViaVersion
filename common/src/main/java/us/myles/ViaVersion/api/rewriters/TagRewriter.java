@@ -17,7 +17,8 @@ public class TagRewriter {
     private final IdRewriteFunction entityRewriter;
     private final List<TagData> newBlockTags = new ArrayList<>();
     private final List<TagData> newItemTags = new ArrayList<>();
-    // add fluid or entity tag lists if needed at some point
+    private final List<TagData> newEntityTags = new ArrayList<>();
+    // add fluid tag list if needed at some point
 
     public TagRewriter(Protocol protocol, IdRewriteFunction blockRewriter, IdRewriteFunction itemRewriter, IdRewriteFunction entityRewriter) {
         this.protocol = protocol;
@@ -51,7 +52,7 @@ public class TagRewriter {
                     handle(wrapper, blockRewriter, newBlockTags);
                     handle(wrapper, itemRewriter, newItemTags);
 
-                    if (entityRewriter == null) return;
+                    if (entityRewriter == null && newEntityTags.isEmpty()) return;
 
                     int fluidTagsSize = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < fluidTagsSize; i++) {
@@ -59,7 +60,7 @@ public class TagRewriter {
                         wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                     }
 
-                    handle(wrapper, entityRewriter, null);
+                    handle(wrapper, entityRewriter, newEntityTags);
                 });
             }
         });
@@ -95,6 +96,7 @@ public class TagRewriter {
             case ITEM:
                 return newItemTags;
             case ENTITY:
+                return newEntityTags;
             case FLUID:
             default:
                 return null;
