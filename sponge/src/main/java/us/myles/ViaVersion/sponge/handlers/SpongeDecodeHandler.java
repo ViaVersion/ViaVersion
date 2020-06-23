@@ -38,11 +38,13 @@ public class SpongeDecodeHandler extends ByteToMessageDecoder {
             try {
                 list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, transformedBuf == null ? bytebuf : transformedBuf));
             } catch (InvocationTargetException e) {
+                bytebuf.clear(); // Don't accumulate
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
                 } else if (e.getCause() instanceof Error) {
                     throw (Error) e.getCause();
                 }
+                throw e;
             }
         } finally {
             if (transformedBuf != null) {

@@ -51,6 +51,7 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
                 } else if (e.getCause() instanceof Error) {
                     throw (Error) e.getCause();
                 }
+                throw e;
             }
         }
 
