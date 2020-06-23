@@ -1,5 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -18,12 +21,13 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.InventoryPacke
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.UUID;
 
 public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, ClientboundPackets1_16, ServerboundPackets1_14, ServerboundPackets1_16> {
 
-    public static final UUID ZERO_UUID = new UUID(0, 0);
+    private static final UUID ZERO_UUID = new UUID(0, 0);
     private TagRewriter tagRewriter;
 
     public Protocol1_16To1_15_2() {
@@ -49,6 +53,47 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                     // Transform string to int array
                     UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
                     wrapper.write(Type.UUID_INT_ARRAY, uuid);
+                });
+            }
+        });
+
+        // Motd Status - line breaks are no longer allowed for player samples
+        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    String original = wrapper.read(Type.STRING);
+                    JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
+                    JsonObject players = object.getAsJsonObject("players");
+                    if (players == null) return;
+
+                    JsonArray sample = players.getAsJsonArray("sample");
+                    if (sample == null) return;
+
+                    JsonArray splitSamples = new JsonArray();
+                    for (JsonElement element : sample) {
+                        JsonObject playerInfo = element.getAsJsonObject();
+                        String name = playerInfo.getAsJsonPrimitive("name").getAsString();
+                        if (name.indexOf('\n') == -1) {
+                            splitSamples.add(playerInfo);
+                            continue;
+                        }
+
+                        String id = playerInfo.getAsJsonPrimitive("id").getAsString();
+                        for (String s : name.split("\n")) {
+                            JsonObject newSample = new JsonObject();
+                            newSample.addProperty("name", s);
+                            newSample.addProperty("id", id);
+                            splitSamples.add(newSample);
+                        }
+                    }
+
+                    if (splitSamples.size() != sample.size()) {
+                        players.add("sample", splitSamples);
+                        wrapper.write(Type.STRING, object.toString());
+                    } else {
+                        wrapper.write(Type.STRING, original);
+                    }
                 });
             }
         });
