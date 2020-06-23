@@ -24,6 +24,7 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
     public MetadataRewriter1_14To1_13_2(Protocol1_14To1_13_2 protocol) {
         super(protocol, EntityTracker1_14.class);
         mapTypes(Entity1_13Types.EntityType.values(), Entity1_14Types.EntityType.class);
+        mapType(Entity1_13Types.EntityType.OCELOT, Entity1_14Types.EntityType.CAT); //TODO remap untamed ocelots to ocelots?
     }
 
     @Override
