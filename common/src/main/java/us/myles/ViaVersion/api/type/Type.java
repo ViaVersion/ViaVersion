@@ -77,6 +77,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Integer[]> UNSIGNED_SHORT_ARRAY = new ArrayType<>(Type.UNSIGNED_SHORT);
     /* Other Types */
+    public static final Type<String> COMPONENT_STRING = new ComponentStringType();
     public static final Type<String> STRING = new StringType();
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);
 

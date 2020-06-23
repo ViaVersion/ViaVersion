@@ -101,7 +101,7 @@ public class InventoryPackets {
                             }
 
                             wrapper.write(Type.VAR_INT, typeId);
-                            wrapper.write(Type.STRING, title);
+                            wrapper.write(Type.COMPONENT_STRING, title);
                         }
                     }
                 });

@@ -56,7 +56,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
         registerOutgoing(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
+                map(Type.COMPONENT_STRING);
                 map(Type.BYTE);
                 handler(wrapper -> wrapper.write(Type.UUID, ZERO_UUID)); // sender uuid
             }
