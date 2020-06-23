@@ -62,7 +62,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    String original = wrapper.read(Type.STRING);
+                    String original = wrapper.passthrough(Type.STRING);
                     JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
                     JsonObject players = object.getAsJsonObject("players");
                     if (players == null) return;
@@ -88,11 +88,10 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                         }
                     }
 
+                    // Replace data if changed
                     if (splitSamples.size() != sample.size()) {
                         players.add("sample", splitSamples);
-                        wrapper.write(Type.STRING, object.toString());
-                    } else {
-                        wrapper.write(Type.STRING, original);
+                        wrapper.set(Type.STRING, 0, object.toString());
                     }
                 });
             }
