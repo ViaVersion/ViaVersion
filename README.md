@@ -6,7 +6,7 @@
 
 Supported Versions:
 
-![Table (https://i.imgur.com/yDtAgF7.png)](https://i.imgur.com/yDtAgF7.png)
+![Table (https://i.imgur.com/0u20Y2u.png)](https://i.imgur.com/0u20Y2u.png)
 
 On Bukkit you may also use ProtocolSupport, but ensure you have the right build for your server version.
 
