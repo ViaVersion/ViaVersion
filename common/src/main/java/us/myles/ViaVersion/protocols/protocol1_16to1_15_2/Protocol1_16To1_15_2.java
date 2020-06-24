@@ -224,6 +224,15 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_fire_base_blocks");
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:non_flammable_wood");
         tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:non_flammable_wood");
+
+        // The rest of not accessed tags added in older versions; #1830
+        tagRewriter.addEmptyTags(TagType.BLOCK, "minecraft:bamboo_plantable_on", "minecraft:beds", "minecraft:bee_growables",
+                "minecraft:beehives", "minecraft:coral_plants", "minecraft:crops", "minecraft:dragon_immune", "minecraft:flowers",
+                "minecraft:portals", "minecraft:shulker_boxes", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors",
+                "minecraft:underwater_bonemeals", "minecraft:wither_immune", "minecraft:wooden_fences", "minecraft:wooden_trapdoors");
+        tagRewriter.addEmptyTags(TagType.ENTITY, "minecraft:arrows", "minecraft:beehive_inhabitors", "minecraft:raiders", "minecraft:skeletons");
+        tagRewriter.addEmptyTags(TagType.ITEM, "minecraft:beds", "minecraft:coals", "minecraft:fences", "minecraft:flowers",
+                "minecraft:lectern_books", "minecraft:music_discs", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors", "minecraft:walls", "minecraft:wooden_fences");
     }
 
     public static int getNewBlockStateId(int id) {

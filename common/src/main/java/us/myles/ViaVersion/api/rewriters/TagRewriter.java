@@ -34,6 +34,13 @@ public class TagRewriter {
         getNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
     }
 
+    public void addEmptyTags(TagType tagType, String... ids) {
+        List<TagData> tagList = getNewTags(tagType);
+        for (String id : ids) {
+            tagList.add(new TagData(id, EMPTY_ARRAY));
+        }
+    }
+
     public void addTag(TagType tagType, String id, int... oldIds) {
         List<TagData> newTags = getNewTags(tagType);
         IdRewriteFunction rewriteFunction = getRewriter(tagType);
