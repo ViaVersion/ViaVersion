@@ -12,7 +12,6 @@ import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class PacketWrapper {
      * @param <T>   The return type of the type you wish to get.
      * @param index The index of the part (relative to the type)
      * @return The requested type or throws ArrayIndexOutOfBounds
-     * @throws Exception If it fails to find it, an exception will be thrown.
+     * @throws InformativeException If it fails to find it, an exception will be thrown.
      */
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
@@ -110,7 +109,7 @@ public class PacketWrapper {
      * @param <T>   The return type of the type you wish to set.
      * @param index The index of the part (relative to the type)
      * @param value The value of the part you wish to set it to.
-     * @throws Exception If it fails to set it, an exception will be thrown.
+     * @throws InformativeException If it fails to set it, an exception will be thrown.
      */
     public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
@@ -133,7 +132,7 @@ public class PacketWrapper {
      * @param type The type you wish to read
      * @param <T>  The return type of the type you wish to read.
      * @return The requested type
-     * @throws Exception If it fails to read
+     * @throws InformativeException If it fails to read
      */
     public <T> T read(Type<T> type) throws Exception {
         if (type == Type.NOTHING) return null;
@@ -215,7 +214,7 @@ public class PacketWrapper {
      * Write the current output to a buffer.
      *
      * @param buffer The buffer to write to.
-     * @throws Exception Throws an exception if it fails to write a value.
+     * @throws InformativeException Throws an exception if it fails to write a value.
      */
     public void writeToBuffer(ByteBuf buffer) throws Exception {
         if (id != -1) {

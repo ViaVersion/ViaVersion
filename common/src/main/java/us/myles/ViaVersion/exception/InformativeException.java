@@ -17,7 +17,7 @@ public class InformativeException extends Exception {
     }
 
     public InformativeException addSource(Class<?> sourceClazz) {
-        return set("Source #" + sources++, getSource(sourceClazz));
+        return set("Source " + sources++, getSource(sourceClazz));
     }
 
     private String getSource(Class<?> sourceClazz) {
