@@ -99,8 +99,10 @@ public class WorldPackets {
 
                         if (newId != -1) {
                             BlockStorage storage = wrapper.user().get(BlockStorage.class);
-                            if (storage.contains(position))
-                                storage.get(position).setReplacement(newId);
+                            BlockStorage.ReplacementData replacementData = storage.get(position);
+                            if (replacementData != null) {
+                                replacementData.setReplacement(newId);
+                            }
                         }
 
                         if (action == 5) // Set type of flower in flower pot
@@ -431,8 +433,10 @@ public class WorldPackets {
 
                                 Position position = new Position(x, (short) y, z);
                                 // Store the replacement blocks for blockupdates
-                                if (storage.contains(position))
-                                    storage.get(position).setReplacement(newId);
+                                BlockStorage.ReplacementData replacementData = storage.get(position);
+                                if (replacementData != null) {
+                                    replacementData.setReplacement(newId);
+                                }
 
                                 chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
                             }

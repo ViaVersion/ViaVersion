@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -8,7 +9,12 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.*;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.BannerHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.BedHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.CommandBlockHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.FlowerPotHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.SkullHandler;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities.SpawnerHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,10 +42,10 @@ public class BlockEntityProvider implements Provider {
      * @throws Exception Gotta throw that exception
      */
     public int transform(UserConnection user, Position position, CompoundTag tag, boolean sendUpdate) throws Exception {
-        if (!tag.contains("id"))
-            return -1;
+        Tag idTag = tag.get("id");
+        if (idTag == null) return -1;
 
-        String id = (String) tag.get("id").getValue();
+        String id = (String) idTag.getValue();
         BlockEntityHandler handler = handlers.get(id);
         if (handler == null) {
             if (Via.getManager().isDebug()) {
@@ -50,8 +56,9 @@ public class BlockEntityProvider implements Provider {
 
         int newBlock = handler.transform(user, tag);
 
-        if (sendUpdate && newBlock != -1)
+        if (sendUpdate && newBlock != -1) {
             sendBlockChange(user, position, newBlock);
+        }
 
         return newBlock;
     }
@@ -67,6 +74,4 @@ public class BlockEntityProvider implements Provider {
     public interface BlockEntityHandler {
         int transform(UserConnection user, CompoundTag tag);
     }
-
-
 }

@@ -223,8 +223,9 @@ public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, Client
                         for (CompoundTag tag : chunk.getBlockEntities()) {
                             if (tag.contains("id")) {
                                 String identifier = ((StringTag) tag.get("id")).getValue();
-                                if (identifier.equals("MobSpawner"))
+                                if (identifier.equals("MobSpawner")) {
                                     EntityIdRewriter.toClientSpawner(tag);
+                                }
 
                                 // Handle new identifier
                                 ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier(identifier));

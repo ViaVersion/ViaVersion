@@ -23,7 +23,6 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         }
 
         int id = storage.get(position).getOriginal();
-
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
             Tag skullType = tag.get("SkullType");
             if (skullType != null) {

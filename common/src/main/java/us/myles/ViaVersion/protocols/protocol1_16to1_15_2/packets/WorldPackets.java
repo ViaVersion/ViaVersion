@@ -5,6 +5,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -69,33 +70,20 @@ public class WorldPackets {
 
                     if (chunk.getBlockEntities() == null) return;
                     for (CompoundTag blockEntity : chunk.getBlockEntities()) {
-                        StringTag idTag = blockEntity.get("id");
-                        if (idTag == null) continue;
-
-                        String id = idTag.getValue();
-                        if (id.equals("minecraft:conduit")) {
-                            StringTag targetUuidTag = blockEntity.remove("target_uuid");
-                            if (targetUuidTag == null) continue;
-
-                            // target_uuid -> Target
-                            UUID targetUuid = UUID.fromString(targetUuidTag.getValue());
-                            blockEntity.put(new IntArrayTag("Target", UUIDIntArrayType.uuidToIntArray(targetUuid)));
-                        } else if (id.equals("minecraft:skull") && blockEntity.get("Owner") instanceof CompoundTag) {
-                            CompoundTag ownerTag = blockEntity.remove("Owner");
-                            StringTag ownerUuidTag = ownerTag.remove("Id");
-                            if (ownerUuidTag != null) {
-                                UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
-                                ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(ownerUuid)));
-                            }
-
-                            // Owner -> SkullOwner
-                            CompoundTag skullOwnerTag = new CompoundTag("SkullOwner");
-                            for (Tag tag : ownerTag) {
-                                skullOwnerTag.put(tag);
-                            }
-                            blockEntity.put(skullOwnerTag);
-                        }
+                        handleBlockEntity(blockEntity);
                     }
+                });
+            }
+        });
+
+        protocol.registerOutgoing(ClientboundPackets1_15.BLOCK_ENTITY_DATA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    Position position = wrapper.passthrough(Type.POSITION1_14);
+                    short action = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                    CompoundTag tag = wrapper.passthrough(Type.NBT);
+                    handleBlockEntity(tag);
                 });
             }
         });
@@ -103,6 +91,35 @@ public class WorldPackets {
         blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
         blockRewriter.registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, 3, 23, 32,
                 WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
+    }
+
+    private static void handleBlockEntity(CompoundTag compoundTag) {
+        StringTag idTag = compoundTag.get("id");
+        if (idTag == null) return;
+
+        String id = idTag.getValue();
+        if (id.equals("minecraft:conduit")) {
+            StringTag targetUuidTag = compoundTag.remove("target_uuid");
+            if (targetUuidTag == null) return;
+
+            // target_uuid -> Target
+            UUID targetUuid = UUID.fromString(targetUuidTag.getValue());
+            compoundTag.put(new IntArrayTag("Target", UUIDIntArrayType.uuidToIntArray(targetUuid)));
+        } else if (id.equals("minecraft:skull") && compoundTag.get("Owner") instanceof CompoundTag) {
+            CompoundTag ownerTag = compoundTag.remove("Owner");
+            StringTag ownerUuidTag = ownerTag.remove("Id");
+            if (ownerUuidTag != null) {
+                UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
+                ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+            }
+
+            // Owner -> SkullOwner
+            CompoundTag skullOwnerTag = new CompoundTag("SkullOwner");
+            for (Tag tag : ownerTag) {
+                skullOwnerTag.put(tag);
+            }
+            compoundTag.put(skullOwnerTag);
+        }
     }
 
     public static int getNewParticleId(int id) {
