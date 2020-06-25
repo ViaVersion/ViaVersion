@@ -58,6 +58,26 @@ public class ViaConnectionManager {
     }
 
     /**
+     * Returns the UUID from the frontend connection to this proxy server
+     * Returns null when there isn't a server or frontend id was not found
+     * When ViaVersion is reloaded, this method may not return some players.
+     * May not return ProtocolSupport players.
+     * <p>
+     * Note that connections are removed as soon as their channel is closed,
+     * so avoid using this method during player quits for example.
+     */
+    @Nullable
+    public UUID getConnectedClientId(UserConnection conn) {
+        if (conn.getProtocolInfo() == null) return null;
+        UUID uuid = conn.getProtocolInfo().getUuid();
+        if (clients.get(uuid).equals(conn)) {
+            // This is frontend
+            return uuid;
+        }
+        return null;
+    }
+
+    /**
      * Returns all UserConnections which are registered
      * May contain duplicated UUIDs on multiple ProtocolInfo.
      * May contain frontend, backend and/or client-sided connections.

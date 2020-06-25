@@ -81,7 +81,7 @@ public abstract class BossBar<T> {
     }
 
     /**
-     * Show the bossbar to a player (uuid). You can retrieve it later with #getPlayers()
+     * Show the bossbar to a player (uuid).
      *
      * @param player uuid of the player
      * @return The BossBar object
@@ -89,7 +89,7 @@ public abstract class BossBar<T> {
     public abstract BossBar addPlayer(UUID player);
 
     /**
-     * Show the bossbar to a player connection. You may retrieve it later with #getConnections()
+     * Show the bossbar to a player connection.
      *
      * @param conn UserConnection of the connection
      * @return The BossBar object
@@ -121,7 +121,7 @@ public abstract class BossBar<T> {
     }
 
     /**
-     * Removes the bossbar from a player. You shouldn't use this with #addConnection
+     * Removes the bossbar from a player.
      *
      * @param uuid The players UUID
      * @return The BossBar object
@@ -129,7 +129,7 @@ public abstract class BossBar<T> {
     public abstract BossBar removePlayer(UUID uuid);
 
     /**
-     * Removes the bossbar from a player connection. You shouldn't use this with #addPlayer
+     * Removes the bossbar from a player connection.
      *
      * @param conn The UserConnection
      * @return The BossBar object
@@ -159,14 +159,14 @@ public abstract class BossBar<T> {
     public abstract boolean hasFlag(BossFlag flag);
 
     /**
-     * Get players. The storage is different from #getConnections()
+     * Get players. Only returns UUIDs which are front-end. For all connections, use #getConnections()
      *
      * @return UUIDS from players (sorry I lied)
      */
     public abstract Set<UUID> getPlayers();
 
     /**
-     * Get UserConnections. The storage is different from #getPlayers()
+     * Get UserConnections.
      *
      * @return UserConnection from players
      */
