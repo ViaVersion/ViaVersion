@@ -42,7 +42,7 @@ public class ViaConnectionManager {
      * Frontend connections will have the UUID stored. Override this if your platform isn't always frontend.
      * UUIDs can't be duplicate between frontend connections.
      */
-    protected boolean isFrontEnd(UserConnection conn) {
+    public boolean isFrontEnd(UserConnection conn) {
         return true;
     }
 
