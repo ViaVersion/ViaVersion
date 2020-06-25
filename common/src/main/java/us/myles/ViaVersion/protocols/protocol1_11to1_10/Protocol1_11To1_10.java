@@ -150,12 +150,11 @@ public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, Client
                         int action = wrapper.get(Type.VAR_INT, 0);
 
                         // Handle the new ActionBar
-                        if (action >= 2)
+                        if (action >= 2) {
                             wrapper.set(Type.VAR_INT, 0, action + 1);
+                        }
                     }
                 });
-
-
             }
         });
 

@@ -304,11 +304,7 @@ public class InventoryPackets {
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
                     display.put(new StringTag(NBT_TAG_NAME + "|Name", name.getValue()));
-                    name.setValue(
-                            ChatRewriter.legacyTextToJson(
-                                    name.getValue()
-                            )
-                    );
+                    name.setValue(ChatRewriter.legacyTextToJson(name.getValue()).toString());
                 }
             }
             // ench is now Enchantments and now uses identifiers

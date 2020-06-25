@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.google.gson.JsonElement;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -37,9 +38,10 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol<ClientboundPackets1_9, Clie
                     public void handle(PacketWrapper wrapper) throws Exception {
                         //read data
                         Position position = wrapper.read(Type.POSITION);
-                        String[] lines = new String[4];
-                        for (int i = 0; i < 4; i++)
-                            lines[i] = wrapper.read(Type.STRING);
+                        JsonElement[] lines = new JsonElement[4];
+                        for (int i = 0; i < 4; i++) {
+                            lines[i] = wrapper.read(Type.COMPONENT);
+                        }
 
                         wrapper.clearInputBuffer();
 
@@ -54,8 +56,9 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol<ClientboundPackets1_9, Clie
                         tag.put(new IntTag("x", position.getX()));
                         tag.put(new IntTag("y", position.getY()));
                         tag.put(new IntTag("z", position.getZ()));
-                        for (int i = 0; i < lines.length; i++)
-                            tag.put(new StringTag("Text" + (i + 1), lines[i]));
+                        for (int i = 0; i < lines.length; i++) {
+                            tag.put(new StringTag("Text" + (i + 1), lines[i].toString()));
+                        }
 
                         wrapper.write(Type.NBT, tag);
                     }

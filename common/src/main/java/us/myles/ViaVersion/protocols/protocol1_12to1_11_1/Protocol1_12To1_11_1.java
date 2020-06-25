@@ -16,16 +16,15 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.util.GsonUtil;
 
 public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
@@ -76,21 +75,18 @@ public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, Clie
         registerOutgoing(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
-                map(Type.BYTE); // 1 - Chat Positon
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if (!Via.getConfig().is1_12NBTArrayFix()) return;
                         try {
-                            JsonElement obj = GsonUtil.getJsonParser().parse(wrapper.get(Type.STRING, 0));
+                            JsonElement obj = Protocol1_9To1_8.FIX_JSON.transform(null, wrapper.passthrough(Type.COMPONENT).toString());
                             if (!TranslateRewriter.toClient(obj, wrapper.user())) {
                                 wrapper.cancel();
                                 return;
                             }
+
                             ChatItemRewriter.toClient(obj, wrapper.user());
-                            wrapper.set(Type.STRING, 0, obj.toString());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -35,9 +35,8 @@ public class PlayerPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         try {
-                            JsonObject obj = (JsonObject) GsonUtil.getJsonParser().parse(wrapper.get(Type.STRING, 0));
+                            JsonObject obj = (JsonObject) wrapper.get(Type.COMPONENT, 0);
                             ChatRewriter.toClient(obj, wrapper.user());
-                            wrapper.set(Type.STRING, 0, obj.toString());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

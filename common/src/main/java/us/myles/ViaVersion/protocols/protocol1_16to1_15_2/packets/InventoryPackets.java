@@ -27,7 +27,7 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.VAR_INT);
                 map(Type.VAR_INT);
-                map(Type.COMPONENT_STRING);
+                map(Type.COMPONENT);
 
                 handler(wrapper -> {
                     int windowType = wrapper.get(Type.VAR_INT, 1);

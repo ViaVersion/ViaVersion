@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.type;
 
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.google.gson.JsonElement;
 import us.myles.ViaVersion.api.minecraft.*;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.types.*;
@@ -77,7 +78,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Integer[]> UNSIGNED_SHORT_ARRAY = new ArrayType<>(Type.UNSIGNED_SHORT);
     /* Other Types */
-    public static final Type<String> COMPONENT_STRING = new ComponentStringType();
+    public static final Type<JsonElement> COMPONENT = new ComponentType();
     public static final Type<String> STRING = new StringType();
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);
 
@@ -110,7 +111,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
 
     public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
-    public static final Type<String> OPTIONAL_CHAT = new OptionalChatType();
+    public static final Type<JsonElement> OPTIONAL_COMPONENT = new OptionalComponentType();
     public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
     public static final Type<Position> OPTIONAL_POSITION_1_14 = new OptPosition1_14Type();
 

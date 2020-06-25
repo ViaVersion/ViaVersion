@@ -7,17 +7,19 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.InventoryNameRewriter;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
@@ -29,6 +31,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class InventoryPackets {
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_14To1_13_2.class.getSimpleName();
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
+    private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter() {
+        @Override
+        protected void handleTranslate(JsonObject object, String translate) {
+            super.handleTranslate(object, translate);
+            // Mojang decided to remove .name from inventory titles
+            if (translate.startsWith("block.") && translate.endsWith(".name")) {
+                object.addProperty("translate", translate.substring(0, translate.length() - 5));
+            }
+        }
+    };
 
     public static void register(Protocol protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
@@ -43,9 +55,9 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Short windowsId = wrapper.read(Type.UNSIGNED_BYTE);
                         String type = wrapper.read(Type.STRING);
-                        String title = InventoryNameRewriter.processTranslate(wrapper.read(Type.STRING));
+                        JsonElement title = wrapper.read(Type.COMPONENT);
+                        COMPONENT_REWRITER.processText(title);
                         Short slots = wrapper.read(Type.UNSIGNED_BYTE);
-
 
                         if (type.equals("EntityHorse")) {
                             wrapper.setId(0x1F);
@@ -101,7 +113,7 @@ public class InventoryPackets {
                             }
 
                             wrapper.write(Type.VAR_INT, typeId);
-                            wrapper.write(Type.COMPONENT_STRING, title);
+                            wrapper.write(Type.COMPONENT, title);
                         }
                     }
                 });
@@ -258,11 +270,7 @@ public class InventoryPackets {
                     display.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|Lore", ConverterRegistry.convertToValue(lore)));
                     for (Tag loreEntry : lore) {
                         if (loreEntry instanceof StringTag) {
-                            ((StringTag) loreEntry).setValue(
-                                    ChatRewriter.legacyTextToJson(
-                                            ((StringTag) loreEntry).getValue()
-                                    )
-                            );
+                            ((StringTag) loreEntry).setValue(ChatRewriter.legacyTextToJson(((StringTag) loreEntry).getValue()).toString());
                         }
                     }
                 }

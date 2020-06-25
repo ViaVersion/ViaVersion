@@ -105,7 +105,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action == 0) {
-                            wrapper.passthrough(Type.STRING);
+                            wrapper.passthrough(Type.COMPONENT);
                             wrapper.passthrough(Type.FLOAT);
                             wrapper.passthrough(Type.VAR_INT);
                             wrapper.passthrough(Type.VAR_INT);
