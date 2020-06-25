@@ -44,35 +44,38 @@ public class ChatRewriter {
                     builder = new StringBuilder();
                     components.add(old);
                 }
-                switch (format) {
-                    case BOLD:
-                        component.setBold(true);
-                        break;
-                    case ITALIC:
-                        component.setItalic(true);
-                        break;
-                    case UNDERLINE:
-                        component.setUnderlined(true);
-                        break;
-                    case STRIKETHROUGH:
-                        component.setStrikethrough(true);
-                        break;
-                    case MAGIC:
-                        component.setObfuscated(true);
-                        break;
-                    case RESET:
-                        format = defaultColor;
-                    default:
-                        component = new TextComponent();
-                        component.setColor(format);
-                        // ViaVersion start
-                        component.setBold(false);
-                        component.setItalic(false);
-                        component.setUnderlined(false);
-                        component.setStrikethrough(false);
-                        component.setObfuscated(false);
-                        // ViaVersion end
-                        break;
+                if (ChatColor.BOLD.equals(format)) {
+                    component.setBold(true);
+                } else if (ChatColor.ITALIC.equals(format)) {
+                    component.setItalic(true);
+                } else if (ChatColor.UNDERLINE.equals(format)) {
+                    component.setUnderlined(true);
+                } else if (ChatColor.STRIKETHROUGH.equals(format)) {
+                    component.setStrikethrough(true);
+                } else if (ChatColor.MAGIC.equals(format)) {
+                    component.setObfuscated(true);
+                } else if (ChatColor.RESET.equals(format)) {
+                    format = defaultColor;
+
+                    component = new TextComponent();
+                    component.setColor(format);
+                    // ViaVersion start
+                    component.setBold(false);
+                    component.setItalic(false);
+                    component.setUnderlined(false);
+                    component.setStrikethrough(false);
+                    component.setObfuscated(false);
+                    // ViaVersion end
+                } else {
+                    component = new TextComponent();
+                    component.setColor(format);
+                    // ViaVersion start
+                    component.setBold(false);
+                    component.setItalic(false);
+                    component.setUnderlined(false);
+                    component.setStrikethrough(false);
+                    component.setObfuscated(false);
+                    // ViaVersion end
                 }
                 continue;
             }

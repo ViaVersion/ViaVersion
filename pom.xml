@@ -114,7 +114,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-chat</artifactId>
-            <version>1.15-SNAPSHOT</version>
+            <version>1.16-R0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 

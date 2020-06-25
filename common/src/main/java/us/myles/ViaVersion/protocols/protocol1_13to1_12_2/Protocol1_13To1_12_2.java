@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
+import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
@@ -40,8 +41,9 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTra
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
@@ -111,7 +113,9 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
             };
 
     // These are arbitrary rewrite values, it just needs an invalid color code character.
-    protected static final EnumMap<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new EnumMap<>(ChatColor.class);
+    protected static final Map<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
+    private static final Set<ChatColor> FORMATTING_CODES = Sets.newHashSet(ChatColor.MAGIC, ChatColor.BOLD, ChatColor.STRIKETHROUGH,
+            ChatColor.UNDERLINE, ChatColor.ITALIC, ChatColor.RESET);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BLACK, 'g');
@@ -1045,19 +1049,8 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
             if (section == ChatColor.COLOR_CHAR && index < length - 1) {
                 char c = input.charAt(index + 1);
                 ChatColor color = ChatColor.getByChar(c);
-
-                if (color != null) {
-                    switch (color) {
-                        case MAGIC:
-                        case BOLD:
-                        case STRIKETHROUGH:
-                        case UNDERLINE:
-                        case ITALIC:
-                        case RESET:
-                            break;
-                        default:
-                            return color;
-                    }
+                if (color != null && !FORMATTING_CODES.contains(color)) {
+                    return color;
                 }
             }
         }
