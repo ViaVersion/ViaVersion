@@ -156,6 +156,10 @@ public class ViaManager {
         return platform.getConnectionManager().getConnectedClients();
     }
 
+    public UUID getConnectedClientId(UserConnection conn) {
+        return platform.getConnectionManager().getConnectedClientId(conn);
+    }
+
     /**
      * @see ViaConnectionManager#isClientConnected(UUID)
      */

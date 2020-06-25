@@ -191,7 +191,6 @@ public class EntityTracker1_9 extends EntityTracker {
                     }
                 }
             }
-            UUID uuid = getUser().getProtocolInfo().getUuid();
             // Boss bar
             if (Via.getConfig().isBossbarPatch()) {
                 if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
@@ -202,7 +201,7 @@ public class EntityTracker1_9 extends EntityTracker {
                         if (bar == null) {
                             bar = Via.getAPI().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
-                            bar.addPlayer(uuid);
+                            bar.addConnection(getUser());
                             bar.show();
 
                             // Send to provider
@@ -219,7 +218,7 @@ public class EntityTracker1_9 extends EntityTracker {
                             String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
                             bar = Via.getAPI().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
-                            bar.addPlayer(uuid);
+                            bar.addConnection(getUser());
                             bar.show();
                             // Send to provider
                             Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(getUser(), bar.getId());

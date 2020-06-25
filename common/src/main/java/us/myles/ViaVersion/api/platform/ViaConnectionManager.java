@@ -2,8 +2,8 @@ package us.myles.ViaVersion.api.platform;
 
 import io.netty.channel.ChannelFutureListener;
 import org.jetbrains.annotations.Nullable;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,9 +17,14 @@ public class ViaConnectionManager {
 
     public void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.getProtocolInfo().getUuid();
         connections.add(connection);
-        clients.put(id, connection);
+
+        if (isFrontEnd(connection)) {
+            UUID id = connection.getProtocolInfo().getUuid();
+            if (clients.put(id, connection) != null) {
+                Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! ("+id+")");
+            }
+        }
 
         if (connection.getChannel() != null) {
             connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
@@ -28,9 +33,20 @@ public class ViaConnectionManager {
 
     public void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.getProtocolInfo().getUuid();
         connections.remove(connection);
-        clients.remove(id);
+
+        if (isFrontEnd(connection)) {
+            UUID id = connection.getProtocolInfo().getUuid();
+            clients.remove(id);
+        }
+    }
+
+    /**
+     * Frontend connections will have the UUID stored. Override this if your platform isn't always frontend.
+     * UUIDs can't be duplicate between frontend connections.
+     */
+    public boolean isFrontEnd(UserConnection conn) {
+        return true;
     }
 
     /**
@@ -55,6 +71,27 @@ public class ViaConnectionManager {
     @Nullable
     public UserConnection getConnectedClient(UUID clientIdentifier) {
         return clients.get(clientIdentifier);
+    }
+
+    /**
+     * Returns the UUID from the frontend connection to this proxy server
+     * Returns null when there isn't a server or this connection isn't frontend or it doesn't have an id
+     * When ViaVersion is reloaded, this method may not return some players.
+     * May not return ProtocolSupport players.
+     * <p>
+     * Note that connections are removed as soon as their channel is closed,
+     * so avoid using this method during player quits for example.
+     */
+    @Nullable
+    public UUID getConnectedClientId(UserConnection conn) {
+        if (conn.getProtocolInfo() == null) return null;
+        UUID uuid = conn.getProtocolInfo().getUuid();
+        UserConnection client = clients.get(uuid);
+        if (client != null && client.equals(conn)) {
+            // This is frontend
+            return uuid;
+        }
+        return null;
     }
 
     /**
