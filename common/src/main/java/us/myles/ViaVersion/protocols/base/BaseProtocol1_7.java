@@ -123,10 +123,9 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                         // Add to ported clients
                         Via.getManager().handleLoginSuccess(wrapper.user());
 
-                        if (info.getPipeline().pipes().size() == 2
-                                && info.getPipeline().pipes().get(1).getClass().isAssignableFrom(BaseProtocol1_7.class)
-                                && info.getPipeline().pipes().get(0).getClass() == BaseProtocol.class) // Only base protocol
+                        if (info.getPipeline().pipes().stream().allMatch(ProtocolRegistry::isBaseProtocol)) { // Only base protocol
                             wrapper.user().setActive(false);
+                        }
 
                         if (Via.getManager().isDebug()) {
                             // Print out the route to console
