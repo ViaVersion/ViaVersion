@@ -12,8 +12,8 @@
     <artifactId>viaversion-bukkit</artifactId>
 
     <properties>
-        <!-- Change Bukkit Version HERE! -->
-        <bukkitVersion>1.15.2-R0.1-SNAPSHOT</bukkitVersion>
+        <!-- Change server version HERE! -->
+        <serverVersion>1.16.1-R0.1-SNAPSHOT</serverVersion>
     </properties>
 
     <build>
@@ -40,9 +40,9 @@
 
         <!-- Bukkit API, http://www.spigotmc.org/ or http://bukkit.org/ -->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkitVersion}</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${serverVersion}</version>
             <scope>provided</scope>
             <optional>true</optional>
             <exclusions>
