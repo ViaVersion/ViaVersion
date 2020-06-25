@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.platform;
 
 import io.netty.channel.ChannelFutureListener;
 import org.jetbrains.annotations.Nullable;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.util.*;
@@ -20,7 +21,9 @@ public class ViaConnectionManager {
 
         if (isFrontEnd(connection)) {
             UUID id = connection.getProtocolInfo().getUuid();
-            clients.put(id, connection);
+            if (clients.put(id, connection) != null) {
+                Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! ("+id+")");
+            }
         }
 
         if (connection.getChannel() != null) {
