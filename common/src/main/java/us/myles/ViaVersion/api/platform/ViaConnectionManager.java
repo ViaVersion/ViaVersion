@@ -3,7 +3,6 @@ package us.myles.ViaVersion.api.platform;
 import io.netty.channel.ChannelFutureListener;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,9 +16,12 @@ public class ViaConnectionManager {
 
     public void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.getProtocolInfo().getUuid();
         connections.add(connection);
-        clients.put(id, connection);
+
+        if (isFrontEnd(connection)) {
+            UUID id = connection.getProtocolInfo().getUuid();
+            clients.put(id, connection);
+        }
 
         if (connection.getChannel() != null) {
             connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
@@ -28,9 +30,20 @@ public class ViaConnectionManager {
 
     public void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        UUID id = connection.getProtocolInfo().getUuid();
         connections.remove(connection);
-        clients.remove(id);
+
+        if (isFrontEnd(connection)) {
+            UUID id = connection.getProtocolInfo().getUuid();
+            clients.remove(id);
+        }
+    }
+
+    /**
+     * Frontend connections will have the UUID stored. Override this if your platform isn't always frontend.
+     * UUIDs can't be duplicate between frontend connections.
+     */
+    protected boolean isFrontEnd(UserConnection conn) {
+        return true;
     }
 
     /**

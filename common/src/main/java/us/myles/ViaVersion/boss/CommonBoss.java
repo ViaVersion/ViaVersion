@@ -8,7 +8,6 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
@@ -17,13 +16,13 @@ import java.util.stream.Collectors;
 
 public abstract class CommonBoss<T> extends BossBar<T> {
     private final UUID uuid;
+    private final Set<UserConnection> connections;
+    private final Set<BossFlag> flags;
     private String title;
     private float health;
     private BossColor color;
     private BossStyle style;
-    private final Set<UserConnection> connections;
     private boolean visible;
-    private final Set<BossFlag> flags;
 
     public CommonBoss(String title, float health, BossColor color, BossStyle style) {
         Preconditions.checkNotNull(title, "Title cannot be null");
@@ -83,11 +82,8 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public BossBar addConnection(UserConnection conn) {
-        if (!connections.contains(conn)) {
-            connections.add(conn);
-            if (visible) {
-                sendPacketConnection(conn, getPacket(CommonBoss.UpdateAction.ADD, conn));
-            }
+        if (connections.add(conn) && visible) {
+            sendPacketConnection(conn, getPacket(CommonBoss.UpdateAction.ADD, conn));
         }
         return this;
     }
@@ -99,8 +95,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public BossBar removeConnection(UserConnection conn) {
-        if (connections.contains(conn)) {
-            connections.remove(conn);
+        if (connections.remove(conn)) {
             sendPacketConnection(conn, getPacket(UpdateAction.REMOVE, conn));
         }
         return this;
@@ -158,6 +153,13 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         return visible;
     }
 
+    private void setVisible(boolean value) {
+        if (visible != value) {
+            visible = value;
+            sendPacket(value ? CommonBoss.UpdateAction.ADD : CommonBoss.UpdateAction.REMOVE);
+        }
+    }
+
     @Override
     public UUID getId() {
         return uuid;
@@ -184,13 +186,6 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     public Set<BossFlag> getFlags() {
         return flags;
-    }
-
-    private void setVisible(boolean value) {
-        if (visible != value) {
-            visible = value;
-            sendPacket(value ? CommonBoss.UpdateAction.ADD : CommonBoss.UpdateAction.REMOVE);
-        }
     }
 
     private void sendPacket(UpdateAction action) {
