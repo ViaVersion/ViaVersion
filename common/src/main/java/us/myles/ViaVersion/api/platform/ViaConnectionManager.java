@@ -59,7 +59,7 @@ public class ViaConnectionManager {
 
     /**
      * Returns the UUID from the frontend connection to this proxy server
-     * Returns null when there isn't a server or frontend id was not found
+     * Returns null when there isn't a server or this connection isn't frontend or it doesn't have an id
      * When ViaVersion is reloaded, this method may not return some players.
      * May not return ProtocolSupport players.
      * <p>
@@ -70,7 +70,8 @@ public class ViaConnectionManager {
     public UUID getConnectedClientId(UserConnection conn) {
         if (conn.getProtocolInfo() == null) return null;
         UUID uuid = conn.getProtocolInfo().getUuid();
-        if (clients.get(uuid).equals(conn)) {
+        UserConnection client = clients.get(uuid);
+        if (client != null && client.equals(conn)) {
             // This is frontend
             return uuid;
         }
