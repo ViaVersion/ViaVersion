@@ -99,11 +99,11 @@ public class WorldPackets {
 
         String id = idTag.getValue();
         if (id.equals("minecraft:conduit")) {
-            StringTag targetUuidTag = compoundTag.remove("target_uuid");
-            if (targetUuidTag == null) return;
+            Tag targetUuidTag = compoundTag.remove("target_uuid");
+            if (!(targetUuidTag instanceof StringTag)) return;
 
             // target_uuid -> Target
-            UUID targetUuid = UUID.fromString(targetUuidTag.getValue());
+            UUID targetUuid = UUID.fromString((String) targetUuidTag.getValue());
             compoundTag.put(new IntArrayTag("Target", UUIDIntArrayType.uuidToIntArray(targetUuid)));
         } else if (id.equals("minecraft:skull") && compoundTag.get("Owner") instanceof CompoundTag) {
             CompoundTag ownerTag = compoundTag.remove("Owner");
