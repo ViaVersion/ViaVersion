@@ -12,11 +12,7 @@ import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class CommonBoss<T> extends BossBar<T> {
     private final UUID uuid;
@@ -25,6 +21,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     private BossColor color;
     private BossStyle style;
     private final Set<UUID> players;
+    private final Set<UserConnection> connections;
     private boolean visible;
     private final Set<BossFlag> flags;
 
@@ -38,6 +35,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         this.color = color == null ? BossColor.PURPLE : color;
         this.style = style == null ? BossStyle.SOLID : style;
         this.players = new HashSet<>();
+        this.connections = Collections.newSetFromMap(new WeakHashMap<>());
         this.flags = new HashSet<>();
         visible = true;
     }
@@ -92,11 +90,31 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     @Override
+    public BossBar addConnection(UserConnection conn) {
+        if (!connections.contains(conn)) {
+            connections.add(conn);
+            if (visible) {
+                sendPacketConnection(conn, getPacket(CommonBoss.UpdateAction.ADD, conn));
+            }
+        }
+        return this;
+    }
+
+    @Override
     public BossBar removePlayer(UUID uuid) {
         if (players.contains(uuid)) {
             players.remove(uuid);
             UserConnection user = Via.getManager().getConnection(uuid);
             sendPacket(uuid, getPacket(UpdateAction.REMOVE, user));
+        }
+        return this;
+    }
+
+    @Override
+    public BossBar removeConnection(UserConnection conn) {
+        if (connections.contains(conn)) {
+            connections.remove(conn);
+            sendPacketConnection(conn, getPacket(UpdateAction.REMOVE, conn));
         }
         return this;
     }
@@ -128,6 +146,11 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     @Override
     public Set<UUID> getPlayers() {
         return Collections.unmodifiableSet(players);
+    }
+
+    @Override
+    public Set<UserConnection> getConnections() {
+        return Collections.unmodifiableSet(connections);
     }
 
     @Override
@@ -188,11 +211,27 @@ public abstract class CommonBoss<T> extends BossBar<T> {
             PacketWrapper wrapper = getPacket(action, connection);
             sendPacket(uuid, wrapper);
         }
+        for (UserConnection conn : new ArrayList<>(connections)) {
+            PacketWrapper wrapper = getPacket(action, conn);
+            sendPacketConnection(conn, wrapper);
+        }
     }
 
     private void sendPacket(UUID uuid, PacketWrapper wrapper) {
         if (!Via.getAPI().isInjected(uuid) || !(Via.getAPI().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
             players.remove(uuid);
+            return;
+        }
+        try {
+            wrapper.send(Protocol1_9To1_8.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendPacketConnection(UserConnection conn, PacketWrapper wrapper) {
+        if (conn.getProtocolInfo() == null || conn.getProtocolInfo().getProtocolVersion() >= ProtocolVersion.v1_9.getId()) {
+            connections.remove(conn);
             return;
         }
         try {
