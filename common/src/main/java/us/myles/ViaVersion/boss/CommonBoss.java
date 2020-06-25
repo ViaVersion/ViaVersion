@@ -230,7 +230,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     private void sendPacketConnection(UserConnection conn, PacketWrapper wrapper) {
-        if (conn.getProtocolInfo() == null || conn.getProtocolInfo().getProtocolVersion() >= ProtocolVersion.v1_9.getId()) {
+        if (conn.getProtocolInfo() == null || conn.getProtocolInfo().getProtocolVersion() < ProtocolVersion.v1_9.getId()) {
             connections.remove(conn);
             return;
         }
