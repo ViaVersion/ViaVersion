@@ -81,7 +81,7 @@ public abstract class BossBar<T> {
     }
 
     /**
-     * Show the bossbar to a player (uuid).
+     * Show the bossbar to a player (uuid). This only works for frontend connections. Use #addConnection(UserConnection) for other types.
      *
      * @param player uuid of the player
      * @return The BossBar object
@@ -121,7 +121,7 @@ public abstract class BossBar<T> {
     }
 
     /**
-     * Removes the bossbar from a player.
+     * Removes the bossbar from a player. This only works for frontend connections. For others types, use #removeConnection(UserConnection)
      *
      * @param uuid The players UUID
      * @return The BossBar object
