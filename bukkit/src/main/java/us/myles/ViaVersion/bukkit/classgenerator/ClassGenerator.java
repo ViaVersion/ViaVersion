@@ -17,6 +17,7 @@ import us.myles.ViaVersion.bukkit.util.NMSUtil;
 
 import java.lang.reflect.Method;
 
+//TODO maybe clean this up a bit 👀
 public class ClassGenerator {
     private static HandlerConstructor constructor = new BasicHandlerConstructor();
     private static String psPackage;
@@ -30,6 +31,7 @@ public class ClassGenerator {
         if (ViaVersionPlugin.getInstance().isCompatSpigotBuild() || ViaVersionPlugin.getInstance().isProtocolSupport()) {
             try {
                 ClassPool pool = ClassPool.getDefault();
+                pool.insertClassPath(new LoaderClassPath(Bukkit.class.getClassLoader()));
                 for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
                     pool.insertClassPath(new LoaderClassPath(p.getClass().getClassLoader()));
                 }
