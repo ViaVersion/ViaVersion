@@ -105,9 +105,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
         if ((Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("paper")
                 || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("taco")
-                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch"))
+                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch")
+                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("newcraft"))
                 && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
-            plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
+            plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch/NewCraftSpigot patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();
         }
 
