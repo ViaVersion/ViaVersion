@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.CancelException;
+import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
@@ -294,7 +295,9 @@ public class UserConnection {
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
      *                       packet is cancelled
-     * @throws Exception when transforming failed or this packet is cancelled
+     * @throws CancelException      if the packet should be cancelled
+     * @throws InformativeException if packet transforming failed
+     * @throws Exception            if any other processing outside of transforming fails
      */
     public void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
         if (!buf.isReadable()) return;
@@ -307,7 +310,9 @@ public class UserConnection {
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
      *                       packet is cancelled
-     * @throws Exception when transforming failed or this packet is cancelled
+     * @throws CancelException      if the packet should be cancelled
+     * @throws InformativeException if packet transforming failed
+     * @throws Exception            if any other processing outside of transforming fails
      */
     public void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
         if (!buf.isReadable()) return;

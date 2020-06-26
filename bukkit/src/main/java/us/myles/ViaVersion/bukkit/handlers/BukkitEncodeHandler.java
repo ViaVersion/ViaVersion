@@ -2,12 +2,12 @@ package us.myles.ViaVersion.bukkit.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.MessageToByteEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.exception.CancelCodecException;
 import us.myles.ViaVersion.exception.CancelEncoderException;
+import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.handlers.ChannelHandlerContextWrapper;
 import us.myles.ViaVersion.handlers.ViaHandler;
 import us.myles.ViaVersion.util.PipelineUtil;
@@ -69,7 +69,7 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
         if (PipelineUtil.containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
 
         super.exceptionCaught(ctx, cause);
-        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, CodecException.class)) {
+        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)) {
             cause.printStackTrace(); // Print if CB doesn't already do it
         }
     }
