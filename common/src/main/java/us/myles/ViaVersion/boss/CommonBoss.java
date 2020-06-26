@@ -196,7 +196,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     private void sendPacketConnection(UserConnection conn, PacketWrapper wrapper) {
-        if (conn.getProtocolInfo() == null || conn.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
+        if (conn.getProtocolInfo() == null || !conn.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
             connections.remove(conn);
             return;
         }
