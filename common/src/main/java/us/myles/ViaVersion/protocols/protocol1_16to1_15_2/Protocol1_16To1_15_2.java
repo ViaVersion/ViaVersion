@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.rewriters.TagType;
@@ -15,6 +16,7 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.TranslationMappings;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
@@ -97,12 +99,16 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             }
         });
 
+        ComponentRewriter componentRewriter = new TranslationMappings();
         registerOutgoing(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.COMPONENT);
                 map(Type.BYTE);
-                handler(wrapper -> wrapper.write(Type.UUID, ZERO_UUID)); // sender uuid
+                handler(wrapper -> {
+                    componentRewriter.processText(wrapper.get(Type.COMPONENT, 0));
+                    wrapper.write(Type.UUID, ZERO_UUID); // Sender uuid - always send as 'system'
+                });
             }
         });
 
