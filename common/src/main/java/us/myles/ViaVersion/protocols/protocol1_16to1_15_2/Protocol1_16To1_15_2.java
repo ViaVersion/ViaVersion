@@ -99,7 +99,8 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             }
         });
 
-        ComponentRewriter componentRewriter = new TranslationMappings();
+        ComponentRewriter componentRewriter = new TranslationMappings(this);
+        // Handle (relevant) component cases for translatable and score changes
         registerOutgoing(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -111,6 +112,9 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                 });
             }
         });
+        componentRewriter.registerBossBar(ClientboundPackets1_15.BOSSBAR);
+        componentRewriter.registerTitle(ClientboundPackets1_15.TITLE);
+        componentRewriter.registerCombatEvent(ClientboundPackets1_15.COMBAT_EVENT);
 
         SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);

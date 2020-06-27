@@ -3,6 +3,10 @@ package us.myles.ViaVersion.api.rewriters;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
+import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.util.GsonUtil;
 
 // Packets using components:
@@ -21,7 +25,69 @@ import us.myles.ViaVersion.util.GsonUtil;
 // declare commands
 // advancements
 // update sign
+
+/**
+ * Handles json chat components, containing methods to override certain parts of the handling.
+ * Also contains methods to register a few of the packets using components.
+ */
 public class ComponentRewriter {
+    protected final Protocol protocol;
+
+    public ComponentRewriter(Protocol protocol) {
+        this.protocol = protocol;
+    }
+
+    /**
+     * Use empty constructor if no packet registering is needed.
+     */
+    public ComponentRewriter() {
+        this.protocol = null;
+    }
+
+    public void registerBossBar(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UUID);
+                map(Type.VAR_INT);
+                handler(wrapper -> {
+                    int action = wrapper.get(Type.VAR_INT, 0);
+                    if (action == 0 || action == 3) {
+                        processText(wrapper.passthrough(Type.COMPONENT));
+                    }
+                });
+            }
+        });
+    }
+
+    public void registerCombatEvent(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    if (wrapper.passthrough(Type.VAR_INT) == 2) {
+                        wrapper.passthrough(Type.VAR_INT);
+                        wrapper.passthrough(Type.INT);
+                        processText(wrapper.passthrough(Type.COMPONENT));
+                    }
+                });
+            }
+        });
+    }
+
+    public void registerTitle(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    int action = wrapper.passthrough(Type.VAR_INT);
+                    if (action >= 0 && action <= 2) {
+                        processText(wrapper.passthrough(Type.COMPONENT));
+                    }
+                });
+            }
+        });
+    }
 
     public JsonElement processText(String value) {
         JsonElement root = GsonUtil.getJsonParser().parse(value);

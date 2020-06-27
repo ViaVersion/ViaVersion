@@ -1,6 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 
 import java.util.HashMap;
@@ -9,7 +12,8 @@ import java.util.Map;
 public class TranslationMappings extends ComponentRewriter {
     private final Map<String, String> mappings = new HashMap<>();
 
-    public TranslationMappings() {
+    public TranslationMappings(Protocol protocol) {
+        super(protocol);
         mappings.put("block.minecraft.flowing_water", "Flowing Water");
         mappings.put("block.minecraft.flowing_lava", "Flowing Lava");
         mappings.put("block.minecraft.bed", "Bed");
@@ -33,6 +37,23 @@ public class TranslationMappings extends ComponentRewriter {
         mappings.put("advancements.husbandry.break_diamond_hoe.title", "Serious Dedication");
         mappings.put("advancements.husbandry.break_diamond_hoe.description", "Completely use up a diamond hoe, and then reevaluate your life choices");
         mappings.put("biome.minecraft.nether", "Nether");
+    }
+
+    @Override
+    public void processText(JsonElement element) {
+        super.processText(element);
+        if (element == null || !element.isJsonObject()) return;
+
+        // Score components no longer contain value fields
+        JsonObject object = element.getAsJsonObject();
+        JsonObject score = object.getAsJsonObject("score");
+        if (score == null || object.has("text")) return;
+
+        JsonPrimitive value = score.getAsJsonPrimitive("value");
+        if (value != null) {
+            object.remove("score");
+            object.add("text", value);
+        }
     }
 
     @Override
