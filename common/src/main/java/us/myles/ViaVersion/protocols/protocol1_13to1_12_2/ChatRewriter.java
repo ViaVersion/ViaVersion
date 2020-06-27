@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class ChatRewriter {
     private static final Pattern URL = Pattern.compile("^(?:(https?)://)?([-\\w_.]{2,}\\.[a-z]{2,4})(/\\S*)?$");
-    private static final BaseComponent[] A = new BaseComponent[0];
+    private static final BaseComponent[] EMPTY_COMPONENTS = new BaseComponent[0];
     private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter() {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
@@ -128,7 +128,7 @@ public class ChatRewriter {
         component.setText(builder.toString());
         components.add(component);
 
-        final String serializedComponents = ComponentSerializer.toString(components.toArray(A));
+        final String serializedComponents = ComponentSerializer.toString(components.toArray(EMPTY_COMPONENTS));
         return GsonUtil.getJsonParser().parse(serializedComponents);
     }
 
