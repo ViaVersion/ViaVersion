@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class ConnectionData {
-    private static final BlockChangeRecord[] A = new BlockChangeRecord[0];
+    private static final BlockChangeRecord[] EMPTY_RECORDS = new BlockChangeRecord[0];
     public static BlockConnectionProvider blockConnectionProvider;
     static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, 1F);
     static Map<String, Integer> keyToId = new HashMap<>(8582, 1F);
@@ -121,7 +121,7 @@ public class ConnectionData {
                     PacketWrapper wrapper = new PacketWrapper(0x0F, null, user);
                     wrapper.write(Type.INT, chunkX + chunkDeltaX);
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
-                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(A));
+                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
                     try {
                         wrapper.send(Protocol1_13To1_12_2.class, true, true);
                     } catch (Exception e) {

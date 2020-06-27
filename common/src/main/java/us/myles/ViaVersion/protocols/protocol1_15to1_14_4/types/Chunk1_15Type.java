@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
-    private static final CompoundTag[] A = new CompoundTag[0];
+    private static final CompoundTag[] EMPTY_COMPOUNDS = new CompoundTag[0];
 
     public Chunk1_15Type(ClientWorld param) {
         super(param, Chunk.class);
@@ -98,7 +98,7 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
         }
 
         // Write Block Entities
-        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(A));
+        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
     }
 
     @Override

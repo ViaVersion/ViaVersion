@@ -263,7 +263,7 @@ public class ItemRewriter {
                 }
                 ListTag pages = tag.get("pages");
                 if (pages == null) {
-                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(Protocol1_9To1_8.fixJson(""))));
+                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
                     tag.put(pages);
                     item.setTag(tag);
                     return;
@@ -273,7 +273,7 @@ public class ItemRewriter {
                     if (!(pages.get(i) instanceof StringTag))
                         continue;
                     StringTag page = pages.get(i);
-                    page.setValue(Protocol1_9To1_8.fixJson(page.getValue()));
+                    page.setValue(Protocol1_9To1_8.fixJson(page.getValue()).toString());
                 }
                 item.setTag(tag);
             }

@@ -154,13 +154,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
         registerOutgoing(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
-                    }
-                });
+                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
             }
         });
 
@@ -258,7 +252,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action == 0 || action == 3) {
-                            wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING)));
+                            ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
                         }
                     }
                 });
@@ -267,13 +261,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
         registerOutgoing(ClientboundPackets1_12_1.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
-                    }
-                });
+                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
             }
         });
         registerOutgoing(ClientboundPackets1_12_1.TAB_COMPLETE, new PacketRemapper() {
@@ -322,8 +310,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Id
                 map(Type.STRING); // Window type
-                map(Type.STRING); // Title
-                handler(wrapper -> wrapper.set(Type.STRING, 1, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 1))));
+                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT))); // Title
             }
         });
 
@@ -369,8 +356,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
         registerOutgoing(ClientboundPackets1_12_1.DISCONNECT, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
-                handler(wrapper -> wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0))));
+                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
             }
         });
 
@@ -420,30 +406,6 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.MAP_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // 0 - Map id
-                map(Type.BYTE); // 1 - Scale
-                map(Type.BOOLEAN); // 2 - Tracking Position
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int iconCount = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < iconCount; i++) {
-                            byte directionAndType = wrapper.read(Type.BYTE);
-                            int type = (directionAndType & 0xF0) >> 4;
-                            wrapper.write(Type.VAR_INT, type);
-                            wrapper.passthrough(Type.BYTE); // Icon X
-                            wrapper.passthrough(Type.BYTE); // Icon Z
-                            byte direction = (byte) (directionAndType & 0x0F);
-                            wrapper.write(Type.BYTE, direction);
-                            wrapper.write(Type.OPTIONAL_CHAT, null); // Display Name
-                        }
-                    }
-                });
-            }
-        });
 
         registerOutgoing(ClientboundPackets1_12_1.CRAFT_RECIPE_RESPONSE, new PacketRemapper() {
             @Override
@@ -462,7 +424,31 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                         if (wrapper.get(Type.VAR_INT, 0) == 2) { // Entity dead
                             wrapper.passthrough(Type.VAR_INT); // Player id
                             wrapper.passthrough(Type.INT); // Entity id
-                            wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING)));
+                            ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
+                        }
+                    }
+                });
+            }
+        });
+        registerOutgoing(ClientboundPackets1_12_1.MAP_DATA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Map id
+                map(Type.BYTE); // 1 - Scale
+                map(Type.BOOLEAN); // 2 - Tracking Position
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int iconCount = wrapper.passthrough(Type.VAR_INT);
+                        for (int i = 0; i < iconCount; i++) {
+                            byte directionAndType = wrapper.read(Type.BYTE);
+                            int type = (directionAndType & 0xF0) >> 4;
+                            wrapper.write(Type.VAR_INT, type);
+                            wrapper.passthrough(Type.BYTE); // Icon X
+                            wrapper.passthrough(Type.BYTE); // Icon Z
+                            byte direction = (byte) (directionAndType & 0x0F);
+                            wrapper.write(Type.BYTE, direction);
+                            wrapper.write(Type.OPTIONAL_COMPONENT, null); // Display Name
                         }
                     }
                 });
@@ -586,8 +572,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                         // On create or update
                         if (mode == 0 || mode == 2) {
                             String value = wrapper.read(Type.STRING); // Value
-                            value = ChatRewriter.legacyTextToJson(value);
-                            wrapper.write(Type.STRING, value);
+                            wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(value));
 
                             String type = wrapper.read(Type.STRING);
                             // integer or hearts
@@ -611,8 +596,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
 
                         if (action == 0 || action == 2) {
                             String displayName = wrapper.read(Type.STRING); // Display Name
-                            displayName = ChatRewriter.legacyTextToJson(displayName);
-                            wrapper.write(Type.STRING, displayName);
+                            wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(displayName));
 
                             String prefix = wrapper.read(Type.STRING); // Prefix moved
                             String suffix = wrapper.read(Type.STRING); // Suffix moved
@@ -635,8 +619,8 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
 
                             wrapper.write(Type.VAR_INT, colour);
 
-                            wrapper.write(Type.STRING, ChatRewriter.legacyTextToJson(prefix)); // Prefix
-                            wrapper.write(Type.STRING, ChatRewriter.legacyTextToJson(suffix)); // Suffix
+                            wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(prefix)); // Prefix
+                            wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(suffix)); // Suffix
                         }
 
                         if (action == 0 || action == 3 || action == 4) {
@@ -681,7 +665,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action >= 0 && action <= 2) {
-                            wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING)));
+                            ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
                         }
                     }
                 });
@@ -694,13 +678,11 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
         registerOutgoing(ClientboundPackets1_12_1.TAB_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING);
-                map(Type.STRING);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.STRING, 0, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 0)));
-                        wrapper.set(Type.STRING, 1, ChatRewriter.processTranslate(wrapper.get(Type.STRING, 1)));
+                        ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
+                        ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
                     }
                 });
             }
@@ -724,15 +706,16 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
 
                             // Display data
                             if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING))); // Title
-                                wrapper.write(Type.STRING, ChatRewriter.processTranslate(wrapper.read(Type.STRING))); // Description
+                                ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)); // Title
+                                ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)); // Description
                                 Item icon = wrapper.read(Type.ITEM);
                                 InventoryPackets.toClient(icon);
                                 wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
                                 wrapper.passthrough(Type.VAR_INT); // Frame type
                                 int flags = wrapper.passthrough(Type.INT); // Flags
-                                if ((flags & 1) != 0)
+                                if ((flags & 1) != 0) {
                                     wrapper.passthrough(Type.STRING); // Background texture
+                                }
                                 wrapper.passthrough(Type.FLOAT); // X
                                 wrapper.passthrough(Type.FLOAT); // Y
                             }
@@ -902,12 +885,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
         registerIncoming(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                create(new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.STRING, "MC|AutoCmd");
-                    }
-                });
+                create(wrapper -> wrapper.write(Type.STRING, "MC|AutoCmd"));
                 handler(POS_TO_3_INT);
                 map(Type.STRING); // Command
                 handler(new PacketHandler() {
