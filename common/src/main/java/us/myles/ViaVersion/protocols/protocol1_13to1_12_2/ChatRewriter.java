@@ -35,14 +35,13 @@ public class ChatRewriter {
             String action = hoverEvent.getAsJsonPrimitive("action").getAsString();
             if (!action.equals("show_item")) return;
 
-            JsonElement value = hoverEvent.getAsJsonObject("value");
+            JsonElement value = hoverEvent.get("value");
             if (value == null) return;
 
             String text = findItemNBT(value);
-            System.out.println(text);
+            if (text == null) return;
             try {
                 CompoundTag tag = BinaryTagIO.readString(text);
-                System.out.println(tag);
                 CompoundTag itemTag = tag.get("tag");
                 ShortTag damageTag = tag.get("Damage");
 
@@ -67,8 +66,6 @@ public class ChatRewriter {
                 String serializedNBT = BinaryTagIO.writeString(tag);
                 object.addProperty("text", serializedNBT);
                 hoverEvent.add("value", array);
-
-                System.out.println(serializedNBT);
             } catch (IOException e) {
                 Via.getPlatform().getLogger().warning("Invalid NBT in show_item:");
                 e.printStackTrace();
