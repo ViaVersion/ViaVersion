@@ -136,8 +136,8 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
 
                             // Display data
                             if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.STRING); // Title
-                                wrapper.passthrough(Type.STRING); // Description
+                                wrapper.passthrough(Type.COMPONENT); // Title
+                                wrapper.passthrough(Type.COMPONENT); // Description
                                 Item icon = wrapper.passthrough(Type.FLAT_ITEM);
                                 InventoryPackets.toClient(icon);
                                 wrapper.passthrough(Type.VAR_INT); // Frame type

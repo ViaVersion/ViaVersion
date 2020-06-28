@@ -136,8 +136,8 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
 
                         // Display data
                         if (wrapper.passthrough(Type.BOOLEAN)) {
-                            wrapper.passthrough(Type.STRING); // Title
-                            wrapper.passthrough(Type.STRING); // Description
+                            wrapper.passthrough(Type.COMPONENT); // Title
+                            wrapper.passthrough(Type.COMPONENT); // Description
                             InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Icon
                             wrapper.passthrough(Type.VAR_INT); // Frame type
                             int flags = wrapper.passthrough(Type.INT); // Flags
