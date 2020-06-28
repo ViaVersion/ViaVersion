@@ -42,8 +42,8 @@ public final class BinaryTagIO {
      * @return the compound tag
      * @throws IOException if an exception was encountered while reading a compound tag
      */
-    public static @NotNull
-    CompoundTag readString(final @NotNull String input) throws IOException {
+    @NotNull
+    public static CompoundTag readString(final @NotNull String input) throws IOException {
         try {
             final CharBuffer buffer = new CharBuffer(input);
             final TagStringReader parser = new TagStringReader(buffer);
@@ -64,8 +64,8 @@ public final class BinaryTagIO {
      * @return the string
      * @throws IOException if an exception was encountered while writing the compound tag
      */
-    public static @NotNull
-    String writeString(final @NotNull CompoundTag tag) throws IOException {
+    @NotNull
+    public static String writeString(final @NotNull CompoundTag tag) throws IOException {
         final StringBuilder sb = new StringBuilder();
         try (final TagStringWriter emit = new TagStringWriter(sb)) {
             emit.writeTag(tag);
