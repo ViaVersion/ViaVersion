@@ -44,6 +44,15 @@ public class ComponentRewriter {
         this.protocol = null;
     }
 
+    public void registerChatMessage(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+            }
+        });
+    }
+
     public void registerBossBar(ClientboundPacketType packetType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override

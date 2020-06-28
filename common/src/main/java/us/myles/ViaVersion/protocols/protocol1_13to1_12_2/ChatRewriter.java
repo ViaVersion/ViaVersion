@@ -1,25 +1,15 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.ShortTag;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.nbt.BinaryTagIO;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,82 +18,7 @@ import java.util.regex.Pattern;
 public class ChatRewriter {
     private static final Pattern URL = Pattern.compile("^(?:(https?)://)?([-\\w_.]{2,}\\.[a-z]{2,4})(/\\S*)?$");
     private static final BaseComponent[] EMPTY_COMPONENTS = new BaseComponent[0];
-    private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter() {
-        @Override
-        protected void handleHoverEvent(JsonObject hoverEvent) {
-            super.handleHoverEvent(hoverEvent);
-            String action = hoverEvent.getAsJsonPrimitive("action").getAsString();
-            if (!action.equals("show_item")) return;
-
-            JsonElement value = hoverEvent.get("value");
-            if (value == null) return;
-
-            String text = findItemNBT(value);
-            if (text == null) return;
-            try {
-                CompoundTag tag = BinaryTagIO.readString(text);
-                CompoundTag itemTag = tag.get("tag");
-                ShortTag damageTag = tag.get("Damage");
-
-                // Call item converter
-                short damage = damageTag != null ? damageTag.getValue() : 0;
-                Item item = new Item();
-                item.setData(damage);
-                item.setTag(itemTag);
-                InventoryPackets.toClient(item);
-
-                // Serialize again
-                if (damage != item.getData()) {
-                    tag.put(new ShortTag("Damage", item.getData()));
-                }
-                if (itemTag != null) {
-                    tag.put(itemTag);
-                }
-
-                JsonArray array = new JsonArray();
-                JsonObject object = new JsonObject();
-                array.add(object);
-                String serializedNBT = BinaryTagIO.writeString(tag);
-                object.addProperty("text", serializedNBT);
-                hoverEvent.add("value", array);
-            } catch (IOException e) {
-                Via.getPlatform().getLogger().warning("Invalid NBT in show_item:");
-                e.printStackTrace();
-            }
-        }
-
-        private String findItemNBT(JsonElement element) {
-            if (element.isJsonArray()) {
-                for (JsonElement jsonElement : element.getAsJsonArray()) {
-                    String value = findItemNBT(jsonElement);
-                    if (value != null) {
-                        return value;
-                    }
-                }
-            } else if (element.isJsonObject()) {
-                JsonPrimitive text = element.getAsJsonObject().getAsJsonPrimitive("text");
-                if (text != null) {
-                    return text.getAsString();
-                }
-            } else if (element.isJsonPrimitive()) {
-                return element.getAsJsonPrimitive().getAsString();
-            }
-            return null;
-        }
-
-        @Override
-        protected void handleTranslate(JsonObject object, String translate) {
-            super.handleTranslate(object, translate);
-            String newTranslate;
-            newTranslate = MappingData.translateMapping.get(translate);
-            if (newTranslate == null) {
-                newTranslate = MappingData.mojangTranslation.get(translate);
-            }
-            if (newTranslate != null) {
-                object.addProperty("translate", newTranslate);
-            }
-        }
-    };
+    private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter1_13();
 
     // Based on https://github.com/SpigotMC/BungeeCord/blob/master/chat/src/main/java/net/md_5/bungee/api/chat/TextComponent.java
     public static JsonElement fromLegacyText(String message, ChatColor defaultColor) {
