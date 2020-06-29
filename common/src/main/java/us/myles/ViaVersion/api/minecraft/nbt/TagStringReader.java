@@ -89,7 +89,12 @@ import java.util.stream.IntStream;
     public ListTag list() throws StringTagParseException {
         final ListTag listTag = new ListTag("");
         this.buffer.expect(Tokens.ARRAY_BEGIN);
+        final boolean prefixedIndex = this.buffer.peek() == '0' && this.buffer.peek(1) == ':';
         while (this.buffer.hasMore()) {
+            if (prefixedIndex) {
+                this.buffer.takeUntil(':');
+            }
+
             final Tag next = this.tag();
             // TODO: validate type
             listTag.add(next);
