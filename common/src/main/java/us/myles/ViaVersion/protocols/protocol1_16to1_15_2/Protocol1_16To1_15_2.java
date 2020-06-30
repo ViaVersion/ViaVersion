@@ -181,6 +181,22 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             }
         });
 
+        // Spigot has the arbitrary limit of 32 in 1.15, upped to 64 in 1.16
+        if (isSpigot()) {
+            registerIncoming(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketRemapper() {
+                @Override
+                public void registerMap() {
+                    handler(wrapper -> {
+                        String channel = wrapper.passthrough(Type.STRING);
+                        if (channel.length() > 32) {
+                            Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 32 characters: " + channel);
+                            wrapper.cancel();
+                        }
+                    });
+                }
+            });
+        }
+
         registerIncoming(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -268,6 +284,15 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
         userConnection.put(new EntityTracker1_16(userConnection));
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
+    }
+
+    private boolean isSpigot() {
+        try {
+            Class.forName("org.spigotmc.SpigotConfig");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 }
