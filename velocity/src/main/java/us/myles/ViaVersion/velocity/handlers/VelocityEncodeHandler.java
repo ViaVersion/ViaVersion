@@ -46,7 +46,7 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         }
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf draft) throws InvocationTargetException {
+    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) throws InvocationTargetException {
         //if (handledCompression) return false;
 
         int encoderIndex = ctx.pipeline().names().indexOf("compression-encoder");
