@@ -34,14 +34,14 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
         ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
-            boolean needsCompress = handleCompressionOrder(ctx, bytebuf);
+            boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
 
-            info.transformIncoming(bytebuf, CancelDecoderException::generate);
+            info.transformIncoming(transformedBuf, CancelDecoderException::generate);
 
             if (needsCompress) {
-                recompress(ctx, bytebuf);
+                recompress(ctx, transformedBuf);
             }
-            out.add(bytebuf.retain());
+            out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();
         }
