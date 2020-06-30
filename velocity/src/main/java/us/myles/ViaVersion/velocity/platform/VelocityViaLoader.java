@@ -9,8 +9,6 @@ import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import us.myles.ViaVersion.velocity.handlers.VelocityServerHandler;
-import us.myles.ViaVersion.velocity.listeners.ElytraPatch;
 import us.myles.ViaVersion.velocity.listeners.UpdateListener;
 import us.myles.ViaVersion.velocity.providers.VelocityBossBarProvider;
 import us.myles.ViaVersion.velocity.providers.VelocityMovementTransmitter;
