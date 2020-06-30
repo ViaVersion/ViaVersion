@@ -31,14 +31,12 @@ public class VelocityVersionProvider extends VersionProvider {
     }
 
     private int getBackProtocol(UserConnection user) throws Exception {
-        System.out.println("backend protocol!");
         ChannelHandler mcHandler = user.getChannel().pipeline().get("handler");
         return ProtocolDetectorService.getProtocolId(
                 ((ServerConnection) getAssociation.invoke(mcHandler)).getServerInfo().getName());
     }
 
     private int getFrontProtocol(UserConnection user) throws Exception {
-        System.out.println("frontend protocol!");
         int playerVersion = user.getProtocolInfo().getProtocolVersion();
 
         IntStream versions = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()

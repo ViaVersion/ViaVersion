@@ -5,11 +5,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.CancelDecoderException;
 import us.myles.ViaVersion.exception.CancelCodecException;
+import us.myles.ViaVersion.exception.CancelDecoderException;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +16,8 @@ import java.util.List;
 @ChannelHandler.Sharable
 public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     private final UserConnection info;
-    boolean handledCompression;
+    private boolean handledCompression;
+    private boolean skipDoubleTransform;
 
     public VelocityDecodeHandler(UserConnection info) {
         this.info = info;
@@ -26,6 +25,12 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
+        if (skipDoubleTransform) {
+            skipDoubleTransform = false;
+            out.add(bytebuf.retain());
+            return;
+        }
+
         if (!info.checkIncomingPacket()) throw CancelDecoderException.generate(null);
         if (!info.shouldTransformPacket()) {
             out.add(bytebuf.retain());
@@ -40,6 +45,7 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
             if (needsCompress) {
                 recompress(ctx, transformedBuf);
+                skipDoubleTransform = true;
             }
             out.add(transformedBuf.retain());
         } finally {
@@ -48,13 +54,12 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf draft) throws InvocationTargetException {
-        //if (handledCompression) return false;
+        if (handledCompression) return false;
 
         int decoderIndex = ctx.pipeline().names().indexOf("compression-decoder");
         if (decoderIndex == -1) return false;
         handledCompression = true;
         if (decoderIndex > ctx.pipeline().names().indexOf("via-decoder")) {
-            System.out.println("bad decoder order");
             // Need to decompress this packet due to bad order
             ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((MessageToMessageDecoder<?>) ctx.pipeline().get("compression-decoder"), ctx, draft).get(0);
             try {

@@ -47,13 +47,12 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     }
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) throws InvocationTargetException {
-        //if (handledCompression) return false;
+        if (handledCompression) return false;
 
         int encoderIndex = ctx.pipeline().names().indexOf("compression-encoder");
         if (encoderIndex == -1) return false;
         handledCompression = true;
         if (encoderIndex > ctx.pipeline().names().indexOf("via-encoder")) {
-            System.out.println("bad decoder order");
             // Need to decompress this packet due to bad order
             ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((MessageToMessageDecoder<?>) ctx.pipeline().get("compression-decoder"), ctx, buf).get(0);
             try {
