@@ -53,7 +53,7 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
         }
     }
 
-    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf draft) throws InvocationTargetException {
+    private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) throws InvocationTargetException {
         if (handledCompression) return false;
 
         int decoderIndex = ctx.pipeline().names().indexOf("compression-decoder");
@@ -61,9 +61,9 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
         handledCompression = true;
         if (decoderIndex > ctx.pipeline().names().indexOf("via-decoder")) {
             // Need to decompress this packet due to bad order
-            ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((MessageToMessageDecoder<?>) ctx.pipeline().get("compression-decoder"), ctx, draft).get(0);
+            ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((MessageToMessageDecoder<?>) ctx.pipeline().get("compression-decoder"), ctx, buf).get(0);
             try {
-                draft.clear().writeBytes(decompressed);
+                buf.clear().writeBytes(decompressed);
             } finally {
                 decompressed.release();
             }
@@ -78,11 +78,11 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
         return false;
     }
 
-    private void recompress(ChannelHandlerContext ctx, ByteBuf draft) throws Exception {
+    private void recompress(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
         ByteBuf compressed = ctx.alloc().buffer();
         try {
-            PipelineUtil.callEncode((MessageToByteEncoder<?>) ctx.pipeline().get("compression-encoder"), ctx, draft, compressed);
-            draft.clear().writeBytes(compressed);
+            PipelineUtil.callEncode((MessageToByteEncoder<?>) ctx.pipeline().get("compression-encoder"), ctx, buf, compressed);
+            buf.clear().writeBytes(compressed);
         } finally {
             compressed.release();
         }
