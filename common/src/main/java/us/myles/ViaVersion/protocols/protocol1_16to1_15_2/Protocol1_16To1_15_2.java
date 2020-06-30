@@ -189,7 +189,9 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                     handler(wrapper -> {
                         String channel = wrapper.passthrough(Type.STRING);
                         if (channel.length() > 32) {
-                            Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 32 characters: " + channel);
+                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 32 characters: " + channel);
+                            }
                             wrapper.cancel();
                         }
                     });

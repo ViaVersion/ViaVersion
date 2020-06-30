@@ -64,7 +64,7 @@ public class BungeeServerHandler implements Listener {
     }
 
     // Set the handshake version every time someone connects to any server
-    @EventHandler
+    @EventHandler(priority = 120)
     public void onServerConnect(ServerConnectEvent e) {
         if (e.isCancelled()) {
             return;
@@ -89,7 +89,7 @@ public class BungeeServerHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = -120)
     public void onServerConnected(ServerConnectedEvent e) {
         try {
             checkServerChange(e, Via.getManager().getConnection(e.getPlayer().getUniqueId()));
@@ -98,7 +98,7 @@ public class BungeeServerHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = -120)
     public void onServerSwitch(ServerSwitchEvent e) {
         // Update entity id
         UserConnection userConnection = Via.getManager().getConnection(e.getPlayer().getUniqueId());
@@ -115,7 +115,6 @@ public class BungeeServerHandler implements Listener {
             }
         }
     }
-
 
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
