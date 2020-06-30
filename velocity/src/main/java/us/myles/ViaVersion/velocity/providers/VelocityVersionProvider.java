@@ -2,7 +2,6 @@ package us.myles.ViaVersion.velocity.providers;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ServerChannel;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -40,7 +39,7 @@ public class VelocityVersionProvider extends VersionProvider {
 
     private int getFrontProtocol(UserConnection user) throws Exception {
         System.out.println("frontend protocol!");
-        int playerVersion = user.get(ProtocolInfo.class).getProtocolVersion();
+        int playerVersion = user.getProtocolInfo().getProtocolVersion();
 
         IntStream versions = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()
                 .mapToInt(com.velocitypowered.api.network.ProtocolVersion::getProtocol);
