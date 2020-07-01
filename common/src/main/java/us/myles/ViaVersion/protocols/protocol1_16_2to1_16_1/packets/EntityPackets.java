@@ -26,7 +26,10 @@ public class EntityPackets {
             @Override
             public void registerMap() {
                 map(Type.INT); // Entity ID
-                handler(wrapper -> wrapper.write(Type.BOOLEAN, false)); // Hardcore //TODO save?
+                handler(wrapper -> {
+                    short gamemode = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                    wrapper.write(Type.BOOLEAN, (gamemode & 0x08) != 0); // Hardcore
+                });
                 map(Type.UNSIGNED_BYTE); //  Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
