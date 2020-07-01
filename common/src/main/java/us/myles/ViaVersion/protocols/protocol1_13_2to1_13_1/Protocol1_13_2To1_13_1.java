@@ -55,8 +55,9 @@ public class Protocol1_13_2To1_13_1 extends Protocol<ClientboundPackets1_13, Cli
                                 wrapper.write(Type.FLAT_VAR_INT_ITEM, icon);
                                 wrapper.passthrough(Type.VAR_INT); // Frame type
                                 int flags = wrapper.passthrough(Type.INT); // Flags
-                                if ((flags & 1) != 0)
+                                if ((flags & 1) != 0) {
                                     wrapper.passthrough(Type.STRING); // Background texture
+                                }
                                 wrapper.passthrough(Type.FLOAT); // X
                                 wrapper.passthrough(Type.FLOAT); // Y
                             }

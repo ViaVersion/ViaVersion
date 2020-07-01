@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data.RecipeRewriter1_15;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 
@@ -58,43 +59,9 @@ public class InventoryPackets {
 
         itemRewriter.registerSetCooldown(ClientboundPackets1_15.COOLDOWN, InventoryPackets::getNewItemId);
         itemRewriter.registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-
-        protocol.registerOutgoing(ClientboundPackets1_15.TRADE_LIST, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                    for (int i = 0; i < size; i++) {
-                        Item input = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                        toClient(input);
-
-                        Item output = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                        toClient(output);
-
-                        if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
-                            // Second Item
-                            toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                        }
-
-                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                        wrapper.passthrough(Type.INT); // Number of tools uses
-                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
-
-                        wrapper.passthrough(Type.INT);
-                        wrapper.passthrough(Type.INT);
-                        wrapper.passthrough(Type.FLOAT);
-                        wrapper.passthrough(Type.INT);
-                    }
-
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.BOOLEAN);
-                });
-            }
-        });
-
+        itemRewriter.registerTradeList(ClientboundPackets1_15.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
         itemRewriter.registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        itemRewriter.registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerOutgoing(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
             @Override
@@ -109,64 +76,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.DECLARE_RECIPES, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
-                        String id = wrapper.passthrough(Type.STRING);
-                        switch (type) {
-                            case "crafting_shapeless": {
-                                wrapper.passthrough(Type.STRING); // Group
-
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
-                                for (int j = 0; j < ingredientsNo; j++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-                                    for (Item item : items) toClient(item);
-                                }
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
-                                break;
-                            }
-                            case "crafting_shaped": {
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
-                                wrapper.passthrough(Type.STRING); // Group
-
-                                for (int j = 0; j < ingredientsNo; j++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-                                    for (Item item : items) toClient(item);
-                                }
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
-                                break;
-                            }
-                            case "blasting":
-                            case "smoking":
-                            case "campfire_cooking":
-                            case "smelting": {
-                                wrapper.passthrough(Type.STRING); // Group
-
-                                Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-
-                                for (Item item : items) toClient(item);
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                                wrapper.passthrough(Type.FLOAT); // EXP
-
-                                wrapper.passthrough(Type.VAR_INT); // Cooking time
-                                break;
-                            }
-                            case "stonecutting": {
-                                wrapper.passthrough(Type.STRING);
-                                Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-                                for (Item item : items) toClient(item);
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                                break;
-                            }
-                        }
-                    }
-                });
-            }
-        });
+        new RecipeRewriter1_15(protocol, InventoryPackets::toClient).registerDefaultHandler(ClientboundPackets1_15.DECLARE_RECIPES);
 
         itemRewriter.registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         itemRewriter.registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);

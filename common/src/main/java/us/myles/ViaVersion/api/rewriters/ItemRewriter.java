@@ -70,7 +70,7 @@ public class ItemRewriter {
                     byte slot;
                     do {
                         slot = wrapper.passthrough(Type.BYTE);
-                         // & 0x7F into an extra variable if slot is needed
+                        // & 0x7F into an extra variable if slot is needed
                         toClient.rewrite(wrapper.passthrough(type));
                     } while ((slot & 0xFFFFFF80) != 0);
                 });
@@ -113,6 +113,77 @@ public class ItemRewriter {
                 handler(wrapper -> {
                     int itemId = wrapper.read(Type.VAR_INT);
                     wrapper.write(Type.VAR_INT, itemIDRewriteFunction.rewrite(itemId));
+                });
+            }
+        });
+    }
+
+    // 1.14.4+
+    public void registerTradeList(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.VAR_INT);
+                    int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                    for (int i = 0; i < size; i++) {
+                        toClient.rewrite(wrapper.passthrough(type)); // Input
+                        toClient.rewrite(wrapper.passthrough(type)); // Output
+
+                        if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
+                            toClient.rewrite(wrapper.passthrough(type)); // Second Item
+                        }
+
+                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                        wrapper.passthrough(Type.INT); // Number of tools uses
+                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                        wrapper.passthrough(Type.INT); // XP
+                        wrapper.passthrough(Type.INT); // Special price
+                        wrapper.passthrough(Type.FLOAT); // Price multiplier
+                        wrapper.passthrough(Type.INT); // Demand
+                    }
+                    //...
+                });
+            }
+        });
+    }
+
+    public void registerAdvancements(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+                    int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+                    for (int i = 0; i < size; i++) {
+                        wrapper.passthrough(Type.STRING); // Identifier
+
+                        // Parent
+                        if (wrapper.passthrough(Type.BOOLEAN))
+                            wrapper.passthrough(Type.STRING);
+
+                        // Display data
+                        if (wrapper.passthrough(Type.BOOLEAN)) {
+                            wrapper.passthrough(Type.COMPONENT); // Title
+                            wrapper.passthrough(Type.COMPONENT); // Description
+                            toClient.rewrite(wrapper.passthrough(type)); // Icon
+                            wrapper.passthrough(Type.VAR_INT); // Frame type
+                            int flags = wrapper.passthrough(Type.INT); // Flags
+                            if ((flags & 1) != 0) {
+                                wrapper.passthrough(Type.STRING); // Background texture
+                            }
+                            wrapper.passthrough(Type.FLOAT); // X
+                            wrapper.passthrough(Type.FLOAT); // Y
+                        }
+
+                        wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                        int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                        for (int array = 0; array < arrayLength; array++) {
+                            wrapper.passthrough(Type.STRING_ARRAY); // String array
+                        }
+                    }
                 });
             }
         });

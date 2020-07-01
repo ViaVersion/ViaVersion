@@ -118,48 +118,6 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
             }
         });
 
-        registerOutgoing(ClientboundPackets1_13.ADVANCEMENTS, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-                        int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
-
-                        for (int i = 0; i < size; i++) {
-                            wrapper.passthrough(Type.STRING); // Identifier
-
-                            // Parent
-                            if (wrapper.passthrough(Type.BOOLEAN))
-                                wrapper.passthrough(Type.STRING);
-
-                            // Display data
-                            if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.COMPONENT); // Title
-                                wrapper.passthrough(Type.COMPONENT); // Description
-                                Item icon = wrapper.passthrough(Type.FLAT_ITEM);
-                                InventoryPackets.toClient(icon);
-                                wrapper.passthrough(Type.VAR_INT); // Frame type
-                                int flags = wrapper.passthrough(Type.INT); // Flags
-                                if ((flags & 1) != 0)
-                                    wrapper.passthrough(Type.STRING); // Background texture
-                                wrapper.passthrough(Type.FLOAT); // X
-                                wrapper.passthrough(Type.FLOAT); // Y
-                            }
-
-                            wrapper.passthrough(Type.STRING_ARRAY); // Criteria
-
-                            int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                            for (int array = 0; array < arrayLength; array++) {
-                                wrapper.passthrough(Type.STRING_ARRAY); // String array
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
         registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
