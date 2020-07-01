@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -79,11 +81,21 @@ public class TagRewriter {
 
         for (int i = 0; i < tagsSize; i++) {
             wrapper.passthrough(Type.STRING);
-            int[] ids = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
+            int[] ids = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
             if (rewriteFunction != null) {
-                for (int j = 0; j < ids.length; j++) {
-                    ids[j] = rewriteFunction.rewrite(ids[j]);
+                // Map ids and filter out new blocks
+                IntList idList = new IntArrayList(ids.length);
+                for (int id : ids) {
+                    int mappedId = rewriteFunction.rewrite(id);
+                    if (mappedId != -1) {
+                        idList.add(mappedId);
+                    }
                 }
+
+                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, idList.toArray(EMPTY_ARRAY));
+            } else {
+                // Write the original array
+                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, ids);
             }
         }
 
