@@ -27,8 +27,11 @@ public class EntityPackets {
             public void registerMap() {
                 map(Type.INT); // Entity ID
                 handler(wrapper -> {
-                    short gamemode = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                    wrapper.write(Type.BOOLEAN, (gamemode & 0x08) != 0); // Hardcore
+                    short gamemode = wrapper.read(Type.UNSIGNED_BYTE);
+                    boolean hardcore = (gamemode & 0x08) != 0;
+                    gamemode &= ~0x08;
+                    wrapper.write(Type.UNSIGNED_BYTE, gamemode);
+                    wrapper.write(Type.BOOLEAN, hardcore); // Hardcore
                 });
                 map(Type.UNSIGNED_BYTE); //  Gamemode
                 map(Type.BYTE); // Previous Gamemode
