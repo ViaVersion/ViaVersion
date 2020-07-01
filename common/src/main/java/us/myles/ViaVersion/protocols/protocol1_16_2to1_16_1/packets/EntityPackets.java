@@ -30,8 +30,8 @@ public class EntityPackets {
                     short gamemode = wrapper.read(Type.UNSIGNED_BYTE);
                     boolean hardcore = (gamemode & 0x08) != 0;
                     gamemode &= ~0x08;
-                    wrapper.write(Type.UNSIGNED_BYTE, gamemode);
                     wrapper.write(Type.BOOLEAN, hardcore); // Hardcore
+                    wrapper.write(Type.UNSIGNED_BYTE, gamemode);
                 });
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
