@@ -88,7 +88,7 @@ public class TagRewriter {
         }
 
         // Send new tags if present
-        if (newTags != null) {
+        if (newTags != null && !newTags.isEmpty()) {
             for (TagData tag : newTags) {
                 wrapper.write(Type.STRING, tag.identifier);
                 wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.entries);

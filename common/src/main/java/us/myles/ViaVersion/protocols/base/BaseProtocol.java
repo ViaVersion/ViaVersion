@@ -27,16 +27,27 @@ public class BaseProtocol extends SimpleProtocol {
         registerIncoming(State.HANDSHAKE, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
-                // select right protocol
-                map(Type.VAR_INT); // 0 - Client Protocol Version
-                map(Type.STRING); // 1 - Server Address
-                map(Type.UNSIGNED_SHORT); // 2 - Server Port
-                map(Type.VAR_INT); // 3 - Next State
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int protVer = wrapper.get(Type.VAR_INT, 0);
-                        int state = wrapper.get(Type.VAR_INT, 1);
+                        try {
+                            handleWithException(wrapper);
+                        } catch (Exception e) {
+                            // Only throw exceptions here when debug is enabled
+                            // The handling has proven to be correct, but often receives invalid packets as the first packet of a connection
+                            if (Via.getManager().isDebug()) {
+                                throw e;
+                            } else {
+                                wrapper.cancel();
+                            }
+                        }
+                    }
+
+                    private void handleWithException(PacketWrapper wrapper) throws Exception {
+                        int protVer = wrapper.passthrough(Type.VAR_INT);
+                        wrapper.passthrough(Type.STRING); // Server Address
+                        wrapper.passthrough(Type.UNSIGNED_SHORT); // Server Port
+                        int state = wrapper.passthrough(Type.VAR_INT);
 
                         ProtocolInfo info = wrapper.user().getProtocolInfo();
                         info.setProtocolVersion(protVer);
