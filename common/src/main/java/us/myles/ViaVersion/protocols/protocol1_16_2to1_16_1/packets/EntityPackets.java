@@ -33,7 +33,6 @@ public class EntityPackets {
                     wrapper.write(Type.UNSIGNED_BYTE, gamemode);
                     wrapper.write(Type.BOOLEAN, hardcore); // Hardcore
                 });
-                map(Type.UNSIGNED_BYTE); //  Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NBT); // Dimension Registry
