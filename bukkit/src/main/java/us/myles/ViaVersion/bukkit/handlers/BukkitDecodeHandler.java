@@ -3,11 +3,13 @@ package us.myles.ViaVersion.bukkit.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.exception.CancelCodecException;
 import us.myles.ViaVersion.exception.CancelDecoderException;
 import us.myles.ViaVersion.exception.InformativeException;
+import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +59,8 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
         if (PipelineUtil.containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
 
         super.exceptionCaught(ctx, cause);
-        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)) {
+        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)
+                && (info.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
             cause.printStackTrace(); // Print if CB doesn't already do it
         }
     }

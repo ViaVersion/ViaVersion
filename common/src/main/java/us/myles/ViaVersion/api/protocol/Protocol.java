@@ -418,7 +418,8 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         try {
             protocolPacket.getRemapper().remap(packetWrapper);
         } catch (Exception e) {
-            if (e instanceof CancelException) {
+            // Don't print cancelled packets or the handshake
+            if (e instanceof CancelException || state == State.HANDSHAKE) {
                 throw e;
             }
 
