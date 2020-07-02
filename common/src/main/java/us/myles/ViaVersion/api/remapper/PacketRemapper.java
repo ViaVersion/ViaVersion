@@ -3,6 +3,7 @@ package us.myles.ViaVersion.api.remapper;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.exception.InformativeException;
 
 import java.util.ArrayList;
@@ -62,7 +63,9 @@ public abstract class PacketRemapper {
      * @param <T2>        The new return type.
      */
     public <T1, T2> void map(ValueTransformer<T1, T2> transformer) {
-        if (transformer.getInputType() == null) throw new IllegalArgumentException("Use map(Type<T1>, ValueTransformer<T1, T2>) for value transformers without specified input type!");
+        if (transformer.getInputType() == null) {
+            throw new IllegalArgumentException("Use map(Type<T1>, ValueTransformer<T1, T2>) for value transformers without specified input type!");
+        }
         map(transformer.getInputType(), transformer);
     }
 
@@ -116,7 +119,8 @@ public abstract class PacketRemapper {
      * Remap a packet wrapper
      *
      * @param packetWrapper The wrapper to remap
-     * @throws Exception Throws if it fails to write / read to the packet.
+     * @throws InformativeException if it fails to write / read to the packet
+     * @throws CancelException      if the packet should be cancelled
      */
     public void remap(PacketWrapper packetWrapper) throws Exception {
         try {
@@ -130,6 +134,14 @@ public abstract class PacketRemapper {
         } catch (InformativeException e) {
             e.addSource(this.getClass());
             throw e;
+        } catch (CancelException e) {
+            // Pass through CancelExceptions
+            throw e;
+        } catch (Exception e) {
+            // Wrap other exceptions during packet handling
+            InformativeException ex = new InformativeException(e);
+            ex.addSource(this.getClass());
+            throw ex;
         }
     }
 }
