@@ -192,7 +192,7 @@ import java.util.stream.IntStream;
             }
 
             final StringBuilder builder = new StringBuilder();
-            while (Tokens.id(this.buffer.peek())) {
+            while (this.buffer.peek() != ':') { // DO NOT CHECK FOR CHARACTER VALIDITY; LEGACY NBT ALLOWS ANY CHARACTER, EVEN WHEN UNQUOTED
                 builder.append(this.buffer.take());
             }
             return builder.toString();
