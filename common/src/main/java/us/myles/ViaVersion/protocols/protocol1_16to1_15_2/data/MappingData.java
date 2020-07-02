@@ -1,17 +1,16 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
 import us.myles.ViaVersion.util.Int2IntBiMap;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MappingData {
     public static Int2IntBiMap oldToNewItems = new Int2IntBiMap();
-    public static Map<String, String> attributeMappings = new HashMap<>();
+    public static BiMap<String, String> attributeMappings = HashBiMap.create();
     public static Mappings blockMappings;
     public static Mappings blockStateMappings;
     public static Mappings soundMappings;

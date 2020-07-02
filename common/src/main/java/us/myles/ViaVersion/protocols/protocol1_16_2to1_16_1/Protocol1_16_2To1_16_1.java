@@ -50,7 +50,7 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
                     boolean open = wrapper.read(Type.BOOLEAN);
                     boolean filter = wrapper.read(Type.BOOLEAN);
                     wrapper.write(Type.VAR_INT, 1); // Settings
-                    wrapper.write(Type.BOOLEAN, open);
+                    wrapper.write(Type.BOOLEAN, recipeType == 0); // Crafting
                     wrapper.write(Type.BOOLEAN, filter);
                     wrapper.write(Type.BOOLEAN, recipeType == 1); // Furnace
                     wrapper.write(Type.BOOLEAN, filter);

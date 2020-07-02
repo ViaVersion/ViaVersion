@@ -2,6 +2,8 @@ package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.LongTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.Via;
@@ -105,6 +107,7 @@ public class InventoryPackets {
             }
         }
 
+        oldToNewAttributes(item);
         item.setIdentifier(getNewItemId(item.getIdentifier()));
     }
 
@@ -125,6 +128,61 @@ public class InventoryPackets {
                 }
             }
         }
+
+        newToOldAttributes(item);
+    }
+
+    public static void oldToNewAttributes(Item item) {
+        if (item.getTag() == null) return;
+
+        ListTag attributes = item.getTag().get("AttributeModifiers");
+        if (attributes == null) return;
+
+        for (Tag tag : attributes) {
+            CompoundTag attribute = (CompoundTag) tag;
+            rewriteAttributeName(attribute, "AttributeName", false);
+            rewriteAttributeName(attribute, "Name", false);
+            Tag leastTag = attribute.get("UUIDLeast");
+            if (leastTag != null) {
+                Tag mostTag = attribute.get("UUIDMost");
+                int[] uuidIntArray = UUIDIntArrayType.bitsToIntArray(((Number) leastTag.getValue()).longValue(), ((Number) mostTag.getValue()).longValue());
+                attribute.put(new IntArrayTag("UUID", uuidIntArray));
+            }
+        }
+    }
+
+    public static void newToOldAttributes(Item item) {
+        if (item.getTag() == null) return;
+
+        ListTag attributes = item.getTag().get("AttributeModifiers");
+        if (attributes == null) return;
+
+        for (Tag tag : attributes) {
+            CompoundTag attribute = (CompoundTag) tag;
+            rewriteAttributeName(attribute, "AttributeName", true);
+            rewriteAttributeName(attribute, "Name", true);
+            IntArrayTag uuidTag = attribute.get("UUID");
+            if (uuidTag != null) {
+                UUID uuid = UUIDIntArrayType.uuidFromIntArray(uuidTag.getValue());
+                attribute.put(new LongTag("UUIDLeast", uuid.getLeastSignificantBits()));
+                attribute.put(new LongTag("UUIDMost", uuid.getMostSignificantBits()));
+            }
+        }
+    }
+
+    public static void rewriteAttributeName(CompoundTag compoundTag, String entryName, boolean inverse) {
+        StringTag attributeNameTag = compoundTag.get("AttributeName");
+        if (attributeNameTag == null) return;
+
+        String attributeName = attributeNameTag.getValue();
+        if (inverse && !attributeName.startsWith("minecraft:")) {
+            attributeName = "minecraft:" + attributeName;
+        }
+
+        String mappedAttribute = (inverse ? MappingData.attributeMappings.inverse() : MappingData.attributeMappings).get(attributeName);
+        if (mappedAttribute == null) return;
+
+        attributeNameTag.setValue(mappedAttribute);
     }
 
     public static int getNewItemId(int id) {
