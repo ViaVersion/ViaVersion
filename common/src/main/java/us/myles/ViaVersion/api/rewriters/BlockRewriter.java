@@ -63,9 +63,22 @@ public class BlockRewriter {
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
                 map(Type.INT); // 1 - Chunk Z
-                map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
                 handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
+                    for (BlockChangeRecord record : wrapper.passthrough(Type.BLOCK_CHANGE_RECORD_ARRAY)) {
+                        record.setBlockId(blockStateRewriter.rewrite(record.getBlockId()));
+                    }
+                });
+            }
+        });
+    }
+
+    public void registerVarLongMultiBlockChange(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.LONG); // Chunk position
+                handler(wrapper -> {
+                    for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
                         record.setBlockId(blockStateRewriter.rewrite(record.getBlockId()));
                     }
                 });

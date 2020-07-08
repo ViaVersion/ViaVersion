@@ -11,7 +11,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
+import us.myles.ViaVersion.api.minecraft.BlockChangeRecord1_8;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class ConnectionData {
-    private static final BlockChangeRecord[] EMPTY_RECORDS = new BlockChangeRecord[0];
+    private static final BlockChangeRecord1_8[] EMPTY_RECORDS = new BlockChangeRecord1_8[0];
     public static BlockConnectionProvider blockConnectionProvider;
     static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, 1F);
     static Map<String, Integer> keyToId = new HashMap<>(8582, 1F);
@@ -61,7 +61,7 @@ public class ConnectionData {
             for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 0) continue;
 
-                List<BlockChangeRecord> updates = new ArrayList<>();
+                List<BlockChangeRecord1_8> updates = new ArrayList<>();
 
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 2) { // Corner
                     for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
@@ -132,13 +132,13 @@ public class ConnectionData {
         }
     }
 
-    public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
+    public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord1_8> records) {
         int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
         ConnectionHandler handler = getConnectionHandler(blockState);
         if (handler == null) return;
 
         int newBlockState = handler.connect(user, pos, blockState);
-        records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY(), newBlockState));
+        records.add(new BlockChangeRecord1_8(pos.getX() & 0xF, pos.getY(), pos.getZ() & 0xF, newBlockState));
     }
 
     public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {

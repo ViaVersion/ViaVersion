@@ -3,10 +3,51 @@ package us.myles.ViaVersion.api.type;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonElement;
-import us.myles.ViaVersion.api.minecraft.*;
+import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
+import us.myles.ViaVersion.api.minecraft.EulerAngle;
+import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.Vector;
+import us.myles.ViaVersion.api.minecraft.VillagerData;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.types.*;
-import us.myles.ViaVersion.api.type.types.minecraft.*;
+import us.myles.ViaVersion.api.type.types.ArrayType;
+import us.myles.ViaVersion.api.type.types.BooleanType;
+import us.myles.ViaVersion.api.type.types.ByteArrayType;
+import us.myles.ViaVersion.api.type.types.ByteType;
+import us.myles.ViaVersion.api.type.types.ComponentType;
+import us.myles.ViaVersion.api.type.types.DoubleType;
+import us.myles.ViaVersion.api.type.types.FloatType;
+import us.myles.ViaVersion.api.type.types.IntType;
+import us.myles.ViaVersion.api.type.types.LongType;
+import us.myles.ViaVersion.api.type.types.RemainingBytesType;
+import us.myles.ViaVersion.api.type.types.ShortType;
+import us.myles.ViaVersion.api.type.types.StringType;
+import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
+import us.myles.ViaVersion.api.type.types.UUIDType;
+import us.myles.ViaVersion.api.type.types.UnsignedByteType;
+import us.myles.ViaVersion.api.type.types.UnsignedShortType;
+import us.myles.ViaVersion.api.type.types.VarIntArrayType;
+import us.myles.ViaVersion.api.type.types.VarIntType;
+import us.myles.ViaVersion.api.type.types.VarLongType;
+import us.myles.ViaVersion.api.type.types.VoidType;
+import us.myles.ViaVersion.api.type.types.minecraft.BlockChangeRecordType;
+import us.myles.ViaVersion.api.type.types.minecraft.EulerAngleType;
+import us.myles.ViaVersion.api.type.types.minecraft.FlatItemArrayType;
+import us.myles.ViaVersion.api.type.types.minecraft.FlatItemType;
+import us.myles.ViaVersion.api.type.types.minecraft.FlatVarIntItemArrayType;
+import us.myles.ViaVersion.api.type.types.minecraft.FlatVarIntItemType;
+import us.myles.ViaVersion.api.type.types.minecraft.ItemArrayType;
+import us.myles.ViaVersion.api.type.types.minecraft.ItemType;
+import us.myles.ViaVersion.api.type.types.minecraft.NBTType;
+import us.myles.ViaVersion.api.type.types.minecraft.OptPosition1_14Type;
+import us.myles.ViaVersion.api.type.types.minecraft.OptPositionType;
+import us.myles.ViaVersion.api.type.types.minecraft.OptUUIDType;
+import us.myles.ViaVersion.api.type.types.minecraft.OptionalComponentType;
+import us.myles.ViaVersion.api.type.types.minecraft.OptionalVarIntType;
+import us.myles.ViaVersion.api.type.types.minecraft.Position1_14Type;
+import us.myles.ViaVersion.api.type.types.minecraft.PositionType;
+import us.myles.ViaVersion.api.type.types.minecraft.VarLongBlockChangeRecordType;
+import us.myles.ViaVersion.api.type.types.minecraft.VectorType;
+import us.myles.ViaVersion.api.type.types.minecraft.VillagerDataType;
 
 import java.util.UUID;
 
@@ -94,7 +135,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Integer[]> VAR_INT_ARRAY = new ArrayType<>(Type.VAR_INT);
     public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
     public static final Type<Integer> OPTIONAL_VAR_INT = new OptionalVarIntType();
-    public static final Type<Long> VAR_LONG = new VarLongType();
+    public static final VarLongType VAR_LONG = new VarLongType();
     /**
      * @deprecated unreasonable overhead
      */
@@ -120,6 +161,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<BlockChangeRecord> BLOCK_CHANGE_RECORD = new BlockChangeRecordType();
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.BLOCK_CHANGE_RECORD);
+
+    public static final Type<BlockChangeRecord> VAR_LONG_BLOCK_CHANGE_RECORD = new VarLongBlockChangeRecordType();
+    public static final Type<BlockChangeRecord[]> VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.VAR_LONG_BLOCK_CHANGE_RECORD);
 
     public static final Type<VillagerData> VILLAGER_DATA = new VillagerDataType();
 

@@ -1,29 +1,38 @@
 package us.myles.ViaVersion.api.minecraft;
 
-public class BlockChangeRecord {
-    private final short horizontal;
-    private final short y;
-    private int blockId;
+public interface BlockChangeRecord {
 
-    public BlockChangeRecord(short horizontal, short y, int blockId) {
-        this.horizontal = horizontal;
-        this.y = y;
-        this.blockId = blockId;
+    /**
+     * @return relative x coordinate within the chunk section
+     */
+    byte getSectionX();
+
+    /**
+     * @return relative y coordinate within the chunk section
+     */
+    byte getSectionY();
+
+    /**
+     * @return relative z coordinate within the chunk section
+     */
+    byte getSectionZ();
+
+    /**
+     * @param chunkSectionY chunk section
+     * @return absolute y coordinate
+     */
+    short getY(int chunkSectionY);
+
+    /**
+     * @return absolute y coordinate
+     * @deprecated 1.16+ stores the relative y coordinate
+     */
+    @Deprecated
+    default short getY() {
+        return getY(-1);
     }
 
-    public short getHorizontal() {
-        return horizontal;
-    }
+    int getBlockId();
 
-    public short getY() {
-        return y;
-    }
-
-    public int getBlockId() {
-        return blockId;
-    }
-
-    public void setBlockId(int blockId) {
-        this.blockId = blockId;
-    }
+    void setBlockId(int blockId);
 }

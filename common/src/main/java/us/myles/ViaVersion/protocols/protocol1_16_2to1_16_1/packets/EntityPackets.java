@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
+import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.storage.EntityTracker1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
@@ -35,7 +36,11 @@ public class EntityPackets {
                 });
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Dimension Registry
+                handler(wrapper -> {
+                    // Throw away the old dimension registry, extra conversion would be too hard of a hit
+                    wrapper.read(Type.NBT);
+                    wrapper.write(Type.NBT, MappingData.dimensionRegistry);
+                });
                 map(Type.STRING); // Dimension Type
                 map(Type.STRING); // Dimension
                 map(Type.LONG); // Seed
