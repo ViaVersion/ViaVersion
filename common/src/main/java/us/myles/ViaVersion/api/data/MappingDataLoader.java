@@ -14,7 +14,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -208,9 +207,5 @@ public class MappingDataLoader {
 
     public static InputStream getResource(String name) {
         return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
-    }
-
-    public static URL getResourceUrl(String name) {
-        return MappingDataLoader.class.getClassLoader().getResource("assets/viaversion/data/" + name);
     }
 }

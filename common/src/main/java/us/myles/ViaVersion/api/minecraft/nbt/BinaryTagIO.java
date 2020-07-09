@@ -23,16 +23,160 @@
  */
 package us.myles.ViaVersion.api.minecraft.nbt;
 
+import com.github.steveice10.opennbt.tag.TagRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * See https://github.com/KyoriPowered/adventure.
  */
 public final class BinaryTagIO {
     private BinaryTagIO() {
+    }
+
+    /**
+     * Reads a compound tag from {@code path}.
+     *
+     * @param path the path
+     * @return the compound tag
+     * @throws IOException if an exception was encountered while reading a compound tag
+     */
+    @NotNull
+    public static CompoundTag readPath(final @NotNull Path path) throws IOException {
+        return readInputStream(Files.newInputStream(path));
+    }
+
+    /**
+     * Reads a compound tag from an input stream.
+     *
+     * @param input the input stream
+     * @return the compound tag
+     * @throws IOException if an exception was encountered while reading a compound tag
+     */
+    @NotNull
+    public static CompoundTag readInputStream(final @NotNull InputStream input) throws IOException {
+        try (final DataInputStream dis = new DataInputStream(input)) {
+            return readDataInput(dis);
+        }
+    }
+
+    /**
+     * Reads a compound tag from {@code path} using GZIP decompression.
+     *
+     * @param path the path
+     * @return the compound tag
+     * @throws IOException if an exception was encountered while reading a compound tag
+     */
+    @NotNull
+    public static CompoundTag readCompressedPath(final @NotNull Path path) throws IOException {
+        return readCompressedInputStream(Files.newInputStream(path));
+    }
+
+    /**
+     * Reads a compound tag from an input stream using GZIP decompression.
+     *
+     * @param input the input stream
+     * @return the compound tag
+     * @throws IOException if an exception was encountered while reading a compound tag
+     */
+    @NotNull
+    public static CompoundTag readCompressedInputStream(final @NotNull InputStream input) throws IOException {
+        try (final DataInputStream dis = new DataInputStream(new GZIPInputStream(input))) {
+            return readDataInput(dis);
+        }
+    }
+
+    /**
+     * Reads a compound tag from {@code input}.
+     *
+     * @param input the input
+     * @return the compound tag
+     * @throws IOException if an exception was encountered while reading a compound tag
+     */
+    @NotNull
+    public static CompoundTag readDataInput(final @NotNull DataInput input) throws IOException {
+        byte type = input.readByte();
+        if (type != TagRegistry.getIdFor(CompoundTag.class)) {
+            throw new IOException(String.format("Expected root tag to be a CompoundTag, was %s", type));
+        }
+        input.skipBytes(input.readUnsignedShort()); // read empty name
+
+        final CompoundTag compoundTag = new CompoundTag("");
+        compoundTag.read(input);
+        return compoundTag;
+    }
+
+    /**
+     * Writes a compound tag to {@code path}.
+     *
+     * @param tag  the compound tag
+     * @param path the path
+     * @throws IOException if an exception was encountered while writing the compound tag
+     */
+    public static void writePath(final @NotNull CompoundTag tag, final @NotNull Path path) throws IOException {
+        writeOutputStream(tag, Files.newOutputStream(path));
+    }
+
+    /**
+     * Writes a compound tag to an output stream.
+     *
+     * @param tag    the compound tag
+     * @param output the output stream
+     * @throws IOException if an exception was encountered while writing the compound tag
+     */
+    public static void writeOutputStream(final @NotNull CompoundTag tag, final @NotNull OutputStream output) throws IOException {
+        try (final DataOutputStream dos = new DataOutputStream(output)) {
+            writeDataOutput(tag, dos);
+        }
+    }
+
+    /**
+     * Writes a compound tag to {@code path} using GZIP compression.
+     *
+     * @param tag  the compound tag
+     * @param path the path
+     * @throws IOException if an exception was encountered while writing the compound tag
+     */
+    public static void writeCompressedPath(final @NotNull CompoundTag tag, final @NotNull Path path) throws IOException {
+        writeCompressedOutputStream(tag, Files.newOutputStream(path));
+    }
+
+    /**
+     * Writes a compound tag to an output stream using GZIP compression.
+     *
+     * @param tag    the compound tag
+     * @param output the output stream
+     * @throws IOException if an exception was encountered while writing the compound tag
+     */
+    public static void writeCompressedOutputStream(final @NotNull CompoundTag tag, final @NotNull OutputStream output) throws IOException {
+        try (final DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(output))) {
+            writeDataOutput(tag, dos);
+        }
+    }
+
+    /**
+     * Writes a compound tag to {@code output}.
+     *
+     * @param tag    the compound tag
+     * @param output the output
+     * @throws IOException if an exception was encountered while writing the compound tag
+     */
+    public static void writeDataOutput(final @NotNull CompoundTag tag, final @NotNull DataOutput output) throws IOException {
+        output.writeByte(TagRegistry.getIdFor(CompoundTag.class));
+        output.writeUTF(""); // write empty name
+        tag.write(output);
     }
 
     /**

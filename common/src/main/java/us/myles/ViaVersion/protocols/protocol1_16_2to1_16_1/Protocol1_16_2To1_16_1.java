@@ -77,6 +77,7 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
     protected void loadMappingData() {
         MappingData.init();
 
+        tagRewriter.addTag(TagType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
         tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:mushroom_grow_block");
 
         // The client now wants ALL (previous) tags to be sent, sooooo :>
@@ -87,7 +88,8 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
                 "minecraft:wither_summon_base_blocks", "minecraft:infiniburn_overworld", "minecraft:piglin_repellents",
                 "minecraft:hoglin_repellents", "minecraft:prevent_mob_spawning_inside", "minecraft:wart_blocks",
                 "minecraft:stone_pressure_plates", "minecraft:nylium", "minecraft:gold_ores", "minecraft:pressure_plates",
-                "minecraft:logs_that_burn", "minecraft:strider_warm_blocks", "minecraft:warped_stems", "minecraft:infiniburn_end");
+                "minecraft:logs_that_burn", "minecraft:strider_warm_blocks", "minecraft:warped_stems", "minecraft:infiniburn_end",
+                "minecraft:base_stone_nether", "minecraft:base_stone_overworld");
     }
 
     public static int getNewBlockStateId(int id) {

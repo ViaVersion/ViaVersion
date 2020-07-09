@@ -1,14 +1,13 @@
 package us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data;
 
-import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
+import us.myles.ViaVersion.api.minecraft.nbt.BinaryTagIO;
 import us.myles.ViaVersion.util.Int2IntBiMap;
 
-import java.io.File;
 import java.io.IOException;
 
 public class MappingData {
@@ -24,7 +23,7 @@ public class MappingData {
         JsonObject mapping1_16_2 = MappingDataLoader.loadData("mapping-1.16.2.json", true);
 
         try {
-            dimensionRegistry = NBTIO.readFile(new File(MappingDataLoader.getResourceUrl("dimenstion-registry-1.16.2.nbt").getFile()));
+            dimensionRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
         } catch (IOException e) {
             Via.getPlatform().getLogger().severe("Error loading dimenstion registry:");
             e.printStackTrace();
