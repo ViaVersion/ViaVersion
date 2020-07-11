@@ -46,7 +46,7 @@ public class EntityPackets {
         wrapper.write(Type.STRING, dimensionName); // dimension type
         wrapper.write(Type.STRING, dimensionName); // dimension
     };
-    private static final CompoundTag DIMENSIONS_TAG = new CompoundTag("");
+    public static final CompoundTag DIMENSIONS_TAG = new CompoundTag("");
     private static final String[] WORLD_NAMES = {"minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"};
 
     static {

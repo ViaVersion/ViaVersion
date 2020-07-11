@@ -25,7 +25,7 @@ public class MappingData {
         try {
             dimensionRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
         } catch (IOException e) {
-            Via.getPlatform().getLogger().severe("Error loading dimenstion registry:");
+            Via.getPlatform().getLogger().severe("Error loading dimension registry:");
             e.printStackTrace();
         }
 
