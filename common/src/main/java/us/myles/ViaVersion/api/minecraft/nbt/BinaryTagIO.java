@@ -27,6 +27,7 @@ import com.github.steveice10.opennbt.tag.TagRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
@@ -93,7 +94,7 @@ public final class BinaryTagIO {
      */
     @NotNull
     public static CompoundTag readCompressedInputStream(final @NotNull InputStream input) throws IOException {
-        try (final DataInputStream dis = new DataInputStream(new GZIPInputStream(input))) {
+        try (final DataInputStream dis = new DataInputStream(new BufferedInputStream(new GZIPInputStream(input)))) {
             return readDataInput(dis);
         }
     }
