@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion-parent</artifactId>
-    <version>3.0.2-20w28a</version>
+    <version>3.0.2-20w29a</version>
     <packaging>pom</packaging>
 
     <name>viaversion-parent</name>
@@ -56,7 +56,7 @@
         <!-- Velocity repository -->
         <repository>
             <id>velocity</id>
-            <url>https://repo.velocitypowered.com/snapshots</url>
+            <url>https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/</url>
         </repository>
 
         <!-- Sponge repository -->
