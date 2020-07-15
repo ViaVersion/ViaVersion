@@ -5,36 +5,13 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data.RecipeRewriter1_15;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
 
-public class RecipeRewriter1_16 extends RecipeRewriter1_15 {
+public class RecipeRewriter1_16 extends RecipeRewriter1_14 {
 
     public RecipeRewriter1_16(Protocol protocol, ItemRewriter.RewriteFunction rewriter) {
         super(protocol, rewriter);
-    }
-
-    @Override
-    public void handle(PacketWrapper wrapper, String type) throws Exception {
-        switch (type) {
-            case "crafting_shapeless":
-                handleCraftingShapeless(wrapper);
-                break;
-            case "crafting_shaped":
-                handleCraftingShaped(wrapper);
-                break;
-            case "blasting":
-            case "smoking":
-            case "campfire_cooking":
-            case "smelting":
-                handleSmelting(wrapper);
-                break;
-            case "stonecutting":
-                handleStonecutting(wrapper);
-                break;
-            case "smithing": // new
-                handleSmithing(wrapper);
-                break;
-        }
+        recipeHandlers.put("smithing", this::handleSmithing);
     }
 
     public void handleSmithing(PacketWrapper wrapper) throws Exception {

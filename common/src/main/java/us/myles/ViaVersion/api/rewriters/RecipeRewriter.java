@@ -6,17 +6,26 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class RecipeRewriter {
 
     protected final Protocol protocol;
     protected final ItemRewriter.RewriteFunction rewriter;
+    protected final Map<String, RecipeConsumer> recipeHandlers = new HashMap<>();
 
     protected RecipeRewriter(Protocol protocol, ItemRewriter.RewriteFunction rewriter) {
         this.protocol = protocol;
         this.rewriter = rewriter;
     }
 
-    public abstract void handle(PacketWrapper wrapper, String type) throws Exception;
+    public void handle(PacketWrapper wrapper, String type) throws Exception {
+        RecipeConsumer handler = recipeHandlers.get(type);
+        if (handler != null) {
+            handler.accept(wrapper);
+        }
+    }
 
     public void registerDefaultHandler(ClientboundPacketType packetType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
@@ -32,5 +41,11 @@ public abstract class RecipeRewriter {
                 });
             }
         });
+    }
+
+    @FunctionalInterface
+    public interface RecipeConsumer {
+
+        void accept(PacketWrapper wrapper) throws Exception;
     }
 }

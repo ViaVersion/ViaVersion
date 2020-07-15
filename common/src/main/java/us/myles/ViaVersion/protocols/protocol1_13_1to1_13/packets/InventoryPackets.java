@@ -6,9 +6,11 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
+import us.myles.ViaVersion.api.rewriters.RecipeRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 
 public class InventoryPackets {
 
@@ -56,49 +58,17 @@ public class InventoryPackets {
 
         itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
 
+        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol, InventoryPackets::toClient);
         protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int recipesNo = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < recipesNo; i++) {
-                            wrapper.passthrough(Type.STRING); // Id
-                            String type = wrapper.passthrough(Type.STRING);
-                            if (type.equals("crafting_shapeless")) {
-                                wrapper.passthrough(Type.STRING); // Group
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
-                                for (int i1 = 0; i1 < ingredientsNo; i1++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                    for (Item item : items) {
-                                        InventoryPackets.toClient(item);
-                                    }
-                                }
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
-                            } else if (type.equals("crafting_shaped")) {
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
-                                wrapper.passthrough(Type.STRING); // Group
-                                for (int i1 = 0; i1 < ingredientsNo; i1++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                    for (Item item : items) {
-                                        InventoryPackets.toClient(item);
-                                    }
-                                }
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
-                            } else if (type.equals("smelting")) {
-                                wrapper.passthrough(Type.STRING); // Group
-                                // Ingredient start
-                                Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                for (Item item : items) {
-                                    InventoryPackets.toClient(item);
-                                }
-                                // Ingredient end
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
-                                wrapper.passthrough(Type.FLOAT); // EXP
-                                wrapper.passthrough(Type.VAR_INT); // Cooking time
-                            }
-                        }
+                handler(wrapper -> {
+                    int size = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < size; i++) {
+                        // First type, then id
+                        String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
+                        String id = wrapper.passthrough(Type.STRING); // Recipe Identifier
+                        recipeRewriter.handle(wrapper, type);
                     }
                 });
             }

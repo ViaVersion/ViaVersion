@@ -17,9 +17,11 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
+import us.myles.ViaVersion.api.rewriters.RecipeRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
@@ -178,51 +180,26 @@ public class InventoryPackets {
 
         itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
+        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol, InventoryPackets::toClient);
         protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int size = wrapper.passthrough(Type.VAR_INT);
-                        int deleted = 0;
-                        for (int i = 0; i < size; i++) {
-                            String id = wrapper.read(Type.STRING); // Recipe Identifier
-                            String type = wrapper.read(Type.STRING);
-                            if (REMOVED_RECIPE_TYPES.contains(type)) {
-                                deleted++;
-                                continue;
-                            }
-                            wrapper.write(Type.STRING, type);
-                            wrapper.write(Type.STRING, id);
-
-                            if (type.equals("crafting_shapeless")) {
-                                wrapper.passthrough(Type.STRING); // Group
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
-                                for (int j = 0; j < ingredientsNo; j++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-                                    for (Item item : items) toClient(item);
-                                }
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
-                            } else if (type.equals("crafting_shaped")) {
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
-                                wrapper.passthrough(Type.STRING); // Group
-                                for (int j = 0; j < ingredientsNo; j++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-                                    for (Item item : items) toClient(item);
-                                }
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
-                            } else if (type.equals("smelting")) {
-                                wrapper.passthrough(Type.STRING); // Group
-                                Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-                                for (Item item : items) toClient(item);
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                                wrapper.passthrough(Type.FLOAT); // EXP
-                                wrapper.passthrough(Type.VAR_INT); // Cooking time
-                            }
+                handler(wrapper -> {
+                    int size = wrapper.passthrough(Type.VAR_INT);
+                    int deleted = 0;
+                    for (int i = 0; i < size; i++) {
+                        String id = wrapper.read(Type.STRING); // Recipe Identifier
+                        String type = wrapper.read(Type.STRING);
+                        if (REMOVED_RECIPE_TYPES.contains(type)) {
+                            deleted++;
+                            continue;
                         }
-                        wrapper.set(Type.VAR_INT, 0, size - deleted);
+                        wrapper.write(Type.STRING, type);
+                        wrapper.write(Type.STRING, id);
+
+                        recipeRewriter.handle(wrapper, type);
                     }
+                    wrapper.set(Type.VAR_INT, 0, size - deleted);
                 });
             }
         });
