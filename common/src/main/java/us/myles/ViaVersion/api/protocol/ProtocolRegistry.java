@@ -381,14 +381,23 @@ public class ProtocolRegistry {
 
     public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
         synchronized (MAPPING_LOADER_LOCK) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor).exceptionally(throwable -> {
+                Via.getPlatform().getLogger().severe("Error during mapping loading of " + protocolClass.getSimpleName());
+                throwable.printStackTrace();
+                return null;
+            });
             mappingLoaderFutures.put(protocolClass, future);
         }
     }
 
     public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
         synchronized (MAPPING_LOADER_LOCK) {
-            CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn).whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor);
+            CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn)
+                    .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(throwable -> {
+                        Via.getPlatform().getLogger().severe("Error during mapping loading of " + protocolClass.getSimpleName());
+                        throwable.printStackTrace();
+                        return null;
+                    });
             mappingLoaderFutures.put(protocolClass, future);
         }
     }
