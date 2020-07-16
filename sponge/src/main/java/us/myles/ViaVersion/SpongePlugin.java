@@ -75,7 +75,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Listener
     public void onServerStart(GameAboutToStartServerEvent event) {
-        if (game.getPluginManager().getPlugin("ViaBackwards").isPresent()) {
+        if (game.getPluginManager().getPlugin("viabackwards").isPresent()) {
             MappingDataLoader.enableMappingsCache();
         }
 
