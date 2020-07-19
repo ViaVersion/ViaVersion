@@ -65,9 +65,9 @@ public class InventoryPackets {
                 handler(wrapper -> {
                     int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
-                        // First type, then id
+                        // First id, then type
+                        String id = wrapper.passthrough(Type.STRING);
                         String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
-                        String id = wrapper.passthrough(Type.STRING); // Recipe Identifier
                         recipeRewriter.handle(wrapper, type);
                     }
                 });
