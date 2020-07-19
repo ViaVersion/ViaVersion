@@ -346,9 +346,16 @@ public interface ViaVersionConfig {
     boolean is1_14HealthNaNFix();
 
     /**
-     * Should 1.15 clients respawn instantly / without showing the death screen
+     * Should 1.15 clients respawn instantly / without showing the death screen.
      *
      * @return True if enabled
      */
     boolean is1_15InstantRespawn();
+
+    /**
+     * Ignores incoming plugin channel messages of 1.16 clients with channel names longer than 32 charatcers.
+     *
+     * @return True if enabled
+     */
+    boolean isIgnoreLong1_16ChannelMessages();
 }
