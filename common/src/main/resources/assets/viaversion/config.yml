@@ -147,7 +147,7 @@ flowerstem-when-block-above: false
 # Vines that are not connected to blocks will be mapped to air, else 1.13+ would still be able to climb up on them.
 vine-climb-fix: false
 #
-# Ignores incoming plugin channel messages of 1.16 clients with channel names longer than 32 charatcers.
+# Ignores incoming plugin channel messages of 1.16+ clients with channel names longer than 32 charatcers.
 # CraftBukkit had this limit hardcoded until 1.16, so we have to assume any server/proxy might have this arbitrary check present.
 ignore-long-1_16-channel-names: true
 #

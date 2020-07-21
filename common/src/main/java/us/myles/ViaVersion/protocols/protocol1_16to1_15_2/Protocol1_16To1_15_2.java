@@ -143,7 +143,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             }
         });
 
-        if (Via.getConfig().isIgnoreLong1_16ChannelMessages()) {
+        if (Via.getConfig().isIgnoreLong1_16ChannelNames()) {
             registerIncoming(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketRemapper() {
                 @Override
                 public void registerMap() {

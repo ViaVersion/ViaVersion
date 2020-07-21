@@ -367,7 +367,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean isIgnoreLong1_16ChannelMessages() {
+    public boolean isIgnoreLong1_16ChannelNames() {
         return ignoreLongChannelNames;
     }
 }
