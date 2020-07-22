@@ -11,7 +11,6 @@ import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data.BiomeMappings;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
@@ -38,14 +37,6 @@ public class WorldPackets {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     Chunk chunk = wrapper.read(new Chunk1_16Type(clientWorld));
                     wrapper.write(new Chunk1_16_2Type(clientWorld), chunk);
-
-                    if (chunk.isBiomeData()) {
-                        int[] biomes = chunk.getBiomeData();
-                        for (int i = 0; i < biomes.length; i++) {
-                            int biome = biomes[i];
-                            biomes[i] = BiomeMappings.getNewBiomeId(biome);
-                        }
-                    }
 
                     for (int s = 0; s < 16; s++) {
                         ChunkSection section = chunk.getSections()[s];

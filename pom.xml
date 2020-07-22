@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion-parent</artifactId>
-    <version>3.1.0-20w29a</version>
+    <version>3.1.0-20w30a</version>
     <packaging>pom</packaging>
 
     <name>viaversion-parent</name>

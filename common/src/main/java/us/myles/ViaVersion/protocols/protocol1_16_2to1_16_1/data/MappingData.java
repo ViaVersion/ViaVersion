@@ -19,6 +19,7 @@ public class MappingData {
 
     public static void init() {
         Via.getPlatform().getLogger().info("Loading 1.16.1 -> 1.16.2 mappings...");
+        JsonObject diffmapping = MappingDataLoader.loadData("mappingdiff-1.16.1to1.16.2.json");
         JsonObject mapping1_16 = MappingDataLoader.loadData("mapping-1.16.json", true);
         JsonObject mapping1_16_2 = MappingDataLoader.loadData("mapping-1.16.2.json", true);
 
@@ -30,7 +31,7 @@ public class MappingData {
         }
 
         oldToNewItems.defaultReturnValue(-1);
-        blockStateMappings = new Mappings(mapping1_16.getAsJsonObject("blockstates"), mapping1_16_2.getAsJsonObject("blockstates"));
+        blockStateMappings = new Mappings(mapping1_16.getAsJsonObject("blockstates"), mapping1_16_2.getAsJsonObject("blockstates"), diffmapping.getAsJsonObject("blockstates"));
         blockMappings = new Mappings(mapping1_16.getAsJsonObject("blocks"), mapping1_16_2.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_16.getAsJsonObject("items"), mapping1_16_2.getAsJsonObject("items"));
         soundMappings = new Mappings(mapping1_16.getAsJsonArray("sounds"), mapping1_16_2.getAsJsonArray("sounds"));

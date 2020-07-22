@@ -29,6 +29,16 @@ public class MetadataRewriter1_16_2To1_16_1 extends MetadataRewriter {
             int data = (int) metadata.getValue();
             metadata.setValue(Protocol1_16_2To1_16_1.getNewBlockStateId(data));
         }
+
+        if (type == null) return;
+
+        if (type.isOrHasParent(Entity1_16_2Types.EntityType.ABSTRACT_PIGLIN)) {
+            if (metadata.getId() == 15) {
+                metadata.setId(16);
+            } else if (metadata.getId() == 16) {
+                metadata.setId(15);
+            }
+        }
     }
 
     @Override
