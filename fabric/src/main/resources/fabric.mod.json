@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "viaversion",
-  "name": "ViaVersion API",
+  "name": "ViaVersion",
   "version": "${project.version}",
   "description": "${project.description}",
   "license": "MIT",
