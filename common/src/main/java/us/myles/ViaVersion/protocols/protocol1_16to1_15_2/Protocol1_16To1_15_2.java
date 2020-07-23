@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_16to1_15_2;
 
+import com.google.common.base.Joiner;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,6 +26,9 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.GsonUtil;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, ClientboundPackets1_16, ServerboundPackets1_14, ServerboundPackets1_16> {
@@ -154,6 +158,27 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                                 Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 32 characters: " + channel);
                             }
                             wrapper.cancel();
+                        } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
+                            String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            List<String> checkedChannels = new ArrayList<>(channels.length);
+                            for (String registeredChannel : channels) {
+                                if (registeredChannel.length() > 32) {
+                                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                        Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel register of '"
+                                                + registeredChannel + "', as it is longer than 32 characters");
+                                    }
+                                    continue;
+                                }
+
+                                checkedChannels.add(registeredChannel);
+                            }
+
+                            if (checkedChannels.isEmpty()) {
+                                wrapper.cancel();
+                                return;
+                            }
+
+                            wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
                         }
                     });
                 }
