@@ -613,8 +613,9 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                             }
 
                             if (Via.getConfig().is1_13TeamColourFix()) {
-                                colour = getLastColor(prefix).ordinal();
-                                suffix = getLastColor(prefix).toString() + suffix;
+                                ChatColor lastColor = getLastColor(prefix);
+                                colour = lastColor.ordinal();
+                                suffix = lastColor.toString() + suffix;
                             }
 
                             wrapper.write(Type.VAR_INT, colour);

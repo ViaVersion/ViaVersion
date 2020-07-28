@@ -3,6 +3,8 @@ package us.myles.ViaVersion.api.rewriters;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -99,9 +101,14 @@ public class ComponentRewriter {
     }
 
     public JsonElement processText(String value) {
-        JsonElement root = GsonUtil.getJsonParser().parse(value);
-        processText(root);
-        return root;
+        try {
+            JsonElement root = GsonUtil.getJsonParser().parse(value);
+            processText(root);
+            return root;
+        } catch (JsonSyntaxException e) {
+            Via.getPlatform().getLogger().severe("Error when trying to parse json: " + value);
+            throw e;
+        }
     }
 
     public void processText(JsonElement element) {
