@@ -63,7 +63,7 @@ public class ChatRewriter {
 
                     component = new TextComponent();
                     component.setColor(format);
-                    // ViaVersion start
+                    // ViaVersion start - Items have style default to italic
                     component.setBold(false);
                     component.setItalic(false);
                     component.setUnderlined(false);
@@ -73,7 +73,7 @@ public class ChatRewriter {
                 } else {
                     component = new TextComponent();
                     component.setColor(format);
-                    // ViaVersion start
+                    // ViaVersion start- Items have style default to italic
                     component.setBold(false);
                     component.setItalic(false);
                     component.setUnderlined(false);
