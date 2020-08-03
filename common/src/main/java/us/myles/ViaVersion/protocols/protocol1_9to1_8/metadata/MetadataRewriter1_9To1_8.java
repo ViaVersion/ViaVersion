@@ -121,7 +121,7 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
                 metadata.setValue(angle);
                 break;
             case Chat:
-                value = Protocol1_9To1_8.fixJson((String) value);
+                value = Protocol1_9To1_8.fixJson(value.toString());
                 metadata.setValue(value);
                 break;
             default:

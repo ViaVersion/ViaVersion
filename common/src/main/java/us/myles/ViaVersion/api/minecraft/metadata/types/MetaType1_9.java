@@ -8,7 +8,7 @@ public enum MetaType1_9 implements MetaType {
     VarInt(1, Type.VAR_INT),
     Float(2, Type.FLOAT),
     String(3, Type.STRING),
-    Chat(4, Type.STRING),
+    Chat(4, Type.COMPONENT),
     Slot(5, Type.ITEM),
     Boolean(6, Type.BOOLEAN),
     Vector3F(7, Type.ROTATION),
