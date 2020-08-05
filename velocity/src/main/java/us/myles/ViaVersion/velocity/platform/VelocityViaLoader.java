@@ -24,7 +24,6 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new VelocityMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
-            //VelocityPlugin.PROXY.getEventManager().register(plugin, new ElytraPatch());
         }
 
         Via.getManager().getProviders().use(VersionProvider.class, new VelocityVersionProvider());
@@ -32,7 +31,6 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         // We don't need main hand patch because Join Game packet makes client send hand data again
 
         VelocityPlugin.PROXY.getEventManager().register(plugin, new UpdateListener());
-        //VelocityPlugin.PROXY.getEventManager().register(plugin, new VelocityServerHandler());
 
         int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
         if (pingInterval > 0) {
