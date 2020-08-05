@@ -3,7 +3,6 @@ package us.myles.ViaVersion.api.data;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.Nullable;
@@ -26,9 +25,9 @@ public class UserConnection {
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
     private final Channel channel;
-    private ProtocolInfo protocolInfo;
-    Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
     private final boolean clientSide;
+    Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    private ProtocolInfo protocolInfo;
     private boolean active = true;
     private boolean pendingDisconnect;
     private Object lastPacket;
@@ -44,7 +43,8 @@ public class UserConnection {
 
     /**
      * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
-     * @param channel netty channel.
+     *
+     * @param channel    netty channel.
      * @param clientSide true if it's a client-side connection
      */
     public UserConnection(@Nullable Channel channel, boolean clientSide) {
@@ -53,9 +53,8 @@ public class UserConnection {
     }
 
     /**
-     *
-     * @see #UserConnection(Channel, boolean)
      * @param channel
+     * @see #UserConnection(Channel, boolean)
      */
     public UserConnection(@Nullable Channel channel) {
         this(channel, false);
@@ -142,8 +141,7 @@ public class UserConnection {
     }
 
     private ChannelFuture sendRawPacketFutureServerSide(final ByteBuf packet) {
-        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
-        return channel.pipeline().context(handler).writeAndFlush(packet);
+        return channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
     }
 
     private ChannelFuture sendRawPacketFutureClientSide(final ByteBuf packet) {
