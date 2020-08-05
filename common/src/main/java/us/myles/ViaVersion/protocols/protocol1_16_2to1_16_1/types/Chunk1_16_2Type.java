@@ -29,7 +29,6 @@ public class Chunk1_16_2Type extends PartialType<Chunk, ClientWorld> {
         int chunkZ = input.readInt();
 
         boolean fullChunk = input.readBoolean();
-        boolean ignoreOldLightData = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
         CompoundTag heightMap = Type.NBT.read(input);
 
@@ -61,7 +60,7 @@ public class Chunk1_16_2Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, fullChunk, ignoreOldLightData, primaryBitmask, sections, biomeData, heightMap, nbtData);
+        return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, heightMap, nbtData);
     }
 
     @Override
@@ -70,7 +69,6 @@ public class Chunk1_16_2Type extends PartialType<Chunk, ClientWorld> {
         output.writeInt(chunk.getZ());
 
         output.writeBoolean(chunk.isFullChunk());
-        output.writeBoolean(chunk.isIgnoreOldLightData());
         Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
         Type.NBT.write(output, chunk.getHeightMap());
 
