@@ -84,6 +84,7 @@ public class WorldPackets {
 
                         PacketWrapper newPacket = wrapper.create(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE.ordinal());
                         newPacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
+                        newPacket.write(Type.BOOLEAN, false); // Ignore light updates
                         newPacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, sectionRecord.toArray(EMPTY_RECORDS));
                     }
                 });

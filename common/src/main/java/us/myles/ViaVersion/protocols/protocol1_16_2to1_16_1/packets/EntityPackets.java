@@ -1,5 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -40,8 +42,11 @@ public class EntityPackets {
                     // Throw away the old dimension registry, extra conversion would be too hard of a hit
                     wrapper.read(Type.NBT);
                     wrapper.write(Type.NBT, MappingData.dimensionRegistry);
+
+                    // Instead of the dimension's resource key, it now just wants the data directly
+                    String dimensionType = wrapper.read(Type.STRING);
+                    wrapper.write(Type.NBT, getDimensionData(dimensionType));
                 });
-                map(Type.STRING); // Dimension Type
                 map(Type.STRING); // Dimension
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE, Type.VAR_INT); // Max players
@@ -54,5 +59,24 @@ public class EntityPackets {
                 });
             }
         });
+
+        protocol.registerOutgoing(ClientboundPackets1_16.RESPAWN, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    String dimensionType = wrapper.read(Type.STRING);
+                    wrapper.write(Type.NBT, getDimensionData(dimensionType));
+                });
+            }
+        });
+    }
+
+    public static CompoundTag getDimensionData(String dimensionType) {
+        CompoundTag tag = MappingData.dimensionDataMap.get(dimensionType);
+        if (tag == null) {
+            Via.getPlatform().getLogger().severe("Could not get dimension data of " + dimensionType);
+            throw new NullPointerException("Dimension data for " + dimensionType + " is null!");
+        }
+        return tag;
     }
 }

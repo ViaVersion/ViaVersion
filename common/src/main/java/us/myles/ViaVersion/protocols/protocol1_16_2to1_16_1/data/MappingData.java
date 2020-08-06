@@ -1,6 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
@@ -9,9 +12,12 @@ import us.myles.ViaVersion.api.minecraft.nbt.BinaryTagIO;
 import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MappingData {
     public static CompoundTag dimensionRegistry;
+    public static Map<String, CompoundTag> dimensionDataMap = new HashMap<>();
     public static Int2IntBiMap oldToNewItems = new Int2IntBiMap();
     public static Mappings blockMappings;
     public static Mappings blockStateMappings;
@@ -35,5 +41,14 @@ public class MappingData {
         blockMappings = new Mappings(mapping1_16.getAsJsonObject("blocks"), mapping1_16_2.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_16.getAsJsonObject("items"), mapping1_16_2.getAsJsonObject("items"));
         soundMappings = new Mappings(mapping1_16.getAsJsonArray("sounds"), mapping1_16_2.getAsJsonArray("sounds"));
+
+        // Data of each dimension
+        ListTag dimensions = ((CompoundTag) dimensionRegistry.get("minecraft:dimension_type")).get("value");
+        for (Tag dimension : dimensions) {
+            CompoundTag dimensionCompound = (CompoundTag) dimension;
+            // Copy with an empty name
+            CompoundTag dimensionData = new CompoundTag("", ((CompoundTag) dimensionCompound.get("element")).getValue());
+            dimensionDataMap.put(((StringTag) dimensionCompound.get("name")).getValue(), dimensionData);
+        }
     }
 }
