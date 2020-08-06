@@ -124,10 +124,6 @@
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>org.yaml.snakeyaml</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.snakeyaml</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>net.md_5.bungee</pattern>
                             <shadedPattern>us.myles.viaversion.libs.bungeecordchat</shadedPattern>
                             <includes>
