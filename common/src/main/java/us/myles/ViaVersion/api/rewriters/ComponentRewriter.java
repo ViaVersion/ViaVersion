@@ -106,8 +106,12 @@ public class ComponentRewriter {
             processText(root);
             return root;
         } catch (JsonSyntaxException e) {
-            Via.getPlatform().getLogger().severe("Error when trying to parse json: " + value);
-            throw e;
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().severe("Error when trying to parse json: " + value);
+                throw e;
+            }
+            // Yay to malformed json being accepted
+            return new JsonPrimitive(value);
         }
     }
 
