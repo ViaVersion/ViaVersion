@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class Effect {
 
-    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(17, 1F);
+    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(19, 1F);
 
     static {
         addRewrite(1005, 1010); //Play music disc
@@ -25,6 +25,8 @@ public class Effect {
         addRewrite(1020, 1029); //Anvil break
         addRewrite(1021, 1030); //Anvil use
         addRewrite(1022, 1031); //Anvil land
+        addRewrite(1013, 1023);
+        addRewrite(1018, 1028);
     }
 
     public static int getNewId(int id) {
