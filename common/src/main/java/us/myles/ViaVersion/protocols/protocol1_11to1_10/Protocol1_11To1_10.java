@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_11to1_10;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_11Types;
@@ -15,6 +16,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.data.PotionColorMapping;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
@@ -256,6 +258,35 @@ public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, Client
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     int dimensionId = wrapper.get(Type.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
+                });
+            }
+        });
+
+        this.registerOutgoing(ClientboundPackets1_9_3.EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                this.map(Type.INT); //effectID
+                this.map(Type.POSITION); //pos
+                this.map(Type.INT); //effectData
+                this.map(Type.BOOLEAN); //serverwide / global
+                handler(packetWrapper -> {
+                    int effectID = packetWrapper.get(Type.INT, 0);
+                    if (effectID == 2002) {
+                        int data = packetWrapper.get(Type.INT, 1);
+                        boolean isInstant = false;
+                        Pair<Integer, Boolean> newData = PotionColorMapping.getNewData(data);
+                        if (newData == null) {
+                            Via.getPlatform().getLogger().warning("Received unknown 1.11 -> 1.10.2 potion data (" + data + ")");
+                            data = 0;
+                        } else {
+                            data = newData.getKey();
+                            isInstant = newData.getValue();
+                        }
+                        if (isInstant) {
+                            packetWrapper.set(Type.INT, 0, 2007);
+                        }
+                        packetWrapper.set(Type.INT, 1, data);
+                    }
                 });
             }
         });
