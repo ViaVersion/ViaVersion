@@ -13,7 +13,6 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,39 +50,7 @@ public abstract class MetadataRewriter {
         }
     }
 
-    public void registerJoinGame(ClientboundPacketType packetType, @Nullable EntityType playerType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
-                handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
-                    clientChunks.setEnvironment(dimensionId);
-
-                    if (playerType != null) {
-                        wrapper.user().get(entityTrackerClass).addEntity(wrapper.get(Type.INT, 0), playerType);
-                    }
-                });
-            }
-        });
-    }
-
-    public void registerRespawn(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT);
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
-                });
-            }
-        });
-    }
+    //TODO add respawn/join once they stop changing too much
 
     public void registerTracker(ClientboundPacketType packetType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {

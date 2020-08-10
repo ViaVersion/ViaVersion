@@ -4,8 +4,7 @@ public enum Environment {
 
     NORMAL(0),
     NETHER(-1),
-    END(1),
-    CUSTOM(Integer.MAX_VALUE);
+    END(1);
 
     private final int id;
 
@@ -26,19 +25,6 @@ public enum Environment {
                 return NORMAL;
             case 1:
                 return END;
-        }
-    }
-
-    public static Environment getEnvironmentById(String id) {
-        switch (id) {
-            case "minecraft:the_nether":
-                return NETHER;
-            case "minecraft:overworld":
-                return NORMAL;
-            case "minecraft:the_end":
-                return END;
-            default:
-                return CUSTOM;
         }
     }
 }

@@ -12,7 +12,6 @@ import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class WorldPackets {
 
@@ -30,9 +29,8 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        Chunk chunk = wrapper.read(new Chunk1_14Type(clientWorld));
-                        wrapper.write(new Chunk1_15Type(clientWorld), chunk);
+                        Chunk chunk = wrapper.read(new Chunk1_14Type());
+                        wrapper.write(new Chunk1_15Type(), chunk);
 
                         if (chunk.isFullChunk()) {
                             int[] biomeData = chunk.getBiomeData();

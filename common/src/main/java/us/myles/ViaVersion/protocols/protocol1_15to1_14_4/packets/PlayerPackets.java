@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class PlayerPackets {
 
@@ -16,14 +15,7 @@ public class PlayerPackets {
             @Override
             public void registerMap() {
                 map(Type.INT);
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
-                });
-                create(wrapper -> {
-                    wrapper.write(Type.LONG, 0L); // Level Seed
-                });
+                create(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
             }
         });
 
@@ -35,28 +27,19 @@ public class PlayerPackets {
                 map(Type.INT); // 2 - Dimension
 
                 handler(wrapper -> {
-                    // Store the player
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
-                    clientChunks.setEnvironment(dimensionId);
-
                     // Register Type ID
                     EntityTracker1_15 tracker = wrapper.user().get(EntityTracker1_15.class);
                     int entityId = wrapper.get(Type.INT, 0);
                     tracker.addEntity(entityId, Entity1_15Types.EntityType.PLAYER);
                 });
-                create(wrapper -> {
-                    wrapper.write(Type.LONG, 0L); // Level Seed
-                });
+                create(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
 
                 map(Type.UNSIGNED_BYTE); // 3 - Max Players
                 map(Type.STRING); // 4 - Level Type
                 map(Type.VAR_INT); // 5 - View Distance
                 map(Type.BOOLEAN); // 6 - Reduce Debug Info
 
-                create(wrapper -> {
-                    wrapper.write(Type.BOOLEAN, !Via.getConfig().is1_15InstantRespawn()); // Show Death Screen
-                });
+                create(wrapper -> wrapper.write(Type.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
             }
         });
     }

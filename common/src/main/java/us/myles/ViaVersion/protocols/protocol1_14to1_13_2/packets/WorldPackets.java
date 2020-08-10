@@ -132,7 +132,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         Chunk chunk = wrapper.read(new Chunk1_13Type(clientWorld));
-                        wrapper.write(new Chunk1_14Type(clientWorld), chunk);
+                        wrapper.write(new Chunk1_14Type(), chunk);
 
                         int[] motionBlocking = new int[16 * 16];
                         int[] worldSurface = new int[16 * 16];

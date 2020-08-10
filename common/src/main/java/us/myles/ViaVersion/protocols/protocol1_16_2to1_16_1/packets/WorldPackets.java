@@ -14,7 +14,6 @@ import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +33,8 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    Chunk chunk = wrapper.read(new Chunk1_16Type(clientWorld));
-                    wrapper.write(new Chunk1_16_2Type(clientWorld), chunk);
+                    Chunk chunk = wrapper.read(new Chunk1_16Type());
+                    wrapper.write(new Chunk1_16_2Type(), chunk);
 
                     for (int s = 0; s < 16; s++) {
                         ChunkSection section = chunk.getSections()[s];

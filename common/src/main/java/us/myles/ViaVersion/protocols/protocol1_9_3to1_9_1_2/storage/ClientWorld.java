@@ -4,6 +4,9 @@ import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Environment;
 
+/**
+ * Stored up until 1.14 to be used in chunk sending.
+ */
 public class ClientWorld extends StoredObject {
     private Environment environment;
 
@@ -16,10 +19,6 @@ public class ClientWorld extends StoredObject {
     }
 
     public void setEnvironment(int environmentId) {
-        this.environment = Environment.getEnvironmentById(environmentId);
-    }
-
-    public void setEnvironment(String environmentId) {
         this.environment = Environment.getEnvironmentById(environmentId);
     }
 }

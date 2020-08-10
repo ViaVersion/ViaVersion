@@ -17,7 +17,6 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.CompactArrayUtil;
 
 import java.util.UUID;
@@ -45,9 +44,8 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    Chunk chunk = wrapper.read(new Chunk1_15Type(clientWorld));
-                    wrapper.write(new Chunk1_16Type(clientWorld), chunk);
+                    Chunk chunk = wrapper.read(new Chunk1_15Type());
+                    wrapper.write(new Chunk1_16Type(), chunk);
 
                     chunk.setIgnoreOldLightData(chunk.isFullChunk());
 

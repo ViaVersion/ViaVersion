@@ -141,7 +141,8 @@ public class Protocol1_14To1_13_2 extends Protocol<ClientboundPackets1_13, Clien
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_14(userConnection));
-        if (!userConnection.has(ClientWorld.class))
+        if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
     }
 }

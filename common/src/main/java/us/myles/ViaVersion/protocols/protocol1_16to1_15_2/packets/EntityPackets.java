@@ -19,7 +19,6 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.UUID;
 
@@ -170,10 +169,6 @@ public class EntityPackets {
                 handler(wrapper -> {
                     wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
 
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    String dimensionId = wrapper.get(Type.STRING, 0);
-                    clientWorld.setEnvironment(dimensionId);
-
                     String levelType = wrapper.read(Type.STRING);
                     wrapper.write(Type.BOOLEAN, false); // debug
                     wrapper.write(Type.BOOLEAN, levelType.equals("flat"));
@@ -196,10 +191,6 @@ public class EntityPackets {
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Max players
                 handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    String dimension = wrapper.get(Type.STRING, 0);
-                    clientChunks.setEnvironment(dimension);
-
                     wrapper.user().get(EntityTracker1_16.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.EntityType.PLAYER);
 
                     final String type = wrapper.read(Type.STRING);// level type

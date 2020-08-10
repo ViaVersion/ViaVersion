@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
+
     public Chunk1_13Type(ClientWorld param) {
         super(param, Chunk.class);
     }

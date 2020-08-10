@@ -23,7 +23,6 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -270,8 +269,5 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_16(userConnection));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
-        }
     }
 }

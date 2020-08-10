@@ -6,25 +6,23 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.chunks.BaseChunk;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
 import us.myles.ViaVersion.api.type.types.version.Types1_13;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
+public class Chunk1_15Type extends Type<Chunk> {
     private static final CompoundTag[] EMPTY_COMPOUNDS = new CompoundTag[0];
 
-    public Chunk1_15Type(ClientWorld param) {
-        super(param, Chunk.class);
+    public Chunk1_15Type() {
+        super(Chunk.class);
     }
 
     @Override
-    public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
+    public Chunk read(ByteBuf input) throws Exception {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
@@ -66,7 +64,7 @@ public class Chunk1_15Type extends PartialType<Chunk, ClientWorld> {
     }
 
     @Override
-    public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 

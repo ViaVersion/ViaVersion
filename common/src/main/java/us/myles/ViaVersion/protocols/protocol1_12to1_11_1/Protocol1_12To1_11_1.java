@@ -138,10 +138,33 @@ public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, Clie
             }
         });
 
-        metadataRewriter.registerJoinGame(ClientboundPackets1_9_3.JOIN_GAME, null);
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
-        metadataRewriter.registerRespawn(ClientboundPackets1_9_3.RESPAWN);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_12.METADATA_LIST);
+
+        registerOutgoing(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT);
+                map(Type.UNSIGNED_BYTE);
+                map(Type.INT);
+                handler(wrapper -> {
+                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientChunks.setEnvironment(dimensionId);
+                });
+            }
+        });
+        registerOutgoing(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT);
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
+                });
+            }
+        });
 
         new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
 

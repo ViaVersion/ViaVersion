@@ -12,7 +12,6 @@ import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRew
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.storage.EntityTracker1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class EntityPackets {
 
@@ -52,9 +51,6 @@ public class EntityPackets {
                 map(Type.UNSIGNED_BYTE, Type.VAR_INT); // Max players
                 // ...
                 handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    String dimension = wrapper.get(Type.STRING, 0);
-                    clientChunks.setEnvironment(dimension);
                     wrapper.user().get(EntityTracker1_16_2.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16_2Types.EntityType.PLAYER);
                 });
             }
