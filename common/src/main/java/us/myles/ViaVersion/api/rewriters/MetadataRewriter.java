@@ -16,10 +16,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public abstract class MetadataRewriter {
@@ -35,16 +32,9 @@ public abstract class MetadataRewriter {
 
     public final void handleMetadata(int entityId, List<Metadata> metadatas, UserConnection connection) {
         EntityType type = connection.get(entityTrackerClass).getEntity(entityId);
-        Map<Integer, Metadata> metadataMap = new HashMap<>(metadatas.size());
-        for (Metadata metadata : metadatas) {
-            metadataMap.put(metadata.getId(), metadata);
-        }
-
-        metadataMap = Collections.unmodifiableMap(metadataMap);
-
         for (Metadata metadata : new ArrayList<>(metadatas)) {
             try {
-                handleMetadata(entityId, type, metadata, metadatas, metadataMap, connection);
+                handleMetadata(entityId, type, metadata, metadatas, connection);
             } catch (Exception e) {
                 metadatas.remove(metadata);
                 if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
@@ -270,20 +260,49 @@ public abstract class MetadataRewriter {
         };
     }
 
+    // ---------------------------------------------------------------------------
+
     protected abstract EntityType getTypeFromId(int type);
 
+    /**
+     * Returns the entity type from the given id.
+     * From 1.14 and onwards, this is the same exact value as {@link #getTypeFromId(int)}.
+     *
+     * @param type entity type id
+     * @return EntityType from id
+     */
     protected EntityType getObjectTypeFromId(int type) {
         return getTypeFromId(type);
     }
 
+    /**
+     * Returns the mapped entitiy (or the same if it has not changed).
+     *
+     * @param oldId old entity id
+     * @return mapped entity id
+     */
     public int getNewEntityId(int oldId) {
         return typeMapping != null ? typeMapping.getOrDefault(oldId, oldId) : oldId;
     }
 
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-    }
+    /**
+     * To be overridden to handle metadata.
+     *
+     * @param entityId   entity id
+     * @param type       entity type, or null if not tracked
+     * @param metadata   current metadata
+     * @param metadatas  full, mutable list of metadata
+     * @param connection user connection
+     */
+    protected abstract void handleMetadata(int entityId, @Nullable EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception;
 
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
-        handleMetadata(entityId, type, metadata, metadatas, connection);
+    @Nullable
+    protected Metadata getMetaByIndex(int index, List<Metadata> metadataList) {
+        for (Metadata metadata : metadataList) {
+            if (metadata.getId() == index) {
+                return metadata;
+            }
+        }
+        return null;
     }
 }

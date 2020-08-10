@@ -15,7 +15,6 @@ import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
@@ -25,7 +24,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
     }
 
     @Override
-    protected void handleMetadata(int entityId, us.myles.ViaVersion.api.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) {
+    protected void handleMetadata(int entityId, us.myles.ViaVersion.api.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         if (metadata.getValue() instanceof Item) {
             // Apply rewrite
             EntityIdRewriter.toClientItem((Item) metadata.getValue());
@@ -100,15 +99,14 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
         }
 
         if (type.is(EntityType.ARMOR_STAND) && Via.getConfig().isHologramPatch()) {
-            Optional<Metadata> flags = Optional.ofNullable(metadataMap.get(11));
-            Optional<Metadata> customName = Optional.ofNullable(metadataMap.get(2));
-            Optional<Metadata> customNameVisible = Optional.ofNullable(metadataMap.get(3));
-            if (metadata.getId() == 0 && flags.isPresent() && customName.isPresent() && customNameVisible.isPresent()) {
-                Metadata meta = flags.get();
+            Metadata flags = getMetaByIndex(11, metadatas);
+            Metadata customName = getMetaByIndex(2, metadatas);
+            Metadata customNameVisible = getMetaByIndex(3, metadatas);
+            if (metadata.getId() == 0 && flags != null && customName != null && customNameVisible != null) {
                 byte data = (byte) metadata.getValue();
                 // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
-                if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                        && !((String) customName.get().getValue()).isEmpty() && (boolean) customNameVisible.get().getValue()) {
+                if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
+                        && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
                     EntityTracker1_11 tracker = connection.get(EntityTracker1_11.class);
                     if (!tracker.isHologram(entityId)) {
                         tracker.addHologram(entityId);

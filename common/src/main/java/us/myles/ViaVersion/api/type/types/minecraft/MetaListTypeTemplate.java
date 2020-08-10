@@ -6,7 +6,8 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.List;
 
 public abstract class MetaListTypeTemplate extends Type<List<Metadata>> {
-    public MetaListTypeTemplate() {
+
+    protected MetaListTypeTemplate() {
         super("MetaData List", List.class);
     }
 

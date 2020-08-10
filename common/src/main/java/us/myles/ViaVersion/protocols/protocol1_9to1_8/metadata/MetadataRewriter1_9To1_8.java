@@ -16,7 +16,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
@@ -26,7 +25,7 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
     }
 
     @Override
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
         MetaIndex metaIndex = MetaIndex.searchIndex(type, metadata.getId());
         if (metaIndex == null) {
             throw new Exception("Could not find valid metadata");
@@ -43,7 +42,8 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
         if (type == Entity1_10Types.EntityType.ENDERMAN && metaIndex.getNewType() == MetaType1_9.BlockID) {
             if (metaIndex.getOldType() == MetaType1_8.Short) {
                 int id = (Short) metadata.getValue();
-                int data = metadataMap.containsKey(17) ? (Byte) metadataMap.get(17).getValue() : 0;
+                Metadata meta = getMetaByIndex(17, metadatas);
+                int data = meta != null ? (Byte) meta.getValue() : 0;
                 int combined = (id << 4) | (data & 0xF);
                 metadata.setValue(combined);
             } else {

@@ -17,7 +17,6 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 
 import java.util.List;
-import java.util.Map;
 
 public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
 
@@ -26,7 +25,7 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
     }
 
     @Override
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, Map<Integer, Metadata> metadataMap, UserConnection connection) throws Exception {
+    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
         // Handle new MetaTypes
         if (metadata.getMetaType().getTypeID() > 4) {
             metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID() + 1));
@@ -80,8 +79,10 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
         if (type == Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) {
             if (metadata.getId() == 9) {
                 int particleId = (int) metadata.getValue();
-                int parameter1 = metadataMap.containsKey(10) ? (int) metadataMap.get(10).getValue() : 0;
-                int parameter2 = metadataMap.containsKey(11) ? (int) metadataMap.get(11).getValue() : 0;
+                Metadata parameter1Meta = getMetaByIndex(10, metadatas);
+                Metadata parameter2Meta = getMetaByIndex(11, metadatas);
+                int parameter1 = parameter1Meta != null ? (int) parameter1Meta.getValue() : 0;
+                int parameter2 = parameter2Meta != null ? (int) parameter2Meta.getValue() : 0;
 
                 Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
                 if (particle != null && particle.getId() != -1) {
