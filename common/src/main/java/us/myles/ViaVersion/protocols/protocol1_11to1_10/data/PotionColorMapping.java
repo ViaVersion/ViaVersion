@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.Pair;
 public class PotionColorMapping {
 
     //<oldData> to <newData, isInstant> mapping
-    private static final Int2ObjectMap<Pair<Integer, Boolean>> POTIONS = new Int2ObjectOpenHashMap<>(17, 1.0F);
+    private static final Int2ObjectMap<Pair<Integer, Boolean>> POTIONS = new Int2ObjectOpenHashMap<>(37, 1.0F);
 
     static {
         addRewrite(0, 3694022, false);
@@ -49,15 +49,11 @@ public class PotionColorMapping {
         addRewrite(36, 3381504, false);
     }
 
-    public static Pair<Integer, Boolean> getNewData(final int oldData) {
-        return POTIONS.getOrDefault(oldData, new Pair<>(-1, false));
+    public static Pair<Integer, Boolean> getNewData(int oldData) {
+        return POTIONS.get(oldData);
     }
 
-    public static boolean contains(final int oldData) {
-        return POTIONS.containsKey(oldData);
-    }
-
-    private static void addRewrite(final int oldData, final int newData, final boolean isInstant) {
+    private static void addRewrite(int oldData, int newData, boolean isInstant) {
         POTIONS.put(oldData, new Pair<>(newData, isInstant));
     }
 

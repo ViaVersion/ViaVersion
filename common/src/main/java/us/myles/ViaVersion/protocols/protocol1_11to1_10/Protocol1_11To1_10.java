@@ -270,17 +270,19 @@ public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, Client
                 this.map(Type.INT); //effectData
                 this.map(Type.BOOLEAN); //serverwide / global
                 handler(packetWrapper -> {
-                    final int effectID = packetWrapper.get(Type.INT, 0);
+                    int effectID = packetWrapper.get(Type.INT, 0);
                     if (effectID == 2002) {
                         int data = packetWrapper.get(Type.INT, 1);
-                        final Pair<Integer, Boolean> newData = PotionColorMapping.getNewData(data);
-                        if (newData.getKey() == -1) {
+                        boolean isInstant = false;
+                        Pair<Integer, Boolean> newData = PotionColorMapping.getNewData(data);
+                        if (newData == null) {
                             Via.getPlatform().getLogger().warning("Received unknown 1.11 -> 1.10.2 potion data (" + data + ")");
                             data = 0;
                         } else {
                             data = newData.getKey();
+                            isInstant = newData.getValue();
                         }
-                        if (newData.getValue()) {
+                        if (isInstant) {
                             packetWrapper.set(Type.INT, 0, 2007);
                         }
                         packetWrapper.set(Type.INT, 1, data);
