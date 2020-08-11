@@ -84,6 +84,7 @@ public class WorldPackets {
                         newPacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
                         newPacket.write(Type.BOOLEAN, false); // Ignore light updates
                         newPacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, sectionRecord.toArray(EMPTY_RECORDS));
+                        newPacket.send(Protocol1_16_2To1_16_1.class);
                     }
                 });
             }
