@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.api.rewriters;
 
-public enum TagType {
+public enum RegistryType {
 
     BLOCK,
     ITEM,

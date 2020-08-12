@@ -32,18 +32,18 @@ public class TagRewriter {
     /**
      * Adds an empty tag (since the client crashes if a checked tag is not registered.)
      */
-    public void addEmptyTag(TagType tagType, String id) {
+    public void addEmptyTag(RegistryType tagType, String id) {
         getNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
     }
 
-    public void addEmptyTags(TagType tagType, String... ids) {
+    public void addEmptyTags(RegistryType tagType, String... ids) {
         List<TagData> tagList = getNewTags(tagType);
         for (String id : ids) {
             tagList.add(new TagData(id, EMPTY_ARRAY));
         }
     }
 
-    public void addTag(TagType tagType, String id, int... oldIds) {
+    public void addTag(RegistryType tagType, String id, int... oldIds) {
         List<TagData> newTags = getNewTags(tagType);
         IdRewriteFunction rewriteFunction = getRewriter(tagType);
         for (int i = 0; i < oldIds.length; i++) {
@@ -108,7 +108,7 @@ public class TagRewriter {
         }
     }
 
-    private List<TagData> getNewTags(TagType tagType) {
+    private List<TagData> getNewTags(RegistryType tagType) {
         switch (tagType) {
             case BLOCK:
                 return newBlockTags;
@@ -122,7 +122,7 @@ public class TagRewriter {
         }
     }
 
-    private IdRewriteFunction getRewriter(TagType tagType) {
+    private IdRewriteFunction getRewriter(RegistryType tagType) {
         switch (tagType) {
             case BLOCK:
                 return blockRewriter;

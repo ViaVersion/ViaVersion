@@ -4,9 +4,10 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
+import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
-import us.myles.ViaVersion.api.rewriters.TagType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;
@@ -35,6 +36,9 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
 
         tagRewriter = new TagRewriter(this, Protocol1_16_2To1_16_1::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
         tagRewriter.register(ClientboundPackets1_16.TAGS);
+
+        new StatisticsRewriter(this, Protocol1_16_2To1_16_1::getNewBlockId, InventoryPackets::getNewItemId,
+                metadataRewriter::getNewEntityId).register(ClientboundPackets1_16.STATISTICS);
 
         SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
         soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
@@ -76,14 +80,14 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
     protected void loadMappingData() {
         MappingData.init();
 
-        tagRewriter.addTag(TagType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:mushroom_grow_block");
+        tagRewriter.addTag(RegistryType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:mushroom_grow_block");
 
         // The client now wants ALL (previous) tags to be sent, sooooo :>
-        tagRewriter.addEmptyTags(TagType.ITEM, "minecraft:soul_fire_base_blocks", "minecraft:furnace_materials", "minecraft:crimson_stems",
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:soul_fire_base_blocks", "minecraft:furnace_materials", "minecraft:crimson_stems",
                 "minecraft:gold_ores", "minecraft:piglin_loved", "minecraft:piglin_repellents", "minecraft:creeper_drop_music_discs",
                 "minecraft:logs_that_burn", "minecraft:stone_tool_materials", "minecraft:warped_stems");
-        tagRewriter.addEmptyTags(TagType.BLOCK, "minecraft:infiniburn_nether", "minecraft:crimson_stems",
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:infiniburn_nether", "minecraft:crimson_stems",
                 "minecraft:wither_summon_base_blocks", "minecraft:infiniburn_overworld", "minecraft:piglin_repellents",
                 "minecraft:hoglin_repellents", "minecraft:prevent_mob_spawning_inside", "minecraft:wart_blocks",
                 "minecraft:stone_pressure_plates", "minecraft:nylium", "minecraft:gold_ores", "minecraft:pressure_plates",

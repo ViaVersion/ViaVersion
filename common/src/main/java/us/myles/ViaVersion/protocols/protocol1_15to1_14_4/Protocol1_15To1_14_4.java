@@ -4,9 +4,10 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
+import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
-import us.myles.ViaVersion.api.rewriters.TagType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
@@ -28,7 +29,7 @@ public class Protocol1_15To1_14_4 extends Protocol<ClientboundPackets1_14, Clien
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_15To1_14_4(this);
+        MetadataRewriter1_15To1_14_4 metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
 
         EntityPackets.register(this);
         PlayerPackets.register(this);
@@ -38,6 +39,9 @@ public class Protocol1_15To1_14_4 extends Protocol<ClientboundPackets1_14, Clien
         SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
         soundRewriter.registerSound(ClientboundPackets1_14.ENTITY_SOUND); // Entity Sound Effect (added somewhere in 1.14)
         soundRewriter.registerSound(ClientboundPackets1_14.SOUND);
+
+        new StatisticsRewriter(this, Protocol1_15To1_14_4::getNewBlockId,
+                InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId).register(ClientboundPackets1_14.STATISTICS);
 
         registerIncoming(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
@@ -59,7 +63,7 @@ public class Protocol1_15To1_14_4 extends Protocol<ClientboundPackets1_14, Clien
         for (int i = 0; i < 17; i++) {
             shulkerBoxes[i] = shulkerBoxOffset + i;
         }
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
     }
 
     public static int getNewBlockStateId(int id) {

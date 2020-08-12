@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
+import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
@@ -29,7 +30,7 @@ public class Protocol1_14To1_13_2 extends Protocol<ClientboundPackets1_13, Clien
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_14To1_13_2(this);
+        MetadataRewriter1_14To1_13_2 metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
 
         InventoryPackets.register(this);
         EntityPackets.register(this);
@@ -37,6 +38,8 @@ public class Protocol1_14To1_13_2 extends Protocol<ClientboundPackets1_13, Clien
         PlayerPackets.register(this);
 
         new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(ClientboundPackets1_13.SOUND);
+        new StatisticsRewriter(this, Protocol1_14To1_13_2::getNewBlockId,
+                InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId).register(ClientboundPackets1_13.STATISTICS);
 
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
         componentRewriter.registerChatMessage(ClientboundPackets1_13.CHAT_MESSAGE);

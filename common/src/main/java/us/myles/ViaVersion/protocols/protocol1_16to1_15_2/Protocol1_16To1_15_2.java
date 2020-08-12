@@ -9,9 +9,10 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
+import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
+import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
-import us.myles.ViaVersion.api.rewriters.TagType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
@@ -49,6 +50,9 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
 
         tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
         tagRewriter.register(ClientboundPackets1_15.TAGS);
+
+        new StatisticsRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId,
+                metadataRewriter::getNewEntityId).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
@@ -219,32 +223,32 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
             wallPostOverrideTag[arrayIndex++] = i;
         }
 
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:wall_post_override", wallPostOverrideTag);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:climbable", 160, 241, 658);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:fire", 142);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:campfires", 679);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:fence_gates", 242, 467, 468, 469, 470, 471);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:unstable_bottom_center", 242, 467, 468, 469, 470, 471);
-        tagRewriter.addTag(TagType.BLOCK, "minecraft:wooden_trapdoors", 193, 194, 195, 196, 197, 198);
-        tagRewriter.addTag(TagType.ITEM, "minecraft:wooden_trapdoors", 215, 216, 217, 218, 219, 220);
-        tagRewriter.addTag(TagType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
-        tagRewriter.addTag(TagType.ENTITY, "minecraft:impact_projectiles", 2, 72, 71, 37, 69, 79, 83, 15, 93);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:wall_post_override", wallPostOverrideTag);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:climbable", 160, 241, 658);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:fire", 142);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:campfires", 679);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:fence_gates", 242, 467, 468, 469, 470, 471);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:unstable_bottom_center", 242, 467, 468, 469, 470, 471);
+        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:wooden_trapdoors", 193, 194, 195, 196, 197, 198);
+        tagRewriter.addTag(RegistryType.ITEM, "minecraft:wooden_trapdoors", 215, 216, 217, 218, 219, 220);
+        tagRewriter.addTag(RegistryType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
+        tagRewriter.addTag(RegistryType.ENTITY, "minecraft:impact_projectiles", 2, 72, 71, 37, 69, 79, 83, 15, 93);
 
         // The client crashes if we don't send all tags it may use
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:guarded_by_piglins");
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_speed_blocks");
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:soul_fire_base_blocks");
-        tagRewriter.addEmptyTag(TagType.BLOCK, "minecraft:non_flammable_wood");
-        tagRewriter.addEmptyTag(TagType.ITEM, "minecraft:non_flammable_wood");
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:guarded_by_piglins");
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:soul_speed_blocks");
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:soul_fire_base_blocks");
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:non_flammable_wood");
+        tagRewriter.addEmptyTag(RegistryType.ITEM, "minecraft:non_flammable_wood");
 
         // The rest of not accessed tags added in older versions; #1830
-        tagRewriter.addEmptyTags(TagType.BLOCK, "minecraft:bamboo_plantable_on", "minecraft:beds", "minecraft:bee_growables",
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:bamboo_plantable_on", "minecraft:beds", "minecraft:bee_growables",
                 "minecraft:beehives", "minecraft:coral_plants", "minecraft:crops", "minecraft:dragon_immune", "minecraft:flowers",
                 "minecraft:portals", "minecraft:shulker_boxes", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors",
                 "minecraft:underwater_bonemeals", "minecraft:wither_immune", "minecraft:wooden_fences", "minecraft:wooden_trapdoors");
-        tagRewriter.addEmptyTags(TagType.ENTITY, "minecraft:arrows", "minecraft:beehive_inhabitors", "minecraft:raiders", "minecraft:skeletons");
-        tagRewriter.addEmptyTags(TagType.ITEM, "minecraft:beds", "minecraft:coals", "minecraft:fences", "minecraft:flowers",
+        tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:arrows", "minecraft:beehive_inhabitors", "minecraft:raiders", "minecraft:skeletons");
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:beds", "minecraft:coals", "minecraft:fences", "minecraft:flowers",
                 "minecraft:lectern_books", "minecraft:music_discs", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors", "minecraft:walls", "minecraft:wooden_fences");
     }
 
