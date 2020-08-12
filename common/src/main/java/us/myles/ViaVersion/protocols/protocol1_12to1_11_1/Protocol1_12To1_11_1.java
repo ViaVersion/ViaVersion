@@ -81,12 +81,9 @@ public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, Clie
                         if (!Via.getConfig().is1_12NBTArrayFix()) return;
                         try {
                             JsonElement obj = Protocol1_9To1_8.FIX_JSON.transform(null, wrapper.passthrough(Type.COMPONENT).toString());
-                            if (!TranslateRewriter.toClient(obj, wrapper.user())) {
-                                wrapper.cancel();
-                                return;
-                            }
-
+                            TranslateRewriter.toClient(obj, wrapper.user());
                             ChatItemRewriter.toClient(obj, wrapper.user());
+                            wrapper.set(Type.COMPONENT, 0, obj);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
