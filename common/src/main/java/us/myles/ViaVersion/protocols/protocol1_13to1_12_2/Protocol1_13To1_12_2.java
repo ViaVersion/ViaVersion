@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Triple;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
@@ -41,9 +42,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTra
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.util.GsonUtil;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
@@ -189,18 +188,22 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int size = wrapper.passthrough(Type.VAR_INT);
+                        int size = wrapper.read(Type.VAR_INT);
+                        List<Triple<Integer, Integer, Integer>> remappedStats = new ArrayList<>();
                         for (int i = 0; i < size; i++) {
                             String name = wrapper.read(Type.STRING);
                             String[] split = name.split("\\.");
                             int categoryId = 0;
-                            int newId = 0;
+                            int newId = -1;
+                            int value = wrapper.read(Type.VAR_INT);
                             if (split.length == 2) {
                                 // Custom types
                                 categoryId = 8;
-                                Integer newIdRaw = StatisticMappings.statistics.get(name);
+                                Integer newIdRaw = StatisticMappings.CUSTOM_STATS.get(name);
                                 if (newIdRaw != null) {
                                     newId = newIdRaw;
+                                } else {
+                                    Via.getPlatform().getLogger().warning("Could not find 1.13 -> 1.12.2 statistic mapping for " + name);
                                 }
                             } else {
                                 String category = split[1];
@@ -232,10 +235,15 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                                         break;
                                 }
                             }
+                            if (newId != -1)
+                                remappedStats.add(new Triple<>(categoryId, newId, value));
+                        }
 
-                            wrapper.write(Type.VAR_INT, categoryId); // category id
-                            wrapper.write(Type.VAR_INT, newId); // statistics id
-                            wrapper.passthrough(Type.VAR_INT); // value
+                        wrapper.write(Type.VAR_INT, remappedStats.size()); // size
+                        for (Triple<Integer, Integer, Integer> stat : remappedStats) {
+                            wrapper.write(Type.VAR_INT, stat.getFirst()); // category id
+                            wrapper.write(Type.VAR_INT, stat.getSecond()); // statistics id
+                            wrapper.write(Type.VAR_INT, stat.getThird()); // value
                         }
                     }
                 });
