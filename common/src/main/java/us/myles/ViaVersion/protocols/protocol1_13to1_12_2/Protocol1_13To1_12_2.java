@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Triple;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
@@ -25,10 +24,7 @@ import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.BlockIdData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.StatisticMappings;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.*;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
@@ -189,7 +185,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int size = wrapper.read(Type.VAR_INT);
-                        List<Triple<Integer, Integer, Integer>> remappedStats = new ArrayList<>();
+                        List<StatisticData> remappedStats = new ArrayList<>();
                         for (int i = 0; i < size; i++) {
                             String name = wrapper.read(Type.STRING);
                             String[] split = name.split("\\.");
@@ -236,14 +232,14 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                                 }
                             }
                             if (newId != -1)
-                                remappedStats.add(new Triple<>(categoryId, newId, value));
+                                remappedStats.add(new StatisticData(categoryId, newId, value));
                         }
 
                         wrapper.write(Type.VAR_INT, remappedStats.size()); // size
-                        for (Triple<Integer, Integer, Integer> stat : remappedStats) {
-                            wrapper.write(Type.VAR_INT, stat.getFirst()); // category id
-                            wrapper.write(Type.VAR_INT, stat.getSecond()); // statistics id
-                            wrapper.write(Type.VAR_INT, stat.getThird()); // value
+                        for (StatisticData stat : remappedStats) {
+                            wrapper.write(Type.VAR_INT, stat.getCategoryId()); // category id
+                            wrapper.write(Type.VAR_INT, stat.getNewId()); // statistics id
+                            wrapper.write(Type.VAR_INT, stat.getValue()); // value
                         }
                     }
                 });

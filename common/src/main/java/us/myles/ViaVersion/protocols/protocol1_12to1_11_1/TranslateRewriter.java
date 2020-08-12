@@ -22,52 +22,57 @@ public class TranslateRewriter {
         @Override
         protected void handleHoverEvent(JsonObject hoverEvent) {
             String action = hoverEvent.getAsJsonPrimitive("action").getAsString();
-            if (action.equals("show_achievement")) {
-                String value = hoverEvent.getAsJsonPrimitive("value").getAsString();
-                if (AchievementTranslationMapping.get(value) != null) {
-                    try {
-                        JsonObject newLine = new JsonObject();
-                        newLine.addProperty("text", "\n");
-                        JsonArray baseArray = new JsonArray();
-                        baseArray.add("");
-                        JsonObject namePart = new JsonObject();
-                        JsonObject typePart = new JsonObject();
-                        baseArray.add(namePart);
-                        baseArray.add(newLine);
-                        baseArray.add(typePart);
-                        if (value.startsWith("achievement")) {
-                            namePart.addProperty("translate", value);
-                            namePart.addProperty("color", AchievementTranslationMapping.isSpecial(value) ? "dark_purple" : "green");
-                            typePart.addProperty("translate", "stats.tooltip.type.achievement");
-                            JsonObject description = new JsonObject();
-                            typePart.addProperty("italic", true);
-                            description.addProperty("translate", value + ".desc");
-                            baseArray.add(newLine);
-                            baseArray.add(description);
-                        } else if (value.startsWith("stat")) {
-                            namePart.addProperty("translate", value);
-                            namePart.addProperty("color", "gray");
-                            typePart.addProperty("translate", "stats.tooltip.type.statistic");
-                            typePart.addProperty("italic", true);
-                        }
-                        hoverEvent.addProperty("action", "show_text");
-                        hoverEvent.add("value", baseArray);
-                    } catch (Exception e) {
-                        Via.getPlatform().getLogger().warning("Error rewriting show_achievement: " + hoverEvent);
-                        e.printStackTrace();
-                        JsonObject invalidText = new JsonObject();
-                        invalidText.addProperty("text", "Invalid statistic/achievement!");
-                        invalidText.addProperty("color", "red");
-                        hoverEvent.addProperty("action", "show_text");
-                        hoverEvent.add("value", invalidText);
-                    }
-                } else {
-                    JsonObject invalidText = new JsonObject();
-                    invalidText.addProperty("text", "Invalid statistic/achievement!");
-                    invalidText.addProperty("color", "red");
-                    hoverEvent.addProperty("action", "show_text");
-                    hoverEvent.add("value", invalidText);
+            if (!action.equals("show_achievement")) {
+                super.handleHoverEvent(hoverEvent);
+                return;
+            }
+
+            String value = hoverEvent.getAsJsonPrimitive("value").getAsString();
+            if (AchievementTranslationMapping.get(value) == null) {
+                JsonObject invalidText = new JsonObject();
+                invalidText.addProperty("text", "Invalid statistic/achievement!");
+                invalidText.addProperty("color", "red");
+                hoverEvent.addProperty("action", "show_text");
+                hoverEvent.add("value", invalidText);
+                super.handleHoverEvent(hoverEvent);
+                return;
+            }
+
+            try {
+                JsonObject newLine = new JsonObject();
+                newLine.addProperty("text", "\n");
+                JsonArray baseArray = new JsonArray();
+                baseArray.add("");
+                JsonObject namePart = new JsonObject();
+                JsonObject typePart = new JsonObject();
+                baseArray.add(namePart);
+                baseArray.add(newLine);
+                baseArray.add(typePart);
+                if (value.startsWith("achievement")) {
+                    namePart.addProperty("translate", value);
+                    namePart.addProperty("color", AchievementTranslationMapping.isSpecial(value) ? "dark_purple" : "green");
+                    typePart.addProperty("translate", "stats.tooltip.type.achievement");
+                    JsonObject description = new JsonObject();
+                    typePart.addProperty("italic", true);
+                    description.addProperty("translate", value + ".desc");
+                    baseArray.add(newLine);
+                    baseArray.add(description);
+                } else if (value.startsWith("stat")) {
+                    namePart.addProperty("translate", value);
+                    namePart.addProperty("color", "gray");
+                    typePart.addProperty("translate", "stats.tooltip.type.statistic");
+                    typePart.addProperty("italic", true);
                 }
+                hoverEvent.addProperty("action", "show_text");
+                hoverEvent.add("value", baseArray);
+            } catch (Exception e) {
+                Via.getPlatform().getLogger().warning("Error rewriting show_achievement: " + hoverEvent);
+                e.printStackTrace();
+                JsonObject invalidText = new JsonObject();
+                invalidText.addProperty("text", "Invalid statistic/achievement!");
+                invalidText.addProperty("color", "red");
+                hoverEvent.addProperty("action", "show_text");
+                hoverEvent.add("value", invalidText);
             }
             super.handleHoverEvent(hoverEvent);
         }

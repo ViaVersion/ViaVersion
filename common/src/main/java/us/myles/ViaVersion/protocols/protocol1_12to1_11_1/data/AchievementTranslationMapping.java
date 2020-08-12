@@ -1,12 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_12to1_11_1.data;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class AchievementTranslationMapping {
 
     private static final Object2ObjectOpenHashMap<String, String> ACHIEVEMENTS = new Object2ObjectOpenHashMap<>(150, 1.0f);
-    private static final ObjectArrayList<String> SPECIAL_ACHIEVEMENTS = new ObjectArrayList<>(10);
+    private static final Set<String> SPECIAL_ACHIEVEMENTS = new HashSet<>(10);
 
     static {
         add("chat.type.achievement", "%s has just earned the achievement %s");
@@ -111,11 +113,11 @@ public class AchievementTranslationMapping {
         add("achievement.bakeCake.desc", "Wheat, sugar, milk and eggs!");
         add("achievement.buildBetterPickaxe", "Getting an Upgrade");
         add("achievement.buildBetterPickaxe.desc", "Construct a better pickaxe");
-        add("achievement.overpowered", "Overpowered", true);
+        addSpecial("achievement.overpowered", "Overpowered");
         add("achievement.overpowered.desc", "Eat a Notch apple");
         add("achievement.cookFish", "Delicious Fish");
         add("achievement.cookFish.desc", "Catch and cook fish!");
-        add("achievement.onARail", "On A Rail", true);
+        addSpecial("achievement.onARail", "On A Rail");
         add("achievement.onARail.desc", "Travel by minecart at least 1 km from where you started");
         add("achievement.buildSword", "Time to Strike!");
         add("achievement.buildSword.desc", "Use planks and sticks to make a sword");
@@ -125,9 +127,9 @@ public class AchievementTranslationMapping {
         add("achievement.killCow.desc", "Harvest some leather");
         add("achievement.breedCow", "Repopulation");
         add("achievement.breedCow.desc", "Breed two cows with wheat");
-        add("achievement.flyPig", "When Pigs Fly", true);
+        addSpecial("achievement.flyPig", "When Pigs Fly");
         add("achievement.flyPig.desc", "Fly a pig off a cliff");
-        add("achievement.snipeSkeleton", "Sniper Duel", true);
+        addSpecial("achievement.snipeSkeleton", "Sniper Duel");
         add("achievement.snipeSkeleton.desc", "Kill a skeleton with an arrow from more than 50 meters");
         add("achievement.diamonds", "DIAMONDS!");
         add("achievement.diamonds.desc", "Acquire diamonds with your iron tools");
@@ -135,27 +137,27 @@ public class AchievementTranslationMapping {
         add("achievement.diamondsToYou.desc", "Throw diamonds at another player");
         add("achievement.portal", "We Need to Go Deeper");
         add("achievement.portal.desc", "Build a portal to the Nether");
-        add("achievement.ghast", "Return to Sender", true);
+        addSpecial("achievement.ghast", "Return to Sender");
         add("achievement.ghast.desc", "Destroy a Ghast with a fireball");
         add("achievement.blazeRod", "Into Fire");
         add("achievement.blazeRod.desc", "Relieve a Blaze of its rod");
         add("achievement.potion", "Local Brewery");
         add("achievement.potion.desc", "Brew a potion");
-        add("achievement.theEnd", "The End?", true);
+        addSpecial("achievement.theEnd", "The End?");
         add("achievement.theEnd.desc", "Locate the End");
-        add("achievement.theEnd2", "The End.", true);
+        addSpecial("achievement.theEnd2", "The End.");
         add("achievement.theEnd2.desc", "Defeat the Ender Dragon");
         add("achievement.spawnWither", "The Beginning?");
         add("achievement.spawnWither.desc", "Spawn the Wither");
         add("achievement.killWither", "The Beginning.");
         add("achievement.killWither.desc", "Kill the Wither");
-        add("achievement.fullBeacon", "Beaconator", true);
+        addSpecial("achievement.fullBeacon", "Beaconator");
         add("achievement.fullBeacon.desc", "Create a full beacon");
-        add("achievement.exploreAllBiomes", "Adventuring Time", true);
+        addSpecial("achievement.exploreAllBiomes", "Adventuring Time");
         add("achievement.exploreAllBiomes.desc", "Discover all biomes");
         add("achievement.enchantments", "Enchanter");
         add("achievement.enchantments.desc", "Use a book, obsidian and diamonds to construct an enchantment table");
-        add("achievement.overkill", "Overkill", true);
+        addSpecial("achievement.overkill", "Overkill");
         add("achievement.overkill.desc", "Deal nine hearts of damage in a single hit");
         add("achievement.bookcase", "Librarian");
         add("achievement.bookcase.desc", "Build some bookshelves to improve your enchantment table");
@@ -165,7 +167,7 @@ public class AchievementTranslationMapping {
         ACHIEVEMENTS.put(key, value);
     }
 
-    private static void add(String key, String value, boolean special) {
+    private static void addSpecial(String key, String value) {
         add(key, value);
         SPECIAL_ACHIEVEMENTS.add(key);
     }
