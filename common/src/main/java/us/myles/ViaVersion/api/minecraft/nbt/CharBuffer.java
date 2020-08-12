@@ -45,20 +45,38 @@ package us.myles.ViaVersion.api.minecraft.nbt;
     }
 
     /**
-     * Get the current character and advance
+     * Get the current character and advance if possible
      *
      * @return current character
      */
     public char take() {
-        return this.sequence.charAt(this.index++);
+        int idx = this.index;
+        if (this.canAdvance()) this.advance();
+        return this.sequence.charAt(idx);
     }
 
-    public boolean advance() {
+    /**
+     * Advances the index of this char buffer
+     */
+    public void advance() {
         this.index++;
-        return this.hasMore();
     }
 
-    public boolean hasMore() {
+    /**
+     * Checks if the index can advance
+     *
+     * @return Whether the index can advance
+     */
+    public boolean canAdvance() {
+        return (this.index + 1) < this.sequence.length();
+    }
+
+    /**
+     * Checks if the index has a value
+     *
+     * @return Whether the index has a value
+     */
+    public boolean hasValue() {
         return this.index < this.sequence.length();
     }
 
@@ -99,18 +117,19 @@ package us.myles.ViaVersion.api.minecraft.nbt;
      */
     public CharBuffer expect(final char expectedChar) throws StringTagParseException {
         this.skipWhitespace();
-        if (!this.hasMore()) {
+        if (!this.hasValue()) {
             throw this.makeError("Expected character '" + expectedChar + "' but got EOF");
         }
         if (this.peek() != expectedChar) {
             throw this.makeError("Expected character '" + expectedChar + "' but got '" + this.peek() + "'");
         }
+
         this.take();
         return this;
     }
 
     public CharBuffer skipWhitespace() {
-        while (this.hasMore() && Character.isWhitespace(this.peek())) this.advance();
+        while (this.canAdvance() && Character.isWhitespace(this.peek())) this.advance();
         return this;
     }
 

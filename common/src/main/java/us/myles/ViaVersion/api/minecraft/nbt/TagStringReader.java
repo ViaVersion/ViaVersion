@@ -65,7 +65,7 @@ import java.util.stream.IntStream;
     public CompoundTag compound() throws StringTagParseException {
         this.buffer.expect(Tokens.COMPOUND_BEGIN);
         final CompoundTag compoundTag = new CompoundTag("");
-        while (this.buffer.hasMore()) {
+        while (this.buffer.hasValue()) {
             final String key = this.key();
             final Tag tag = this.tag();
             // Doesn't get around this with the steveice lib :/
@@ -90,7 +90,7 @@ import java.util.stream.IntStream;
         final ListTag listTag = new ListTag("");
         this.buffer.expect(Tokens.ARRAY_BEGIN);
         final boolean prefixedIndex = this.buffer.peek() == '0' && this.buffer.peek(1) == ':';
-        while (this.buffer.hasMore()) {
+        while (this.buffer.hasValue()) {
             if (prefixedIndex) {
                 this.buffer.takeUntil(':');
             }
@@ -128,7 +128,7 @@ import java.util.stream.IntStream;
 
     private byte[] byteArray() throws StringTagParseException {
         final List<Byte> bytes = new ArrayList<>();
-        while (this.buffer.hasMore()) {
+        while (this.buffer.hasValue()) {
             final CharSequence value = this.buffer.skipWhitespace().takeUntil(Tokens.TYPE_BYTE);
             try {
                 bytes.add(Byte.valueOf(value.toString()));
@@ -149,7 +149,7 @@ import java.util.stream.IntStream;
 
     private int[] intArray() throws StringTagParseException {
         final IntStream.Builder builder = IntStream.builder();
-        while (this.buffer.hasMore()) {
+        while (this.buffer.hasValue()) {
             final Tag value = this.tag();
             if (!(value instanceof IntTag)) {
                 throw this.buffer.makeError("All elements of an int array must be ints!");
@@ -164,7 +164,7 @@ import java.util.stream.IntStream;
 
     private long[] longArray() throws StringTagParseException {
         final List<Long> longs = new ArrayList<>();
-        while (this.buffer.hasMore()) {
+        while (this.buffer.hasValue()) {
             final CharSequence value = this.buffer.skipWhitespace().takeUntil(Tokens.TYPE_LONG);
             try {
                 longs.add(Long.valueOf(value.toString()));
@@ -215,6 +215,7 @@ import java.util.stream.IntStream;
             case Tokens.SINGLE_QUOTE:
             case Tokens.DOUBLE_QUOTE:
                 // definitely a string tag
+                if (!this.buffer.canAdvance()) throw this.buffer.makeError("Reached end of document without string close");
                 this.buffer.advance();
                 return new StringTag("", unescape(this.buffer.takeUntil(startToken).toString()));
             default: // scalar
@@ -232,7 +233,7 @@ import java.util.stream.IntStream;
     private Tag scalar() {
         final StringBuilder builder = new StringBuilder();
         boolean possiblyNumeric = true;
-        while (this.buffer.hasMore()) {
+        while (this.buffer.hasValue()) {
             final char current = this.buffer.peek();
             if (possiblyNumeric && !Tokens.numeric(current)) {
                 if (builder.length() != 0) {
@@ -266,7 +267,7 @@ import java.util.stream.IntStream;
                 }
             }
             if (current == '\\') { // escape -- we are significantly more lenient than original format at the moment
-                this.buffer.advance();
+                this.buffer.take();
                 builder.append(this.buffer.take());
             } else if (Tokens.id(current)) {
                 builder.append(this.buffer.take());

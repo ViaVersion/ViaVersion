@@ -193,7 +193,7 @@ public final class BinaryTagIO {
             final CharBuffer buffer = new CharBuffer(input);
             final TagStringReader parser = new TagStringReader(buffer);
             final CompoundTag tag = parser.compound();
-            if (buffer.skipWhitespace().hasMore()) {
+            if (buffer.skipWhitespace().hasValue()) {
                 throw new IOException("Document had trailing content after first CompoundTag");
             }
             return tag;
