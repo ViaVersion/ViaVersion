@@ -11,6 +11,7 @@ public class MappingData {
     public static Mappings blockMappings;
     public static Mappings blockStateMappings;
     public static Mappings soundMappings;
+    public static Mappings statisticsMappings;
 
     public static void init() {
         Via.getPlatform().getLogger().info("Loading 1.14.4 -> 1.15 mappings...");
@@ -23,5 +24,6 @@ public class MappingData {
         blockMappings = new Mappings(mapping1_14.getAsJsonObject("blocks"), mapping1_15.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_14.getAsJsonObject("items"), mapping1_15.getAsJsonObject("items"));
         soundMappings = new Mappings(mapping1_14.getAsJsonArray("sounds"), mapping1_15.getAsJsonArray("sounds"), false);
+        statisticsMappings = new Mappings(mapping1_14.getAsJsonArray("statistics"), mapping1_15.getAsJsonArray("statistics"));
     }
 }

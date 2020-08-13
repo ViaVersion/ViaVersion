@@ -11,16 +11,17 @@ public class StatisticsRewriter {
     private final IdRewriteFunction blockRewriter;
     private final IdRewriteFunction itemRewriter;
     private final IdRewriteFunction entityRewriter;
-    private final IdRewriteFunction categoryIdRewriter;
+    private final IdRewriteFunction statisticsIdRewriter;
+    private final int customStatsCategory = 8; // Make this changeable if it differs in a future version
 
     public StatisticsRewriter(Protocol protocol,
                               @Nullable IdRewriteFunction blockRewriter, @Nullable IdRewriteFunction itemRewriter, @Nullable IdRewriteFunction entityRewriter,
-                              @Nullable IdRewriteFunction categoryIdRewriter) {
+                              @Nullable IdRewriteFunction statisticsIdRewriter) {
         this.protocol = protocol;
         this.blockRewriter = blockRewriter;
         this.itemRewriter = itemRewriter;
         this.entityRewriter = entityRewriter;
-        this.categoryIdRewriter = categoryIdRewriter;
+        this.statisticsIdRewriter = statisticsIdRewriter;
     }
 
     public StatisticsRewriter(Protocol protocol, @Nullable IdRewriteFunction blockRewriter, @Nullable IdRewriteFunction itemRewriter, @Nullable IdRewriteFunction entityRewriter) {
@@ -38,27 +39,25 @@ public class StatisticsRewriter {
                         int categoryId = wrapper.read(Type.VAR_INT);
                         int statisticId = wrapper.read(Type.VAR_INT);
                         int value = wrapper.read(Type.VAR_INT);
-                        // Rewrite category id
-                        if (categoryIdRewriter != null) {
-                            categoryId = categoryIdRewriter.rewrite(categoryId);
-                            if (categoryId == -1) {
+                        if (categoryId == customStatsCategory && statisticsIdRewriter != null) {
+                            // Rewrite custom statistics id
+                            statisticId = statisticsIdRewriter.rewrite(statisticId);
+                            if (statisticId == -1) {
                                 // Remove entry
                                 newSize--;
                                 continue;
                             }
+                        } else {
+                            // Rewrite the block/item/entity id
+                            RegistryType type = getRegistryTypeForStatistic(categoryId);
+                            IdRewriteFunction statisticsRewriter;
+                            if (type != null && (statisticsRewriter = getRewriter(type)) != null) {
+                                statisticId = statisticsRewriter.rewrite(statisticId);
+                            }
                         }
 
                         wrapper.write(Type.VAR_INT, categoryId);
-
-                        RegistryType type = getRegistryTypeForStatistic(categoryId);
-                        IdRewriteFunction statisticsRewriter;
-                        // Rewrite the block/item/entity id
-                        if (type != null && (statisticsRewriter = getRewriter(type)) != null) {
-                            wrapper.write(Type.VAR_INT, statisticsRewriter.rewrite(statisticId));
-                        } else {
-                            wrapper.write(Type.VAR_INT, statisticId);
-                        }
-
+                        wrapper.write(Type.VAR_INT, statisticId);
                         wrapper.write(Type.VAR_INT, value);
                     }
 

@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
+import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
@@ -143,6 +144,20 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
                     }
                 });
             }
+        });
+
+        new StatisticsRewriter(this, null, null, null, id -> {
+            int newId = id;
+            if (newId > 22) {
+                newId += 2;
+            }
+            if (newId > 25) {
+                newId += 3;
+            }
+            if (newId > 40) {
+                newId++;
+            }
+            return newId;
         });
     }
 

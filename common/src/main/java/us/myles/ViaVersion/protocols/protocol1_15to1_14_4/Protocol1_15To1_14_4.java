@@ -40,8 +40,8 @@ public class Protocol1_15To1_14_4 extends Protocol<ClientboundPackets1_14, Clien
         soundRewriter.registerSound(ClientboundPackets1_14.ENTITY_SOUND); // Entity Sound Effect (added somewhere in 1.14)
         soundRewriter.registerSound(ClientboundPackets1_14.SOUND);
 
-        new StatisticsRewriter(this, Protocol1_15To1_14_4::getNewBlockId,
-                InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId).register(ClientboundPackets1_14.STATISTICS);
+        new StatisticsRewriter(this, Protocol1_15To1_14_4::getNewBlockId, InventoryPackets::getNewItemId,
+                metadataRewriter::getNewEntityId, id -> MappingData.statisticsMappings.getNewId(id)).register(ClientboundPackets1_14.STATISTICS);
 
         registerIncoming(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override

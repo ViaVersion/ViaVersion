@@ -18,6 +18,7 @@ public class MappingData {
     public static Mappings blockStateMappings;
     public static Mappings blockMappings;
     public static Mappings soundMappings;
+    public static Mappings statisticsMappings;
     public static IntSet motionBlocking;
     public static IntSet nonFullBlocks;
 
@@ -31,6 +32,7 @@ public class MappingData {
         blockMappings = new Mappings(mapping1_13_2.getAsJsonObject("blocks"), mapping1_14.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_13_2.getAsJsonObject("items"), mapping1_14.getAsJsonObject("items"));
         soundMappings = new Mappings(mapping1_13_2.getAsJsonArray("sounds"), mapping1_14.getAsJsonArray("sounds"));
+        statisticsMappings = new Mappings(mapping1_13_2.getAsJsonArray("statistics"), mapping1_14.getAsJsonArray("statistics"));
 
         JsonObject blockStates = mapping1_14.getAsJsonObject("blockstates");
         Map<String, Integer> blockStateMap = new HashMap<>(blockStates.entrySet().size());

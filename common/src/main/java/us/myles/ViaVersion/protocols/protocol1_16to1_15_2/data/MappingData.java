@@ -14,6 +14,7 @@ public class MappingData {
     public static Mappings blockMappings;
     public static Mappings blockStateMappings;
     public static Mappings soundMappings;
+    public static Mappings statisticsMappings;
 
     public static void init() {
         Via.getPlatform().getLogger().info("Loading 1.15 -> 1.16 mappings...");
@@ -26,6 +27,7 @@ public class MappingData {
         blockMappings = new Mappings(mapping1_15.getAsJsonObject("blocks"), mapping1_16.getAsJsonObject("blocks"));
         MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_15.getAsJsonObject("items"), mapping1_16.getAsJsonObject("items"), diffmapping.getAsJsonObject("items"));
         soundMappings = new Mappings(mapping1_15.getAsJsonArray("sounds"), mapping1_16.getAsJsonArray("sounds"), diffmapping.getAsJsonObject("sounds"));
+        statisticsMappings = new Mappings(mapping1_15.getAsJsonArray("statistics"), mapping1_16.getAsJsonArray("statistics"));
 
         attributeMappings.put("generic.maxHealth", "minecraft:generic.max_health");
         attributeMappings.put("zombie.spawnReinforcements", "minecraft:zombie.spawn_reinforcements");

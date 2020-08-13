@@ -52,7 +52,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
         tagRewriter.register(ClientboundPackets1_15.TAGS);
 
         new StatisticsRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId,
-                metadataRewriter::getNewEntityId).register(ClientboundPackets1_15.STATISTICS);
+                metadataRewriter::getNewEntityId, id -> MappingData.statisticsMappings.getNewId(id)).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {

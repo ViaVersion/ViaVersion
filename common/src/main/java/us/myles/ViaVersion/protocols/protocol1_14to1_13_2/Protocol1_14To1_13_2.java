@@ -39,7 +39,7 @@ public class Protocol1_14To1_13_2 extends Protocol<ClientboundPackets1_13, Clien
 
         new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id)).registerSound(ClientboundPackets1_13.SOUND);
         new StatisticsRewriter(this, Protocol1_14To1_13_2::getNewBlockId,
-                InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId).register(ClientboundPackets1_13.STATISTICS);
+                InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId, id -> MappingData.statisticsMappings.getNewId(id)).register(ClientboundPackets1_13.STATISTICS);
 
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
         componentRewriter.registerChatMessage(ClientboundPackets1_13.CHAT_MESSAGE);
