@@ -3,19 +3,19 @@ package us.myles.ViaVersion.bukkit.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.bukkit.util.NMSUtil;
+import us.myles.ViaVersion.exception.CancelCodecException;
+import us.myles.ViaVersion.exception.CancelDecoderException;
+import us.myles.ViaVersion.exception.InformativeException;
+import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class BukkitDecodeHandler extends ByteToMessageDecoder {
-
     private final ByteToMessageDecoder minecraftDecoder;
     private final UserConnection info;
 
@@ -26,64 +26,42 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
-        // use transformers
-        if (bytebuf.readableBytes() > 0) {
-            // Ignore if pending disconnect
-            if (info.isPendingDisconnect()) {
-                return;
-            }
-            // Increment received
-            boolean second = info.incrementReceived();
-            // Check PPS
-            if (second) {
-                if (info.handlePPS())
-                    return;
+        if (!info.checkIncomingPacket()) {
+            bytebuf.clear(); // Don't accumulate
+            throw CancelDecoderException.generate(null);
+        }
+
+        ByteBuf transformedBuf = null;
+        try {
+            if (info.shouldTransformPacket()) {
+                transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+                info.transformIncoming(transformedBuf, CancelDecoderException::generate);
             }
 
-            if (info.isActive()) {
-                // Handle ID
-                int id = Type.VAR_INT.read(bytebuf);
-                // Transform
-                ByteBuf newPacket = ctx.alloc().buffer();
-                try {
-                    if (id == PacketWrapper.PASSTHROUGH_ID) {
-                        newPacket.writeBytes(bytebuf);
-                    } else {
-                        PacketWrapper wrapper = new PacketWrapper(id, bytebuf, info);
-                        ProtocolInfo protInfo = info.get(ProtocolInfo.class);
-                        protInfo.getPipeline().transform(Direction.INCOMING, protInfo.getState(), wrapper);
-                        wrapper.writeToBuffer(newPacket);
-                    }
-
-                    bytebuf.clear();
-                    bytebuf = newPacket;
-                } catch (Exception e) {
-                    // Clear Buffer
-                    bytebuf.clear();
-                    // Release Packet, be free!
-                    newPacket.release();
-                    throw e;
-                }
-            }
-
-            // call minecraft decoder
             try {
-                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, transformedBuf == null ? bytebuf : transformedBuf));
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
+                } else if (e.getCause() instanceof Error) {
+                    throw (Error) e.getCause();
                 }
-            } finally {
-                if (info.isActive()) {
-                    bytebuf.release();
-                }
+            }
+        } finally {
+            if (transformedBuf != null) {
+                transformedBuf.release();
             }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelException.class)) return;
+        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
+
         super.exceptionCaught(ctx, cause);
+        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)
+                && (info.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
+            cause.printStackTrace(); // Print if CB doesn't already do it
+        }
     }
 }

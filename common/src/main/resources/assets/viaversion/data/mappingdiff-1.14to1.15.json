@@ -1,0 +1,20 @@
+{
+  "blockstates": {
+    "11198": "minecraft:bell[attachment=floor,facing=north,powered=false]",
+    "11199": "minecraft:bell[attachment=floor,facing=south,powered=false]",
+    "11200": "minecraft:bell[attachment=floor,facing=west,powered=false]",
+    "11201": "minecraft:bell[attachment=floor,facing=east,powered=false]",
+    "11202": "minecraft:bell[attachment=ceiling,facing=north,powered=false]",
+    "11203": "minecraft:bell[attachment=ceiling,facing=south,powered=false]",
+    "11204": "minecraft:bell[attachment=ceiling,facing=west,powered=false]",
+    "11205": "minecraft:bell[attachment=ceiling,facing=east,powered=false]",
+    "11206": "minecraft:bell[attachment=single_wall,facing=north,powered=false]",
+    "11207": "minecraft:bell[attachment=single_wall,facing=south,powered=false]",
+    "11208": "minecraft:bell[attachment=single_wall,facing=west,powered=false]",
+    "11209": "minecraft:bell[attachment=single_wall,facing=east,powered=false]",
+    "11210": "minecraft:bell[attachment=double_wall,facing=north,powered=false]",
+    "11211": "minecraft:bell[attachment=double_wall,facing=south,powered=false]",
+    "11212": "minecraft:bell[attachment=double_wall,facing=west,powered=false]",
+    "11213": "minecraft:bell[attachment=double_wall,facing=east,powered=false]"
+  }
+}

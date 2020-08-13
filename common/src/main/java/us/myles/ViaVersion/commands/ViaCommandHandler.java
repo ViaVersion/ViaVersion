@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.commands;
 
 import com.google.common.base.Preconditions;
-import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -24,7 +23,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
     }
 
     @Override
-    public void registerSubCommand(@NonNull ViaSubCommand command) throws Exception {
+    public void registerSubCommand(ViaSubCommand command) throws Exception {
         Preconditions.checkArgument(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid sub-command name.");
         if (hasSubCommand(command.name()))
             throw new Exception("ViaSubCommand " + command.name() + " does already exists!"); //Maybe another exception later.
@@ -107,7 +106,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
      */
     public void showHelp(ViaCommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
-        if (allowed.size() == 0) {
+        if (allowed.isEmpty()) {
             sender.sendMessage(color("&cYou are not allowed to use these commands!"));
             return;
         }
@@ -163,7 +162,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
      * @param message The message
      * @param args    The objects to replace
      */
-    public static void sendMessage(@NonNull ViaCommandSender sender, String message, Object... args) {
+    public static void sendMessage(ViaCommandSender sender, String message, Object... args) {
         sender.sendMessage(color(args == null ? message : String.format(message, args)));
     }
 }

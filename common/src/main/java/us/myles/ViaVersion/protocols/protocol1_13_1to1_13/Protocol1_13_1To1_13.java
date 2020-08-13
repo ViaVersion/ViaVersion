@@ -8,23 +8,30 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol1_13_1To1_13 extends Protocol {
+public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
+
+    public Protocol1_13_1To1_13() {
+        super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
+    }
 
     @Override
     protected void registerPackets() {
+        new MetadataRewriter1_13_1To1_13(this);
+
         EntityPackets.register(this);
         InventoryPackets.register(this);
         WorldPackets.register(this);
 
-        //Tab complete
-        registerIncoming(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -38,8 +45,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        //Edit Book
-        registerIncoming(State.PLAY, 0x0B, 0x0B, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLAT_ITEM);
@@ -63,8 +69,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Tab complete
-        registerOutgoing(State.PLAY, 0x10, 0x10, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Transaction id
@@ -90,24 +95,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Set cooldown
-        registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Item
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0,
-                                InventoryPackets.getNewItemId(wrapper.get(Type.VAR_INT, 0))
-                        );
-                    }
-                });
-            }
-        });
-
-        // Boss bar
-        registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.BOSSBAR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UUID);
@@ -117,7 +105,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action == 0) {
-                            wrapper.passthrough(Type.STRING);
+                            wrapper.passthrough(Type.COMPONENT);
                             wrapper.passthrough(Type.FLOAT);
                             wrapper.passthrough(Type.VAR_INT);
                             wrapper.passthrough(Type.VAR_INT);
@@ -130,52 +118,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
             }
         });
 
-        // Advancements
-        registerOutgoing(State.PLAY, 0x51, 0x51, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-                        int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
-
-                        for (int i = 0; i < size; i++) {
-                            wrapper.passthrough(Type.STRING); // Identifier
-
-                            // Parent
-                            if (wrapper.passthrough(Type.BOOLEAN))
-                                wrapper.passthrough(Type.STRING);
-
-                            // Display data
-                            if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.STRING); // Title
-                                wrapper.passthrough(Type.STRING); // Description
-                                Item icon = wrapper.passthrough(Type.FLAT_ITEM);
-                                InventoryPackets.toClient(icon);
-                                wrapper.passthrough(Type.VAR_INT); // Frame type
-                                int flags = wrapper.passthrough(Type.INT); // Flags
-                                if ((flags & 1) != 0)
-                                    wrapper.passthrough(Type.STRING); // Background texture
-                                wrapper.passthrough(Type.FLOAT); // X
-                                wrapper.passthrough(Type.FLOAT); // Y
-                            }
-
-                            wrapper.passthrough(Type.STRING_ARRAY); // Criteria
-
-                            int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                            for (int array = 0; array < arrayLength; array++) {
-                                wrapper.passthrough(Type.STRING_ARRAY); // String array
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-
-        //Tags
-        registerOutgoing(State.PLAY, 0x55, 0x55, new PacketRemapper() {
+        registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -184,7 +127,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
                         int blockTagsSize = wrapper.passthrough(Type.VAR_INT); // block tags
                         for (int i = 0; i < blockTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < blocks.length; j++) {
                                 blocks[j] = getNewBlockId(blocks[j]);
                             }
@@ -192,7 +135,7 @@ public class Protocol1_13_1To1_13 extends Protocol {
                         int itemTagsSize = wrapper.passthrough(Type.VAR_INT); // item tags
                         for (int i = 0; i < itemTagsSize; i++) {
                             wrapper.passthrough(Type.STRING);
-                            Integer[] items = wrapper.passthrough(Type.VAR_INT_ARRAY);
+                            int[] items = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < items.length; j++) {
                                 items[j] = InventoryPackets.getNewItemId(items[j]);
                             }
@@ -205,9 +148,10 @@ public class Protocol1_13_1To1_13 extends Protocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker(userConnection));
-        if (!userConnection.has(ClientWorld.class))
+        userConnection.put(new EntityTracker1_13(userConnection));
+        if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
     }
 
 

@@ -5,55 +5,24 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.ItemRewriter;
+import us.myles.ViaVersion.api.rewriters.RecipeRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {
+        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        /*
-            Outgoing packets
-         */
+        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_ITEM);
+        itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_ITEM_ARRAY);
+        itemRewriter.registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_ITEM);
 
-        // Set slot packet
-        protocol.registerOutgoing(State.PLAY, 0x17, 0x17, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.FLAT_ITEM, Type.FLAT_ITEM); // 2 - Slot Value
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.FLAT_ITEM, 0);
-                        toClient(stack);
-                    }
-                });
-            }
-        });
-
-        // Window items packet
-        protocol.registerOutgoing(State.PLAY, 0x15, 0x15, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.FLAT_ITEM_ARRAY, Type.FLAT_ITEM_ARRAY); // 1 - Window Values
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item[] stacks = wrapper.get(Type.FLAT_ITEM_ARRAY, 0);
-                        for (Item stack : stacks)
-                            toClient(stack);
-                    }
-                });
-            }
-        });
-
-        // Plugin message
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -87,117 +56,26 @@ public class InventoryPackets {
             }
         });
 
-        // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x42, new PacketRemapper() {
+        itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
+
+        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol, InventoryPackets::toClient);
+        protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.VAR_INT); // 1 - Slot ID
-                map(Type.FLAT_ITEM, Type.FLAT_ITEM); // 2 - Item
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.FLAT_ITEM, 0);
-                        toClient(stack);
+                handler(wrapper -> {
+                    int size = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < size; i++) {
+                        // First id, then type
+                        String id = wrapper.passthrough(Type.STRING);
+                        String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
+                        recipeRewriter.handle(wrapper, type);
                     }
                 });
             }
         });
 
-        // Declare Recipes
-        protocol.registerOutgoing(State.PLAY, 0x54, 0x54, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int recipesNo = wrapper.passthrough(Type.VAR_INT);
-                        for (int i = 0; i < recipesNo; i++) {
-                            wrapper.passthrough(Type.STRING); // Id
-                            String type = wrapper.passthrough(Type.STRING);
-                            if (type.equals("crafting_shapeless")) {
-                                wrapper.passthrough(Type.STRING); // Group
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT);
-                                for (int i1 = 0; i1 < ingredientsNo; i1++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                    for (int i2 = 0; i2 < items.length; i2++) {
-                                        InventoryPackets.toClient(items[i2]);
-                                    }
-                                }
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
-                            } else if (type.equals("crafting_shaped")) {
-                                int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
-                                wrapper.passthrough(Type.STRING); // Group
-                                for (int i1 = 0; i1 < ingredientsNo; i1++) {
-                                    Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                    for (int i2 = 0; i2 < items.length; i2++) {
-                                        InventoryPackets.toClient(items[i2]);
-                                    }
-                                }
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM)); // Result
-                            } else if (type.equals("smelting")) {
-                                wrapper.passthrough(Type.STRING); // Group
-                                // Ingredient start
-                                Item[] items = wrapper.passthrough(Type.FLAT_ITEM_ARRAY_VAR_INT);
-                                for (int i2 = 0; i2 < items.length; i2++) {
-                                    InventoryPackets.toClient(items[i2]);
-                                }
-                                // Ingredient end
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
-                                wrapper.passthrough(Type.FLOAT); // EXP
-                                wrapper.passthrough(Type.VAR_INT); // Cooking time
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-
-        /*
-            Incoming packets
-         */
-
-        // Click window packet
-        protocol.registerIncoming(State.PLAY, 0x08, 0x08, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                        map(Type.SHORT); // 1 - Slot
-                        map(Type.BYTE); // 2 - Button
-                        map(Type.SHORT); // 3 - Action number
-                        map(Type.VAR_INT); // 4 - Mode
-                        map(Type.FLAT_ITEM, Type.FLAT_ITEM); // 5 - Clicked Item
-
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.FLAT_ITEM, 0);
-                                toServer(item);
-                            }
-                        });
-                    }
-                }
-        );
-
-        // Creative Inventory Action
-        protocol.registerIncoming(State.PLAY, 0x24, 0x24, new PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.SHORT); // 0 - Slot
-                        map(Type.FLAT_ITEM, Type.FLAT_ITEM); // 1 - Clicked Item
-
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.FLAT_ITEM, 0);
-                                toServer(item);
-                            }
-                        });
-                    }
-                }
-        );
+        itemRewriter.registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW, Type.FLAT_ITEM);
+        itemRewriter.registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, Type.FLAT_ITEM);
     }
 
     public static void toClient(Item item) {

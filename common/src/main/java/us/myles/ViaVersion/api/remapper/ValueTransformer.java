@@ -1,14 +1,21 @@
 package us.myles.ViaVersion.api.remapper;
 
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.InformativeException;
 
 public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
+    private final Type<T1> inputType;
     private final Type<T2> outputType;
 
-    public ValueTransformer(Type<T2> outputType) {
+    public ValueTransformer(@Nullable Type<T1> inputType, Type<T2> outputType) {
+        this.inputType = inputType;
         this.outputType = outputType;
+    }
+
+    public ValueTransformer(Type<T2> outputType) {
+        this(null, outputType);
     }
 
     /**
@@ -29,5 +36,14 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
             e.addSource(this.getClass());
             throw e;
         }
+    }
+
+    @Nullable
+    public Type<T1> getInputType() {
+        return inputType;
+    }
+
+    public Type<T2> getOutputType() {
+        return outputType;
     }
 }

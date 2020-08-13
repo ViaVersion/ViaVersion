@@ -51,7 +51,7 @@ public class HandItemCache implements Runnable {
     }
 
     public static Item convert(ItemStack itemInHand) {
-        if (itemInHand == null) return new Item((short) 0, (byte) 0, (short) 0, null);
+        if (itemInHand == null) return new Item(0, (byte) 0, (short) 0, null);
         if (GET_DAMAGE == null) {
             try {
                 GET_DAMAGE = itemInHand.getClass().getDeclaredField("field_77991_e");
@@ -70,20 +70,24 @@ public class HandItemCache implements Runnable {
             }
         }
         int id = 0;
-        try {
-            id = (int) GET_ID.invoke(null, itemInHand.getItem());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        if (GET_ID != null) {
+            try {
+                id = (int) GET_ID.invoke(null, itemInHand.getItem());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
         int damage = 0;
-        try {
-            damage = (int) GET_DAMAGE.get(itemInHand);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        if (GET_DAMAGE != null) {
+            try {
+                damage = (int) GET_DAMAGE.get(itemInHand);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
-        return new Item((short) id, (byte) itemInHand.getQuantity(), (short) damage, null);
+        return new Item(id, (byte) itemInHand.getQuantity(), (short) damage, null);
     }
 }
 

@@ -2,7 +2,6 @@ sudo: false
 
 language: java
 jdk:
-  - oraclejdk8
   - openjdk11
 
 cache:
@@ -12,3 +11,5 @@ cache:
 script:
 - mvn dependency:purge-local-repository -DactTransitively=false -DreResolve=false
 - mvn clean install -B -U
+
+install: true

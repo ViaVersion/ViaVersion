@@ -1,21 +1,43 @@
 package us.myles.ViaVersion.velocity.providers;
 
+import com.velocitypowered.api.proxy.ServerConnection;
+import io.netty.channel.ChannelHandler;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
+import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class VelocityVersionProvider extends VersionProvider {
+    private static Method getAssociation;
+
+    static {
+        try {
+            getAssociation = Class.forName("com.velocitypowered.proxy.connection.MinecraftConnection").getMethod("getAssociation");
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public int getServerProtocol(UserConnection user) throws Exception {
-        int playerVersion = user.get(ProtocolInfo.class).getProtocolVersion();
+        return user.isClientSide() ? getBackProtocol(user) : getFrontProtocol(user);
+    }
+
+    private int getBackProtocol(UserConnection user) throws Exception {
+        ChannelHandler mcHandler = user.getChannel().pipeline().get("handler");
+        return ProtocolDetectorService.getProtocolId(
+                ((ServerConnection) getAssociation.invoke(mcHandler)).getServerInfo().getName());
+    }
+
+    private int getFrontProtocol(UserConnection user) throws Exception {
+        int playerVersion = user.getProtocolInfo().getProtocolVersion();
 
         IntStream versions = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()
                 .mapToInt(com.velocitypowered.api.network.ProtocolVersion::getProtocol);

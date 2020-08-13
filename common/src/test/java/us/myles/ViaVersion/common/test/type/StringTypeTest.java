@@ -35,7 +35,7 @@ public class StringTypeTest {
     public void testStringReadOverflowException() throws Exception {
         // Read exception
         final ByteBuf buf = Unpooled.buffer();
-        Type.VAR_INT.write(buf, (Short.MAX_VALUE + 1) * 4);
+        Type.VAR_INT.writePrimitive(buf, (Short.MAX_VALUE + 1) * 4);
         for (int i = 0; i < Short.MAX_VALUE / 2 + 1; i++) {
             buf.writeBytes(new byte[]{0x04, (byte) 0xf0, (byte) 0x9f, (byte) 0xa7, (byte) 0xbd}); // Sponge emoji
         }

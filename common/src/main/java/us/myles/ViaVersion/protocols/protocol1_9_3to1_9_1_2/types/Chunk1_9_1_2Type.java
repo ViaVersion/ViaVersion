@@ -11,7 +11,6 @@ import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
@@ -26,15 +25,16 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
     @Override
     public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
-        boolean replacePistons = world.getUser().get(ProtocolInfo.class).getPipeline().contains(Protocol1_10To1_9_3_4.class) && Via.getConfig().isReplacePistons();
+        boolean replacePistons = world.getUser().getProtocolInfo().getPipeline().contains(Protocol1_10To1_9_3_4.class) && Via.getConfig().isReplacePistons();
         int replacementId = Via.getConfig().getPistonReplacementId();
 
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
         boolean groundUp = input.readBoolean();
-        int primaryBitmask = Type.VAR_INT.read(input);
-        int size = Type.VAR_INT.read(input);
+        int primaryBitmask = Type.VAR_INT.readPrimitive(input);
+        // Size (unused)
+        Type.VAR_INT.readPrimitive(input);
 
         BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
@@ -66,7 +66,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, groundUp, primaryBitmask, sections, biomeData, new ArrayList<CompoundTag>());
+        return new BaseChunk(chunkX, chunkZ, groundUp, false, primaryBitmask, sections, biomeData, new ArrayList<CompoundTag>());
     }
 
     @Override
@@ -74,8 +74,8 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
-        output.writeBoolean(chunk.isGroundUp());
-        Type.VAR_INT.write(output, chunk.getBitmask());
+        output.writeBoolean(chunk.isFullChunk());
+        Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
 
         ByteBuf buf = output.alloc().buffer();
         try {
@@ -90,7 +90,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
             }
             buf.readerIndex(0);
-            Type.VAR_INT.write(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
+            Type.VAR_INT.writePrimitive(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
             output.writeBytes(buf);
         } finally {
             buf.release(); // release buffer

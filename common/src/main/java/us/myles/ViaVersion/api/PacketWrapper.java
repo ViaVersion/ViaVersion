@@ -3,8 +3,6 @@ package us.myles.ViaVersion.api;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
@@ -14,7 +12,6 @@ import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
@@ -22,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class PacketWrapper {
     public static final int PASSTHROUGH_ID = 1000;
@@ -29,8 +27,6 @@ public class PacketWrapper {
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
-    @Setter
-    @Getter
     private int id = -1;
     private final LinkedList<Pair<Type, Object>> readableObjects = new LinkedList<>();
     private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
@@ -48,7 +44,7 @@ public class PacketWrapper {
      * @param <T>   The return type of the type you wish to get.
      * @param index The index of the part (relative to the type)
      * @return The requested type or throws ArrayIndexOutOfBounds
-     * @throws Exception If it fails to find it, an exception will be thrown.
+     * @throws InformativeException If it fails to find it, an exception will be thrown.
      */
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
@@ -113,7 +109,7 @@ public class PacketWrapper {
      * @param <T>   The return type of the type you wish to set.
      * @param index The index of the part (relative to the type)
      * @param value The value of the part you wish to set it to.
-     * @throws Exception If it fails to set it, an exception will be thrown.
+     * @throws InformativeException If it fails to set it, an exception will be thrown.
      */
     public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
@@ -136,7 +132,7 @@ public class PacketWrapper {
      * @param type The type you wish to read
      * @param <T>  The return type of the type you wish to read.
      * @return The requested type
-     * @throws Exception If it fails to read
+     * @throws InformativeException If it fails to read
      */
     public <T> T read(Type<T> type) throws Exception {
         if (type == Type.NOTHING) return null;
@@ -218,13 +214,13 @@ public class PacketWrapper {
      * Write the current output to a buffer.
      *
      * @param buffer The buffer to write to.
-     * @throws Exception Throws an exception if it fails to write a value.
+     * @throws InformativeException Throws an exception if it fails to write a value.
      */
     public void writeToBuffer(ByteBuf buffer) throws Exception {
         if (id != -1) {
-            Type.VAR_INT.write(buffer, id);
+            Type.VAR_INT.writePrimitive(buffer, id);
         }
-        if (readableObjects.size() > 0) {
+        if (!readableObjects.isEmpty()) {
             packetValues.addAll(readableObjects);
             readableObjects.clear();
         }
@@ -256,8 +252,9 @@ public class PacketWrapper {
      * Clear the input buffer / readable objects
      */
     public void clearInputBuffer() {
-        if (inputBuffer != null)
+        if (inputBuffer != null) {
             inputBuffer.clear();
+        }
         readableObjects.clear(); // :(
     }
 
@@ -321,24 +318,25 @@ public class PacketWrapper {
      */
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
         // Apply current pipeline
-        List<Protocol> protocols = new ArrayList<>(user().get(ProtocolInfo.class).getPipeline().pipes());
+        List<Protocol> protocols = new ArrayList<>(user().getProtocolInfo().getPipeline().pipes());
         if (direction == Direction.OUTGOING) {
             // Other way if outgoing
             Collections.reverse(protocols);
         }
-        int index = 0;
+        int index = -1;
         for (int i = 0; i < protocols.size(); i++) {
             if (protocols.get(i).getClass().equals(packetProtocol)) {
                 index = skipCurrentPipeline ? (i + 1) : (i);
                 break;
             }
         }
+        if (index == -1) throw new NoSuchElementException(packetProtocol.getCanonicalName());
 
         // Reset reader before we start
         resetReader();
 
         // Apply other protocols
-        apply(direction, user().get(ProtocolInfo.class).getState(), index, protocols);
+        apply(direction, user().getProtocolInfo().getState(), index, protocols);
         // Send
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
@@ -523,6 +521,13 @@ public class PacketWrapper {
         sendToServer(packetProtocol, true);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {

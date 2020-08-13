@@ -1,7 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -9,13 +8,12 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockEntity {
-    @Getter
-    private static final Map<String, Integer> types = new ConcurrentHashMap<>();
+    private static final Map<String, Integer> types = new HashMap<>();
 
     static {
         types.put("MobSpawner", 1);
@@ -47,7 +45,7 @@ public class BlockEntity {
                 int y = (int) tag.get("y").getValue();
                 int z = (int) tag.get("z").getValue();
 
-                Position pos = new Position((long) x, (long) y, (long) z);
+                Position pos = new Position(x, (short) y, z);
 
                 updateBlockEntity(pos, (short) newId, tag, connection);
             } catch (Exception e) {

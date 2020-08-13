@@ -2,6 +2,8 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.reflect.TypeToken;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.IOException;
@@ -11,51 +13,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockIdData {
+    public static final String[] PREVIOUS = new String[0];
     public static Map<String, String[]> blockIdMapping;
     public static Map<String, String[]> fallbackReverseMapping;
-    public static Map<Integer, String> numberIdToString;
+    public static Int2ObjectMap<String> numberIdToString;
 
     public static void init() {
         InputStream stream = MappingData.class.getClassLoader()
                 .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
-        InputStreamReader reader = new InputStreamReader(stream);
-        try {
-            blockIdMapping = new HashMap<>((Map<String, String[]>) GsonUtil.getGson().fromJson(
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            Map<String, String[]> map = GsonUtil.getGson().fromJson(
                     reader,
                     new TypeToken<Map<String, String[]>>() {
-                    }.getType()
-            ));
+                    }.getType());
+            blockIdMapping = new HashMap<>(map);
             fallbackReverseMapping = new HashMap<>();
             for (Map.Entry<String, String[]> entry : blockIdMapping.entrySet()) {
                 for (String val : entry.getValue()) {
                     String[] previous = fallbackReverseMapping.get(val);
-                    if (previous == null) previous = new String[0];
+                    if (previous == null) previous = PREVIOUS;
                     fallbackReverseMapping.put(val, ObjectArrays.concat(previous, entry.getKey()));
                 }
             }
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ignored) {
-                // Ignored
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         InputStream blockS = MappingData.class.getClassLoader()
                 .getResourceAsStream("assets/viaversion/data/blockNumberToString1.12.json");
-        InputStreamReader blockR = new InputStreamReader(blockS);
-        try {
-            numberIdToString = new HashMap<>((Map<Integer, String>) GsonUtil.getGson().fromJson(
+        try (InputStreamReader blockR = new InputStreamReader(blockS)) {
+            Map<Integer, String> map = GsonUtil.getGson().fromJson(
                     blockR,
                     new TypeToken<Map<Integer, String>>() {
                     }.getType()
-            ));
-        } finally {
-            try {
-                blockR.close();
-            } catch (IOException ignored) {
-                // Ignored
-            }
+            );
+            numberIdToString = new Int2ObjectOpenHashMap<>(map);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        // Ignored
     }
 }

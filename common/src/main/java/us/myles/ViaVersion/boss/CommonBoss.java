@@ -1,9 +1,6 @@
 package us.myles.ViaVersion.boss;
 
 import com.google.common.base.Preconditions;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.boss.BossBar;
@@ -11,22 +8,21 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossFlag;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Getter
 public abstract class CommonBoss<T> extends BossBar<T> {
-    private UUID uuid;
+    private final UUID uuid;
+    private final Set<UserConnection> connections;
+    private final Set<BossFlag> flags;
     private String title;
     private float health;
     private BossColor color;
     private BossStyle style;
-    private Set<UUID> players;
     private boolean visible;
-    private Set<BossFlag> flags;
 
     public CommonBoss(String title, float health, BossColor color, BossStyle style) {
         Preconditions.checkNotNull(title, "Title cannot be null");
@@ -37,13 +33,14 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         this.health = health;
         this.color = color == null ? BossColor.PURPLE : color;
         this.style = style == null ? BossStyle.SOLID : style;
-        this.players = new HashSet<>();
+        this.connections = Collections.newSetFromMap(new WeakHashMap<>());
         this.flags = new HashSet<>();
         visible = true;
     }
 
     @Override
-    public BossBar setTitle(@NonNull String title) {
+    public BossBar setTitle(String title) {
+        Preconditions.checkNotNull(title);
         this.title = title;
         sendPacket(CommonBoss.UpdateAction.UPDATE_TITLE);
         return this;
@@ -63,14 +60,16 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     @Override
-    public BossBar setColor(@NonNull BossColor color) {
+    public BossBar setColor(BossColor color) {
+        Preconditions.checkNotNull(color);
         this.color = color;
         sendPacket(CommonBoss.UpdateAction.UPDATE_STYLE);
         return this;
     }
 
     @Override
-    public BossBar setStyle(@NonNull BossStyle style) {
+    public BossBar setStyle(BossStyle style) {
+        Preconditions.checkNotNull(style);
         this.style = style;
         sendPacket(CommonBoss.UpdateAction.UPDATE_STYLE);
         return this;
@@ -78,28 +77,33 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public BossBar addPlayer(UUID player) {
-        if (!players.contains(player)) {
-            players.add(player);
-            if (visible) {
-                UserConnection user = Via.getManager().getConnection(player);
-                sendPacket(player, getPacket(CommonBoss.UpdateAction.ADD, user));
-            }
+        return addConnection(Via.getManager().getConnection(player));
+    }
+
+    @Override
+    public BossBar addConnection(UserConnection conn) {
+        if (connections.add(conn) && visible) {
+            sendPacketConnection(conn, getPacket(CommonBoss.UpdateAction.ADD, conn));
         }
         return this;
     }
 
     @Override
     public BossBar removePlayer(UUID uuid) {
-        if (players.contains(uuid)) {
-            players.remove(uuid);
-            UserConnection user = Via.getManager().getConnection(uuid);
-            sendPacket(uuid, getPacket(UpdateAction.REMOVE, user));
+        return removeConnection(Via.getManager().getConnection(uuid));
+    }
+
+    @Override
+    public BossBar removeConnection(UserConnection conn) {
+        if (connections.remove(conn)) {
+            sendPacketConnection(conn, getPacket(UpdateAction.REMOVE, conn));
         }
         return this;
     }
 
     @Override
-    public BossBar addFlag(@NonNull BossFlag flag) {
+    public BossBar addFlag(BossFlag flag) {
+        Preconditions.checkNotNull(flag);
         if (!hasFlag(flag))
             flags.add(flag);
         sendPacket(CommonBoss.UpdateAction.UPDATE_FLAGS);
@@ -107,7 +111,8 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     @Override
-    public BossBar removeFlag(@NonNull BossFlag flag) {
+    public BossBar removeFlag(BossFlag flag) {
+        Preconditions.checkNotNull(flag);
         if (hasFlag(flag))
             flags.remove(flag);
         sendPacket(CommonBoss.UpdateAction.UPDATE_FLAGS);
@@ -115,13 +120,20 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     }
 
     @Override
-    public boolean hasFlag(@NonNull BossFlag flag) {
+    public boolean hasFlag(BossFlag flag) {
+        Preconditions.checkNotNull(flag);
         return flags.contains(flag);
     }
 
     @Override
     public Set<UUID> getPlayers() {
-        return Collections.unmodifiableSet(players);
+        return connections.stream().map(conn -> Via.getManager().getConnectedClientId(conn)).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<UserConnection> getConnections() {
+        return Collections.unmodifiableSet(connections);
     }
 
     @Override
@@ -141,11 +153,6 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         return visible;
     }
 
-    @Override
-    public UUID getId() {
-        return uuid;
-    }
-
     private void setVisible(boolean value) {
         if (visible != value) {
             visible = value;
@@ -153,17 +160,44 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         }
     }
 
+    @Override
+    public UUID getId() {
+        return uuid;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public float getHealth() {
+        return health;
+    }
+
+    @Override
+    public BossStyle getStyle() {
+        return style;
+    }
+
+    public Set<BossFlag> getFlags() {
+        return flags;
+    }
+
     private void sendPacket(UpdateAction action) {
-        for (UUID uuid : new ArrayList<>(players)) {
-            UserConnection connection = Via.getManager().getConnection(uuid);
-            PacketWrapper wrapper = getPacket(action, connection);
-            sendPacket(uuid, wrapper);
+        for (UserConnection conn : new ArrayList<>(connections)) {
+            PacketWrapper wrapper = getPacket(action, conn);
+            sendPacketConnection(conn, wrapper);
         }
     }
 
-    private void sendPacket(UUID uuid, PacketWrapper wrapper) {
-        if (!Via.getAPI().isPorted(uuid) || !(Via.getAPI().getPlayerVersion(uuid) >= ProtocolVersion.v1_9.getId())) {
-            players.remove(uuid);
+    private void sendPacketConnection(UserConnection conn, PacketWrapper wrapper) {
+        if (conn.getProtocolInfo() == null || !conn.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
+            connections.remove(conn);
             return;
         }
         try {
@@ -217,9 +251,8 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         return bitmask;
     }
 
-    @RequiredArgsConstructor
-    @Getter
     private enum UpdateAction {
+
         ADD(0),
         REMOVE(1),
         UPDATE_HEALTH(2),
@@ -228,5 +261,13 @@ public abstract class CommonBoss<T> extends BossBar<T> {
         UPDATE_FLAGS(5);
 
         private final int id;
+
+        UpdateAction(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
     }
 }

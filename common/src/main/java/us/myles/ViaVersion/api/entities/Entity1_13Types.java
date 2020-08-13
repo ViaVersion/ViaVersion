@@ -1,46 +1,42 @@
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Optional;
 
 // TODO auto generate 18w11a with PAaaS
 public class Entity1_13Types {
+
     public static EntityType getTypeFromId(int typeID, boolean isObject) {
         Optional<EntityType> type;
 
         if (isObject)
-            type = ObjectTypes.getPCEntity(typeID);
+            type = ObjectType.getPCEntity(typeID);
         else
             type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID + " isObject=" + isObject);
+            Via.getPlatform().getLogger().severe("Could not find 1.13 type id " + typeID + " isObject=" + isObject);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
         return type.get();
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum EntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         // Auto generated
 
         ENTITY(-1), // abm
 
         AREA_EFFECT_CLOUD(0, ENTITY), // abk
-        ENDER_CRYSTAL(16, ENTITY), // aho
-        EVOCATION_FANGS(20, ENTITY), // ala
-        XP_ORB(22, ENTITY), // abs
-        EYE_OF_ENDER_SIGNAL(23, ENTITY), // alb
+        END_CRYSTAL(16, ENTITY), // aho
+        EVOKER_FANGS(20, ENTITY), // ala
+        EXPERIENCE_ORB(22, ENTITY), // abs
+        EYE_OF_ENDER(23, ENTITY), // alb
         FALLING_BLOCK(24, ENTITY), // aix
-        FIREWORKS_ROCKET(25, ENTITY), // alc
+        FIREWORK_ROCKET(25, ENTITY), // alc
         ITEM(32, ENTITY), // aiy
         LLAMA_SPIT(37, ENTITY), // ale
         TNT(55, ENTITY), // aiz
@@ -77,7 +73,6 @@ public class Entity1_13Types {
         ABSTRACT_PARROT(-1, ABSTRACT_TAMEABLE_ANIMAL), // agr
         PARROT(50, ABSTRACT_PARROT), // agk
 
-
         // Horses
         ABSTRACT_HORSE(-1, ABSTRACT_ANIMAL), // aha
         CHESTED_HORSE(-1, ABSTRACT_HORSE), // agz
@@ -90,17 +85,16 @@ public class Entity1_13Types {
 
         // Golem
         ABSTRACT_GOLEM(-1, ABSTRACT_CREATURE), // agc
-        SNOWMAN(66, ABSTRACT_GOLEM), // ags
-        VILLAGER_GOLEM(80, ABSTRACT_GOLEM), // agw
+        SNOW_GOLEM(66, ABSTRACT_GOLEM), // ags
+        IRON_GOLEM(80, ABSTRACT_GOLEM), // agw
         SHULKER(59, ABSTRACT_GOLEM), // ajx
 
         // Fish
         ABSTRACT_FISHES(-1, ABSTRACT_CREATURE), // agb
-        COD_MOB(8, ABSTRACT_FISHES), // agf
-        PUFFER_FISH(52, ABSTRACT_FISHES), // agn
-        SALMON_MOB(57, ABSTRACT_FISHES), // agp
+        COD(8, ABSTRACT_FISHES), // agf
+        PUFFERFISH(52, ABSTRACT_FISHES), // agn
+        SALMON(57, ABSTRACT_FISHES), // agp
         TROPICAL_FISH(72, ABSTRACT_FISHES), // agu
-
 
         // Monsters
         ABSTRACT_MONSTER(-1, ABSTRACT_CREATURE), // ajs
@@ -117,9 +111,9 @@ public class Entity1_13Types {
         // Illagers
         ABSTRACT_ILLAGER_BASE(-1, ABSTRACT_MONSTER), // ajb
         ABSTRACT_EVO_ILLU_ILLAGER(-1, ABSTRACT_ILLAGER_BASE), // akb
-        EVOCATION_ILLAGER(21, ABSTRACT_EVO_ILLU_ILLAGER), // ajl
-        ILLUSION_ILLAGER(31, ABSTRACT_EVO_ILLU_ILLAGER), // ajq
-        VINDICATION_ILLAGER(81, ABSTRACT_ILLAGER_BASE), // akf
+        EVOKER(21, ABSTRACT_EVO_ILLU_ILLAGER), // ajl
+        ILLUSIONER(31, ABSTRACT_EVO_ILLU_ILLAGER), // ajq
+        VINDICATOR(81, ABSTRACT_ILLAGER_BASE), // akf
 
         // Skeletons
         ABSTRACT_SKELETON(-1, ABSTRACT_MONSTER), // ajc
@@ -152,6 +146,7 @@ public class Entity1_13Types {
 
         ABSTRACT_WATERMOB(-1, ABSTRACT_INSENTIENT), // agx
         SQUID(70, ABSTRACT_WATERMOB), // agt
+        DOLPHIN(12, ABSTRACT_WATERMOB),
 
         // Slimes
         SLIME(64, ABSTRACT_INSENTIENT), // aka
@@ -185,7 +180,7 @@ public class Entity1_13Types {
         ENDER_PEARL(75, PROJECTILE_ABSTRACT), // aln
         EGG(74, PROJECTILE_ABSTRACT), // alm
         POTION(77, PROJECTILE_ABSTRACT), // alp
-        XP_BOTTLE(76, PROJECTILE_ABSTRACT), // alo
+        EXPERIENCE_BOTTLE(76, PROJECTILE_ABSTRACT), // alo
 
         // Vehicles
         MINECART_ABSTRACT(-1, ENTITY), // alt
@@ -194,7 +189,7 @@ public class Entity1_13Types {
         HOPPER_MINECART(43, CHESTED_MINECART_ABSTRACT), // ama
         MINECART(39, MINECART_ABSTRACT), // alw
         FURNACE_MINECART(42, MINECART_ABSTRACT), // alz
-        COMMANDBLOCK_MINECART(41, MINECART_ABSTRACT), // aly
+        COMMAND_BLOCK_MINECART(41, MINECART_ABSTRACT), // aly
         TNT_MINECART(45, MINECART_ABSTRACT), // amc
         SPAWNER_MINECART(44, MINECART_ABSTRACT), // amb
         BOAT(5, ENTITY); // alv
@@ -209,6 +204,21 @@ public class Entity1_13Types {
             this.parent = null;
         }
 
+        EntityType(int id, EntityType parent) {
+            this.id = id;
+            this.parent = parent;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getParent() {
+            return parent;
+        }
+
         static {
             for (EntityType type : EntityType.values()) {
                 TYPES.put(type.id, type);
@@ -217,44 +227,18 @@ public class Entity1_13Types {
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
-        }
-
-        public boolean is(EntityType... types) {
-            for (EntityType type : types)
-                if (is(type))
-                    return true;
-            return false;
-        }
-
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
-        public boolean isOrHasParent(EntityType type) {
-            EntityType parent = this;
-
-            do {
-                if (parent.equals(type))
-                    return true;
-
-                parent = parent.getParent();
-            } while (parent != null);
-
-            return false;
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum ObjectTypes {
+    public enum ObjectType implements us.myles.ViaVersion.api.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
         MINECART(10, EntityType.MINECART),
         TNT_PRIMED(50, EntityType.TNT),
-        ENDER_CRYSTAL(51, EntityType.ENDER_CRYSTAL),
+        ENDER_CRYSTAL(51, EntityType.END_CRYSTAL),
         TIPPED_ARROW(60, EntityType.ARROW),
         SNOWBALL(61, EntityType.SNOWBALL),
         EGG(62, EntityType.EGG),
@@ -263,44 +247,65 @@ public class Entity1_13Types {
         ENDER_PEARL(65, EntityType.ENDER_PEARL),
         WITHER_SKULL(66, EntityType.WITHER_SKULL),
         SHULKER_BULLET(67, EntityType.SHULKER_BULLET),
-        LIAMA_SPIT(68, EntityType.LLAMA_SPIT),
+        LLAMA_SPIT(68, EntityType.LLAMA_SPIT),
         FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
         ITEM_FRAME(71, EntityType.ITEM_FRAME),
-        ENDER_SIGNAL(72, EntityType.EYE_OF_ENDER_SIGNAL),
+        EYE_OF_ENDER(72, EntityType.EYE_OF_ENDER),
         POTION(73, EntityType.POTION),
-        THROWN_EXP_BOTTLE(75, EntityType.XP_BOTTLE),
-        FIREWORK(76, EntityType.FIREWORKS_ROCKET),
+        EXPERIENCE_BOTTLE(75, EntityType.EXPERIENCE_BOTTLE),
+        FIREWORK_ROCKET(76, EntityType.FIREWORK_ROCKET),
         LEASH(77, EntityType.LEASH_KNOT),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        EVOCATION_FANGS(79, EntityType.EVOCATION_FANGS),
+        EVOKER_FANGS(79, EntityType.EVOKER_FANGS),
         FISHIHNG_HOOK(90, EntityType.FISHING_BOBBER),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL),
         TRIDENT(94, EntityType.TRIDENT);
 
-        private static final Map<Integer, ObjectTypes> TYPES = new HashMap<>();
+        private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
 
         private final int id;
         private final EntityType type;
 
         static {
-            for (ObjectTypes type : ObjectTypes.values()) {
+            for (ObjectType type : ObjectType.values()) {
                 TYPES.put(type.id, type);
             }
         }
 
-        public static Optional<ObjectTypes> findById(int id) {
+        ObjectType(int id, EntityType type) {
+            this.id = id;
+            this.type = type;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getType() {
+            return type;
+        }
+
+        public static Optional<ObjectType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
-            Optional<ObjectTypes> output = findById(id);
-
+            Optional<ObjectType> output = findById(id);
             if (!output.isPresent())
-                return Optional.absent();
-            return Optional.of(output.get().getType());
+                return Optional.empty();
+            return Optional.of(output.get().type);
+        }
+
+        public static Optional<ObjectType> fromEntityType(EntityType type) {
+            for (ObjectType ent : ObjectType.values())
+                if (ent.type == type)
+                    return Optional.of(ent);
+            return Optional.empty();
         }
     }
 }

@@ -1,29 +1,12 @@
 package us.myles.ViaVersion.api.type.types.version;
 
-import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
-import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
+import us.myles.ViaVersion.api.type.types.minecraft.ModernMetaType;
 
-public class Metadata1_13Type extends MetaTypeTemplate {
+public class Metadata1_13Type extends ModernMetaType {
     @Override
-    public Metadata read(ByteBuf buffer) throws Exception {
-        short index = buffer.readUnsignedByte();
-
-        if (index == 0xff) return null; //End of metadata
-        MetaType1_13 type = MetaType1_13.byId(buffer.readByte());
-
-        return new Metadata(index, type, type.getType().read(buffer));
-    }
-
-    @Override
-    public void write(ByteBuf buffer, Metadata object) throws Exception {
-        if (object == null) {
-            buffer.writeByte(255);
-        } else {
-            buffer.writeByte(object.getId());
-            buffer.writeByte(object.getMetaType().getTypeID());
-            object.getMetaType().getType().write(buffer, object.getValue());
-        }
+    protected MetaType getType(final int index) {
+        return MetaType1_13.byId(index);
     }
 }

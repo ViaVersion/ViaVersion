@@ -2,13 +2,15 @@ package us.myles.ViaVersion.update;
 
 import com.google.common.base.Joiner;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Version implements Comparable<Version> {
     private static final Pattern semVer = Pattern.compile("(?<a>0|[1-9]\\d*)\\.(?<b>0|[1-9]\\d*)(?:\\.(?<c>0|[1-9]\\d*))?(?:-(?<tag>[A-z0-9.-]*))?");
     private final int[] parts = new int[3];
-    private String tag;
+    private final String tag;
 
     public Version(String value) {
         if (value == null)
@@ -46,9 +48,9 @@ public class Version implements Comparable<Version> {
         }
 
         // Simple tag check
-        if (verA.tag.length() == 0 && verB.tag.length() > 0)
+        if (verA.tag.isEmpty() && !verB.tag.isEmpty())
             return 1;
-        if (verA.tag.length() > 0 && verB.tag.length() == 0)
+        if (!verA.tag.isEmpty() && verB.tag.isEmpty())
             return -1;
 
         return 0;
@@ -72,7 +74,7 @@ public class Version implements Comparable<Version> {
         for (int i = 0; i < parts.length; i += 1)
             split[i] = String.valueOf(parts[i]);
 
-        return Joiner.on(".").join(split) + (tag.length() != 0 ? "-" + tag : "");
+        return Joiner.on(".").join(split) + (!tag.isEmpty() ? "-" + tag : "");
     }
 
     @Override
@@ -83,6 +85,13 @@ public class Version implements Comparable<Version> {
     @Override
     public boolean equals(Object that) {
         return that instanceof Version && equals(this, (Version) that);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(tag);
+        result = 31 * result + Arrays.hashCode(parts);
+        return result;
     }
 
     /**

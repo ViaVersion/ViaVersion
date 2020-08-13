@@ -1,11 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
-import com.google.common.base.Optional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.Optional;
 
-@Getter
-@AllArgsConstructor
 public enum SoundSource {
     MASTER("master", 0),
     MUSIC("music", 1),
@@ -21,10 +17,23 @@ public enum SoundSource {
     private final String name;
     private final int id;
 
+    SoundSource(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+
     public static Optional<SoundSource> findBySource(String source) {
         for (SoundSource item : SoundSource.values())
-            if (item.getName().equalsIgnoreCase(source))
+            if (item.name.equalsIgnoreCase(source))
                 return Optional.of(item);
-        return Optional.absent();
+        return Optional.empty();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
     }
 }

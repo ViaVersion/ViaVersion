@@ -5,7 +5,7 @@
     <parent>
         <artifactId>viaversion-parent</artifactId>
         <groupId>us.myles</groupId>
-        <version>2.1.0</version>
+        <version>3.1.0-1.16.2-pre2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>viaversion-jar</name>
@@ -34,17 +34,83 @@
         </resources>
 
         <plugins>
-            <!-- Libs Shading and Relocation -->
+            <!-- Write git commit hash into build properties -->
+            <plugin>
+                <groupId>net.md-5</groupId>
+                <artifactId>scriptus</artifactId>
+                <version>0.3.2</version>
+                <configuration>
+                    <format>git-ViaVersion-${project.parent.version}:%s</format>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>describe</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!--suppress MavenModelInspection -->
+                            <Implementation-Version>${describe}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <!--Relocate all lib we use in order to fix class loading errors if we use different versions
                 than already loaded libs (i.e. by Mojang -> gson)-->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.2.2</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <minimizeJar>false</minimizeJar>
+                    <filters>
+                        <filter>
+                            <artifact>it.unimi.dsi:fastutil</artifact>
+                            <includes>
+                                <!-- We only want int and Object maps -->
+                                <include>it/unimi/dsi/fastutil/ints/*</include>
+                                <include>it/unimi/dsi/fastutil/objects/*</include>
+                                <include>it/unimi/dsi/fastutil/*.class</include>
+                            </includes>
+                            <excludes>
+                                <!-- Object types -->
+                                <exclude>it/unimi/dsi/fastutil/*/*Reference*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Boolean*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Byte*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Short*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Float*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Double*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Long*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Char*</exclude>
+                                <!-- Map types -->
+                                <exclude>it/unimi/dsi/fastutil/*/*Custom*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Linked*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Sorted*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Tree*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Heap*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Queue*</exclude>
+                                <!-- Crossing fingers -->
+                                <exclude>it/unimi/dsi/fastutil/*/*Big*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Synchronized*</exclude>
+                                <exclude>it/unimi/dsi/fastutil/*/*Unmodifiable*</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <relocations>
+                        <relocation>
+                            <pattern>it.unimi.dsi.fastutil</pattern>
+                            <shadedPattern>us.myles.viaversion.libs.fastutil</shadedPattern>
+                        </relocation>
                         <relocation>
                             <pattern>com.github.steveice10.opennbt</pattern>
                             <shadedPattern>us.myles.viaversion.libs.opennbt</shadedPattern>
@@ -56,10 +122,6 @@
                         <relocation>
                             <pattern>javassist</pattern>
                             <shadedPattern>us.myles.viaversion.libs.javassist</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.yaml.snakeyaml</pattern>
-                            <shadedPattern>us.myles.viaversion.libs.snakeyaml</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>net.md_5.bungee</pattern>
@@ -99,6 +161,11 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion-bungee</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion-fabric</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

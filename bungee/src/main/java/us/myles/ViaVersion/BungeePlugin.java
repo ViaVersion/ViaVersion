@@ -3,42 +3,59 @@ package us.myles.ViaVersion;
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.protocol.ProtocolConstants;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
-import us.myles.ViaVersion.bungee.platform.*;
+import us.myles.ViaVersion.bungee.platform.BungeeTaskId;
+import us.myles.ViaVersion.bungee.platform.BungeeViaAPI;
+import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
+import us.myles.ViaVersion.bungee.platform.BungeeViaInjector;
+import us.myles.ViaVersion.bungee.platform.BungeeViaLoader;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
+public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, Listener {
+    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private BungeeViaAPI api;
     private BungeeViaConfig config;
-    private BungeeCommandHandler commandHandler;
 
     @Override
     public void onLoad() {
+        try {
+            ProtocolConstants.class.getField("MINECRAFT_1_15_2");
+        } catch (NoSuchFieldException e) {
+            getLogger().warning("      / \\");
+            getLogger().warning("     /   \\");
+            getLogger().warning("    /  |  \\");
+            getLogger().warning("   /   |   \\         BUNGEECORD IS OUTDATED");
+            getLogger().warning("  /         \\   VIAVERSION MAY NOT WORK AS INTENDED");
+            getLogger().warning(" /     o     \\");
+            getLogger().warning("/_____________\\");
+        }
+
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
-        commandHandler = new BungeeCommandHandler();
+        BungeeCommandHandler commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
+
         // Init platform
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -50,6 +67,10 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
     @Override
     public void onEnable() {
+        if (ProxyServer.getInstance().getPluginManager().getPlugin("ViaBackwards") != null) {
+            MappingDataLoader.enableMappingsCache();
+        }
+
         // Inject
         Via.getManager().init();
     }
@@ -128,7 +149,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
     }
 
     @Override
-    public ViaAPI getApi() {
+    public ViaAPI<ProxiedPlayer> getApi() {
         return api;
     }
 
@@ -153,7 +174,13 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
 
         List<PluginInfo> plugins = new ArrayList<>();
         for (Plugin p : ProxyServer.getInstance().getPluginManager().getPlugins())
-            plugins.add(new PluginInfo(true, p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), Arrays.asList(p.getDescription().getAuthor())));
+            plugins.add(new PluginInfo(
+                    true,
+                    p.getDescription().getName(),
+                    p.getDescription().getVersion(),
+                    p.getDescription().getMain(),
+                    Collections.singletonList(p.getDescription().getAuthor())
+            ));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
         platformSpecific.add("servers", GsonUtil.getGson().toJsonTree(ProtocolDetectorService.getDetectedIds()));
@@ -165,15 +192,8 @@ public class BungeePlugin extends Plugin implements ViaPlatform, Listener {
         return true;
     }
 
-    @EventHandler
-    public void onQuit(PlayerDisconnectEvent e) {
-        UserConnection userConnection = Via.getManager().getPortedPlayers().get(e.getPlayer().getUniqueId());
-        if (userConnection != null) {
-            // Only remove if the connection is disconnected (eg. relogin)
-            if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
-            }
-        }
-
+    @Override
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 }

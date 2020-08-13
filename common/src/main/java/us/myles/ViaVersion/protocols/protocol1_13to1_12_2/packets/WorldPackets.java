@@ -1,7 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.common.base.Optional;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -13,13 +14,13 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.api.type.types.Particle;
+import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
@@ -28,38 +29,35 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 public class WorldPackets {
-    private static final Set<Integer> validBiomes = new HashSet<>();
+    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, 1F);
 
     static {
         // Client will crash if it receives a invalid biome id
         for (int i = 0; i < 50; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
-        validBiomes.add(127);
+        VALID_BIOMES.add(127);
         for (int i = 129; i <= 134; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
-        validBiomes.add(140);
-        validBiomes.add(149);
-        validBiomes.add(151);
+        VALID_BIOMES.add(140);
+        VALID_BIOMES.add(149);
+        VALID_BIOMES.add(151);
         for (int i = 155; i <= 158; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
         for (int i = 160; i <= 167; i++) {
-            validBiomes.add(i);
+            VALID_BIOMES.add(i);
         }
     }
 
     public static void register(Protocol protocol) {
         // Outgoing packets
-
-        // Spawn Painting
-        protocol.registerOutgoing(State.PLAY, 0x04, 0x04, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -73,17 +71,16 @@ public class WorldPackets {
 
                         Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                        if (!id.isPresent() && (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug())) {
+                        if (!id.isPresent() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
                             Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
                         }
-                        wrapper.write(Type.VAR_INT, id.or(0));
+                        wrapper.write(Type.VAR_INT, id.orElse(0));
                     }
                 });
             }
         });
 
-        // Update Block Entity
-        protocol.registerOutgoing(State.PLAY, 0x09, 0x09, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Location
@@ -102,8 +99,10 @@ public class WorldPackets {
 
                         if (newId != -1) {
                             BlockStorage storage = wrapper.user().get(BlockStorage.class);
-                            if (storage.contains(position))
-                                storage.get(position).setReplacement(newId);
+                            BlockStorage.ReplacementData replacementData = storage.get(position);
+                            if (replacementData != null) {
+                                replacementData.setReplacement(newId);
+                            }
                         }
 
                         if (action == 5) // Set type of flower in flower pot
@@ -113,8 +112,7 @@ public class WorldPackets {
             }
         });
 
-        // Block action
-        protocol.registerOutgoing(State.PLAY, 0xA, 0xA, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // Location
@@ -152,7 +150,7 @@ public class WorldPackets {
 
                         if (blockId == 73) { // Note block
                             PacketWrapper blockChange = wrapper.create(0x0B); // block change
-                            blockChange.write(Type.POSITION, new Position(pos.getX(), pos.getY(), pos.getZ())); // Clone because position is mutable
+                            blockChange.write(Type.POSITION, new Position(pos)); // Clone because position is mutable
                             blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                             blockChange.send(Protocol1_13To1_12_2.class, true, true);
                         }
@@ -162,8 +160,7 @@ public class WorldPackets {
             }
         });
 
-        // Block Change
-        protocol.registerOutgoing(State.PLAY, 0xB, 0xB, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION);
@@ -177,7 +174,7 @@ public class WorldPackets {
                         UserConnection userConnection = wrapper.user();
                         if (Via.getConfig().isServersideBlockConnections()) {
 
-                            ConnectionData.updateBlockStorage(userConnection, position, newId);
+                            ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), newId);
                             newId = ConnectionData.connect(userConnection, position, newId);
                         }
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
@@ -193,8 +190,7 @@ public class WorldPackets {
             }
         });
 
-        // Multi Block Change
-        protocol.registerOutgoing(State.PLAY, 0x10, 0xF, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
@@ -211,12 +207,12 @@ public class WorldPackets {
                         for (BlockChangeRecord record : records) {
                             int newBlock = toNewId(record.getBlockId());
                             Position position = new Position(
-                                    (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                    (long) record.getY(),
-                                    (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                    record.getSectionX() + (chunkX * 16),
+                                    record.getY(),
+                                    record.getSectionZ() + (chunkZ * 16));
 
                             if (Via.getConfig().isServersideBlockConnections()) {
-                                ConnectionData.updateBlockStorage(userConnection, position, newBlock);
+                                ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), newBlock);
                             }
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
@@ -226,9 +222,9 @@ public class WorldPackets {
                                 int blockState = record.getBlockId();
 
                                 Position position = new Position(
-                                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                        (long) record.getY(),
-                                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                        record.getSectionX() + (chunkX * 16),
+                                        record.getY(),
+                                        record.getSectionZ() + (chunkZ * 16));
 
                                 ConnectionHandler handler = ConnectionData.getConnectionHandler(blockState);
                                 if (handler != null) {
@@ -242,9 +238,9 @@ public class WorldPackets {
 
                             for (BlockChangeRecord record : records) {
                                 Position position = new Position(
-                                        (long) (record.getHorizontal() >> 4 & 15) + (chunkX * 16),
-                                        (long) record.getY(),
-                                        (long) (record.getHorizontal() & 15) + (chunkZ * 16));
+                                        record.getSectionX() + (chunkX * 16),
+                                        record.getY(),
+                                        record.getSectionZ() + (chunkZ * 16));
                                 ConnectionData.update(userConnection, position);
                             }
                         }
@@ -254,8 +250,52 @@ public class WorldPackets {
             }
         });
 
-        // Unload Chunk
-        protocol.registerOutgoing(State.PLAY, 0x1D, 0x1F, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.EXPLOSION, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                if (!Via.getConfig().isServersideBlockConnections())
+                    return;
+
+                map(Type.FLOAT); // X
+                map(Type.FLOAT); // Y
+                map(Type.FLOAT); // Z
+                map(Type.FLOAT); // Radius
+                map(Type.INT); // Record Count
+
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        UserConnection userConnection = wrapper.user();
+                        int x = (int) Math.floor(wrapper.get(Type.FLOAT, 0));
+                        int y = (int) Math.floor(wrapper.get(Type.FLOAT, 1));
+                        int z = (int) Math.floor(wrapper.get(Type.FLOAT, 2));
+                        int recordCount = wrapper.get(Type.INT, 0);
+                        Position[] records = new Position[recordCount];
+
+                        for (int i = 0; i < recordCount; i++) {
+                            Position position = new Position(
+                                    x + wrapper.passthrough(Type.BYTE),
+                                    (short) (y + wrapper.passthrough(Type.BYTE)),
+                                    z + wrapper.passthrough(Type.BYTE));
+                            records[i] = position;
+
+                            // Set to air
+                            ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), 0);
+                        }
+
+                        // Workaround for packet order issue
+                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                        wrapper.cancel();
+
+                        for (int i = 0; i < recordCount; i++) {
+                            ConnectionData.update(userConnection, records[i]);
+                        }
+                    }
+                });
+            }
+        });
+
+        protocol.registerOutgoing(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 if (Via.getConfig().isServersideBlockConnections()) {
@@ -264,15 +304,14 @@ public class WorldPackets {
                         public void handle(PacketWrapper wrapper) throws Exception {
                             int x = wrapper.passthrough(Type.INT);
                             int z = wrapper.passthrough(Type.INT);
-                            ConnectionData.getProvider().unloadChunk(wrapper.user(), x, z);
+                            ConnectionData.blockConnectionProvider.unloadChunk(wrapper.user(), x, z);
                         }
                     });
                 }
             }
         });
 
-        // Named Sound Effect TODO String -> Identifier? Check if identifier is present?
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x1A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.NAMED_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -286,8 +325,7 @@ public class WorldPackets {
             }
         });
 
-        // Chunk Data
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x22, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -339,9 +377,9 @@ public class WorldPackets {
                                             int block = section.getFlatBlock(x, y, z);
                                             if (storage.isWelcome(block)) {
                                                 storage.store(new Position(
-                                                        (long) (x + (chunk.getX() << 4)),
-                                                        (long) (y + (i << 4)),
-                                                        (long) (z + (chunk.getZ() << 4))
+                                                        (x + (chunk.getX() << 4)),
+                                                        (short) (y + (i << 4)),
+                                                        (z + (chunk.getZ() << 4))
                                                 ), block);
                                             }
                                         }
@@ -355,9 +393,9 @@ public class WorldPackets {
                                         for (int x = 0; x < 16; x++) {
                                             int block = section.getFlatBlock(x, y, z);
                                             if (ConnectionData.isWelcome(block)) {
-                                                ConnectionData.getProvider().storeBlock(wrapper.user(), (long) (x + (chunk.getX() << 4)),
-                                                        (long) (y + (i << 4)),
-                                                        (long) (z + (chunk.getZ() << 4)),
+                                                ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), x + (chunk.getX() << 4),
+                                                        y + (i << 4),
+                                                        z + (chunk.getZ() << 4),
                                                         block);
                                             }
                                         }
@@ -371,10 +409,10 @@ public class WorldPackets {
                             int latestBiomeWarn = Integer.MIN_VALUE;
                             for (int i = 0; i < 256; i++) {
                                 int biome = chunk.getBiomeData()[i];
-                                if (!validBiomes.contains(biome)) {
+                                if (!VALID_BIOMES.contains(biome)) {
                                     if (biome != 255 // is it generated naturally? *shrug*
                                             && latestBiomeWarn != biome) {
-                                        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+                                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                                             Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
                                         }
                                         latestBiomeWarn = biome;
@@ -393,10 +431,12 @@ public class WorldPackets {
                                 int y = (int) tag.get("y").getValue();
                                 int z = (int) tag.get("z").getValue();
 
-                                Position position = new Position((long) x, (long) y, (long) z);
+                                Position position = new Position(x, (short) y, z);
                                 // Store the replacement blocks for blockupdates
-                                if (storage.contains(position))
-                                    storage.get(position).setReplacement(newId);
+                                BlockStorage.ReplacementData replacementData = storage.get(position);
+                                if (replacementData != null) {
+                                    replacementData.setReplacement(newId);
+                                }
 
                                 chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
                             }
@@ -418,8 +458,7 @@ public class WorldPackets {
             }
         });
 
-        // Particle
-        protocol.registerOutgoing(State.PLAY, 0x22, 0x24, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID
@@ -496,18 +535,18 @@ public class WorldPackets {
         if (oldId < 0) {
             oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
         }
-        int newId = MappingData.blockMappings.getNewBlock(oldId);
+        int newId = MappingData.blockMappings.getNewId(oldId);
         if (newId != -1) {
             return newId;
         }
-        newId = MappingData.blockMappings.getNewBlock(oldId & ~0xF); // Remove data
+        newId = MappingData.blockMappings.getNewId(oldId & ~0xF); // Remove data
         if (newId != -1) {
-            if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Missing block " + oldId);
             }
             return newId;
         }
-        if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
+        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
             Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
         }
         // Default stone

@@ -1,18 +1,18 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
 public class FlowerConnectionHandler extends ConnectionHandler {
-    private static Map<Integer, Integer> flowers = new HashMap<>();
+    private static final Int2IntMap flowers = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> baseFlower = new HashSet<>();
@@ -24,15 +24,12 @@ public class FlowerConnectionHandler extends ConnectionHandler {
         baseFlower.add("minecraft:lilac");
 
         final FlowerConnectionHandler handler = new FlowerConnectionHandler();
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                if (baseFlower.contains(blockData.getMinecraftKey())) {
-                    ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
-                    if (blockData.getValue("half").equals("lower")) {
-                        blockData.set("half", "upper");
-                        flowers.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
-                    }
+        return blockData -> {
+            if (baseFlower.contains(blockData.getMinecraftKey())) {
+                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
+                if (blockData.getValue("half").equals("lower")) {
+                    blockData.set("half", "upper");
+                    flowers.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
                 }
             }
         };
@@ -41,14 +38,15 @@ public class FlowerConnectionHandler extends ConnectionHandler {
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
-        if (flowers.containsKey(blockBelowId)) {
+        int connectBelow = flowers.get(blockBelowId);
+        if (connectBelow != 0) {
             int blockAboveId = getBlockData(user, position.getRelative(BlockFace.TOP));
             if (Via.getConfig().isStemWhenBlockAbove()) {
                 if (blockAboveId == 0) {
-                    return flowers.get(blockBelowId);
+                    return connectBelow;
                 }
             } else if (!flowers.containsKey(blockAboveId)) {
-                return flowers.get(blockBelowId);
+                return connectBelow;
             }
         }
         return blockState;

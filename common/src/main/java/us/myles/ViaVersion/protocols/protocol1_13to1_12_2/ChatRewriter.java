@@ -1,27 +1,31 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
+import com.google.gson.JsonElement;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatRewriter {
+    private static final Pattern URL = Pattern.compile("^(?:(https?)://)?([-\\w_.]{2,}\\.[a-z]{2,4})(/\\S*)?$");
+    private static final BaseComponent[] EMPTY_COMPONENTS = new BaseComponent[0];
+    private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter1_13();
+
     // Based on https://github.com/SpigotMC/BungeeCord/blob/master/chat/src/main/java/net/md_5/bungee/api/chat/TextComponent.java
-
-    private static final Pattern url = Pattern.compile("^(?:(https?)://)?([-\\w_\\.]{2,}\\.[a-z]{2,4})(/\\S*)?$");
-
-    public static BaseComponent[] fromLegacyText(String message, ChatColor defaultColor) {
-        ArrayList<BaseComponent> components = new ArrayList<>();
+    public static JsonElement fromLegacyText(String message, ChatColor defaultColor) {
+        List<BaseComponent> components = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         TextComponent component = new TextComponent();
-        Matcher matcher = url.matcher(message);
+        Matcher matcher = URL.matcher(message);
 
         for (int i = 0; i < message.length(); i++) {
             char c = message.charAt(i);
@@ -44,35 +48,38 @@ public class ChatRewriter {
                     builder = new StringBuilder();
                     components.add(old);
                 }
-                switch (format) {
-                    case BOLD:
-                        component.setBold(true);
-                        break;
-                    case ITALIC:
-                        component.setItalic(true);
-                        break;
-                    case UNDERLINE:
-                        component.setUnderlined(true);
-                        break;
-                    case STRIKETHROUGH:
-                        component.setStrikethrough(true);
-                        break;
-                    case MAGIC:
-                        component.setObfuscated(true);
-                        break;
-                    case RESET:
-                        format = defaultColor;
-                    default:
-                        component = new TextComponent();
-                        component.setColor(format);
-                        // ViaVersion start
-                        component.setBold(false);
-                        component.setItalic(false);
-                        component.setUnderlined(false);
-                        component.setStrikethrough(false);
-                        component.setObfuscated(false);
-                        // ViaVersion end
-                        break;
+                if (ChatColor.BOLD.equals(format)) {
+                    component.setBold(true);
+                } else if (ChatColor.ITALIC.equals(format)) {
+                    component.setItalic(true);
+                } else if (ChatColor.UNDERLINE.equals(format)) {
+                    component.setUnderlined(true);
+                } else if (ChatColor.STRIKETHROUGH.equals(format)) {
+                    component.setStrikethrough(true);
+                } else if (ChatColor.MAGIC.equals(format)) {
+                    component.setObfuscated(true);
+                } else if (ChatColor.RESET.equals(format)) {
+                    format = defaultColor;
+
+                    component = new TextComponent();
+                    component.setColor(format);
+                    // ViaVersion start - Items have style default to italic
+                    component.setBold(false);
+                    component.setItalic(false);
+                    component.setUnderlined(false);
+                    component.setStrikethrough(false);
+                    component.setObfuscated(false);
+                    // ViaVersion end
+                } else {
+                    component = new TextComponent();
+                    component.setColor(format);
+                    // ViaVersion start- Items have style default to italic
+                    component.setBold(false);
+                    component.setItalic(false);
+                    component.setUnderlined(false);
+                    component.setStrikethrough(false);
+                    component.setObfuscated(false);
+                    // ViaVersion end
                 }
                 continue;
             }
@@ -107,53 +114,19 @@ public class ChatRewriter {
         component.setText(builder.toString());
         components.add(component);
 
-        return components.toArray(new BaseComponent[0]);
+        final String serializedComponents = ComponentSerializer.toString(components.toArray(EMPTY_COMPONENTS));
+        return GsonUtil.getJsonParser().parse(serializedComponents);
     }
 
-    public static String legacyTextToJson(String legacyText) {
-        return ComponentSerializer.toString(fromLegacyText(legacyText, ChatColor.WHITE));
+    public static JsonElement legacyTextToJson(String legacyText) {
+        return fromLegacyText(legacyText, ChatColor.WHITE);
     }
 
     public static String jsonTextToLegacy(String value) {
         return TextComponent.toLegacyText(ComponentSerializer.parse(value));
     }
 
-    public static String processTranslate(String value) {
-        BaseComponent[] components = ComponentSerializer.parse(value);
-        for (BaseComponent component : components) {
-            processTranslate(component);
-        }
-        if (components.length == 1) {
-            return ComponentSerializer.toString(components[0]);
-        } else {
-            return ComponentSerializer.toString(components);
-        }
-    }
-
-    private static void processTranslate(BaseComponent component) {
-        if (component instanceof TranslatableComponent) {
-            String oldTranslate = ((TranslatableComponent) component).getTranslate();
-            String newTranslate;
-            newTranslate = MappingData.translateMapping.get(oldTranslate);
-            if (newTranslate == null) MappingData.mojangTranslation.get(oldTranslate);
-            if (newTranslate != null) {
-                ((TranslatableComponent) component).setTranslate(newTranslate);
-            }
-            if (((TranslatableComponent) component).getWith() != null) {
-                for (BaseComponent baseComponent : ((TranslatableComponent) component).getWith()) {
-                    processTranslate(baseComponent);
-                }
-            }
-        }
-        if (component.getHoverEvent() != null) {
-            for (BaseComponent baseComponent : component.getHoverEvent().getValue()) {
-                processTranslate(baseComponent);
-            }
-        }
-        if (component.getExtra() != null) {
-            for (BaseComponent baseComponent : component.getExtra()) {
-                processTranslate(baseComponent);
-            }
-        }
+    public static void processTranslate(JsonElement value) {
+        COMPONENT_REWRITER.processText(value);
     }
 }

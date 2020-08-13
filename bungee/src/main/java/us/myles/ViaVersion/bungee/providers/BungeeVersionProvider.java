@@ -34,7 +34,7 @@ public class BungeeVersionProvider extends VersionProvider {
         List<Integer> sorted = new ArrayList<>(list);
         Collections.sort(sorted);
 
-        ProtocolInfo info = user.get(ProtocolInfo.class);
+        ProtocolInfo info = user.getProtocolInfo();
 
         // Bungee supports it
         if (sorted.contains(info.getProtocolVersion()))

@@ -1,11 +1,15 @@
 package us.myles.ViaVersion.api.platform;
 
 import com.google.gson.JsonObject;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
+import java.io.File;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -111,6 +115,20 @@ public interface ViaPlatform<T> {
     boolean kickPlayer(UUID uuid, String message);
 
     /**
+     * Disconnects an UserConnection for a reason
+     *
+     * @param connection    The UserConnection
+     * @param message The message to kick them with
+     * @return True if it was successful
+     */
+    default boolean disconnect(UserConnection connection, String message) {
+        if (connection.isClientSide()) return false;
+        UUID uuid = connection.get(ProtocolInfo.class).getUuid();
+        if (uuid == null) return false;
+        return kickPlayer(uuid, message);
+    }
+
+    /**
      * Check if the plugin is enabled.
      *
      * @return True if it is enabled
@@ -140,6 +158,13 @@ public interface ViaPlatform<T> {
     ConfigurationProvider getConfigurationProvider();
 
     /**
+     * Get ViaVersions's data folder.
+     *
+     * @return data folder
+     */
+    File getDataFolder();
+
+    /**
      * Called when a reload happens
      */
     void onReload();
@@ -158,4 +183,6 @@ public interface ViaPlatform<T> {
      * @return True if allowed
      */
     boolean isOldClientsAllowed();
+
+    ViaConnectionManager getConnectionManager();
 }

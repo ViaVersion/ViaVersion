@@ -15,6 +15,7 @@ import java.util.UUID;
  * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
  */
 public interface ViaAPI<T> {
+
     /**
      * Get protocol number from a player
      * Will also retrieve version from ProtocolSupport if it's being used.
@@ -33,14 +34,25 @@ public interface ViaAPI<T> {
     int getPlayerVersion(UUID uuid);
 
     /**
-     * Is player using 1.9?
+     * Returns if the player is ported by Via.
      *
      * @param playerUUID UUID of a player
-     * @return True if the client is on 1.9
-     * @deprecated As of 0.9.9, because all players are ported use {@link #getPlayerVersion(UUID)}
+     * @return true if Via has a cached userconnection for this player
+     * @deprecated use {@link #isInjected(UUID)}
+     * @see #isInjected(UUID)
      */
     @Deprecated
-    boolean isPorted(UUID playerUUID);
+    default boolean isPorted(UUID playerUUID) {
+        return isInjected(playerUUID);
+    }
+
+    /**
+     * Returns if Via injected into this player connection
+     *
+     * @param playerUUID UUID of a player
+     * @return true if Via has a cached UserConnection for this player
+     */
+    boolean isInjected(UUID playerUUID);
 
     /**
      * Get the version of the plugin
@@ -54,18 +66,18 @@ public interface ViaAPI<T> {
      *
      * @param player Platform player object, eg. Bukkit this is Player
      * @param packet The packet, you need a VarInt ID then the packet contents.
-     * @throws IllegalArgumentException If not on 1.9 throws IllegalArg
+     * @throws IllegalArgumentException if the player is not injected by Via
      */
-    void sendRawPacket(T player, ByteBuf packet) throws IllegalArgumentException;
+    void sendRawPacket(T player, ByteBuf packet);
 
     /**
      * Send a raw packet to the player (Use new IDs)
      *
      * @param uuid   The uuid from the player to send packet
      * @param packet The packet, you need a VarInt ID then the packet contents.
-     * @throws IllegalArgumentException If not on 1.9 throws IllegalArg
+     * @throws IllegalArgumentException if the player is not injected by Via
      */
-    void sendRawPacket(UUID uuid, ByteBuf packet) throws IllegalArgumentException;
+    void sendRawPacket(UUID uuid, ByteBuf packet);
 
     /**
      * Create a new bossbar instance

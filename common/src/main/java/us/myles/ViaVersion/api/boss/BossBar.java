@@ -1,11 +1,13 @@
 package us.myles.ViaVersion.api.boss;
 
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.util.Set;
 import java.util.UUID;
 
 public abstract class BossBar<T> {
+
     /**
      * Get the current title
      *
@@ -79,12 +81,20 @@ public abstract class BossBar<T> {
     }
 
     /**
-     * Show the bossbar to a player (uuid)
+     * Show the bossbar to a player (uuid). This only works for frontend connections. Use #addConnection(UserConnection) for other types.
      *
      * @param player uuid of the player
      * @return The BossBar object
      */
     public abstract BossBar addPlayer(UUID player);
+
+    /**
+     * Show the bossbar to a player connection.
+     *
+     * @param conn UserConnection of the connection
+     * @return The BossBar object
+     */
+    public abstract BossBar addConnection(UserConnection conn);
 
     /**
      * add multiple players
@@ -111,12 +121,20 @@ public abstract class BossBar<T> {
     }
 
     /**
-     * Removes the bossbar from a player
+     * Removes the bossbar from a player. This only works for frontend connections. For others types, use #removeConnection(UserConnection)
      *
-     * @param uuid The platers YYUD
+     * @param uuid The players UUID
      * @return The BossBar object
      */
     public abstract BossBar removePlayer(UUID uuid);
+
+    /**
+     * Removes the bossbar from a player connection.
+     *
+     * @param conn The UserConnection
+     * @return The BossBar object
+     */
+    public abstract BossBar removeConnection(UserConnection conn);
 
     /**
      * Add flags
@@ -141,11 +159,18 @@ public abstract class BossBar<T> {
     public abstract boolean hasFlag(BossFlag flag);
 
     /**
-     * Get players
+     * Get players. Only returns UUIDs which are front-end. For all connections, use #getConnections()
      *
      * @return UUIDS from players (sorry I lied)
      */
     public abstract Set<UUID> getPlayers();
+
+    /**
+     * Get UserConnections.
+     *
+     * @return UserConnection from players
+     */
+    public abstract Set<UserConnection> getConnections();
 
     /**
      * Show the bossbar to everyone (In the getPlayer set)

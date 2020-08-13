@@ -17,11 +17,13 @@ public class Position1_14Type extends Type<Position> {
         long y = val << 52 >> 52;
         long z = val << 26 >> 38;
 
-        return new Position(x, y, z);
+        return new Position((int) x, (short) y, (int) z);
     }
 
     @Override
     public void write(ByteBuf buffer, Position object) {
-        buffer.writeLong(((object.getX() & 0x3ffffff) << 38) | (object.getY() & 0xfff) | ((object.getZ() & 0x3ffffff) << 12));
+        buffer.writeLong((((long) object.getX() & 0x3ffffff) << 38)
+                | (object.getY() & 0xfff)
+                | ((((long) object.getZ()) & 0x3ffffff) << 12));
     }
 }

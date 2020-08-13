@@ -4,31 +4,25 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 class ChestConnectionHandler extends ConnectionHandler {
-    private static Map<Integer, BlockFace> chestFacings = new HashMap<>();
-    private static Map<Byte, Integer> connectedStates = new HashMap<>();
-    private static Set<Integer> trappedChests = new HashSet<>();
+    private static final Map<Integer, BlockFace> chestFacings = new HashMap<>();
+    private static final Map<Byte, Integer> connectedStates = new HashMap<>();
+    private static final Set<Integer> trappedChests = new HashSet<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final ChestConnectionHandler connectionHandler = new ChestConnectionHandler();
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                if (!blockData.getMinecraftKey().equals("minecraft:chest") && !blockData.getMinecraftKey().equals("minecraft:trapped_chest"))
-                    return;
-                if (blockData.getValue("waterlogged").equals("true")) return;
-                chestFacings.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)));
-                if (blockData.getMinecraftKey().equalsIgnoreCase("minecraft:trapped_chest"))
-                    trappedChests.add(blockData.getSavedBlockStateId());
-                connectedStates.put(getStates(blockData), blockData.getSavedBlockStateId());
-                ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
+        return blockData -> {
+            if (!blockData.getMinecraftKey().equals("minecraft:chest") && !blockData.getMinecraftKey().equals("minecraft:trapped_chest"))
+                return;
+            if (blockData.getValue("waterlogged").equals("true")) return;
+            chestFacings.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)));
+            if (blockData.getMinecraftKey().equalsIgnoreCase("minecraft:trapped_chest")) {
+                trappedChests.add(blockData.getSavedBlockStateId());
             }
+            connectedStates.put(getStates(blockData), blockData.getSavedBlockStateId());
+            ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
         };
     }
 

@@ -2,21 +2,17 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.common.base.Optional;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage extends StoredObject {
-    private Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
-    @Setter
-    @Getter
+    private final Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
     private boolean permissions = false;
 
     public CommandBlockStorage(UserConnection user) {
@@ -32,7 +28,7 @@ public class CommandBlockStorage extends StoredObject {
         Pair<Integer, Integer> chunkPos = getChunkCoords(position);
 
         if (!storedCommandBlocks.containsKey(chunkPos))
-            storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<Position, CompoundTag>());
+            storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<>());
 
         Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
 
@@ -44,8 +40,8 @@ public class CommandBlockStorage extends StoredObject {
     }
 
     private Pair<Integer, Integer> getChunkCoords(Position position) {
-        int chunkX = (int) Math.floor(position.getX() / 16);
-        int chunkZ = (int) Math.floor(position.getZ() / 16);
+        int chunkX = Math.floorDiv(position.getX(), 16);
+        int chunkZ = Math.floorDiv(position.getZ(), 16);
 
         return new Pair<>(chunkX, chunkZ);
     }
@@ -55,11 +51,11 @@ public class CommandBlockStorage extends StoredObject {
 
         Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkCoords);
         if (blocks == null)
-            return Optional.absent();
+            return Optional.empty();
 
         CompoundTag tag = blocks.get(position);
         if (tag == null)
-            return Optional.absent();
+            return Optional.empty();
 
         tag = tag.clone();
         tag.put(new ByteTag("powered", (byte) 0));
@@ -70,5 +66,13 @@ public class CommandBlockStorage extends StoredObject {
 
     public void unloadChunks() {
         storedCommandBlocks.clear();
+    }
+
+    public boolean isPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(boolean permissions) {
+        this.permissions = permissions;
     }
 }

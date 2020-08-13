@@ -5,7 +5,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
@@ -14,7 +13,6 @@ import java.lang.reflect.Method;
 
 public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
 
-    @Getter
     private final ChannelInitializer<Channel> original;
     private Method method;
 
@@ -50,5 +48,9 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
         } else {
             this.method.invoke(this.original, channel);
         }
+    }
+
+    public ChannelInitializer<Channel> getOriginal() {
+        return original;
     }
 }

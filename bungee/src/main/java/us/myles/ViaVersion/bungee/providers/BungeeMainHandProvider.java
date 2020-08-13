@@ -26,7 +26,7 @@ public class BungeeMainHandProvider extends MainHandProvider {
 
     @Override
     public void setMainHand(UserConnection user, int hand) {
-        ProtocolInfo info = user.get(ProtocolInfo.class);
+        ProtocolInfo info = user.getProtocolInfo();
         if (info == null || info.getUuid() == null) return;
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(info.getUuid());
         if (player == null) return;

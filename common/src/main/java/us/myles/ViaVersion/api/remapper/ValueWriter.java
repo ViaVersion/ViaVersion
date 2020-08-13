@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.remapper;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 
+@FunctionalInterface
 public interface ValueWriter<T> {
     /**
      * Write a value to a packet

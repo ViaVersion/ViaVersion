@@ -1,12 +1,8 @@
 package us.myles.ViaVersion.api.minecraft.metadata.types;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
 import us.myles.ViaVersion.api.type.Type;
 
-@RequiredArgsConstructor
-@Getter
 public enum MetaType1_8 implements MetaType {
     Byte(0, Type.BYTE),
     Short(1, Type.SHORT),
@@ -21,7 +17,22 @@ public enum MetaType1_8 implements MetaType {
     private final int typeID;
     private final Type type;
 
+    MetaType1_8(int typeID, Type type) {
+        this.typeID = typeID;
+        this.type = type;
+    }
+
     public static MetaType1_8 byId(int id) {
         return values()[id];
+    }
+
+    @Override
+    public int getTypeID() {
+        return typeID;
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

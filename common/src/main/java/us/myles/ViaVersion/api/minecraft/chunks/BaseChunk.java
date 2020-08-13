@@ -1,35 +1,98 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import java.util.List;
 
-@AllArgsConstructor
-@Data
 public class BaseChunk implements Chunk {
-    protected int x;
-    protected int z;
-    protected boolean groundUp;
-    protected int bitmask;
-    protected ChunkSection[] sections;
+    protected final int x;
+    protected final int z;
+    protected final boolean fullChunk;
+    protected boolean ignoreOldLightData;
+    protected final int bitmask;
+    protected final ChunkSection[] sections;
     protected int[] biomeData;
     protected CompoundTag heightMap;
-    protected List<CompoundTag> blockEntities;
+    protected final List<CompoundTag> blockEntities;
 
-    public BaseChunk(int x, int z, boolean groundUp, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
+    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, int bitmask, ChunkSection[] sections, int[] biomeData, CompoundTag heightMap, List<CompoundTag> blockEntities) {
         this.x = x;
         this.z = z;
-        this.groundUp = groundUp;
+        this.fullChunk = fullChunk;
+        this.ignoreOldLightData = ignoreOldLightData;
         this.bitmask = bitmask;
         this.sections = sections;
         this.biomeData = biomeData;
+        this.heightMap = heightMap;
         this.blockEntities = blockEntities;
+    }
+
+    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
+        this(x, z, fullChunk, ignoreOldLightData, bitmask, sections, biomeData, null, blockEntities);
     }
 
     @Override
     public boolean isBiomeData() {
         return biomeData != null;
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public int getZ() {
+        return z;
+    }
+
+    @Override
+    public boolean isFullChunk() {
+        return fullChunk;
+    }
+
+    @Override
+    public boolean isIgnoreOldLightData() {
+        return ignoreOldLightData;
+    }
+
+    @Override
+    public void setIgnoreOldLightData(boolean ignoreOldLightData) {
+        this.ignoreOldLightData = ignoreOldLightData;
+    }
+
+    @Override
+    public int getBitmask() {
+        return bitmask;
+    }
+
+    @Override
+    public ChunkSection[] getSections() {
+        return sections;
+    }
+
+    @Override
+    public int[] getBiomeData() {
+        return biomeData;
+    }
+
+    @Override
+    public void setBiomeData(final int[] biomeData) {
+        this.biomeData = biomeData;
+    }
+
+    @Override
+    public CompoundTag getHeightMap() {
+        return heightMap;
+    }
+
+    @Override
+    public void setHeightMap(final CompoundTag heightMap) {
+        this.heightMap = heightMap;
+    }
+
+    @Override
+    public List<CompoundTag> getBlockEntities() {
+        return blockEntities;
     }
 }

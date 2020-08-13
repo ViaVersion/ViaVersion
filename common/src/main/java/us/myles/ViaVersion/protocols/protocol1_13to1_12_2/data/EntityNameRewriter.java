@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /*
     CHANGED ENTITY NAMES IN 1.13
@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
     xp_orb => experience_orb
  */
 public class EntityNameRewriter {
-    private static Map<String, String> entityNames = new ConcurrentHashMap<>();
+    private static final Map<String, String> entityNames = new HashMap<>();
 
     static {
         /*

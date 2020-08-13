@@ -1,43 +1,42 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
 
-import com.google.common.collect.Sets;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockStorage extends StoredObject {
-    // This BlockStorage is very exclusive (;
-    private static final Set<Integer> whitelist = Sets.newConcurrentHashSet();
+    private static final IntSet WHITELIST = new IntOpenHashSet(46, 1F);
+    private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     static {
         // Flower pots
-        whitelist.add(5266);
+        WHITELIST.add(5266);
 
         // Add those red beds
-        for (int i = 0; i < 16; i++)
-            whitelist.add(972 + i);
+        for (int i = 0; i < 16; i++) {
+            WHITELIST.add(972 + i);
+        }
 
         // Add the white banners
-        for (int i = 0; i < 20; i++)
-            whitelist.add(6854 + i);
+        for (int i = 0; i < 20; i++) {
+            WHITELIST.add(6854 + i);
+        }
 
         // Add the white wall banners
         for (int i = 0; i < 4; i++) {
-            whitelist.add(7110 + i);
+            WHITELIST.add(7110 + i);
         }
 
         // Skeleton skulls
-        for (int i = 0; i < 5; i++)
-            whitelist.add(5447 + i);
+        for (int i = 0; i < 5; i++) {
+            WHITELIST.add(5447 + i);
+        }
     }
-
-    private Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
     public BlockStorage(UserConnection user) {
         super(user);
@@ -48,14 +47,14 @@ public class BlockStorage extends StoredObject {
     }
 
     public void store(Position position, int block, int replacementId) {
-        if (!whitelist.contains(block))
+        if (!WHITELIST.contains(block))
             return;
 
         blocks.put(position, new ReplacementData(block, replacementId));
     }
 
     public boolean isWelcome(int block) {
-        return whitelist.contains(block);
+        return WHITELIST.contains(block);
     }
 
     public boolean contains(Position position) {
@@ -70,11 +69,29 @@ public class BlockStorage extends StoredObject {
         return blocks.remove(position);
     }
 
-    @Data
-    @AllArgsConstructor
-    public class ReplacementData {
+    public static class ReplacementData {
         private int original;
         private int replacement;
-    }
 
+        public ReplacementData(int original, int replacement) {
+            this.original = original;
+            this.replacement = replacement;
+        }
+
+        public int getOriginal() {
+            return original;
+        }
+
+        public void setOriginal(int original) {
+            this.original = original;
+        }
+
+        public int getReplacement() {
+            return replacement;
+        }
+
+        public void setReplacement(int replacement) {
+            this.replacement = replacement;
+        }
+    }
 }

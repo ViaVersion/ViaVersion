@@ -1,13 +1,11 @@
 package us.myles.ViaVersion.sponge.platform;
 
-import lombok.Getter;
 import org.spongepowered.api.entity.living.player.Player;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.boss.CommonBoss;
 
-@Getter
 public class SpongeBossBar extends CommonBoss<Player> {
 
     public SpongeBossBar(String title, float health, BossColor color, BossStyle style) {

@@ -1,8 +1,6 @@
 package us.myles.ViaVersion.velocity.storage;
 
 import com.velocitypowered.api.proxy.Player;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.util.ReflectionUtil;
@@ -10,12 +8,11 @@ import us.myles.ViaVersion.util.ReflectionUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 public class VelocityStorage extends StoredObject {
-    private Player player;
+    private final Player player;
     private String currentServer;
     private List<UUID> cachedBossbar;
     private static Method getServerBossBars;
@@ -57,5 +54,39 @@ public class VelocityStorage extends StoredObject {
             }
         }
         return cachedBossbar;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public String getCurrentServer() {
+        return currentServer;
+    }
+
+    public void setCurrentServer(final String currentServer) {
+        this.currentServer = currentServer;
+    }
+
+    public List<UUID> getCachedBossbar() {
+        return cachedBossbar;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VelocityStorage that = (VelocityStorage) o;
+        if (!Objects.equals(player, that.player)) return false;
+        if (!Objects.equals(currentServer, that.currentServer)) return false;
+        return Objects.equals(cachedBossbar, that.cachedBossbar);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = player != null ? player.hashCode() : 0;
+        result = 31 * result + (currentServer != null ? currentServer.hashCode() : 0);
+        result = 31 * result + (cachedBossbar != null ? cachedBossbar.hashCode() : 0);
+        return result;
     }
 }

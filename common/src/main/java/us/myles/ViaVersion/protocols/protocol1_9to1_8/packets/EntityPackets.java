@@ -5,23 +5,26 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Triple;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class EntityPackets {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
@@ -31,9 +34,9 @@ public class EntityPackets {
         }
     };
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_9To1_8 protocol) {
         // Attach Entity Packet
-        protocol.registerOutgoing(State.PLAY, 0x1B, 0x3A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ATTACH_ENTITY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -44,7 +47,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN, new ValueTransformer<Boolean, Void>(Type.NOTHING) {
                     @Override
                     public Void transform(PacketWrapper wrapper, Boolean inputValue) throws Exception {
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                         if (!inputValue) {
                             int passenger = wrapper.get(Type.INT, 0);
                             int vehicle = wrapper.get(Type.INT, 1);
@@ -56,10 +59,10 @@ public class EntityPackets {
                                 if (!tracker.getVehicleMap().containsKey(passenger))
                                     return null; // Cancel
                                 passengerPacket.write(Type.VAR_INT, tracker.getVehicleMap().remove(passenger));
-                                passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{});
+                                passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{});
                             } else {
                                 passengerPacket.write(Type.VAR_INT, vehicle);
-                                passengerPacket.write(Type.VAR_INT_ARRAY, new Integer[]{passenger});
+                                passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{passenger});
                                 tracker.getVehicleMap().put(passenger, vehicle);
                             }
                             passengerPacket.send(Protocol1_9To1_8.class); // Send the packet
@@ -69,8 +72,7 @@ public class EntityPackets {
                 });
             }
         });
-        // Entity Teleport Packet
-        protocol.registerOutgoing(State.PLAY, 0x18, 0x4A, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -89,7 +91,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (Via.getConfig().isHologramPatch()) {
-                            EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                             if (tracker.getKnownHolograms().contains(entityID)) {
                                 Double newValue = wrapper.get(Type.DOUBLE, 1);
                                 newValue += (Via.getConfig().getHologramYOffset());
@@ -102,8 +104,7 @@ public class EntityPackets {
 
             }
         });
-        // Entity Look Move Packet
-        protocol.registerOutgoing(State.PLAY, 0x17, 0x26, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -118,8 +119,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 6 - On Ground
             }
         });
-        // Entity Relative Move Packet
-        protocol.registerOutgoing(State.PLAY, 0x15, 0x25, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_POSITION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -131,8 +131,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 4 - On Ground
             }
         });
-        // Entity Equipment Packet
-        protocol.registerOutgoing(State.PLAY, 0x04, 0x3C, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -140,7 +139,15 @@ public class EntityPackets {
                 // 1 - Slot ID
                 map(Type.SHORT, new ValueTransformer<Short, Integer>(Type.VAR_INT) {
                     @Override
-                    public Integer transform(PacketWrapper wrapper, Short slot) {
+                    public Integer transform(PacketWrapper wrapper, Short slot) throws Exception {
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        int receiverId = wrapper.user().get(EntityTracker1_9.class).getClientEntityId();
+                        // Normally, 0 = hand and 1-4 = armor
+                        // ... but if the sent id is equal to the receiver's id, 0-3 will instead mark the armor slots
+                        // (In 1.9+, every client treats the received the same: 0=hand, 1=offhand, 2-5=armor)
+                        if (entityId == receiverId) {
+                            return slot.intValue() + 2;
+                        }
                         return slot > 0 ? slot.intValue() + 1 : slot.intValue();
                     }
                 });
@@ -157,7 +164,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         Item stack = wrapper.get(Type.ITEM, 0);
 
@@ -172,8 +179,7 @@ public class EntityPackets {
                 });
             }
         });
-        // Entity Metadata Packet
-        protocol.registerOutgoing(State.PLAY, 0x1C, 0x39, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_METADATA, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -183,14 +189,13 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                        Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityID);
-                        if (type != null) {
-                            MetadataRewriter.transform(type, metadataList);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        if (tracker.hasEntity(entityId)) {
+                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
                             // Buffer
-                            tracker.addMetadataToBuffer(entityID, metadataList);
+                            tracker.addMetadataToBuffer(entityId, metadataList);
                             wrapper.cancel();
                         }
                     }
@@ -202,7 +207,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                         tracker.handleMetadata(entityID, metadataList);
                     }
                 });
@@ -212,7 +217,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        if (metadataList.size() == 0) {
+                        if (metadataList.isEmpty()) {
                             wrapper.cancel();
                         }
                     }
@@ -220,9 +225,7 @@ public class EntityPackets {
             }
         });
 
-        // Entity Effect Packet
-        protocol.registerOutgoing(State.PLAY, 0x1D, 0x4C, new PacketRemapper() {
-
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -241,26 +244,12 @@ public class EntityPackets {
             }
         });
 
+        protocol.cancelOutgoing(ClientboundPackets1_8.UPDATE_ENTITY_NBT);
 
-        // Update Entity NBT
-        protocol.registerOutgoing(State.PLAY, 0x49, 0x49, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel();
-                    }
-                });
-            }
-        });
-
-        // Combat Event Packet
-        protocol.registerOutgoing(State.PLAY, 0x42, 0x2C, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.COMBAT_EVENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); //Event id
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -274,8 +263,7 @@ public class EntityPackets {
             }
         });
 
-        // Entity Properties Packet
-        protocol.registerOutgoing(State.PLAY, 0x20, 0x4B, new PacketRemapper() {
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -283,7 +271,7 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if (!Via.getConfig().isMinimizeCooldown()) return;
-                        if (wrapper.get(Type.VAR_INT, 0) != wrapper.user().get(EntityTracker.class).getProvidedEntityId()) {
+                        if (wrapper.get(Type.VAR_INT, 0) != wrapper.user().get(EntityTracker1_9.class).getProvidedEntityId()) {
                             return;
                         }
                         int propertiesToRead = wrapper.read(Type.INT);
@@ -331,22 +319,8 @@ public class EntityPackets {
         });
 
 
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerOutgoing(State.PLAY, 0x1A, 0x1B); // Entity Status Packet
-        protocol.registerOutgoing(State.PLAY, 0x16, 0x27); // Entity Look Packet
-        protocol.registerOutgoing(State.PLAY, 0x14, 0x28); // Entity Packet
-
-        protocol.registerOutgoing(State.PLAY, 0x0A, 0x2F); // Use Bed Packet
-
-        protocol.registerOutgoing(State.PLAY, 0x1E, 0x31); // Remove Entity Effect Packet
-        protocol.registerOutgoing(State.PLAY, 0x19, 0x34); // Entity Head Look Packet
-        protocol.registerOutgoing(State.PLAY, 0x12, 0x3B); // Entity Velocity Packet
-
         /* Incoming Packets */
-
-        // Entity Action Packet
-        protocol.registerIncoming(State.PLAY, 0x0B, 0x14, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.ENTITY_ACTION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -367,9 +341,7 @@ public class EntityPackets {
             }
         });
 
-
-        // Use Entity Packet
-        protocol.registerIncoming(State.PLAY, 0x02, 0x0A, new PacketRemapper() {
+        protocol.registerIncoming(ServerboundPackets1_9.INTERACT_ENTITY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -396,11 +368,5 @@ public class EntityPackets {
                 });
             }
         });
-
-        /* Packets which do not have any field remapping or handlers */
-
-        protocol.registerIncoming(State.PLAY, 0x0C, 0x15); // Steer Vehicle Packet
-        protocol.registerIncoming(State.PLAY, 0x18, 0x1B); // Spectate Packet
-
     }
 }

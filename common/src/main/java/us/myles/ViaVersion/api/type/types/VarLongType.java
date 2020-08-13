@@ -10,10 +10,25 @@ public class VarLongType extends Type<Long> implements TypeConverter<Long> {
         super("VarLong", Long.class);
     }
 
-    @Override
-    public void write(ByteBuf buffer, Long object) {
+    public long readPrimitive(ByteBuf buffer) {
+        long out = 0;
+        int bytes = 0;
+        byte in;
+        do {
+            in = buffer.readByte();
+
+            out |= (long) (in & 0x7F) << (bytes++ * 7);
+
+            if (bytes > 10) { // 10 is maxBytes
+                throw new RuntimeException("VarLong too big");
+            }
+        } while ((in & 0x80) == 0x80);
+        return out;
+    }
+
+    public void writePrimitive(ByteBuf buffer, long object) {
         int part;
-        while (true) {
+        do {
             part = (int) (object & 0x7F);
 
             object >>>= 7;
@@ -22,35 +37,26 @@ public class VarLongType extends Type<Long> implements TypeConverter<Long> {
             }
 
             buffer.writeByte(part);
-
-            if (object == 0) {
-                break;
-            }
-        }
+        } while (object != 0);
     }
 
+    /**
+     * @deprecated use {@link #readPrimitive(ByteBuf)} for manual reading to avoid wrapping
+     */
     @Override
+    @Deprecated
     public Long read(ByteBuf buffer) {
-        long out = 0;
-        int bytes = 0;
-        byte in;
-        while (true) {
-            in = buffer.readByte();
-
-            out |= (in & 0x7F) << (bytes++ * 7);
-
-            if (bytes > 10) { // 10 is maxBytes
-                throw new RuntimeException("VarLong too big");
-            }
-
-            if ((in & 0x80) != 0x80) {
-                break;
-            }
-        }
-
-        return out;
+        return readPrimitive(buffer);
     }
 
+    /**
+     * @deprecated use {@link #writePrimitive(ByteBuf, long)} for manual reading to avoid wrapping
+     */
+    @Override
+    @Deprecated
+    public void write(ByteBuf buffer, Long object) {
+        writePrimitive(buffer, object);
+    }
 
     @Override
     public Long from(Object o) {

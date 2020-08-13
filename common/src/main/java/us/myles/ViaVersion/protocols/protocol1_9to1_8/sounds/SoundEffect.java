@@ -1,12 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-@Getter
 public enum SoundEffect {
 
     MOB_HORSE_ZOMBIE_IDLE("mob.horse.zombie.idle", "entity.zombie_horse.ambient", SoundCategory.NEUTRAL),
@@ -15,7 +12,7 @@ public enum SoundEffect {
     DIG_GRAVEL("dig.gravel", "block.gravel.place", SoundCategory.BLOCK),
     RANDOM_BOWHIT("random.bowhit", "block.tripwire.detach", SoundCategory.NEUTRAL),
     DIG_GLASS("dig.glass", "block.glass.break", SoundCategory.BLOCK),
-    MOB_ZOMBIE_SAY("mob.zombie.say", "entity.zombie_villager.ambient", SoundCategory.HOSTILE),
+    MOB_ZOMBIE_SAY("mob.zombie.say", "entity.zombie.ambient", SoundCategory.HOSTILE),
     MOB_PIG_DEATH("mob.pig.death", "entity.pig.death", SoundCategory.NEUTRAL),
     MOB_HORSE_DONKEY_HIT("mob.horse.donkey.hit", "entity.donkey.hurt", SoundCategory.NEUTRAL),
     GAME_NEUTRAL_SWIM("game.neutral.swim", "entity.player.swim", SoundCategory.NEUTRAL),
@@ -207,7 +204,7 @@ public enum SoundEffect {
     MOB_MAGMACUBE_SMALL("mob.magmacube.small", "entity.small_magmacube.squish", SoundCategory.HOSTILE),
     FIRE_IGNITE("fire.ignite", "item.flintandsteel.use", SoundCategory.BLOCK, true),
     MOB_ENDERDRAGON_HIT("mob.enderdragon.hit", "entity.enderdragon.hurt", SoundCategory.HOSTILE),
-    MOB_ZOMBIE_HURT("mob.zombie.hurt", "entity.zombie_villager.hurt", SoundCategory.HOSTILE),
+    MOB_ZOMBIE_HURT("mob.zombie.hurt", "entity.zombie.hurt", SoundCategory.HOSTILE),
     RANDOM_EXPLODE("random.explode", "block.end_gateway.spawn", SoundCategory.BLOCK),
     MOB_SLIME_ATTACK("mob.slime.attack", "entity.slime.attack", SoundCategory.HOSTILE),
     MOB_MAGMACUBE_JUMP("mob.magmacube.jump", "entity.magmacube.jump", SoundCategory.HOSTILE),
@@ -261,7 +258,7 @@ public enum SoundEffect {
     private final SoundCategory category;
     private final boolean breaksound;
 
-    private static Map<String, SoundEffect> effects;
+    private static final Map<String, SoundEffect> effects;
 
     static {
         effects = new HashMap<>();
@@ -289,4 +286,19 @@ public enum SoundEffect {
         return effects.get(name);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public SoundCategory getCategory() {
+        return category;
+    }
+
+    public boolean isBreaksound() {
+        return breaksound;
+    }
 }

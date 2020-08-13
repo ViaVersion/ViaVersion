@@ -1,34 +1,31 @@
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 // 1.11 Entity / Object ids TODO maybe in the future instead of copying it, some api.
 public class Entity1_11Types {
+
     public static EntityType getTypeFromId(int typeID, boolean isObject) {
         Optional<EntityType> type;
 
         if (isObject)
-            type = ObjectTypes.getPCEntity(typeID);
+            type = ObjectType.getPCEntity(typeID);
         else
             type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID + " isObject=" + isObject);
+            Via.getPlatform().getLogger().severe("Could not find 1.11 type id " + typeID + " isObject=" + isObject);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
         return type.get();
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum EntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
         DROPPED_ITEM(1, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
@@ -103,10 +100,10 @@ public class Entity1_11Types {
         ENDERMITE(67, ENTITY_INSENTIENT),
 
         GUARDIAN(68, ENTITY_INSENTIENT),
-        ELDER_GUARDIAN(4, EntityType.GUARDIAN), // Moved down to avoid illegal forward reference
+        ELDER_GUARDIAN(4, GUARDIAN), // Moved down to avoid illegal forward reference
 
         IRON_GOLEM(99, ENTITY_INSENTIENT), // moved up to avoid illegal forward references
-        SHULKER(69, EntityType.IRON_GOLEM),
+        SHULKER(69, IRON_GOLEM),
         PIG(90, ENTITY_AGEABLE),
         SHEEP(91, ENTITY_AGEABLE),
         COW(92, ENTITY_AGEABLE),
@@ -114,7 +111,7 @@ public class Entity1_11Types {
         SQUID(94, ENTITY_INSENTIENT),
         WOLF(95, ENTITY_TAMEABLE_ANIMAL),
         MUSHROOM_COW(96, COW),
-        SNOWMAN(97, EntityType.IRON_GOLEM),
+        SNOWMAN(97, IRON_GOLEM),
         OCELOT(98, ENTITY_TAMEABLE_ANIMAL),
 
         ABSTRACT_HORSE(-1, ENTITY_AGEABLE),
@@ -153,6 +150,21 @@ public class Entity1_11Types {
             this.parent = null;
         }
 
+        EntityType(int id, EntityType parent) {
+            this.id = id;
+            this.parent = parent;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getParent() {
+            return parent;
+        }
+
         static {
             for (EntityType type : EntityType.values()) {
                 TYPES.put(type.id, type);
@@ -161,38 +173,12 @@ public class Entity1_11Types {
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
-        }
-
-        public boolean is(EntityType... types) {
-            for (EntityType type : types)
-                if (is(type))
-                    return true;
-            return false;
-        }
-
-        public boolean is(EntityType type) {
-            return this == type;
-        }
-
-        public boolean isOrHasParent(EntityType type) {
-            EntityType parent = this;
-
-            do {
-                if (parent.equals(type))
-                    return true;
-
-                parent = parent.getParent();
-            } while (parent != null);
-
-            return false;
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum ObjectTypes {
+    public enum ObjectType implements us.myles.ViaVersion.api.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
@@ -216,34 +202,49 @@ public class Entity1_11Types {
         FIREWORK(76, EntityType.FIREWORK),
         LEASH(77, EntityType.LEASH_HITCH),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        EVOCATION_FANGS(39, EntityType.EVOCATION_FANGS),
+        EVOCATION_FANGS(79, EntityType.EVOCATION_FANGS),
         FISHIHNG_HOOK(90, EntityType.FISHING_HOOK),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
 
-        private static final Map<Integer, ObjectTypes> TYPES = new HashMap<>();
+        private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
 
         private final int id;
         private final EntityType type;
 
         static {
-            for (ObjectTypes type : ObjectTypes.values()) {
+            for (ObjectType type : ObjectType.values()) {
                 TYPES.put(type.id, type);
             }
         }
 
-        public static Optional<ObjectTypes> findById(int id) {
+        ObjectType(int id, EntityType type) {
+            this.id = id;
+            this.type = type;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getType() {
+            return type;
+        }
+
+        public static Optional<ObjectType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
-            Optional<ObjectTypes> output = findById(id);
+            Optional<ObjectType> output = findById(id);
 
             if (!output.isPresent())
-                return Optional.absent();
-            return Optional.of(output.get().getType());
+                return Optional.empty();
+            return Optional.of(output.get().type);
         }
     }
 }

@@ -5,15 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -25,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class BaseProtocol1_7 extends Protocol {
+public class BaseProtocol1_7 extends SimpleProtocol {
 
     @Override
     protected void registerPackets() {
@@ -39,7 +37,7 @@ public class BaseProtocol1_7 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
+                        ProtocolInfo info = wrapper.user().getProtocolInfo();
                         String originalStatus = wrapper.get(Type.STRING, 0);
                         try {
                             JsonElement json = GsonUtil.getGson().fromJson(originalStatus, JsonElement.class);
@@ -111,35 +109,29 @@ public class BaseProtocol1_7 extends Protocol {
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING); // 0 - UUID as String
-                map(Type.STRING); // 1 - Player Username
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
+                        ProtocolInfo info = wrapper.user().getProtocolInfo();
                         info.setState(State.PLAY);
-                        // Save other info
-                        String stringUUID = wrapper.get(Type.STRING, 0);
-                        if (stringUUID.length() == 32) { // Trimmed UUIDs are 32 characters
-                            // Trimmed
-                            stringUUID = addDashes(stringUUID);
-                        }
-                        UUID uuid = UUID.fromString(stringUUID);
-                        info.setUuid(uuid);
-                        info.setUsername(wrapper.get(Type.STRING, 1));
-                        // Add to ported clients
-                        Via.getManager().addPortedClient(wrapper.user());
 
-                        if (info.getPipeline().pipes().size() == 2
-                                && info.getPipeline().pipes().get(1).getClass() == BaseProtocol1_7.class
-                                && info.getPipeline().pipes().get(0).getClass() == BaseProtocol.class) // Only base protocol
+                        UUID uuid = passthroughLoginUUID(wrapper);
+                        info.setUuid(uuid);
+
+                        String username = wrapper.passthrough(Type.STRING);
+                        info.setUsername(username);
+                        // Add to ported clients
+                        Via.getManager().handleLoginSuccess(wrapper.user());
+
+                        if (info.getPipeline().pipes().stream().allMatch(ProtocolRegistry::isBaseProtocol)) { // Only base protocol
                             wrapper.user().setActive(false);
+                        }
 
                         if (Via.getManager().isDebug()) {
                             // Print out the route to console
                             Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
                                     new Object[]{
-                                            wrapper.get(Type.STRING, 1),
+                                            username,
                                             info.getProtocolVersion(),
                                             Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
                                     });
@@ -164,9 +156,10 @@ public class BaseProtocol1_7 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(final PacketWrapper wrapper) throws Exception {
-                        int protocol = wrapper.user().get(ProtocolInfo.class).getProtocolVersion();
+                        int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
                         if (Via.getConfig().getBlockedProtocols().contains(protocol)) {
                             if (!wrapper.user().getChannel().isOpen()) return;
+                            if (!wrapper.user().shouldApplyBlockProtocol()) return;
 
                             PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
                             Protocol1_9To1_8.FIX_JSON.write(disconnectPacket, ChatColor.translateAlternateColorCodes('&', Via.getConfig().getBlockedDisconnectMsg()));
@@ -174,12 +167,7 @@ public class BaseProtocol1_7 extends Protocol {
 
                             // Send and close
                             ChannelFuture future = disconnectPacket.sendFuture(BaseProtocol.class);
-                            future.addListener(new GenericFutureListener<Future<? super Void>>() {
-                                @Override
-                                public void operationComplete(Future<? super Void> future) throws Exception {
-                                    wrapper.user().getChannel().close();
-                                }
-                            });
+                            future.addListener(f -> wrapper.user().getChannel().close());
                         }
                     }
                 });
@@ -189,11 +177,6 @@ public class BaseProtocol1_7 extends Protocol {
         registerIncoming(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
     }
 
-    @Override
-    public void init(UserConnection userConnection) {
-
-    }
-
     public static String addDashes(String trimmedUUID) {
         StringBuilder idBuff = new StringBuilder(trimmedUUID);
         idBuff.insert(20, '-');
@@ -201,5 +184,14 @@ public class BaseProtocol1_7 extends Protocol {
         idBuff.insert(12, '-');
         idBuff.insert(8, '-');
         return idBuff.toString();
+    }
+
+    protected UUID passthroughLoginUUID(PacketWrapper wrapper) throws Exception {
+        String uuidString = wrapper.passthrough(Type.STRING);
+        if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
+            // Trimmed
+            uuidString = addDashes(uuidString);
+        }
+        return UUID.fromString(uuidString);
     }
 }

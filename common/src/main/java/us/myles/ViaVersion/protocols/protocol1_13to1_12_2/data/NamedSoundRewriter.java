@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class NamedSoundRewriter {
-    private static Map<String, String> oldToNew = new HashMap<>();
+    private static final Map<String, String> oldToNew = new HashMap<>();
 
     static {
         // Extracted from Minecraft Wiki
@@ -144,7 +144,6 @@ public class NamedSoundRewriter {
         oldToNew.put("record.strad", "music_disc.strad");
         oldToNew.put("record.wait", "music_disc.wait");
         oldToNew.put("record.ward", "music_disc.ward");
-
     }
 
     public static String getNewId(String old) {

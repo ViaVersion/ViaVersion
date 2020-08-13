@@ -3,6 +3,7 @@ package us.myles.ViaVersion.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -17,49 +18,30 @@ import java.util.UUID;
 
 public class UpdateUtil {
 
-    public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
-    private final static String URL = "https://api.spiget.org/v2/resources/";
-    private final static int PLUGIN = 19254;
-    private final static String LATEST_VERSION = "/versions/latest";
+    public static final String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
+    private static final String URL = "https://api.spiget.org/v2/resources/";
+    private static final int PLUGIN = 19254;
+    private static final String LATEST_VERSION = "/versions/latest";
 
     public static void sendUpdateMessage(final UUID uuid) {
-        Via.getPlatform().runAsync(new Runnable() {
-            @Override
-            public void run() {
-                final String message = getUpdateMessage(false);
-                if (message != null) {
-                    Via.getPlatform().runSync(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Via.getPlatform().sendMessage(uuid, PREFIX + message);
-                                }
-                            }
-                    );
-                }
+        Via.getPlatform().runAsync(() -> {
+            final String message = getUpdateMessage(false);
+            if (message != null) {
+                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(uuid, PREFIX + message));
             }
         });
     }
 
     public static void sendUpdateMessage() {
-        Via.getPlatform().runAsync(new Runnable() {
-            @Override
-            public void run() {
-                final String message = getUpdateMessage(true);
-                if (message != null) {
-                    Via.getPlatform().runSync(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Via.getPlatform().getLogger().warning(message);
-                                }
-                            }
-                    );
-                }
+        Via.getPlatform().runAsync(() -> {
+            final String message = getUpdateMessage(true);
+            if (message != null) {
+                Via.getPlatform().runSync(() -> Via.getPlatform().getLogger().warning(message));
             }
         });
     }
 
+    @Nullable
     private static String getUpdateMessage(boolean console) {
         if (Via.getPlatform().getPluginVersion().equals("${project.version}")) {
             return "You are using a debug/custom version, consider updating.";
@@ -91,6 +73,7 @@ public class UpdateUtil {
         return null;
     }
 
+    @Nullable
     private static String getNewestVersion() {
         try {
             URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
@@ -100,14 +83,14 @@ public class UpdateUtil {
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;
-            String content = "";
+            StringBuilder builder = new StringBuilder();
             while ((input = br.readLine()) != null) {
-                content = content + input;
+                builder.append(input);
             }
             br.close();
             JsonObject statistics;
             try {
-                statistics = GsonUtil.getGson().fromJson(content, JsonObject.class);
+                statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
             } catch (JsonParseException e) {
                 e.printStackTrace();
                 return null;

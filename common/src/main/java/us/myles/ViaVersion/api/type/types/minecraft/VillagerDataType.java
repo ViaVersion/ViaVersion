@@ -11,13 +11,13 @@ public class VillagerDataType extends Type<VillagerData> {
 
     @Override
     public VillagerData read(ByteBuf buffer) throws Exception {
-        return new VillagerData(Type.VAR_INT.read(buffer), Type.VAR_INT.read(buffer), Type.VAR_INT.read(buffer));
+        return new VillagerData(Type.VAR_INT.readPrimitive(buffer), Type.VAR_INT.readPrimitive(buffer), Type.VAR_INT.readPrimitive(buffer));
     }
 
     @Override
     public void write(ByteBuf buffer, VillagerData object) throws Exception {
-        Type.VAR_INT.write(buffer, object.getType());
-        Type.VAR_INT.write(buffer, object.getProfession());
-        Type.VAR_INT.write(buffer, object.getLevel());
+        Type.VAR_INT.writePrimitive(buffer, object.getType());
+        Type.VAR_INT.writePrimitive(buffer, object.getProfession());
+        Type.VAR_INT.writePrimitive(buffer, object.getLevel());
     }
 }

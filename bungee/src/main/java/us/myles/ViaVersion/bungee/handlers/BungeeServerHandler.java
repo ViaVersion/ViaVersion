@@ -26,7 +26,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -64,8 +64,12 @@ public class BungeeServerHandler implements Listener {
     }
 
     // Set the handshake version every time someone connects to any server
-    @EventHandler
+    @EventHandler(priority = 120)
     public void onServerConnect(ServerConnectEvent e) {
+        if (e.isCancelled()) {
+            return;
+        }
+
         UserConnection user = Via.getManager().getConnection(e.getPlayer().getUniqueId());
         if (user == null) return;
         if (!user.has(BungeeStorage.class)) {
@@ -73,19 +77,19 @@ public class BungeeServerHandler implements Listener {
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
-        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.get(ProtocolInfo.class).getProtocolVersion(), protocolId);
+        List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
 
         // Check if ViaVersion can support that version
         try {
             //Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
             Object handshake = getHandshake.invoke(e.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? user.get(ProtocolInfo.class).getProtocolVersion() : protocolId);
+            setProtocol.invoke(handshake, protocols == null ? user.getProtocolInfo().getProtocolVersion() : protocolId);
         } catch (InvocationTargetException | IllegalAccessException e1) {
             e1.printStackTrace();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = -120)
     public void onServerConnected(ServerConnectedEvent e) {
         try {
             checkServerChange(e, Via.getManager().getConnection(e.getPlayer().getUniqueId()));
@@ -94,7 +98,7 @@ public class BungeeServerHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = -120)
     public void onServerSwitch(ServerSwitchEvent e) {
         // Update entity id
         UserConnection userConnection = Via.getManager().getConnection(e.getPlayer().getUniqueId());
@@ -112,7 +116,6 @@ public class BungeeServerHandler implements Listener {
         }
     }
 
-
     public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
         if (user == null) return;
         // Auto-team handling
@@ -124,7 +127,7 @@ public class BungeeServerHandler implements Listener {
             if (e.getServer() != null) {
                 if (!e.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
                     // Clear auto-team
-                    EntityTracker oldEntityTracker = user.get(EntityTracker.class);
+                    EntityTracker1_9 oldEntityTracker = user.get(EntityTracker1_9.class);
                     if (oldEntityTracker != null) {
                         if (oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
                             oldEntityTracker.sendTeamPacket(false, true);
@@ -139,22 +142,26 @@ public class BungeeServerHandler implements Listener {
 
                     if (protocolId <= ProtocolVersion.v1_8.getId()) { // 1.8 doesn't have BossBar packet
                         if (storage.getBossbar() != null) {
-                            for (UUID uuid : storage.getBossbar()) {
-                                PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
-                                wrapper.write(Type.UUID, uuid);
-                                wrapper.write(Type.VAR_INT, 1); // remove
-                                wrapper.send(Protocol1_9To1_8.class, true, true);
+                            // TODO: Verify whether this packet needs to be sent when 1.8 -> 1.9 protocol isn't present in the pipeline
+                            // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
+                            if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
+                                for (UUID uuid : storage.getBossbar()) {
+                                    PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
+                                    wrapper.write(Type.UUID, uuid);
+                                    wrapper.write(Type.VAR_INT, 1); // remove
+                                    wrapper.send(Protocol1_9To1_8.class, true, true);
+                                }
                             }
                             storage.getBossbar().clear();
                         }
                     }
 
-                    ProtocolInfo info = user.get(ProtocolInfo.class);
+                    ProtocolInfo info = user.getProtocolInfo();
                     int previousServerProtocol = info.getServerProtocolVersion();
 
                     // Refresh the pipes
                     List<Pair<Integer, Protocol>> protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocolId);
-                    ProtocolPipeline pipeline = user.get(ProtocolInfo.class).getPipeline();
+                    ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
                     user.clearStoredObjects();
                     pipeline.cleanPipes();
                     if (protocols == null) {
@@ -215,7 +222,7 @@ public class BungeeServerHandler implements Listener {
                         protocol.init(user);
                     }
 
-                    EntityTracker newTracker = user.get(EntityTracker.class);
+                    EntityTracker1_9 newTracker = user.get(EntityTracker1_9.class);
                     if (newTracker != null) {
                         if (Via.getConfig().isAutoTeam()) {
                             String currentTeam = null;

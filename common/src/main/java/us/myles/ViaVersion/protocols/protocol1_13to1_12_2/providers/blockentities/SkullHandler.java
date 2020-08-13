@@ -9,13 +9,13 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityP
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 
 public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
-    private final int SKULL_WALL_START = 5447;
-    private final int SKULL_END = 5566;
+    private static final int SKULL_WALL_START = 5447;
+    private static final int SKULL_END = 5566;
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
-        Position position = new Position(getLong(tag.get("x")), getLong(tag.get("y")), getLong(tag.get("z")));
+        Position position = new Position((int) getLong(tag.get("x")), (short) getLong(tag.get("y")), (int) getLong(tag.get("z")));
 
         if (!storage.contains(position)) {
             Via.getPlatform().getLogger().warning("Received an head update packet, but there is no head! O_o " + tag);
@@ -23,7 +23,6 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         }
 
         int id = storage.get(position).getOriginal();
-
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
             Tag skullType = tag.get("SkullType");
             if (skullType != null) {

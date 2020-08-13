@@ -11,14 +11,15 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockConnectionStorage extends StoredObject {
-    private Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
-
+    private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8582];
     private static Constructor<?> fastUtilLongObjectHashMap;
-    private static HashMap<Short, Short> reverseBlockMappings;
+
+    private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
 
     static {
         try {
@@ -26,10 +27,13 @@ public class BlockConnectionStorage extends StoredObject {
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
-        reverseBlockMappings = new HashMap<>();
+
+        Arrays.fill(REVERSE_BLOCK_MAPPINGS, (short) -1);
         for (int i = 0; i < 4096; i++) {
-            int newBlock = MappingData.blockMappings.getNewBlock(i);
-            if (newBlock != -1) reverseBlockMappings.put((short) newBlock, (short) i);
+            int newBlock = MappingData.blockMappings.getNewId(i);
+            if (newBlock != -1) {
+                REVERSE_BLOCK_MAPPINGS[newBlock] = (short) i;
+            }
         }
     }
 
@@ -37,35 +41,38 @@ public class BlockConnectionStorage extends StoredObject {
         super(user);
     }
 
-    public void store(Position position, int blockState) {
-        Short mapping = reverseBlockMappings.get((short) blockState);
-        if (mapping == null) return;
+    public void store(int x, int y, int z, int blockState) {
+        short mapping = REVERSE_BLOCK_MAPPINGS[blockState];
+        if (mapping == -1) return;
+
         blockState = mapping;
-        long pair = getChunkSectionIndex(position);
+        long pair = getChunkSectionIndex(x, y, z);
         Pair<byte[], NibbleArray> map = getChunkSection(pair, (blockState & 0xF) != 0);
-        int blockIndex = encodeBlockPos(position);
+        int blockIndex = encodeBlockPos(x, y, z);
         map.getKey()[blockIndex] = (byte) (blockState >> 4);
         NibbleArray nibbleArray = map.getValue();
-        if (nibbleArray != null) nibbleArray.set(blockIndex, blockState);
+        if (nibbleArray != null) {
+            nibbleArray.set(blockIndex, blockState);
+        }
     }
 
-    public int get(Position position) {
-        long pair = getChunkSectionIndex(position);
+    public int get(int x, int y, int z) {
+        long pair = getChunkSectionIndex(x, y, z);
         Pair<byte[], NibbleArray> map = blockStorage.get(pair);
         if (map == null) return 0;
-        short blockPosition = encodeBlockPos(position);
+        short blockPosition = encodeBlockPos(x, y, z);
         NibbleArray nibbleArray = map.getValue();
         return WorldPackets.toNewId(
                 ((map.getKey()[blockPosition] & 0xFF) << 4)
-                | (nibbleArray == null ? 0 : nibbleArray.get(blockPosition))
+                        | (nibbleArray == null ? 0 : nibbleArray.get(blockPosition))
         );
     }
 
-    public void remove(Position position) {
-        long pair = getChunkSectionIndex(position);
+    public void remove(int x, int y, int z) {
+        long pair = getChunkSectionIndex(x, y, z);
         Pair<byte[], NibbleArray> map = blockStorage.get(pair);
         if (map == null) return;
-        int blockIndex = encodeBlockPos(position);
+        int blockIndex = encodeBlockPos(x, y, z);
         NibbleArray nibbleArray = map.getValue();
         if (nibbleArray != null) {
             nibbleArray.set(blockIndex, 0);
@@ -112,7 +119,7 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     private long getChunkSectionIndex(Position position) {
-        return getChunkSectionIndex(position.getX().intValue(), position.getY().intValue(), position.getZ().intValue());
+        return getChunkSectionIndex(position.getX(), position.getY(), position.getZ());
     }
 
     private short encodeBlockPos(int x, int y, int z) {
@@ -120,7 +127,7 @@ public class BlockConnectionStorage extends StoredObject {
     }
 
     private short encodeBlockPos(Position pos) {
-        return encodeBlockPos(pos.getX().intValue(), pos.getY().intValue(), pos.getZ().intValue());
+        return encodeBlockPos(pos.getX(), pos.getY(), pos.getZ());
     }
 
     private <T> Map<Long, T> createLongObjectMap() {

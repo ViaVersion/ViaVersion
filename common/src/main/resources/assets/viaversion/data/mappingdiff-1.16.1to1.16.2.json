@@ -1,0 +1,10 @@
+{
+  "blockstates": {
+    "4729": "minecraft:chain[axis=y,waterlogged=true]",
+    "4730": "minecraft:chain[axis=y,waterlogged=false]",
+    "14886": "minecraft:lantern[hanging=true,waterlogged=false]",
+    "14887": "minecraft:lantern[hanging=false,waterlogged=false]",
+    "14888": "minecraft:soul_lantern[hanging=true,waterlogged=false]",
+    "14889": "minecraft:soul_lantern[hanging=false,waterlogged=false]"
+  }
+}

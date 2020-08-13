@@ -2,15 +2,12 @@ package us.myles.ViaVersion.bungee.handlers;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import lombok.Getter;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
 public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
-    @Getter
     private final ChannelInitializer<Channel> original;
     private Method method;
 
@@ -40,6 +37,9 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
 
         socketChannel.pipeline().addBefore("packet-encoder", "via-encoder", encoder);
         socketChannel.pipeline().addBefore("packet-decoder", "via-decoder", decoder);
+    }
 
+    public ChannelInitializer<Channel> getOriginal() {
+        return original;
     }
 }

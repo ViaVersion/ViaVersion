@@ -2,10 +2,8 @@ package us.myles.ViaVersion.bukkit.platform;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 import us.myles.ViaVersion.ViaVersionPlugin;
 import us.myles.ViaVersion.api.Via;
@@ -17,13 +15,19 @@ import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.listeners.UpdateListener;
 import us.myles.ViaVersion.bukkit.listeners.multiversion.PlayerSneakListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.*;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.BlockListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.DeathListener;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.HandItemCache;
+import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
 import us.myles.ViaVersion.bukkit.providers.BukkitBlockConnectionProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
@@ -33,14 +37,15 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class BukkitViaLoader implements ViaPlatformLoader {
-    private ViaVersionPlugin plugin;
+    private final ViaVersionPlugin plugin;
 
-    private Set<Listener> listeners = new HashSet<>();
-    private Set<BukkitTask> tasks = new HashSet<>();
+    private final Set<Listener> listeners = new HashSet<>();
+    private final Set<BukkitTask> tasks = new HashSet<>();
+
+    private HandItemCache handItemCache;
 
     public BukkitViaLoader(ViaVersionPlugin plugin) {
         this.plugin = plugin;
@@ -66,23 +71,35 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         // Add ProtocolSupport ConnectListener if necessary.
         ClassGenerator.registerPSConnectListener(plugin);
 
-        registerListener(new Listener() {
-            @EventHandler
-            public void onPlayerQuit(PlayerQuitEvent e) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
-            }
-        });
-
         /* 1.9 client to 1.8 server */
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            storeListener(new ArmorListener(plugin)).register();
+            storeListener(new DeathListener(plugin)).register();
+            storeListener(new BlockListener(plugin)).register();
 
-        storeListener(new ArmorListener(plugin)).register();
-        storeListener(new DeathListener(plugin)).register();
-        storeListener(new BlockListener(plugin)).register();
+            if (plugin.getConf().isItemCache()) {
+                handItemCache = new HandItemCache();
+                tasks.add(handItemCache.runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
+            }
+        }
 
         if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_14.getId()) {
             boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId();
             if (use1_9Fix || plugin.getConf().is1_14HitboxFix()) {
-                storeListener(new PlayerSneakListener(plugin, this, use1_9Fix, plugin.getConf().is1_14HitboxFix())).register();
+                try {
+                    storeListener(new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix())).register();
+                } catch (ReflectiveOperationException e) {
+                    Via.getPlatform().getLogger().warning("Could not load hitbox fix - please report this on our GitHub");
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_15.getId()) {
+            try {
+                Class.forName("org.bukkit.event.entity.EntityToggleGlideEvent");
+                storeListener(new EntityToggleGlideListener(plugin)).register();
+            } catch (ClassNotFoundException ignored) {
             }
         }
 
@@ -93,37 +110,26 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();
         }
-        if (plugin.getConf().isItemCache()) {
-            tasks.add(new HandItemCache().runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
-            HandItemCache.CACHE = true;
-        }
 
         /* Providers */
-        Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
-        Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
-        if (plugin.getConf().is1_12QuickMoveActionFix()) {
-            Via.getManager().getProviders().use(InventoryQuickMoveProvider.class, new BukkitInventoryQuickMoveProvider());
-        }
-        if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")) {
-            Via.getManager().getProviders().use(BlockConnectionProvider.class, new BukkitBlockConnectionProvider());
-        }
-        Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
-            @Override
-            public Item getHandItem(final UserConnection info) {
-                if (HandItemCache.CACHE) {
-                    return HandItemCache.getHandItem(info.get(ProtocolInfo.class).getUuid());
-                } else {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+            Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
+            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
+
+            Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
+                @Override
+                public Item getHandItem(final UserConnection info) {
+                    if (handItemCache != null) {
+                        return handItemCache.getHandItem(info.getProtocolInfo().getUuid());
+                    }
                     try {
-                        return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), new Callable<Item>() {
-                            @Override
-                            public Item call() throws Exception {
-                                UUID playerUUID = info.get(ProtocolInfo.class).getUuid();
-                                Player player = Bukkit.getPlayer(playerUUID);
-                                if (player != null) {
-                                    return HandItemCache.convert(player.getItemInHand());
-                                }
-                                return null;
+                        return Bukkit.getScheduler().callSyncMethod(Bukkit.getPluginManager().getPlugin("ViaVersion"), () -> {
+                            UUID playerUUID = info.getProtocolInfo().getUuid();
+                            Player player = Bukkit.getPlayer(playerUUID);
+                            if (player != null) {
+                                return HandItemCache.convert(player.getItemInHand());
                             }
+                            return null;
                         }).get(10, TimeUnit.SECONDS);
                     } catch (Exception e) {
                         Via.getPlatform().getLogger().severe("Error fetching hand item: " + e.getClass().getName());
@@ -132,9 +138,21 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                         return null;
                     }
                 }
-            }
-        });
+            });
+        }
 
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
+            if (plugin.getConf().is1_12QuickMoveActionFix()) {
+                Via.getManager().getProviders().use(InventoryQuickMoveProvider.class, new BukkitInventoryQuickMoveProvider());
+            }
+        }
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_13.getId()) {
+            if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")) {
+                BukkitBlockConnectionProvider blockConnectionProvider = new BukkitBlockConnectionProvider();
+                Via.getManager().getProviders().use(BlockConnectionProvider.class, blockConnectionProvider);
+                ConnectionData.blockConnectionProvider = blockConnectionProvider;
+            }
+        }
     }
 
     @Override

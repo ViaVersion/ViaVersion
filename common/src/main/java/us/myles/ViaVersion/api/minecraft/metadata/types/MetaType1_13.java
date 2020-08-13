@@ -1,20 +1,16 @@
 package us.myles.ViaVersion.api.minecraft.metadata.types;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import us.myles.ViaVersion.api.type.types.version.Types1_13;
 
-@RequiredArgsConstructor
-@Getter
 public enum MetaType1_13 implements MetaType {
     Byte(0, Type.BYTE),
     VarInt(1, Type.VAR_INT),
     Float(2, Type.FLOAT),
     String(3, Type.STRING),
-    Chat(4, Type.STRING),
-    OptChat(5, Type.OPTIONAL_CHAT),
+    Chat(4, Type.COMPONENT),
+    OptChat(5, Type.OPTIONAL_COMPONENT),
     Slot(6, Type.FLAT_ITEM),
     Boolean(7, Type.BOOLEAN),
     Vector3F(8, Type.ROTATION),
@@ -24,14 +20,28 @@ public enum MetaType1_13 implements MetaType {
     OptUUID(12, Type.OPTIONAL_UUID),
     BlockID(13, Type.VAR_INT),
     NBTTag(14, Type.NBT),
-    PARTICLE(15, Protocol1_13To1_12_2.PARTICLE_TYPE),
+    PARTICLE(15, Types1_13.PARTICLE),
     Discontinued(99, null);
 
     private final int typeID;
     private final Type type;
 
+    MetaType1_13(int typeID, Type type) {
+        this.typeID = typeID;
+        this.type = type;
+    }
+
     public static MetaType1_13 byId(int id) {
         return values()[id];
     }
 
+    @Override
+    public int getTypeID() {
+        return typeID;
+    }
+
+    @Override
+    public Type getType() {
+        return type;
+    }
 }

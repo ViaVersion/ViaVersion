@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.api;
 
-import java.util.List;
+import java.util.Set;
 
 public interface ViaVersionConfig {
 
@@ -76,14 +76,6 @@ public interface ViaVersionConfig {
     boolean isBossbarAntiflicker();
 
     /**
-     * Get if unknown entity errors will be suppressed
-     *
-     * @return true if boss bar patching is enabled
-     */
-    @Deprecated
-    boolean isUnknownEntitiesSuppressed();
-
-    /**
      * Get the vertical offset armor stands are being moved with when the hologram patch is enabled
      *
      * @return the vertical offset holograms will be moved with
@@ -96,14 +88,6 @@ public interface ViaVersionConfig {
      * @return true if automatic teaming is enabled
      */
     boolean isAutoTeam();
-
-    /**
-     * Get if our block break patch is enabled to prevent weird ghost glitches.
-     *
-     * @return true if it is enabled.
-     */
-    @Deprecated
-    boolean isBlockBreakPatch();
 
     /**
      * Get the maximum number of packets a client can send per second.
@@ -166,7 +150,7 @@ public interface ViaVersionConfig {
      *
      * @return if true, enabled
      */
-    boolean isStimulatePlayerTick();
+    boolean isSimulatePlayerTick();
 
     /**
      * Use the item cache to prevent high resource usage
@@ -185,7 +169,7 @@ public interface ViaVersionConfig {
     /**
      * Replace extended pistons on 1.10 chunk loading.
      *
-     * @return True if to replace them
+     * @return true if to replace them
      */
     boolean isReplacePistons();
 
@@ -199,28 +183,28 @@ public interface ViaVersionConfig {
     /**
      * Force json transform
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isForceJsonTransform();
 
     /**
      * Should we fix nbt array's in json chat messages for 1.12 clients
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean is1_12NBTArrayFix();
 
     /**
      * Should we make team colours based on the last colour in team prefix
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean is1_13TeamColourFix();
 
     /**
      * Should we fix shift quick move action for 1.12 clients
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean is1_12QuickMoveActionFix();
 
@@ -229,7 +213,7 @@ public interface ViaVersionConfig {
      *
      * @return An Integer list
      */
-    List<Integer> getBlockedProtocols();
+    Set<Integer> getBlockedProtocols();
 
     /**
      * Get the custom disconnect message
@@ -247,30 +231,30 @@ public interface ViaVersionConfig {
     String getReloadDisconnectMsg();
 
     /**
-     * Should we hide errors that occur when trying to converting to 1.13 data?
+     * Should we hide errors that occur when trying to convert block and item data over versions?
      *
-     * @return True if enabled
+     * @return true if enabled
      */
-    boolean isSuppress1_13ConversionErrors();
+    boolean isSuppressConversionWarnings();
 
     /**
      * Should we disable the 1.13 auto-complete feature to stop spam kicks? (for any server lower than 1.13)
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isDisable1_13AutoComplete();
 
     /**
      * Tries to minimize cooldown animation.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isMinimizeCooldown();
 
     /**
      * Enable the serverside blockconnections for 1.13+ clients
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isServersideBlockConnections();
 
@@ -284,7 +268,7 @@ public interface ViaVersionConfig {
     /**
      * When activated, only the most important blocks are saved in the BlockStorage.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isReduceBlockStorageMemory();
 
@@ -292,16 +276,30 @@ public interface ViaVersionConfig {
      * When activated with serverside-blockconnections, flower parts with blocks above will be sent as stems.
      * Useful for lobbyservers where users can't build and those stems are used decoratively.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isStemWhenBlockAbove();
 
     /**
+     * Vines not connected to any blocks will be mapped to air for 1.13+ clients to prevent them from climbing up.
+     *
+     * @return true if enabled
+     */
+    boolean isVineClimbFix();
+
+    /**
      * When activated, the 1-layer snow will be sent as 2-layer snow to 1.13+ clients to have collision.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isSnowCollisionFix();
+
+    /**
+     * When activated, infested blocks will be mapped to their normal stone variants for 1.13+ clients.
+     *
+     * @return true if enabled
+     */
+    boolean isInfestedBlocksFix();
 
     /**
      * When greater than 0, enables tab complete request delaying by x ticks
@@ -313,28 +311,51 @@ public interface ViaVersionConfig {
     /**
      * When activated, edited books with more than 50 pages will be shortened to 50.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isTruncate1_14Books();
 
     /**
      * Handles left handed info by using unused bit 7 on Client Settings packet
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean isLeftHandedHandling();
 
     /**
      * Fixes velocity bugs due to different hitbox for 1.9-1.13 clients on 1.8 servers.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean is1_9HitboxFix();
 
     /**
      * Fixes velocity bugs due to different hitbox for 1.14+ clients on sub 1.14 servers.
      *
-     * @return True if enabled
+     * @return true if enabled
      */
     boolean is1_14HitboxFix();
+
+    /**
+     * Fixes non full blocks having 0 light for 1.14+ clients on sub 1.14 servers.
+     *
+     * @return true if enabled
+     */
+    boolean isNonFullBlockLightFix();
+
+    boolean is1_14HealthNaNFix();
+
+    /**
+     * Should 1.15 clients respawn instantly / without showing the death screen.
+     *
+     * @return true if enabled
+     */
+    boolean is1_15InstantRespawn();
+
+    /**
+     * Ignores incoming plugin channel messages of 1.16+ clients with channel names longer than 32 charatcers.
+     *
+     * @return true if enabled
+     */
+    boolean isIgnoreLong1_16ChannelNames();
 }

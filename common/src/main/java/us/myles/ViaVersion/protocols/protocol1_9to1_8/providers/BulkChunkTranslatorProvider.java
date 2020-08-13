@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.providers;
 
-import lombok.Data;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.platform.providers.Provider;
 import us.myles.ViaVersion.api.type.Type;
@@ -74,7 +73,6 @@ public class BulkChunkTranslatorProvider implements Provider {
         return true;
     }
 
-    @Data
     private static class ChunkBulkSection {
         private int x;
         private int z;
@@ -92,6 +90,46 @@ public class BulkChunkTranslatorProvider implements Provider {
             bulkSection.setLength((bitCount * ((4096 * 2) + 2048)) + (skylight ? bitCount * 2048 : 0) + 256); // Thanks MCProtocolLib
 
             return bulkSection;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
+        public int getZ() {
+            return z;
+        }
+
+        public void setZ(int z) {
+            this.z = z;
+        }
+
+        public int getBitMask() {
+            return bitMask;
+        }
+
+        public void setBitMask(int bitMask) {
+            this.bitMask = bitMask;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public void setLength(int length) {
+            this.length = length;
+        }
+
+        public byte[] getData() {
+            return data;
+        }
+
+        public void setData(byte[] data) {
+            this.data = data;
         }
     }
 }

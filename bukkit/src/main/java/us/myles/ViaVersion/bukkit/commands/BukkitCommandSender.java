@@ -1,15 +1,17 @@
 package us.myles.ViaVersion.bukkit.commands;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 
-@AllArgsConstructor
 public class BukkitCommandSender implements ViaCommandSender {
-    private CommandSender sender;
+    private final CommandSender sender;
+
+    public BukkitCommandSender(CommandSender sender) {
+        this.sender = sender;
+    }
 
     @Override
     public boolean hasPermission(String permission) {

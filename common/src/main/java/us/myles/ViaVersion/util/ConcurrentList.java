@@ -1,9 +1,13 @@
 package us.myles.ViaVersion.util;
 
-import lombok.SneakyThrows;
-
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  * Created by wea_ondara licensed under MIT
@@ -13,7 +17,9 @@ import java.util.*;
  * https://github.com/weaondara/BungeePerms/blob/master/src/main/java/net/alpenblock/bungeeperms/util/ConcurrentList.java
  *
  * @param <E> List Type
+ * @deprecated get rid of this at some point
  */
+@Deprecated
 public class ConcurrentList<E> extends ArrayList<E> {
 
     private final Object lock = new Object();
@@ -54,16 +60,19 @@ public class ConcurrentList<E> extends ArrayList<E> {
     }
 
     @Override
-    @SneakyThrows
     public Object clone() {
         synchronized (lock) {
-            ConcurrentList<E> clist = (ConcurrentList<E>) super.clone();
-            clist.modCount = 0;
-            Field f = ArrayList.class.getDeclaredField("elementData");
-            f.setAccessible(true);
-            f.set(clist, Arrays.copyOf((Object[]) f.get(this), this.size()));
+            try {
+                ConcurrentList<E> clist = (ConcurrentList<E>) super.clone();
+                clist.modCount = 0;
+                Field f = ArrayList.class.getDeclaredField("elementData");
+                f.setAccessible(true);
+                f.set(clist, Arrays.copyOf((Object[]) f.get(this), this.size()));
 
-            return clist;
+                return clist;
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

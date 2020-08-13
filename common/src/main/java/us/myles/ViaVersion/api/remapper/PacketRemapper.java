@@ -3,10 +3,12 @@ package us.myles.ViaVersion.api.remapper;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.exception.InformativeException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public abstract class PacketRemapper {
     private final List<Pair<ValueReader, ValueWriter>> valueRemappers = new ArrayList<>();
@@ -40,6 +42,38 @@ public abstract class PacketRemapper {
      *
      * @param oldType     The old type
      * @param <T1>        The old return type.
+     * @param newType     The new type
+     * @param <T2>        The new return type.
+     * @param transformer The transformer to use to produce the new type.
+     */
+    public <T1, T2> void map(Type<T1> oldType, Type<T2> newType, Function<T1, T2> transformer) {
+        map(new TypeRemapper<>(oldType), new ValueTransformer<T1, T2>(newType) {
+            @Override
+            public T2 transform(PacketWrapper wrapper, T1 inputValue) throws Exception {
+                return transformer.apply(inputValue);
+            }
+        });
+    }
+
+    /**
+     * Map a type from an old type to a transformed new type.
+     *
+     * @param <T1>        The old return type.
+     * @param transformer The transformer to use to produce the new type.
+     * @param <T2>        The new return type.
+     */
+    public <T1, T2> void map(ValueTransformer<T1, T2> transformer) {
+        if (transformer.getInputType() == null) {
+            throw new IllegalArgumentException("Use map(Type<T1>, ValueTransformer<T1, T2>) for value transformers without specified input type!");
+        }
+        map(transformer.getInputType(), transformer);
+    }
+
+    /**
+     * Map a type from an old type to a transformed new type.
+     *
+     * @param oldType     The old type
+     * @param <T1>        The old return type.
      * @param transformer The transformer to use to produce the new type.
      * @param <T2>        The new return type.
      */
@@ -55,7 +89,7 @@ public abstract class PacketRemapper {
      * @param <T>          The return type
      */
     public <T> void map(ValueReader<T> inputReader, ValueWriter<T> outputWriter) {
-        valueRemappers.add(new Pair<ValueReader, ValueWriter>(inputReader, outputWriter));
+        valueRemappers.add(new Pair<>(inputReader, outputWriter));
     }
 
     /**
@@ -85,7 +119,8 @@ public abstract class PacketRemapper {
      * Remap a packet wrapper
      *
      * @param packetWrapper The wrapper to remap
-     * @throws Exception Throws if it fails to write / read to the packet.
+     * @throws InformativeException if it fails to write / read to the packet
+     * @throws CancelException      if the packet should be cancelled
      */
     public void remap(PacketWrapper packetWrapper) throws Exception {
         try {
@@ -99,6 +134,14 @@ public abstract class PacketRemapper {
         } catch (InformativeException e) {
             e.addSource(this.getClass());
             throw e;
+        } catch (CancelException e) {
+            // Pass through CancelExceptions
+            throw e;
+        } catch (Exception e) {
+            // Wrap other exceptions during packet handling
+            InformativeException ex = new InformativeException(e);
+            ex.addSource(this.getClass());
+            throw ex;
         }
     }
 }

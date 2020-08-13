@@ -3,10 +3,6 @@ package us.myles.ViaVersion.bukkit.classgenerator;
 import javassist.*;
 import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -15,14 +11,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.ViaVersion;
 import us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler;
 import us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 
+import java.lang.reflect.Method;
+
+//TODO maybe clean this up a bit 👀
 public class ClassGenerator {
     private static HandlerConstructor constructor = new BasicHandlerConstructor();
-    private static String psPackage = null;
+    private static String psPackage;
     private static Class psConnectListener;
 
     public static HandlerConstructor getConstructor() {
@@ -30,14 +28,15 @@ public class ClassGenerator {
     }
 
     public static void generate() {
-        if (ViaVersion.getInstance().isCompatSpigotBuild() || ViaVersion.getInstance().isProtocolSupport()) {
+        if (ViaVersionPlugin.getInstance().isCompatSpigotBuild() || ViaVersionPlugin.getInstance().isProtocolSupport()) {
             try {
                 ClassPool pool = ClassPool.getDefault();
+                pool.insertClassPath(new LoaderClassPath(Bukkit.class.getClassLoader()));
                 for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
                     pool.insertClassPath(new LoaderClassPath(p.getClass().getClassLoader()));
                 }
 
-                if (ViaVersion.getInstance().isCompatSpigotBuild()) {
+                if (ViaVersionPlugin.getInstance().isCompatSpigotBuild()) {
                     Class decodeSuper = NMSUtil.nms("PacketDecoder");
                     Class encodeSuper = NMSUtil.nms("PacketEncoder");
                     // Generate the classes
@@ -215,7 +214,7 @@ public class ClassGenerator {
                     "        int protoVersion = packet.b();\n"
                   ))
                     // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
-                    // If via has put the protoVersion to the server we can spoof ProtocolSupport's version. 
+                    // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.
                   + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == us.myles.ViaVersion.api.protocol.ProtocolRegistry.SERVER_PROTOCOL) {\n"
                   + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
                   + "        }\n"
@@ -230,7 +229,7 @@ public class ClassGenerator {
         }
         return null;
     }
-    
+
     public static void registerPSConnectListener(ViaVersionPlugin plugin) {
         if (getPSConnectListener() != null) {
             try {

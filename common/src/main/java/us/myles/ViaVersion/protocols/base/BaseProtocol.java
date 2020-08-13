@@ -8,7 +8,7 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
+import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.Direction;
@@ -16,7 +16,7 @@ import us.myles.ViaVersion.packets.State;
 
 import java.util.List;
 
-public class BaseProtocol extends Protocol {
+public class BaseProtocol extends SimpleProtocol {
 
     @Override
     protected void registerPackets() {
@@ -26,52 +26,48 @@ public class BaseProtocol extends Protocol {
         registerIncoming(State.HANDSHAKE, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
-                // select right protocol
-                map(Type.VAR_INT); // 0 - Client Protocol Version
-                map(Type.STRING); // 1 - Server Address
-                map(Type.UNSIGNED_SHORT); // 2 - Server Port
-                map(Type.VAR_INT); // 3 - Next State
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int protVer = wrapper.get(Type.VAR_INT, 0);
-                        int state = wrapper.get(Type.VAR_INT, 1);
+                handler(wrapper -> {
+                    int protVer = wrapper.passthrough(Type.VAR_INT);
+                    wrapper.passthrough(Type.STRING); // Server Address
+                    wrapper.passthrough(Type.UNSIGNED_SHORT); // Server Port
+                    int state = wrapper.passthrough(Type.VAR_INT);
 
-                        ProtocolInfo info = wrapper.user().get(ProtocolInfo.class);
-                        info.setProtocolVersion(protVer);
-                        // Ensure the server has a version provider
-                        if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
-                            wrapper.user().setActive(false);
-                            return;
-                        }
-                        // Choose the pipe
-                        int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
-                        info.setServerProtocolVersion(protocol);
-                        List<Pair<Integer, Protocol>> protocols = null;
+                    ProtocolInfo info = wrapper.user().getProtocolInfo();
+                    info.setProtocolVersion(protVer);
+                    // Ensure the server has a version provider
+                    if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
+                        wrapper.user().setActive(false);
+                        return;
+                    }
+                    // Choose the pipe
+                    int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                    info.setServerProtocolVersion(protocol);
+                    List<Pair<Integer, Protocol>> protocols = null;
 
-                        // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
-                        if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {
-                            protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
-                        }
+                    // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
+                    if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {
+                        protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+                    }
 
-                        ProtocolPipeline pipeline = wrapper.user().get(ProtocolInfo.class).getPipeline();
-                        if (protocols != null) {
-                            for (Pair<Integer, Protocol> prot : protocols) {
-                                pipeline.add(prot.getValue());
-                            }
-                            wrapper.set(Type.VAR_INT, 0, protocol);
+                    ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
+                    if (protocols != null) {
+                        for (Pair<Integer, Protocol> prot : protocols) {
+                            pipeline.add(prot.getValue());
+                            // Ensure mapping data has already been loaded
+                            ProtocolRegistry.completeMappingDataLoading(prot.getValue().getClass());
                         }
+                        wrapper.set(Type.VAR_INT, 0, protocol);
+                    }
 
-                        // Add Base Protocol
-                        pipeline.add(ProtocolRegistry.getBaseProtocol(protocol));
+                    // Add Base Protocol
+                    pipeline.add(ProtocolRegistry.getBaseProtocol(protocol));
 
-                        // Change state
-                        if (state == 1) {
-                            info.setState(State.STATUS);
-                        }
-                        if (state == 2) {
-                            info.setState(State.LOGIN);
-                        }
+                    // Change state
+                    if (state == 1) {
+                        info.setState(State.STATUS);
+                    }
+                    if (state == 2) {
+                        info.setState(State.LOGIN);
                     }
                 });
             }

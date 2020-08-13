@@ -5,16 +5,16 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mojang changed the way how tile entities inside chunk packets work in 1.10.1
  * It requires now to have all tile entity data included in the chunk packet, otherwise it'll crash.
  */
 public class FakeTileEntity {
-    private static final Map<Integer, CompoundTag> tileEntities = new ConcurrentHashMap<>();
+    private static final Map<Integer, CompoundTag> tileEntities = new HashMap<>();
 
     static {
         register(Arrays.asList(61, 62), "Furnace");

@@ -1,32 +1,12 @@
 package us.myles.ViaVersion.api.type.types.version;
 
-import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
+import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.minecraft.ModernMetaListType;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MetadataList1_12Type extends MetaListTypeTemplate {
+public class MetadataList1_12Type extends ModernMetaListType {
     @Override
-    public List<Metadata> read(ByteBuf buffer) throws Exception {
-        List<Metadata> list = new ArrayList<>();
-        Metadata meta;
-        do {
-            meta = Types1_12.METADATA.read(buffer);
-            if (meta != null)
-                list.add(meta);
-        } while (meta != null);
-
-        return list;
-    }
-
-    @Override
-    public void write(ByteBuf buffer, List<Metadata> object) throws Exception {
-        for (Metadata m : object)
-            Types1_12.METADATA.write(buffer, m);
-
-        // Write end of list
-        Types1_12.METADATA.write(buffer, null);
+    protected Type<Metadata> getType() {
+        return Types1_12.METADATA;
     }
 }

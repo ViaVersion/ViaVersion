@@ -5,6 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * @deprecated scary
+ */
+@Deprecated
 public abstract class ListWrapper implements List {
     private final List list;
 

@@ -10,8 +10,8 @@ import io.netty.util.concurrent.EventExecutor;
 import java.net.SocketAddress;
 
 public class ChannelHandlerContextWrapper implements ChannelHandlerContext {
-    private ChannelHandlerContext base;
-    private ViaHandler handler;
+    private final ChannelHandlerContext base;
+    private final ViaHandler handler;
 
     public ChannelHandlerContextWrapper(ChannelHandlerContext base, ViaHandler handler) {
         this.base = base;

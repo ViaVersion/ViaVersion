@@ -1,14 +1,12 @@
-# ViaVersion 2.0.1 - Spigot, Sponge, BungeeCord, Velocity
+# ViaVersion 3.0.1 - Spigot, Sponge, BungeeCord, Velocity
 [![Build Status](https://travis-ci.com/ViaVersion/ViaVersion.svg?branch=master)](https://travis-ci.com/ViaVersion/ViaVersion)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
-
-IRC: [#viaversion](http://irc.spi.gt/iris/?channels=viaversion) on irc.spi.gt for Support.
 
 **Allows the connection of higher client versions to lower server versions**
 
 Supported Versions:
 
-![Table (https://i.imgur.com/iWAtD1p.png)](https://i.imgur.com/iWAtD1p.png)
+![Table (https://i.imgur.com/0u20Y2u.png)](https://i.imgur.com/0u20Y2u.png)
 
 On Bukkit you may also use ProtocolSupport, but ensure you have the right build for your server version.
 

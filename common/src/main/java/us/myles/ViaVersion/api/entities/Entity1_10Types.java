@@ -1,12 +1,10 @@
 package us.myles.ViaVersion.api.entities;
 
-import com.google.common.base.Optional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 // 1.10 Entity / Object ids
 public class Entity1_10Types {
@@ -15,42 +13,40 @@ public class Entity1_10Types {
         Optional<EntityType> type;
 
         if (isObject)
-            type = ObjectTypes.getPCEntity(typeID);
+            type = ObjectType.getPCEntity(typeID);
         else
             type = EntityType.findById(typeID);
 
         if (!type.isPresent()) {
-            Via.getPlatform().getLogger().severe("Could not find type id " + typeID + " isObject=" + isObject);
+            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeID + " isObject=" + isObject);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
 
         return type.get();
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum EntityType {
+    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
         ENTITY(-1),
-        DROPPED_ITEM(1, EntityType.ENTITY),
-        EXPERIENCE_ORB(2, EntityType.ENTITY),
-        LEASH_HITCH(8, EntityType.ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
-        PAINTING(9, EntityType.ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
-        ARROW(10, EntityType.ENTITY),
-        SNOWBALL(11, EntityType.ENTITY), // Actually EntityProjectile
-        FIREBALL(12, EntityType.ENTITY),
-        SMALL_FIREBALL(13, EntityType.ENTITY),
-        ENDER_PEARL(14, EntityType.ENTITY), // Actually EntityProjectile
-        ENDER_SIGNAL(15, EntityType.ENTITY),
-        THROWN_EXP_BOTTLE(17, EntityType.ENTITY),
-        ITEM_FRAME(18, EntityType.ENTITY), // Actually EntityHanging
-        WITHER_SKULL(19, EntityType.ENTITY),
-        PRIMED_TNT(20, EntityType.ENTITY),
-        FALLING_BLOCK(21, EntityType.ENTITY),
-        FIREWORK(22, EntityType.ENTITY),
-        TIPPED_ARROW(23, EntityType.ARROW),
-        SPECTRAL_ARROW(24, EntityType.ARROW),
-        SHULKER_BULLET(25, EntityType.ENTITY),
-        DRAGON_FIREBALL(26, EntityType.FIREBALL),
+        DROPPED_ITEM(1, ENTITY),
+        EXPERIENCE_ORB(2, ENTITY),
+        LEASH_HITCH(8, ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
+        PAINTING(9, ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
+        ARROW(10, ENTITY),
+        SNOWBALL(11, ENTITY), // Actually EntityProjectile
+        FIREBALL(12, ENTITY),
+        SMALL_FIREBALL(13, ENTITY),
+        ENDER_PEARL(14, ENTITY), // Actually EntityProjectile
+        ENDER_SIGNAL(15, ENTITY),
+        THROWN_EXP_BOTTLE(17, ENTITY),
+        ITEM_FRAME(18, ENTITY), // Actually EntityHanging
+        WITHER_SKULL(19, ENTITY),
+        PRIMED_TNT(20, ENTITY),
+        FALLING_BLOCK(21, ENTITY),
+        FIREWORK(22, ENTITY),
+        TIPPED_ARROW(23, ARROW),
+        SPECTRAL_ARROW(24, ARROW),
+        SHULKER_BULLET(25, ENTITY),
+        DRAGON_FIREBALL(26, FIREBALL),
 
         ENTITY_LIVING(-1, ENTITY),
         ENTITY_INSENTIENT(-1, ENTITY_LIVING),
@@ -58,7 +54,7 @@ public class Entity1_10Types {
         ENTITY_TAMEABLE_ANIMAL(-1, ENTITY_AGEABLE),
         ENTITY_HUMAN(-1, ENTITY_LIVING),
 
-        ARMOR_STAND(30, EntityType.ENTITY_LIVING),
+        ARMOR_STAND(30, ENTITY_LIVING),
 
         // Vehicles
         MINECART_ABSTRACT(-1, ENTITY),
@@ -91,7 +87,7 @@ public class Entity1_10Types {
         ENDERMITE(67, ENTITY_INSENTIENT),
         GUARDIAN(68, ENTITY_INSENTIENT),
         IRON_GOLEM(99, ENTITY_INSENTIENT), // moved up to avoid illegal forward references
-        SHULKER(69, EntityType.IRON_GOLEM),
+        SHULKER(69, IRON_GOLEM),
         PIG(90, ENTITY_AGEABLE),
         SHEEP(91, ENTITY_AGEABLE),
         COW(92, ENTITY_AGEABLE),
@@ -99,7 +95,7 @@ public class Entity1_10Types {
         SQUID(94, ENTITY_INSENTIENT),
         WOLF(95, ENTITY_TAMEABLE_ANIMAL),
         MUSHROOM_COW(96, COW),
-        SNOWMAN(97, EntityType.IRON_GOLEM),
+        SNOWMAN(97, IRON_GOLEM),
         OCELOT(98, ENTITY_TAMEABLE_ANIMAL),
         HORSE(100, ENTITY_AGEABLE),
         RABBIT(101, ENTITY_AGEABLE),
@@ -126,6 +122,11 @@ public class Entity1_10Types {
             this.parent = null;
         }
 
+        EntityType(int id, EntityType parent) {
+            this.id = id;
+            this.parent = parent;
+        }
+
         static {
             for (EntityType type : EntityType.values()) {
                 TYPES.put(type.id, type);
@@ -134,14 +135,22 @@ public class Entity1_10Types {
 
         public static Optional<EntityType> findById(int id) {
             if (id == -1)  // Check if this is called
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getParent() {
+            return parent;
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum ObjectTypes {
+    public enum ObjectType implements us.myles.ViaVersion.api.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
@@ -168,29 +177,44 @@ public class Entity1_10Types {
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
 
-        private static final Map<Integer, ObjectTypes> TYPES = new HashMap<>();
+        private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
 
         private final int id;
         private final EntityType type;
 
         static {
-            for (ObjectTypes type : ObjectTypes.values()) {
+            for (ObjectType type : ObjectType.values()) {
                 TYPES.put(type.id, type);
             }
         }
 
-        public static Optional<ObjectTypes> findById(int id) {
+        ObjectType(int id, EntityType type) {
+            this.id = id;
+            this.type = type;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public EntityType getType() {
+            return type;
+        }
+
+        public static Optional<ObjectType> findById(int id) {
             if (id == -1)
-                return Optional.absent();
-            return Optional.fromNullable(TYPES.get(id));
+                return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
         }
 
         public static Optional<EntityType> getPCEntity(int id) {
-            Optional<ObjectTypes> output = findById(id);
+            Optional<ObjectType> output = findById(id);
 
             if (!output.isPresent())
-                return Optional.absent();
-            return Optional.of(output.get().getType());
+                return Optional.empty();
+            return Optional.of(output.get().type);
         }
     }
 }

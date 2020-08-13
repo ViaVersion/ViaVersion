@@ -14,7 +14,7 @@ checkforupdates: true
 # Send the supported versions with the Status (Ping) response packet
 send-supported-versions: false
 # Block specific Minecraft protocols that ViaVersion allows
-# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers
+# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers or use a generator: https://via.krusic22.com
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
@@ -22,6 +22,8 @@ block-disconnect-msg: "You are using an unsupported Minecraft version!"
 # (We don't suggest using reload either, use a plugin manager)
 # You can customise the message we kick people with if you use ProtocolLib here.
 reload-disconnect-msg: "Server reload, please rejoin!"
+# We warn when there's a error converting item and block data over versions, should we suppress these? (Only suggested if spamming)
+suppress-conversion-warnings: false
 #
 #----------------------------------------------------------#
 #                     BUNGEE OPTIONS                       #
@@ -110,14 +112,14 @@ chat-nbt-fix: true
 quick-move-action-fix: false
 # Should we use prefix for team colour on 1.13 and above clients
 team-colour-fix: true
-# We warn when there's a error converting from pre-1.13 to 1.13, should we suppress these? (Only suggested if spamming)
-suppress-1_13-conversion-errors: false
 # 1.13 introduced new auto complete which can trigger "Kicked for spamming" for servers older than 1.13, the following option will disable it completely.
 disable-1_13-auto-complete: false
 # The following option will delay the tab complete request in x ticks if greater than 0, if other tab-complete is received, the previous is cancelled
 1_13-tab-complete-delay: 0
 # For 1.13 clients the smallest (1 layer) snow doesn't have collision, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
 fix-low-snow-collision: false
+# Infested blocks are instantly breakable for 1.13+ clients, resulting in them being unable to break them on sub 1.13 servers. This remaps them to their normal stone variants
+fix-infested-block-breaking: true
 # In 1.14 the client page limit has been upped to 100 (from 50). Some anti-exploit plugins ban when clients go higher than 50. This option cuts edited books to 50 pages.
 truncate-1_14-books: false
 # This prevents clients using 1.9-1.13 on 1.8 servers from receiving no knockback/having velocity bugs whilst sneaking under a block.
@@ -126,9 +128,15 @@ change-1_9-hitbox: false
 # WARNING: This gives 1.14+ players the ability to sneak under blocks, that players under that version cannot (sneaking in places that are only 1.5 blocks high)!
 # Another thing to remember is that those players might be missed by projectiles and other hits directed at the very top of their head whilst sneaking.
 change-1_14-hitbox: false
+# Fixes 1.14+ clients on sub 1.14 servers having a light value of 0 for non full blocks.
+fix-non-full-blocklight: true
+# Fixes walk animation not shown when health is set to Float.NaN
+fix-1_14-health-nan: true
+# Should 1.15+ clients respawn instantly / without showing a death screen?
+use-1_15-instant-respawn: false
 #
-# Enable serverside block-connections for 1.13+ clients
-serverside-blockconnections: false
+# Enable serverside block-connections for 1.13+ clients - all of the options in this section are built around this option
+serverside-blockconnections: true
 # Sets the method for the block connections (world for highly experimental (USE AT OWN RISK) world-level or packet for packet-level)
 blockconnection-method: packet
 # When activated, only the most important blocks are stored in the blockstorage. (fences, glass panes etc. won't connect to solid blocks)
@@ -136,6 +144,12 @@ reduce-blockstorage-memory: false
 # When activated with serverside-blockconnections, flower parts with blocks above will be sent as stems
 # Useful for lobbyservers where users can't build and those stems are used decoratively
 flowerstem-when-block-above: false
+# Vines that are not connected to blocks will be mapped to air, else 1.13+ would still be able to climb up on them.
+vine-climb-fix: false
+#
+# Ignores incoming plugin channel messages of 1.16+ clients with channel names longer than 32 charatcers.
+# CraftBukkit had this limit hardcoded until 1.16, so we have to assume any server/proxy might have this arbitrary check present.
+ignore-long-1_16-channel-names: true
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #

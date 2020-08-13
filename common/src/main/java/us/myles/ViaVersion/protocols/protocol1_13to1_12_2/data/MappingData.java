@@ -8,54 +8,64 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
+import us.myles.ViaVersion.api.data.Mappings;
 import us.myles.ViaVersion.util.GsonUtil;
+import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MappingData {
-    public static BiMap<Integer, Integer> oldToNewItems = HashBiMap.create();
-    public static Map<String, Integer[]> blockTags = new HashMap<>();
-    public static Map<String, Integer[]> itemTags = new HashMap<>();
-    public static Map<String, Integer[]> fluidTags = new HashMap<>();
-    public static BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
-    public static Map<String, String> translateMapping = new HashMap<>();
-    public static Map<String, String> mojangTranslation = new HashMap<>();
-    public static EnchantmentMappings enchantmentMappings;
-    public static SoundMappings soundMappings;
-    public static BlockMappings blockMappings;
+    public static final Int2IntBiMap oldToNewItems = new Int2IntBiMap();
+    public static final Map<String, Integer[]> blockTags = new HashMap<>();
+    public static final Map<String, Integer[]> itemTags = new HashMap<>();
+    public static final Map<String, Integer[]> fluidTags = new HashMap<>();
+    public static final BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
+    public static final Map<String, String> translateMapping = new HashMap<>();
+    public static final Map<String, String> mojangTranslation = new HashMap<>();
+    public static final BiMap<String, String> channelMappings = HashBiMap.create(); // 1.12->1.13
+    public static Mappings enchantmentMappings;
+    public static Mappings soundMappings;
+    public static Mappings blockMappings;
 
     public static void init() {
-        JsonObject mapping1_12 = loadData("mapping-1.12.json");
-        JsonObject mapping1_13 = loadData("mapping-1.13.json");
+        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 mappings...");
+        JsonObject mapping1_12 = MappingDataLoader.loadData("mapping-1.12.json", true);
+        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
 
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 block mapping...");
+        oldToNewItems.defaultReturnValue(-1);
         blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 item mapping...");
-        mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
-        Via.getPlatform().getLogger().info("Loading new 1.13 tags...");
+        MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
         loadTags(blockTags, mapping1_13.getAsJsonObject("block_tags"));
         loadTags(itemTags, mapping1_13.getAsJsonObject("item_tags"));
         loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 enchantment mapping...");
+
         loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
-        enchantmentMappings = new EnchantmentMappingByteArray(mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 sound mapping...");
-        soundMappings = new SoundMappingShortArray(mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
-        Via.getPlatform().getLogger().info("Loading translation mappping");
-        translateMapping = new HashMap<>();
+        enchantmentMappings = new Mappings(72, mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
+        soundMappings = new Mappings(662, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
+
+        JsonObject object = MappingDataLoader.loadFromDataDir("channelmappings-1.13.json");
+        if (object != null) {
+            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                String oldChannel = entry.getKey();
+                String newChannel = entry.getValue().getAsString();
+                if (!isValid1_13Channel(newChannel)) {
+                    Via.getPlatform().getLogger().warning("Channel '" + newChannel + "' is not a valid 1.13 plugin channel, please check your configuration!");
+                    continue;
+                }
+                channelMappings.put(oldChannel, newChannel);
+            }
+        }
+
         Map<String, String> translateData = GsonUtil.getGson().fromJson(
-                new InputStreamReader(
-                        MappingData.class.getClassLoader()
-                                .getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")
-                ),
-                (new TypeToken<Map<String, String>>(){}).getType());
+                new InputStreamReader(MappingData.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
+                new TypeToken<Map<String, String>>() {
+                }.getType());
         try {
             String[] lines;
             try (Reader reader = new InputStreamReader(MappingData.class.getClassLoader()
@@ -64,14 +74,16 @@ public class MappingData {
             }
             for (String line : lines) {
                 if (line.isEmpty()) continue;
+
                 String[] keyAndTranslation = line.split("=", 2);
                 if (keyAndTranslation.length != 2) continue;
+
                 String key = keyAndTranslation[0];
-                String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
                 if (!translateData.containsKey(key)) {
-                    translateMapping.put(key, translation);
+                    String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
+                    mojangTranslation.put(key, translation);
                 } else {
-                    String dataValue = translateData.get(keyAndTranslation[0]);
+                    String dataValue = translateData.get(key);
                     if (dataValue != null) {
                         translateMapping.put(key, dataValue);
                     }
@@ -82,70 +94,20 @@ public class MappingData {
         }
     }
 
-    public static JsonObject loadData(String name) {
-        InputStream stream = MappingData.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
-        InputStreamReader reader = new InputStreamReader(stream);
-        try {
-            JsonObject jsonObject = GsonUtil.getGson().fromJson(reader, JsonObject.class);
-            return jsonObject;
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ignored) {
-                // Ignored
-            }
+    public static String validateNewChannel(String newId) {
+        if (!isValid1_13Channel(newId)) {
+            return null; // Not valid
         }
+        int separatorIndex = newId.indexOf(':');
+        // Vanilla parses ``:`` and ```` as ``minecraft:`` (also ensure there's enough space)
+        if ((separatorIndex == -1 || separatorIndex == 0) && newId.length() <= 10) {
+            newId = "minecraft:" + newId;
+        }
+        return newId;
     }
 
-    private static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                }
-                continue;
-            }
-            output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
-        }
-    }
-
-    private static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                }
-                continue;
-            }
-            output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
-        }
-    }
-
-    private static void mapIdentifiers(byte[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
-            if (value == null) {
-                Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
-                continue;
-            }
-            output[Integer.parseInt(entry.getKey())] = Byte.parseByte(value.getKey());
-        }
-    }
-
-    private static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers) {
-        for (int i = 0; i < oldIdentifiers.size(); i++) {
-            JsonElement v = oldIdentifiers.get(i);
-            Integer index = findIndex(newIdentifiers, v.getAsString());
-            if (index == null) {
-                if (!Via.getConfig().isSuppress1_13ConversionErrors() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + v + " :( ");
-                }
-                continue;
-            }
-            output[i] = index.shortValue();
-        }
+    public static boolean isValid1_13Channel(String channelId) {
+        return channelId.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)");
     }
 
     private static void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
@@ -165,81 +127,25 @@ public class MappingData {
         }
     }
 
-    private static Map.Entry<String, JsonElement> findValue(JsonObject object, String needle) {
-        for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-            String value = entry.getValue().getAsString();
-            if (value.equals(needle)) {
-                return entry;
-            }
-        }
-        return null;
-    }
-
-    private static Integer findIndex(JsonArray array, String value) {
-        for (int i = 0; i < array.size(); i++) {
-            JsonElement v = array.get(i);
-            if (v.getAsString().equals(value)) {
-                return i;
-            }
-        }
-        return null;
-    }
-
-    public interface BlockMappings {
-        int getNewBlock(int old);
-    }
-
-    private static class BlockMappingsShortArray implements BlockMappings {
-        private short[] oldToNew = new short[4084];
+    private static class BlockMappingsShortArray extends Mappings {
 
         private BlockMappingsShortArray(JsonObject mapping1_12, JsonObject mapping1_13) {
-            Arrays.fill(oldToNew, (short) -1);
-            mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
+            super(4084, mapping1_12, mapping1_13);
+
             // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
             if (Via.getConfig().isSnowCollisionFix()) {
                 oldToNew[1248] = 3416;
             }
-        }
 
-        @Override
-        public int getNewBlock(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
-        }
-    }
-
-    public interface SoundMappings {
-        int getNewSound(int old);
-    }
-
-    private static class SoundMappingShortArray implements SoundMappings {
-        private short[] oldToNew = new short[662];
-
-        private SoundMappingShortArray(JsonArray mapping1_12, JsonArray mapping1_13) {
-            Arrays.fill(oldToNew, (short) -1);
-            mapIdentifiers(oldToNew, mapping1_12, mapping1_13);
-        }
-
-        @Override
-        public int getNewSound(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
-        }
-    }
-
-    public interface EnchantmentMappings {
-        int getNewEnchantment(int old);
-    }
-
-    private static class EnchantmentMappingByteArray implements EnchantmentMappings {
-        private byte[] oldToNew = new byte[72];
-
-        private EnchantmentMappingByteArray(JsonObject m1_12, JsonObject m1_13) {
-            Arrays.fill(oldToNew, (byte) -1);
-            mapIdentifiers(oldToNew, m1_12, m1_13);
-        }
-
-        @Override
-        public int getNewEnchantment(int old) {
-            return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
+            // Remap infested blocks, as they are instantly breakabale in 1.13+ and can't be broken by those clients on older servers
+            if (Via.getConfig().isInfestedBlocksFix()) {
+                oldToNew[1552] = 1; // stone
+                oldToNew[1553] = 14; // cobblestone
+                oldToNew[1554] = 3983; // stone bricks
+                oldToNew[1555] = 3984; // mossy stone bricks
+                oldToNew[1556] = 3985; // cracked stone bricks
+                oldToNew[1557] = 3986; // chiseled stone bricks
+            }
         }
     }
 }

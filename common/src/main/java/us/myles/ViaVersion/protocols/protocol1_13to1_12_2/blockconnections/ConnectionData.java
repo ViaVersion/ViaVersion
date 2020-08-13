@@ -3,10 +3,15 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
+import us.myles.ViaVersion.api.minecraft.BlockChangeRecord1_8;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -15,27 +20,27 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class ConnectionData {
-    static Map<Integer, String> idToKey = new HashMap<>();
-    static Map<String, Integer> keyToId = new HashMap<>();
-    static Map<Integer, ConnectionHandler> connectionHandlerMap = new HashMap<>();
-    static Map<Integer, BlockData> blockConnectionData = new HashMap<>();
-    static Set<Integer> occludingStates = new HashSet<>();
+    private static final BlockChangeRecord1_8[] EMPTY_RECORDS = new BlockChangeRecord1_8[0];
+    public static BlockConnectionProvider blockConnectionProvider;
+    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, 1F);
+    static Map<String, Integer> keyToId = new HashMap<>(8582, 1F);
+    static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>(1);
+    static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>(1);
+    static IntSet occludingStates = new IntOpenHashSet(377, 1F);
 
     public static void update(UserConnection user, Position position) {
-        BlockConnectionProvider connectionProvider = Via.getManager().getProviders().get(BlockConnectionProvider.class);
         for (BlockFace face : BlockFace.values()) {
-            Position pos = new Position(
-                    position.getX() + face.getModX(),
-                    position.getY() + face.getModY(),
-                    position.getZ() + face.getModZ()
-            );
-            int blockState = connectionProvider.getBlockdata(user, pos);
+            Position pos = position.getRelative(face);
+            int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) continue;
 
@@ -56,7 +61,7 @@ public class ConnectionData {
             for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 0) continue;
 
-                List<BlockChangeRecord> updates = new ArrayList<>();
+                List<BlockChangeRecord1_8> updates = new ArrayList<>();
 
                 if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 2) { // Corner
                     for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
@@ -64,9 +69,9 @@ public class ConnectionData {
                         int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
                         updateBlock(user,
                                 new Position(
-                                        (long) ((chunkX + chunkDeltaX) << 4) + blockPosX,
-                                        (long) blockY,
-                                        (long) ((chunkZ + chunkDeltaZ) << 4) + blockPosZ
+                                        ((chunkX + chunkDeltaX) << 4) + blockPosX,
+                                        (short) blockY,
+                                        ((chunkZ + chunkDeltaZ) << 4) + blockPosZ
                                 ),
                                 updates
                         );
@@ -102,9 +107,9 @@ public class ConnectionData {
                             for (int blockZ = zStart; blockZ < zEnd; blockZ++) {
                                 updateBlock(user,
                                         new Position(
-                                                (long) ((chunkX + chunkDeltaX) << 4) + blockX,
-                                                (long) blockY,
-                                                (long) ((chunkZ + chunkDeltaZ) << 4) + blockZ),
+                                                ((chunkX + chunkDeltaX) << 4) + blockX,
+                                                (short) blockY,
+                                                ((chunkZ + chunkDeltaZ) << 4) + blockZ),
                                         updates
                                 );
                             }
@@ -116,7 +121,7 @@ public class ConnectionData {
                     PacketWrapper wrapper = new PacketWrapper(0x0F, null, user);
                     wrapper.write(Type.INT, chunkX + chunkDeltaX);
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
-                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(new BlockChangeRecord[0]));
+                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
                     try {
                         wrapper.send(Protocol1_13To1_12_2.class, true, true);
                     } catch (Exception e) {
@@ -127,35 +132,31 @@ public class ConnectionData {
         }
     }
 
-    public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord> records) {
-        int blockState = Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockdata(user, pos);
+    public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord1_8> records) {
+        int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
         ConnectionHandler handler = getConnectionHandler(blockState);
         if (handler == null) return;
 
         int newBlockState = handler.connect(user, pos, blockState);
-        records.add(new BlockChangeRecord((short) (((pos.getX() & 0xF) << 4) | (pos.getZ() & 0xF)), pos.getY().shortValue(), newBlockState));
+        records.add(new BlockChangeRecord1_8(pos.getX() & 0xF, pos.getY(), pos.getZ() & 0xF, newBlockState));
     }
 
-    public static BlockConnectionProvider getProvider() {
-        return Via.getManager().getProviders().get(BlockConnectionProvider.class);
-    }
-
-    public static void updateBlockStorage(UserConnection userConnection, Position position, int blockState) {
+    public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {
         if (!needStoreBlocks()) return;
         if (ConnectionData.isWelcome(blockState)) {
-            ConnectionData.getProvider().storeBlock(userConnection, position, blockState);
+            blockConnectionProvider.storeBlock(userConnection, x, y, z, blockState);
         } else {
-            ConnectionData.getProvider().removeBlock(userConnection, position);
+            blockConnectionProvider.removeBlock(userConnection, x, y, z);
         }
     }
 
     public static void clearBlockStorage(UserConnection connection) {
         if (!needStoreBlocks()) return;
-        getProvider().clearStorage(connection);
+        blockConnectionProvider.clearStorage(connection);
     }
 
     public static boolean needStoreBlocks() {
-        return getProvider().storesBlocks();
+        return blockConnectionProvider.storesBlocks();
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
@@ -186,7 +187,11 @@ public class ConnectionData {
 
                         ConnectionHandler handler = ConnectionData.getConnectionHandler(block);
                         if (handler != null) {
-                            block = handler.connect(user, new Position(xOff + x, yOff + y, zOff + z), block);
+                            block = handler.connect(user, new Position(
+                                    (int) (xOff + x),
+                                    (short) (yOff + y),
+                                    (int) (zOff + z)
+                            ), block);
                             section.setFlatBlock(x, y, z, block);
                         }
                     }
@@ -197,18 +202,22 @@ public class ConnectionData {
 
     public static void init() {
         if (!Via.getConfig().isServersideBlockConnections()) return;
+
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        JsonObject mapping1_13 = MappingData.loadData("mapping-1.13.json");
+        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
         JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
         for (Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {
-            Integer id = Integer.parseInt(blockState.getKey());
+            int id = Integer.parseInt(blockState.getKey());
             String key = blockState.getValue().getAsString();
             idToKey.put(id, key);
             keyToId.put(key, id);
         }
 
+        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650, 1F);
+
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
-            JsonObject mappingBlockConnections = MappingData.loadData("blockConnections.json");
+            blockConnectionData = new Int2ObjectOpenHashMap<>(1146, 1F);
+            JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());
                 BlockData blockData = new BlockData();
@@ -231,10 +240,10 @@ public class ConnectionData {
             }
         }
 
-        JsonObject blockData = MappingData.loadData("blockData.json");
+        JsonObject blockData = MappingDataLoader.loadData("blockData.json");
         JsonArray occluding = blockData.getAsJsonArray("occluding");
         for (JsonElement jsonElement : occluding) {
-            occludingStates.add(keyToId.get(jsonElement.getAsString()));
+            occludingStates.add(keyToId.get(jsonElement.getAsString()).intValue());
         }
 
         List<ConnectorInitAction> initActions = new ArrayList<>();
@@ -252,6 +261,11 @@ public class ConnectionData {
         initActions.addAll(ChorusPlantConnectionHandler.init());
         initActions.add(TripwireConnectionHandler.init());
         initActions.add(SnowyGrassConnectionHandler.init());
+        initActions.add(FireConnectionHandler.init());
+        if (Via.getConfig().isVineClimbFix()) {
+            initActions.add(VineConnectionHandler.init());
+        }
+
         for (String key : keyToId.keySet()) {
             WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(key);
             for (ConnectorInitAction action : initActions) {
@@ -260,7 +274,8 @@ public class ConnectionData {
         }
 
         if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("packet")) {
-            Via.getManager().getProviders().register(BlockConnectionProvider.class, new PacketBlockConnectionProvider());
+            blockConnectionProvider = new PacketBlockConnectionProvider();
+            Via.getManager().getProviders().register(BlockConnectionProvider.class, blockConnectionProvider);
         }
     }
 
@@ -282,13 +297,14 @@ public class ConnectionData {
     }
 
     public static int getId(String key) {
-        return keyToId.containsKey(key) ? keyToId.get(key) : -1;
+        return keyToId.getOrDefault(key, -1);
     }
 
     public static String getKey(int id) {
         return idToKey.get(id);
     }
 
+    @FunctionalInterface
     interface ConnectorInitAction {
 
         void check(WrappedBlockData blockData);

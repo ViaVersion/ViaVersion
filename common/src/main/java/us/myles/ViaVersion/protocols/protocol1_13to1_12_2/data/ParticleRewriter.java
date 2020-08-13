@@ -1,20 +1,19 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ParticleRewriter {
-    private static List<NewParticle> particles = new LinkedList<>();
+    private static final List<NewParticle> particles = new ArrayList<>();
 
     static {
         add(34); // (0->34) explode -> minecraft:poof
@@ -127,9 +126,9 @@ public class ParticleRewriter {
             public Particle handler(Particle particle, Integer[] data) {
                 Item item;
                 if (data.length == 1)
-                    item = new Item(data[0].shortValue(), (byte) 1, (short) 0, null);
+                    item = new Item(data[0], (byte) 1, (short) 0, null);
                 else if (data.length == 2)
-                    item = new Item(data[0].shortValue(), (byte) 1, data[1].shortValue(), null);
+                    item = new Item(data[0], (byte) 1, data[1].shortValue(), null);
                 else
                     return particle;
 
@@ -161,18 +160,27 @@ public class ParticleRewriter {
         Particle handler(Particle particle, Integer[] data);
     }
 
-    @Data
-    @RequiredArgsConstructor
     private static class NewParticle {
         private final int id;
         private final ParticleDataHandler handler;
+
+        public NewParticle(int id, ParticleDataHandler handler) {
+            this.id = id;
+            this.handler = handler;
+        }
 
         public Particle handle(Particle particle, Integer[] data) {
             if (handler != null)
                 return handler.handler(particle, data);
             return particle;
         }
+
+        public int getId() {
+            return id;
+        }
+
+        public ParticleDataHandler getHandler() {
+            return handler;
+        }
     }
-
-
 }

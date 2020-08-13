@@ -3,14 +3,12 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler {
-    private int endstone;
+    private final int endstone;
 
     static List<ConnectionData.ConnectorInitAction> init() {
         List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(2);
@@ -26,12 +24,9 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
     }
 
     public ConnectionData.ConnectorInitAction getExtraAction() {
-        return new ConnectionData.ConnectorInitAction() {
-            @Override
-            public void check(WrappedBlockData blockData) {
-                if (blockData.getMinecraftKey().equals("minecraft:chorus_flower")) {
-                    getBlockStates().add(blockData.getSavedBlockStateId());
-                }
+        return blockData -> {
+            if (blockData.getMinecraftKey().equals("minecraft:chorus_flower")) {
+                getBlockStates().add(blockData.getSavedBlockStateId());
             }
         };
     }

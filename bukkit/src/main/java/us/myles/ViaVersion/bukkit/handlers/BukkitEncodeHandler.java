@@ -3,22 +3,22 @@ package us.myles.ViaVersion.bukkit.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
-import us.myles.ViaVersion.exception.CancelException;
+import us.myles.ViaVersion.exception.CancelCodecException;
+import us.myles.ViaVersion.exception.CancelEncoderException;
+import us.myles.ViaVersion.exception.InformativeException;
 import us.myles.ViaVersion.handlers.ChannelHandlerContextWrapper;
 import us.myles.ViaVersion.handlers.ViaHandler;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHandler {
-    private static Field versionField = null;
+    private static Field versionField;
 
     static {
         try {
@@ -37,7 +37,6 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
         this.minecraftEncoder = minecraftEncoder;
     }
 
-
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
         if (versionField != null) {
@@ -51,6 +50,8 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof Exception) {
                     throw (Exception) e.getCause();
+                } else if (e.getCause() instanceof Error) {
+                    throw (Error) e.getCause();
                 }
             }
         }
@@ -58,36 +59,21 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
         transform(bytebuf);
     }
 
+    @Override
     public void transform(ByteBuf bytebuf) throws Exception {
-        if (bytebuf.readableBytes() == 0) {
-            return; // Someone Already Decoded It!
-        }
-        // Increment sent
-        info.incrementSent();
-        if (info.isActive()) {
-            // Handle ID
-            int id = Type.VAR_INT.read(bytebuf);
-            // Transform
-            ByteBuf oldPacket = bytebuf.copy();
-            bytebuf.clear();
-
-            try {
-                PacketWrapper wrapper = new PacketWrapper(id, oldPacket, info);
-                ProtocolInfo protInfo = info.get(ProtocolInfo.class);
-                protInfo.getPipeline().transform(Direction.OUTGOING, protInfo.getState(), wrapper);
-                wrapper.writeToBuffer(bytebuf);
-            } catch (Exception e) {
-                bytebuf.clear();
-                throw e;
-            } finally {
-                oldPacket.release();
-            }
-        }
+        if (!info.checkOutgoingPacket()) throw CancelEncoderException.generate(null);
+        if (!info.shouldTransformPacket()) return;
+        info.transformOutgoing(bytebuf, CancelEncoderException::generate);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelException.class)) return;
+        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
+
         super.exceptionCaught(ctx, cause);
+        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)
+                && (info.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
+            cause.printStackTrace(); // Print if CB doesn't already do it
+        }
     }
 }

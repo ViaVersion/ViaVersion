@@ -2,15 +2,14 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import lombok.Getter;
 import net.kyori.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -18,8 +17,9 @@ import org.slf4j.Logger;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -30,6 +30,7 @@ import us.myles.ViaVersion.velocity.platform.*;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.util.LoggerWrapper;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,24 +41,25 @@ import java.util.concurrent.TimeUnit;
         id = "viaversion",
         name = "ViaVersion",
         version = VersionInfo.VERSION,
-        authors = {"_MylesC", "Matsv"},
+        authors = {"_MylesC", "creeper123123321", "Gerrygames", "KennyTV", "Matsv"},
         description = "Allow newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
 )
-@Getter
 public class VelocityPlugin implements ViaPlatform<Player> {
+    public static ProxyServer PROXY;
+
     @Inject
     private ProxyServer proxy;
     @Inject
-    public static ProxyServer PROXY;
-    @Inject
     private Logger loggerslf4j;
-    private java.util.logging.Logger logger;
     @Inject
     @DataDirectory
     private Path configDir;
+
     private VelocityViaAPI api;
+    private java.util.logging.Logger logger;
     private VelocityViaConfig conf;
+    private ViaConnectionManager connectionManager;
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
@@ -67,23 +69,21 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
+        connectionManager = new ViaConnectionManager();
         Via.init(ViaManager.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
                 .loader(new VelocityViaLoader())
                 .injector(new VelocityViaInjector()).build());
-        Via.getManager().init();
+
+        if (proxy.getPluginManager().getPlugin("viabackwards").isPresent()) {
+            MappingDataLoader.enableMappingsCache();
+        }
     }
 
-    @Subscribe
-    public void onQuit(DisconnectEvent e) {
-        UserConnection userConnection = Via.getManager().getPortedPlayers().get(e.getPlayer().getUniqueId());
-        if (userConnection != null) {
-            // Only remove if the connection is disconnected (eg. relogin)
-            if (userConnection.getChannel() == null || !userConnection.getChannel().isOpen()) {
-                Via.getManager().removePortedClient(e.getPlayer().getUniqueId());
-            }
-        }
+    @Subscribe(order = PostOrder.LAST)
+    public void onProxyLateInit(ProxyInitializeEvent e) {
+        Via.getManager().init();
     }
 
     @Override
@@ -177,6 +177,21 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
+    public File getDataFolder() {
+        return configDir.toFile();
+    }
+
+    @Override
+    public VelocityViaAPI getApi() {
+        return api;
+    }
+
+    @Override
+    public VelocityViaConfig getConf() {
+        return conf;
+    }
+
+    @Override
     public void onReload() {
 
     }
@@ -202,5 +217,15 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public java.util.logging.Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 }

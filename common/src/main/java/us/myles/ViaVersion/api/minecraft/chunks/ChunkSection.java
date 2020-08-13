@@ -1,8 +1,7 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
-import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ChunkSection {
+
     /**
      * Size (dimensions) of blocks in a chunks section.
      */
@@ -18,13 +18,11 @@ public class ChunkSection {
      * Length of the sky and block light nibble arrays.
      */
     public static final int LIGHT_LENGTH = 16 * 16 * 16 / 2; // size * size * size / 2 (nibble bit count)
-    private List<Integer> palette = new ArrayList<>();
-    private Map<Integer, Integer> inversePalette = new HashMap<>();
+    private final List<Integer> palette = new ArrayList<>();
+    private final Map<Integer, Integer> inversePalette = new HashMap<>();
     private final int[] blocks;
     private NibbleArray blockLight;
     private NibbleArray skyLight;
-    @Getter
-    @Setter
     private int nonAirBlocksCount;
 
     public ChunkSection() {
@@ -148,7 +146,7 @@ public class ChunkSection {
      *
      * @param data The value to set the block light to
      */
-    public void setBlockLight(byte[] data) {
+    public void setBlockLight(@Nullable byte[] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.blockLight == null) {
             this.blockLight = new NibbleArray(data);
@@ -162,7 +160,7 @@ public class ChunkSection {
      *
      * @param data The value to set the sky light to
      */
-    public void setSkyLight(byte[] data) {
+    public void setSkyLight(@Nullable byte[] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.skyLight == null) {
             this.skyLight = new NibbleArray(data);
@@ -171,12 +169,24 @@ public class ChunkSection {
         }
     }
 
+    @Nullable
     public byte[] getBlockLight() {
         return blockLight == null ? null : blockLight.getHandle();
     }
 
+    @Nullable
+    public NibbleArray getBlockLightNibbleArray() {
+        return blockLight;
+    }
+
+    @Nullable
     public byte[] getSkyLight() {
         return skyLight == null ? null : skyLight.getHandle();
+    }
+
+    @Nullable
+    public NibbleArray getSkyLightNibbleArray() {
+        return skyLight;
     }
 
     public void readBlockLight(ByteBuf input) {
@@ -193,7 +203,7 @@ public class ChunkSection {
         input.readBytes(this.skyLight.getHandle());
     }
 
-    private static int index(int x, int y, int z) {
+    public static int index(int x, int y, int z) {
         return y << 8 | z << 4 | x;
     }
 
@@ -226,5 +236,13 @@ public class ChunkSection {
 
     public boolean hasBlockLight() {
         return blockLight != null;
+    }
+
+    public int getNonAirBlocksCount() {
+        return nonAirBlocksCount;
+    }
+
+    public void setNonAirBlocksCount(int nonAirBlocksCount) {
+        this.nonAirBlocksCount = nonAirBlocksCount;
     }
 }

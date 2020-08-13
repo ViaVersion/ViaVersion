@@ -3,60 +3,77 @@ package us.myles.ViaVersion.api.data;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.Data;
-import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.CancelException;
+import us.myles.ViaVersion.exception.InformativeException;
+import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
-@Data
 public class UserConnection {
-    @NonNull
+    private static final AtomicLong IDS = new AtomicLong();
+    private final long id = IDS.incrementAndGet();
     private final Channel channel;
+    private final boolean clientSide;
     Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    private ProtocolInfo protocolInfo;
     private boolean active = true;
-    private boolean pendingDisconnect = false;
+    private boolean pendingDisconnect;
     private Object lastPacket;
-    private long sentPackets = 0L;
-    private long receivedPackets = 0L;
+    private long sentPackets;
+    private long receivedPackets;
     // Used for tracking pps
-    private long startTime = 0L;
-    private long intervalPackets = 0L;
+    private long startTime;
+    private long intervalPackets;
     private long packetsPerSecond = -1L;
     // Used for handling warnings (over time)
-    private int secondsObserved = 0;
-    private int warnings = 0;
-    private ReadWriteLock velocityLock = new ReentrantReadWriteLock();
+    private int secondsObserved;
+    private int warnings;
 
-    public UserConnection(Channel channel) {
+    /**
+     * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
+     *
+     * @param channel    netty channel.
+     * @param clientSide true if it's a client-side connection
+     */
+    public UserConnection(@Nullable Channel channel, boolean clientSide) {
         this.channel = channel;
+        this.clientSide = clientSide;
     }
 
     /**
-     * Get an object from the storage
+     * @param channel
+     * @see #UserConnection(Channel, boolean)
+     */
+    public UserConnection(@Nullable Channel channel) {
+        this(channel, false);
+    }
+
+    /**
+     * Get an object from the storage.
      *
      * @param objectClass The class of the object to get
      * @param <T>         The type of the class you want to get.
      * @return The requested object
      */
+    @Nullable
     public <T extends StoredObject> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
     /**
-     * Check if the storage has an object
+     * Check if the storage has an object.
      *
      * @param objectClass The object class to check
      * @return True if the object is in the storage
@@ -66,7 +83,7 @@ public class UserConnection {
     }
 
     /**
-     * Put an object into the stored objects based on class
+     * Put an object into the stored objects based on class.
      *
      * @param object The object to store.
      */
@@ -75,7 +92,7 @@ public class UserConnection {
     }
 
     /**
-     * Clear all the stored objects
+     * Clear all the stored objects.
      * Used for bungee when switching servers.
      */
     public void clearStoredObjects() {
@@ -83,57 +100,76 @@ public class UserConnection {
     }
 
     /**
-     * Send a raw packet to the player
+     * Send a raw packet to the player.
      *
      * @param packet        The raw packet to send
      * @param currentThread Should it run in the same thread
      */
     public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
-        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
-        if (currentThread) {
-            channel.pipeline().context(handler).writeAndFlush(packet);
+        Runnable act;
+        if (clientSide) {
+            // We'll just assume that Via decoder isn't wrapping the original decoder
+            act = () -> getChannel().pipeline()
+                    .context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
         } else {
-            channel.eventLoop().submit(new Runnable() {
-                @Override
-                public void run() {
-                    channel.pipeline().context(handler).writeAndFlush(packet);
-                }
-            });
+            act = () -> channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+        }
+        if (currentThread) {
+            act.run();
+        } else {
+            try {
+                channel.eventLoop().submit(act);
+            } catch (Throwable e) {
+                packet.release(); // Couldn't schedule
+                e.printStackTrace();
+            }
         }
     }
 
     /**
-     * Send a raw packet to the player with returning the future
+     * Send a raw packet to the player with returning the future.
      *
      * @param packet The raw packet to send
      * @return ChannelFuture of the packet being sent
      */
     public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
-        final ChannelHandler handler = channel.pipeline().get(Via.getManager().getInjector().getEncoderName());
-        ChannelFuture future = channel.pipeline().context(handler).writeAndFlush(packet);
-        return future;
+        if (clientSide) {
+            return sendRawPacketFutureClientSide(packet);
+        } else {
+            return sendRawPacketFutureServerSide(packet);
+        }
+    }
+
+    private ChannelFuture sendRawPacketFutureServerSide(final ByteBuf packet) {
+        return channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+    }
+
+    private ChannelFuture sendRawPacketFutureClientSide(final ByteBuf packet) {
+        // Assume that decoder isn't wrapping
+        getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
+        return getChannel().newSucceededFuture();
     }
 
     /**
-     * Send a raw packet to the player (netty thread)
+     * Send a raw packet to the player (netty thread).
      *
      * @param packet The packet to send
      */
-    public void sendRawPacket(final ByteBuf packet) {
+    public void sendRawPacket(ByteBuf packet) {
         sendRawPacket(packet, false);
     }
 
     /**
-     * Used for incrementing the number of packets sent to the client
+     * Used for incrementing the number of packets sent to the client.
      */
     public void incrementSent() {
         this.sentPackets++;
     }
 
     /**
-     * Used for incrementing the number of packets received from the client
+     * Used for incrementing the number of packets received from the client.
      *
-     * @return True if the interval has reset
+     * @return true if the interval has reset and can now be checked for the packets sent
      */
     public boolean incrementReceived() {
         // handle stats
@@ -151,30 +187,38 @@ public class UserConnection {
         return false;
     }
 
-    public boolean handlePPS() {
+    /**
+     * Checks for packet flood with the packets sent in the last second.
+     * ALWAYS check for {@link #incrementReceived()} before using this method.
+     *
+     * @return true if the packet should be cancelled
+     * @see #incrementReceived()
+     */
+    public boolean exceedsMaxPPS() {
+        if (clientSide) return false; // Don't apply PPS limiting for client-side
         ViaVersionConfig conf = Via.getConfig();
         // Max PPS Checker
         if (conf.getMaxPPS() > 0) {
-            if (getPacketsPerSecond() >= conf.getMaxPPS()) {
-                disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(getPacketsPerSecond())));
+            if (packetsPerSecond >= conf.getMaxPPS()) {
+                disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
                 return true; // don't send current packet
             }
         }
 
         // Tracking PPS Checker
         if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
-            if (getSecondsObserved() > conf.getTrackingPeriod()) {
+            if (secondsObserved > conf.getTrackingPeriod()) {
                 // Reset
-                setWarnings(0);
-                setSecondsObserved(1);
+                warnings = 0;
+                secondsObserved = 1;
             } else {
-                setSecondsObserved(getSecondsObserved() + 1);
-                if (getPacketsPerSecond() >= conf.getWarningPPS()) {
-                    setWarnings(getWarnings() + 1);
+                secondsObserved++;
+                if (packetsPerSecond >= conf.getWarningPPS()) {
+                    warnings++;
                 }
 
-                if (getWarnings() >= conf.getMaxWarnings()) {
-                    disconnect(conf.getMaxWarningsKickMessage().replace("%pps", Long.toString(getPacketsPerSecond())));
+                if (warnings >= conf.getMaxWarnings()) {
+                    disconnect(conf.getMaxWarningsKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
                     return true; // don't send current packet
                 }
             }
@@ -183,64 +227,60 @@ public class UserConnection {
     }
 
     /**
-     * Disconnect a connection
+     * Disconnect a connection.
      *
      * @param reason The reason to use, not used if player is not active.
      */
-    public void disconnect(final String reason) {
-        if (!getChannel().isOpen()) return;
-        if (pendingDisconnect) return;
-        pendingDisconnect = true;
-        if (get(ProtocolInfo.class).getUuid() != null) {
-            final UUID uuid = get(ProtocolInfo.class).getUuid();
-            Via.getPlatform().runSync(new Runnable() {
-                @Override
-                public void run() {
-                    if (!Via.getPlatform().kickPlayer(uuid, ChatColor.translateAlternateColorCodes('&', reason))) {
-                        getChannel().close(); // =)
-                    }
-                }
-            });
-        }
+    public void disconnect(String reason) {
+        if (!channel.isOpen() || pendingDisconnect) return;
 
+        pendingDisconnect = true;
+        Via.getPlatform().runSync(() -> {
+            if (!Via.getPlatform().disconnect(this, ChatColor.translateAlternateColorCodes('&', reason))) {
+                channel.close(); // =)
+            }
+        });
     }
 
     /**
-     * Sends a raw packet to the server
+     * Sends a raw packet to the server.
      *
      * @param packet        Raw packet to be sent
      * @param currentThread If {@code true} executes immediately, {@code false} submits a task to EventLoop
      */
     public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
+        if (clientSide) {
+            sendRawPacketToServerClientSide(packet, currentThread);
+        } else {
+            sendRawPacketToServerServerSide(packet, currentThread);
+        }
+    }
+
+    private void sendRawPacketToServerServerSide(final ByteBuf packet, boolean currentThread) {
         final ByteBuf buf = packet.alloc().buffer();
         try {
+            // We'll use passing through because there are some encoder wrappers
+            ChannelHandlerContext context = PipelineUtil
+                    .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
             try {
-                Type.VAR_INT.write(buf, PacketWrapper.PASSTHROUGH_ID);
+                Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
             } catch (Exception e) {
                 // Should not happen
                 Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
             }
             buf.writeBytes(packet);
-            final ChannelHandlerContext context = PipelineUtil
-                    .getPreviousContext(Via.getManager().getInjector().getDecoderName(), getChannel().pipeline());
-            if (currentThread) {
+            Runnable act = () -> {
                 if (context != null) {
                     context.fireChannelRead(buf);
                 } else {
-                    getChannel().pipeline().fireChannelRead(buf);
+                    channel.pipeline().fireChannelRead(buf);
                 }
+            };
+            if (currentThread) {
+                act.run();
             } else {
                 try {
-                    channel.eventLoop().submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (context != null) {
-                                context.fireChannelRead(buf);
-                            } else {
-                                getChannel().pipeline().fireChannelRead(buf);
-                            }
-                        }
-                    });
+                    channel.eventLoop().submit(act);
                 } catch (Throwable t) {
                     // Couldn't schedule
                     buf.release();
@@ -252,12 +292,255 @@ public class UserConnection {
         }
     }
 
+    private void sendRawPacketToServerClientSide(final ByteBuf packet, boolean currentThread) {
+        Runnable act = () -> getChannel().pipeline()
+                .context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+        if (currentThread) {
+            act.run();
+        } else {
+            try {
+                getChannel().eventLoop().submit(act);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                packet.release(); // Couldn't schedule
+            }
+        }
+    }
+
     /**
-     * Sends a raw packet to the server. It will submit a task to EventLoop
+     * Sends a raw packet to the server. It will submit a task to EventLoop.
      *
      * @param packet Raw packet to be sent
      */
     public void sendRawPacketToServer(ByteBuf packet) {
         sendRawPacketToServer(packet, false);
+    }
+
+    /**
+     * Monitors incoming packets
+     *
+     * @return false if this packet should be cancelled
+     */
+    public boolean checkIncomingPacket() {
+        if (clientSide) {
+            return checkClientBound();
+        } else {
+            return checkServerBound();
+        }
+    }
+
+    private boolean checkClientBound() {
+        incrementSent();
+        return true;
+    }
+
+    private boolean checkServerBound() {
+        // Ignore if pending disconnect
+        if (pendingDisconnect) return false;
+        // Increment received + Check PPS
+        return !incrementReceived() || !exceedsMaxPPS();
+    }
+
+    /**
+     * Monitors outgoing packets
+     *
+     * @return false if this packet should be cancelled
+     */
+    public boolean checkOutgoingPacket() {
+        if (clientSide) {
+            return checkServerBound();
+        } else {
+            return checkClientBound();
+        }
+    }
+
+    /**
+     * Checks if packets needs transforming.
+     *
+     * @return if packets should be passed through
+     */
+    public boolean shouldTransformPacket() {
+        return active;
+    }
+
+    /**
+     * Transforms the outgoing packet contained in ByteBuf. When clientSide is true, this packet is considered
+     * serverbound.
+     *
+     * @param buf            ByteBuf with packet id and packet contents
+     * @param cancelSupplier Function called with original CancelException for generating the Exception used when
+     *                       packet is cancelled
+     * @throws CancelException      if the packet should be cancelled
+     * @throws InformativeException if packet transforming failed
+     * @throws Exception            if any other processing outside of transforming fails
+     */
+    public void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!buf.isReadable()) return;
+        transform(buf, clientSide ? Direction.INCOMING : Direction.OUTGOING, cancelSupplier);
+    }
+
+    /**
+     * Transforms the incoming packet contained in ByteBuf. When clientSide is true, this packet is considered
+     * clientbound
+     *
+     * @param buf            ByteBuf with packet id and packet contents
+     * @param cancelSupplier Function called with original CancelException for generating the Exception used when
+     *                       packet is cancelled
+     * @throws CancelException      if the packet should be cancelled
+     * @throws InformativeException if packet transforming failed
+     * @throws Exception            if any other processing outside of transforming fails
+     */
+    public void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!buf.isReadable()) return;
+        transform(buf, clientSide ? Direction.OUTGOING : Direction.INCOMING, cancelSupplier);
+    }
+
+    private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        int id = Type.VAR_INT.readPrimitive(buf);
+        if (id == PacketWrapper.PASSTHROUGH_ID) return;
+
+        PacketWrapper wrapper = new PacketWrapper(id, buf, this);
+        try {
+            protocolInfo.getPipeline().transform(direction, protocolInfo.getState(), wrapper);
+        } catch (CancelException ex) {
+            throw cancelSupplier.apply(ex);
+        }
+
+        ByteBuf transformed = buf.alloc().buffer();
+        try {
+            wrapper.writeToBuffer(transformed);
+            buf.clear().writeBytes(transformed);
+        } finally {
+            transformed.release();
+        }
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    @Nullable
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Nullable
+    public ProtocolInfo getProtocolInfo() {
+        return protocolInfo;
+    }
+
+    public void setProtocolInfo(@Nullable ProtocolInfo protocolInfo) {
+        this.protocolInfo = protocolInfo;
+        if (protocolInfo != null) {
+            storedObjects.put(ProtocolInfo.class, protocolInfo);
+        } else {
+            storedObjects.remove(ProtocolInfo.class);
+        }
+    }
+
+    public Map<Class, StoredObject> getStoredObjects() {
+        return storedObjects;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isPendingDisconnect() {
+        return pendingDisconnect;
+    }
+
+    public void setPendingDisconnect(boolean pendingDisconnect) {
+        this.pendingDisconnect = pendingDisconnect;
+    }
+
+    @Nullable
+    public Object getLastPacket() {
+        return lastPacket;
+    }
+
+    public void setLastPacket(@Nullable Object lastPacket) {
+        this.lastPacket = lastPacket;
+    }
+
+    public long getSentPackets() {
+        return sentPackets;
+    }
+
+    public void setSentPackets(long sentPackets) {
+        this.sentPackets = sentPackets;
+    }
+
+    public long getReceivedPackets() {
+        return receivedPackets;
+    }
+
+    public void setReceivedPackets(long receivedPackets) {
+        this.receivedPackets = receivedPackets;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getIntervalPackets() {
+        return intervalPackets;
+    }
+
+    public void setIntervalPackets(long intervalPackets) {
+        this.intervalPackets = intervalPackets;
+    }
+
+    public long getPacketsPerSecond() {
+        return packetsPerSecond;
+    }
+
+    public void setPacketsPerSecond(long packetsPerSecond) {
+        this.packetsPerSecond = packetsPerSecond;
+    }
+
+    public int getSecondsObserved() {
+        return secondsObserved;
+    }
+
+    public void setSecondsObserved(int secondsObserved) {
+        this.secondsObserved = secondsObserved;
+    }
+
+    public int getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(int warnings) {
+        this.warnings = warnings;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserConnection that = (UserConnection) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(id);
+    }
+
+    public boolean isClientSide() {
+        return clientSide;
+    }
+
+    public boolean shouldApplyBlockProtocol() {
+        return !clientSide; // Don't apply protocol blocking on client-side
     }
 }

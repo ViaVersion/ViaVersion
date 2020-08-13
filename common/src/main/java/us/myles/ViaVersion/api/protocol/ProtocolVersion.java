@@ -1,13 +1,9 @@
 package us.myles.ViaVersion.api.protocol;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import com.google.common.base.Preconditions;
 
 import java.util.*;
 
-@AllArgsConstructor
-@Getter
 public class ProtocolVersion {
     private static final Map<Integer, ProtocolVersion> versions = new HashMap<>();
     private static final List<ProtocolVersion> versionList = new ArrayList<>();
@@ -37,6 +33,15 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_13_2;
     public static final ProtocolVersion v1_14;
     public static final ProtocolVersion v1_14_1;
+    public static final ProtocolVersion v1_14_2;
+    public static final ProtocolVersion v1_14_3;
+    public static final ProtocolVersion v1_14_4;
+    public static final ProtocolVersion v1_15;
+    public static final ProtocolVersion v1_15_1;
+    public static final ProtocolVersion v1_15_2;
+    public static final ProtocolVersion v1_16;
+    public static final ProtocolVersion v1_16_1;
+    public static final ProtocolVersion v1_16_2;
     public static final ProtocolVersion unknown;
 
     private final int id;
@@ -51,6 +56,7 @@ public class ProtocolVersion {
         register(v_1_6_2 = new ProtocolVersion(74, "1.6.2"));
         register(v_1_6_3 = new ProtocolVersion(77, "1.6.3"));
         register(v_1_6_4 = new ProtocolVersion(78, "1.6.4"));
+
         // After netty rewrite
         register(v1_7_1 = new ProtocolVersion(4, "1.7-1.7.5"));
         register(v1_7_6 = new ProtocolVersion(5, "1.7.6-1.7.10"));
@@ -70,10 +76,26 @@ public class ProtocolVersion {
         register(v1_13_2 = new ProtocolVersion(404, "1.13.2"));
         register(v1_14 = new ProtocolVersion(477, "1.14"));
         register(v1_14_1 = new ProtocolVersion(480, "1.14.1"));
+        register(v1_14_2 = new ProtocolVersion(485, "1.14.2"));
+        register(v1_14_3 = new ProtocolVersion(490, "1.14.3"));
+        register(v1_14_4 = new ProtocolVersion(498, "1.14.4"));
+        register(v1_15 = new ProtocolVersion(573, "1.15"));
+        register(v1_15_1 = new ProtocolVersion(575, "1.15.1"));
+        register(v1_15_2 = new ProtocolVersion(578, "1.15.2"));
+        register(v1_16 = new ProtocolVersion(735, "1.16"));
+        register(v1_16_1 = new ProtocolVersion(736, "1.16.1"));
+        register(v1_16_2 = new ProtocolVersion(746, "1.16.2"));
+
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
-    public static void register(@NonNull ProtocolVersion protocol) {
+    public ProtocolVersion(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public static void register(ProtocolVersion protocol) {
+        Preconditions.checkNotNull(protocol);
         versions.put(protocol.getId(), protocol);
         versionList.add(protocol);
     }
@@ -115,6 +137,14 @@ public class ProtocolVersion {
             }
         }
         return null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

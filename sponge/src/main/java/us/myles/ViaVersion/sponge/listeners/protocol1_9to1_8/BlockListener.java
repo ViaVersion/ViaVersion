@@ -8,7 +8,7 @@ import org.spongepowered.api.world.Location;
 import us.myles.ViaVersion.SpongePlugin;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import us.myles.ViaVersion.sponge.listeners.ViaSpongeListener;
 
 public class BlockListener extends ViaSpongeListener {
@@ -22,8 +22,8 @@ public class BlockListener extends ViaSpongeListener {
         if (isOnPipe(player.getUniqueId())) {
             Location loc = e.getTransactions().get(0).getFinal().getLocation().get();
             getUserConnection(player.getUniqueId())
-                    .get(EntityTracker.class)
-                    .addBlockInteraction(new Position((long) loc.getX(), (long) loc.getY(), (long) loc.getZ()));
+                    .get(EntityTracker1_9.class)
+                    .addBlockInteraction(new Position(loc.getBlockX(), (short) loc.getBlockY(), loc.getBlockZ()));
         }
     }
 }
