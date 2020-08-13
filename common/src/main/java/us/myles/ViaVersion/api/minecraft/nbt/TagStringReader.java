@@ -65,6 +65,11 @@ import java.util.stream.IntStream;
     public CompoundTag compound() throws StringTagParseException {
         this.buffer.expect(Tokens.COMPOUND_BEGIN);
         final CompoundTag compoundTag = new CompoundTag("");
+        if (this.buffer.peek() == Tokens.COMPOUND_END) {
+            this.buffer.take();
+            return compoundTag;
+        }
+
         while (this.buffer.hasMore()) {
             final String key = this.key();
             final Tag tag = this.tag();

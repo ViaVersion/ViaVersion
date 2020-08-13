@@ -39,10 +39,9 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
         CompoundTag tag;
         try {
             tag = BinaryTagIO.readString(text);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Via.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
-            e.printStackTrace();
-            return;
+            throw new RuntimeException(e);
         }
 
         CompoundTag itemTag = tag.get("tag");
