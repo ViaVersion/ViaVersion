@@ -1,6 +1,7 @@
 ---
 name: Bug report
 about: Create a bug report so we can fix it
+labels: bug
 
 ---
 
