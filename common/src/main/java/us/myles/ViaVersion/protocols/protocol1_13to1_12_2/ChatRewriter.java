@@ -16,7 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatRewriter {
-    private static final Pattern URL = Pattern.compile("^(?:(https?)://)?([-\\w_.]{2,}\\.[a-z]{2,4})(/\\S*)?$");
     private static final BaseComponent[] EMPTY_COMPONENTS = new BaseComponent[0];
     private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter1_13();
 
@@ -25,7 +24,6 @@ public class ChatRewriter {
         List<BaseComponent> components = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         TextComponent component = new TextComponent();
-        Matcher matcher = URL.matcher(message);
 
         for (int i = 0; i < message.length(); i++) {
             char c = message.charAt(i);
@@ -81,31 +79,6 @@ public class ChatRewriter {
                     component.setObfuscated(false);
                     // ViaVersion end
                 }
-                continue;
-            }
-            int pos = message.indexOf(' ', i);
-            if (pos == -1) {
-                pos = message.length();
-            }
-            if (matcher.region(i, pos).find()) { //Web link handling
-
-                if (builder.length() > 0) {
-                    TextComponent old = component;
-                    component = new TextComponent(old);
-                    old.setText(builder.toString());
-                    builder = new StringBuilder();
-                    components.add(old);
-                }
-
-                TextComponent old = component;
-                component = new TextComponent(old);
-                String urlString = message.substring(i, pos);
-                component.setText(urlString);
-                component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
-                        urlString.startsWith("http") ? urlString : "http://" + urlString));
-                components.add(component);
-                i += pos - i - 1;
-                component = old;
                 continue;
             }
             builder.append(c);
