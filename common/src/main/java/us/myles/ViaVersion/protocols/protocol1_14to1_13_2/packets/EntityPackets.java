@@ -55,7 +55,7 @@ public class EntityPackets {
                         if (type1_14 != null) {
                             int data = wrapper.get(Type.INT, 0);
                             if (type1_14.is(Entity1_14Types.EntityType.FALLING_BLOCK)) {
-                                wrapper.set(Type.INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(data));
+                                wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                             } else if (type1_14.is(Entity1_14Types.EntityType.MINECART)) {
                                 // default is 0 = rideable minecart
                                 switch (data) {

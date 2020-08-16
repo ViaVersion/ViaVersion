@@ -1,12 +1,14 @@
 package us.myles.ViaVersion.protocols.protocol1_13_1to1_13;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
+import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
@@ -20,13 +22,15 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
 
+    public static final MappingData MAPPINGS = new MappingData("1.13", "1.13.2", true);
+
     public Protocol1_13_1To1_13() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
     }
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_13_1To1_13(this);
+        MetadataRewriter metadataRewriter = new MetadataRewriter1_13_1To1_13(this);
 
         EntityPackets.register(this);
         InventoryPackets.register(this);
@@ -130,7 +134,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
                             wrapper.passthrough(Type.STRING);
                             int[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < blocks.length; j++) {
-                                blocks[j] = getNewBlockId(blocks[j]);
+                                blocks[j] = getMappingData().getNewBlockId(blocks[j]);
                             }
                         }
                         int itemTagsSize = wrapper.passthrough(Type.VAR_INT); // item tags
@@ -138,7 +142,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
                             wrapper.passthrough(Type.STRING);
                             int[] items = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                             for (int j = 0; j < items.length; j++) {
-                                items[j] = InventoryPackets.getNewItemId(items[j]);
+                                items[j] = getMappingData().getNewItemId(items[j]);
                             }
                         }
                     }
@@ -146,7 +150,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
             }
         });
 
-        new StatisticsRewriter(this, null, null, null, id -> {
+        new StatisticsRewriter(this, id -> {
             int newId = id;
             if (newId > 22) {
                 newId += 2;
@@ -169,26 +173,8 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
         }
     }
 
-
-    public static int getNewBlockStateId(int blockId) {
-        if (blockId > 8573) {
-            blockId += 17;
-        } else if (blockId > 8463) {
-            blockId += 16;
-        } else if (blockId > 8458) {
-            blockId = 8470 + (blockId - 8459) * 2;
-        } else if (blockId > 1126) {
-            blockId += 1;
-        }
-
-        return blockId;
-    }
-
-    public static int getNewBlockId(final int oldBlockId) {
-        int blockId = oldBlockId;
-        if (oldBlockId >= 561) {
-            blockId += 5;
-        }
-        return blockId;
+    @Override
+    public MappingData getMappingData() {
+        return MAPPINGS;
     }
 }

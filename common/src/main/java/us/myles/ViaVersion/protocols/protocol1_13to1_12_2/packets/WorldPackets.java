@@ -19,7 +19,6 @@ import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
@@ -535,11 +534,11 @@ public class WorldPackets {
         if (oldId < 0) {
             oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
         }
-        int newId = MappingData.blockMappings.getNewId(oldId);
+        int newId = Protocol1_13To1_12_2.MAPPINGS.getBlockMappings().getNewId(oldId);
         if (newId != -1) {
             return newId;
         }
-        newId = MappingData.blockMappings.getNewId(oldId & ~0xF); // Remove data
+        newId = Protocol1_13To1_12_2.MAPPINGS.getBlockMappings().getNewId(oldId & ~0xF); // Remove data
         if (newId != -1) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Missing block " + oldId);

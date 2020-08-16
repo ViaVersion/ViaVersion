@@ -7,8 +7,12 @@ import us.myles.ViaVersion.api.type.Type;
 
 public class SoundRewriter {
     protected final Protocol protocol;
-    // Can't hold the mappings instance here since it's loaded later
     protected final IdRewriteFunction idRewriter;
+
+    public SoundRewriter(Protocol protocol) {
+        this.protocol = protocol;
+        this.idRewriter = id -> protocol.getMappingData().getSoundMappings().getNewId(id);
+    }
 
     public SoundRewriter(Protocol protocol, IdRewriteFunction idRewriter) {
         this.protocol = protocol;

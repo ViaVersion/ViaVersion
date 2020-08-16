@@ -30,7 +30,7 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
             InventoryPackets.toClient((Item) metadata.getValue());
         } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
             int data = (int) metadata.getValue();
-            metadata.setValue(Protocol1_16To1_15_2.getNewBlockStateId(data));
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
         if (type == null) return;

@@ -12,15 +12,11 @@ import us.myles.ViaVersion.api.type.Type;
 // If any of these methods become outdated, just create a new rewriter overriding the methods
 public class BlockRewriter {
     private final Protocol protocol;
-    private final IdRewriteFunction blockStateRewriter;
-    private final IdRewriteFunction blockRewriter;
     private final Type<Position> positionType;
 
-    public BlockRewriter(Protocol protocol, Type<Position> positionType, IdRewriteFunction blockStateRewriter, IdRewriteFunction blockRewriter) {
+    public BlockRewriter(Protocol protocol, Type<Position> positionType) {
         this.protocol = protocol;
         this.positionType = positionType;
-        this.blockStateRewriter = blockStateRewriter;
-        this.blockRewriter = blockRewriter;
     }
 
     public void registerBlockAction(ClientboundPacketType packetType) {
@@ -33,7 +29,7 @@ public class BlockRewriter {
                 map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
                 handler(wrapper -> {
                     int id = wrapper.get(Type.VAR_INT, 0);
-                    int mappedId = blockRewriter.rewrite(id);
+                    int mappedId = protocol.getMappingData().getNewBlockId(id);
                     if (mappedId == -1) {
                         // Block (action) has been removed
                         wrapper.cancel();
@@ -52,7 +48,7 @@ public class BlockRewriter {
             public void registerMap() {
                 map(positionType);
                 map(Type.VAR_INT);
-                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, blockStateRewriter.rewrite(wrapper.get(Type.VAR_INT, 0))));
+                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 0))));
             }
         });
     }
@@ -65,7 +61,7 @@ public class BlockRewriter {
                 map(Type.INT); // 1 - Chunk Z
                 handler(wrapper -> {
                     for (BlockChangeRecord record : wrapper.passthrough(Type.BLOCK_CHANGE_RECORD_ARRAY)) {
-                        record.setBlockId(blockStateRewriter.rewrite(record.getBlockId()));
+                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
                     }
                 });
             }
@@ -79,7 +75,7 @@ public class BlockRewriter {
                 map(Type.LONG); // Chunk position
                 handler(wrapper -> {
                     for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
-                        record.setBlockId(blockStateRewriter.rewrite(record.getBlockId()));
+                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
                     }
                 });
             }
@@ -91,7 +87,7 @@ public class BlockRewriter {
         registerBlockChange(packetType);
     }
 
-    public void registerEffect(ClientboundPacketType packetType, int playRecordId, int blockBreakId, IdRewriteFunction itemIdRewriteFunction) {
+    public void registerEffect(ClientboundPacketType packetType, int playRecordId, int blockBreakId) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -102,9 +98,9 @@ public class BlockRewriter {
                     int id = wrapper.get(Type.INT, 0);
                     int data = wrapper.get(Type.INT, 1);
                     if (id == playRecordId) { // Play record
-                        wrapper.set(Type.INT, 1, itemIdRewriteFunction.rewrite(data));
+                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
                     } else if (id == blockBreakId) { // Block break + block break sound
-                        wrapper.set(Type.INT, 1, blockStateRewriter.rewrite(data));
+                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                     }
                 });
             }
@@ -136,7 +132,7 @@ public class BlockRewriter {
                     if (id == -1) return;
                     if (id == blockId || id == fallingDustId) {
                         int data = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.set(Type.VAR_INT, 0, blockStateRewriter.rewrite(data));
+                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (id == itemId) {
                         // Has to be like this, until we make *everything* object oriented inside of each protocol :(
                         itemRewriteFunction.rewrite(wrapper.passthrough(itemType));

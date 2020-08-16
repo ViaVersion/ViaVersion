@@ -2,7 +2,9 @@ package us.myles.ViaVersion.api.rewriters;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -14,18 +16,14 @@ import java.util.List;
 public class TagRewriter {
     private static final int[] EMPTY_ARRAY = {};
     private final Protocol protocol;
-    private final IdRewriteFunction blockRewriter;
-    private final IdRewriteFunction itemRewriter;
     private final IdRewriteFunction entityRewriter;
     private final List<TagData> newBlockTags = new ArrayList<>();
     private final List<TagData> newItemTags = new ArrayList<>();
     private final List<TagData> newEntityTags = new ArrayList<>();
     // add fluid tag list if needed at some point
 
-    public TagRewriter(Protocol protocol, IdRewriteFunction blockRewriter, IdRewriteFunction itemRewriter, IdRewriteFunction entityRewriter) {
+    public TagRewriter(Protocol protocol, @Nullable IdRewriteFunction entityRewriter) {
         this.protocol = protocol;
-        this.blockRewriter = blockRewriter;
-        this.itemRewriter = itemRewriter;
         this.entityRewriter = entityRewriter;
     }
 
@@ -58,8 +56,9 @@ public class TagRewriter {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    handle(wrapper, blockRewriter, newBlockTags);
-                    handle(wrapper, itemRewriter, newItemTags);
+                    MappingData mappingData = protocol.getMappingData();
+                    handle(wrapper, id -> mappingData != null ? mappingData.getNewBlockId(id) : null, newBlockTags);
+                    handle(wrapper, id -> mappingData != null ? mappingData.getNewItemId(id) : null, newItemTags);
 
                     if (entityRewriter == null && newEntityTags.isEmpty()) return;
 
@@ -122,12 +121,13 @@ public class TagRewriter {
         }
     }
 
+    @Nullable
     private IdRewriteFunction getRewriter(RegistryType tagType) {
         switch (tagType) {
             case BLOCK:
-                return blockRewriter;
+                return protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
             case ITEM:
-                return itemRewriter;
+                return protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
             case ENTITY:
                 return entityRewriter;
             case FLUID:

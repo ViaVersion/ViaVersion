@@ -7,7 +7,6 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.storage.EntityTracker1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
@@ -16,8 +15,7 @@ public class EntityPackets {
 
     public static void register(Protocol1_16_2To1_16_1 protocol) {
         MetadataRewriter1_16_2To1_16_1 metadataRewriter = protocol.get(MetadataRewriter1_16_2To1_16_1.class);
-
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, Entity1_16_2Types.EntityType.FALLING_BLOCK, Protocol1_16_2To1_16_1::getNewBlockStateId);
+        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, Entity1_16_2Types.EntityType.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_MOB);
         metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, Entity1_16_2Types.EntityType.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.ENTITY_METADATA, Types1_14.METADATA_LIST);
@@ -39,7 +37,7 @@ public class EntityPackets {
                 handler(wrapper -> {
                     // Throw away the old dimension registry, extra conversion would be too hard of a hit
                     wrapper.read(Type.NBT);
-                    wrapper.write(Type.NBT, MappingData.dimensionRegistry);
+                    wrapper.write(Type.NBT, protocol.getMappingData().getDimensionRegistry());
 
                     // Instead of the dimension's resource key, it now just wants the data directly
                     String dimensionType = wrapper.read(Type.STRING);
@@ -67,7 +65,7 @@ public class EntityPackets {
     }
 
     public static CompoundTag getDimensionData(String dimensionType) {
-        CompoundTag tag = MappingData.dimensionDataMap.get(dimensionType);
+        CompoundTag tag = Protocol1_16_2To1_16_1.MAPPINGS.getDimensionDataMap().get(dimensionType);
         if (tag == null) {
             Via.getPlatform().getLogger().severe("Could not get dimension data of " + dimensionType);
             throw new NullPointerException("Dimension data for " + dimensionType + " is null!");

@@ -1,9 +1,9 @@
 package us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1;
 
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
@@ -20,27 +20,27 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16
 
 public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, ClientboundPackets1_16_2, ServerboundPackets1_16, ServerboundPackets1_16_2> {
 
+    public static final MappingData MAPPINGS = new MappingData();
     private TagRewriter tagRewriter;
 
     public Protocol1_16_2To1_16_1() {
-        super(ClientboundPackets1_16.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16.class, ServerboundPackets1_16_2.class, true);
+        super(ClientboundPackets1_16.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16.class, ServerboundPackets1_16_2.class);
     }
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter1_16_2To1_16_1 metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
+        MetadataRewriter metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
 
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
 
-        tagRewriter = new TagRewriter(this, Protocol1_16_2To1_16_1::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
+        tagRewriter = new TagRewriter(this, metadataRewriter::getNewEntityId);
         tagRewriter.register(ClientboundPackets1_16.TAGS);
 
-        new StatisticsRewriter(this, Protocol1_16_2To1_16_1::getNewBlockId, InventoryPackets::getNewItemId,
-                metadataRewriter::getNewEntityId).register(ClientboundPackets1_16.STATISTICS);
+        new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_16.STATISTICS);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
+        SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16.ENTITY_SOUND);
 
@@ -77,9 +77,7 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
     }
 
     @Override
-    protected void loadMappingData() {
-        MappingData.init();
-
+    protected void onMappingDataLoaded() {
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:mushroom_grow_block");
 
@@ -95,26 +93,13 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
                 "minecraft:base_stone_nether", "minecraft:base_stone_overworld");
     }
 
-    public static int getNewBlockStateId(int id) {
-        int newId = MappingData.blockStateMappings.getNewId(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.16.2 blockstate for 1.16 blockstate " + id);
-            return 0;
-        }
-        return newId;
-    }
-
-    public static int getNewBlockId(int id) {
-        int newId = MappingData.blockMappings.getNewId(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.16.2 block for 1.16 block " + id);
-            return 0;
-        }
-        return newId;
-    }
-
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_16_2(userConnection));
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return MAPPINGS;
     }
 }

@@ -48,6 +48,7 @@ public class MappingDataLoader {
     /**
      * Loads the file from the plugin folder if present, else from the bundled resources.
      */
+    @Nullable
     public static JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
         if (!file.exists()) return loadData(name);
@@ -68,6 +69,7 @@ public class MappingDataLoader {
     /**
      * Loads the file from the bundled resources. Uses the cache if enabled.
      */
+    @Nullable
     public static JsonObject loadData(String name) {
         return loadData(name, false);
     }
@@ -77,6 +79,7 @@ public class MappingDataLoader {
      *
      * @param cacheIfEnabled whether loaded files should be cached
      */
+    @Nullable
     public static JsonObject loadData(String name, boolean cacheIfEnabled) {
         if (cacheJsonMappings) {
             JsonObject cached = MAPPINGS_CACHE.get(name);
@@ -86,6 +89,8 @@ public class MappingDataLoader {
         }
 
         InputStream stream = getResource(name);
+        if (stream == null) return null;
+
         InputStreamReader reader = new InputStreamReader(stream);
         try {
             JsonObject object = GsonUtil.getGson().fromJson(reader, JsonObject.class);
@@ -106,9 +111,9 @@ public class MappingDataLoader {
         mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
     }
 
-    public static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
+    public static void mapIdentifiers(Map<Integer, Integer> output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = mapIdentifierEntry(entry, oldIdentifiers, newIdentifiers, diffIdentifiers);
+            Map.Entry<String, JsonElement> value = mapIdentifierEntry(entry, newIdentifiers, diffIdentifiers);
             if (value != null) {
                 output.put(Integer.parseInt(entry.getKey()), Integer.parseInt(value.getKey()));
             }
@@ -119,9 +124,9 @@ public class MappingDataLoader {
         MappingDataLoader.mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
     }
 
-    public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
+    public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            Map.Entry<String, JsonElement> value = mapIdentifierEntry(entry, oldIdentifiers, newIdentifiers, diffIdentifiers);
+            Map.Entry<String, JsonElement> value = mapIdentifierEntry(entry, newIdentifiers, diffIdentifiers);
             if (value != null) {
                 output[Integer.parseInt(entry.getKey())] = Short.parseShort(value.getKey());
             }
@@ -129,7 +134,7 @@ public class MappingDataLoader {
     }
 
     @Nullable
-    private static Map.Entry<String, JsonElement> mapIdentifierEntry(Map.Entry<String, JsonElement> entry, JsonObject oldIdentifiers, JsonObject newIdentifiers, JsonObject diffIdentifiers) {
+    private static Map.Entry<String, JsonElement> mapIdentifierEntry(Map.Entry<String, JsonElement> entry, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
         Map.Entry<String, JsonElement> value = findValue(newIdentifiers, entry.getValue().getAsString());
         if (value == null) {
             // Search in diff mappings
@@ -153,7 +158,7 @@ public class MappingDataLoader {
         mapIdentifiers(output, oldIdentifiers, newIdentifiers, null, warnOnMissing);
     }
 
-    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, JsonObject diffIdentifiers, boolean warnOnMissing) {
+    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         for (int i = 0; i < oldIdentifiers.size(); i++) {
             JsonElement value = oldIdentifiers.get(i);
             Integer index = findIndex(newIdentifiers, value.getAsString());
@@ -208,6 +213,7 @@ public class MappingDataLoader {
         return null;
     }
 
+    @Nullable
     public static InputStream getResource(String name) {
         return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
     }

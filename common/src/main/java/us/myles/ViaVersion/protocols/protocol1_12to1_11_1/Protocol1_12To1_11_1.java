@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_12;
@@ -34,7 +35,7 @@ public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, Clie
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter1_12To1_11_1 metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+        MetadataRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
 
         InventoryPackets.register(this);
 

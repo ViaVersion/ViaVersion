@@ -205,7 +205,7 @@ public class ConnectionData {
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
         JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
-        JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blocks");
+        JsonObject blocks1_13 = mapping1_13.getAsJsonObject("blockstates");
         for (Entry<String, JsonElement> blockState : blocks1_13.entrySet()) {
             int id = Integer.parseInt(blockState.getKey());
             String key = blockState.getValue().getAsString();

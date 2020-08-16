@@ -8,7 +8,6 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -16,7 +15,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 public class WorldPackets {
 
     public static void register(Protocol protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION, Protocol1_13_1To1_13::getNewBlockStateId, Protocol1_13_1To1_13::getNewBlockId);
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION);
 
         protocol.registerOutgoing(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
             @Override
@@ -30,7 +29,7 @@ public class WorldPackets {
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
                             for (int i = 0; i < section.getPaletteSize(); i++) {
-                                section.setPaletteEntry(i, Protocol1_13_1To1_13.getNewBlockStateId(section.getPaletteEntry(i)));
+                                section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(section.getPaletteEntry(i)));
                             }
                         }
                     }
@@ -41,7 +40,7 @@ public class WorldPackets {
         blockRewriter.registerBlockAction(ClientboundPackets1_13.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_CHANGE);
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerEffect(ClientboundPackets1_13.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
+        blockRewriter.registerEffect(ClientboundPackets1_13.EFFECT, 1010, 2001);
 
         protocol.registerOutgoing(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override

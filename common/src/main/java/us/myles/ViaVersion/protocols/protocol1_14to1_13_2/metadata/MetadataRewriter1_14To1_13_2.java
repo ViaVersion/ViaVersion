@@ -38,7 +38,7 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
         } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
             // Convert to new block id
             int data = (int) metadata.getValue();
-            metadata.setValue(Protocol1_14To1_13_2.getNewBlockStateId(data));
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
         if (type == null) return;
@@ -95,7 +95,7 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
             if (metadata.getId() == 10) {
                 // New block format
                 int data = (int) metadata.getValue();
-                metadata.setValue(Protocol1_14To1_13_2.getNewBlockStateId(data));
+                metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
             }
         } else if (type.is(Entity1_14Types.EntityType.HORSE)) {
             if (metadata.getId() == 18) {
@@ -104,11 +104,11 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
                 int armorType = (int) metadata.getValue();
                 Item armorItem = null;
                 if (armorType == 1) {  //iron armor
-                    armorItem = new Item(InventoryPackets.getNewItemId(727), (byte) 1, (short) 0, null);
+                    armorItem = new Item(protocol.getMappingData().getNewItemId(727), (byte) 1, (short) 0, null);
                 } else if (armorType == 2) {  //gold armor
-                    armorItem = new Item(InventoryPackets.getNewItemId(728), (byte) 1, (short) 0, null);
+                    armorItem = new Item(protocol.getMappingData().getNewItemId(728), (byte) 1, (short) 0, null);
                 } else if (armorType == 3) {  //diamond armor
-                    armorItem = new Item(InventoryPackets.getNewItemId(729), (byte) 1, (short) 0, null);
+                    armorItem = new Item(protocol.getMappingData().getNewItemId(729), (byte) 1, (short) 0, null);
                 }
 
                 PacketWrapper equipmentPacket = new PacketWrapper(0x46, null, connection);

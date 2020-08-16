@@ -1,21 +1,19 @@
 package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets;
 
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 
 public class InventoryPackets {
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_15To1_14_4 protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        itemRewriter.registerSetCooldown(ClientboundPackets1_14.COOLDOWN, InventoryPackets::getNewItemId);
+        itemRewriter.registerSetCooldown(ClientboundPackets1_14.COOLDOWN);
         itemRewriter.registerWindowItems(ClientboundPackets1_14.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
         itemRewriter.registerTradeList(ClientboundPackets1_14.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
         itemRewriter.registerSetSlot(ClientboundPackets1_14.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
@@ -30,25 +28,11 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        item.setIdentifier(getNewItemId(item.getIdentifier()));
+        item.setIdentifier(Protocol1_15To1_14_4.MAPPINGS.getNewItemId(item.getIdentifier()));
     }
 
     public static void toServer(Item item) {
         if (item == null) return;
-        item.setIdentifier(getOldItemId(item.getIdentifier()));
-    }
-
-    public static int getNewItemId(int id) {
-        int newId = MappingData.oldToNewItems.get(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.15 item for 1.14 item " + id);
-            return 1;
-        }
-        return newId;
-    }
-
-    public static int getOldItemId(int id) {
-        int oldId = MappingData.oldToNewItems.inverse().get(id);
-        return oldId != -1 ? oldId : 1;
+        item.setIdentifier(Protocol1_15To1_14_4.MAPPINGS.getOldItemId(item.getIdentifier()));
     }
 }

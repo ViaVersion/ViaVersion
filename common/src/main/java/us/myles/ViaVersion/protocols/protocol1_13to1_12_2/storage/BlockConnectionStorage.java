@@ -6,7 +6,7 @@ import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.lang.reflect.Constructor;
@@ -30,7 +30,7 @@ public class BlockConnectionStorage extends StoredObject {
 
         Arrays.fill(REVERSE_BLOCK_MAPPINGS, (short) -1);
         for (int i = 0; i < 4096; i++) {
-            int newBlock = MappingData.blockMappings.getNewId(i);
+            int newBlock = Protocol1_13To1_12_2.MAPPINGS.getBlockMappings().getNewId(i);
             if (newBlock != -1) {
                 REVERSE_BLOCK_MAPPINGS[newBlock] = (short) i;
             }

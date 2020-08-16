@@ -23,7 +23,7 @@ public class WorldPackets {
     private static final BlockChangeRecord[] EMPTY_RECORDS = new BlockChangeRecord[0];
 
     public static void register(Protocol protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_16_2To1_16_1::getNewBlockStateId, Protocol1_16_2To1_16_1::getNewBlockId);
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_16.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_16.BLOCK_CHANGE);
@@ -41,7 +41,7 @@ public class WorldPackets {
                         if (section == null) continue;
                         for (int i = 0; i < section.getPaletteSize(); i++) {
                             int old = section.getPaletteEntry(i);
-                            section.setPaletteEntry(i, Protocol1_16_2To1_16_1.getNewBlockStateId(old));
+                            section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(old));
                         }
                     }
                 });
@@ -71,7 +71,7 @@ public class WorldPackets {
                         }
 
                         // Absolute y -> relative chunk section y
-                        int blockId = Protocol1_16_2To1_16_1.getNewBlockStateId(record.getBlockId());
+                        int blockId = protocol.getMappingData().getNewBlockStateId(record.getBlockId());
                         list.add(new BlockChangeRecord1_16_2(record.getSectionX(), record.getSectionY(), record.getSectionZ(), blockId));
                     }
 
@@ -90,7 +90,7 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_16.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
+        blockRewriter.registerEffect(ClientboundPackets1_16.EFFECT, 1010, 2001);
         blockRewriter.registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, 3, 23, 34,
                 null, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }

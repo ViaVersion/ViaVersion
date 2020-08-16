@@ -180,4 +180,8 @@ public class ComponentRewriter {
             processText(jsonElement);
         }
     }
+
+    public <T extends Protocol> T getProtocol() {
+        return (T) protocol;
+    }
 }

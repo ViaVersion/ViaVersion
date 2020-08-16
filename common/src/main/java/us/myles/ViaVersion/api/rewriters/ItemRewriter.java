@@ -106,13 +106,13 @@ public class ItemRewriter {
         });
     }
 
-    public void registerSetCooldown(ClientboundPacketType packetType, IdRewriteFunction itemIDRewriteFunction) {
+    public void registerSetCooldown(ClientboundPacketType packetType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
                     int itemId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, itemIDRewriteFunction.rewrite(itemId));
+                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
                 });
             }
         });
