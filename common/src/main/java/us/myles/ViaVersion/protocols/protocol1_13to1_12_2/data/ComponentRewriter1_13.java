@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.nbt.BinaryTagIO;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
+import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 
 import java.io.IOException;
@@ -103,9 +104,10 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
     protected void handleTranslate(JsonObject object, String translate) {
         super.handleTranslate(object, translate);
         String newTranslate;
-        newTranslate = MappingData.translateMapping.get(translate);
+        Protocol1_13To1_12_2 protocol = getProtocol();
+        newTranslate = protocol.getMappingData().getTranslateMapping().get(translate);
         if (newTranslate == null) {
-            newTranslate = MappingData.mojangTranslation.get(translate);
+            newTranslate = protocol.getMappingData().getMojangTranslation().get(translate);
         }
         if (newTranslate != null) {
             object.addProperty("translate", newTranslate);

@@ -11,10 +11,6 @@ public abstract class SimpleProtocol extends Protocol<SimpleProtocol.DummyPacket
     protected SimpleProtocol() {
     }
 
-    protected SimpleProtocol(boolean hasMappingDataToLoad) {
-        super(hasMappingDataToLoad);
-    }
-
     public enum DummyPacketTypes implements ClientboundPacketType, ServerboundPacketType {
     }
 }

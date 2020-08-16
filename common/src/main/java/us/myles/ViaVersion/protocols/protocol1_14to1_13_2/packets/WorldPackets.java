@@ -9,7 +9,6 @@ import us.myles.ViaVersion.api.minecraft.BlockFace;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
@@ -18,7 +17,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
@@ -38,8 +36,8 @@ public class WorldPackets {
         Arrays.fill(FULL_LIGHT, (byte) 0xff);
     }
 
-    public static void register(final Protocol protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, null, Protocol1_14To1_13_2::getNewBlockStateId, Protocol1_14To1_13_2::getNewBlockId);
+    public static void register(Protocol1_14To1_13_2 protocol) {
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, null);
 
         protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketRemapper() {
             @Override
@@ -65,7 +63,7 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
+                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockId(wrapper.get(Type.VAR_INT, 0)));
                     }
                 });
             }
@@ -80,7 +78,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.VAR_INT, 0);
 
-                        wrapper.set(Type.VAR_INT, 0, Protocol1_14To1_13_2.getNewBlockStateId(id));
+                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(id));
                     }
                 });
             }
@@ -144,7 +142,7 @@ public class WorldPackets {
                             boolean hasBlock = false;
                             for (int i = 0; i < section.getPaletteSize(); i++) {
                                 int old = section.getPaletteEntry(i);
-                                int newId = Protocol1_14To1_13_2.getNewBlockStateId(old);
+                                int newId = protocol.getMappingData().getNewBlockStateId(old);
                                 if (!hasBlock && newId != air && newId != voidAir && newId != caveAir) { // air, void_air, cave_air
                                     hasBlock = true;
                                 }
@@ -164,12 +162,12 @@ public class WorldPackets {
                                             nonAirBlockCount++;
                                             worldSurface[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
                                         }
-                                        if (MappingData.motionBlocking.contains(id)) {
+                                        if (protocol.getMappingData().getMotionBlocking().contains(id)) {
                                             motionBlocking[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
                                         }
 
                                         // Manually update light for non full blocks (block light must not be sent)
-                                        if (Via.getConfig().isNonFullBlockLightFix() && MappingData.nonFullBlocks.contains(id)) {
+                                        if (Via.getConfig().isNonFullBlockLightFix() && protocol.getMappingData().getNonFullBlocks().contains(id)) {
                                             setNonFullLight(chunk, section, s, x, y, z);
                                         }
                                     }
@@ -265,9 +263,9 @@ public class WorldPackets {
                         int id = wrapper.get(Type.INT, 0);
                         int data = wrapper.get(Type.INT, 1);
                         if (id == 1010) { // Play record
-                            wrapper.set(Type.INT, 1, InventoryPackets.getNewItemId(data));
+                            wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
                         } else if (id == 2001) { // Block break + block break sound
-                            wrapper.set(Type.INT, 1, Protocol1_14To1_13_2.getNewBlockStateId(data));
+                            wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                         }
                     }
                 });

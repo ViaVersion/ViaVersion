@@ -7,11 +7,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.data.Mappings;
 import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.util.Int2IntBiMap;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,34 +20,44 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingData {
-    public static final Int2IntBiMap oldToNewItems = new Int2IntBiMap();
-    public static final Map<String, Integer[]> blockTags = new HashMap<>();
-    public static final Map<String, Integer[]> itemTags = new HashMap<>();
-    public static final Map<String, Integer[]> fluidTags = new HashMap<>();
-    public static final BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
-    public static final Map<String, String> translateMapping = new HashMap<>();
-    public static final Map<String, String> mojangTranslation = new HashMap<>();
-    public static final BiMap<String, String> channelMappings = HashBiMap.create(); // 1.12->1.13
-    public static Mappings enchantmentMappings;
-    public static Mappings soundMappings;
-    public static Mappings blockMappings;
+public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
+    private final Map<String, Integer[]> blockTags = new HashMap<>();
+    private final Map<String, Integer[]> itemTags = new HashMap<>();
+    private final Map<String, Integer[]> fluidTags = new HashMap<>();
+    private final BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
+    private final Map<String, String> translateMapping = new HashMap<>();
+    private final Map<String, String> mojangTranslation = new HashMap<>();
+    private final BiMap<String, String> channelMappings = HashBiMap.create(); // 1.12->1.13
+    private Mappings enchantmentMappings;
 
-    public static void init() {
-        Via.getPlatform().getLogger().info("Loading 1.12.2 -> 1.13 mappings...");
-        JsonObject mapping1_12 = MappingDataLoader.loadData("mapping-1.12.json", true);
-        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
+    public MappingData() {
+        super("1.12", "1.13");
+    }
 
-        oldToNewItems.defaultReturnValue(-1);
-        blockMappings = new BlockMappingsShortArray(mapping1_12.getAsJsonObject("blocks"), mapping1_13.getAsJsonObject("blocks"));
-        MappingDataLoader.mapIdentifiers(oldToNewItems, mapping1_12.getAsJsonObject("items"), mapping1_13.getAsJsonObject("items"));
-        loadTags(blockTags, mapping1_13.getAsJsonObject("block_tags"));
-        loadTags(itemTags, mapping1_13.getAsJsonObject("item_tags"));
-        loadTags(fluidTags, mapping1_13.getAsJsonObject("fluid_tags"));
+    @Override
+    public void loadExtras(JsonObject oldMappings, JsonObject newMappings, JsonObject diffMappings) {
+        loadTags(blockTags, newMappings.getAsJsonObject("block_tags"));
+        loadTags(itemTags, newMappings.getAsJsonObject("item_tags"));
+        loadTags(fluidTags, newMappings.getAsJsonObject("fluid_tags"));
 
-        loadEnchantments(oldEnchantmentsIds, mapping1_12.getAsJsonObject("enchantments"));
-        enchantmentMappings = new Mappings(72, mapping1_12.getAsJsonObject("enchantments"), mapping1_13.getAsJsonObject("enchantments"));
-        soundMappings = new Mappings(662, mapping1_12.getAsJsonArray("sounds"), mapping1_13.getAsJsonArray("sounds"));
+        loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("enchantments"));
+        enchantmentMappings = new Mappings(72, oldMappings.getAsJsonObject("enchantments"), newMappings.getAsJsonObject("enchantments"));
+
+        // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
+        if (Via.getConfig().isSnowCollisionFix()) {
+            blockMappings.getOldToNew()[1248] = 3416;
+        }
+
+        // Remap infested blocks, as they are instantly breakabale in 1.13+ and can't be broken by those clients on older servers
+        if (Via.getConfig().isInfestedBlocksFix()) {
+            short[] oldToNew = blockMappings.getOldToNew();
+            oldToNew[1552] = 1; // stone
+            oldToNew[1553] = 14; // cobblestone
+            oldToNew[1554] = 3983; // stone bricks
+            oldToNew[1555] = 3984; // mossy stone bricks
+            oldToNew[1556] = 3985; // cracked stone bricks
+            oldToNew[1557] = 3986; // chiseled stone bricks
+        }
 
         JsonObject object = MappingDataLoader.loadFromDataDir("channelmappings-1.13.json");
         if (object != null) {
@@ -94,6 +104,16 @@ public class MappingData {
         }
     }
 
+    @Override
+    protected Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+        if (key.equals("blocks")) {
+            // Need to use a custom size since there are larger gaps in ids
+            return new Mappings(4084, oldMappings.getAsJsonObject("blocks"), newMappings.getAsJsonObject("blockstates"));
+        } else {
+            return super.loadFromObject(oldMappings, newMappings, diffMappings, key);
+        }
+    }
+
     public static String validateNewChannel(String newId) {
         if (!isValid1_13Channel(newId)) {
             return null; // Not valid
@@ -110,7 +130,7 @@ public class MappingData {
         return channelId.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)");
     }
 
-    private static void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
+    private void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
         for (Map.Entry<String, JsonElement> entry : newTags.entrySet()) {
             JsonArray ids = entry.getValue().getAsJsonArray();
             Integer[] idsArray = new Integer[ids.size()];
@@ -121,31 +141,41 @@ public class MappingData {
         }
     }
 
-    private static void loadEnchantments(Map<Short, String> output, JsonObject enchantments) {
+    private void loadEnchantments(Map<Short, String> output, JsonObject enchantments) {
         for (Map.Entry<String, JsonElement> enchantment : enchantments.entrySet()) {
             output.put(Short.parseShort(enchantment.getKey()), enchantment.getValue().getAsString());
         }
     }
 
-    private static class BlockMappingsShortArray extends Mappings {
+    public Map<String, Integer[]> getBlockTags() {
+        return blockTags;
+    }
 
-        private BlockMappingsShortArray(JsonObject mapping1_12, JsonObject mapping1_13) {
-            super(4084, mapping1_12, mapping1_13);
+    public Map<String, Integer[]> getItemTags() {
+        return itemTags;
+    }
 
-            // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
-            if (Via.getConfig().isSnowCollisionFix()) {
-                oldToNew[1248] = 3416;
-            }
+    public Map<String, Integer[]> getFluidTags() {
+        return fluidTags;
+    }
 
-            // Remap infested blocks, as they are instantly breakabale in 1.13+ and can't be broken by those clients on older servers
-            if (Via.getConfig().isInfestedBlocksFix()) {
-                oldToNew[1552] = 1; // stone
-                oldToNew[1553] = 14; // cobblestone
-                oldToNew[1554] = 3983; // stone bricks
-                oldToNew[1555] = 3984; // mossy stone bricks
-                oldToNew[1556] = 3985; // cracked stone bricks
-                oldToNew[1557] = 3986; // chiseled stone bricks
-            }
-        }
+    public BiMap<Short, String> getOldEnchantmentsIds() {
+        return oldEnchantmentsIds;
+    }
+
+    public Map<String, String> getTranslateMapping() {
+        return translateMapping;
+    }
+
+    public Map<String, String> getMojangTranslation() {
+        return mojangTranslation;
+    }
+
+    public BiMap<String, String> getChannelMappings() {
+        return channelMappings;
+    }
+
+    public Mappings getEnchantmentMappings() {
+        return enchantmentMappings;
     }
 }

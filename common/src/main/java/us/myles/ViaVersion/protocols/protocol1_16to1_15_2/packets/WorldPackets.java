@@ -8,7 +8,6 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
@@ -23,8 +22,8 @@ import java.util.UUID;
 
 public class WorldPackets {
 
-    public static void register(Protocol protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_16To1_15_2::getNewBlockStateId, Protocol1_16To1_15_2::getNewBlockId);
+    public static void register(Protocol1_16To1_15_2 protocol) {
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_CHANGE);
@@ -54,7 +53,7 @@ public class WorldPackets {
                         if (section == null) continue;
                         for (int i = 0; i < section.getPaletteSize(); i++) {
                             int old = section.getPaletteEntry(i);
-                            section.setPaletteEntry(i, Protocol1_16To1_15_2.getNewBlockStateId(old));
+                            section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(old));
                         }
                     }
 
@@ -86,7 +85,7 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
+        blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001);
         blockRewriter.registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, 3, 23, 32,
                 WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }

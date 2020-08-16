@@ -3,7 +3,6 @@ package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
@@ -15,8 +14,8 @@ import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 
 public class WorldPackets {
 
-    public static void register(Protocol protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14, Protocol1_15To1_14_4::getNewBlockStateId, Protocol1_15To1_14_4::getNewBlockId);
+    public static void register(Protocol1_15To1_14_4 protocol) {
+        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_14.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_14.BLOCK_CHANGE);
@@ -59,7 +58,7 @@ public class WorldPackets {
                             if (section == null) continue;
                             for (int i = 0; i < section.getPaletteSize(); i++) {
                                 int old = section.getPaletteEntry(i);
-                                int newId = Protocol1_15To1_14_4.getNewBlockStateId(old);
+                                int newId = protocol.getMappingData().getNewBlockStateId(old);
                                 section.setPaletteEntry(i, newId);
                             }
                         }
@@ -68,7 +67,7 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_14.EFFECT, 1010, 2001, InventoryPackets::getNewItemId);
+        blockRewriter.registerEffect(ClientboundPackets1_14.EFFECT, 1010, 2001);
         protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -88,7 +87,7 @@ public class WorldPackets {
                         int id = wrapper.get(Type.INT, 0);
                         if (id == 3 || id == 23) {
                             int data = wrapper.passthrough(Type.VAR_INT);
-                            wrapper.set(Type.VAR_INT, 0, Protocol1_15To1_14_4.getNewBlockStateId(data));
+                            wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         } else if (id == 32) {
                             InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                         }

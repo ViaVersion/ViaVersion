@@ -2,25 +2,33 @@ package us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.rewriters.RecipeRewriter;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 
 public class InventoryPackets {
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_13_1To1_13 protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
-
-        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN, InventoryPackets::getNewItemId);
         itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_ITEM);
         itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_ITEM_ARRAY);
         itemRewriter.registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_ITEM);
+
+        protocol.registerOutgoing(ClientboundPackets1_13.COOLDOWN, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    int itemId = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
+                });
+            }
+        });
 
         protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
@@ -80,25 +88,11 @@ public class InventoryPackets {
 
     public static void toClient(Item item) {
         if (item == null) return;
-        item.setIdentifier(getNewItemId(item.getIdentifier()));
-    }
-
-    public static int getNewItemId(int itemId) {
-        if (itemId >= 443) {
-            return itemId + 5;
-        }
-        return itemId;
+        item.setIdentifier(Protocol1_13_1To1_13.MAPPINGS.getNewItemId(item.getIdentifier()));
     }
 
     public static void toServer(Item item) {
         if (item == null) return;
-        item.setIdentifier(getOldItemId(item.getIdentifier()));
-    }
-
-    public static int getOldItemId(int newId) {
-        if (newId >= 448) {
-            return newId - 5;
-        }
-        return newId;
+        item.setIdentifier(Protocol1_13_1To1_13.MAPPINGS.getOldItemId(item.getIdentifier()));
     }
 }

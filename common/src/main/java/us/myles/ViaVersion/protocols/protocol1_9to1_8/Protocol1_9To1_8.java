@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
+import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -94,7 +95,7 @@ public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, Clientboun
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_9To1_8(this);
+        MetadataRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
 
         // Disconnect workaround (JSON!)
         registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {

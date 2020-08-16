@@ -27,7 +27,7 @@ public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter {
         } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
             // Convert to new block id
             int data = (int) metadata.getValue();
-            metadata.setValue(Protocol1_13_1To1_13.getNewBlockStateId(data));
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
         if (type == null) return;
@@ -35,7 +35,7 @@ public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter {
         if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
             // New block format
             int data = (int) metadata.getValue();
-            metadata.setValue(Protocol1_13_1To1_13.getNewBlockStateId(data));
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
         if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.getId() >= 7) {

@@ -8,24 +8,12 @@ import us.myles.ViaVersion.api.type.Type;
 
 public class StatisticsRewriter {
     private final Protocol protocol;
-    private final IdRewriteFunction blockRewriter;
-    private final IdRewriteFunction itemRewriter;
     private final IdRewriteFunction entityRewriter;
-    private final IdRewriteFunction statisticsIdRewriter;
     private final int customStatsCategory = 8; // Make this changeable if it differs in a future version
 
-    public StatisticsRewriter(Protocol protocol,
-                              @Nullable IdRewriteFunction blockRewriter, @Nullable IdRewriteFunction itemRewriter, @Nullable IdRewriteFunction entityRewriter,
-                              @Nullable IdRewriteFunction statisticsIdRewriter) {
+    public StatisticsRewriter(Protocol protocol, @Nullable IdRewriteFunction entityRewriter) {
         this.protocol = protocol;
-        this.blockRewriter = blockRewriter;
-        this.itemRewriter = itemRewriter;
         this.entityRewriter = entityRewriter;
-        this.statisticsIdRewriter = statisticsIdRewriter;
-    }
-
-    public StatisticsRewriter(Protocol protocol, @Nullable IdRewriteFunction blockRewriter, @Nullable IdRewriteFunction itemRewriter, @Nullable IdRewriteFunction entityRewriter) {
-        this(protocol, blockRewriter, itemRewriter, entityRewriter, null);
     }
 
     public void register(ClientboundPacketType packetType) {
@@ -39,9 +27,9 @@ public class StatisticsRewriter {
                         int categoryId = wrapper.read(Type.VAR_INT);
                         int statisticId = wrapper.read(Type.VAR_INT);
                         int value = wrapper.read(Type.VAR_INT);
-                        if (categoryId == customStatsCategory && statisticsIdRewriter != null) {
+                        if (categoryId == customStatsCategory && protocol.getMappingData().getStatisticsMappings() != null) {
                             // Rewrite custom statistics id
-                            statisticId = statisticsIdRewriter.rewrite(statisticId);
+                            statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
                             if (statisticId == -1) {
                                 // Remove entry
                                 newSize--;
@@ -73,9 +61,9 @@ public class StatisticsRewriter {
     protected IdRewriteFunction getRewriter(RegistryType type) {
         switch (type) {
             case BLOCK:
-                return blockRewriter;
+                return protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
             case ITEM:
-                return itemRewriter;
+                return protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
             case ENTITY:
                 return entityRewriter;
         }

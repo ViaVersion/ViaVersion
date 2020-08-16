@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -36,14 +37,9 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     protected final Class<C2> newClientboundPacketEnum;
     protected final Class<S1> oldServerboundPacketEnum;
     protected final Class<S2> newServerboundPacketEnum;
-    protected final boolean hasMappingDataToLoad;
 
     protected Protocol() {
-        this(null, null, null, null, false);
-    }
-
-    protected Protocol(boolean hasMappingDataToLoad) {
-        this(null, null, null, null, hasMappingDataToLoad);
+        this(null, null, null, null);
     }
 
     /**
@@ -51,21 +47,10 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      */
     protected Protocol(@Nullable Class<C1> oldClientboundPacketEnum, @Nullable Class<C2> clientboundPacketEnum,
                        @Nullable Class<S1> oldServerboundPacketEnum, @Nullable Class<S2> serverboundPacketEnum) {
-        this(oldClientboundPacketEnum, clientboundPacketEnum, oldServerboundPacketEnum, serverboundPacketEnum, false);
-    }
-
-    /**
-     * Creates a protocol with automated id mapping if the respective enums are not null.
-     *
-     * @param hasMappingDataToLoad whether an async executor should call the {@Link #loadMappingData} method
-     */
-    protected Protocol(@Nullable Class<C1> oldClientboundPacketEnum, @Nullable Class<C2> clientboundPacketEnum,
-                       @Nullable Class<S1> oldServerboundPacketEnum, @Nullable Class<S2> serverboundPacketEnum, boolean hasMappingDataToLoad) {
         this.oldClientboundPacketEnum = oldClientboundPacketEnum;
         this.newClientboundPacketEnum = clientboundPacketEnum;
         this.oldServerboundPacketEnum = oldServerboundPacketEnum;
         this.newServerboundPacketEnum = serverboundPacketEnum;
-        this.hasMappingDataToLoad = hasMappingDataToLoad;
         registerPackets();
 
         // Register the rest of the ids with no handlers if necessary
@@ -157,11 +142,19 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     }
 
     /**
-     * Load mapping data for the protocol.
+     * Loads the mappingdata.
+     */
+    protected final void loadMappingData() {
+        getMappingData().load();
+        onMappingDataLoaded();
+    }
+
+    /**
+     * Called after {@link #loadMappingData()} is called; load extra mapping data for the protocol.
      * <p>
      * To be overridden if needed.
      */
-    protected void loadMappingData() {
+    protected void onMappingDataLoaded() {
     }
 
     /**
@@ -387,10 +380,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         return incoming.containsKey(packet);
     }
 
-    public boolean hasMappingDataToLoad() {
-        return hasMappingDataToLoad;
-    }
-
     /**
      * Transform a packet using this protocol
      *
@@ -468,6 +457,16 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
 
     public void put(Object object) {
         storedObjects.put(object.getClass(), object);
+    }
+
+    public boolean hasMappingDataToLoad() {
+        return getMappingData() != null;
+    }
+
+    @Nullable
+    public MappingData getMappingData() {
+        //TODO Fully hold the instance here and get rid of all static usages (at some point:tm:)
+        return null; // Let the protocols hold the mappings to still have easy, static singleton access there
     }
 
     @Override

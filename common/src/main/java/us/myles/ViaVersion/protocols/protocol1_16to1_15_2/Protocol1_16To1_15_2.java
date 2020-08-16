@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
+import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
@@ -35,25 +36,25 @@ import java.util.UUID;
 public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, ClientboundPackets1_16, ServerboundPackets1_14, ServerboundPackets1_16> {
 
     private static final UUID ZERO_UUID = new UUID(0, 0);
+    public static final MappingData MAPPINGS = new MappingData();
     private TagRewriter tagRewriter;
 
     public Protocol1_16To1_15_2() {
-        super(ClientboundPackets1_15.class, ClientboundPackets1_16.class, ServerboundPackets1_14.class, ServerboundPackets1_16.class, true);
+        super(ClientboundPackets1_15.class, ClientboundPackets1_16.class, ServerboundPackets1_14.class, ServerboundPackets1_16.class);
     }
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
+        MetadataRewriter metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
 
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
 
-        tagRewriter = new TagRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId, metadataRewriter::getNewEntityId);
+        tagRewriter = new TagRewriter(this, metadataRewriter::getNewEntityId);
         tagRewriter.register(ClientboundPackets1_15.TAGS);
 
-        new StatisticsRewriter(this, Protocol1_16To1_15_2::getNewBlockId, InventoryPackets::getNewItemId,
-                metadataRewriter::getNewEntityId, id -> MappingData.statisticsMappings.getNewId(id)).register(ClientboundPackets1_15.STATISTICS);
+        new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
         registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
@@ -124,7 +125,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
         componentRewriter.registerTitle(ClientboundPackets1_15.TITLE);
         componentRewriter.registerCombatEvent(ClientboundPackets1_15.COMBAT_EVENT);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this, id -> MappingData.soundMappings.getNewId(id));
+        SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_15.ENTITY_SOUND);
 
@@ -206,9 +207,7 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
     }
 
     @Override
-    protected void loadMappingData() {
-        MappingData.init();
-
+    protected void onMappingDataLoaded() {
         int[] wallPostOverrideTag = new int[47];
         int arrayIndex = 0;
         wallPostOverrideTag[arrayIndex++] = 140;
@@ -253,27 +252,14 @@ public class Protocol1_16To1_15_2 extends Protocol<ClientboundPackets1_15, Clien
                 "minecraft:lectern_books", "minecraft:music_discs", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors", "minecraft:walls", "minecraft:wooden_fences");
     }
 
-    public static int getNewBlockStateId(int id) {
-        int newId = MappingData.blockStateMappings.getNewId(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.16 blockstate for 1.15.2 blockstate " + id);
-            return 0;
-        }
-        return newId;
-    }
-
-    public static int getNewBlockId(int id) {
-        int newId = MappingData.blockMappings.getNewId(id);
-        if (newId == -1) {
-            Via.getPlatform().getLogger().warning("Missing 1.16 block for 1.15.2 block " + id);
-            return 0;
-        }
-        return newId;
-    }
-
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_16(userConnection));
         userConnection.put(new InventoryTracker1_16(userConnection));
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return MAPPINGS;
     }
 }
