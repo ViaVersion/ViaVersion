@@ -16,6 +16,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
@@ -39,7 +40,7 @@ public class InventoryPackets {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
                     if (inventoryTracker.getInventory() != -1) {
                         // Close open inventory before opening a new one.
-                        PacketWrapper closePacket = wrapper.create(0x13); // 1.16 inventory close
+                        PacketWrapper closePacket = wrapper.create(ClientboundPackets1_16.CLOSE_WINDOW.ordinal());
                         closePacket.write(Type.UNSIGNED_BYTE, inventoryTracker.getInventory());
                         closePacket.send(Protocol1_16To1_15_2.class, true, true);
                     }
