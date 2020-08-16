@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.md_5.bungee.api.ChatColor;
@@ -840,7 +841,14 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                         int type = wrapper.get(Type.VAR_INT, 0);
 
                         if (type == 0) {
-                            wrapper.write(Type.INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18)));
+                            Integer id = Ints.tryParse(wrapper.read(Type.STRING).substring(18));
+                            // Custom recipes
+                            if (id == null) {
+                                wrapper.cancel();
+                                return;
+                            }
+
+                            wrapper.write(Type.INT, id);
                         }
                         if (type == 1) {
                             wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open

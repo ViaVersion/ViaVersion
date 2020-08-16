@@ -158,7 +158,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
                 newId++;
             }
             return newId;
-        });
+        }).register(ClientboundPackets1_13.STATISTICS);
     }
 
     @Override
