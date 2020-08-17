@@ -104,10 +104,9 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
     protected void handleTranslate(JsonObject object, String translate) {
         super.handleTranslate(object, translate);
         String newTranslate;
-        Protocol1_13To1_12_2 protocol = getProtocol();
-        newTranslate = protocol.getMappingData().getTranslateMapping().get(translate);
+        newTranslate = Protocol1_13To1_12_2.MAPPINGS.getTranslateMapping().get(translate);
         if (newTranslate == null) {
-            newTranslate = protocol.getMappingData().getMojangTranslation().get(translate);
+            newTranslate = Protocol1_13To1_12_2.MAPPINGS.getMojangTranslation().get(translate);
         }
         if (newTranslate != null) {
             object.addProperty("translate", newTranslate);
