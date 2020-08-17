@@ -42,10 +42,12 @@ public class Protocol1_9_1_2To1_9_3_4 extends Protocol<ClientboundPackets1_9_3, 
 
                             wrapper.clearPacket(); //Clear the packet
 
-                            wrapper.setId(0x46); //Update sign packet
+                            wrapper.setId(ClientboundPackets1_9.UPDATE_SIGN.ordinal()); //Update sign packet
                             wrapper.write(Type.POSITION, position); // Position
-                            for (int i = 1; i < 5; i++)
+                            for (int i = 1; i < 5; i++) {
+                                // Should technically be written as COMPONENT, but left as String for simplification/to remove redundant wrapping for VR
                                 wrapper.write(Type.STRING, (String) tag.get("Text" + i).getValue()); // Sign line
+                            }
                         }
                     }
                 });
