@@ -104,7 +104,7 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
         super.handleTranslate(object, translate);
         String newTranslate;
         newTranslate = MappingData.translateMapping.get(translate);
-        if (newTranslate != null) {
+        if (newTranslate == null) {
             newTranslate = MappingData.mojangTranslation.get(translate);
         }
         if (newTranslate != null) {
