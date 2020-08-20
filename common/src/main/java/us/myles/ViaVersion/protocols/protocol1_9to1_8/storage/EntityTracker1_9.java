@@ -246,12 +246,12 @@ public class EntityTracker1_9 extends EntityTracker {
             if (!teamExists) {
                 wrapper.write(Type.BYTE, (byte) 0); // make team
                 wrapper.write(Type.STRING, "viaversion");
-                wrapper.write(Type.STRING, ""); // prefix
+                wrapper.write(Type.STRING, "§f"); // prefix
                 wrapper.write(Type.STRING, ""); // suffix
                 wrapper.write(Type.BYTE, (byte) 0); // friendly fire
                 wrapper.write(Type.STRING, ""); // nametags
                 wrapper.write(Type.STRING, "never"); // collision rule :)
-                wrapper.write(Type.BYTE, (byte) 0); // color
+                wrapper.write(Type.BYTE, (byte) 15); // color
             } else {
                 wrapper.write(Type.BYTE, (byte) 3);
             }
