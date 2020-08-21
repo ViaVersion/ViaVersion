@@ -411,34 +411,38 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         int oldId = packetWrapper.getId();
         int newId = direction == Direction.OUTGOING ? protocolPacket.getNewID() : protocolPacket.getOldID();
         packetWrapper.setId(newId);
-        if (protocolPacket.getRemapper() == null) {
-            return;
+
+        PacketRemapper remapper = protocolPacket.getRemapper();
+        if (remapper != null) {
+            try {
+                remapper.remap(packetWrapper);
+            } catch (InformativeException e) { // Catch InformativeExceptions, pass through CancelExceptions
+                throwRemapError(direction, state, oldId, newId, e);
+                return;
+            }
+
+            if (packetWrapper.isCancelled()) {
+                throw CancelException.generate();
+            }
         }
+    }
 
-        // Remap
-        try {
-            protocolPacket.getRemapper().remap(packetWrapper);
-        } catch (InformativeException e) { // Catch InformativeExceptions, pass through CancelExceptions
-            // Don't print errors during handshake
-            if (state == State.HANDSHAKE) {
-                throw e;
-            }
-
-            Class<? extends PacketType> packetTypeClass = state == State.PLAY ? (direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum) : null;
-            if (packetTypeClass != null) {
-                PacketType[] enumConstants = packetTypeClass.getEnumConstants();
-                PacketType packetType = oldId < enumConstants.length && oldId >= 0 ? enumConstants[oldId] : null;
-                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(oldId) + ")");
-            } else {
-                Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                        + " IN REMAP OF " + toNiceHex(oldId) + "->" + toNiceHex(newId));
-            }
+    private void throwRemapError(Direction direction, State state, int oldId, int newId, InformativeException e) throws InformativeException {
+        // Don't print errors during handshake
+        if (state == State.HANDSHAKE) {
             throw e;
         }
 
-        if (packetWrapper.isCancelled()) {
-            throw CancelException.generate();
+        Class<? extends PacketType> packetTypeClass = state == State.PLAY ? (direction == Direction.OUTGOING ? oldClientboundPacketEnum : newServerboundPacketEnum) : null;
+        if (packetTypeClass != null) {
+            PacketType[] enumConstants = packetTypeClass.getEnumConstants();
+            PacketType packetType = oldId < enumConstants.length && oldId >= 0 ? enumConstants[oldId] : null;
+            Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(oldId) + ")");
+        } else {
+            Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
+                    + " IN REMAP OF " + toNiceHex(oldId) + "->" + toNiceHex(newId));
         }
+        throw e;
     }
 
     private String toNiceHex(int id) {
