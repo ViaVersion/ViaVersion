@@ -6,7 +6,6 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.LongTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -16,8 +15,6 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
@@ -38,24 +35,12 @@ public class InventoryPackets {
 
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    if (inventoryTracker.getInventory() != -1) {
-                        // Close open inventory before opening a new one.
-                        PacketWrapper closePacket = wrapper.create(ClientboundPackets1_16.CLOSE_WINDOW.ordinal());
-                        closePacket.write(Type.UNSIGNED_BYTE, inventoryTracker.getInventory());
-                        closePacket.send(Protocol1_16To1_15_2.class, true, true);
-                    }
-
                     int windowId = wrapper.get(Type.VAR_INT, 0);
                     int windowType = wrapper.get(Type.VAR_INT, 1);
                     if (windowType >= 20) { // smithing added with id 20
                         wrapper.set(Type.VAR_INT, 1, ++windowType);
                     }
-
                     inventoryTracker.setInventory((short) windowId);
-
-                    // Workaround for packet order issue
-                    wrapper.send(Protocol1_16To1_15_2.class, true, true);
-                    wrapper.cancel();
                 });
             }
         });
