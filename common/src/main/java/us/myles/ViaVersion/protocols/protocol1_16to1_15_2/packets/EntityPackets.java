@@ -16,9 +16,11 @@ import us.myles.ViaVersion.api.type.types.version.Types1_14;
 import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
+import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 
 import java.util.UUID;
 
@@ -238,6 +240,19 @@ public class EntityPackets {
                             wrapper.passthrough(Type.DOUBLE);
                             wrapper.passthrough(Type.BYTE);
                         }
+                    }
+                });
+            }
+        });
+
+        protocol.registerIncoming(ServerboundPackets1_16.ANIMATION, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+                    // Don't send an arm swing if the player is switching between inventories.
+                    if (inventoryTracker.getInventory() != -1) {
+                        wrapper.cancel();
                     }
                 });
             }
