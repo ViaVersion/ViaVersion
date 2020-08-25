@@ -112,16 +112,8 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
                 metadata.setValue(value);
                 break;
             case BlockID:
-                // convert from int, short, byte
-                if (metaIndex.getOldType() == MetaType1_8.Byte) {
-                    metadata.setValue(((Byte) value).intValue());
-                }
-                if (metaIndex.getOldType() == MetaType1_8.Short) {
-                    metadata.setValue(((Short) value).intValue());
-                }
-                if (metaIndex.getOldType() == MetaType1_8.Int) {
-                    metadata.setValue(value);
-                }
+                // Convert from int, short, byte
+                metadata.setValue(((Number) value).intValue());
                 break;
             default:
                 metadatas.remove(metadata);
