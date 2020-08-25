@@ -43,6 +43,14 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
             }
         }
 
+        // Remap held block to match new format for remapping to flat block
+        if (type == Entity1_13Types.EntityType.ENDERMAN && metadata.getId() == 12) {
+            int stateId = (int) metadata.getValue();
+            int id = stateId & 4095;
+            int data = stateId >> 12 & 15;
+            metadata.setValue((id << 4) | (data & 0xF));
+        }
+
         // 1.13 changed item to flat item (no data)
         if (metadata.getMetaType() == MetaType1_13.Slot) {
             metadata.setMetaType(MetaType1_13.Slot);
