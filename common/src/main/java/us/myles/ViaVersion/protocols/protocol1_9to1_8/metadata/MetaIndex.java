@@ -68,8 +68,8 @@ public enum MetaIndex {
     // villager
     VILLAGER_PROFESSION(VILLAGER, 16, MetaType1_8.Int, 12, MetaType1_9.VarInt),
     // enderman
-    ENDERMAN_BLOCK(ENDERMAN, 16, MetaType1_8.Short, 11, MetaType1_9.BlockID), // special case
-    ENDERMAN_BLOCKDATA(ENDERMAN, 17, MetaType1_8.Byte, 11, MetaType1_9.BlockID), // special case
+    ENDERMAN_BLOCKSTATE(ENDERMAN, 16, MetaType1_8.Short, 11, MetaType1_9.BlockID),
+    ENDERMAN_BLOCKDATA(ENDERMAN, 17, MetaType1_8.Byte, MetaType1_9.Discontinued), //always 0 when sent, never read by the client
     ENDERMAN_ISSCREAMING(ENDERMAN, 18, MetaType1_8.Byte, 12, MetaType1_9.Boolean),
     // zombie
     ZOMBIE_ISCHILD(ZOMBIE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),

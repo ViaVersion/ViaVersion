@@ -39,19 +39,6 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
         metadata.setId(metaIndex.getNewIndex());
         metadata.setMetaType(metaIndex.getNewType());
 
-        if (type == Entity1_10Types.EntityType.ENDERMAN && metaIndex.getNewType() == MetaType1_9.BlockID) {
-            if (metaIndex.getOldType() == MetaType1_8.Short) {
-                int id = (Short) metadata.getValue();
-                Metadata meta = getMetaByIndex(17, metadatas);
-                int data = meta != null ? (Byte) meta.getValue() : 0;
-                int combined = (id << 4) | (data & 0xF);
-                metadata.setValue(combined);
-            } else {
-                metadatas.remove(metadata);
-            }
-            return;
-        }
-
         Object value = metadata.getValue();
         switch (metaIndex.getNewType()) {
             case Byte:
@@ -123,6 +110,18 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
             case Chat:
                 value = Protocol1_9To1_8.fixJson(value.toString());
                 metadata.setValue(value);
+                break;
+            case BlockID:
+                // convert from int, short, byte
+                if (metaIndex.getOldType() == MetaType1_8.Byte) {
+                    metadata.setValue(((Byte) value).intValue());
+                }
+                if (metaIndex.getOldType() == MetaType1_8.Short) {
+                    metadata.setValue(((Short) value).intValue());
+                }
+                if (metaIndex.getOldType() == MetaType1_8.Int) {
+                    metadata.setValue(value);
+                }
                 break;
             default:
                 metadatas.remove(metadata);
