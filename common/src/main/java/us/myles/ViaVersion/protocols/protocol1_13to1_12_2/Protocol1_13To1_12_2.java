@@ -841,9 +841,10 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                         int type = wrapper.get(Type.VAR_INT, 0);
 
                         if (type == 0) {
-                            Integer id = Ints.tryParse(wrapper.read(Type.STRING).substring(18));
+                            String s = wrapper.read(Type.STRING);
+                            Integer id;
                             // Custom recipes
-                            if (id == null) {
+                            if (s.length() < 19 || (id = Ints.tryParse(s.substring(18))) == null) {
                                 wrapper.cancel();
                                 return;
                             }
