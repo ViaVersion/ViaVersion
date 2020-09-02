@@ -826,7 +826,17 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
             @Override
             public void registerMap() {
                 map(Type.BYTE); // Window id
-                handler(wrapper -> wrapper.write(Type.VAR_INT, Integer.parseInt(wrapper.read(Type.STRING).substring(18))));
+
+                handler(wrapper -> {
+                    String s = wrapper.read(Type.STRING);
+                    Integer id;
+                    if (s.length() < 19 || (id = Ints.tryParse(s.substring(18))) == null) {
+                        wrapper.cancel();
+                        return;
+                    }
+
+                    wrapper.write(Type.VAR_INT, id);
+                });
             }
         });
 
