@@ -465,7 +465,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
 
     @Nullable
     public MappingData getMappingData() {
-        //TODO Fully hold the instance here and get rid of all static usages (at some point:tm:)
         return null; // Let the protocols hold the mappings to still have easy, static singleton access there
     }
 

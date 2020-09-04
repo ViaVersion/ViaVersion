@@ -47,19 +47,20 @@ public class MappingData {
     }
 
     public int getNewBlockStateId(int id) {
-        return checkValidity(blockStateMappings.getNewId(id), "blockstate");
+        return checkValidity(id, blockStateMappings.getNewId(id), "blockstate");
     }
 
     public int getNewBlockId(int id) {
-        return checkValidity(blockMappings.getNewId(id), "block");
+        return checkValidity(id, blockMappings.getNewId(id), "block");
     }
 
     public int getNewItemId(int id) {
-        return checkValidity(itemMappings.get(id), "item");
+        return checkValidity(id, itemMappings.get(id), "item");
     }
 
     public int getOldItemId(int id) {
         int oldId = itemMappings.inverse().get(id);
+        // Remap new items to stone
         return oldId != -1 ? oldId : 1;
     }
 
@@ -108,12 +109,12 @@ public class MappingData {
         return MappingDataLoader.loadData("mappingdiff-" + oldVersion + "to" + newVersion + ".json");
     }
 
-    protected int checkValidity(int id, String type) {
-        if (id == -1) {
+    protected int checkValidity(int id, int mappedId, String type) {
+        if (mappedId == -1) {
             Via.getPlatform().getLogger().warning(String.format("Missing %s %s for %s %s %d", newVersion, type, oldVersion, type, id));
             return 0;
         }
-        return id;
+        return mappedId;
     }
 
     /**
