@@ -9,7 +9,6 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -19,7 +18,6 @@ public class ProtocolPipeline extends SimpleProtocol {
     private UserConnection userConnection;
 
     public ProtocolPipeline(UserConnection userConnection) {
-        super();
         init(userConnection);
     }
 
@@ -72,37 +70,36 @@ public class ProtocolPipeline extends SimpleProtocol {
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
         int originalID = packetWrapper.getId();
-        List<Protocol> protocols = new ArrayList<>(protocolList);
-        // Other way if outgoing
-        if (direction == Direction.OUTGOING)
-            Collections.reverse(protocols);
 
         // Apply protocols
-        packetWrapper.apply(direction, state, 0, protocols);
+        packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.OUTGOING);
         super.transform(direction, state, packetWrapper);
 
         if (Via.getManager().isDebug()) {
-            // Debug packet
-            int serverProtocol = userConnection.getProtocolInfo().getServerProtocolVersion();
-            int clientProtocol = userConnection.getProtocolInfo().getProtocolVersion();
-            ViaPlatform platform = Via.getPlatform();
-
-            String actualUsername = packetWrapper.user().getProtocolInfo().getUsername();
-            String username = actualUsername != null ? actualUsername + " " : "";
-
-            platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} (0x{4}) -> {5} (0x{6}) [{7}] {8}",
-                    new Object[]{
-                            username,
-                            direction,
-                            state,
-                            originalID,
-                            Integer.toHexString(originalID),
-                            packetWrapper.getId(),
-                            Integer.toHexString(packetWrapper.getId()),
-                            Integer.toString(clientProtocol),
-                            packetWrapper
-                    });
+            logPacket(direction, state, packetWrapper, originalID);
         }
+    }
+
+    private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID) {
+        // Debug packet
+        int clientProtocol = userConnection.getProtocolInfo().getProtocolVersion();
+        ViaPlatform platform = Via.getPlatform();
+
+        String actualUsername = packetWrapper.user().getProtocolInfo().getUsername();
+        String username = actualUsername != null ? actualUsername + " " : "";
+
+        platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} (0x{4}) -> {5} (0x{6}) [{7}] {8}",
+                new Object[]{
+                        username,
+                        direction,
+                        state,
+                        originalID,
+                        Integer.toHexString(originalID),
+                        packetWrapper.getId(),
+                        Integer.toHexString(packetWrapper.getId()),
+                        Integer.toString(clientProtocol),
+                        packetWrapper
+                });
     }
 
     /**

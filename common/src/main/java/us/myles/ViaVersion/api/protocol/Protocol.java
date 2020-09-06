@@ -459,6 +459,14 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         storedObjects.put(object.getClass(), object);
     }
 
+    /**
+     * Returns true if this Protocol's {@link #loadMappingData()} method should be called.
+     * <p>
+     * This does *not* necessarily mean that {@link #getMappingData()} is non-null, since this may be
+     * overriden, depending on special cases.
+     *
+     * @return true if this Protocol's {@link #loadMappingData()} method should be called
+     */
     public boolean hasMappingDataToLoad() {
         return getMappingData() != null;
     }

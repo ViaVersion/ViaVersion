@@ -372,6 +372,7 @@ public class ProtocolRegistry {
     }
 
     private static void shutdownLoaderExecutor() {
+        Via.getPlatform().getLogger().info("Shutting down mapping loader executor!");
         mappingsLoaded = true;
         mappingLoaderExecutor.shutdown();
         mappingLoaderExecutor = null;

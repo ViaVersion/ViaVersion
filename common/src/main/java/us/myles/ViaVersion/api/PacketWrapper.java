@@ -16,13 +16,13 @@ import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 public class PacketWrapper {
     public static final int PASSTHROUGH_ID = 1000;
+    private static final Protocol[] PROTOCOL_ARRAY = new Protocol[0];
 
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
@@ -317,30 +317,33 @@ public class PacketWrapper {
      * @throws Exception if it fails to write
      */
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
-        // Apply current pipeline
-        List<Protocol> protocols = new ArrayList<>(user().getProtocolInfo().getPipeline().pipes());
-        if (direction == Direction.OUTGOING) {
-            // Other way if outgoing
-            Collections.reverse(protocols);
-        }
+        // Apply current pipeline - for outgoing protocol, the collection will be reversed in the apply method
+        Protocol[] protocols = user().getProtocolInfo().getPipeline().pipes().toArray(PROTOCOL_ARRAY);
+        boolean reverse = direction == Direction.OUTGOING;
         int index = -1;
-        for (int i = 0; i < protocols.size(); i++) {
-            if (protocols.get(i).getClass().equals(packetProtocol)) {
-                index = skipCurrentPipeline ? (i + 1) : (i);
+        for (int i = 0; i < protocols.length; i++) {
+            if (protocols[i].getClass() == packetProtocol) {
+                index = i;
                 break;
             }
         }
-        if (index == -1) throw new NoSuchElementException(packetProtocol.getCanonicalName());
+
+        if (index == -1) {
+            // The given protocol is not in the pipeline
+            throw new NoSuchElementException(packetProtocol.getCanonicalName());
+        }
+
+        if (skipCurrentPipeline) {
+            index = reverse ? index - 1 : index + 1;
+        }
 
         // Reset reader before we start
         resetReader();
 
         // Apply other protocols
-        apply(direction, user().getProtocolInfo().getState(), index, protocols);
-        // Send
+        apply(direction, user().getProtocolInfo().getState(), index, protocols, reverse);
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         writeToBuffer(output);
-
         return output;
     }
 
@@ -417,22 +420,41 @@ public class PacketWrapper {
     }
 
     /**
-     * Applies a pipeline from an index to the wrapper
+     * Applies a pipeline from an index to the wrapper.
      *
-     * @param direction The direction
-     * @param state     The state
-     * @param index     The index to start from
-     * @param pipeline  The pipeline
+     * @param direction protocol direction
+     * @param state     protocol state
+     * @param index     index to start from, will be reversed depending on the reverse parameter
+     * @param pipeline  protocol pipeline
+     * @param reverse   whether the array should be looped in reverse, will also reverse the given index
      * @return The current packetwrapper
      * @throws Exception If it fails to transform a packet, exception will be thrown
      */
-    public PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
-        for (int i = index; i < pipeline.size(); i++) { // Copy to prevent from removal.
-            pipeline.get(i).transform(direction, state, this);
-            // Reset the reader for the packetWrapper (So it can be recycled across packets)
-            resetReader();
-        }
+    public PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline, boolean reverse) throws Exception {
+        Protocol[] array = pipeline.toArray(PROTOCOL_ARRAY);
+        return apply(direction, state, reverse ? array.length - 1 : index, array, reverse); // Copy to prevent from removal
+    }
 
+    /**
+     * @see #apply(Direction, State, int, List, boolean)
+     */
+    public PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
+        return apply(direction, state, index, pipeline.toArray(PROTOCOL_ARRAY), false);
+    }
+
+    private PacketWrapper apply(Direction direction, State state, int index, Protocol[] pipeline, boolean reverse) throws Exception {
+        // Reset the reader after every transformation for the packetWrapper, so it can be recycled across packets
+        if (reverse) {
+            for (int i = index; i >= 0; i--) {
+                pipeline[i].transform(direction, state, this);
+                resetReader();
+            }
+        } else {
+            for (int i = index; i < pipeline.length; i++) {
+                pipeline[i].transform(direction, state, this);
+                resetReader();
+            }
+        }
         return this;
     }
 
