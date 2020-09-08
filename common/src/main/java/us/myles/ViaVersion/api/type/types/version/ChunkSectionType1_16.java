@@ -14,8 +14,6 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
 
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
-        ChunkSection chunkSection = new ChunkSection();
-
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
         int originalBitsPerBlock = bitsPerBlock;
@@ -24,11 +22,16 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
             bitsPerBlock = GLOBAL_PALETTE;
         }
 
-        int paletteLength = bitsPerBlock == GLOBAL_PALETTE ? 0 : Type.VAR_INT.readPrimitive(buffer);
         // Read palette
-        chunkSection.clearPalette();
-        for (int i = 0; i < paletteLength; i++) {
-            chunkSection.addPaletteEntry(Type.VAR_INT.readPrimitive(buffer));
+        ChunkSection chunkSection;
+        if (bitsPerBlock != GLOBAL_PALETTE) {
+            int paletteLength = Type.VAR_INT.readPrimitive(buffer);
+            chunkSection = new ChunkSection(paletteLength);
+            for (int i = 0; i < paletteLength; i++) {
+                chunkSection.addPaletteEntry(Type.VAR_INT.readPrimitive(buffer));
+            }
+        } else {
+            chunkSection = new ChunkSection();
         }
 
         // Read blocks
