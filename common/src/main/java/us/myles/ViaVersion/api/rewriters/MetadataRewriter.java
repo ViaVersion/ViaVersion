@@ -82,7 +82,7 @@ public abstract class MetadataRewriter {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     EntityType entityType = wrapper.user().get(entityTrackerClass).getEntity(entityId);
                     if (entityType == fallingBlockType) {
-                        wrapper.set(Type.INT, 0, protocol.getMappingData().getNewItemId(wrapper.get(Type.INT, 0)));
+                        wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.INT, 0)));
                     }
                 });
             }
