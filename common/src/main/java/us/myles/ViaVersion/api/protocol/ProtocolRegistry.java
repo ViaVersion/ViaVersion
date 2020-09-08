@@ -58,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 public class ProtocolRegistry {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
     public static int SERVER_PROTOCOL = -1;
+    public static int maxProtocolPathSize = 50;
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private static final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
     private static final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
@@ -242,7 +243,7 @@ public class ProtocolRegistry {
     @Nullable
     private static List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
         if (clientVersion == serverVersion) return null; // We're already there
-        if (current.size() > 50) return null; // Fail safe, protocol too complicated.
+        if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
 
         // First check if there is any protocols for this
         Int2ObjectMap<Protocol> inputMap = registryMap.get(clientVersion);
