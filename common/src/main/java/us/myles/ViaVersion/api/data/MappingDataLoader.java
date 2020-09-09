@@ -161,12 +161,12 @@ public class MappingDataLoader {
     public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         Object2IntMap newIdentifierMap = MappingDataLoader.arrayToMap(newIdentifiers);
         for (int i = 0; i < oldIdentifiers.size(); i++) {
-            JsonElement oldIfentifier = oldIdentifiers.get(i);
-            int mappedId = newIdentifierMap.getInt(oldIfentifier.getAsString());
+            JsonElement oldIdentifier = oldIdentifiers.get(i);
+            int mappedId = newIdentifierMap.getInt(oldIdentifier.getAsString());
             if (mappedId == -1) {
                 // Search in diff mappings
                 if (diffIdentifiers != null) {
-                    JsonElement diffElement = diffIdentifiers.get(oldIfentifier.getAsString());
+                    JsonElement diffElement = diffIdentifiers.get(oldIdentifier.getAsString());
                     if (diffElement != null) {
                         String mappedName = diffElement.getAsString();
                         if (mappedName.isEmpty()) continue; // "empty" remaps
@@ -176,7 +176,7 @@ public class MappingDataLoader {
                 }
                 if (mappedId == -1) {
                     if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                        Via.getPlatform().getLogger().warning("No key for " + oldIfentifier + " :( ");
+                        Via.getPlatform().getLogger().warning("No key for " + oldIdentifier + " :( ");
                     }
                     continue;
                 }

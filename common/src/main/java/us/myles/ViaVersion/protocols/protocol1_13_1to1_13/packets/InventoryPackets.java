@@ -19,16 +19,7 @@ public class InventoryPackets {
         itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_ITEM);
         itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_ITEM_ARRAY);
         itemRewriter.registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_ITEM);
-
-        protocol.registerOutgoing(ClientboundPackets1_13.COOLDOWN, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int itemId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
-                });
-            }
-        });
+        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
 
         protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override

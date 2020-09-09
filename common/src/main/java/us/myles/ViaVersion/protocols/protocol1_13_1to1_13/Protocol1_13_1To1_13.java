@@ -8,8 +8,8 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
+import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
@@ -30,7 +30,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_13_1To1_13(this);
+        new MetadataRewriter1_13_1To1_13(this);
 
         EntityPackets.register(this);
         InventoryPackets.register(this);
@@ -123,46 +123,8 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
             }
         });
 
-        registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int blockTagsSize = wrapper.passthrough(Type.VAR_INT); // block tags
-                        for (int i = 0; i < blockTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] blocks = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < blocks.length; j++) {
-                                blocks[j] = getMappingData().getNewBlockId(blocks[j]);
-                            }
-                        }
-                        int itemTagsSize = wrapper.passthrough(Type.VAR_INT); // item tags
-                        for (int i = 0; i < itemTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] items = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < items.length; j++) {
-                                items[j] = getMappingData().getNewItemId(items[j]);
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-        new StatisticsRewriter(this, id -> {
-            int newId = id;
-            if (newId > 22) {
-                newId += 2;
-            }
-            if (newId > 25) {
-                newId += 3;
-            }
-            if (newId > 40) {
-                newId++;
-            }
-            return newId;
-        }).register(ClientboundPackets1_13.STATISTICS);
+        new TagRewriter(this, null).register(ClientboundPackets1_13.TAGS);
+        new StatisticsRewriter(this, null).register(ClientboundPackets1_13.STATISTICS);
     }
 
     @Override

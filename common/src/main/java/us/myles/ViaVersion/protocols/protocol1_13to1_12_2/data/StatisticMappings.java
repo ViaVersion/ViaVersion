@@ -35,7 +35,7 @@ public class StatisticMappings {
         CUSTOM_STATS.put("stat.playerKills", 26);
         CUSTOM_STATS.put("stat.fishCaught", 27);
         CUSTOM_STATS.put("stat.talkedToVillager", 28);
-        CUSTOM_STATS.put("stat.tradedWithVillage", 29);
+        CUSTOM_STATS.put("stat.tradedWithVillager", 29);
         CUSTOM_STATS.put("stat.cakeSlicesEaten", 30);
         CUSTOM_STATS.put("stat.cauldronFilled", 31);
         CUSTOM_STATS.put("stat.cauldronUsed", 32);
