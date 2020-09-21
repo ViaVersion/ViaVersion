@@ -9,7 +9,7 @@ Supported Versions:
 
 ![Table (https://i.imgur.com/0u20Y2u.png)](https://i.imgur.com/0u20Y2u.png)
 
-On Bukkit you may also use ProtocolSupport, but ensure you have the right build for your server version.
+On Paper you may also use ProtocolSupport, but ensure you have the right build for your server version.
 
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
