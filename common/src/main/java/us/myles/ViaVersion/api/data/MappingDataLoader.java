@@ -111,7 +111,7 @@ public class MappingDataLoader {
     }
 
     public static void mapIdentifiers(Int2IntBiMap output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
-        Object2IntMap newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers);
             if (value != -1) {
@@ -159,7 +159,7 @@ public class MappingDataLoader {
     }
 
     public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap newIdentifierMap = MappingDataLoader.arrayToMap(newIdentifiers);
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(newIdentifiers);
         for (int i = 0; i < oldIdentifiers.size(); i++) {
             JsonElement oldIdentifier = oldIdentifiers.get(i);
             int mappedId = newIdentifierMap.getInt(oldIdentifier.getAsString());
@@ -189,8 +189,8 @@ public class MappingDataLoader {
      * @param object json object
      * @return map with indexes hashed by their id value
      */
-    public static Object2IntMap indexedObjectToMap(JsonObject object) {
-        Object2IntMap map = new Object2IntOpenHashMap(object.size(), 1F);
+    public static Object2IntMap<String> indexedObjectToMap(JsonObject object) {
+        Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), 1F);
         map.defaultReturnValue(-1);
         for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
             map.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
@@ -202,8 +202,8 @@ public class MappingDataLoader {
      * @param array json array
      * @return map with indexes hashed by their id value
      */
-    public static Object2IntMap arrayToMap(JsonArray array) {
-        Object2IntMap map = new Object2IntOpenHashMap(array.size(), 1F);
+    public static Object2IntMap<String> arrayToMap(JsonArray array) {
+        Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), 1F);
         map.defaultReturnValue(-1);
         for (int i = 0; i < array.size(); i++) {
             map.put(array.get(i).getAsString(), i);

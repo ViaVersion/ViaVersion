@@ -91,7 +91,5 @@ public class WorldPackets {
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_16.EFFECT, 1010, 2001);
-        blockRewriter.registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, 3, 23, 34,
-                null, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
 }

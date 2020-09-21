@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.api.rewriters;
 
+import us.myles.ViaVersion.api.data.ParticleMappings;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -183,6 +184,42 @@ public class ItemRewriter {
                         for (int array = 0; array < arrayLength; array++) {
                             wrapper.passthrough(Type.STRING_ARRAY); // String array
                         }
+                    }
+                });
+            }
+        });
+    }
+
+    // Not the very best place for this, but has to stay here until *everything* is abstracted
+    public void registerSpawnParticle(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Particle ID
+                map(Type.BOOLEAN); // 1 - Long Distance
+                map(coordType); // 2 - X
+                map(coordType); // 3 - Y
+                map(coordType); // 4 - Z
+                map(Type.FLOAT); // 5 - Offset X
+                map(Type.FLOAT); // 6 - Offset Y
+                map(Type.FLOAT); // 7 - Offset Z
+                map(Type.FLOAT); // 8 - Particle Data
+                map(Type.INT); // 9 - Particle Count
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
+                    if (id == -1) return;
+
+                    ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+                    if (id == mappings.getBlockId() || id == mappings.getFallingDustId()) {
+                        int data = wrapper.passthrough(Type.VAR_INT);
+                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                    } else if (id == mappings.getItemId()) {
+                        toClient.rewrite(wrapper.passthrough(itemType));
+                    }
+
+                    int newId = protocol.getMappingData().getNewParticleId(id);
+                    if (newId != id) {
+                        wrapper.set(Type.INT, 0, newId);
                     }
                 });
             }

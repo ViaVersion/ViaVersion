@@ -86,8 +86,6 @@ public class WorldPackets {
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001);
-        blockRewriter.registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, 3, 23, 32,
-                WorldPackets::getNewParticleId, InventoryPackets::toClient, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
 
     private static void handleBlockEntity(CompoundTag compoundTag) {
@@ -117,12 +115,5 @@ public class WorldPackets {
             }
             compoundTag.put(skullOwnerTag);
         }
-    }
-
-    public static int getNewParticleId(int id) {
-        if (id >= 27) {
-            id += 2; // soul flame, soul
-        }
-        return id;
     }
 }

@@ -10,6 +10,7 @@ public class MappingData {
     protected final String newVersion;
     protected final boolean hasDiffFile;
     protected Int2IntBiMap itemMappings;
+    protected ParticleMappings particleMappings;
     protected Mappings blockMappings;
     protected Mappings blockStateMappings;
     protected Mappings soundMappings;
@@ -36,6 +37,12 @@ public class MappingData {
         blockStateMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blockstates");
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
+
+        Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
+        if (particles != null) {
+            particleMappings = new ParticleMappings(oldMappings.getAsJsonArray("particles"), particles);
+        }
+
         if (loadItems && newMappings.has("items")) {
             itemMappings = new Int2IntBiMap();
             itemMappings.defaultReturnValue(-1);
@@ -64,9 +71,18 @@ public class MappingData {
         return oldId != -1 ? oldId : 1;
     }
 
+    public int getNewParticleId(int id) {
+        return checkValidity(id, particleMappings.getMappings().getNewId(id), "particles");
+    }
+
     @Nullable
     public Int2IntBiMap getItemMappings() {
         return itemMappings;
+    }
+
+    @Nullable
+    public ParticleMappings getParticleMappings() {
+        return particleMappings;
     }
 
     @Nullable
