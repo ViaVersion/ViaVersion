@@ -50,6 +50,10 @@ public class Particle {
             return value;
         }
 
+        public <T> T get() {
+            return (T) value;
+        }
+
         public void setValue(Object value) {
             this.value = value;
         }

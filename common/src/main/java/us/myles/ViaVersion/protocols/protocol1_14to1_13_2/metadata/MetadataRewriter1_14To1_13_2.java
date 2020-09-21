@@ -148,8 +148,7 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
             }
         } else if (type.is(Entity1_14Types.EntityType.AREA_EFFECT_CLOUD)) {
             if (metadata.getId() == 10) {
-                Particle particle = (Particle) metadata.getValue();
-                particle.setId(protocol.getMappingData().getNewParticleId(particle.getId()));
+                rewriteParticle((Particle) metadata.getValue());
             }
         }
 
