@@ -14,7 +14,7 @@ public class ParticleMappings {
 
         Object2IntMap<String> map = MappingDataLoader.arrayToMap(oldMappings);
         blockId = map.getInt("block");
-        fallingDustId = map.getInt("dust");
+        fallingDustId = map.getInt("falling_dust");
         itemId = map.getInt("item");
     }
 
