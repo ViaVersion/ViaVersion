@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
+import us.myles.ViaVersion.api.type.types.Particle;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
@@ -36,10 +37,10 @@ public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter {
             // New block format
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        }
-
-        if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.getId() >= 7) {
+        } else if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.getId() >= 7) {
             metadata.setId(metadata.getId() + 1); // New shooter UUID
+        } else if (type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) && metadata.getId() == 10) {
+            rewriteParticle((Particle) metadata.getValue());
         }
     }
 
