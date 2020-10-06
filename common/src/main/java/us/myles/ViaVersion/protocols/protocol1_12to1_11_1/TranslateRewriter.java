@@ -27,7 +27,13 @@ public class TranslateRewriter {
                 return;
             }
 
-            String value = hoverEvent.getAsJsonPrimitive("value").getAsString();
+            String value;
+            if (!hoverEvent.get("value").isJsonPrimitive()) {
+                value = hoverEvent.getAsJsonObject("value").get("text").getAsString();
+            } else {
+                value = hoverEvent.getAsJsonPrimitive("value").getAsString();
+            }
+
             if (AchievementTranslationMapping.get(value) == null) {
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");
