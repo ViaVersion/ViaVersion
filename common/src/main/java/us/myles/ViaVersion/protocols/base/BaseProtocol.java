@@ -27,26 +27,27 @@ public class BaseProtocol extends SimpleProtocol {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    int protVer = wrapper.passthrough(Type.VAR_INT);
+                    int protocolVersion = wrapper.passthrough(Type.VAR_INT);
                     wrapper.passthrough(Type.STRING); // Server Address
                     wrapper.passthrough(Type.UNSIGNED_SHORT); // Server Port
                     int state = wrapper.passthrough(Type.VAR_INT);
 
                     ProtocolInfo info = wrapper.user().getProtocolInfo();
-                    info.setProtocolVersion(protVer);
+                    info.setProtocolVersion(protocolVersion);
                     // Ensure the server has a version provider
                     if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
                         wrapper.user().setActive(false);
                         return;
                     }
+
                     // Choose the pipe
-                    int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
-                    info.setServerProtocolVersion(protocol);
+                    int serverProtocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                    info.setServerProtocolVersion(serverProtocol);
                     List<Pair<Integer, Protocol>> protocols = null;
 
                     // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
-                    if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {
-                        protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), protocol);
+                    if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
+                        protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), serverProtocol);
                     }
 
                     ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
@@ -56,11 +57,11 @@ public class BaseProtocol extends SimpleProtocol {
                             // Ensure mapping data has already been loaded
                             ProtocolRegistry.completeMappingDataLoading(prot.getValue().getClass());
                         }
-                        wrapper.set(Type.VAR_INT, 0, protocol);
+                        wrapper.set(Type.VAR_INT, 0, serverProtocol);
                     }
 
                     // Add Base Protocol
-                    pipeline.add(ProtocolRegistry.getBaseProtocol(protocol));
+                    pipeline.add(ProtocolRegistry.getBaseProtocol(serverProtocol));
 
                     // Change state
                     if (state == 1) {

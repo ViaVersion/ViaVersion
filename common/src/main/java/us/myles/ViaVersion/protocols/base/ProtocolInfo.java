@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.base;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.packets.State;
 
 import java.util.UUID;
@@ -32,7 +33,9 @@ public class ProtocolInfo extends StoredObject {
     }
 
     public void setProtocolVersion(int protocolVersion) {
-        this.protocolVersion = protocolVersion;
+        // Map snapshot versions to the higher/orderer release version
+        ProtocolVersion protocol = ProtocolVersion.getProtocol(protocolVersion);
+        this.protocolVersion = protocol.getId();
     }
 
     public int getServerProtocolVersion() {
@@ -40,7 +43,8 @@ public class ProtocolInfo extends StoredObject {
     }
 
     public void setServerProtocolVersion(int serverProtocolVersion) {
-        this.serverProtocolVersion = serverProtocolVersion;
+        ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocolVersion);
+        this.serverProtocolVersion = protocol.getId();
     }
 
     public String getUsername() {

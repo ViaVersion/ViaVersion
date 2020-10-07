@@ -83,7 +83,7 @@ public class ViaManager {
     public void onServerLoaded() {
         // Load Server Protocol
         try {
-            ProtocolRegistry.SERVER_PROTOCOL = injector.getServerProtocolVersion();
+            ProtocolRegistry.SERVER_PROTOCOL = ProtocolVersion.getProtocol(injector.getServerProtocolVersion()).getId();
         } catch (Exception e) {
             platform.getLogger().severe("ViaVersion failed to get the server protocol!");
             e.printStackTrace();

@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -60,16 +61,21 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                                 version = new JsonObject();
                                 json.getAsJsonObject().add("version", version);
                             }
-                            if (Via.getConfig().isSendSupportedVersions()) //Send supported versions
-                                version.add("supportedVersions", GsonUtil.getGson().toJsonTree(Via.getAPI().getSupportedVersions()));
 
-                            if (ProtocolRegistry.SERVER_PROTOCOL == -1) // Set the Server protocol if the detection on startup failed
-                                ProtocolRegistry.SERVER_PROTOCOL = protocolVersion;
+                            if (Via.getConfig().isSendSupportedVersions()) { // Send supported versions
+                                version.add("supportedVersions", GsonUtil.getGson().toJsonTree(Via.getAPI().getSupportedVersions()));
+                            }
+
+                            if (ProtocolRegistry.SERVER_PROTOCOL == -1) { // Set the Server protocol if the detection on startup failed
+                                ProtocolRegistry.SERVER_PROTOCOL = ProtocolVersion.getProtocol(protocolVersion).getId();
+                            }
+
                             // Ensure the server has a version provider
                             if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
                                 wrapper.user().setActive(false);
                                 return;
                             }
+
                             int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
                             List<Pair<Integer, Protocol>> protocols = null;
 
@@ -88,8 +94,9 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                                 wrapper.user().setActive(false);
                             }
 
-                            if (Via.getConfig().getBlockedProtocols().contains(info.getProtocolVersion()))
+                            if (Via.getConfig().getBlockedProtocols().contains(info.getProtocolVersion())) {
                                 version.addProperty("protocol", -1); // Show blocked versions as outdated
+                            }
 
                             wrapper.set(Type.STRING, 0, GsonUtil.getGson().toJson(json)); // Update value
                         } catch (JsonParseException e) {

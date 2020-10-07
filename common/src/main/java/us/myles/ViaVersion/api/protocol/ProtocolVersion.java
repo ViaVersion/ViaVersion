@@ -1,11 +1,15 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ProtocolVersion {
-    private static final Map<Integer, ProtocolVersion> versions = new HashMap<>();
+    private static final Int2ObjectMap<ProtocolVersion> versions = new Int2ObjectOpenHashMap<>();
     private static final List<ProtocolVersion> versionList = new ArrayList<>();
 
     public static final ProtocolVersion v1_4_6;
@@ -43,10 +47,8 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_16_1;
     public static final ProtocolVersion v1_16_2;
     public static final ProtocolVersion v1_16_3;
+    public static final ProtocolVersion v1_16_4;
     public static final ProtocolVersion unknown;
-
-    private final int id;
-    private final String name;
 
     static {
         // Before netty rewrite
@@ -87,18 +89,17 @@ public class ProtocolVersion {
         register(v1_16_1 = new ProtocolVersion(736, "1.16.1"));
         register(v1_16_2 = new ProtocolVersion(751, "1.16.2"));
         register(v1_16_3 = new ProtocolVersion(753, "1.16.3"));
+        register(v1_16_4 = new ProtocolVersion(754, 1, "1.16.4"));
 
         register(unknown = new ProtocolVersion(-1, "UNKNOWN"));
     }
 
-    public ProtocolVersion(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public static void register(ProtocolVersion protocol) {
         Preconditions.checkNotNull(protocol);
-        versions.put(protocol.getId(), protocol);
+        versions.put(protocol.id, protocol);
+        if (protocol.isSnapshot()) {
+            versions.put(protocol.getFullSnapshotId(), protocol);
+        }
         versionList.add(protocol);
     }
 
@@ -125,28 +126,65 @@ public class ProtocolVersion {
 
     public static ProtocolVersion getClosest(String protocol) {
         for (ProtocolVersion version : versions.values()) {
-            if (version.getName().equals(protocol))
+            String name = version.name;
+            if (name.equals(protocol) || name.equals(protocol + ".x")) {
                 return version;
-            if (version.getName().equals(protocol + ".x"))
-                return version;
-            String[] parts = version.getName().split("-");
-            for (String part : parts) {
-                if (part.equalsIgnoreCase(protocol)) {
-                    return version;
+            }
+
+            if (version.isRange()) {
+                String[] parts = name.split("-");
+                for (String part : parts) {
+                    if (part.equalsIgnoreCase(protocol) || part.equals(protocol + ".x")) {
+                        return version;
+                    }
                 }
-                if (part.equals(protocol + ".x"))
-                    return version;
             }
         }
         return null;
+    }
+
+    private final int id;
+    private final int snapshotId;
+    private final String name;
+
+    public ProtocolVersion(int id, String name) {
+        this(id, -1, name);
+    }
+
+    public ProtocolVersion(int id, int snapshotId, String name) {
+        this.id = id;
+        this.snapshotId = snapshotId;
+        this.name = name;
     }
 
     public int getId() {
         return id;
     }
 
+    /**
+     * @return snapshot protocol version without the snapshot indicator bit, -1 if not a snapshot
+     */
+    public int getSnapshotId() {
+        return snapshotId;
+    }
+
+    /**
+     * @return snapshot protocol version with the hight bit indicating its snapshot status, -1 if not a snapshot
+     */
+    public int getFullSnapshotId() {
+        return id == -1 ? -1 : (1 << 30) | snapshotId; // Bit indicating snapshot versions
+    }
+
     public String getName() {
         return name;
+    }
+
+    public boolean isSnapshot() {
+        return snapshotId != -1;
+    }
+
+    public boolean isRange() {
+        return name.indexOf('-') != -1;
     }
 
     @Override
@@ -165,6 +203,6 @@ public class ProtocolVersion {
 
     @Override
     public String toString() {
-        return String.format("%s(%d)", this.getName(), this.getId());
+        return String.format("%s(%d)", this.name, this.id);
     }
 }
