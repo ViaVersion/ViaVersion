@@ -1,11 +1,11 @@
 package us.myles.ViaVersion;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
 
@@ -35,7 +35,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean autoTeam;
     private boolean forceJsonTransform;
     private boolean nbtArrayFix;
-    private Set<Integer> blockedProtocols;
+    private IntSet blockedProtocols;
     private String blockedDisconnectMessage;
     private String reloadDisconnectMessage;
     private boolean suppressConversionWarnings;
@@ -93,7 +93,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         autoTeam = getBoolean("auto-team", true);
         forceJsonTransform = getBoolean("force-json-transform", false);
         nbtArrayFix = getBoolean("chat-nbt-fix", true);
-        blockedProtocols = new HashSet<>(getIntegerList("block-protocols"));
+        blockedProtocols = new IntOpenHashSet(getIntegerList("block-protocols"));
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
         minimizeCooldown = getBoolean("minimize-cooldown", true);
@@ -257,7 +257,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public Set<Integer> getBlockedProtocols() {
+    public IntSet getBlockedProtocols() {
         return blockedProtocols;
     }
 

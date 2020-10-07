@@ -52,14 +52,12 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                                         protocolVersion = ((Long) version.get("protocol").getAsLong()).intValue();
                                     }
                                 } else {
-                                    version = new JsonObject();
-                                    json.getAsJsonObject().add("version", version);
+                                    json.getAsJsonObject().add("version", version = new JsonObject());
                                 }
                             } else {
                                 // Format properly
                                 json = new JsonObject();
-                                version = new JsonObject();
-                                json.getAsJsonObject().add("version", version);
+                                json.getAsJsonObject().add("version", version = new JsonObject());
                             }
 
                             if (Via.getConfig().isSendSupportedVersions()) { // Send supported versions
@@ -71,12 +69,13 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                             }
 
                             // Ensure the server has a version provider
-                            if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
+                            VersionProvider versionProvider = Via.getManager().getProviders().get(VersionProvider.class);
+                            if (versionProvider == null) {
                                 wrapper.user().setActive(false);
                                 return;
                             }
 
-                            int protocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                            int protocol = versionProvider.getServerProtocol(wrapper.user());
                             List<Pair<Integer, Protocol>> protocols = null;
 
                             // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
@@ -85,9 +84,9 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                             }
 
                             if (protocols != null) {
-                                if (protocolVersion == protocol || protocolVersion == 0) {
-                                    //Fix ServerListPlus
-                                    version.addProperty("protocol", info.getProtocolVersion());
+                                if (protocolVersion == protocol || protocolVersion == 0) { // Fix ServerListPlus
+                                    ProtocolVersion prot = ProtocolVersion.getProtocol(info.getProtocolVersion());
+                                    version.addProperty("protocol", prot.getOriginalId());
                                 }
                             } else {
                                 // not compatible :(, *plays very sad violin*

@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.api;
 
-import java.util.Set;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 public interface ViaVersionConfig {
 
@@ -213,7 +213,7 @@ public interface ViaVersionConfig {
      *
      * @return An Integer list
      */
-    Set<Integer> getBlockedProtocols();
+    IntSet getBlockedProtocols();
 
     /**
      * Get the custom disconnect message

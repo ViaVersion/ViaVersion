@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
@@ -57,7 +58,10 @@ public class BaseProtocol extends SimpleProtocol {
                             // Ensure mapping data has already been loaded
                             ProtocolRegistry.completeMappingDataLoading(prot.getValue().getClass());
                         }
-                        wrapper.set(Type.VAR_INT, 0, serverProtocol);
+
+                        // Set the original snapshot version if present
+                        ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocol);
+                        wrapper.set(Type.VAR_INT, 0, protocol.getOriginalId());
                     }
 
                     // Add Base Protocol

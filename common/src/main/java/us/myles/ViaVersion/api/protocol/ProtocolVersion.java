@@ -161,6 +161,10 @@ public class ProtocolVersion {
         return id;
     }
 
+    public int getOriginalId() {
+        return snapshotId == -1 ? id : ((1 << 30) | snapshotId);
+    }
+
     /**
      * @return snapshot protocol version without the snapshot indicator bit, -1 if not a snapshot
      */
