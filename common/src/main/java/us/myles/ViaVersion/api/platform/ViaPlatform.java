@@ -16,6 +16,7 @@ import java.util.logging.Logger;
  * @param <T> - The player type for the platform, used for API related methods
  */
 public interface ViaPlatform<T> {
+
     /**
      * Get the logger for this platform
      *
@@ -33,9 +34,18 @@ public interface ViaPlatform<T> {
     /**
      * Get the platform version
      *
-     * @return Platforn version
+     * @return Platform version
      */
     String getPlatformVersion();
+
+    /**
+     * Returns true if the server Via is running on is a proxy server.
+     *
+     * @return true if the platform is a proxy
+     */
+    default boolean isProxy() {
+        return false;
+    }
 
     /**
      * Get the plugin version
