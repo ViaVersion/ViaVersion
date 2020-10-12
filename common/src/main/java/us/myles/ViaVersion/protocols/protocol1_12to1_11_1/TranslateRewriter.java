@@ -27,14 +27,15 @@ public class TranslateRewriter {
                 return;
             }
 
-            String value;
-            if (!hoverEvent.get("value").isJsonPrimitive()) {
-                value = hoverEvent.getAsJsonObject("value").get("text").getAsString();
+            String textValue;
+            JsonElement value = hoverEvent.get("value");
+            if (value.isJsonObject()) {
+                textValue = value.getAsJsonObject().get("text").getAsString();
             } else {
-                value = hoverEvent.getAsJsonPrimitive("value").getAsString();
+                textValue = value.getAsJsonPrimitive().getAsString();
             }
 
-            if (AchievementTranslationMapping.get(value) == null) {
+            if (AchievementTranslationMapping.get(textValue) == null) {
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");
                 invalidText.addProperty("color", "red");
@@ -54,17 +55,17 @@ public class TranslateRewriter {
                 baseArray.add(namePart);
                 baseArray.add(newLine);
                 baseArray.add(typePart);
-                if (value.startsWith("achievement")) {
-                    namePart.addProperty("translate", value);
-                    namePart.addProperty("color", AchievementTranslationMapping.isSpecial(value) ? "dark_purple" : "green");
+                if (textValue.startsWith("achievement")) {
+                    namePart.addProperty("translate", textValue);
+                    namePart.addProperty("color", AchievementTranslationMapping.isSpecial(textValue) ? "dark_purple" : "green");
                     typePart.addProperty("translate", "stats.tooltip.type.achievement");
                     JsonObject description = new JsonObject();
                     typePart.addProperty("italic", true);
                     description.addProperty("translate", value + ".desc");
                     baseArray.add(newLine);
                     baseArray.add(description);
-                } else if (value.startsWith("stat")) {
-                    namePart.addProperty("translate", value);
+                } else if (textValue.startsWith("stat")) {
+                    namePart.addProperty("translate", textValue);
                     namePart.addProperty("color", "gray");
                     typePart.addProperty("translate", "stats.tooltip.type.statistic");
                     typePart.addProperty("italic", true);
