@@ -97,6 +97,9 @@ public class ViaManager {
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
                 platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://jo0001.github.io/ViaSetup");
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
+            } else if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.v1_8.getId() && !platform.isProxy()) {
+                platform.getLogger().warning("This version of Minecraft is over half a decade old and support for it will be fully dropped eventually. "
+                        + "Please upgrade to a newer version to avoid encountering bugs and stability issues that have long been fixed.");
             }
         }
         // Load Listeners / Tasks

@@ -86,6 +86,11 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     }
 
     @Override
+    public boolean isProxy() {
+        return true;
+    }
+
+    @Override
     public String getPluginVersion() {
         return getDescription().getVersion();
     }
