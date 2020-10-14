@@ -222,7 +222,7 @@ public class EntityPackets {
                                 if (!Via.getConfig().isSuppressConversionWarnings()) {
                                     Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
                                 }
-                                wrapper.set(Type.INT, 0, --actualSize);
+                                actualSize--;
                                 wrapper.read(Type.DOUBLE);
                                 int modifierSize = wrapper.read(Type.VAR_INT);
                                 for (int j = 0; j < modifierSize; j++) {
@@ -243,6 +243,9 @@ public class EntityPackets {
                             wrapper.passthrough(Type.DOUBLE);
                             wrapper.passthrough(Type.BYTE);
                         }
+                    }
+                    if (size != actualSize) {
+                        wrapper.set(Type.INT, 0, actualSize);
                     }
                 });
             }
