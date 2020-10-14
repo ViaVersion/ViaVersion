@@ -211,6 +211,7 @@ public class EntityPackets {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.VAR_INT);
                     int size = wrapper.passthrough(Type.INT);
+                    int actualSize = size;
                     for (int i = 0; i < size; i++) {
                         // Attributes have been renamed and are now namespaced identifiers
                         String key = wrapper.read(Type.STRING);
@@ -218,7 +219,10 @@ public class EntityPackets {
                         if (attributeIdentifier == null) {
                             attributeIdentifier = "minecraft:" + key;
                             if (!us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
-                                Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
+                                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                    Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
+                                }
+                                wrapper.set(Type.INT, 0, --actualSize);
                                 wrapper.read(Type.DOUBLE);
                                 int modifierSize = wrapper.read(Type.VAR_INT);
                                 for (int j = 0; j < modifierSize; j++) {
