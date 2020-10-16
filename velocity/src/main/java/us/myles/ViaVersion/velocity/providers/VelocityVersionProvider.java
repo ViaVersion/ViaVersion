@@ -23,7 +23,7 @@ public class VelocityVersionProvider extends VersionProvider {
         if (VelocityViaInjector.getPlayerInfoForwardingMode != null
                 && ((Enum<?>) VelocityViaInjector.getPlayerInfoForwardingMode.invoke(VelocityPlugin.PROXY.getConfiguration()))
                 .name().equals("MODERN")) {
-            versions = versions.filter(ver -> ver >= ProtocolVersion.v1_13.getId());
+            versions = versions.filter(ver -> ver >= ProtocolVersion.v1_13.getVersion());
         }
         int[] compatibleProtocols = versions.toArray();
 

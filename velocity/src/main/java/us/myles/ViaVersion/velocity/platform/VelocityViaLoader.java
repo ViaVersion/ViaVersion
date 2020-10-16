@@ -23,7 +23,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         Object plugin = VelocityPlugin.PROXY.getPluginManager()
                 .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new VelocityMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
             VelocityPlugin.PROXY.getEventManager().register(plugin, new ElytraPatch());

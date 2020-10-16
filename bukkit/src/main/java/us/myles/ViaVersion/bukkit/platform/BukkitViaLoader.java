@@ -25,7 +25,6 @@ import us.myles.ViaVersion.bukkit.providers.BukkitBlockConnectionProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
@@ -72,7 +71,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         ClassGenerator.registerPSConnectListener(plugin);
 
         /* 1.9 client to 1.8 server */
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
             storeListener(new ArmorListener(plugin)).register();
             storeListener(new DeathListener(plugin)).register();
             storeListener(new BlockListener(plugin)).register();
@@ -83,8 +82,8 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_14.getId()) {
-            boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId();
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_14.getVersion()) {
+            boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion();
             if (use1_9Fix || plugin.getConf().is1_14HitboxFix()) {
                 try {
                     storeListener(new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix())).register();
@@ -95,7 +94,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_15.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_15.getVersion()) {
             try {
                 Class.forName("org.bukkit.event.entity.EntityToggleGlideEvent");
                 storeListener(new EntityToggleGlideListener(plugin)).register();
@@ -106,13 +105,13 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if ((Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("paper")
                 || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("taco")
                 || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch"))
-                && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
+                && ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getVersion()) {
             plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();
         }
 
         /* Providers */
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
 
@@ -141,12 +140,12 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             });
         }
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_12.getVersion()) {
             if (plugin.getConf().is1_12QuickMoveActionFix()) {
                 Via.getManager().getProviders().use(InventoryQuickMoveProvider.class, new BukkitInventoryQuickMoveProvider());
             }
         }
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_13.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_13.getVersion()) {
             if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")) {
                 BukkitBlockConnectionProvider blockConnectionProvider = new BukkitBlockConnectionProvider();
                 Via.getManager().getProviders().use(BlockConnectionProvider.class, blockConnectionProvider);

@@ -51,7 +51,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
 
 
         // From 1.9 upwards the server hitbox is set in every entity tick, so we have to reset it everytime
-        if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_9.getId()) {
+        if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_9.getVersion()) {
             sneaking = new WeakHashMap<>();
             useCache = true;
             plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {
@@ -79,7 +79,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
         if (info == null) return;
 
         int protocolVersion = info.getProtocolVersion();
-        if (is1_14Fix && protocolVersion >= ProtocolVersion.v1_14.getId()) {
+        if (is1_14Fix && protocolVersion >= ProtocolVersion.v1_14.getVersion()) {
             setHeight(player, event.isSneaking() ? HEIGHT_1_14 : STANDING_HEIGHT);
             if (event.isSneaking())
                 sneakingUuids.add(player.getUniqueId());
@@ -91,7 +91,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
                 sneaking.put(player, true);
             else
                 sneaking.remove(player);
-        } else if (is1_9Fix && protocolVersion >= ProtocolVersion.v1_9.getId()) {
+        } else if (is1_9Fix && protocolVersion >= ProtocolVersion.v1_9.getVersion()) {
             setHeight(player, event.isSneaking() ? HEIGHT_1_9 : STANDING_HEIGHT);
             if (!useCache) return;
             if (event.isSneaking())

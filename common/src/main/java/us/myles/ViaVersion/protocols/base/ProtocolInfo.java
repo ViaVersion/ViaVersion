@@ -35,7 +35,7 @@ public class ProtocolInfo extends StoredObject {
     public void setProtocolVersion(int protocolVersion) {
         // Map snapshot versions to the higher/orderer release version
         ProtocolVersion protocol = ProtocolVersion.getProtocol(protocolVersion);
-        this.protocolVersion = protocol.getId();
+        this.protocolVersion = protocol.getVersion();
     }
 
     public int getServerProtocolVersion() {
@@ -44,7 +44,7 @@ public class ProtocolInfo extends StoredObject {
 
     public void setServerProtocolVersion(int serverProtocolVersion) {
         ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocolVersion);
-        this.serverProtocolVersion = protocol.getId();
+        this.serverProtocolVersion = protocol.getVersion();
     }
 
     public String getUsername() {

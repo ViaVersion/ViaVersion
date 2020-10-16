@@ -61,7 +61,7 @@ public class BaseProtocol extends SimpleProtocol {
 
                         // Set the original snapshot version if present
                         ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocol);
-                        wrapper.set(Type.VAR_INT, 0, protocol.getOriginalId());
+                        wrapper.set(Type.VAR_INT, 0, protocol.getOriginalVersion());
                     }
 
                     // Add Base Protocol

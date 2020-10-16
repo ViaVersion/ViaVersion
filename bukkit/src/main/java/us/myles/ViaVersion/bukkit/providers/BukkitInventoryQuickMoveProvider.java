@@ -58,7 +58,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             if (slotId >= 36 && slotId <= 44) {
                 int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
                 // this seems to be working just fine.
-                if (protocolId == ProtocolVersion.v1_8.getId()) {
+                if (protocolId == ProtocolVersion.v1_8.getVersion()) {
                     return false;
                 }
             }
@@ -89,7 +89,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         InventoryType tinvtype = tinv == null ? null : tinv.getType(); // can this even be null?
         if (tinvtype != null) {
             int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
-            if (protocolId == ProtocolVersion.v1_8.getId()) {
+            if (protocolId == ProtocolVersion.v1_8.getVersion()) {
                 if (tinvtype == InventoryType.BREWING) {
                     // 1.9 added the blaze powder slot to brewing stand fix for 1.8 servers
                     if (slotId >= 5 && slotId <= 40) {
@@ -118,9 +118,9 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             ReflectionUtil.set(packet, "d", storage.getActionId());
             ReflectionUtil.set(packet, "item", nmsItem);
             int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
-            if (protocolId == ProtocolVersion.v1_8.getId()) {
+            if (protocolId == ProtocolVersion.v1_8.getVersion()) {
                 ReflectionUtil.set(packet, "shift", 1);
-            } else if (protocolId >= ProtocolVersion.v1_9.getId()) { // 1.9+
+            } else if (protocolId >= ProtocolVersion.v1_9.getVersion()) { // 1.9+
                 ReflectionUtil.set(packet, "shift", clickTypeEnum);
             }
         } catch (Exception e) {
@@ -157,7 +157,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         try {
             this.windowClickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
             int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
-            if (protocolId >= ProtocolVersion.v1_9.getId()) {
+            if (protocolId >= ProtocolVersion.v1_9.getVersion()) {
                 Class<?> eclassz = NMSUtil.nms("InventoryClickType");
                 Object[] constants = eclassz.getEnumConstants();
                 this.clickTypeEnum = constants[1]; // QUICK_MOVE
@@ -186,7 +186,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
 
     private boolean isSupported() {
         int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
-        if (protocolId >= ProtocolVersion.v1_8.getId() && protocolId <= ProtocolVersion.v1_11_1.getId()) {
+        if (protocolId >= ProtocolVersion.v1_8.getVersion() && protocolId <= ProtocolVersion.v1_11_1.getVersion()) {
             return true; // 1.8-1.11.2
         }
         // this is not needed on 1.12+ servers

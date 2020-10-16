@@ -65,7 +65,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                             }
 
                             if (ProtocolRegistry.SERVER_PROTOCOL == -1) { // Set the Server protocol if the detection on startup failed
-                                ProtocolRegistry.SERVER_PROTOCOL = ProtocolVersion.getProtocol(protocolVersion).getId();
+                                ProtocolRegistry.SERVER_PROTOCOL = ProtocolVersion.getProtocol(protocolVersion).getVersion();
                             }
 
                             // Ensure the server has a version provider
@@ -86,7 +86,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                             if (protocols != null) {
                                 if (protocolVersion == protocol || protocolVersion == 0) { // Fix ServerListPlus
                                     ProtocolVersion prot = ProtocolVersion.getProtocol(info.getProtocolVersion());
-                                    version.addProperty("protocol", prot.getOriginalId());
+                                    version.addProperty("protocol", prot.getOriginalVersion());
                                 }
                             } else {
                                 // not compatible :(, *plays very sad violin*
