@@ -101,7 +101,14 @@ public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, Clientboun
         registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Reason
+                handler(wrapper -> {
+                    if (wrapper.isReadable(Type.COMPONENT, 0)) {
+                        // Already written as json somewhere else
+                        return;
+                    }
+
+                    wrapper.write(Type.COMPONENT, fixJson(wrapper.read(Type.STRING)));
+                });
             }
         });
 
