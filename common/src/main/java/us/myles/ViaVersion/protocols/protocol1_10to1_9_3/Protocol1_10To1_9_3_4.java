@@ -22,7 +22,7 @@ public class Protocol1_10To1_9_3_4 extends Protocol<ClientboundPackets1_9_3, Cli
     public static final ValueTransformer<Short, Float> TO_NEW_PITCH = new ValueTransformer<Short, Float>(Type.FLOAT) {
         @Override
         public Float transform(PacketWrapper wrapper, Short inputValue) throws Exception {
-            return inputValue / 63.5F;
+            return inputValue / 63.0F;
         }
     };
     public static final ValueTransformer<List<Metadata>, List<Metadata>> TRANSFORM_METADATA = new ValueTransformer<List<Metadata>, List<Metadata>>(Types1_9.METADATA_LIST) {
