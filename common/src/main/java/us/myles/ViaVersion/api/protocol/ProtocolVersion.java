@@ -4,10 +4,13 @@ import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProtocolVersion {
     private static final Int2ObjectMap<ProtocolVersion> versions = new Int2ObjectOpenHashMap<>();
@@ -22,13 +25,13 @@ public class ProtocolVersion {
     public static final ProtocolVersion v_1_6_3 = register(77, "1.6.3");
     public static final ProtocolVersion v_1_6_4 = register(78, "1.6.4");
     // After the Netty rewrite
-    public static final ProtocolVersion v1_7_1 = register(4, "1.7-1.7.5");
-    public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10");
+    public static final ProtocolVersion v1_7_1 = register(4, "1.7-1.7.5", new VersionRange("1.7", 0, 5));
+    public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10", new VersionRange("1.7", 6, 10));
     public static final ProtocolVersion v1_8 = register(47, "1.8.x");
     public static final ProtocolVersion v1_9 = register(107, "1.9");
     public static final ProtocolVersion v1_9_1 = register(108, "1.9.1");
     public static final ProtocolVersion v1_9_2 = register(109, "1.9.2");
-    public static final ProtocolVersion v1_9_3 = register(110, "1.9.3/4");
+    public static final ProtocolVersion v1_9_3 = register(110, "1.9.3/4", new VersionRange("1.9", 3, 4));
     public static final ProtocolVersion v1_10 = register(210, "1.10");
     public static final ProtocolVersion v1_11 = register(315, "1.11");
     public static final ProtocolVersion v1_11_1 = register(316, "1.11.1");
@@ -58,7 +61,15 @@ public class ProtocolVersion {
     }
 
     public static ProtocolVersion register(int version, int snapshotVersion, String name) {
-        ProtocolVersion protocol = new ProtocolVersion(version, snapshotVersion, name);
+        return register(version, snapshotVersion, name, null);
+    }
+
+    public static ProtocolVersion register(int version, String name, @Nullable VersionRange versionRange) {
+        return register(version, -1, name, versionRange);
+    }
+
+    public static ProtocolVersion register(int version, int snapshotVersion, String name, @Nullable VersionRange versionRange) {
+        ProtocolVersion protocol = new ProtocolVersion(version, snapshotVersion, name, versionRange);
         versionList.add(protocol);
         versions.put(protocol.version, protocol);
         if (protocol.isSnapshot()) {
@@ -89,19 +100,23 @@ public class ProtocolVersion {
         return Collections.unmodifiableList(new ArrayList<>(versions.values()));
     }
 
+    @Nullable
     public static ProtocolVersion getClosest(String protocol) {
         for (ProtocolVersion version : versions.values()) {
             String name = version.name;
-            if (name.equals(protocol) || name.equals(protocol + ".x")) {
+            if (name.equals(protocol)) {
                 return version;
             }
 
-            if (version.isRange()) {
-                String[] parts = name.split("-");
-                for (String part : parts) {
-                    if (part.equalsIgnoreCase(protocol) || part.equals(protocol + ".x")) {
-                        return version;
-                    }
+            if (version.versionWildcard) {
+                // Test against the major version as well as with the ".x" prefix
+                String majorVersion = name.substring(0, name.length() - 2);
+                if (majorVersion.equals(protocol) || (protocol.startsWith(name.substring(0, name.length() - 1)))) {
+                    return version;
+                }
+            } else if (version.isRange()) {
+                if (version.includedVersions.contains(protocol)) {
+                    return version;
                 }
             }
         }
@@ -111,15 +126,32 @@ public class ProtocolVersion {
     private final int version;
     private final int snapshotVersion;
     private final String name;
+    private final boolean versionWildcard;
+    private final Set<String> includedVersions;
 
     public ProtocolVersion(int version, String name) {
-        this(version, -1, name);
+        this(version, -1, name, null);
     }
 
-    public ProtocolVersion(int version, int snapshotVersion, String name) {
+    public ProtocolVersion(int version, int snapshotVersion, String name, @Nullable VersionRange versionRange) {
         this.version = version;
         this.snapshotVersion = snapshotVersion;
         this.name = name;
+        this.versionWildcard = name.endsWith(".x");
+
+        Preconditions.checkArgument(!versionWildcard || versionRange == null, "A version cannot be a wildcard and a range at the same time!");
+        if (versionRange != null) {
+            includedVersions = new HashSet<>();
+            for (int i = versionRange.getRangeFrom(); i <= versionRange.getRangeTo(); i++) {
+                if (i == 0) {
+                    includedVersions.add(versionRange.getBaseVersion()); // Keep both the base version and with ".0" appended
+                }
+
+                includedVersions.add(versionRange.getBaseVersion() + "." + i);
+            }
+        } else {
+            includedVersions = Collections.singleton(name);
+        }
     }
 
     /**
@@ -157,12 +189,30 @@ public class ProtocolVersion {
     }
 
     /**
-     * @return release version
-     * @deprecated ambiguous, see {@link #getOriginalVersion()} ()}, {@link #getVersion()} ()}, and {@link #getSnapshotVersion()}
+     * @return true if the protocol includes a range of versions (but not an entire major version range), for example 1.7-1.7.5
+     * @see #getIncludedVersions()
      */
-    @Deprecated
-    public int getId() {
-        return version;
+    public boolean isRange() {
+        return includedVersions.size() != 1;
+    }
+
+    /**
+     * Returns an immutable set of all included versions if the protocol is a version range.
+     * If the protocol only includes a single Minecraft version or the entire major version as a wildcard ({@link #isVersionWildcard()}),
+     * the set will only contain the string given in {@link #getName()}.
+     *
+     * @return immutable set of all included versions if the protocol is a version range
+     * @see #isRange()
+     */
+    public Set<String> getIncludedVersions() {
+        return Collections.unmodifiableSet(includedVersions);
+    }
+
+    /**
+     * @return true if the protocol includes an entire major version range (for example 1.8.x)
+     */
+    public boolean isVersionWildcard() {
+        return versionWildcard;
     }
 
     public String getName() {
@@ -173,8 +223,13 @@ public class ProtocolVersion {
         return snapshotVersion != -1;
     }
 
-    public boolean isRange() {
-        return name.indexOf('-') != -1;
+    /**
+     * @return release version
+     * @deprecated ambiguous, see {@link #getOriginalVersion()}, {@link #getVersion()}, and {@link #getSnapshotVersion()}
+     */
+    @Deprecated
+    public int getId() {
+        return version;
     }
 
     @Override
