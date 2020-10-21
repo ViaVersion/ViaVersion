@@ -71,7 +71,7 @@ public class ProtocolVersion {
     public static ProtocolVersion register(int version, int snapshotVersion, String name, @Nullable VersionRange versionRange) {
         ProtocolVersion protocol = new ProtocolVersion(version, snapshotVersion, name, versionRange);
         versionList.add(protocol);
-        versions.put(protocol.version, protocol);
+        versions.put(protocol.getVersion(), protocol);
         if (protocol.isSnapshot()) {
             versions.put(protocol.getFullSnapshotVersion(), protocol);
         }
@@ -103,19 +103,19 @@ public class ProtocolVersion {
     @Nullable
     public static ProtocolVersion getClosest(String protocol) {
         for (ProtocolVersion version : versions.values()) {
-            String name = version.name;
+            String name = version.getName();
             if (name.equals(protocol)) {
                 return version;
             }
 
-            if (version.versionWildcard) {
+            if (version.isVersionWildcard()) {
                 // Test against the major version as well as with the ".x" prefix
                 String majorVersion = name.substring(0, name.length() - 2);
                 if (majorVersion.equals(protocol) || (protocol.startsWith(name.substring(0, name.length() - 1)))) {
                     return version;
                 }
             } else if (version.isRange()) {
-                if (version.includedVersions.contains(protocol)) {
+                if (version.getIncludedVersions().contains(protocol)) {
                     return version;
                 }
             }
