@@ -53,7 +53,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_16_1 = register(736, "1.16.1");
     public static final ProtocolVersion v1_16_2 = register(751, "1.16.2");
     public static final ProtocolVersion v1_16_3 = register(753, "1.16.3");
-    public static final ProtocolVersion v1_16_4 = register(754, 1, "1.16.4");
+    public static final ProtocolVersion v1_16_4 = register(754, 2, "1.16.4");
     public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
 
     public static ProtocolVersion register(int version, String name) {
@@ -109,7 +109,7 @@ public class ProtocolVersion {
             }
 
             if (version.isVersionWildcard()) {
-                // Test against the major version as well as with the ".x" prefix
+                // Test against the major version with and without a minor version
                 String majorVersion = name.substring(0, name.length() - 2);
                 if (majorVersion.equals(protocol) || (protocol.startsWith(name.substring(0, name.length() - 1)))) {
                     return version;
