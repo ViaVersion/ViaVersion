@@ -6,6 +6,7 @@ import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
 public class DontBugMeSubCmd extends ViaSubCommand {
+
     @Override
     public String name() {
         return "dontbugme";
@@ -21,7 +22,7 @@ public class DontBugMeSubCmd extends ViaSubCommand {
         ConfigurationProvider provider = Via.getPlatform().getConfigurationProvider();
         boolean newValue = !Via.getConfig().isCheckForUpdates();
 
-        provider.set("checkforupdates", newValue);
+        Via.getConfig().setCheckForUpdates(newValue);
         provider.saveConfig();
         sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));
 

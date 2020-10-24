@@ -121,6 +121,12 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
+    public void setCheckForUpdates(boolean checkForUpdates) {
+        this.checkForUpdates = checkForUpdates;
+        set("checkforupdates", checkForUpdates);
+    }
+
+    @Override
     public boolean isPreventCollision() {
         return preventCollision;
     }

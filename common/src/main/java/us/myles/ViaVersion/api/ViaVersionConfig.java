@@ -12,6 +12,14 @@ public interface ViaVersionConfig {
     boolean isCheckForUpdates();
 
     /**
+     * Sets whether to check for updates. This updates the internally cached value
+     * as well as the config, but does not save the config to disc.
+     *
+     * @param checkForUpdates true to check for updates on server start and joins
+     */
+    void setCheckForUpdates(boolean checkForUpdates);
+
+    /**
      * Get if collision preventing for players is enabled
      *
      * @return true if collision preventing is enabled
