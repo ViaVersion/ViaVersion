@@ -12,12 +12,12 @@ public class VersionRange {
      *
      * @param baseVersion base version
      * @param rangeFrom   minor version the range begins at, must be greater than or equal to 0
-     * @param rangeTo     minor version the range ends at, must be greater than 0 and {@link #rangeFrom}
+     * @param rangeTo     minor version the range ends at, must be greater than {@code rangeFrom}
      */
     public VersionRange(String baseVersion, int rangeFrom, int rangeTo) {
         Preconditions.checkNotNull(baseVersion);
         Preconditions.checkArgument(rangeFrom >= 0);
-        Preconditions.checkArgument(rangeTo > rangeFrom && rangeTo > 0);
+        Preconditions.checkArgument(rangeTo > rangeFrom);
         this.baseVersion = baseVersion;
         this.rangeFrom = rangeFrom;
         this.rangeTo = rangeTo;
