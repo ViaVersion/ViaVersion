@@ -13,7 +13,7 @@ public interface ViaVersionConfig {
 
     /**
      * Sets whether to check for updates. This updates the internally cached value
-     * as well as the config, but does not save the config to disc.
+     * as well as the config, but does not save the config to disk.
      *
      * @param checkForUpdates true to check for updates on server start and joins
      */
