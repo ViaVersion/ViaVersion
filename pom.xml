@@ -70,6 +70,12 @@
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
         </repository>
+		
+        <!-- Mojang's Minecraft Libraries -->
+        <repository>
+            <id>mojang</id>
+            <url>https://libraries.minecraft.net</url>
+        </repository>
     </repositories>
 
     <dependencies>
