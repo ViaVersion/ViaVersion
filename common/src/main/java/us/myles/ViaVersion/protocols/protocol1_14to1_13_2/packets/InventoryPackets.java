@@ -8,6 +8,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -248,7 +249,8 @@ public class InventoryPackets {
                 display.put(new ListTag(NBT_TAG_NAME + "|Lore", lore.clone().getValue())); // Save old lore
                 for (Tag loreEntry : lore) {
                     if (loreEntry instanceof StringTag) {
-                        ((StringTag) loreEntry).setValue(ChatRewriter.legacyTextToJsonString(((StringTag) loreEntry).getValue()));
+                        String jsonText = ChatRewriter.fromLegacyTextAsString(((StringTag) loreEntry).getValue(), ChatColor.WHITE, true);
+                        ((StringTag) loreEntry).setValue(jsonText);
                     }
                 }
             }
