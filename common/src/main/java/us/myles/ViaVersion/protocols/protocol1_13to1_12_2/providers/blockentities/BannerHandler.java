@@ -55,7 +55,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
 
         Tag name = tag.get("CustomName");
         if (name instanceof StringTag) {
-            ((StringTag) name).setValue(ChatRewriter.legacyTextToJson(((StringTag) name).getValue()).toString());
+            ((StringTag) name).setValue(ChatRewriter.legacyTextToJsonString(((StringTag) name).getValue()));
         }
 
         return blockId;

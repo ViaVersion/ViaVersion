@@ -1,6 +1,5 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
-import com.github.steveice10.opennbt.conversion.ConverterRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
@@ -237,20 +236,19 @@ public class InventoryPackets {
         if (item == null) return;
         item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getNewItemId(item.getIdentifier()));
 
-        CompoundTag tag;
-        if ((tag = item.getTag()) != null) {
-            // Display Lore now uses JSON
-            Tag displayTag = tag.get("display");
-            if (displayTag instanceof CompoundTag) {
-                CompoundTag display = (CompoundTag) displayTag;
-                Tag loreTag = display.get("Lore");
-                if (loreTag instanceof ListTag) {
-                    ListTag lore = (ListTag) loreTag;
-                    display.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|Lore", ConverterRegistry.convertToValue(lore)));
-                    for (Tag loreEntry : lore) {
-                        if (loreEntry instanceof StringTag) {
-                            ((StringTag) loreEntry).setValue(ChatRewriter.legacyTextToJson(((StringTag) loreEntry).getValue()).toString());
-                        }
+        if (item.getTag() == null) return;
+
+        // Display Lore now uses JSON
+        Tag displayTag = item.getTag().get("display");
+        if (displayTag instanceof CompoundTag) {
+            CompoundTag display = (CompoundTag) displayTag;
+            Tag loreTag = display.get("Lore");
+            if (loreTag instanceof ListTag) {
+                ListTag lore = (ListTag) loreTag;
+                display.put(new ListTag(NBT_TAG_NAME + "|Lore", lore.clone().getValue())); // Save old lore
+                for (Tag loreEntry : lore) {
+                    if (loreEntry instanceof StringTag) {
+                        ((StringTag) loreEntry).setValue(ChatRewriter.legacyTextToJsonString(((StringTag) loreEntry).getValue()));
                     }
                 }
             }
@@ -261,30 +259,24 @@ public class InventoryPackets {
         if (item == null) return;
         item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getOldItemId(item.getIdentifier()));
 
-        CompoundTag tag;
-        if ((tag = item.getTag()) != null) {
-            // Display Name now uses JSON
-            Tag displayTag = tag.get("display");
-            if (displayTag instanceof CompoundTag) {
-                CompoundTag display = (CompoundTag) displayTag;
-                Tag loreTag = display.get("Lore");
-                if (loreTag instanceof ListTag) {
-                    ListTag lore = (ListTag) loreTag;
-                    ListTag via = display.get(NBT_TAG_NAME + "|Lore");
-                    if (via != null) {
-                        display.put(ConverterRegistry.convertToTag("Lore", ConverterRegistry.convertToValue(via)));
-                    } else {
-                        for (Tag loreEntry : lore) {
-                            if (loreEntry instanceof StringTag) {
-                                ((StringTag) loreEntry).setValue(
-                                        ChatRewriter.jsonTextToLegacy(
-                                                ((StringTag) loreEntry).getValue()
-                                        )
-                                );
-                            }
+        if (item.getTag() == null) return;
+
+        // Display Name now uses JSON
+        Tag displayTag = item.getTag().get("display");
+        if (displayTag instanceof CompoundTag) {
+            CompoundTag display = (CompoundTag) displayTag;
+            Tag loreTag = display.get("Lore");
+            if (loreTag instanceof ListTag) {
+                ListTag lore = (ListTag) loreTag;
+                ListTag savedLore = display.remove(NBT_TAG_NAME + "|Lore");
+                if (savedLore != null) {
+                    display.put(new ListTag("Lore", savedLore.getValue()));
+                } else {
+                    for (Tag loreEntry : lore) {
+                        if (loreEntry instanceof StringTag) {
+                            ((StringTag) loreEntry).setValue(ChatRewriter.jsonTextToLegacy(((StringTag) loreEntry).getValue()));
                         }
                     }
-                    display.remove(NBT_TAG_NAME + "|Lore");
                 }
             }
         }

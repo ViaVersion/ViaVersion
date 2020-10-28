@@ -20,7 +20,7 @@ public class ChatRewriter {
     private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter1_13();
 
     // Based on https://github.com/SpigotMC/BungeeCord/blob/master/chat/src/main/java/net/md_5/bungee/api/chat/TextComponent.java
-    public static JsonElement fromLegacyText(String message, ChatColor defaultColor) {
+    public static String fromLegacyTextAsString(String message, ChatColor defaultColor) {
         List<BaseComponent> components = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         TextComponent component = new TextComponent();
@@ -61,23 +61,9 @@ public class ChatRewriter {
 
                     component = new TextComponent();
                     component.setColor(format);
-                    // ViaVersion start - Items have style default to italic
-                    component.setBold(false);
-                    component.setItalic(false);
-                    component.setUnderlined(false);
-                    component.setStrikethrough(false);
-                    component.setObfuscated(false);
-                    // ViaVersion end
                 } else {
                     component = new TextComponent();
                     component.setColor(format);
-                    // ViaVersion start- Items have style default to italic
-                    component.setBold(false);
-                    component.setItalic(false);
-                    component.setUnderlined(false);
-                    component.setStrikethrough(false);
-                    component.setObfuscated(false);
-                    // ViaVersion end
                 }
                 continue;
             }
@@ -87,12 +73,19 @@ public class ChatRewriter {
         component.setText(builder.toString());
         components.add(component);
 
-        final String serializedComponents = ComponentSerializer.toString(components.toArray(EMPTY_COMPONENTS));
-        return GsonUtil.getJsonParser().parse(serializedComponents);
+        return ComponentSerializer.toString(components.toArray(EMPTY_COMPONENTS));
+    }
+
+    public static JsonElement fromLegacyText(String message, ChatColor defaultColor) {
+        return GsonUtil.getJsonParser().parse(fromLegacyTextAsString(message, defaultColor));
     }
 
     public static JsonElement legacyTextToJson(String legacyText) {
         return fromLegacyText(legacyText, ChatColor.WHITE);
+    }
+
+    public static String legacyTextToJsonString(String legacyText) {
+        return fromLegacyTextAsString(legacyText, ChatColor.WHITE);
     }
 
     public static String jsonTextToLegacy(String value) {
