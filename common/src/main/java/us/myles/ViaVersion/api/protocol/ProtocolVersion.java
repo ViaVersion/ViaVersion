@@ -17,7 +17,7 @@ public class ProtocolVersion {
     private static final List<ProtocolVersion> versionList = new ArrayList<>();
 
     // Before the Netty rewrite
-    public static final ProtocolVersion v1_4_6 = register(51, "1.4.6");
+    public static final ProtocolVersion v1_4_6 = register(51, "1.4.6/7", new VersionRange("1.4", 6, 7));
     public static final ProtocolVersion v1_5_1 = register(60, "1.5.1");
     public static final ProtocolVersion v1_5_2 = register(61, "1.5.2");
     public static final ProtocolVersion v_1_6_1 = register(73, "1.6.1");
@@ -32,9 +32,9 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_9_1 = register(108, "1.9.1");
     public static final ProtocolVersion v1_9_2 = register(109, "1.9.2");
     public static final ProtocolVersion v1_9_3 = register(110, "1.9.3/4", new VersionRange("1.9", 3, 4));
-    public static final ProtocolVersion v1_10 = register(210, "1.10");
+    public static final ProtocolVersion v1_10 = register(210, "1.10.x");
     public static final ProtocolVersion v1_11 = register(315, "1.11");
-    public static final ProtocolVersion v1_11_1 = register(316, "1.11.1");
+    public static final ProtocolVersion v1_11_1 = register(316, "1.11.1/2", new VersionRange("1.11", 1, 2));
     public static final ProtocolVersion v1_12 = register(335, "1.12");
     public static final ProtocolVersion v1_12_1 = register(338, "1.12.1");
     public static final ProtocolVersion v1_12_2 = register(340, "1.12.2");
