@@ -337,7 +337,7 @@ public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, Client
             id += 1;
         if (id >= 197) // evocation things
             id += 8;
-        if (id >= 196) // Rip the Experience orb touch sound :'(
+        if (id >= 207) // Rip the Experience orb touch sound :'(
             id -= 1;
         if (id >= 279) // Liama's
             id += 9;
