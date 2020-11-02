@@ -12,14 +12,6 @@
 
     <artifactId>viaversion-common</artifactId>
     <dependencies>
-        <!-- Snake YAML -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.18</version>
-            <scope>compile</scope> <!-- Velocity doesn't have snakeyaml -->
-        </dependency>
-
         <!-- FastUtil for performance increases -->
         <dependency>
             <groupId>it.unimi.dsi</groupId>

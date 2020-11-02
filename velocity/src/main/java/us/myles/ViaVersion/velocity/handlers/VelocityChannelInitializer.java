@@ -7,12 +7,14 @@ import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
-public class VelocityChannelInitializer extends ChannelInitializer {
-    private final ChannelInitializer original;
+public class VelocityChannelInitializer extends ChannelInitializer<Channel> {
+    private final ChannelInitializer<?> original;
+    private final boolean clientSide;
     private static Method initChannel;
 
-    public VelocityChannelInitializer(ChannelInitializer original) {
+    public VelocityChannelInitializer(ChannelInitializer<?> original, boolean clientSide) {
         this.original = original;
+        this.clientSide = clientSide;
     }
 
     static {
@@ -28,7 +30,7 @@ public class VelocityChannelInitializer extends ChannelInitializer {
     protected void initChannel(Channel channel) throws Exception {
         initChannel.invoke(original, channel);
 
-        UserConnection user = new UserConnection(channel);
+        UserConnection user = new UserConnection(channel, clientSide);
         new ProtocolPipeline(user);
 
         // We need to add a separated handler because Velocity uses pipeline().get(MINECRAFT_DECODER)

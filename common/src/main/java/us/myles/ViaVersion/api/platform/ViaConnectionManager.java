@@ -46,7 +46,7 @@ public class ViaConnectionManager {
      * UUIDs can't be duplicate between frontend connections.
      */
     public boolean isFrontEnd(UserConnection conn) {
-        return true;
+        return !conn.isClientSide();
     }
 
     /**

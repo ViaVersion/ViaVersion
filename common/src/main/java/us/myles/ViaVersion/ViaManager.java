@@ -91,7 +91,7 @@ public class ViaManager {
         // Check if there are any pipes to this version
         if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
             platform.getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
-            if (!ProtocolRegistry.isWorkingPipe()) {
+            if (!ProtocolRegistry.isWorkingPipe() && !platform.isProxy()) {
                 platform.getLogger().warning("ViaVersion does not have any compatible versions for this server version!");
                 platform.getLogger().warning("Please remember that ViaVersion only adds support for versions newer than the server version.");
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");

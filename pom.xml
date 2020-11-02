@@ -70,6 +70,12 @@
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
         </repository>
+		
+        <!-- Mojang's Minecraft Libraries -->
+        <repository>
+            <id>mojang</id>
+            <url>https://libraries.minecraft.net</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -140,6 +146,14 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.3.1</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Snake YAML -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.18</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
