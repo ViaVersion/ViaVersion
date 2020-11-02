@@ -21,7 +21,7 @@ public class ChatRewriter {
         if (lore) {
             // Workaround for all italic lore
             headComponent.setItalic(false);
-            component.setItalic(true);
+            //TODO set first child to italics if it doesn't have a color
         }
 
         for (int i = 0; i < message.length(); i++) {
