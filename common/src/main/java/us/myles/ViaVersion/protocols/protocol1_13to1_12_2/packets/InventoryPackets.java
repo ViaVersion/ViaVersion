@@ -9,6 +9,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
+import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -303,7 +304,7 @@ public class InventoryPackets {
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
                     display.put(new StringTag(NBT_TAG_NAME + "|Name", name.getValue()));
-                    name.setValue(ChatRewriter.legacyTextToJsonString(name.getValue()));
+                    name.setValue(ChatRewriter.fromLegacyTextAsString(name.getValue(), ChatColor.WHITE, true));
                 }
             }
             // ench is now Enchantments and now uses identifiers
@@ -521,16 +522,18 @@ public class InventoryPackets {
         if (tag != null) {
             if (isDamageable(item.getIdentifier())) {
                 if (tag.get("Damage") instanceof IntTag) {
-                    if (!gotRawIdFromTag)
+                    if (!gotRawIdFromTag) {
                         item.setData((short) (int) tag.get("Damage").getValue());
+                    }
                     tag.remove("Damage");
                 }
             }
 
             if (item.getIdentifier() == 358) { // map
                 if (tag.get("map") instanceof IntTag) {
-                    if (!gotRawIdFromTag)
+                    if (!gotRawIdFromTag) {
                         item.setData((short) (int) tag.get("map").getValue());
+                    }
                     tag.remove("map");
                 }
             }
@@ -555,15 +558,10 @@ public class InventoryPackets {
             // Display Name now uses JSON
             if (tag.get("display") instanceof CompoundTag) {
                 CompoundTag display = tag.get("display");
-                if (((CompoundTag) tag.get("display")).get("Name") instanceof StringTag) {
+                if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
-                    StringTag via = display.get(NBT_TAG_NAME + "|Name");
-                    name.setValue(
-                            via != null ? via.getValue() : ChatRewriter.jsonTextToLegacy(
-                                    name.getValue()
-                            )
-                    );
-                    display.remove(NBT_TAG_NAME + "|Name");
+                    StringTag via = display.remove(NBT_TAG_NAME + "|Name");
+                    name.setValue(via != null ? via.getValue() : ChatRewriter.jsonTextToLegacy(name.getValue()));
                 }
             }
 
@@ -580,12 +578,7 @@ public class InventoryPackets {
                             oldId = Short.valueOf(newId.substring(18));
                         }
                         if (oldId != null) {
-                            enchEntry.put(
-                                    new ShortTag(
-                                            "id",
-                                            oldId
-                                    )
-                            );
+                            enchEntry.put(new ShortTag("id", oldId));
                             enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
                             ench.add(enchEntry);
                         }
@@ -606,12 +599,7 @@ public class InventoryPackets {
                             oldId = Short.valueOf(newId.substring(18));
                         }
                         if (oldId != null) {
-                            enchEntry.put(
-                                    new ShortTag(
-                                            "id",
-                                            oldId
-                                    )
-                            );
+                            enchEntry.put(new ShortTag("id", oldId));
                             enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
                             newStoredEnch.add(enchEntry);
                         }

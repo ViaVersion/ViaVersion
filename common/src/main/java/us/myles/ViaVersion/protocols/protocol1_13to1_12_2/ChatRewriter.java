@@ -2,7 +2,6 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
 import com.google.gson.JsonElement;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
@@ -10,15 +9,14 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ComponentRewriter
 import us.myles.ViaVersion.util.GsonUtil;
 
 public class ChatRewriter {
-    private static final BaseComponent[] EMPTY_COMPONENTS = new BaseComponent[0];
     private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter1_13();
 
     // Based on https://github.com/SpigotMC/BungeeCord/blob/master/chat/src/main/java/net/md_5/bungee/api/chat/TextComponent.java
-    public static String fromLegacyTextAsString(String message, ChatColor defaultColor, boolean lore) {
+    public static String fromLegacyTextAsString(String message, ChatColor defaultColor, boolean itemData) {
         TextComponent headComponent = new TextComponent();
         TextComponent component = new TextComponent();
         StringBuilder builder = new StringBuilder();
-        if (lore) {
+        if (itemData) {
             // Workaround for all italic lore
             headComponent.setItalic(false);
             //TODO set first child to italics if it doesn't have a color
