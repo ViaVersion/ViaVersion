@@ -75,7 +75,7 @@ public class ProtocolPipeline extends SimpleProtocol {
         packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.OUTGOING);
         super.transform(direction, state, packetWrapper);
 
-        if (Via.getManager().isDebug()) { // 26 52 76
+        if (Via.getManager().isDebug()) {
             logPacket(direction, state, packetWrapper, originalID);
         }
     }

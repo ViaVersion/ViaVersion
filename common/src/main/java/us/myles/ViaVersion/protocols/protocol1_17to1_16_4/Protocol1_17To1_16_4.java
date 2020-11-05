@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_17to1_16_4;
 
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.MappingData;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.RegistryType;
@@ -13,10 +14,11 @@ import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 
 public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_16_2, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
 
-    public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17");
+    public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17", true);
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
@@ -54,6 +56,11 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles");
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
+    }
+
+    @Override
+    public void init(UserConnection user) {
+        user.put(new BiomeStorage(user));
     }
 
     @Override
