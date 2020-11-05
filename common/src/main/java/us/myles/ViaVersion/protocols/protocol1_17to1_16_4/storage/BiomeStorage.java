@@ -10,9 +10,19 @@ import java.util.Map;
 public class BiomeStorage extends StoredObject {
 
     private final Map<Long, int[]> chunkBiomes = new HashMap<>();
+    private String world;
 
     public BiomeStorage(UserConnection user) {
         super(user);
+    }
+
+    @Nullable
+    public String getWorld() {
+        return world;
+    }
+
+    public void setWorld(String world) {
+        this.world = world;
     }
 
     @Nullable
@@ -26,6 +36,10 @@ public class BiomeStorage extends StoredObject {
 
     public void clearBiomes(int x, int z) {
         chunkBiomes.remove(getChunkSectionIndex(x, z));
+    }
+
+    public void clearBiomes() {
+        chunkBiomes.clear();
     }
 
     private long getChunkSectionIndex(int x, int z) {

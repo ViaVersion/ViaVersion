@@ -19,7 +19,7 @@ public class WorldPackets {
 
         blockRewriter.registerBlockAction(ClientboundPackets1_16_2.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_16_2.BLOCK_CHANGE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerOutgoing(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketRemapper() {
@@ -55,7 +55,7 @@ public class WorldPackets {
                             chunk.setBiomeData(biomes);
                         } else {
                             Via.getPlatform().getLogger().warning("Biome data not found for chunk at " + chunk.getX() + ", " + chunk.getZ());
-                            chunk.setBiomeData(new int[0]);
+                            chunk.setBiomeData(new int[1024]);
                         }
                     }
 
@@ -67,6 +67,39 @@ public class WorldPackets {
                             section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(old));
                         }
                     }
+                });
+            }
+        });
+
+
+        protocol.registerOutgoing(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT);
+                map(Type.BOOLEAN);
+                map(Type.UNSIGNED_BYTE);
+                map(Type.BYTE);
+                map(Type.STRING_ARRAY);
+                map(Type.NBT);
+                map(Type.NBT);
+                handler(wrapper -> {
+                    String world = wrapper.passthrough(Type.STRING);
+                    wrapper.user().get(BiomeStorage.class).setWorld(world);
+                });
+            }
+        });
+        protocol.registerOutgoing(ClientboundPackets1_16_2.RESPAWN, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.NBT);
+                    String world = wrapper.passthrough(Type.STRING);
+                    BiomeStorage biomeStorage = wrapper.user().get(BiomeStorage.class);
+                    if (!world.equals(biomeStorage.getWorld())) {
+                        biomeStorage.clearBiomes();
+                    }
+
+                    biomeStorage.setWorld(world);
                 });
             }
         });
