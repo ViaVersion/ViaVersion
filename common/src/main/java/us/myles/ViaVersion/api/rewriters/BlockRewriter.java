@@ -71,6 +71,7 @@ public class BlockRewriter {
             @Override
             public void registerMap() {
                 map(Type.LONG); // Chunk position
+                map(Type.BOOLEAN); // Suppress light updates
                 handler(wrapper -> {
                     for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
                         record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
