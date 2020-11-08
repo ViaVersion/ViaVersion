@@ -10,6 +10,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
@@ -43,6 +44,9 @@ public class Protocol1_10To1_9_3_4 extends Protocol<ClientboundPackets1_9_3, Cli
 
     @Override
     protected void registerPackets() {
+
+        InventoryPackets.register(this);
+
         // Named sound effect
         registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
             @Override
