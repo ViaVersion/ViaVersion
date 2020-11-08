@@ -96,6 +96,11 @@ import java.util.stream.IntStream;
         this.buffer.expect(Tokens.ARRAY_BEGIN);
         final boolean prefixedIndex = this.buffer.peek() == '0' && this.buffer.peek(1) == ':';
         while (this.buffer.hasMore()) {
+            if (this.buffer.peek() == Tokens.ARRAY_END) {
+                this.buffer.advance();
+                return listTag;
+            }
+
             if (prefixedIndex) {
                 this.buffer.takeUntil(':');
             }
