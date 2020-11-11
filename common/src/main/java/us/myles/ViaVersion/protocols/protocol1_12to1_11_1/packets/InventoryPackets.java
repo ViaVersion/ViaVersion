@@ -103,9 +103,9 @@ public class InventoryPackets {
     public static void toServerItem(Item item) {
         BedRewriter.toServerItem(item);
         if (item == null) return;
-        boolean invalid = item.getIdentifier() >= 235 && item.getIdentifier() <= 252;
-        invalid |= item.getIdentifier() == 453;
-        if (invalid) { // Stone
+        boolean newItem = item.getIdentifier() >= 235 && item.getIdentifier() <= 252;
+        newItem |= item.getIdentifier() == 453;
+        if (newItem) { // Replace server-side unknown items
             item.setIdentifier((short) 1);
             item.setData((short) 0);
         }

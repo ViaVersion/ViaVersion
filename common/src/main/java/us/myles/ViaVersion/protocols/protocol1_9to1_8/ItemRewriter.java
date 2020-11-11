@@ -187,10 +187,10 @@ public class ItemRewriter {
                 item.setData((short) data);
             }
 
-            boolean invalid = item.getIdentifier() >= 198 && item.getIdentifier() <= 212;
-            invalid |= item.getIdentifier() == 397 && item.getData() == 5;
-            invalid |= item.getIdentifier() >= 432 && item.getIdentifier() <= 448;
-            if (invalid) { // Stone
+            boolean newItem = item.getIdentifier() >= 198 && item.getIdentifier() <= 212;
+            newItem |= item.getIdentifier() == 397 && item.getData() == 5;
+            newItem |= item.getIdentifier() >= 432 && item.getIdentifier() <= 448;
+            if (newItem) { // Replace server-side unknown items
                 item.setIdentifier((short) 1);
                 item.setData((short) 0);
             }

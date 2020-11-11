@@ -59,9 +59,9 @@ public class InventoryPackets {
     public static void toServerItem(Item item) {
         EntityIdRewriter.toServerItem(item);
         if (item == null) return;
-        boolean invalid = item.getIdentifier() >= 218 && item.getIdentifier() <= 234;
-        invalid |= item.getIdentifier() == 449 || item.getIdentifier() == 450;
-        if (invalid) { // Stone
+        boolean newItem = item.getIdentifier() >= 218 && item.getIdentifier() <= 234;
+        newItem |= item.getIdentifier() == 449 || item.getIdentifier() == 450;
+        if (newItem) { // Replace server-side unknown items
             item.setIdentifier((short) 1);
             item.setData((short) 0);
         }
