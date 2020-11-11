@@ -5,7 +5,7 @@
     <parent>
         <artifactId>viaversion-parent</artifactId>
         <groupId>us.myles</groupId>
-        <version>3.3.0-20w45a</version>
+        <version>3.3.0-20w46a</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
