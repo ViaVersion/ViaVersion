@@ -12,9 +12,12 @@ import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.EntityPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
 public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_16_2, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
 
@@ -27,6 +30,9 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
 
     @Override
     protected void registerPackets() {
+        new MetadataRewriter1_17To1_16_4(this);
+
+        EntityPackets.register(this);
         InventoryPackets.register(this);
         WorldPackets.register(this);
 
@@ -49,6 +55,27 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
                 });
             }
         });
+
+        registerOutgoing(ClientboundPackets1_16_2.MAP_DATA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.VAR_INT);
+                    wrapper.passthrough(Type.BYTE);
+                    wrapper.read(Type.BOOLEAN); // Tracking position removed
+                    wrapper.passthrough(Type.BOOLEAN);
+
+                    int size = wrapper.read(Type.VAR_INT);
+                    // Write whether markers exists or not
+                    if (size != 0) {
+                        wrapper.write(Type.BOOLEAN, true);
+                        wrapper.write(Type.VAR_INT, size);
+                    } else {
+                        wrapper.write(Type.BOOLEAN, false);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -62,6 +89,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
     @Override
     public void init(UserConnection user) {
         user.put(new BiomeStorage(user));
+        user.put(new EntityTracker1_17(user));
     }
 
     @Override

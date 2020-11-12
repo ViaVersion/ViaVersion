@@ -1,6 +1,8 @@
 package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets;
 
 import us.myles.ViaVersion.api.Via;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -10,6 +12,7 @@ import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 
 public class WorldPackets {
@@ -71,7 +74,6 @@ public class WorldPackets {
             }
         });
 
-
         protocol.registerOutgoing(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -84,10 +86,14 @@ public class WorldPackets {
                 map(Type.NBT);
                 handler(wrapper -> {
                     String world = wrapper.passthrough(Type.STRING);
-                    wrapper.user().get(BiomeStorage.class).setWorld(world);
+
+                    UserConnection user = wrapper.user();
+                    user.get(BiomeStorage.class).setWorld(world);
+                    user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16_2Types.EntityType.PLAYER);
                 });
             }
         });
+
         protocol.registerOutgoing(ClientboundPackets1_16_2.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
