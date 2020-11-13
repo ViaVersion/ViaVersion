@@ -186,6 +186,14 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) data);
             }
+
+            boolean newItem = item.getIdentifier() >= 198 && item.getIdentifier() <= 212;
+            newItem |= item.getIdentifier() == 397 && item.getData() == 5;
+            newItem |= item.getIdentifier() >= 432 && item.getIdentifier() <= 448;
+            if (newItem) { // Replace server-side unknown items
+                item.setIdentifier((short) 1);
+                item.setData((short) 0);
+            }
         }
     }
 
