@@ -99,7 +99,8 @@ public class ViaManager {
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
             } else if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.v1_8.getVersion() && !platform.isProxy()) {
                 platform.getLogger().warning("This version of Minecraft is over half a decade old and support for it will be fully dropped eventually. "
-                        + "Please upgrade to a newer version to avoid encountering bugs and stability issues that have long been fixed.");
+                        + "Please upgrade to a newer version to avoid encountering bugs and stability issues that have long been fixed."
+                        + "Or otherwise for now, we recommand install viaversion on server that behind proxy");
             }
         }
         // Load Listeners / Tasks
