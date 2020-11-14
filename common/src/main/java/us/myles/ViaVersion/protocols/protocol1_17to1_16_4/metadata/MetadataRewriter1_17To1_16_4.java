@@ -7,8 +7,8 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
 import java.util.List;
