@@ -2,6 +2,7 @@ package us.myles.ViaVersion.api.rewriters;
 
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 
@@ -25,16 +26,20 @@ public class SoundRewriter {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Sound Id
-                handler(wrapper -> {
-                    int soundId = wrapper.get(Type.VAR_INT, 0);
-                    int mappedId = idRewriter.rewrite(soundId);
-                    if (mappedId == -1) {
-                        wrapper.cancel();
-                    } else if (soundId != mappedId) {
-                        wrapper.set(Type.VAR_INT, 0, mappedId);
-                    }
-                });
+                handler(getSoundHandler());
             }
         });
+    }
+
+    public PacketHandler getSoundHandler() {
+        return wrapper -> {
+            int soundId = wrapper.get(Type.VAR_INT, 0);
+            int mappedId = idRewriter.rewrite(soundId);
+            if (mappedId == -1) {
+                wrapper.cancel();
+            } else if (soundId != mappedId) {
+                wrapper.set(Type.VAR_INT, 0, mappedId);
+            }
+        };
     }
 }
