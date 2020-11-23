@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -86,7 +87,12 @@ public class ChatRewriter {
     }
 
     public static String jsonTextToLegacy(String value) {
-        return TextComponent.toLegacyText(ComponentSerializer.parse(value));
+        try {
+            return TextComponent.toLegacyText(ComponentSerializer.parse(value));
+        } catch (Exception e) {
+            Via.getPlatform().getLogger().warning("Error converting json text to legacy: " + value);
+            return "";
+        }
     }
 
     public static void processTranslate(JsonElement value) {

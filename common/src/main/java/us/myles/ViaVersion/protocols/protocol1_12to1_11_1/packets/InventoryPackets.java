@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.ItemRewriter;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
 import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
@@ -16,7 +17,7 @@ import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQui
 public class InventoryPackets {
 
     public static void register(Protocol1_12To1_11_1 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, BedRewriter::toClientItem, BedRewriter::toServerItem);
+        ItemRewriter itemRewriter = new ItemRewriter(protocol, BedRewriter::toClientItem, InventoryPackets::toServerItem);
 
         itemRewriter.registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
         itemRewriter.registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
@@ -97,5 +98,16 @@ public class InventoryPackets {
 
         // Creative Inventory Action
         itemRewriter.registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+    }
+
+    public static void toServerItem(Item item) {
+        BedRewriter.toServerItem(item);
+        if (item == null) return;
+        boolean newItem = item.getIdentifier() >= 235 && item.getIdentifier() <= 252;
+        newItem |= item.getIdentifier() == 453;
+        if (newItem) { // Replace server-side unknown items
+            item.setIdentifier((short) 1);
+            item.setData((short) 0);
+        }
     }
 }

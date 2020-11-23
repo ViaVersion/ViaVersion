@@ -16,7 +16,6 @@ import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -172,8 +171,11 @@ public class EntityTracker1_9 extends EntityTracker {
                     Metadata meta = getMetaByIndex(metadataList, 10); //Only happens if the armorstand is small
                     byte data = (byte) metadata.getValue();
                     // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
+                    Metadata displayName;
+                    Metadata displayNameVisible;
                     if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                            && !((String) getMetaByIndex(metadataList, 2).getValue()).isEmpty() && (boolean) getMetaByIndex(metadataList, 3).getValue()) {
+                            && (displayName = getMetaByIndex(metadataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
+                            && (displayNameVisible = getMetaByIndex(metadataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
                         if (!knownHolograms.contains(entityId)) {
                             knownHolograms.add(entityId);
                             try {
@@ -233,8 +235,9 @@ public class EntityTracker1_9 extends EntityTracker {
 
     public Metadata getMetaByIndex(List<Metadata> list, int index) {
         for (Metadata meta : list)
-            if (index == meta.getId())
+            if (index == meta.getId()) {
                 return meta;
+            }
         return null;
     }
 
