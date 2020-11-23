@@ -2,8 +2,7 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,13 +24,19 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
-import us.myles.ViaVersion.sponge.platform.*;
+import us.myles.ViaVersion.sponge.platform.SpongeTaskId;
+import us.myles.ViaVersion.sponge.platform.SpongeViaAPI;
+import us.myles.ViaVersion.sponge.platform.SpongeViaConfig;
+import us.myles.ViaVersion.sponge.platform.SpongeViaInjector;
+import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.VersionInfo;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Plugin(id = "viaversion",
@@ -164,16 +169,8 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        game.getServer().getPlayer(uuid)
-                .ifPresent(player ->
-                        player.sendMessage(
-                                TextSerializers.JSON.deserialize(
-                                        ComponentSerializer.toString(
-                                                TextComponent.fromLegacyText(message) // Hacky way to fix links
-                                        )
-                                )
-                        )
-                );
+        String serialized = LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacySection().deserialize(message));
+        game.getServer().getPlayer(uuid).ifPresent(player -> player.sendMessage(TextSerializers.JSON.deserialize(serialized))); // Hacky way to fix links //TODO ??
     }
 
     @Override

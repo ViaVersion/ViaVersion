@@ -10,9 +10,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.kyori.text.serializer.gson.GsonComponentSerializer;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.slf4j.Logger;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -26,7 +24,11 @@ import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
 import us.myles.ViaVersion.velocity.command.VelocityCommandSender;
-import us.myles.ViaVersion.velocity.platform.*;
+import us.myles.ViaVersion.velocity.platform.VelocityTaskId;
+import us.myles.ViaVersion.velocity.platform.VelocityViaAPI;
+import us.myles.ViaVersion.velocity.platform.VelocityViaConfig;
+import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
+import us.myles.ViaVersion.velocity.platform.VelocityViaLoader;
 import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
 import us.myles.ViaVersion.velocity.util.LoggerWrapper;
 
@@ -65,7 +67,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     public void onProxyInit(ProxyInitializeEvent e) {
         PROXY = proxy;
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
-        PROXY.getCommandManager().register(commandHandler, "viaver", "vvvelocity", "viaversion");
+        PROXY.getCommandManager().register("viaver", commandHandler, "vvvelocity", "viaversion");
         api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
@@ -152,21 +154,13 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        PROXY.getPlayer(uuid).ifPresent(it -> it.sendMessage(
-                GsonComponentSerializer.INSTANCE.deserialize(
-                        ComponentSerializer.toString(TextComponent.fromLegacyText(message)) // Fixes links
-                )
-        ));
+        PROXY.getPlayer(uuid).ifPresent(it -> it.sendMessage(LegacyComponentSerializer.legacySection().deserialize(message)));
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         return PROXY.getPlayer(uuid).map(it -> {
-            it.disconnect(
-                    GsonComponentSerializer.INSTANCE.deserialize(
-                            ComponentSerializer.toString(TextComponent.fromLegacyText(message))
-                    )
-            );
+            it.disconnect(LegacyComponentSerializer.legacySection().deserialize(message));
             return true;
         }).orElse(false);
     }
