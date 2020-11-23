@@ -23,7 +23,9 @@ public class BlockConnectionStorage extends StoredObject {
 
     static {
         try {
-            fastUtilLongObjectHashMap = Class.forName("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").getConstructor();
+            //noinspection StringBufferReplaceableByString - prevent relocation
+            String className = new StringBuilder("it").append(".unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").toString();
+            fastUtilLongObjectHashMap = Class.forName(className).getConstructor();
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
