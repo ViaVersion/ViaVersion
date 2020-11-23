@@ -1,14 +1,30 @@
 package us.myles.ViaVersion.commands;
 
 import com.google.common.base.Preconditions;
-import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.command.ViaVersionCommand;
-import us.myles.ViaVersion.commands.defaultsubs.*;
+import us.myles.ViaVersion.commands.defaultsubs.AutoTeamSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.DebugSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.DisplayLeaksSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.DontBugMeSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.DumpSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.HelpSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.ListSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.PPSSubCmd;
+import us.myles.ViaVersion.commands.defaultsubs.ReloadSubCmd;
+import us.myles.ViaVersion.util.ChatColorUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class ViaCommandHandler implements ViaVersionCommand {
     private final Map<String, ViaSubCommand> commandMap;
@@ -148,11 +164,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
      * @return The output String
      */
     public static String color(String string) {
-        try {
-            string = ChatColor.translateAlternateColorCodes('&', string); //Dont replace all & with $ like we did before.
-        } catch (Exception ignored) {
-        }
-        return string;
+        return ChatColorUtil.translateAlternateColorCodes(string);
     }
 
     /**

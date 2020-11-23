@@ -1,14 +1,12 @@
 package us.myles.ViaVersion.velocity.command;
 
-import com.velocitypowered.api.command.Command;
-import com.velocitypowered.api.command.CommandSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import com.velocitypowered.api.command.SimpleCommand;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
 import us.myles.ViaVersion.velocity.command.subs.ProbeSubCmd;
 
 import java.util.List;
 
-public class VelocityCommandHandler extends ViaCommandHandler implements Command {
+public class VelocityCommandHandler extends ViaCommandHandler implements SimpleCommand {
     public VelocityCommandHandler() {
         try {
             registerSubCommand(new ProbeSubCmd());
@@ -18,12 +16,12 @@ public class VelocityCommandHandler extends ViaCommandHandler implements Command
     }
 
     @Override
-    public void execute(@NonNull CommandSource source, String[] args) {
-        onCommand(new VelocityCommandSender(source), args);
+    public void execute(Invocation invocation) {
+        onCommand(new VelocityCommandSender(invocation.source()), invocation.arguments());
     }
 
     @Override
-    public List<String> suggest(@NonNull CommandSource source, String[] currentArgs) {
-        return onTabComplete(new VelocityCommandSender(source), currentArgs);
+    public List<String> suggest(Invocation invocation) {
+        return onTabComplete(new VelocityCommandSender(invocation.source()), invocation.arguments());
     }
 }

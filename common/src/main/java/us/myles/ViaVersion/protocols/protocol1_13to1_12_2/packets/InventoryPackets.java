@@ -9,7 +9,6 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
-import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -304,7 +303,7 @@ public class InventoryPackets {
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
                     display.put(new StringTag(NBT_TAG_NAME + "|Name", name.getValue()));
-                    name.setValue(ChatRewriter.fromLegacyTextAsString(name.getValue(), ChatColor.WHITE, true));
+                    name.setValue(ChatRewriter.legacyTextToJsonString(name.getValue(), true));
                 }
             }
             // ench is now Enchantments and now uses identifiers
@@ -561,7 +560,7 @@ public class InventoryPackets {
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
                     StringTag via = display.remove(NBT_TAG_NAME + "|Name");
-                    name.setValue(via != null ? via.getValue() : ChatRewriter.jsonTextToLegacy(name.getValue()));
+                    name.setValue(via != null ? via.getValue() : ChatRewriter.jsonToLegacyText(name.getValue()));
                 }
             }
 

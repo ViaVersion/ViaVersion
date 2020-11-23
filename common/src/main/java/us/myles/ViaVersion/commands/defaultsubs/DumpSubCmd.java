@@ -2,7 +2,6 @@ package us.myles.ViaVersion.commands.defaultsubs;
 
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonObject;
-import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -60,7 +59,7 @@ public class DumpSubCmd extends ViaSubCommand {
                 try {
                     con = (HttpURLConnection) new URL("https://dump.viaversion.com/documents").openConnection();
                 } catch (IOException e) {
-                    sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
+                    sender.sendMessage("§4Failed to dump, please check the console for more information");
                     Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to ViaVersion Dump", e);
                     return;
                 }
@@ -75,7 +74,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     out.close();
 
                     if (con.getResponseCode() == 429) {
-                        sender.sendMessage(ChatColor.RED + "You can only paste ones every minute to protect our systems.");
+                        sender.sendMessage("§4You can only paste ones every minute to protect our systems.");
                         return;
                     }
 
@@ -87,9 +86,9 @@ public class DumpSubCmd extends ViaSubCommand {
                     if (!output.has("key"))
                         throw new InvalidObjectException("Key is not given in Hastebin output");
 
-                    sender.sendMessage(ChatColor.GREEN + "We've made a dump with useful information, report your issue and provide this url: " + getUrl(output.get("key").getAsString()));
+                    sender.sendMessage("§2We've made a dump with useful information, report your issue and provide this url: " + getUrl(output.get("key").getAsString()));
                 } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Failed to dump, please check the console for more information");
+                    sender.sendMessage("§4Failed to dump, please check the console for more information");
                     Via.getPlatform().getLogger().log(Level.WARNING, "Could not paste ViaVersion dump to Hastebin", e);
                     try {
                         if (con.getResponseCode() < 200 || con.getResponseCode() > 400) {

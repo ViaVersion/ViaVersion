@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -42,6 +41,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.util.ChatColorUtil;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
@@ -53,6 +53,34 @@ import java.util.Set;
 public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
     public static final MappingData MAPPINGS = new MappingData();
+    // These are arbitrary rewrite values, it just needs an invalid color code character.
+    private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
+    private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
+
+    static {
+        SCOREBOARD_TEAM_NAME_REWRITE.put('0', 'g');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('1', 'h');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('2', 'i');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('3', 'j');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('4', 'p');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('5', 'q');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('6', 's');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('7', 't');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('8', 'u');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('9', 'v');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('a', 'w');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('b', 'x');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('c', 'y');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('d', 'z');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('e', '!');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('f', '?');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('k', '#');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('l', '(');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('m', ')');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('n', ':');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('o', ';');
+        SCOREBOARD_TEAM_NAME_REWRITE.put('r', '/');
+    }
 
     public Protocol1_13To1_12_2() {
         super(ClientboundPackets1_12_1.class, ClientboundPackets1_13.class, ServerboundPackets1_12_1.class, ServerboundPackets1_13.class);
@@ -114,36 +142,6 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                     }
                 }).send(Protocol1_13To1_12_2.class);
             };
-
-    // These are arbitrary rewrite values, it just needs an invalid color code character.
-    protected static final Map<ChatColor, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
-    private static final Set<ChatColor> FORMATTING_CODES = Sets.newHashSet(ChatColor.MAGIC, ChatColor.BOLD, ChatColor.STRIKETHROUGH,
-            ChatColor.UNDERLINE, ChatColor.ITALIC, ChatColor.RESET);
-
-    static {
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BLACK, 'g');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.DARK_BLUE, 'h');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.DARK_GREEN, 'i');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.DARK_AQUA, 'j');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.DARK_RED, 'p');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.DARK_PURPLE, 'q');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.GOLD, 's');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.GRAY, 't');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.DARK_GRAY, 'u');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BLUE, 'v');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.GREEN, 'w');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.AQUA, 'x');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.RED, 'y');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.LIGHT_PURPLE, 'z');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.YELLOW, '!');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.WHITE, '?');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.MAGIC, '#');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.BOLD, '(');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.STRIKETHROUGH, ')');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.UNDERLINE, ':');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.ITALIC, ';');
-        SCOREBOARD_TEAM_NAME_REWRITE.put(ChatColor.RESET, '/');
-    }
 
     @Override
     protected void registerPackets() {
@@ -625,9 +623,9 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                             }
 
                             if (Via.getConfig().is1_13TeamColourFix()) {
-                                ChatColor lastColor = getLastColor(prefix);
-                                colour = lastColor.ordinal();
-                                suffix = lastColor.toString() + suffix;
+                                char lastColorChar = getLastColorChar(prefix);
+                                colour = ChatColorUtil.getColorOrdinal(lastColorChar);
+                                suffix = ChatColorUtil.COLOR_CHAR + Character.toString(lastColorChar) + suffix;
                             }
 
                             wrapper.write(Type.VAR_INT, colour);
@@ -1049,36 +1047,33 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
     }
 
     // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java
-    public ChatColor getLastColor(String input) {
+    public char getLastColorChar(String input) {
         int length = input.length();
-
         for (int index = length - 1; index > -1; index--) {
             char section = input.charAt(index);
-            if (section == ChatColor.COLOR_CHAR && index < length - 1) {
+            if (section == ChatColorUtil.COLOR_CHAR && index < length - 1) {
                 char c = input.charAt(index + 1);
-                ChatColor color = ChatColor.getByChar(c);
-                if (color != null && !FORMATTING_CODES.contains(color)) {
-                    return color;
+                if (ChatColorUtil.isColorCode(c) && !FORMATTING_CODES.contains(c)) {
+                    return c;
                 }
             }
         }
-
-        return ChatColor.RESET;
+        return 'r';
     }
 
     protected String rewriteTeamMemberName(String name) {
         // The Display Name is just colours which overwrites the suffix
         // It also overwrites for ANY colour in name but most plugins
         // will just send colour as 'invisible' character
-        if (ChatColor.stripColor(name).isEmpty()) {
+        if (ChatColorUtil.stripColor(name).isEmpty()) {
             StringBuilder newName = new StringBuilder();
             for (int i = 1; i < name.length(); i += 2) {
                 char colorChar = name.charAt(i);
-                Character rewrite = SCOREBOARD_TEAM_NAME_REWRITE.get(ChatColor.getByChar(colorChar));
+                Character rewrite = SCOREBOARD_TEAM_NAME_REWRITE.get(colorChar);
                 if (rewrite == null) {
                     rewrite = colorChar;
                 }
-                newName.append(ChatColor.COLOR_CHAR).append(rewrite);
+                newName.append(ChatColorUtil.COLOR_CHAR).append(rewrite);
             }
             name = newName.toString();
         }

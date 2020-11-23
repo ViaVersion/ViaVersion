@@ -2,7 +2,6 @@ package us.myles.ViaVersion.update;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -18,7 +17,7 @@ import java.util.UUID;
 
 public class UpdateUtil {
 
-    public static final String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
+    public static final String PREFIX = "§a§l[ViaVersion] §a";
     private static final String URL = "https://api.spiget.org/v2/resources/";
     private static final int PLUGIN = 19254;
     private static final String LATEST_VERSION = "/versions/latest";
