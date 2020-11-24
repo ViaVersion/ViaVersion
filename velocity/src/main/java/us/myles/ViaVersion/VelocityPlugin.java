@@ -48,6 +48,7 @@ import java.util.concurrent.TimeUnit;
         url = "https://viaversion.com"
 )
 public class VelocityPlugin implements ViaPlatform<Player> {
+    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character('§').extractUrls().build();
     public static ProxyServer PROXY;
 
     @Inject
@@ -154,7 +155,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        PROXY.getPlayer(uuid).ifPresent(it -> it.sendMessage(LegacyComponentSerializer.legacySection().deserialize(message)));
+        PROXY.getPlayer(uuid).ifPresent(player -> player.sendMessage(COMPONENT_SERIALIZER.deserialize(message)));
     }
 
     @Override
