@@ -2,7 +2,7 @@ package us.myles.ViaVersion.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class VelocityCommandSender implements ViaCommandSender {
 
     @Override
     public void sendMessage(String msg) {
-        source.sendMessage(LegacyComponentSerializer.legacySection().deserialize(msg));
+        source.sendMessage(VelocityPlugin.COMPONENT_SERIALIZER.deserialize(msg));
     }
 
     @Override

@@ -79,7 +79,7 @@ public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
         try {
             String[] lines;
             try (Reader reader = new InputStreamReader(MappingData.class.getClassLoader()
-                    .getResourceAsStream("mojang-translations/en_US.properties"), StandardCharsets.UTF_8)) {
+                    .getResourceAsStream("assets/viaversion/data/en_US.properties"), StandardCharsets.UTF_8)) {
                 lines = CharStreams.toString(reader).split("\n");
             }
             for (String line : lines) {

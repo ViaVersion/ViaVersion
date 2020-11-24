@@ -15,10 +15,10 @@ public class ChatColorUtil {
     private static int ordinalCounter;
 
     static {
-        addColorOrindal('0', '9');
-        addColorOrindal('a', 'f');
-        addColorOrindal('k', 'o');
-        addColorOrindal('r');
+        addColorOrdinal('0', '9');
+        addColorOrdinal('a', 'f');
+        addColorOrdinal('k', 'o');
+        addColorOrdinal('r');
     }
 
     public static boolean isColorCode(char c) {
@@ -44,13 +44,13 @@ public class ChatColorUtil {
         return STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
     }
 
-    private static void addColorOrindal(int from, int to) {
+    private static void addColorOrdinal(int from, int to) {
         for (int c = from; c <= to; c++) {
-            addColorOrindal(c);
+            addColorOrdinal(c);
         }
     }
 
-    private static void addColorOrindal(int colorChar) {
+    private static void addColorOrdinal(int colorChar) {
         COLOR_ORDINALS.put(colorChar, ordinalCounter++);
     }
 }
