@@ -18198,7 +18198,28 @@
     "18195": "minecraft:lightning_rod[facing=up,powered=true]",
     "18196": "minecraft:lightning_rod[facing=up,powered=false]",
     "18197": "minecraft:lightning_rod[facing=down,powered=true]",
-    "18198": "minecraft:lightning_rod[facing=down,powered=false]"
+    "18198": "minecraft:lightning_rod[facing=down,powered=false]",
+    "18199": "minecraft:pointed_dripstone[thickness=tip_merge,vertical_direction=up,waterlogged=true]",
+    "18200": "minecraft:pointed_dripstone[thickness=tip_merge,vertical_direction=up,waterlogged=false]",
+    "18201": "minecraft:pointed_dripstone[thickness=tip_merge,vertical_direction=down,waterlogged=true]",
+    "18202": "minecraft:pointed_dripstone[thickness=tip_merge,vertical_direction=down,waterlogged=false]",
+    "18203": "minecraft:pointed_dripstone[thickness=tip,vertical_direction=up,waterlogged=true]",
+    "18204": "minecraft:pointed_dripstone[thickness=tip,vertical_direction=up,waterlogged=false]",
+    "18205": "minecraft:pointed_dripstone[thickness=tip,vertical_direction=down,waterlogged=true]",
+    "18206": "minecraft:pointed_dripstone[thickness=tip,vertical_direction=down,waterlogged=false]",
+    "18207": "minecraft:pointed_dripstone[thickness=frustum,vertical_direction=up,waterlogged=true]",
+    "18208": "minecraft:pointed_dripstone[thickness=frustum,vertical_direction=up,waterlogged=false]",
+    "18209": "minecraft:pointed_dripstone[thickness=frustum,vertical_direction=down,waterlogged=true]",
+    "18210": "minecraft:pointed_dripstone[thickness=frustum,vertical_direction=down,waterlogged=false]",
+    "18211": "minecraft:pointed_dripstone[thickness=middle,vertical_direction=up,waterlogged=true]",
+    "18212": "minecraft:pointed_dripstone[thickness=middle,vertical_direction=up,waterlogged=false]",
+    "18213": "minecraft:pointed_dripstone[thickness=middle,vertical_direction=down,waterlogged=true]",
+    "18214": "minecraft:pointed_dripstone[thickness=middle,vertical_direction=down,waterlogged=false]",
+    "18215": "minecraft:pointed_dripstone[thickness=base,vertical_direction=up,waterlogged=true]",
+    "18216": "minecraft:pointed_dripstone[thickness=base,vertical_direction=up,waterlogged=false]",
+    "18217": "minecraft:pointed_dripstone[thickness=base,vertical_direction=down,waterlogged=true]",
+    "18218": "minecraft:pointed_dripstone[thickness=base,vertical_direction=down,waterlogged=false]",
+    "18219": "minecraft:dripstone_block"
   },
   "blocks": {
     "0": "air",
@@ -19040,7 +19061,9 @@
     "836": "waxed_semi_weathered_cut_copper_slab",
     "837": "waxed_lightly_weathered_cut_copper_slab",
     "838": "waxed_cut_copper_slab",
-    "839": "lightning_rod"
+    "839": "lightning_rod",
+    "840": "pointed_dripstone",
+    "841": "dripstone_block"
   },
   "items": {
     "0": "minecraft:air",
@@ -20079,7 +20102,9 @@
     "1033": "minecraft:waxed_lightly_weathered_cut_copper_slab",
     "1034": "minecraft:waxed_semi_weathered_cut_copper_slab",
     "1035": "minecraft:lightning_rod",
-    "1036": "minecraft:powder_snow_bucket"
+    "1036": "minecraft:powder_snow_bucket",
+    "1037": "minecraft:pointed_dripstone",
+    "1038": "minecraft:dripstone_block"
   },
   "sounds": [
     "ambient.cave",
@@ -20314,6 +20339,21 @@
     "entity.donkey.death",
     "entity.donkey.eat",
     "entity.donkey.hurt",
+    "block.dripstone_block.break",
+    "block.dripstone_block.step",
+    "block.dripstone_block.place",
+    "block.dripstone_block.hit",
+    "block.dripstone_block.fall",
+    "block.pointed_dripstone.break",
+    "block.pointed_dripstone.step",
+    "block.pointed_dripstone.place",
+    "block.pointed_dripstone.hit",
+    "block.pointed_dripstone.fall",
+    "block.pointed_dripstone.land",
+    "block.pointed_dripstone.drip_lava",
+    "block.pointed_dripstone.drip_water",
+    "block.pointed_dripstone.drip_lava_into_cauldron",
+    "block.pointed_dripstone.drip_water_into_cauldron",
     "entity.drowned.ambient",
     "entity.drowned.ambient_water",
     "entity.drowned.death",
@@ -21200,6 +21240,10 @@
     "reverse_portal",
     "white_ash",
     "small_flame",
-    "snowflake"
+    "snowflake",
+    "dripping_dripstone_lava",
+    "falling_dripstone_lava",
+    "dripping_dripstone_water",
+    "falling_dripstone_water"
   ]
 }

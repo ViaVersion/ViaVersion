@@ -80,8 +80,9 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
 
     @Override
     protected void onMappingDataLoaded() {
-        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food");
-        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles", "minecraft:snow_step_sound_blocks");
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
+                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks");
         tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs");
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
     }
