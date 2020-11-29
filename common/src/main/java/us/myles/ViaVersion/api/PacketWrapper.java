@@ -487,11 +487,8 @@ public class PacketWrapper {
      * Reset the reader, so that it can be read again.
      */
     public void resetReader() {
-        // Move readable objects are packet values
-        this.packetValues.addAll(readableObjects);
-        this.readableObjects.clear();
         // Move all packet values to the readable for next packet.
-        this.readableObjects.addAll(packetValues);
+        this.readableObjects.addAll(0, packetValues);
         this.packetValues.clear();
     }
 
