@@ -3,18 +3,18 @@ package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Mojang changed the way how tile entities inside chunk packets work in 1.10.1
  * It requires now to have all tile entity data included in the chunk packet, otherwise it'll crash.
  */
 public class FakeTileEntity {
-    private static final Map<Integer, CompoundTag> tileEntities = new HashMap<>();
+    private static final Int2ObjectMap<CompoundTag> tileEntities = new Int2ObjectOpenHashMap<>();
 
     static {
         register(Arrays.asList(61, 62), "Furnace");
@@ -41,15 +41,16 @@ public class FakeTileEntity {
         register(137, "Control");
     }
 
-    private static void register(Integer material, String name) {
+    private static void register(int material, String name) {
         CompoundTag comp = new CompoundTag("");
         comp.put(new StringTag(name));
         tileEntities.put(material, comp);
     }
 
     private static void register(List<Integer> materials, String name) {
-        for (int m : materials)
-            register(m, name);
+        for (int id : materials) {
+            register(id, name);
+        }
     }
 
     public static boolean hasBlock(int block) {
