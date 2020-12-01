@@ -17,7 +17,6 @@ import us.myles.ViaVersion.util.PipelineUtil;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -490,9 +489,8 @@ public class PacketWrapper {
      */
     public void resetReader() {
         // Move all packet values to the readable for next packet.
-        Collections.reverse(packetValues);
-        for (Pair<Type, Object> obj : this.packetValues) {
-            this.readableObjects.addFirst(obj);
+        for (int i = packetValues.size() - 1; i >= 0; i--) {
+            this.readableObjects.addFirst(this.packetValues.get(i));
         }
         this.packetValues.clear();
     }
