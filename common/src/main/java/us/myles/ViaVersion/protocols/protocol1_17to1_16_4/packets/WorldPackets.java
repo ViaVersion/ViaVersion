@@ -1,5 +1,10 @@
 package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
@@ -15,6 +20,10 @@ import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+
 public class WorldPackets {
 
     public static void register(Protocol1_17To1_16_4 protocol) {
@@ -28,16 +37,44 @@ public class WorldPackets {
         protocol.registerOutgoing(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.VAR_INT); // x
+                map(Type.VAR_INT); // y
+                map(Type.BOOLEAN); // trust edges
                 handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.BOOLEAN);
+                    int skyLightMask = wrapper.read(Type.VAR_INT);
+                    int blockLightMask = wrapper.read(Type.VAR_INT);
+                    // Now all written as a representation of BitSets
+                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(skyLightMask)); // Sky light mask
+                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(blockLightMask)); // Block light mask
+                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(wrapper.read(Type.VAR_INT))); // Empty sky light mask
+                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(wrapper.read(Type.VAR_INT))); // Empty block light mask
 
-                    wrapper.write(Type.VAR_LONG, wrapper.read(Type.VAR_INT).longValue()); // Sky mask
-                    wrapper.write(Type.VAR_LONG, wrapper.read(Type.VAR_INT).longValue()); // Block mask
-                    wrapper.write(Type.VAR_LONG, wrapper.read(Type.VAR_INT).longValue()); // Empty sky mask
-                    wrapper.write(Type.VAR_LONG, wrapper.read(Type.VAR_INT).longValue()); // Empty block mask
+                    writeLightArrays(wrapper, skyLightMask);
+                    writeLightArrays(wrapper, blockLightMask);
                 });
+            }
+
+            private void writeLightArrays(PacketWrapper wrapper, int bitMask) throws Exception {
+                List<byte[]> light = new ArrayList<>();
+                for (int i = 0; i <= 17; i++) {
+                    if (isSet(bitMask, i)) {
+                        light.add(wrapper.read(Type.BYTE_ARRAY_PRIMITIVE));
+                    }
+                }
+
+                // Now needs the length of the bytearray-array
+                wrapper.write(Type.VAR_INT, light.size());
+                for (byte[] bytes : light) {
+                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, bytes);
+                }
+            }
+
+            private long[] toBitSetLongArray(int bitmask) {
+                return new long[]{bitmask};
+            }
+
+            private boolean isSet(int mask, int i) {
+                return (mask & (1 << i)) != 0;
             }
         });
 
@@ -77,14 +114,28 @@ public class WorldPackets {
         protocol.registerOutgoing(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.INT);
-                map(Type.BOOLEAN);
-                map(Type.UNSIGNED_BYTE);
-                map(Type.BYTE);
-                map(Type.STRING_ARRAY);
-                map(Type.NBT);
-                map(Type.NBT);
+                map(Type.INT); // Entity ID
+                map(Type.BOOLEAN); // Hardcore
+                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Previous Gamemode
+                map(Type.STRING_ARRAY); // World List
+                map(Type.NBT); // Registry
+                map(Type.NBT); // Current dimension
                 handler(wrapper -> {
+                    // Add new dimension fields
+                    CompoundTag dimensionRegistry = wrapper.get(Type.NBT, 0).get("minecraft:dimension_type");
+                    ListTag dimensions = dimensionRegistry.get("value");
+                    for (Tag dimension : dimensions) {
+                        CompoundTag dimensionCompound = ((CompoundTag) dimension).get("element");
+                        dimensionCompound.put(new IntTag("min_y", 0));
+                        dimensionCompound.put(new IntTag("height", 256));
+                    }
+
+                    CompoundTag currentDimensionTag = wrapper.get(Type.NBT, 1);
+                    currentDimensionTag.put(new IntTag("min_y", 0));
+                    currentDimensionTag.put(new IntTag("height", 256));
+
+                    // Tracking
                     String world = wrapper.passthrough(Type.STRING);
 
                     UserConnection user = wrapper.user();

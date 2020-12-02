@@ -19,13 +19,13 @@ import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
-public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_16_2, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
+public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
 
     public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17", true);
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
-        super(ClientboundPackets1_16_2.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16_2.class, ServerboundPackets1_16_2.class);
+        super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_16_2.class);
     }
 
     @Override
@@ -82,7 +82,8 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
     protected void onMappingDataLoaded() {
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
-                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks");
+                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals",
+                "minecraft:dripstone_replaceable_blocks", "minecraft:ignore_vibrations_stepping_carefully");
         tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs");
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
     }

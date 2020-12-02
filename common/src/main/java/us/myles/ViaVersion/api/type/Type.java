@@ -17,6 +17,7 @@ import us.myles.ViaVersion.api.type.types.ComponentType;
 import us.myles.ViaVersion.api.type.types.DoubleType;
 import us.myles.ViaVersion.api.type.types.FloatType;
 import us.myles.ViaVersion.api.type.types.IntType;
+import us.myles.ViaVersion.api.type.types.LongArrayType;
 import us.myles.ViaVersion.api.type.types.LongType;
 import us.myles.ViaVersion.api.type.types.RemainingBytesType;
 import us.myles.ViaVersion.api.type.types.ShortType;
@@ -91,12 +92,13 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Double[]> DOUBLE_ARRAY = new ArrayType<>(Type.DOUBLE);
 
-    public static final Type<Long> LONG = new LongType();
+    public static final LongType LONG = new LongType();
     /**
      * @deprecated unreasonable overhead
      */
     @Deprecated
     public static final Type<Long[]> LONG_ARRAY = new ArrayType<>(Type.LONG);
+    public static final Type<long[]> LONG_ARRAY_PRIMITIVE = new LongArrayType();
 
     public static final FloatType FLOAT = new FloatType();
     /**
