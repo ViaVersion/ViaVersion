@@ -22,6 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1
 public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
 
     public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17", true);
+    private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_stepping_carefully", "minecraft:vibrations"};
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
@@ -37,7 +38,20 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
         WorldPackets.register(this);
 
         tagRewriter = new TagRewriter(this, null);
-        tagRewriter.register(ClientboundPackets1_16_2.TAGS);
+        registerOutgoing(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(tagRewriter.getHandler(false));
+                handler(wrapper -> {
+                    // New Game Event tags type
+                    wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
+                    for (String tag : NEW_GAME_EVENT_TAGS) {
+                        wrapper.write(Type.STRING, tag);
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]);
+                    }
+                });
+            }
+        });
 
         new StatisticsRewriter(this, null).register(ClientboundPackets1_16_2.STATISTICS);
 
@@ -82,8 +96,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
     protected void onMappingDataLoaded() {
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
-                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals",
-                "minecraft:dripstone_replaceable_blocks", "minecraft:ignore_vibrations_stepping_carefully");
+                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks");
         tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs");
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
     }

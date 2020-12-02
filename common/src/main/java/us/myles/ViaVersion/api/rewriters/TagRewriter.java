@@ -7,20 +7,20 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class TagRewriter {
     private static final int[] EMPTY_ARRAY = {};
     private final Protocol protocol;
     private final IdRewriteFunction entityRewriter;
-    private final List<TagData> newBlockTags = new ArrayList<>();
-    private final List<TagData> newItemTags = new ArrayList<>();
-    private final List<TagData> newEntityTags = new ArrayList<>();
-    // add fluid tag list if needed at some point
+    private final Map<RegistryType, List<TagData>> newTags = new EnumMap<>(RegistryType.class);
 
     public TagRewriter(Protocol protocol, @Nullable IdRewriteFunction entityRewriter) {
         this.protocol = protocol;
@@ -31,18 +31,18 @@ public class TagRewriter {
      * Adds an empty tag (since the client crashes if a checked tag is not registered.)
      */
     public void addEmptyTag(RegistryType tagType, String id) {
-        getNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
+        getOrComputeNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
     }
 
     public void addEmptyTags(RegistryType tagType, String... ids) {
-        List<TagData> tagList = getNewTags(tagType);
+        List<TagData> tagList = getOrComputeNewTags(tagType);
         for (String id : ids) {
             tagList.add(new TagData(id, EMPTY_ARRAY));
         }
     }
 
     public void addTag(RegistryType tagType, String id, int... oldIds) {
-        List<TagData> newTags = getNewTags(tagType);
+        List<TagData> newTags = getOrComputeNewTags(tagType);
         IdRewriteFunction rewriteFunction = getRewriter(tagType);
         for (int i = 0; i < oldIds.length; i++) {
             int oldId = oldIds[i];
@@ -52,29 +52,32 @@ public class TagRewriter {
     }
 
     public void register(ClientboundPacketType packetType) {
+        register(packetType, false);
+    }
+
+    public void register(ClientboundPacketType packetType, boolean hasGameEvents) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(wrapper -> {
-                    MappingData mappingData = protocol.getMappingData();
-                    handle(wrapper, id -> mappingData != null ? mappingData.getNewBlockId(id) : null, newBlockTags);
-                    handle(wrapper, id -> mappingData != null ? mappingData.getNewItemId(id) : null, newItemTags);
-
-                    if (entityRewriter == null && newEntityTags.isEmpty()) return;
-
-                    int fluidTagsSize = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < fluidTagsSize; i++) {
-                        wrapper.passthrough(Type.STRING);
-                        wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                    }
-
-                    handle(wrapper, entityRewriter, newEntityTags);
-                });
+                handler(getHandler(hasGameEvents));
             }
         });
     }
 
-    private void handle(PacketWrapper wrapper, IdRewriteFunction rewriteFunction, List<TagData> newTags) throws Exception {
+    public PacketHandler getHandler(boolean hasGameEvents) {
+        return wrapper -> {
+            MappingData mappingData = protocol.getMappingData();
+            handle(wrapper, id -> mappingData != null ? mappingData.getNewBlockId(id) : null, getNewTags(RegistryType.BLOCK));
+            handle(wrapper, id -> mappingData != null ? mappingData.getNewItemId(id) : null, getNewTags(RegistryType.ITEM));
+            handle(wrapper, null, getNewTags(RegistryType.FLUID));
+            handle(wrapper, entityRewriter, getNewTags(RegistryType.ENTITY));
+            if (hasGameEvents) {
+                handle(wrapper, null, getNewTags(RegistryType.GAME_EVENT));
+            }
+        };
+    }
+
+    private void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, List<TagData> newTags) throws Exception {
         int tagsSize = wrapper.read(Type.VAR_INT);
         wrapper.write(Type.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
 
@@ -107,18 +110,13 @@ public class TagRewriter {
         }
     }
 
+    @Nullable
     private List<TagData> getNewTags(RegistryType tagType) {
-        switch (tagType) {
-            case BLOCK:
-                return newBlockTags;
-            case ITEM:
-                return newItemTags;
-            case ENTITY:
-                return newEntityTags;
-            case FLUID:
-            default:
-                return null;
-        }
+        return newTags.get(tagType);
+    }
+
+    private List<TagData> getOrComputeNewTags(RegistryType tagType) {
+        return newTags.computeIfAbsent(tagType, type -> new ArrayList<>());
     }
 
     @Nullable

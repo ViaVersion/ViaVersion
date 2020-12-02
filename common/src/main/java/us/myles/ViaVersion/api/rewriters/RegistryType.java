@@ -5,5 +5,6 @@ public enum RegistryType {
     BLOCK,
     ITEM,
     FLUID,
-    ENTITY
+    ENTITY,
+    GAME_EVENT
 }
