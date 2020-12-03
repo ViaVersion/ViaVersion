@@ -17,7 +17,7 @@ public class Position1_14Type extends Type<Position> {
         long y = val << 52 >> 52;
         long z = val << 26 >> 38;
 
-        return new Position((int) x, (short) y, (int) z);
+        return new Position((int) x, (int) y, (int) z);
     }
 
     @Override

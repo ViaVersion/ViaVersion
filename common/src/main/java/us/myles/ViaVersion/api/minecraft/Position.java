@@ -2,8 +2,14 @@ package us.myles.ViaVersion.api.minecraft;
 
 public class Position {
     private final int x;
-    private final short y;
+    private final int y;
     private final int z;
+
+    public Position(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
     public Position(int x, short y, int z) {
         this.x = x;
@@ -23,7 +29,7 @@ public class Position {
         return x;
     }
 
-    public short getY() {
+    public int getY() {
         return y;
     }
 
@@ -44,7 +50,7 @@ public class Position {
     @Override
     public int hashCode() {
         int result = x;
-        result = 31 * result + (int) y;
+        result = 31 * result + y;
         result = 31 * result + z;
         return result;
     }

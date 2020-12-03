@@ -61,7 +61,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
     public static final PacketHandler POS_TO_3_INT = wrapper -> {
         Position position = wrapper.read(Type.POSITION);
         wrapper.write(Type.INT, position.getX());
-        wrapper.write(Type.INT, (int) position.getY());
+        wrapper.write(Type.INT, position.getY());
         wrapper.write(Type.INT, position.getZ());
     };
 

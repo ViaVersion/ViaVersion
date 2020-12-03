@@ -19,7 +19,8 @@ public class OptPosition1_14Type extends Type<Position> {
     @Override
     public void write(ByteBuf buffer, Position object) throws Exception {
         buffer.writeBoolean(object != null);
-        if (object != null)
+        if (object != null) {
             Type.POSITION1_14.write(buffer, object);
+        }
     }
 }

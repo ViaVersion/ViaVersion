@@ -343,7 +343,7 @@ public class WorldPackets {
                             return;
                         Position p = wrapper.get(Type.POSITION, 0);
                         int x = p.getX();
-                        short y = p.getY();
+                        int y = p.getY();
                         int z = p.getZ();
                         switch (face) {
                             case 0:
