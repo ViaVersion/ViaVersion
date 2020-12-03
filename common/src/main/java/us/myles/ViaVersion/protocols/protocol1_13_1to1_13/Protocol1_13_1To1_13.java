@@ -124,7 +124,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
             }
         });
 
-        new TagRewriter(this, null).register(ClientboundPackets1_13.TAGS, RegistryType.BLOCK);
+        new TagRewriter(this, null).register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
         new StatisticsRewriter(this, null).register(ClientboundPackets1_13.STATISTICS);
     }
 

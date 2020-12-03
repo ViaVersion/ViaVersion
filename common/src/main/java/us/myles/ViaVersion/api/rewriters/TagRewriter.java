@@ -64,15 +64,6 @@ public class TagRewriter {
         });
     }
 
-    /**
-     * Registers the handler, reading and processing until and including the entity tags.
-     *
-     * @param packetType packet type
-     */
-    public void register(ClientboundPacketType packetType) {
-        register(packetType, RegistryType.ENTITY);
-    }
-
     public PacketHandler getHandler(@Nullable RegistryType readUntilType) {
         return wrapper -> {
             for (RegistryType type : RegistryType.getValues()) {

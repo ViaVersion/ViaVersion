@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.chunks.BaseChunk;
@@ -16,9 +17,12 @@ import java.util.List;
 
 public class Chunk1_17Type extends Type<Chunk> {
     private static final CompoundTag[] EMPTY_COMPOUNDS = new CompoundTag[0];
+    private final int ySectionCount;
 
-    public Chunk1_17Type() {
+    public Chunk1_17Type(int ySectionCount) {
         super(Chunk.class);
+        Preconditions.checkArgument(ySectionCount > 0);
+        this.ySectionCount = ySectionCount;
     }
 
     @Override
@@ -26,7 +30,7 @@ public class Chunk1_17Type extends Type<Chunk> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        int primaryBitmask = Type.VAR_INT.readPrimitive(input);
+        int sectionsMask = Type.VAR_INT.readPrimitive(input);
         CompoundTag heightMap = Type.NBT.read(input);
 
         int[] biomeData = Type.VAR_INT_ARRAY_PRIMITIVE.read(input);
@@ -34,9 +38,9 @@ public class Chunk1_17Type extends Type<Chunk> {
         Type.VAR_INT.readPrimitive(input); // data size in bytes
 
         // Read sections
-        ChunkSection[] sections = new ChunkSection[16];
-        for (int i = 0; i < 16; i++) {
-            if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
+        ChunkSection[] sections = new ChunkSection[ySectionCount];
+        for (int i = 0; i < ySectionCount; i++) {
+            if ((sectionsMask & (1 << i)) == 0) continue; // Section not set
 
             short nonAirBlocksCount = input.readShort();
             ChunkSection section = Types1_16.CHUNK_SECTION.read(input);
@@ -54,7 +58,7 @@ public class Chunk1_17Type extends Type<Chunk> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, true, false, primaryBitmask, sections, biomeData, heightMap, nbtData);
+        return new BaseChunk(chunkX, chunkZ, true, false, sectionsMask, sections, biomeData, heightMap, nbtData);
     }
 
     @Override
@@ -70,8 +74,8 @@ public class Chunk1_17Type extends Type<Chunk> {
 
         ByteBuf buf = output.alloc().buffer();
         try {
-            for (int i = 0; i < 16; i++) {
-                ChunkSection section = chunk.getSections()[i];
+            ChunkSection[] sections = chunk.getSections();
+            for (ChunkSection section : sections) {
                 if (section == null) continue; // Section not set
 
                 buf.writeShort(section.getNonAirBlocksCount());

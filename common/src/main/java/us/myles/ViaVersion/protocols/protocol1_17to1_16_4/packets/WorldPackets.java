@@ -21,7 +21,6 @@ import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 public class WorldPackets {
@@ -83,7 +82,7 @@ public class WorldPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     Chunk chunk = wrapper.read(new Chunk1_16_2Type());
-                    wrapper.write(new Chunk1_17Type(), chunk);
+                    wrapper.write(new Chunk1_17Type(16), chunk);
 
                     BiomeStorage biomeStorage = wrapper.user().get(BiomeStorage.class);
                     if (chunk.isFullChunk()) {
