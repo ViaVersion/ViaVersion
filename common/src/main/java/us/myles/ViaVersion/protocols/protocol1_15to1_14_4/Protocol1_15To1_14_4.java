@@ -51,7 +51,7 @@ public class Protocol1_15To1_14_4 extends Protocol<ClientboundPackets1_14, Clien
         });
 
         tagRewriter = new TagRewriter(this, EntityPackets::getNewEntityId);
-        tagRewriter.register(ClientboundPackets1_14.TAGS);
+        tagRewriter.register(ClientboundPackets1_14.TAGS, RegistryType.ENTITY);
     }
 
     @Override

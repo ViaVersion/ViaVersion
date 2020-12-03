@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
+import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.type.Type;
@@ -123,7 +124,7 @@ public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, Clien
             }
         });
 
-        new TagRewriter(this, null).register(ClientboundPackets1_13.TAGS);
+        new TagRewriter(this, null).register(ClientboundPackets1_13.TAGS, RegistryType.BLOCK);
         new StatisticsRewriter(this, null).register(ClientboundPackets1_13.STATISTICS);
     }
 

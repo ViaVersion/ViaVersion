@@ -36,7 +36,7 @@ public class Protocol1_16_2To1_16_1 extends Protocol<ClientboundPackets1_16, Cli
         InventoryPackets.register(this);
 
         tagRewriter = new TagRewriter(this, metadataRewriter::getNewEntityId);
-        tagRewriter.register(ClientboundPackets1_16.TAGS);
+        tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
 
         new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_16.STATISTICS);
 

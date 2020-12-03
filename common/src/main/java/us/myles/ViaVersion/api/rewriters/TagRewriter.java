@@ -51,28 +51,37 @@ public class TagRewriter {
         newTags.add(new TagData(id, oldIds));
     }
 
-    public void register(ClientboundPacketType packetType) {
-        register(packetType, false);
-    }
-
-    public void register(ClientboundPacketType packetType, boolean hasGameEvents) {
+    /**
+     * @param packetType    packet type
+     * @param readUntilType read and process the types until (including) the given registry type
+     */
+    public void register(ClientboundPacketType packetType, @Nullable RegistryType readUntilType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(getHandler(hasGameEvents));
+                handler(getHandler(readUntilType));
             }
         });
     }
 
-    public PacketHandler getHandler(boolean hasGameEvents) {
+    /**
+     * Registers the handler, reading and processing until and including the entity tags.
+     *
+     * @param packetType packet type
+     */
+    public void register(ClientboundPacketType packetType) {
+        register(packetType, RegistryType.ENTITY);
+    }
+
+    public PacketHandler getHandler(@Nullable RegistryType readUntilType) {
         return wrapper -> {
-            MappingData mappingData = protocol.getMappingData();
-            handle(wrapper, id -> mappingData != null ? mappingData.getNewBlockId(id) : null, getNewTags(RegistryType.BLOCK));
-            handle(wrapper, id -> mappingData != null ? mappingData.getNewItemId(id) : null, getNewTags(RegistryType.ITEM));
-            handle(wrapper, null, getNewTags(RegistryType.FLUID));
-            handle(wrapper, entityRewriter, getNewTags(RegistryType.ENTITY));
-            if (hasGameEvents) {
-                handle(wrapper, null, getNewTags(RegistryType.GAME_EVENT));
+            for (RegistryType type : RegistryType.getValues()) {
+                handle(wrapper, getRewriter(type), getNewTags(type));
+
+                // Stop iterating
+                if (type == readUntilType) {
+                    break;
+                }
             }
         };
     }
@@ -102,7 +111,7 @@ public class TagRewriter {
         }
 
         // Send new tags if present
-        if (newTags != null && !newTags.isEmpty()) {
+        if (newTags != null) {
             for (TagData tag : newTags) {
                 wrapper.write(Type.STRING, tag.identifier);
                 wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.entries);
@@ -121,14 +130,16 @@ public class TagRewriter {
 
     @Nullable
     private IdRewriteFunction getRewriter(RegistryType tagType) {
+        MappingData mappingData = protocol.getMappingData();
         switch (tagType) {
             case BLOCK:
-                return protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
+                return mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
             case ITEM:
-                return protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
+                return mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
             case ENTITY:
                 return entityRewriter;
             case FLUID:
+            case GAME_EVENT:
             default:
                 return null;
         }

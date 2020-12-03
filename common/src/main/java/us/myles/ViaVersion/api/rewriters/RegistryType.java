@@ -6,5 +6,11 @@ public enum RegistryType {
     ITEM,
     FLUID,
     ENTITY,
-    GAME_EVENT
+    GAME_EVENT;
+
+    private static final RegistryType[] VALUES = values();
+
+    public static RegistryType[] getValues() {
+        return VALUES;
+    }
 }

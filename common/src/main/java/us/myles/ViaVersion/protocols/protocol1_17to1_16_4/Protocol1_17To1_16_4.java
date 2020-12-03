@@ -41,7 +41,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
         registerOutgoing(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(tagRewriter.getHandler(false));
+                handler(tagRewriter.getHandler(RegistryType.ENTITY));
                 handler(wrapper -> {
                     // New Game Event tags type
                     wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
