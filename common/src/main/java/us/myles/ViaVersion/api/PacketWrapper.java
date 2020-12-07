@@ -15,8 +15,9 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.util.PipelineUtil;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -28,7 +29,7 @@ public class PacketWrapper {
     private final UserConnection userConnection;
     private boolean send = true;
     private int id = -1;
-    private final LinkedList<Pair<Type, Object>> readableObjects = new LinkedList<>();
+    private final Deque<Pair<Type, Object>> readableObjects = new ArrayDeque<>();
     private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
 
     public PacketWrapper(int packetID, ByteBuf inputBuffer, UserConnection userConnection) {
@@ -488,7 +489,9 @@ public class PacketWrapper {
      */
     public void resetReader() {
         // Move all packet values to the readable for next packet.
-        this.readableObjects.addAll(0, packetValues);
+        for (int i = packetValues.size() - 1; i >= 0; i--) {
+            this.readableObjects.addFirst(this.packetValues.get(i));
+        }
         this.packetValues.clear();
     }
 
