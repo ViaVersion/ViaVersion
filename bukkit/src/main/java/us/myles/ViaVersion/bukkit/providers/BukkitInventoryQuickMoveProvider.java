@@ -51,10 +51,8 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             return false;
         }
         if (windowId == 0) {
-            /**
-             * windowId is always 0 for player inventory.
-             * This has almost definitely something to do with the offhand slot.
-             */
+            // windowId is always 0 for player inventory.
+            // This has almost definitely something to do with the offhand slot.
             if (slotId >= 36 && slotId <= 44) {
                 int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
                 // this seems to be working just fine.
@@ -73,7 +71,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         }
         // http://wiki.vg/index.php?title=Protocol&oldid=13223#Click_Window
         updateTask.addItem(windowId, slotId, actionId);
-        if (!registered) {
+        if (!registered && Via.getPlatform().isPluginEnabled()) {
             Via.getPlatform().runSync(updateTask, 5L);
         }
         return true;
