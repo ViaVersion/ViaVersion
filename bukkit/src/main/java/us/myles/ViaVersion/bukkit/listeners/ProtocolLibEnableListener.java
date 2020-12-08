@@ -21,9 +21,9 @@ public class ProtocolLibEnableListener implements Listener {
     }
 
     @EventHandler
-	public void onPluginDisable(PluginDisableEvent e) {
-	    if (e.getPlugin().getName().equals("ProtocolLib")) {
-		    injector.setProtocolLib(false);
-	    }
+    public void onPluginDisable(PluginDisableEvent e) {
+        if (e.getPlugin().getName().equals("ProtocolLib")) {
+            injector.setProtocolLib(false);
+        }
     }
 }
