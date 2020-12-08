@@ -17,6 +17,7 @@ import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
+import us.myles.ViaVersion.bukkit.listeners.ProtocolLibEnableListener;
 import us.myles.ViaVersion.bukkit.platform.BukkitTaskId;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
 import us.myles.ViaVersion.bukkit.platform.BukkitViaConfig;
@@ -48,13 +49,19 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Command handler
         commandHandler = new BukkitCommandHandler();
+
         // Init platform
+        BukkitViaInjector injector = new BukkitViaInjector();
+        injector.setProtocolLib(Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"));
+        Bukkit.getPluginManager().registerEvents(new ProtocolLibEnableListener(injector), this);
+
         Via.init(ViaManager.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
-                .injector(new BukkitViaInjector())
+                .injector(injector)
                 .loader(new BukkitViaLoader(this))
                 .build());
+
         // Config magic
         conf = new BukkitViaConfig();
 
