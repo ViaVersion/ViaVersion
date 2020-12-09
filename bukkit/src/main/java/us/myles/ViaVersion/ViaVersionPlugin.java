@@ -52,7 +52,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Init platform
         BukkitViaInjector injector = new BukkitViaInjector();
-        injector.setProtocolLib(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null);
 
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -78,6 +77,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onLoad() {
+        // Via should load before PL, so we can't check for it in the constructor
+        boolean hasProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
+        ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(hasProtocolLib);
+
         // Spigot detector
         try {
             Class.forName("org.spigotmc.SpigotConfig");
