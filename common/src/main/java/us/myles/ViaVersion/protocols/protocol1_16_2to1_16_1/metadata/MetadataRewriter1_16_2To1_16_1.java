@@ -29,6 +29,8 @@ public class MetadataRewriter1_16_2To1_16_1 extends MetadataRewriter {
         } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        } else if (metadata.getMetaType() == MetaType1_14.PARTICLE) {
+            rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
@@ -38,10 +40,6 @@ public class MetadataRewriter1_16_2To1_16_1 extends MetadataRewriter {
                 metadata.setId(16);
             } else if (metadata.getId() == 16) {
                 metadata.setId(15);
-            }
-        } else if (type.is(Entity1_16_2Types.EntityType.AREA_EFFECT_CLOUD)) {
-            if (metadata.getId() == 10) {
-                rewriteParticle((Particle) metadata.getValue());
             }
         }
     }

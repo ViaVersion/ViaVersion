@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.entities.Entity1_15Types;
 import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.type.types.Particle;
@@ -29,6 +30,8 @@ public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        } else if (metadata.getMetaType() == MetaType1_13.PARTICLE) {
+            rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
@@ -48,8 +51,6 @@ public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
             } else if (metadata.getId() > 18) {
                 metadata.setId(metadata.getId() - 1);
             }
-        } else if (type == Entity1_15Types.EntityType.AREA_EFFECT_CLOUD && metadata.getId() == 10) {
-            rewriteParticle((Particle) metadata.getValue());
         }
     }
 

@@ -39,6 +39,8 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        } else if (metadata.getMetaType() == MetaType1_14.PARTICLE) {
+            rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
@@ -145,10 +147,6 @@ public class MetadataRewriter1_14To1_13_2 extends MetadataRewriter {
                         | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Is swinging arms"
                 metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
-            }
-        } else if (type.is(Entity1_14Types.EntityType.AREA_EFFECT_CLOUD)) {
-            if (metadata.getId() == 10) {
-                rewriteParticle((Particle) metadata.getValue());
             }
         }
 

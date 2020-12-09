@@ -30,15 +30,13 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
         } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        } else if (metadata.getMetaType() == MetaType1_14.PARTICLE) {
+            rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
 
-        if (type == Entity1_16Types.EntityType.AREA_EFFECT_CLOUD) {
-            if (metadata.getId() == 10) {
-                rewriteParticle((Particle) metadata.getValue());
-            }
-        } else if (type.isOrHasParent(Entity1_16Types.EntityType.ABSTRACT_ARROW)) {
+        if (type.isOrHasParent(Entity1_16Types.EntityType.ABSTRACT_ARROW)) {
             if (metadata.getId() == 8) {
                 metadatas.remove(metadata);
             } else if (metadata.getId() > 8) {

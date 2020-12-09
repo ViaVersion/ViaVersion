@@ -29,6 +29,8 @@ public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        } else if (metadata.getMetaType() == MetaType1_13.PARTICLE) {
+            rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
@@ -39,8 +41,6 @@ public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter {
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         } else if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.getId() >= 7) {
             metadata.setId(metadata.getId() + 1); // New shooter UUID
-        } else if (type.is(Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) && metadata.getId() == 10) {
-            rewriteParticle((Particle) metadata.getValue());
         }
     }
 

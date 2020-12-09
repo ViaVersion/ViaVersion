@@ -85,7 +85,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Integer[]> INT_ARRAY = new ArrayType<>(Type.INT);
 
-    public static final Type<Double> DOUBLE = new DoubleType();
+    public static final DoubleType DOUBLE = new DoubleType();
     /**
      * @deprecated unreasonable overhead
      */
