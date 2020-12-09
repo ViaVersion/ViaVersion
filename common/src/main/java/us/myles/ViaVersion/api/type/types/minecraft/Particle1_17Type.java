@@ -51,7 +51,7 @@ public class Particle1_17Type extends Type<Particle> {
                 if (resourceLocation.equals("block")) {
                     particle.getArguments().add(new Particle.ParticleData(Type.POSITION1_14, Type.POSITION1_14.read(buffer))); // Target block pos
                 } else if (resourceLocation.equals("entity")) {
-                    particle.getArguments().add(new Particle.ParticleData(Type.POSITION1_14, Type.POSITION1_14.read(buffer))); // Target entity
+                    particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, Type.VAR_INT.read(buffer))); // Target entity
                 } else {
                     Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + resourceLocation);
                 }
