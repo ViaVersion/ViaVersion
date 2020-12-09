@@ -11,6 +11,7 @@ public class ProtocolLibEnableListener implements Listener {
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent e) {
+        // Will likely never happen, but try to account for hacky plugin loading systems anyways
         if (e.getPlugin().getName().equals("ProtocolLib")) {
             ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(true);
         }
