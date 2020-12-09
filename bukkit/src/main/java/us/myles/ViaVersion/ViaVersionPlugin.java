@@ -53,7 +53,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         // Init platform
         BukkitViaInjector injector = new BukkitViaInjector();
         injector.setProtocolLib(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null);
-        Bukkit.getPluginManager().registerEvents(new ProtocolLibEnableListener(injector), this);
 
         Via.init(ViaManager.builder()
                 .platform(this)
@@ -116,6 +115,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         getCommand("viaversion").setExecutor(commandHandler);
         getCommand("viaversion").setTabCompleter(commandHandler);
+
+        getServer().getPluginManager().registerEvents(new ProtocolLibEnableListener(), this);
 
         // Warn them if they have anti-xray on and they aren't using spigot
         if (conf.isAntiXRay() && !spigot) {
