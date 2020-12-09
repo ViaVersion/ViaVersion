@@ -205,25 +205,29 @@ public class ItemRewriter {
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    if (id == -1) return;
-
-                    ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-                    if (id == mappings.getBlockId() || id == mappings.getFallingDustId()) {
-                        int data = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                    } else if (id == mappings.getItemId()) {
-                        toClient.rewrite(wrapper.passthrough(itemType));
-                    }
-
-                    int newId = protocol.getMappingData().getNewParticleId(id);
-                    if (newId != id) {
-                        wrapper.set(Type.INT, 0, newId);
-                    }
-                });
+                handler(getSpawnParticleHandler(itemType, coordType));
             }
         });
+    }
+
+    public PacketHandler getSpawnParticleHandler(Type<Item> itemType, Type<?> coordType) {
+        return wrapper -> {
+            int id = wrapper.get(Type.INT, 0);
+            if (id == -1) return;
+
+            ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+            if (id == mappings.getBlockId() || id == mappings.getFallingDustId()) {
+                int data = wrapper.passthrough(Type.VAR_INT);
+                wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+            } else if (id == mappings.getItemId()) {
+                toClient.rewrite(wrapper.passthrough(itemType));
+            }
+
+            int newId = protocol.getMappingData().getNewParticleId(id);
+            if (newId != id) {
+                wrapper.set(Type.INT, 0, newId);
+            }
+        };
     }
 
     // Only sent to the client
