@@ -26,6 +26,8 @@ public class BukkitViaInjector implements ViaInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Pair<Field, Object>> injectedLists = new ArrayList<>();
 
+    private boolean protocolLib;
+
     @Override
     public void inject() throws Exception {
         try {
@@ -214,7 +216,7 @@ public class BukkitViaInjector implements ViaInjector {
 
     @Override
     public String getDecoderName() {
-        return "decoder";
+        return protocolLib ? "protocol_lib_decoder" : "decoder";
     }
 
     public static Object getServerConnection() throws Exception {
@@ -338,5 +340,9 @@ public class BukkitViaInjector implements ViaInjector {
             list.addAll((Collection) value);
             field.set(connection, list);
         }
+    }
+
+    public void setProtocolLib(boolean protocolLib) {
+        this.protocolLib = protocolLib;
     }
 }
