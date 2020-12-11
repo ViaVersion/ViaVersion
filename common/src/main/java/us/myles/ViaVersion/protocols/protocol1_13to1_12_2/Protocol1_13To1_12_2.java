@@ -210,7 +210,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                                 } else {
                                     Via.getPlatform().getLogger().warning("Could not find 1.13 -> 1.12.2 statistic mapping for " + name);
                                 }
-                            } else {
+                            } else if (split.length > 2) {
                                 String category = split[1];
                                 //TODO convert string ids (blocks, items, entities)
                                 switch (category) {
