@@ -1,7 +1,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 /**
- * Dummy protocol class for when you do not need any of the
+ * Dummy protocol class when there is no need of any of the
  * existing packet type enums or automated channel mappings.
  *
  * @see Protocol

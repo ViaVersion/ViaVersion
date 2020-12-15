@@ -88,6 +88,7 @@ public class ViaManager {
             platform.getLogger().severe("ViaVersion failed to get the server protocol!");
             e.printStackTrace();
         }
+
         // Check if there are any pipes to this version
         if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
             platform.getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
@@ -97,11 +98,13 @@ public class ViaManager {
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
                 platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://jo0001.github.io/ViaSetup");
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
-            } else if (ProtocolRegistry.SERVER_PROTOCOL == ProtocolVersion.v1_8.getVersion() && !platform.isProxy()) {
-                platform.getLogger().warning("This version of Minecraft is over half a decade old and support for it will be fully dropped eventually. "
-                        + "Please upgrade to a newer version to avoid encountering bugs and stability issues that have long been fixed.");
+            } else if (ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_12_2.getVersion() && !platform.isProxy()) {
+                platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
+                        + "You will still be able to run Via on this version, but we are unlikely to provide any further fixes or help with problems specific to legacy versions. "
+                        + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
             }
         }
+
         // Load Listeners / Tasks
         ProtocolRegistry.onServerLoaded();
 
