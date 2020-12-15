@@ -28,6 +28,7 @@ import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -126,9 +127,10 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
 
     @Override
     public ViaCommandSender[] getOnlinePlayers() {
-        ViaCommandSender[] array = new ViaCommandSender[getProxy().getPlayers().size()];
+        Collection<ProxiedPlayer> players = getProxy().getPlayers();
+        ViaCommandSender[] array = new ViaCommandSender[players.size()];
         int i = 0;
-        for (ProxiedPlayer player : getProxy().getPlayers()) {
+        for (ProxiedPlayer player : players) {
             array[i++] = new BungeeCommandSender(player);
         }
         return array;
