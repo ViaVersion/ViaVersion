@@ -136,13 +136,21 @@ public class TagRewriter {
         }
     }
 
-    private static final class TagData {
+    public static final class TagData {
         private final String identifier;
         private final int[] entries;
 
-        private TagData(String identifier, int[] entries) {
+        public TagData(String identifier, int[] entries) {
             this.identifier = identifier;
             this.entries = entries;
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        public int[] getEntries() {
+            return entries;
         }
     }
 }
