@@ -41,9 +41,24 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
         registerOutgoing(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(tagRewriter.getHandler(RegistryType.ENTITY));
                 handler(wrapper -> {
+                    // Tags are now generically written with resource location - 5 different Vanilla types
+                    wrapper.write(Type.VAR_INT, 5);
+                    for (RegistryType type : RegistryType.getValues()) {
+                        // Prefix with resource location
+                        wrapper.write(Type.STRING, type.getResourceLocation());
+
+                        // Id conversion
+                        tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
+
+                        // Stop iterating after entity types
+                        if (type == RegistryType.ENTITY) {
+                            break;
+                        }
+                    }
+
                     // New Game Event tags type
+                    wrapper.write(Type.STRING, RegistryType.GAME_EVENT.getResourceLocation());
                     wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
                     for (String tag : NEW_GAME_EVENT_TAGS) {
                         wrapper.write(Type.STRING, tag);
@@ -94,10 +109,11 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
 
     @Override
     protected void onMappingDataLoaded() {
-        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables");
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
+                "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
                 "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks");
-        tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs");
+        tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs", "minecraft:axolotl_always_hostiles", "minecraft:axolotl_tempted_hostiles");
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
     }
 

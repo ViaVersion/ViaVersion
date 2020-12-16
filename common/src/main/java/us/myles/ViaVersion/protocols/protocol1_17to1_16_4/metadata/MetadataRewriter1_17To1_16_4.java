@@ -2,6 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.metadata;
 
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
+import us.myles.ViaVersion.api.entities.Entity1_17Types;
 import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -19,6 +20,7 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
 
     public MetadataRewriter1_17To1_16_4(Protocol1_17To1_16_4 protocol) {
         super(protocol, EntityTracker1_17.class);
+        mapTypes(Entity1_16_2Types.EntityType.values(), Entity1_17Types.EntityType.class);
     }
 
     @Override
@@ -44,7 +46,7 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_16_2Types.EntityType.ENTITY)) {
+        if (type.isOrHasParent(Entity1_17Types.EntityType.ENTITY)) {
             if (metadata.getId() >= 7) {
                 metadata.setId(metadata.getId() + 1); // Ticks frozen added with id 7
             }
@@ -53,6 +55,6 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
 
     @Override
     protected EntityType getTypeFromId(int type) {
-        return Entity1_16_2Types.getTypeFromId(type);
+        return Entity1_17Types.getTypeFromId(type);
     }
 }

@@ -77,7 +77,7 @@ public class TagRewriter {
         };
     }
 
-    private void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, List<TagData> newTags) throws Exception {
+    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, List<TagData> newTags) throws Exception {
         int tagsSize = wrapper.read(Type.VAR_INT);
         wrapper.write(Type.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
 
@@ -111,16 +111,16 @@ public class TagRewriter {
     }
 
     @Nullable
-    private List<TagData> getNewTags(RegistryType tagType) {
+    public List<TagData> getNewTags(RegistryType tagType) {
         return newTags.get(tagType);
     }
 
-    private List<TagData> getOrComputeNewTags(RegistryType tagType) {
+    public List<TagData> getOrComputeNewTags(RegistryType tagType) {
         return newTags.computeIfAbsent(tagType, type -> new ArrayList<>());
     }
 
     @Nullable
-    private IdRewriteFunction getRewriter(RegistryType tagType) {
+    public IdRewriteFunction getRewriter(RegistryType tagType) {
         MappingData mappingData = protocol.getMappingData();
         switch (tagType) {
             case BLOCK:
