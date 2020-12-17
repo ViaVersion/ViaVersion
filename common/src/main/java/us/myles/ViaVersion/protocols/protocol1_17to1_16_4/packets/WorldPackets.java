@@ -126,13 +126,11 @@ public class WorldPackets {
                     ListTag dimensions = dimensionRegistry.get("value");
                     for (Tag dimension : dimensions) {
                         CompoundTag dimensionCompound = ((CompoundTag) dimension).get("element");
-                        dimensionCompound.put(new IntTag("min_y", 0));
-                        dimensionCompound.put(new IntTag("height", 256));
+                        addNewDimensionData(dimensionCompound);
                     }
 
                     CompoundTag currentDimensionTag = wrapper.get(Type.NBT, 1);
-                    currentDimensionTag.put(new IntTag("min_y", 0));
-                    currentDimensionTag.put(new IntTag("height", 256));
+                    addNewDimensionData(currentDimensionTag);
 
                     // Tracking
                     String world = wrapper.passthrough(Type.STRING);
@@ -148,7 +146,9 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    wrapper.passthrough(Type.NBT);
+                    CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
+                    addNewDimensionData(dimensionData);
+
                     String world = wrapper.passthrough(Type.STRING);
                     BiomeStorage biomeStorage = wrapper.user().get(BiomeStorage.class);
                     if (!world.equals(biomeStorage.getWorld())) {
@@ -172,5 +172,10 @@ public class WorldPackets {
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_16_2.EFFECT, 1010, 2001);
+    }
+
+    private static void addNewDimensionData(CompoundTag tag) {
+        tag.put(new IntTag("min_y", 0));
+        tag.put(new IntTag("height", 256));
     }
 }
