@@ -7,7 +7,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
+import us.myles.ViaVersion.api.entities.Entity1_17Types;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -137,7 +137,7 @@ public class WorldPackets {
 
                     UserConnection user = wrapper.user();
                     user.get(BiomeStorage.class).setWorld(world);
-                    user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16_2Types.EntityType.PLAYER);
+                    user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.EntityType.PLAYER);
                 });
             }
         });
