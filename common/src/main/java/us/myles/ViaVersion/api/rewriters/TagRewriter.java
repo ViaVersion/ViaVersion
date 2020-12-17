@@ -52,6 +52,8 @@ public class TagRewriter {
     }
 
     /**
+     * Pre 1.17 reading of hardcoded registry types.
+     *
      * @param packetType    packet type
      * @param readUntilType read and process the types until (including) the given registry type
      */
@@ -64,6 +66,20 @@ public class TagRewriter {
         });
     }
 
+    /**
+     * 1.17+ reading of generic tag types.
+     *
+     * @param packetType packet type
+     */
+    public void registerGeneric(ClientboundPacketType packetType) {
+        protocol.registerOutgoing(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(getGenericHandler());
+            }
+        });
+    }
+
     public PacketHandler getHandler(@Nullable RegistryType readUntilType) {
         return wrapper -> {
             for (RegistryType type : RegistryType.getValues()) {
@@ -72,6 +88,25 @@ public class TagRewriter {
                 // Stop iterating
                 if (type == readUntilType) {
                     break;
+                }
+            }
+        };
+    }
+
+    public PacketHandler getGenericHandler() {
+        return wrapper -> {
+            int length = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < length; i++) {
+                String registryKey = wrapper.passthrough(Type.STRING);
+                if (registryKey.startsWith("minecraft:")) {
+                    registryKey = registryKey.substring(10);
+                }
+
+                RegistryType type = RegistryType.getByKey(registryKey);
+                if (type != null) {
+                    handle(wrapper, getRewriter(type), getNewTags(type));
+                } else {
+                    handle(wrapper, null, null);
                 }
             }
         };

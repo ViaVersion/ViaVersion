@@ -205,12 +205,12 @@ public class ItemRewriter {
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(itemType, coordType));
+                handler(getSpawnParticleHandler(itemType));
             }
         });
     }
 
-    public PacketHandler getSpawnParticleHandler(Type<Item> itemType, Type<?> coordType) {
+    public PacketHandler getSpawnParticleHandler(Type<Item> itemType) {
         return wrapper -> {
             int id = wrapper.get(Type.INT, 0);
             if (id == -1) return;

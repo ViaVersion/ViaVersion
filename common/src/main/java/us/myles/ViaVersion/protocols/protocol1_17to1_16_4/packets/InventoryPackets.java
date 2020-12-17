@@ -56,7 +56,7 @@ public class InventoryPackets {
                         wrapper.passthrough(Type.FLOAT); // Scale
                     }
                 });
-                handler(itemRewriter.getSpawnParticleHandler(Type.FLAT_VAR_INT_ITEM, Type.DOUBLE));
+                handler(itemRewriter.getSpawnParticleHandler(Type.FLAT_VAR_INT_ITEM));
             }
         });
     }
