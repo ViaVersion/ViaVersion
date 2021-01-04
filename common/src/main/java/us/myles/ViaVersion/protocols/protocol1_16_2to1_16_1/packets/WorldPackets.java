@@ -36,7 +36,7 @@ public class WorldPackets {
                     Chunk chunk = wrapper.read(new Chunk1_16Type());
                     wrapper.write(new Chunk1_16_2Type(), chunk);
 
-                    for (int s = 0; s < 16; s++) {
+                    for (int s = 0; s < chunk.getSections().length; s++) {
                         ChunkSection section = chunk.getSections()[s];
                         if (section == null) continue;
                         for (int i = 0; i < section.getPaletteSize(); i++) {
