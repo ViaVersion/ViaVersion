@@ -82,7 +82,7 @@ public class WorldPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     Chunk chunk = wrapper.read(new Chunk1_16_2Type());
-                    wrapper.write(new Chunk1_17Type(16), chunk);
+                    wrapper.write(new Chunk1_17Type(chunk.getSections().length), chunk);
 
                     BiomeStorage biomeStorage = wrapper.user().get(BiomeStorage.class);
                     if (chunk.isFullChunk()) {
@@ -98,7 +98,7 @@ public class WorldPackets {
                         }
                     }
 
-                    for (int s = 0; s < 16; s++) {
+                    for (int s = 0; s < chunk.getSections().length; s++) {
                         ChunkSection section = chunk.getSections()[s];
                         if (section == null) continue;
                         for (int i = 0; i < section.getPaletteSize(); i++) {

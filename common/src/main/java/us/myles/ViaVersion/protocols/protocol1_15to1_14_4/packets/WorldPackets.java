@@ -53,7 +53,7 @@ public class WorldPackets {
                             chunk.setBiomeData(newBiomeData);
                         }
 
-                        for (int s = 0; s < 16; s++) {
+                        for (int s = 0; s < chunk.getSections().length; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
                             for (int i = 0; i < section.getPaletteSize(); i++) {

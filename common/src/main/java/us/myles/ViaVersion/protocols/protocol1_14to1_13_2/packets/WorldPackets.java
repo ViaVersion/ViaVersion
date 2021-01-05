@@ -134,7 +134,7 @@ public class WorldPackets {
                         int[] motionBlocking = new int[16 * 16];
                         int[] worldSurface = new int[16 * 16];
 
-                        for (int s = 0; s < 16; s++) {
+                        for (int s = 0; s < chunk.getSections().length; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
 
