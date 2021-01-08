@@ -1,17 +1,12 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -28,6 +23,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_1
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
+import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -254,14 +250,17 @@ public class InventoryPackets {
                     if (loreEntry instanceof StringTag) {
                         String loreVal = ((StringTag) loreEntry).getValue();
                         try {
-                            // if it's a valid component, just do nothing
-                            ComponentSerializer.parse(loreVal);
-                        } catch (JsonSyntaxException ex) {
-                            // if not, then save it as plain text
-                            String jsonText = ChatRewriter.fromLegacyTextAsString(loreVal, ChatColor.WHITE, true);
-                            ((StringTag) loreEntry).setValue(jsonText);
+                            JsonElement element = GsonUtil.getJsonParser().parse(loreVal);
+                            if (element instanceof JsonObject || element instanceof JsonArray) {
+                                // just do nothing
+                                continue;
+                            }
+                        } catch (JsonSyntaxException ignore) {
+
                         }
 
+                        String jsonText = ChatRewriter.fromLegacyTextAsString(loreVal, ChatColor.WHITE, true);
+                        ((StringTag) loreEntry).setValue(jsonText);
                     }
                 }
             }
