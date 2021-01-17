@@ -53,7 +53,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_16_1 = register(736, "1.16.1");
     public static final ProtocolVersion v1_16_2 = register(751, "1.16.2");
     public static final ProtocolVersion v1_16_3 = register(753, "1.16.3");
-    public static final ProtocolVersion v1_16_4 = register(754, "1.16.4");
+    public static final ProtocolVersion v1_16_4 = register(754, "1.16.4/5", new VersionRange("1.16", 4, 5));
     public static final ProtocolVersion v1_17 = register(755, 9, "1.17");
     public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
 
