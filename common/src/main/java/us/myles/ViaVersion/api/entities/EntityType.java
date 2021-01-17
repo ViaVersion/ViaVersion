@@ -13,8 +13,9 @@ public interface EntityType {
 
     default boolean is(EntityType... types) {
         for (EntityType type : types)
-            if (is(type))
+            if (this == type) {
                 return true;
+            }
         return false;
     }
 
@@ -26,8 +27,9 @@ public interface EntityType {
         EntityType parent = this;
 
         do {
-            if (parent.equals(type))
+            if (parent == type) {
                 return true;
+            }
 
             parent = parent.getParent();
         } while (parent != null);

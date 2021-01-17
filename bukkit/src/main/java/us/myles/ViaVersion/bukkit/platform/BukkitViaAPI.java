@@ -13,7 +13,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.bukkit.util.ProtocolSupportUtil;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -33,17 +32,15 @@ public class BukkitViaAPI implements ViaAPI<Player> {
 
     @Override
     public int getPlayerVersion(UUID uuid) {
-        if (!isInjected(uuid))
-            return getExternalVersion(Bukkit.getPlayer(uuid));
-        return Via.getManager().getConnection(uuid).getProtocolInfo().getProtocolVersion();
-    }
-
-    private int getExternalVersion(Player player) {
-        if (!isProtocolSupport()) {
-            return ProtocolRegistry.SERVER_PROTOCOL;
-        } else {
-            return ProtocolSupportUtil.getProtocolVersion(player);
+        UserConnection connection = Via.getManager().getConnection(uuid);
+        if (connection == null) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && isProtocolSupport()) {
+                return ProtocolSupportUtil.getProtocolVersion(player);
+            }
+            return -1;
         }
+        return connection.getProtocolInfo().getProtocolVersion();
     }
 
     @Override

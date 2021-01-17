@@ -17,19 +17,19 @@ import java.util.UUID;
 public interface ViaAPI<T> {
 
     /**
-     * Get protocol number from a player
+     * Get protocol version number from a player.
      * Will also retrieve version from ProtocolSupport if it's being used.
      *
      * @param player Platform player object, eg. Bukkit this is Player
-     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
+     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if no longer connected
      */
     int getPlayerVersion(T player);
 
     /**
-     * Get protocol number from a player
+     * Get protocol number from a player.
      *
      * @param uuid UUID of a player
-     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1)
+     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if not connected
      */
     int getPlayerVersion(UUID uuid);
 

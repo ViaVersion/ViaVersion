@@ -2,7 +2,6 @@ package us.myles.ViaVersion.velocity.platform;
 
 import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.boss.BossBar;
@@ -10,25 +9,22 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
 public class VelocityViaAPI implements ViaAPI<Player> {
+
     @Override
     public int getPlayerVersion(Player player) {
-        if (!isInjected(player.getUniqueId()))
-            return player.getProtocolVersion().getProtocol();
-        return Via.getManager().getConnection(player.getUniqueId()).getProtocolInfo().getProtocolVersion();
+        return getPlayerVersion(player.getUniqueId());
     }
 
     @Override
     public int getPlayerVersion(UUID uuid) {
-        return getPlayerVersion(VelocityPlugin.PROXY.getPlayer(uuid).orElseThrow(NoSuchElementException::new));
-
+        UserConnection connection = Via.getManager().getConnection(uuid);
+        return connection != null ? connection.getProtocolInfo().getProtocolVersion() : -1;
     }
 
     @Override

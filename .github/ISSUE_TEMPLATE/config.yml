@@ -1,1 +1,5 @@
 blank_issues_enabled: false
+contact_links:
+  - name: ViaVersion Discord Server
+    url: https://discord.gg/casfFyh
+    about: You can also join the Via Discord server for help with smaller issues during setup.

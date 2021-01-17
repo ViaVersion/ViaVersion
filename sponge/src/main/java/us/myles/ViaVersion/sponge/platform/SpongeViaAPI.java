@@ -9,7 +9,6 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -24,9 +23,8 @@ public class SpongeViaAPI implements ViaAPI<Player> {
 
     @Override
     public int getPlayerVersion(UUID uuid) {
-        if (!isInjected(uuid))
-            return ProtocolRegistry.SERVER_PROTOCOL;
-        return Via.getManager().getConnection(uuid).getProtocolInfo().getProtocolVersion();
+        UserConnection connection = Via.getManager().getConnection(uuid);
+        return connection != null ? connection.getProtocolInfo().getProtocolVersion() : -1;
     }
 
     @Override
