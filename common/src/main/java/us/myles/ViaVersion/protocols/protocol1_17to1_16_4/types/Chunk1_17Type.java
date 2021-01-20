@@ -13,6 +13,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_16;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 public class Chunk1_17Type extends Type<Chunk> {
@@ -30,7 +31,7 @@ public class Chunk1_17Type extends Type<Chunk> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        int sectionsMask = Type.VAR_INT.readPrimitive(input);
+        BitSet sectionsMask = BitSet.valueOf(Type.LONG_ARRAY_PRIMITIVE.read(input));
         CompoundTag heightMap = Type.NBT.read(input);
 
         int[] biomeData = Type.VAR_INT_ARRAY_PRIMITIVE.read(input);
@@ -40,7 +41,7 @@ public class Chunk1_17Type extends Type<Chunk> {
         // Read sections
         ChunkSection[] sections = new ChunkSection[ySectionCount];
         for (int i = 0; i < ySectionCount; i++) {
-            if ((sectionsMask & (1 << i)) == 0) continue; // Section not set
+            if (!sectionsMask.get(i)) continue; // Section not set
 
             short nonAirBlocksCount = input.readShort();
             ChunkSection section = Types1_16.CHUNK_SECTION.read(input);
@@ -66,7 +67,7 @@ public class Chunk1_17Type extends Type<Chunk> {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
-        Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
+        Type.LONG_ARRAY_PRIMITIVE.write(output, chunk.getChunkMask().toLongArray());
         Type.NBT.write(output, chunk.getHeightMap());
 
         // Write biome data
