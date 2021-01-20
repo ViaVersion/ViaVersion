@@ -77,6 +77,11 @@ public class BaseChunk implements Chunk {
     }
 
     @Override
+    public void setBitmask(int bitmask) {
+        this.bitmask = bitmask;
+    }
+
+    @Override
     @Nullable
     public BitSet getChunkMask() {
         return chunkSectionBitSet;

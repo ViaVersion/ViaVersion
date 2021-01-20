@@ -37,6 +37,8 @@ public interface Chunk {
      */
     int getBitmask();
 
+    void setBitmask(int bitmask);
+
     /**
      * @return chunk section bit mask, only non-null available for 1.17+ chunks
      * @see #getBitmask()
