@@ -156,7 +156,7 @@ public class Entity1_17Types {
 
         ABSTRACT_WATERMOB(-1, ABSTRACT_INSENTIENT),
         SQUID(84, ABSTRACT_WATERMOB),
-        GLOW_SQUID(32, SQUID),
+        GLOW_SQUID(33, SQUID),
 
         // Slimes
         SLIME(78, ABSTRACT_INSENTIENT),
