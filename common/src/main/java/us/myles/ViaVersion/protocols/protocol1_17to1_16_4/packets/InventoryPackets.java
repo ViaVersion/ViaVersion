@@ -33,32 +33,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.SPAWN_PARTICLE, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // Particle id
-                map(Type.BOOLEAN); // Long distance
-                map(Type.DOUBLE); // X
-                map(Type.DOUBLE); // Y
-                map(Type.DOUBLE); // Z
-                map(Type.FLOAT); // Offset X
-                map(Type.FLOAT); // Offset Y
-                map(Type.FLOAT); // Offset Z
-                map(Type.FLOAT); // Particle data
-                map(Type.INT); // Particle count
-                handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    if (id == 14) { // Dust
-                        // RGB now written as doubles
-                        wrapper.write(Type.DOUBLE, wrapper.read(Type.FLOAT).doubleValue()); // R
-                        wrapper.write(Type.DOUBLE, wrapper.read(Type.FLOAT).doubleValue()); // G
-                        wrapper.write(Type.DOUBLE, wrapper.read(Type.FLOAT).doubleValue()); // B
-                        wrapper.passthrough(Type.FLOAT); // Scale
-                    }
-                });
-                handler(itemRewriter.getSpawnParticleHandler(Type.FLAT_VAR_INT_ITEM));
-            }
-        });
+        itemRewriter.registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
 
     public static void toClient(Item item) {
