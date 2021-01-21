@@ -41,6 +41,15 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
                 metadata.setId(metadata.getId() + 1); // Ticks frozen added with id 7
             }
         }
+
+        if (type == Entity1_17Types.EntityType.SHULKER) {
+            // Attachment position removed
+            if (metadata.getId() == 16) {
+                metadatas.remove(metadata);
+            } else if (metadata.getId() > 16) {
+                metadata.setId(metadata.getId() - 1);
+            }
+        }
     }
 
     @Override
