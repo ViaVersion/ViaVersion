@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4;
+package us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5;
 
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 

@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage;
+package us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.storage;
 
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.StoredObject;

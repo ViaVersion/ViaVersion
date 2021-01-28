@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4;
+package us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5;
 
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.MappingData;
@@ -12,20 +12,20 @@ import us.myles.ViaVersion.api.rewriters.TagRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.metadata.MetadataRewriter1_17To1_16_4;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.packets.EntityPackets;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.packets.WorldPackets;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.storage.BiomeStorage;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.storage.EntityTracker1_17;
 
-public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
+public class Protocol1_17To1_16_4_5 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
 
     public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17", true);
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_stepping_carefully", "minecraft:vibrations"};
     private TagRewriter tagRewriter;
 
-    public Protocol1_17To1_16_4() {
+    public Protocol1_17To1_16_4_5() {
         super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_16_2.class);
     }
 

@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.metadata;
+package us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.metadata;
 
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
@@ -9,15 +9,15 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_17;
 import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.Protocol1_17To1_16_4_5;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.packets.InventoryPackets;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.storage.EntityTracker1_17;
 
 import java.util.List;
 
 public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
 
-    public MetadataRewriter1_17To1_16_4(Protocol1_17To1_16_4 protocol) {
+    public MetadataRewriter1_17To1_16_4(Protocol1_17To1_16_4_5 protocol) {
         super(protocol, EntityTracker1_17.class);
         mapTypes(Entity1_16_2Types.EntityType.values(), Entity1_17Types.EntityType.class);
     }

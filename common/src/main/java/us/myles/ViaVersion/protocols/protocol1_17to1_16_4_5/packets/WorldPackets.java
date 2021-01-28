@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets;
+package us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
@@ -15,10 +15,10 @@ import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.Protocol1_17To1_16_4_5;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.storage.BiomeStorage;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.storage.EntityTracker1_17;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.types.Chunk1_17Type;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -26,7 +26,7 @@ import java.util.List;
 
 public class WorldPackets {
 
-    public static void register(Protocol1_17To1_16_4 protocol) {
+    public static void register(Protocol1_17To1_16_4_5 protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_16_2.BLOCK_ACTION);

@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets;
+package us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.packets;
 
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -7,11 +7,11 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4_5.Protocol1_17To1_16_4_5;
 
 public class InventoryPackets {
 
-    public static void register(Protocol1_17To1_16_4 protocol) {
+    public static void register(Protocol1_17To1_16_4_5 protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
         itemRewriter.registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
@@ -38,12 +38,12 @@ public class InventoryPackets {
     public static void toClient(Item item) {
         if (item == null) return;
 
-        item.setIdentifier(Protocol1_17To1_16_4.MAPPINGS.getNewItemId(item.getIdentifier()));
+        item.setIdentifier(Protocol1_17To1_16_4_5.MAPPINGS.getNewItemId(item.getIdentifier()));
     }
 
     public static void toServer(Item item) {
         if (item == null) return;
 
-        item.setIdentifier(Protocol1_17To1_16_4.MAPPINGS.getOldItemId(item.getIdentifier()));
+        item.setIdentifier(Protocol1_17To1_16_4_5.MAPPINGS.getOldItemId(item.getIdentifier()));
     }
 }
