@@ -25,8 +25,8 @@ public class Effect {
         addRewrite(1020, 1029); //Anvil break
         addRewrite(1021, 1030); //Anvil use
         addRewrite(1022, 1031); //Anvil land
-        addRewrite(1013, 1023);
-        addRewrite(1018, 1028);
+        addRewrite(1013, 1023); //Wither spawn
+        addRewrite(1018, 1028); //EnderDragon end
     }
 
     public static int getNewId(int id) {
