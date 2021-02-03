@@ -22,7 +22,7 @@ import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1
 public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
 
     public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17", true);
-    private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_stepping_carefully", "minecraft:vibrations"};
+    private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
@@ -112,9 +112,12 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
                 "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
-                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks");
+                "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks",
+                "azalea_log_replaceable", "cave_vines", "lush_plants_replaceable");
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs", "minecraft:axolotl_always_hostiles", "minecraft:axolotl_tempted_hostiles");
+
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
+        tagRewriter.addTag(RegistryType.ITEM, "minecraft:fox_food", 948);
     }
 
     @Override
