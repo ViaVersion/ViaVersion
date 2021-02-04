@@ -24,6 +24,64 @@ public class PlayerPackets {
             }
         });
 
+        protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_COMMANDS, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int size = wrapper.passthrough(Type.VAR_INT); // Size
+                        for (int i = 0; i < size; i++) { // Nodes
+                            byte flags = wrapper.passthrough(Type.BYTE); // Flags
+                            wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); //children
+                            if ((flags & 0x08) != 0) {
+                                wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                            }
+                            byte nodeType = (byte) (flags & 0x03);
+                            if (nodeType == 1 || nodeType == 2) { // Name for literal and argument nodes
+                                wrapper.passthrough(Type.STRING); // Name
+                            }
+                            if (nodeType == 2) {
+                                String parser = wrapper.read(Type.STRING); // Parser
+                                if (parser.equals("minecraft:nbt")) {
+                                    parser = "minecraft:nbt_compound_tag";
+                                }
+                                wrapper.write(Type.STRING, parser);
+                                switch (parser) {
+                                    case "brigadier:double":
+                                        byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+                                        if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.DOUBLE); // Min Value
+                                        if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.DOUBLE); // Max Value
+                                        break;
+                                    case "brigadier:float":
+                                        propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+                                        if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.FLOAT); // Min Value
+                                        if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.FLOAT); // Max Value
+                                        break;
+                                    case "brigadier:integer":
+                                        propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+                                        if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.INT); // Min Value
+                                        if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.INT); // Max Value
+                                        break;
+                                    case "brigadier:string":
+                                        wrapper.passthrough(Type.VAR_INT); // Flags
+                                        break;
+                                    case "minecraft:entity":
+                                    case "minecraft:score_holder":
+                                        wrapper.passthrough(Type.BYTE); // Flags
+                                        break;
+                                }
+                            }
+                            if ((flags & 0x10) != 0) {
+                                wrapper.passthrough(Type.STRING); // Suggestion type
+                            }
+                        }
+                        wrapper.passthrough(Type.VAR_INT); // Root node index
+                    }
+                });
+            }
+        });
+
         protocol.registerIncoming(ServerboundPackets1_14.QUERY_BLOCK_NBT, new PacketRemapper() {
             @Override
             public void registerMap() {
