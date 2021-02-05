@@ -12,6 +12,7 @@ import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.CommandRewriter1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.ComponentRewriter1_14;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.MappingData;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
@@ -44,6 +45,9 @@ public class Protocol1_14To1_13_2 extends Protocol<ClientboundPackets1_13, Clien
 
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
         componentRewriter.registerChatMessage(ClientboundPackets1_13.CHAT_MESSAGE);
+
+        CommandRewriter1_14 commandRewriter = new CommandRewriter1_14(this);
+        commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);
 
         registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
             @Override
