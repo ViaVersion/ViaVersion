@@ -21,55 +21,34 @@ public abstract class CommandRewriter {
         this.protocol = protocol;
 
         // Register default parsers
-        this.parserHandlers.put("brigadier:double", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-                if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.DOUBLE); // Min Value
-                if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.DOUBLE); // Max Value
-            }
+        this.parserHandlers.put("brigadier:double", wrapper -> {
+            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.DOUBLE); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.DOUBLE); // Max Value
         });
-        this.parserHandlers.put("brigadier:float", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-                if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.FLOAT); // Min Value
-                if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.FLOAT); // Max Value
-            }
+        this.parserHandlers.put("brigadier:float", wrapper -> {
+            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.FLOAT); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.FLOAT); // Max Value
         });
-        this.parserHandlers.put("brigadier:integer", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-                if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.INT); // Min Value
-                if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.INT); // Max Value
-            }
+        this.parserHandlers.put("brigadier:integer", wrapper -> {
+            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.INT); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.INT); // Max Value
         });
-        this.parserHandlers.put("brigadier:long", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-                if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.LONG); // Min Value
-                if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.LONG); // Max Value
-            }
+        this.parserHandlers.put("brigadier:long", wrapper -> {
+            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.LONG); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.LONG); // Max Value
         });
-        this.parserHandlers.put("brigadier:string", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                wrapper.passthrough(Type.VAR_INT); // Flags
-            }
+        this.parserHandlers.put("brigadier:string", wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Flags
         });
-        this.parserHandlers.put("minecraft:entity", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                wrapper.passthrough(Type.BYTE); // Flags
-            }
+        this.parserHandlers.put("minecraft:entity", wrapper -> {
+            wrapper.passthrough(Type.BYTE); // Flags
         });
-        this.parserHandlers.put("minecraft:score_holder", new CommandArgumentConsumer() {
-            @Override
-            public void accept(PacketWrapper wrapper) throws Exception {
-                wrapper.passthrough(Type.BYTE); // Flags
-            }
+        this.parserHandlers.put("minecraft:score_holder", wrapper -> {
+            wrapper.passthrough(Type.BYTE); // Flags
         });
     }
 
@@ -99,11 +78,14 @@ public abstract class CommandRewriter {
                         }
 
                         if (nodeType == 2) { // Argument node
-                            String argumentType = handleArgumentType(wrapper.read(Type.STRING));
-                            if (argumentType != null) {
-                                wrapper.write(Type.STRING, argumentType);
-                                handleArgument(wrapper, argumentType);
+                            String argumentType = wrapper.read(Type.STRING);
+                            String newArgumentType = handleArgumentType(argumentType);
+                            if (newArgumentType != null) {
+                                wrapper.write(Type.STRING, newArgumentType);
                             }
+
+                            // Always call the handler using the previous name
+                            handleArgument(wrapper, argumentType);
                         }
 
                         if ((flags & 0x10) != 0) {
