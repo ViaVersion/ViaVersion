@@ -39,7 +39,7 @@ public class EntityTracker1_9 extends EntityTracker {
     private final Set<Integer> validBlocking = Sets.newConcurrentHashSet();
     private final Set<Integer> knownHolograms = Sets.newConcurrentHashSet();
     private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
-            .maximumSize(10)
+            .maximumSize(1000)
             .expireAfterAccess(250, TimeUnit.MILLISECONDS)
             .<Position, Boolean>build()
             .asMap());
