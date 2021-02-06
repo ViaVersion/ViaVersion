@@ -326,11 +326,18 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Position position = wrapper.get(Type.POSITION, 0);
+                        short x = wrapper.get(Type.UNSIGNED_BYTE, 1);
+                        short y = wrapper.get(Type.UNSIGNED_BYTE, 2);
+                        short z = wrapper.get(Type.UNSIGNED_BYTE, 3);
+
                         PlaceBlockTracker tracker = wrapper.user().get(PlaceBlockTracker.class);
-                        if (tracker.getLastPlacedPosition() != null && tracker.getLastPlacedPosition().equals(position) && !tracker.isExpired(50))
+                        if (tracker == null) return;
+                        if (!tracker.isExpired(5) && tracker.isSame(position, x, y, z)) {
                             wrapper.cancel();
+                            return;
+                        }
                         tracker.updateTime();
-                        tracker.setLastPlacedPosition(position);
+                        tracker.setLastPlacedPosition(position, x, y, z);
                     }
                 });
 

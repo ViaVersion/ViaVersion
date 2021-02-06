@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 public class PlaceBlockTracker extends StoredObject {
     private long lastPlaceTimestamp = 0;
     private Position lastPlacedPosition = null;
+    private short x = -1, y = -1, z = -1;
 
     public PlaceBlockTracker(UserConnection user) {
         super(user);
@@ -29,15 +30,35 @@ public class PlaceBlockTracker extends StoredObject {
         lastPlaceTimestamp = System.currentTimeMillis();
     }
 
-    public long getLastPlaceTimestamp() {
-        return lastPlaceTimestamp;
+    /**
+     * Checks if the place clicked the same block again
+     *
+     * @param lastPlacedPosition the last placed position
+     * @param x the x position of the crosshair
+     * @param y the y position of the crosshair
+     * @param z the z position of the crosshair
+     * @return True if the block is the same as the stored block
+     */
+    public boolean isSame(Position lastPlacedPosition, short x, short y, short z) {
+        return lastPlacedPosition.equals(this.lastPlacedPosition)
+                && x == this.x
+                && y == this.y
+                && z == this.z;
     }
 
-    public Position getLastPlacedPosition() {
-        return lastPlacedPosition;
-    }
-
-    public void setLastPlacedPosition(Position lastPlacedPosition) {
+    /**
+     * Sets the last placed block position and face
+     *
+     * @param lastPlacedPosition the block position the player just placed a block at
+     * @param x the x position of the crosshair
+     * @param y the y position of the crosshair
+     * @param z the z position of the crosshair
+     */
+    public void setLastPlacedPosition(Position lastPlacedPosition, short x, short y, short z) {
         this.lastPlacedPosition = lastPlacedPosition;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
+
 }
