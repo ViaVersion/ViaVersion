@@ -35,8 +35,9 @@ public class SpongeEncodeHandler extends MessageToByteEncoder<Object> implements
                     throw (Error) e.getCause();
                 }
             }
+        } else {
+            bytebuf.writeBytes((ByteBuf) o)
         }
-
         transform(bytebuf);
     }
 
