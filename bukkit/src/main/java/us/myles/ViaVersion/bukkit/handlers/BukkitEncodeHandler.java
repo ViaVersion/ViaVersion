@@ -56,7 +56,7 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHand
             }
             
         } else {
-            bytebuf.clear().writeBytes((ByteBuf) o);
+            bytebuf.writeBytes((ByteBuf) o);
         }
         transform(bytebuf);
     }
