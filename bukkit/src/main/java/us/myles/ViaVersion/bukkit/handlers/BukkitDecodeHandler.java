@@ -31,25 +31,17 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
             throw CancelDecoderException.generate(null);
         }
 
-        ByteBuf transformedBuf = null;
-        try {
-            if (info.shouldTransformPacket()) {
-                transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
-                info.transformIncoming(transformedBuf, CancelDecoderException::generate);
-            }
+        if (info.shouldTransformPacket()) {
+            info.transformIncoming(bytebuf, CancelDecoderException::generate);
+        }
 
-            try {
-                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, transformedBuf == null ? bytebuf : transformedBuf));
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                } else if (e.getCause() instanceof Error) {
-                    throw (Error) e.getCause();
-                }
-            }
-        } finally {
-            if (transformedBuf != null) {
-                transformedBuf.release();
+        try {
+            list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, bytebuf));
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof Exception) {
+                throw (Exception) e.getCause();
+            } else if (e.getCause() instanceof Error) {
+                throw (Error) e.getCause();
             }
         }
     }
