@@ -26,6 +26,7 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
+      if (bytebuf.readableBytes() != 0) {
         if (!info.checkIncomingPacket()) {
             bytebuf.clear(); // Don't accumulate
             throw CancelDecoderException.generate(null);
@@ -44,7 +45,8 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
                 throw (Error) e.getCause();
             }
         }
-    }
+     }
+  }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
