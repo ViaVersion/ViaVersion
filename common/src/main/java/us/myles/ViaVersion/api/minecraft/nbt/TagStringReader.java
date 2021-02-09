@@ -303,6 +303,10 @@ import java.util.stream.IntStream;
             return true;
         }
         this.buffer.expect(Tokens.VALUE_SEPARATOR);
+        if (this.buffer.skipWhitespace().peek() == endCharacter) {
+            this.buffer.take();
+            return true;
+        }
         return false;
     }
 
