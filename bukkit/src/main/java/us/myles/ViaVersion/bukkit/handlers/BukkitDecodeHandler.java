@@ -26,6 +26,10 @@ public class BukkitDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
+      if (bytebuf.capacity() < 0) {
+          ctx.close();
+          return;
+      }
       if (bytebuf.readableBytes() != 0) {
         if (!info.checkIncomingPacket()) {
             bytebuf.clear(); // Don't accumulate
