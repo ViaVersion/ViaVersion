@@ -14,7 +14,7 @@ public class BaseChunk implements Chunk {
     protected boolean ignoreOldLightData;
     protected BitSet chunkSectionBitSet;
     protected int bitmask;
-    protected final ChunkSection[] sections;
+    protected ChunkSection[] sections;
     protected int[] biomeData;
     protected CompoundTag heightMap;
     protected final List<CompoundTag> blockEntities;
@@ -95,6 +95,11 @@ public class BaseChunk implements Chunk {
     @Override
     public ChunkSection[] getSections() {
         return sections;
+    }
+
+    @Override
+    public void setSections(ChunkSection[] sections) {
+        this.sections = sections;
     }
 
     @Override

@@ -50,6 +50,8 @@ public interface Chunk {
 
     ChunkSection[] getSections();
 
+    void setSections(ChunkSection[] sections);
+
     @Nullable
     int[] getBiomeData();
 
