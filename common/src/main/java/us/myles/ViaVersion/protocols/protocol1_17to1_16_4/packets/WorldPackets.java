@@ -98,7 +98,7 @@ public class WorldPackets {
                             chunk.setBiomeData(biomes);
                         } else {
                             Via.getPlatform().getLogger().warning("Biome data not found for chunk at " + chunk.getX() + ", " + chunk.getZ());
-                            chunk.setBiomeData(new int[1024]);
+                            chunk.setBiomeData(new int[chunk.getSections().length * 64]);
                         }
                     }
 
