@@ -27,7 +27,7 @@ public class EntityPackets {
                 map(Type.DOUBLE);
                 map(Type.FLOAT);
                 map(Type.FLOAT);
-                map(Type.UNSIGNED_BYTE);
+                map(Type.BYTE);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
                     // Dismount vehicle
