@@ -248,6 +248,6 @@ public class ProtocolVersion {
 
     @Override
     public String toString() {
-        return String.format("%s(%d)", this.name, this.version);
+        return String.format("%s (%d)", this.name, this.version);
     }
 }
