@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-// TODO auto generate 18w11a with PAaaS
 public class Entity1_13Types {
 
     public static EntityType getTypeFromId(int typeID, boolean isObject) {

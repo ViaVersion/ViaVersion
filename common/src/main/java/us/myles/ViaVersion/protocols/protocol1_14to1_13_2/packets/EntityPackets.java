@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_13Types;
 import us.myles.ViaVersion.api.entities.Entity1_14Types;
+import us.myles.ViaVersion.api.entities.EntityType;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
@@ -50,37 +51,37 @@ public class EntityPackets {
 
                         Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
                         typeId = metadataRewriter.getNewEntityId(type1_13.getId());
-                        Entity1_14Types.EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
+                        EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
 
                         if (type1_14 != null) {
                             int data = wrapper.get(Type.INT, 0);
-                            if (type1_14.is(Entity1_14Types.EntityType.FALLING_BLOCK)) {
+                            if (type1_14.is(Entity1_14Types.FALLING_BLOCK)) {
                                 wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                            } else if (type1_14.is(Entity1_14Types.EntityType.MINECART)) {
+                            } else if (type1_14.is(Entity1_14Types.MINECART)) {
                                 // default is 0 = rideable minecart
                                 switch (data) {
                                     case 1:
-                                        typeId = Entity1_14Types.EntityType.CHEST_MINECART.getId();
+                                        typeId = Entity1_14Types.CHEST_MINECART.getId();
                                         break;
                                     case 2:
-                                        typeId = Entity1_14Types.EntityType.FURNACE_MINECART.getId();
+                                        typeId = Entity1_14Types.FURNACE_MINECART.getId();
                                         break;
                                     case 3:
-                                        typeId = Entity1_14Types.EntityType.TNT_MINECART.getId();
+                                        typeId = Entity1_14Types.TNT_MINECART.getId();
                                         break;
                                     case 4:
-                                        typeId = Entity1_14Types.EntityType.SPAWNER_MINECART.getId();
+                                        typeId = Entity1_14Types.SPAWNER_MINECART.getId();
                                         break;
                                     case 5:
-                                        typeId = Entity1_14Types.EntityType.HOPPER_MINECART.getId();
+                                        typeId = Entity1_14Types.HOPPER_MINECART.getId();
                                         break;
                                     case 6:
-                                        typeId = Entity1_14Types.EntityType.COMMAND_BLOCK_MINECART.getId();
+                                        typeId = Entity1_14Types.COMMAND_BLOCK_MINECART.getId();
                                         break;
                                 }
-                            } else if ((type1_14.is(Entity1_14Types.EntityType.ITEM) && data > 0)
-                                    || type1_14.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
-                                if (type1_14.isOrHasParent(Entity1_14Types.EntityType.ABSTRACT_ARROW)) {
+                            } else if ((type1_14.is(Entity1_14Types.ITEM) && data > 0)
+                                    || type1_14.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
+                                if (type1_14.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
                                     wrapper.set(Type.INT, 0, data - 1);
                                 }
                                 // send velocity in separate packet, 1.14 is now ignoring the velocity
@@ -146,7 +147,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_14.METADATA_LIST, Entity1_14Types.EntityType.PLAYER));
+                handler(metadataRewriter.getTrackerAndRewriter(Types1_14.METADATA_LIST, Entity1_14Types.PLAYER));
             }
         });
 

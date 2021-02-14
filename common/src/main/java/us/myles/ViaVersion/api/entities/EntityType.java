@@ -4,8 +4,14 @@ import org.jetbrains.annotations.Nullable;
 
 public interface EntityType {
 
+    /**
+     * @return entity id
+     */
     int getId();
 
+    /**
+     * @return parent entity type if present
+     */
     @Nullable
     EntityType getParent();
 
@@ -23,6 +29,10 @@ public interface EntityType {
         return this == type;
     }
 
+    /**
+     * @param type entity type to check against
+     * @return true if the current type is equal to the given type, or has it as a parent type
+     */
     default boolean isOrHasParent(EntityType type) {
         EntityType parent = this;
 

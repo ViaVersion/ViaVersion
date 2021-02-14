@@ -288,7 +288,7 @@ public class WorldPackets {
 
                         int entityId = wrapper.get(Type.INT, 0);
 
-                        Entity1_14Types.EntityType entType = Entity1_14Types.EntityType.PLAYER;
+                        Entity1_14Types entType = Entity1_14Types.PLAYER;
                         // Register Type ID
                         EntityTracker1_14 tracker = wrapper.user().get(EntityTracker1_14.class);
                         tracker.addEntity(entityId, entType);

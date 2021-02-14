@@ -19,7 +19,7 @@ public class MetadataRewriter1_16_2To1_16_1 extends MetadataRewriter {
 
     public MetadataRewriter1_16_2To1_16_1(Protocol1_16_2To1_16_1 protocol) {
         super(protocol, EntityTracker1_16_2.class);
-        mapTypes(Entity1_16Types.EntityType.values(), Entity1_16_2Types.EntityType.class);
+        mapTypes(Entity1_16Types.values(), Entity1_16_2Types.class);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class MetadataRewriter1_16_2To1_16_1 extends MetadataRewriter {
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_16_2Types.EntityType.ABSTRACT_PIGLIN)) {
+        if (type.isOrHasParent(Entity1_16_2Types.ABSTRACT_PIGLIN)) {
             if (metadata.getId() == 15) {
                 metadata.setId(16);
             } else if (metadata.getId() == 16) {
