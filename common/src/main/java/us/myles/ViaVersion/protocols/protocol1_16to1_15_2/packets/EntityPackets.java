@@ -135,10 +135,10 @@ public class EntityPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     int entityId = wrapper.passthrough(Type.VAR_INT);
-                    wrapper.user().get(EntityTracker1_16.class).addEntity(entityId, Entity1_16Types.EntityType.LIGHTNING_BOLT);
+                    wrapper.user().get(EntityTracker1_16.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
 
                     wrapper.write(Type.UUID, UUID.randomUUID()); // uuid
-                    wrapper.write(Type.VAR_INT, Entity1_16Types.EntityType.LIGHTNING_BOLT.getId()); // entity type
+                    wrapper.write(Type.VAR_INT, Entity1_16Types.LIGHTNING_BOLT.getId()); // entity type
 
                     wrapper.read(Type.BYTE); // remove type
 
@@ -155,9 +155,9 @@ public class EntityPackets {
             }
         });
 
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.EntityType.FALLING_BLOCK);
+        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, Entity1_16Types.EntityType.PLAYER);
+        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, Entity1_16Types.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST);
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_15.DESTROY_ENTITIES);
 
@@ -192,7 +192,7 @@ public class EntityPackets {
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Max players
                 handler(wrapper -> {
-                    wrapper.user().get(EntityTracker1_16.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.EntityType.PLAYER);
+                    wrapper.user().get(EntityTracker1_16.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.PLAYER);
 
                     final String type = wrapper.read(Type.STRING);// level type
                     wrapper.passthrough(Type.VAR_INT); // View distance

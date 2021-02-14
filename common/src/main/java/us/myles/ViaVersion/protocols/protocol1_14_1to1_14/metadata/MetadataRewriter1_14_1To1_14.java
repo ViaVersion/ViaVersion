@@ -20,7 +20,7 @@ public class MetadataRewriter1_14_1To1_14 extends MetadataRewriter {
     public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         if (type == null) return;
 
-        if (type == Entity1_14Types.EntityType.VILLAGER || type == Entity1_14Types.EntityType.WANDERING_TRADER) {
+        if (type == Entity1_14Types.VILLAGER || type == Entity1_14Types.WANDERING_TRADER) {
             if (metadata.getId() >= 15) {
                 metadata.setId(metadata.getId() + 1);
             }

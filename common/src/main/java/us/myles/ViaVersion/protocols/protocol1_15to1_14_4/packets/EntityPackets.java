@@ -18,7 +18,7 @@ public class EntityPackets {
     public static void register(Protocol1_15To1_14_4 protocol) {
         MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
 
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_14.SPAWN_ENTITY, Entity1_15Types.EntityType.FALLING_BLOCK);
+        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_14.SPAWN_ENTITY, Entity1_15Types.FALLING_BLOCK);
 
         protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_MOB, new PacketRemapper() {
             @Override
@@ -62,7 +62,7 @@ public class EntityPackets {
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
-                    Entity1_15Types.EntityType entityType = Entity1_15Types.EntityType.PLAYER;
+                    Entity1_15Types entityType = Entity1_15Types.PLAYER;
                     wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
 
                     List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);

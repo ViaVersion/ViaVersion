@@ -2,7 +2,7 @@ package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_14Types.EntityType;
+import us.myles.ViaVersion.api.entities.Entity1_14Types;
 import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
@@ -21,7 +21,7 @@ public class EntityTracker1_14 extends EntityTracker {
     private int chunkCenterX, chunkCenterZ;
 
     public EntityTracker1_14(UserConnection user) {
-        super(user, EntityType.PLAYER);
+        super(user, Entity1_14Types.PLAYER);
     }
 
     @Override

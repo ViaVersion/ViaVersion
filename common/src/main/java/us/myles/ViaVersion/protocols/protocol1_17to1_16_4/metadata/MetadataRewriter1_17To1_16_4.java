@@ -19,7 +19,7 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
 
     public MetadataRewriter1_17To1_16_4(Protocol1_17To1_16_4 protocol) {
         super(protocol, EntityTracker1_17.class);
-        mapTypes(Entity1_16_2Types.EntityType.values(), Entity1_17Types.EntityType.class);
+        mapTypes(Entity1_16_2Types.values(), Entity1_17Types.class);
     }
 
     @Override
@@ -36,13 +36,13 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_17Types.EntityType.ENTITY)) {
+        if (type.isOrHasParent(Entity1_17Types.ENTITY)) {
             if (metadata.getId() >= 7) {
                 metadata.setId(metadata.getId() + 1); // Ticks frozen added with id 7
             }
         }
 
-        if (type == Entity1_17Types.EntityType.SHULKER) {
+        if (type == Entity1_17Types.SHULKER) {
             // Attachment position removed
             if (metadata.getId() == 16) {
                 metadatas.remove(metadata);

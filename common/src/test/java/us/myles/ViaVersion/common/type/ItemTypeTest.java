@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.common.test.type;
+package us.myles.ViaVersion.common.type;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

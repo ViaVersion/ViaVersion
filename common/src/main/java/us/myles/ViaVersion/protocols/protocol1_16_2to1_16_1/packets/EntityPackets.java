@@ -15,9 +15,9 @@ public class EntityPackets {
 
     public static void register(Protocol1_16_2To1_16_1 protocol) {
         MetadataRewriter1_16_2To1_16_1 metadataRewriter = protocol.get(MetadataRewriter1_16_2To1_16_1.class);
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, Entity1_16_2Types.EntityType.FALLING_BLOCK);
+        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, Entity1_16_2Types.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, Entity1_16_2Types.EntityType.PLAYER);
+        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, Entity1_16_2Types.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.ENTITY_METADATA, Types1_14.METADATA_LIST);
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_16.DESTROY_ENTITIES);
 
@@ -48,7 +48,7 @@ public class EntityPackets {
                 map(Type.UNSIGNED_BYTE, Type.VAR_INT); // Max players
                 // ...
                 handler(wrapper -> {
-                    wrapper.user().get(EntityTracker1_16_2.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16_2Types.EntityType.PLAYER);
+                    wrapper.user().get(EntityTracker1_16_2.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16_2Types.PLAYER);
                 });
             }
         });

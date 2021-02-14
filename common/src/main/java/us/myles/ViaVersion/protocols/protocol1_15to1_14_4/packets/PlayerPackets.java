@@ -30,7 +30,7 @@ public class PlayerPackets {
                     // Register Type ID
                     EntityTracker1_15 tracker = wrapper.user().get(EntityTracker1_15.class);
                     int entityId = wrapper.get(Type.INT, 0);
-                    tracker.addEntity(entityId, Entity1_15Types.EntityType.PLAYER);
+                    tracker.addEntity(entityId, Entity1_15Types.PLAYER);
                 });
                 create(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
 

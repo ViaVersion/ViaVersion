@@ -141,7 +141,7 @@ public class WorldPackets {
 
                     UserConnection user = wrapper.user();
                     user.get(BiomeStorage.class).setWorld(world);
-                    user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.EntityType.PLAYER);
+                    user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.PLAYER);
                 });
             }
         });
