@@ -1,10 +1,6 @@
 package us.myles.ViaVersion.api.entities;
 
-import us.myles.ViaVersion.api.Via;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import us.myles.ViaVersion.util.EntityTypeUtil;
 
 public enum Entity1_16_2Types implements EntityType {
 
@@ -218,23 +214,10 @@ public enum Entity1_16_2Types implements EntityType {
     }
 
     static {
-        List<Entity1_16_2Types> types = new ArrayList<>();
-        for (Entity1_16_2Types type : values()) {
-            if (type.id != -1) {
-                types.add(type);
-            }
-        }
-
-        types.sort(Comparator.comparingInt(Entity1_16_2Types::getId));
-        TYPES = types.toArray(new EntityType[0]);
+        TYPES = EntityTypeUtil.toOrderedArray(values());
     }
 
-    public static us.myles.ViaVersion.api.entities.EntityType getTypeFromId(int typeId) {
-        EntityType type;
-        if (typeId < 0 || typeId >= TYPES.length || (type = TYPES[typeId]) == null) {
-            Via.getPlatform().getLogger().severe("Could not find 1.16.2 type id " + typeId);
-            return ENTITY;
-        }
-        return type;
+    public static EntityType getTypeFromId(int typeId) {
+        return EntityTypeUtil.getTypeFromId(TYPES, typeId, ENTITY);
     }
 }
