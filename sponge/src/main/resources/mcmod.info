@@ -2,8 +2,8 @@
     {
         "modid": "viaversion",
         "name": "ViaVersion",
-        "version": "${project.version}",
-        "description": "${project.description}",
+        "version": "${version}",
+        "description": "${description}",
         "authorList": [
             "_MylesC",
             "creeper123123321",

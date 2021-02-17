@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "viaversion",
   "name": "ViaVersion",
-  "version": "${project.version}",
-  "description": "${project.description}",
+  "version": "${version}",
+  "description": "${description}",
   "license": "MIT",
   "contact": {
     "homepage": "https://viaversion.com/",

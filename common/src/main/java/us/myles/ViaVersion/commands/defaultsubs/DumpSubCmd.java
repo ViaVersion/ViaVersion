@@ -44,7 +44,7 @@ public class DumpSubCmd extends ViaSubCommand {
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion(),
-                ViaManager.class.getPackage().getImplementationVersion(),
+                "$IMPL_VERSION",
                 Via.getManager().getSubPlatforms()
         );
 
