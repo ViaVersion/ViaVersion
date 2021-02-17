@@ -23,7 +23,7 @@ import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.velocity.VersionInfo;
+import us.myles.ViaVersion.util.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
 import us.myles.ViaVersion.velocity.command.VelocityCommandSender;
 import us.myles.ViaVersion.velocity.platform.*;

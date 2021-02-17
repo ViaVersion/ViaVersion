@@ -1,0 +1,21 @@
+rootProject.name = "viaversion-parent"
+
+include(":viaversion")
+include(":viaversion-common")
+include(":viaversion-bukkit")
+include(":viaversion-bukkit-legacy")
+include(":viaversion-bungee")
+include(":viaversion-velocity")
+include(":viaversion-sponge-legacy")
+include(":viaversion-sponge")
+include(":viaversion-fabric")
+
+project(":viaversion-common").projectDir = file("common")
+project(":viaversion-bukkit").projectDir = file("bukkit")
+project(":viaversion-bukkit-legacy").projectDir = file("bukkit-legacy")
+project(":viaversion-bungee").projectDir = file("bungee")
+project(":viaversion-velocity").projectDir = file("velocity")
+project(":viaversion-sponge").projectDir = file("sponge")
+project(":viaversion-sponge-legacy").projectDir = file("sponge-legacy")
+project(":viaversion-fabric").projectDir = file("fabric")
+project(":viaversion").projectDir = file("jar")

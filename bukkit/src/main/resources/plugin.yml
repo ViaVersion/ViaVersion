@@ -1,8 +1,8 @@
 name: ViaVersion
 main: us.myles.ViaVersion.ViaVersionPlugin
 authors: [_MylesC, creeper123123321, Gerrygames, KennyTV, Matsv]
-version: ${project.version}
-description: ${project.description}
+version: ${version}
+description: ${description}
 load: postworld
 api-version: 1.13
 loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer]

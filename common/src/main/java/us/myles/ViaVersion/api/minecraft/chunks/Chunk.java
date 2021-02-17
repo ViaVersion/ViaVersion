@@ -32,7 +32,7 @@ public interface Chunk {
     void setIgnoreOldLightData(boolean ignoreOldLightData);
 
     /**
-     * @return chunk section bit mask for chunks < 1.17
+     * @return chunk section bit mask for chunks &lt; 1.17
      * @see #getChunkMask()
      */
     int getBitmask();
