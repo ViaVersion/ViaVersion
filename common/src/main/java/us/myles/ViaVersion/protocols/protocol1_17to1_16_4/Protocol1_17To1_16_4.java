@@ -105,6 +105,21 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
                 });
             }
         });
+
+        registerIncoming(ServerboundPackets1_16_2.CLIENT_SETTINGS, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Locale
+                map(Type.BYTE); // View distance
+                map(Type.VAR_INT); // Chat mode
+                map(Type.BOOLEAN); // Chat colors
+                map(Type.UNSIGNED_BYTE); // Chat flags
+                map(Type.VAR_INT); // Main hand
+                handler(wrapper -> {
+                    wrapper.read(Type.BOOLEAN); // Text filtering
+                });
+            }
+        });
     }
 
     @Override

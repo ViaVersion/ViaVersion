@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion-parent</artifactId>
-    <version>3.3.0-21w06a</version>
+    <version>3.3.0-21w07a</version>
     <packaging>pom</packaging>
 
     <name>viaversion-parent</name>
@@ -120,7 +120,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-chat</artifactId>
-            <version>1.16-R0.4-SNAPSHOT</version>
+            <version>1.16-R0.5-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
