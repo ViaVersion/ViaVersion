@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":viaversion-common"))
+    compileOnly(project(":viaversion-common"))
     compileOnly("org.spongepowered:spongeapi:4.0.0-SNAPSHOT")
 }
 

@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":viaversion-common"))
+    compileOnly(project(":viaversion-common"))
 }
 
 description = "viaversion-fabric"
