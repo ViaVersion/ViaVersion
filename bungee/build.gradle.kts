@@ -1,6 +1,4 @@
 dependencies {
-    compileOnly(project(":viaversion-common"))
-    compileOnly("net.md-5:bungeecord-api:1.15-SNAPSHOT")
+    implementation(project(":viaversion-common"))
+    compileOnly("net.md-5", "bungeecord-api", Versions.bungee)
 }
-
-description = "viaversion-bungee"
