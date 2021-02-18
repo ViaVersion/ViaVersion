@@ -66,6 +66,7 @@ subprojects {
             issues = true
         }
         mitLicense()
+        publishAllTo("via", "https://repo.viaversion.com")
     }
 }
 
