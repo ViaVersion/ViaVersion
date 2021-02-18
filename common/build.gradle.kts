@@ -14,7 +14,6 @@ dependencies {
     api("it.unimi.dsi", "fastutil", Versions.fastUtil)
     api("com.github.steveice10", "opennbt", Versions.openNBT)
     api("com.google.code.gson", "gson", Versions.gson)
-    api("org.javassist", "javassist", Versions.javassist)
 
     compileOnlyApi("org.yaml", "snakeyaml", Versions.snakeYaml)
     compileOnlyApi("io.netty", "netty-all", Versions.netty)
