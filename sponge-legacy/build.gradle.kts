@@ -1,6 +1,4 @@
 dependencies {
-    compileOnly(project(":viaversion-common"))
-    compileOnly("org.spongepowered:spongeapi:4.0.0-SNAPSHOT")
+    implementation(project(":viaversion-common"))
+    compileOnly("org.spongepowered", "spongeapi", Versions.legacySponge)
 }
-
-description = "viaversion-sponge-legacy"

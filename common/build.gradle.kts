@@ -1,30 +1,23 @@
 plugins {
     id("net.kyori.blossom") version "1.1.0"
-    id("org.ajoberstar.grgit") version "4.1.0"
 }
-
-val commitId: String = grgit.head().abbreviatedId
 
 blossom {
     replaceToken("\$VERSION", project.version)
-    replaceToken("\$IMPL_VERSION", "git-ViaVersion-" + project.version + ":" + commitId)
+    replaceToken("\$IMPL_VERSION", "git-ViaVersion-${project.version}:${rootProject.latestCommitHash()}")
 }
 
 dependencies {
-    implementation("net.md-5:bungeecord-chat:1.16-R0.5-SNAPSHOT")
-    implementation("it.unimi.dsi:fastutil:8.3.1")
-    implementation("com.github.steveice10:opennbt:1.2-SNAPSHOT")
-    implementation("com.google.code.gson:gson:2.8.6")
-    implementation("org.javassist:javassist:3.27.0-GA")
-    implementation("org.yaml:snakeyaml:1.18")
+    api("net.md-5", "bungeecord-chat", Versions.bungeeChat) {
+        exclude("com.google.guava")
+    }
+    api("it.unimi.dsi", "fastutil", Versions.fastUtil)
+    api("com.github.steveice10", "opennbt", Versions.openNBT)
+    api("com.google.code.gson", "gson", Versions.gson)
+    api("org.javassist", "javassist", Versions.javassist)
+    api("org.yaml", "snakeyaml", Versions.snakeYaml)
 
-    compileOnly("io.netty:netty-all:4.0.20.Final")
-    compileOnly("com.google.guava:guava:17.0")
-    compileOnly("org.jetbrains:annotations:19.0.0")
-
-    testImplementation("io.netty:netty-all:4.0.20.Final")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.6.3")
+    compileOnlyApi("io.netty", "netty-all", Versions.netty)
+    compileOnlyApi("com.google.guava", "guava", Versions.guava)
+    compileOnlyApi("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
 }
-
-description = "viaversion-common"
