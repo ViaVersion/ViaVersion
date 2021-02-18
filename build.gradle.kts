@@ -24,6 +24,9 @@ subprojects {
                 expand("version" to project.version, "description" to project.description)
             }
         }
+        withType<JavaCompile> {
+            options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:-unchecked", "-Xlint:-deprecation"))
+        }
     }
 
     val platforms = listOf(
