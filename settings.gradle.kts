@@ -1,21 +1,22 @@
 rootProject.name = "viaversion-parent"
 
-include(":viaversion")
-include(":viaversion-common")
-include(":viaversion-bukkit")
-include(":viaversion-bukkit-legacy")
-include(":viaversion-bungee")
-include(":viaversion-velocity")
-include(":viaversion-sponge-legacy")
-include(":viaversion-sponge")
-include(":viaversion-fabric")
+setupViaSubproject("common")
+setupViaSubproject("bukkit")
+setupViaSubproject("bukkit-legacy")
+setupViaSubproject("bungee")
+setupViaSubproject("velocity")
+setupViaSubproject("sponge")
+setupViaSubproject("sponge-legacy")
+setupViaSubproject("fabric")
+setupViaSubproject("universal")
 
-project(":viaversion-common").projectDir = file("common")
-project(":viaversion-bukkit").projectDir = file("bukkit")
-project(":viaversion-bukkit-legacy").projectDir = file("bukkit-legacy")
-project(":viaversion-bungee").projectDir = file("bungee")
-project(":viaversion-velocity").projectDir = file("velocity")
-project(":viaversion-sponge").projectDir = file("sponge")
-project(":viaversion-sponge-legacy").projectDir = file("sponge-legacy")
-project(":viaversion-fabric").projectDir = file("fabric")
-project(":viaversion").projectDir = file("jar")
+fun setupViaSubproject(name: String) {
+    setupSubproject("viaversion-$name") {
+        projectDir = file(name)
+    }
+}
+
+inline fun setupSubproject(name: String, block: ProjectDescriptor.() -> Unit) {
+    include(name)
+    project(":$name").apply(block)
+}

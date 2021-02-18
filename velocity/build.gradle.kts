@@ -1,7 +1,5 @@
 dependencies {
-    compileOnly(project(":viaversion-common"))
-    compileOnly("com.velocitypowered:velocity-api:1.1.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:1.1.0-SNAPSHOT")
+    implementation(project(":viaversion-common"))
+    compileOnly("com.velocitypowered", "velocity-api", Versions.velocityApi)
+    annotationProcessor("com.velocitypowered", "velocity-api", Versions.velocityApi)
 }
-
-description = "viaversion-velocity"
