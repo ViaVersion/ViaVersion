@@ -15,8 +15,8 @@ dependencies {
     api("com.github.steveice10", "opennbt", Versions.openNBT)
     api("com.google.code.gson", "gson", Versions.gson)
     api("org.javassist", "javassist", Versions.javassist)
-    api("org.yaml", "snakeyaml", Versions.snakeYaml)
 
+    compileOnlyApi("org.yaml", "snakeyaml", Versions.snakeYaml)
     compileOnlyApi("io.netty", "netty-all", Versions.netty)
     compileOnlyApi("com.google.guava", "guava", Versions.guava)
     compileOnlyApi("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
