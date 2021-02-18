@@ -42,7 +42,6 @@ subprojects {
     }
 
     repositories {
-        mavenLocal()
         sonatypeSnapshots()
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
         maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/")
