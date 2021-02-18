@@ -11,6 +11,7 @@ fun Project.configureShadowJar() {
     tasks {
         withType<ShadowJar> {
             archiveClassifier.set("")
+            archiveFileName.set("ViaVersion-${project.name.substringAfter("viaversion-").capitalize()}-${project.version}.jar")
             destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
             //minimize() // ?
             configureRelocations()
@@ -23,7 +24,6 @@ fun Project.configureShadowJar() {
 }
 
 private fun ShadowJar.configureRelocations() {
-    relocate("org.yaml.snakeyaml", "us.myles.viaversion.libs.snakeyaml")
     relocate("javassist", "us.myles.viaversion.libs.javassist")
     relocate("com.google.gson", "us.myles.viaversion.libs.gson")
     relocate("com.github.steveice10.opennbt", "us.myles.viaversion.libs.opennbt")
@@ -69,6 +69,7 @@ private fun ShadowJar.configureExcludes() {
     exclude("it/unimi/dsi/fastutil/*/*Big*")
     exclude("it/unimi/dsi/fastutil/*/*Synchronized*")
     exclude("it/unimi/dsi/fastutil/*/*Unmodifiable*")
+    exclude("it/unimi/dsi/fastutil/io/*")
 }
 
 fun Project.latestCommitHash(): String {
