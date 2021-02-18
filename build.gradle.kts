@@ -1,13 +1,11 @@
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
-import net.kyori.indra.sonatype.IndraSonatypePublishingPlugin
 import net.kyori.indra.sonatypeSnapshots
 
 plugins {
     `java-library`
     `maven-publish`
     id("net.kyori.indra")
-    id("net.kyori.indra.publishing.sonatype") version("1.3.1") apply false
 }
 
 group = "us.myles"
@@ -19,7 +17,6 @@ subprojects {
     apply<MavenPublishPlugin>()
     apply<IndraPlugin>()
     apply<IndraPublishingPlugin>()
-    apply<IndraSonatypePublishingPlugin>()
 
     tasks {
         // Variable replacements
@@ -72,15 +69,6 @@ subprojects {
         }
         mitLicense()
     }
-
-    //TODO use indra with proper repository (currently local)?
-    /*extensions.configure<de.marcphilipp.gradle.nexus.NexusPublishExtension> {
-        repositories.create("via") {
-            snapshotRepositoryUrl.set(uri("https://repo.viaversion.com"))
-            username.set(System.getenv("PUBLISHING_USERNAME"))
-            password.set(System.getenv("PUBLISHING_PASSWORD"))
-        }
-    }*/
 }
 
 tasks {
