@@ -2,7 +2,7 @@ tasks {
     val universalJar = register<Jar>("universalJar") {
         artifacts.add("archives", this)
         archiveClassifier.set("")
-        archiveFileName.set("ViaVersion-Universal-${project.version}.jar")
+        archiveFileName.set("ViaVersion-${project.version}.jar")
         destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         arrayOf(
