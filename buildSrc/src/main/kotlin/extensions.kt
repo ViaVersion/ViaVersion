@@ -10,7 +10,7 @@ fun Project.configureShadowJar() {
     apply<ShadowPlugin>()
     tasks {
         withType<ShadowJar> {
-            archiveClassifier.set("")
+            archiveClassifier.set("jar")
             archiveFileName.set("ViaVersion-${project.name.substringAfter("viaversion-").capitalize()}-${project.version}.jar")
             destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
             //minimize() // ?
