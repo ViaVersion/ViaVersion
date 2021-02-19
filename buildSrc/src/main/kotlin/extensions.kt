@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 import org.gradle.api.Project
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.withType
@@ -10,15 +11,19 @@ fun Project.configureShadowJar() {
     apply<ShadowPlugin>()
     tasks {
         withType<ShadowJar> {
-            archiveClassifier.set("jar")
+            archiveClassifier.set("")
             archiveFileName.set("ViaVersion-${project.name.substringAfter("viaversion-").capitalize()}-${project.version}.jar")
             destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
-            //minimize() // ?
             configureRelocations()
             configureExcludes()
         }
         getByName("build") {
             dependsOn(withType<ShadowJar>())
+        }
+        withType<Jar> {
+            if (name == "jar") {
+                archiveClassifier.set("unshaded")
+            }
         }
     }
 }

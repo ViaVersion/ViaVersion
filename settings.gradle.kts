@@ -8,7 +8,10 @@ setupViaSubproject("velocity")
 setupViaSubproject("sponge")
 setupViaSubproject("sponge-legacy")
 setupViaSubproject("fabric")
-setupViaSubproject("universal")
+
+setupSubproject("viaversion") {
+    projectDir = file("universal")
+}
 
 fun setupViaSubproject(name: String) {
     setupSubproject("viaversion-$name") {
