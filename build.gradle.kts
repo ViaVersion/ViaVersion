@@ -73,6 +73,9 @@ subprojects {
         name = "Via"
         url = uri("https://repo.viaversion.com/")
         credentials(PasswordCredentials::class)
+        authentication {
+            create<BasicAuthentication>("basic")
+        }
     }
 }
 
