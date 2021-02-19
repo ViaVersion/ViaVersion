@@ -68,6 +68,12 @@ subprojects {
         }
         mitLicense()
     }
+
+    publishing.repositories.maven {
+        name = "Via"
+        url = uri("https://repo.viaversion.com/")
+        credentials(PasswordCredentials::class)
+    }
 }
 
 tasks {
