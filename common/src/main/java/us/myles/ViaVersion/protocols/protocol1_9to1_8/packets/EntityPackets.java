@@ -318,6 +318,22 @@ public class EntityPackets {
             }
         });
 
+        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_ANIMATION, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Animation
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        if(wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) {
+                            wrapper.cancel();
+                        }
+                    }
+                });
+            }
+        });
+
 
         /* Incoming Packets */
         protocol.registerIncoming(ServerboundPackets1_9.ENTITY_ACTION, new PacketRemapper() {
