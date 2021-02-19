@@ -1,7 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+apply<ShadowPlugin>()
+
 tasks {
-    val universalJar = register<Jar>("universalJar") {
-        artifacts.add("archives", this)
-        archiveClassifier.set("jar")
+    withType<ShadowJar> {
+        archiveClassifier.set("")
         archiveFileName.set("ViaVersion-${project.version}.jar")
         destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -19,6 +23,11 @@ tasks {
         }
     }
     build {
-        dependsOn(universalJar)
+        dependsOn(withType<ShadowJar>())
+    }
+    withType<Jar> {
+        if (name == "jar") {
+            archiveClassifier.set("unshaded")
+        }
     }
 }
