@@ -71,7 +71,7 @@ subprojects {
 
     publishing.repositories.maven {
         name = "Via"
-        url = uri("https://repo.viaversion.com/")
+        url = uri("https://repo.viaversion.com/everything")
         credentials(PasswordCredentials::class)
         authentication {
             create<BasicAuthentication>("basic")
