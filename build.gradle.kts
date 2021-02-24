@@ -5,9 +5,11 @@ plugins {
     `maven-publish`
 }
 
-group = "us.myles"
-version = "3.3.0-21w07a"
-description = "Allow newer clients to join older server versions."
+allprojects {
+    group = "us.myles"
+    version = "3.3.0-21w07a"
+    description = "Allow newer clients to join older server versions."
+}
 
 subprojects {
     apply<JavaLibraryPlugin>()
