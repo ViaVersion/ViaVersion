@@ -10,11 +10,13 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_17Types;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.BlockRewriter;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
+import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
@@ -33,6 +35,41 @@ public class WorldPackets {
         blockRewriter.registerBlockChange(ClientboundPackets1_16_2.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.ACKNOWLEDGE_PLAYER_DIGGING);
+
+        protocol.registerOutgoing(ClientboundPackets1_16_2.WORLD_BORDER, null, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    // Border packet actions have been split into individual packets (the content hasn't changed)
+                    int type = wrapper.read(Type.VAR_INT);
+                    ClientboundPacketType packetType;
+                    switch (type) {
+                        case 0:
+                            packetType = ClientboundPackets1_17.WORLD_BORDER_SIZE;
+                            break;
+                        case 1:
+                            packetType = ClientboundPackets1_17.WORLD_BORDER_LERP_SIZE;
+                            break;
+                        case 2:
+                            packetType = ClientboundPackets1_17.WORLD_BORDER_CENTER;
+                            break;
+                        case 3:
+                            packetType = ClientboundPackets1_17.WORLD_BORDER_INIT;
+                            break;
+                        case 4:
+                            packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DELAY;
+                            break;
+                        case 5:
+                            packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DISTANCE;
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid world border type received: " + type);
+                    }
+
+                    wrapper.setId(packetType.ordinal());
+                });
+            }
+        });
 
         protocol.registerOutgoing(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketRemapper() {
             @Override

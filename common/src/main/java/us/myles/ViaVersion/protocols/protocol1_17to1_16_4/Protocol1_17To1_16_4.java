@@ -3,6 +3,7 @@ package us.myles.ViaVersion.protocols.protocol1_17to1_16_4;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.rewriters.RegistryType;
@@ -106,6 +107,67 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
             }
         });
 
+        registerOutgoing(ClientboundPackets1_16_2.TITLE, null, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    // Title packet actions have been split into individual packets (the content hasn't changed)
+                    int type = wrapper.read(Type.VAR_INT);
+                    ClientboundPacketType packetType;
+                    switch (type) {
+                        case 0:
+                            packetType = ClientboundPackets1_17.TITLE_TEXT;
+                            break;
+                        case 1:
+                            packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
+                            break;
+                        case 2:
+                            packetType = ClientboundPackets1_17.ACTIONBAR;
+                            break;
+                        case 3:
+                            packetType = ClientboundPackets1_17.TITLE_TIMES;
+                            break;
+                        case 4:
+                            packetType = ClientboundPackets1_17.CLEAR_TITLES;
+                            wrapper.write(Type.BOOLEAN, false); // Reset times
+                            break;
+                        case 5:
+                            packetType = ClientboundPackets1_17.CLEAR_TITLES;
+                            wrapper.write(Type.BOOLEAN, true); // Reset times
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid title type received: " + type);
+                    }
+
+                    wrapper.setId(packetType.ordinal());
+                });
+            }
+        });
+
+        registerOutgoing(ClientboundPackets1_16_2.EXPLOSION, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.FLOAT); // X
+                map(Type.FLOAT); // Y
+                map(Type.FLOAT); // Z
+                handler(wrapper -> {
+                    // Collection length is now a var int
+                    wrapper.write(Type.VAR_INT, wrapper.read(Type.INT));
+                });
+            }
+        });
+
+        registerOutgoing(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION1_14);
+                handler(wrapper -> {
+                    // Angle (which Mojang just forgot to write to the buffer, lol)
+                    wrapper.write(Type.FLOAT, 0f);
+                });
+            }
+        });
+
         registerIncoming(ServerboundPackets1_16_2.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -125,10 +187,12 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
     @Override
     protected void onMappingDataLoaded() {
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
-                "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals");
+                "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals",
+                "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
                 "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks",
-                "azalea_log_replaceable", "cave_vines", "lush_plants_replaceable");
+                "minecraft:azalea_log_replaceable", "minecraft:cave_vines", "minecraft:lush_plants_replaceable", "minecraft:deepslate_ore_replaceables",
+                "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores", "minecraft:stone_ore_replaceables");
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs", "minecraft:axolotl_always_hostiles", "minecraft:axolotl_tempted_hostiles");
 
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
