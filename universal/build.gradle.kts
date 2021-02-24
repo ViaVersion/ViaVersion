@@ -1,7 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
-apply<ShadowPlugin>()
 
 tasks {
     withType<ShadowJar> {
@@ -24,10 +21,5 @@ tasks {
     }
     build {
         dependsOn(withType<ShadowJar>())
-    }
-    withType<Jar> {
-        if (name == "jar") {
-            archiveClassifier.set("unshaded")
-        }
     }
 }
