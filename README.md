@@ -43,6 +43,11 @@ You can find official dev builds here:
 
 **Maven Repo:** https://repo.viaversion.com
 
+Building:
+--------
+
+After cloning this repository, build the project with Gradle by running `/gradlew build` and take the created jar out of the `build/libs` directory.
+
 License:
 --------
 
