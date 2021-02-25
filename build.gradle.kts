@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = "us.myles"
-    version = "3.3.0-21w07a"
+    version = "3.3.0-21w08a-gradle"
     description = "Allow newer clients to join older server versions."
 }
 
