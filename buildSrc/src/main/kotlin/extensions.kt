@@ -34,6 +34,7 @@ private fun ShadowJar.configureRelocations() {
     relocate("com.github.steveice10.opennbt", "us.myles.viaversion.libs.opennbt")
     relocate("net.md_5.bungee", "us.myles.viaversion.libs.bungeecordchat") {
         include("net.md_5.bungee.api.chat.*")
+        include("net.md_5.bungee.api.chat.hover.content.*")
         include("net.md_5.bungee.api.ChatColor")
         include("net.md_5.bungee.api.ChatMessageType")
         include("net.md_5.bungee.chat.*")
