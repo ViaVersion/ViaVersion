@@ -32,28 +32,17 @@ private fun ShadowJar.configureRelocations() {
     relocate("javassist", "us.myles.viaversion.libs.javassist")
     relocate("com.google.gson", "us.myles.viaversion.libs.gson")
     relocate("com.github.steveice10.opennbt", "us.myles.viaversion.libs.opennbt")
-    relocate("net.md_5.bungee", "us.myles.viaversion.libs.bungeecordchat")
+    relocate("net.md_5.bungee", "us.myles.viaversion.libs.bungeecordchat") {
+        include("net.md_5.bungee.api.chat.*")
+        include("net.md_5.bungee.api.ChatColor")
+        include("net.md_5.bungee.api.ChatMessageType")
+        include("net.md_5.bungee.chat.*")
+    }
     relocate("it.unimi.dsi.fastutil", "us.myles.viaversion.libs.fastutil")
 }
 
 private fun ShadowJar.configureExcludes() {
-    // bungee api
-    /*
-    include("net.md_5.bungee.api.chat.*")
-    include("net.md_5.bungee.api.ChatColor")
-    include("net.md_5.bungee.api.ChatMessageType")
-    include("net.md_5.bungee.chat.*")
-    */
-
-    // fastutil
-
-    // We only want int and Object maps
-    /*
-    include("it.unimi.dsi.fastutil.ints.*")
-    include("it.unimi.dsi.fastutil.objects.*")
-    include("it.unimi.dsi.fastutil.*.class")
-    */
-
+    // FastUtil - we only want object and int maps
     // Object types
     exclude("it/unimi/dsi/fastutil/*/*Reference*")
     exclude("it/unimi/dsi/fastutil/*/*Boolean*")
