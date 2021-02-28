@@ -33,7 +33,6 @@ private fun ShadowJar.configureRelocations() {
     relocate("com.google.gson", "us.myles.viaversion.libs.gson")
     relocate("com.github.steveice10.opennbt", "us.myles.viaversion.libs.opennbt")
     relocate("it.unimi.dsi.fastutil", "us.myles.viaversion.libs.fastutil")
-    relocate("net.kyori", "us.myles.viaversion.libs.kyori")
 }
 
 private fun ShadowJar.configureExcludes() {
