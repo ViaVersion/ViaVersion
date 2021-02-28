@@ -2,7 +2,6 @@ package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
@@ -32,6 +31,7 @@ import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.VersionInfo;
+import us.myles.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +54,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @DefaultConfig(sharedRoot = false)
     private File spongeConfig;
 
+    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character('§').extractUrls().build();
     private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private final SpongeViaAPI api = new SpongeViaAPI();
     private SpongeViaConfig conf;
@@ -169,8 +170,8 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        String serialized = LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacySection().deserialize(message));
-        game.getServer().getPlayer(uuid).ifPresent(player -> player.sendMessage(TextSerializers.JSON.deserialize(serialized))); // Hacky way to fix links //TODO ??
+        String serialized = SpongePlugin.COMPONENT_SERIALIZER.serialize(SpongePlugin.COMPONENT_SERIALIZER.deserialize(message));
+        game.getServer().getPlayer(uuid).ifPresent(player -> player.sendMessage(TextSerializers.JSON.deserialize(serialized))); // Hacky way to fix links
     }
 
     @Override

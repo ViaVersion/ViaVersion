@@ -2,13 +2,13 @@ package us.myles.ViaVersion.protocols.protocol1_13to1_12_2;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
+import us.myles.viaversion.libs.kyori.adventure.text.Component;
+import us.myles.viaversion.libs.kyori.adventure.text.format.TextDecoration;
+import us.myles.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import us.myles.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class ChatRewriter {
     private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter1_13();
@@ -18,6 +18,8 @@ public class ChatRewriter {
             if (itemData) {
                 builder.decoration(TextDecoration.ITALIC, false);
             }
+
+            // Not used for chat messages, so no need for url extraction
             builder.append(LegacyComponentSerializer.legacySection().deserialize(message));
         });
         return GsonComponentSerializer.gson().serialize(component);

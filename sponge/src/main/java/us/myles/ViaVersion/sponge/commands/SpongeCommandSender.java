@@ -1,9 +1,9 @@
 package us.myles.ViaVersion.sponge.commands;
 
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Identifiable;
+import us.myles.ViaVersion.SpongePlugin;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 
 import java.util.UUID;
@@ -22,8 +22,8 @@ public class SpongeCommandSender implements ViaCommandSender {
 
     @Override
     public void sendMessage(String msg) {
-        String serialized = LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacySection().deserialize(msg));
-        source.sendMessage(TextSerializers.JSON.deserialize(serialized)); // Hacky way to fix links //TODO ??
+        String serialized = SpongePlugin.COMPONENT_SERIALIZER.serialize(SpongePlugin.COMPONENT_SERIALIZER.deserialize(msg));
+        source.sendMessage(TextSerializers.JSON.deserialize(serialized)); // Hacky way to fix links
     }
 
     @Override
