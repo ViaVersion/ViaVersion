@@ -1,10 +1,6 @@
 package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -107,8 +103,9 @@ public class InventoryPackets {
                                 case "minecraft:container":
                                 case "minecraft:chest":
                                 default:
-                                    if (slots > 0 && slots <= 54)
+                                    if (slots > 0 && slots <= 54) {
                                         typeId = slots / 9 - 1;
+                                    }
                                     break;
                             }
 
