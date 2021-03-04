@@ -55,7 +55,7 @@ public class InventoryPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        Short windowsId = wrapper.read(Type.UNSIGNED_BYTE);
+                        Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
                         String type = wrapper.read(Type.STRING);
                         JsonElement title = wrapper.read(Type.COMPONENT);
                         COMPONENT_REWRITER.processText(title);
@@ -64,19 +64,15 @@ public class InventoryPackets {
                         if (type.equals("EntityHorse")) {
                             wrapper.setId(0x1F);
                             int entityId = wrapper.read(Type.INT);
-                            wrapper.write(Type.UNSIGNED_BYTE, windowsId);
+                            wrapper.write(Type.UNSIGNED_BYTE, windowId);
                             wrapper.write(Type.VAR_INT, slots.intValue());
                             wrapper.write(Type.INT, entityId);
                         } else {
                             wrapper.setId(0x2E);
-                            wrapper.write(Type.VAR_INT, windowsId.intValue());
+                            wrapper.write(Type.VAR_INT, windowId.intValue());
 
                             int typeId = -1;
                             switch (type) {
-                                case "minecraft:container":
-                                case "minecraft:chest":
-                                    typeId = slots / 9 - 1;
-                                    break;
                                 case "minecraft:crafting_table":
                                     typeId = 11;
                                     break;
@@ -107,6 +103,12 @@ public class InventoryPackets {
                                     break;
                                 case "minecraft:shulker_box":
                                     typeId = 19;
+                                    break;
+                                case "minecraft:container":
+                                case "minecraft:chest":
+                                default:
+                                    if (slots > 0 && slots <= 54)
+                                        typeId = slots / 9 - 1;
                                     break;
                             }
 
