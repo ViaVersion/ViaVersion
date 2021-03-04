@@ -1,6 +1,6 @@
 object Versions {
     // Common compiled
-    const val adventure = "4.5.1"
+    const val adventure = "4.6.0"
     const val gson = "2.8.6"
     const val fastUtil = "8.3.1"
     const val openNBT = "1.2-SNAPSHOT"
