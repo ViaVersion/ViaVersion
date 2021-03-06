@@ -4,6 +4,8 @@ about: Create a bug report so we can fix it
 
 ---
 
+*Please fill in this template rather than deleting it*
+
 **Describe the bug, provide any errors**
 A clear and concise description of what the bug is. If present, can you paste the error to https://paste.gg/?
 
