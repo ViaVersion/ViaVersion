@@ -93,8 +93,8 @@ public enum ClientboundPackets1_17 implements ClientboundPacketType {
     UPDATE_SCORE, // 0x56
     TITLE_SUBTITLE, // 0x57
     TIME_UPDATE, // 0x58
-    TITLE_TIMES, // 0x59
-    TITLE_TEXT, // 0x5A
+    TITLE_TEXT, // 0x59
+    TITLE_TIMES, // 0x5A
     ENTITY_SOUND, // 0x5B
     SOUND, // 0x5C
     STOP_SOUND, // 0x5D
