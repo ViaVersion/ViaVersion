@@ -150,6 +150,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
                 map(Type.FLOAT); // X
                 map(Type.FLOAT); // Y
                 map(Type.FLOAT); // Z
+                map(Type.FLOAT); // Strength
                 handler(wrapper -> {
                     // Collection length is now a var int
                     wrapper.write(Type.VAR_INT, wrapper.read(Type.INT));
