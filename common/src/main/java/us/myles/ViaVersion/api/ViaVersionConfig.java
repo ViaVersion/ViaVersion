@@ -368,7 +368,7 @@ public interface ViaVersionConfig {
     boolean isIgnoreLong1_16ChannelNames();
 
     /**
-     * Force the 1.17+ client to use server resource pack.
+     * Force 1.17+ client to accept the server resource pack.
      *
      * @return true if enabled
      */
