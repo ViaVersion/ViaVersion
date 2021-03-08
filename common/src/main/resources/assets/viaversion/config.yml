@@ -151,6 +151,9 @@ vine-climb-fix: false
 # CraftBukkit had this limit hardcoded until 1.16, so we have to assume any server/proxy might have this arbitrary check present.
 ignore-long-1_16-channel-names: true
 #
+# Force 1.17+ client to accept the server resource pack; they will automatically disconnect if they decline.
+forced-use-1_17-resource-pack: false
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#

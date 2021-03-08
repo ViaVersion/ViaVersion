@@ -55,6 +55,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean healthNaNFix;
     private boolean instantRespawn;
     private boolean ignoreLongChannelNames;
+    private boolean forcedUse1_17ResourcePack;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -113,6 +114,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         healthNaNFix = getBoolean("fix-1_14-health-nan", true);
         instantRespawn = getBoolean("use-1_15-instant-respawn", false);
         ignoreLongChannelNames = getBoolean("ignore-long-1_16-channel-names", true);
+        forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
     }
 
     @Override
@@ -375,5 +377,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isIgnoreLong1_16ChannelNames() {
         return ignoreLongChannelNames;
+    }
+
+    @Override
+    public boolean isForcedUse1_17ResourcePack() {
+        return forcedUse1_17ResourcePack;
     }
 }
