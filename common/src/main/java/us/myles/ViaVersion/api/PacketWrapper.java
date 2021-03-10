@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.PacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
@@ -394,6 +395,16 @@ public class PacketWrapper {
             writeToBuffer(output);
             user().sendRawPacket(output);
         }
+    }
+
+    /**
+     * Create a new packet for the target of this packet.
+     *
+     * @param packetType packet type of the new packedt
+     * @return The newly created packet wrapper
+     */
+    public PacketWrapper create(PacketType packetType) {
+        return new PacketWrapper(packetType.ordinal(), null, user());
     }
 
     /**

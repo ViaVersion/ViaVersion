@@ -107,6 +107,30 @@ public class ItemRewriter {
         });
     }
 
+    public void registerClickWindow1_17(ServerboundPacketType packetType, Type<Item> type) {
+        protocol.registerIncoming(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window Id
+                map(Type.SHORT); // Slot
+                map(Type.BYTE); // Button
+                map(Type.VAR_INT); // Mode
+
+                handler(wrapper -> {
+                    // Affected items
+                    int length = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < length; i++) {
+                        wrapper.passthrough(Type.SHORT); // Slot
+                        toServer.rewrite(wrapper.passthrough(type));
+                    }
+
+                    // Carried item
+                    toServer.rewrite(wrapper.passthrough(type));
+                });
+            }
+        });
+    }
+
     public void registerSetCooldown(ClientboundPacketType packetType) {
         protocol.registerOutgoing(packetType, new PacketRemapper() {
             @Override

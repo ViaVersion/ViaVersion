@@ -16,11 +16,11 @@ import us.myles.ViaVersion.api.storage.EntityTracker;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.Particle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 public abstract class MetadataRewriter {
+    private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     private final Class<? extends EntityTracker> entityTrackerClass;
     protected final Protocol protocol;
     private Int2IntMap typeMapping;
@@ -33,7 +33,7 @@ public abstract class MetadataRewriter {
 
     public final void handleMetadata(int entityId, List<Metadata> metadatas, UserConnection connection) {
         EntityType type = connection.get(entityTrackerClass).getEntity(entityId);
-        for (Metadata metadata : new ArrayList<>(metadatas)) {
+        for (Metadata metadata : metadatas.toArray(EMPTY_ARRAY)) {
             try {
                 handleMetadata(entityId, type, metadata, metadatas, connection);
             } catch (Exception e) {

@@ -80,7 +80,7 @@ public class WorldPackets {
                         List<BlockChangeRecord> sectionRecord = sectionRecords[chunkY];
                         if (sectionRecord == null) continue;
 
-                        PacketWrapper newPacket = wrapper.create(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE.ordinal());
+                        PacketWrapper newPacket = wrapper.create(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
                         newPacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
                         newPacket.write(Type.BOOLEAN, false); // Ignore light updates
                         newPacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, sectionRecord.toArray(EMPTY_RECORDS));

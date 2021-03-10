@@ -54,7 +54,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_16_2 = register(751, "1.16.2");
     public static final ProtocolVersion v1_16_3 = register(753, "1.16.3");
     public static final ProtocolVersion v1_16_4 = register(754, "1.16.4/5", new VersionRange("1.16", 4, 5));
-    public static final ProtocolVersion v1_17 = register(755, 17, "1.17");
+    public static final ProtocolVersion v1_17 = register(755, 18, "1.17");
     public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
 
     public static ProtocolVersion register(int version, String name) {

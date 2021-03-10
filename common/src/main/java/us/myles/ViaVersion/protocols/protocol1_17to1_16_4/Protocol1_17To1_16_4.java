@@ -21,14 +21,14 @@ import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
-public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_16_2> {
+public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 
     public static final MappingData MAPPINGS = new MappingData("1.16.2", "1.17", true);
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
-        super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_16_2.class);
+        super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_17.class);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
             }
         });
 
-        registerIncoming(ServerboundPackets1_16_2.CLIENT_SETTINGS, new PacketRemapper() {
+        registerIncoming(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Locale
@@ -190,11 +190,13 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
     protected void onMappingDataLoaded() {
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
                 "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals",
-                "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores");
+                "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores",
+                "minecraft:coal_ores", "minecraft:copper_ores", "minecraft:emerald_ores");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
                 "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks",
-                "minecraft:azalea_log_replaceable", "minecraft:cave_vines", "minecraft:lush_plants_replaceable", "minecraft:deepslate_ore_replaceables",
-                "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores", "minecraft:stone_ore_replaceables");
+                "minecraft:cave_vines", "minecraft:lush_plants_replaceable", "minecraft:deepslate_ore_replaceables", "minecraft:lush_ground_replaceable",
+                "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores", "minecraft:stone_ore_replaceables",
+                "minecraft:coal_ores", "minecraft:copper_ores", "minecraft:emerald_ores");
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs", "minecraft:axolotl_always_hostiles", "minecraft:axolotl_tempted_hostiles");
 
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
