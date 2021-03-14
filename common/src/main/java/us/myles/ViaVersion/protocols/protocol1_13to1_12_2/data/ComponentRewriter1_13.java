@@ -49,7 +49,7 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
         ShortTag damageTag = tag.get("Damage");
 
         // Call item converter
-        short damage = damageTag != null ? damageTag.getValue() : 0;
+        short damage = damageTag != null ? damageTag.asShort() : 0;
         Item item = new Item();
         item.setData(damage);
         item.setTag(itemTag);
@@ -57,10 +57,10 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
 
         // Serialize again
         if (damage != item.getData()) {
-            tag.put(new ShortTag("Damage", item.getData()));
+            tag.put("Damage", new ShortTag(item.getData()));
         }
         if (itemTag != null) {
-            tag.put(itemTag);
+            tag.put("tag", itemTag);
         }
 
         JsonArray array = new JsonArray();

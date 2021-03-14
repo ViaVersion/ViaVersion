@@ -58,9 +58,9 @@ public class CommandBlockStorage extends StoredObject {
             return Optional.empty();
 
         tag = tag.clone();
-        tag.put(new ByteTag("powered", (byte) 0));
-        tag.put(new ByteTag("auto", (byte) 0));
-        tag.put(new ByteTag("conditionMet", (byte) 0));
+        tag.put("powered", new ByteTag((byte) 0));
+        tag.put("auto", new ByteTag((byte) 0));
+        tag.put("conditionMet", new ByteTag((byte) 0));
         return Optional.of(tag);
     }
 

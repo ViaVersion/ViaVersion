@@ -23,7 +23,6 @@
  */
 package us.myles.ViaVersion.api.minecraft.nbt;
 
-import com.github.steveice10.opennbt.tag.TagRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
@@ -109,12 +108,12 @@ public final class BinaryTagIO {
     @NotNull
     public static CompoundTag readDataInput(final @NotNull DataInput input) throws IOException {
         byte type = input.readByte();
-        if (type != TagRegistry.getIdFor(CompoundTag.class)) {
+        if (type != CompoundTag.ID) {
             throw new IOException(String.format("Expected root tag to be a CompoundTag, was %s", type));
         }
         input.skipBytes(input.readUnsignedShort()); // read empty name
 
-        final CompoundTag compoundTag = new CompoundTag("");
+        final CompoundTag compoundTag = new CompoundTag();
         compoundTag.read(input);
         return compoundTag;
     }
@@ -175,7 +174,7 @@ public final class BinaryTagIO {
      * @throws IOException if an exception was encountered while writing the compound tag
      */
     public static void writeDataOutput(final @NotNull CompoundTag tag, final @NotNull DataOutput output) throws IOException {
-        output.writeByte(TagRegistry.getIdFor(CompoundTag.class));
+        output.writeByte(CompoundTag.ID);
         output.writeUTF(""); // write empty name
         tag.write(output);
     }

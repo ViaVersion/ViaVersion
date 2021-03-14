@@ -18,6 +18,7 @@ import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
 import us.myles.ViaVersion.util.CompactArrayUtil;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class WorldPackets {
@@ -58,7 +59,7 @@ public class WorldPackets {
                     }
 
                     CompoundTag heightMaps = chunk.getHeightMap();
-                    for (Tag heightMapTag : heightMaps) {
+                    for (Tag heightMapTag : heightMaps.values()) {
                         LongArrayTag heightMap = (LongArrayTag) heightMapTag;
                         int[] heightMapData = new int[256];
                         CompactArrayUtil.iterateCompactArray(9, heightMapData.length, heightMap.getValue(), (i, v) -> heightMapData[i] = v);
@@ -99,21 +100,21 @@ public class WorldPackets {
 
             // target_uuid -> Target
             UUID targetUuid = UUID.fromString((String) targetUuidTag.getValue());
-            compoundTag.put(new IntArrayTag("Target", UUIDIntArrayType.uuidToIntArray(targetUuid)));
+            compoundTag.put("Target", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(targetUuid)));
         } else if (id.equals("minecraft:skull") && compoundTag.get("Owner") instanceof CompoundTag) {
             CompoundTag ownerTag = compoundTag.remove("Owner");
             StringTag ownerUuidTag = ownerTag.remove("Id");
             if (ownerUuidTag != null) {
                 UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
-                ownerTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+                ownerTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(ownerUuid)));
             }
 
             // Owner -> SkullOwner
-            CompoundTag skullOwnerTag = new CompoundTag("SkullOwner");
-            for (Tag tag : ownerTag) {
-                skullOwnerTag.put(tag);
+            CompoundTag skullOwnerTag = new CompoundTag();
+            for (Map.Entry<String, Tag> entry : ownerTag.entrySet()) {
+                skullOwnerTag.put(entry.getKey(), entry.getValue());
             }
-            compoundTag.put(skullOwnerTag);
+            compoundTag.put("SkullOwner", skullOwnerTag);
         }
     }
 }

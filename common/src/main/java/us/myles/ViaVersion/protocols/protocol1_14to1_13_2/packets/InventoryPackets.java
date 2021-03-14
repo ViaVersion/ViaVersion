@@ -217,8 +217,8 @@ public class InventoryPackets {
                         resyncPacket.write(Type.BYTE, (byte) 2); // 2 - Button - End left click
                         resyncPacket.write(Type.SHORT, ((short) ThreadLocalRandom.current().nextInt())); // 3 - Action number
                         resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
-                        CompoundTag tag = new CompoundTag("");
-                        tag.put(new DoubleTag("force_resync", Double.NaN)); // Tags with NaN are not equal
+                        CompoundTag tag = new CompoundTag();
+                        tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
                         resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new Item(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
                         resyncPacket.sendToServer(Protocol1_14To1_13_2.class, true, false);
                     }
@@ -244,7 +244,7 @@ public class InventoryPackets {
             Tag loreTag = display.get("Lore");
             if (loreTag instanceof ListTag) {
                 ListTag lore = (ListTag) loreTag;
-                display.put(new ListTag(NBT_TAG_NAME + "|Lore", lore.clone().getValue())); // Save old lore
+                display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.clone().getValue())); // Save old lore
                 for (Tag loreEntry : lore) {
                     if (loreEntry instanceof StringTag) {
                         String jsonText = ChatRewriter.legacyTextToJsonString(((StringTag) loreEntry).getValue(), true);
@@ -270,7 +270,7 @@ public class InventoryPackets {
                 ListTag lore = (ListTag) loreTag;
                 ListTag savedLore = display.remove(NBT_TAG_NAME + "|Lore");
                 if (savedLore != null) {
-                    display.put(new ListTag("Lore", savedLore.getValue()));
+                    display.put("Lore", new ListTag(savedLore.getValue()));
                 } else {
                     for (Tag loreEntry : lore) {
                         if (loreEntry instanceof StringTag) {

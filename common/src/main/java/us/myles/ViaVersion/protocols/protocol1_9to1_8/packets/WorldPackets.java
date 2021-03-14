@@ -186,13 +186,13 @@ public class WorldPackets {
                             if (tag != null) {
                                 if (tag.contains("EntityId")) {
                                     String entity = (String) tag.get("EntityId").getValue();
-                                    CompoundTag spawn = new CompoundTag("SpawnData");
-                                    spawn.put(new StringTag("id", entity));
-                                    tag.put(spawn);
+                                    CompoundTag spawn = new CompoundTag();
+                                    spawn.put("id", new StringTag(entity));
+                                    tag.put("SpawnData", spawn);
                                 } else { // EntityID does not exist
-                                    CompoundTag spawn = new CompoundTag("SpawnData");
-                                    spawn.put(new StringTag("id", "AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
-                                    tag.put(spawn);
+                                    CompoundTag spawn = new CompoundTag();
+                                    spawn.put("id", new StringTag("AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
+                                    tag.put("SpawnData", spawn);
                                 }
                             }
                         }

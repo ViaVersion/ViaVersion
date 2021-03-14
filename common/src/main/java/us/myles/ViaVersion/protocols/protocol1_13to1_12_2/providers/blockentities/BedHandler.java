@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -25,13 +26,13 @@ public class BedHandler implements BlockEntityProvider.BlockEntityHandler {
 
         Tag color = tag.get("color");
         if (color != null) {
-            blockId += (((Number) color.getValue()).intValue() * 16);
+            blockId += (((NumberTag) color).asInt() * 16);
         }
 
         return blockId;
     }
 
-    private long getLong(Tag tag) {
-        return ((Integer) tag.getValue()).longValue();
+    private long getLong(NumberTag tag) {
+        return tag.asLong();
     }
 }

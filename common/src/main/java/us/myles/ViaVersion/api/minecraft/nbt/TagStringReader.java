@@ -33,11 +33,11 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.LongTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -46,17 +46,7 @@ import java.util.stream.IntStream;
  * See https://github.com/KyoriPowered/adventure.
  */
 /* package */ final class TagStringReader {
-    private static final Field NAME_FIELD = getNameField();
     private final CharBuffer buffer;
-
-    private static Field getNameField() {
-        try {
-            return Tag.class.getDeclaredField("name");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     public TagStringReader(final CharBuffer buffer) {
         this.buffer = buffer;
@@ -64,7 +54,7 @@ import java.util.stream.IntStream;
 
     public CompoundTag compound() throws StringTagParseException {
         this.buffer.expect(Tokens.COMPOUND_BEGIN);
-        final CompoundTag compoundTag = new CompoundTag("");
+        final CompoundTag compoundTag = new CompoundTag();
         if (this.buffer.peek() == Tokens.COMPOUND_END) {
             this.buffer.take();
             return compoundTag;
@@ -73,17 +63,7 @@ import java.util.stream.IntStream;
         while (this.buffer.hasMore()) {
             final String key = this.key();
             final Tag tag = this.tag();
-            // Doesn't get around this with the steveice lib :/
-            try {
-                if (!NAME_FIELD.isAccessible()) {
-                    NAME_FIELD.setAccessible(true);
-                }
-                NAME_FIELD.set(tag, key);
-            } catch (IllegalAccessException e) {
-                throw new IllegalArgumentException(e);
-            }
-
-            compoundTag.put(tag);
+            compoundTag.put(key, tag);
             if (this.separatorOrCompleteWith(Tokens.COMPOUND_END)) {
                 return compoundTag;
             }
@@ -92,7 +72,7 @@ import java.util.stream.IntStream;
     }
 
     public ListTag list() throws StringTagParseException {
-        final ListTag listTag = new ListTag("");
+        final ListTag listTag = new ListTag();
         this.buffer.expect(Tokens.ARRAY_BEGIN);
         final boolean prefixedIndex = this.buffer.peek() == '0' && this.buffer.peek(1) == ':';
         while (this.buffer.hasMore()) {
@@ -126,11 +106,11 @@ import java.util.stream.IntStream;
                 .expect(Tokens.ARRAY_SIGNATURE_SEPARATOR);
 
         if (elementType == Tokens.TYPE_BYTE) {
-            return new ByteArrayTag("", this.byteArray());
+            return new ByteArrayTag(this.byteArray());
         } else if (elementType == Tokens.TYPE_INT) {
-            return new IntArrayTag("", this.intArray());
+            return new IntArrayTag(this.intArray());
         } else if (elementType == Tokens.TYPE_LONG) {
-            return new LongArrayTag("", this.longArray());
+            return new LongArrayTag(this.longArray());
         } else {
             throw this.buffer.makeError("Type " + elementType + " is not a valid element type in an array!");
         }
@@ -164,7 +144,7 @@ import java.util.stream.IntStream;
             if (!(value instanceof IntTag)) {
                 throw this.buffer.makeError("All elements of an int array must be ints!");
             }
-            builder.add(((IntTag) value).getValue());
+            builder.add(((NumberTag) value).asInt());
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
                 return builder.build().toArray();
             }
@@ -226,7 +206,7 @@ import java.util.stream.IntStream;
             case Tokens.DOUBLE_QUOTE:
                 // definitely a string tag
                 this.buffer.advance();
-                return new StringTag("", unescape(this.buffer.takeUntil(startToken).toString()));
+                return new StringTag(unescape(this.buffer.takeUntil(startToken).toString()));
             default: // scalar
                 return this.scalar();
         }
@@ -251,19 +231,19 @@ import java.util.stream.IntStream;
                         switch (Character.toUpperCase(current)) { // try to read and return as a number
                             // case Tokens.TYPE_INTEGER: // handled below, ints are ~special~
                             case Tokens.TYPE_BYTE:
-                                result = new ByteTag("", Byte.parseByte(builder.toString()));
+                                result = new ByteTag(Byte.parseByte(builder.toString()));
                                 break;
                             case Tokens.TYPE_SHORT:
-                                result = new ShortTag("", (Short.parseShort(builder.toString())));
+                                result = new ShortTag(Short.parseShort(builder.toString()));
                                 break;
                             case Tokens.TYPE_LONG:
-                                result = new LongTag("", (Long.parseLong(builder.toString())));
+                                result = new LongTag(Long.parseLong(builder.toString()));
                                 break;
                             case Tokens.TYPE_FLOAT:
-                                result = new FloatTag("", (Float.parseFloat(builder.toString())));
+                                result = new FloatTag(Float.parseFloat(builder.toString()));
                                 break;
                             case Tokens.TYPE_DOUBLE:
-                                result = new DoubleTag("", (Double.parseDouble(builder.toString())));
+                                result = new DoubleTag(Double.parseDouble(builder.toString()));
                                 break;
                         }
                     } catch (final NumberFormatException ex) {
@@ -288,12 +268,12 @@ import java.util.stream.IntStream;
         final String built = builder.toString();
         if (possiblyNumeric) {
             try {
-                return new IntTag("", Integer.parseInt(built));
+                return new IntTag(Integer.parseInt(built));
             } catch (final NumberFormatException ex) {
                 // ignore
             }
         }
-        return new StringTag("", built);
+        return new StringTag(built);
 
     }
 

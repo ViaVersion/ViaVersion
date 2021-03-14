@@ -30,7 +30,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
         Tag base = tag.get("Base");
         int color = 0;
         if (base != null) {
-            color = ((Number) tag.get("Base").getValue()).intValue();
+            color = ((NumberTag) tag.get("Base")).asInt();
         }
         // Standing banner
         if (blockId >= BANNER_START && blockId <= BANNER_STOP) {

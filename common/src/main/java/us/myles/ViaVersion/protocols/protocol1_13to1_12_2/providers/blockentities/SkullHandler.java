@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -26,10 +27,10 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
             Tag skullType = tag.get("SkullType");
             if (skullType != null) {
-                id += ((Number) tag.get("SkullType").getValue()).intValue() * 20;
+                id += ((NumberTag) tag.get("SkullType")).asInt() * 20;
             }
             if (tag.contains("Rot")) {
-                id += ((Number) tag.get("Rot").getValue()).intValue();
+                id += ((NumberTag) tag.get("Rot")).asInt();
             }
         } else {
             Via.getPlatform().getLogger().warning("Why does this block have the skull block entity? " + tag);

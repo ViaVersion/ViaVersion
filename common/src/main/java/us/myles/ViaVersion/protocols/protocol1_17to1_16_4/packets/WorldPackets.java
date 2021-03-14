@@ -216,7 +216,7 @@ public class WorldPackets {
     }
 
     private static void addNewDimensionData(CompoundTag tag) {
-        tag.put(new IntTag("min_y", 0));
-        tag.put(new IntTag("height", 256));
+        tag.put("min_y", new IntTag(0));
+        tag.put("height", new IntTag(256));
     }
 }

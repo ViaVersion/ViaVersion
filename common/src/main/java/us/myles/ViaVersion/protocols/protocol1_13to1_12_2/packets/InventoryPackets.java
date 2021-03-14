@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.conversion.ConverterRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
@@ -263,12 +264,12 @@ public class InventoryPackets {
 
         // NBT Additions
         if (isDamageable(item.getIdentifier())) {
-            if (tag == null) item.setTag(tag = new CompoundTag("tag"));
-            tag.put(new IntTag("Damage", item.getData()));
+            if (tag == null) item.setTag(tag = new CompoundTag());
+            tag.put("Damage", new IntTag(item.getData()));
         }
         if (item.getIdentifier() == 358) { // map
-            if (tag == null) item.setTag(tag = new CompoundTag("tag"));
-            tag.put(new IntTag("map", item.getData()));
+            if (tag == null) item.setTag(tag = new CompoundTag());
+            tag.put("map", new IntTag(item.getData()));
         }
 
         // NBT Changes
@@ -282,16 +283,16 @@ public class InventoryPackets {
                         IntTag base = blockEntityTag.get("Base");
                         // Set banner item id according to nbt
                         if (banner) {
-                            rawId = 6800 + base.getValue();
+                            rawId = 6800 + base.asInt();
                         }
 
-                        base.setValue(15 - base.getValue());
+                        base.setValue(15 - base.asInt());
                     }
                     if (blockEntityTag.get("Patterns") instanceof ListTag) {
                         for (Tag pattern : (ListTag) blockEntityTag.get("Patterns")) {
                             if (pattern instanceof CompoundTag) {
                                 IntTag c = ((CompoundTag) pattern).get("Color");
-                                c.setValue(15 - c.getValue()); // Invert color id
+                                c.setValue(15 - c.asInt()); // Invert color id
                             }
                         }
                     }
@@ -302,55 +303,53 @@ public class InventoryPackets {
                 CompoundTag display = tag.get("display");
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
-                    display.put(new StringTag(NBT_TAG_NAME + "|Name", name.getValue()));
+                    display.put(NBT_TAG_NAME + "|Name", new StringTag(name.getValue()));
                     name.setValue(ChatRewriter.legacyTextToJsonString(name.getValue(), true));
                 }
             }
             // ench is now Enchantments and now uses identifiers
             if (tag.get("ench") instanceof ListTag) {
                 ListTag ench = tag.get("ench");
-                ListTag enchantments = new ListTag("Enchantments", CompoundTag.class);
+                ListTag enchantments = new ListTag(CompoundTag.class);
                 for (Tag enchEntry : ench) {
                     if (enchEntry instanceof CompoundTag) {
-                        CompoundTag enchantmentEntry = new CompoundTag("");
-                        short oldId = ((Number) ((CompoundTag) enchEntry).get("id").getValue()).shortValue();
+                        CompoundTag enchantmentEntry = new CompoundTag();
+                        short oldId = ((NumberTag) ((CompoundTag) enchEntry).get("id")).asShort();
                         String newId = Protocol1_13To1_12_2.MAPPINGS.getOldEnchantmentsIds().get(oldId);
                         if (newId == null) {
                             newId = "viaversion:legacy/" + oldId;
                         }
-                        enchantmentEntry.put(new StringTag("id", newId));
-                        enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
+                        enchantmentEntry.put("id", new StringTag(newId));
+                        enchantmentEntry.put("lvl", new ShortTag(((NumberTag) ((CompoundTag) enchEntry).get("lvl")).asShort()));
                         enchantments.add(enchantmentEntry);
                     }
                 }
                 tag.remove("ench");
-                tag.put(enchantments);
+                tag.put("Enchantments", enchantments);
             }
             if (tag.get("StoredEnchantments") instanceof ListTag) {
                 ListTag storedEnch = tag.get("StoredEnchantments");
-                ListTag newStoredEnch = new ListTag("StoredEnchantments", CompoundTag.class);
+                ListTag newStoredEnch = new ListTag(CompoundTag.class);
                 for (Tag enchEntry : storedEnch) {
                     if (enchEntry instanceof CompoundTag) {
-                        CompoundTag enchantmentEntry = new CompoundTag("");
-                        short oldId = ((Number) ((CompoundTag) enchEntry).get("id").getValue()).shortValue();
+                        CompoundTag enchantmentEntry = new CompoundTag();
+                        short oldId = ((NumberTag) ((CompoundTag) enchEntry).get("id")).asShort();
                         String newId = Protocol1_13To1_12_2.MAPPINGS.getOldEnchantmentsIds().get(oldId);
                         if (newId == null) {
                             newId = "viaversion:legacy/" + oldId;
                         }
-                        enchantmentEntry.put(new StringTag("id",
-                                newId
-                        ));
-                        enchantmentEntry.put(new ShortTag("lvl", ((Number) ((CompoundTag) enchEntry).get("lvl").getValue()).shortValue()));
+                        enchantmentEntry.put("id", new StringTag(newId));
+                        enchantmentEntry.put("lvl", new ShortTag(((NumberTag) ((CompoundTag) enchEntry).get("lvl")).asShort()));
                         newStoredEnch.add(enchantmentEntry);
                     }
                 }
                 tag.remove("StoredEnchantments");
-                tag.put(newStoredEnch);
+                tag.put("StoredEnchantments", newStoredEnch);
             }
             if (tag.get("CanPlaceOn") instanceof ListTag) {
                 ListTag old = tag.get("CanPlaceOn");
-                ListTag newCanPlaceOn = new ListTag("CanPlaceOn", StringTag.class);
-                tag.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|CanPlaceOn", ConverterRegistry.convertToValue(old))); // There will be data losing
+                ListTag newCanPlaceOn = new ListTag(StringTag.class);
+                tag.put(NBT_TAG_NAME + "|CanPlaceOn", ConverterRegistry.convertToTag(ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String oldId = value.toString().replace("minecraft:", "");
@@ -361,18 +360,18 @@ public class InventoryPackets {
                     String[] newValues = BlockIdData.blockIdMapping.get(oldId.toLowerCase(Locale.ROOT));
                     if (newValues != null) {
                         for (String newValue : newValues) {
-                            newCanPlaceOn.add(new StringTag("", newValue));
+                            newCanPlaceOn.add(new StringTag(newValue));
                         }
                     } else {
-                        newCanPlaceOn.add(new StringTag("", oldId.toLowerCase(Locale.ROOT)));
+                        newCanPlaceOn.add(new StringTag(oldId.toLowerCase(Locale.ROOT)));
                     }
                 }
-                tag.put(newCanPlaceOn);
+                tag.put("CanPlaceOn", newCanPlaceOn);
             }
             if (tag.get("CanDestroy") instanceof ListTag) {
                 ListTag old = tag.get("CanDestroy");
-                ListTag newCanDestroy = new ListTag("CanDestroy", StringTag.class);
-                tag.put(ConverterRegistry.convertToTag(NBT_TAG_NAME + "|CanDestroy", ConverterRegistry.convertToValue(old))); // There will be data losing
+                ListTag newCanDestroy = new ListTag(StringTag.class);
+                tag.put(NBT_TAG_NAME + "|CanDestroy", ConverterRegistry.convertToTag(ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String oldId = value.toString().replace("minecraft:", "");
@@ -383,13 +382,13 @@ public class InventoryPackets {
                     String[] newValues = BlockIdData.blockIdMapping.get(oldId.toLowerCase(Locale.ROOT));
                     if (newValues != null) {
                         for (String newValue : newValues) {
-                            newCanDestroy.add(new StringTag("", newValue));
+                            newCanDestroy.add(new StringTag(newValue));
                         }
                     } else {
-                        newCanDestroy.add(new StringTag("", oldId.toLowerCase(Locale.ROOT)));
+                        newCanDestroy.add(new StringTag(oldId.toLowerCase(Locale.ROOT)));
                     }
                 }
-                tag.put(newCanDestroy);
+                tag.put("CanDestroy", newCanDestroy);
             }
             // Handle SpawnEggs
             if (item.getIdentifier() == 383) {
@@ -421,8 +420,8 @@ public class InventoryPackets {
 
         if (!Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId)) {
             if (!isDamageable(item.getIdentifier()) && item.getIdentifier() != 358) { // Map
-                if (tag == null) item.setTag(tag = new CompoundTag("tag"));
-                tag.put(new IntTag(NBT_TAG_NAME, originalId)); // Data will be lost, saving original id
+                if (tag == null) item.setTag(tag = new CompoundTag());
+                tag.put(NBT_TAG_NAME, new IntTag(originalId)); // Data will be lost, saving original id
             }
             if (item.getIdentifier() == 31 && item.getData() == 0) { // Shrub was removed
                 rawId = 32 << 4; // Dead Bush
@@ -495,11 +494,11 @@ public class InventoryPackets {
                 if (eggEntityId.isPresent()) {
                     rawId = 383 << 16;
                     if (tag == null)
-                        item.setTag(tag = new CompoundTag("tag"));
+                        item.setTag(tag = new CompoundTag());
                     if (!tag.contains("EntityTag")) {
-                        CompoundTag entityTag = new CompoundTag("EntityTag");
-                        entityTag.put(new StringTag("id", eggEntityId.get()));
-                        tag.put(entityTag);
+                        CompoundTag entityTag = new CompoundTag();
+                        entityTag.put("id", new StringTag(eggEntityId.get()));
+                        tag.put("EntityTag", entityTag);
                     }
                 } else {
                     rawId = (oldId >> 4) << 16 | oldId & 0xF;
@@ -542,13 +541,13 @@ public class InventoryPackets {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
                         IntTag base = blockEntityTag.get("Base");
-                        base.setValue(15 - base.getValue()); // invert color id
+                        base.setValue(15 - base.asInt()); // invert color id
                     }
                     if (blockEntityTag.get("Patterns") instanceof ListTag) {
                         for (Tag pattern : (ListTag) blockEntityTag.get("Patterns")) {
                             if (pattern instanceof CompoundTag) {
                                 IntTag c = ((CompoundTag) pattern).get("Color");
-                                c.setValue(15 - c.getValue()); // Invert color id
+                                c.setValue(15 - c.asInt()); // Invert color id
                             }
                         }
                     }
@@ -567,55 +566,52 @@ public class InventoryPackets {
             // ench is now Enchantments and now uses identifiers
             if (tag.get("Enchantments") instanceof ListTag) {
                 ListTag enchantments = tag.get("Enchantments");
-                ListTag ench = new ListTag("ench", CompoundTag.class);
+                ListTag ench = new ListTag(CompoundTag.class);
                 for (Tag enchantmentEntry : enchantments) {
                     if (enchantmentEntry instanceof CompoundTag) {
-                        CompoundTag enchEntry = new CompoundTag("");
+                        CompoundTag enchEntry = new CompoundTag();
                         String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
                         Short oldId = Protocol1_13To1_12_2.MAPPINGS.getOldEnchantmentsIds().inverse().get(newId);
                         if (oldId == null && newId.startsWith("viaversion:legacy/")) {
                             oldId = Short.valueOf(newId.substring(18));
                         }
                         if (oldId != null) {
-                            enchEntry.put(new ShortTag("id", oldId));
-                            enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                            enchEntry.put("id", new ShortTag(oldId));
+                            enchEntry.put("lvl", new ShortTag((Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
                             ench.add(enchEntry);
                         }
                     }
                 }
                 tag.remove("Enchantments");
-                tag.put(ench);
+                tag.put("ench", ench);
             }
             if (tag.get("StoredEnchantments") instanceof ListTag) {
                 ListTag storedEnch = tag.get("StoredEnchantments");
-                ListTag newStoredEnch = new ListTag("StoredEnchantments", CompoundTag.class);
+                ListTag newStoredEnch = new ListTag(CompoundTag.class);
                 for (Tag enchantmentEntry : storedEnch) {
                     if (enchantmentEntry instanceof CompoundTag) {
-                        CompoundTag enchEntry = new CompoundTag("");
+                        CompoundTag enchEntry = new CompoundTag();
                         String newId = (String) ((CompoundTag) enchantmentEntry).get("id").getValue();
                         Short oldId = Protocol1_13To1_12_2.MAPPINGS.getOldEnchantmentsIds().inverse().get(newId);
                         if (oldId == null && newId.startsWith("viaversion:legacy/")) {
                             oldId = Short.valueOf(newId.substring(18));
                         }
                         if (oldId != null) {
-                            enchEntry.put(new ShortTag("id", oldId));
-                            enchEntry.put(new ShortTag("lvl", (Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                            enchEntry.put("id", new ShortTag(oldId));
+                            enchEntry.put("lvl", new ShortTag((Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
                             newStoredEnch.add(enchEntry);
                         }
                     }
                 }
                 tag.remove("StoredEnchantments");
-                tag.put(newStoredEnch);
+                tag.put("StoredEnchantments", newStoredEnch);
             }
             if (tag.get(NBT_TAG_NAME + "|CanPlaceOn") instanceof ListTag) {
-                tag.put(ConverterRegistry.convertToTag(
-                        "CanPlaceOn",
-                        ConverterRegistry.convertToValue(tag.get(NBT_TAG_NAME + "|CanPlaceOn"))
-                ));
+                tag.put("CanPlaceOn", ConverterRegistry.convertToTag(ConverterRegistry.convertToValue(tag.get(NBT_TAG_NAME + "|CanPlaceOn"))));
                 tag.remove(NBT_TAG_NAME + "|CanPlaceOn");
             } else if (tag.get("CanPlaceOn") instanceof ListTag) {
                 ListTag old = tag.get("CanPlaceOn");
-                ListTag newCanPlaceOn = new ListTag("CanPlaceOn", StringTag.class);
+                ListTag newCanPlaceOn = new ListTag(StringTag.class);
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
@@ -623,23 +619,22 @@ public class InventoryPackets {
                             : null);
                     if (newValues != null) {
                         for (String newValue : newValues) {
-                            newCanPlaceOn.add(new StringTag("", newValue));
+                            newCanPlaceOn.add(new StringTag(newValue));
                         }
                     } else {
                         newCanPlaceOn.add(oldTag);
                     }
                 }
-                tag.put(newCanPlaceOn);
+                tag.put("CanPlaceOn", newCanPlaceOn);
             }
             if (tag.get(NBT_TAG_NAME + "|CanDestroy") instanceof ListTag) {
-                tag.put(ConverterRegistry.convertToTag(
-                        "CanDestroy",
+                tag.put("CanDestroy", ConverterRegistry.convertToTag(
                         ConverterRegistry.convertToValue(tag.get(NBT_TAG_NAME + "|CanDestroy"))
                 ));
                 tag.remove(NBT_TAG_NAME + "|CanDestroy");
             } else if (tag.get("CanDestroy") instanceof ListTag) {
                 ListTag old = tag.get("CanDestroy");
-                ListTag newCanDestroy = new ListTag("CanDestroy", StringTag.class);
+                ListTag newCanDestroy = new ListTag(StringTag.class);
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
@@ -647,13 +642,13 @@ public class InventoryPackets {
                             : null);
                     if (newValues != null) {
                         for (String newValue : newValues) {
-                            newCanDestroy.add(new StringTag("", newValue));
+                            newCanDestroy.add(new StringTag(newValue));
                         }
                     } else {
                         newCanDestroy.add(oldTag);
                     }
                 }
-                tag.put(newCanDestroy);
+                tag.put("CanDestroy", newCanDestroy);
             }
         }
     }

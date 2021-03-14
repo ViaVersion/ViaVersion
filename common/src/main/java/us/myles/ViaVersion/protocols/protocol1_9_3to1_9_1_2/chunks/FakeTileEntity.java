@@ -42,8 +42,8 @@ public class FakeTileEntity {
     }
 
     private static void register(int material, String name) {
-        CompoundTag comp = new CompoundTag("");
-        comp.put(new StringTag(name));
+        CompoundTag comp = new CompoundTag();
+        comp.put(name, new StringTag());
         tileEntities.put(material, comp);
     }
 
@@ -61,9 +61,9 @@ public class FakeTileEntity {
         CompoundTag originalTag = tileEntities.get(block);
         if (originalTag != null) {
             CompoundTag tag = originalTag.clone();
-            tag.put(new IntTag("x", x));
-            tag.put(new IntTag("y", y));
-            tag.put(new IntTag("z", z));
+            tag.put("x", new IntTag(x));
+            tag.put("y", new IntTag(y));
+            tag.put("z", new IntTag(z));
             return tag;
         }
         return null;
