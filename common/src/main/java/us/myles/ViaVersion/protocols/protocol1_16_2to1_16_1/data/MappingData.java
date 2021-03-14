@@ -35,7 +35,7 @@ public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
         for (Tag dimension : dimensions) {
             CompoundTag dimensionCompound = (CompoundTag) dimension;
             // Copy with an empty name
-            CompoundTag dimensionData = new CompoundTag("", ((CompoundTag) dimensionCompound.get("element")).getValue());
+            CompoundTag dimensionData = new CompoundTag(((CompoundTag) dimensionCompound.get("element")).getValue());
             dimensionDataMap.put(((StringTag) dimensionCompound.get("name")).getValue(), dimensionData);
         }
     }

@@ -10,7 +10,7 @@ blossom {
 dependencies {
     api(project(":adventure", "shadow"))
     api("it.unimi.dsi", "fastutil", Versions.fastUtil)
-    api("com.github.steveice10", "opennbt", Versions.openNBT)
+    api("com.viaversion", "opennbt", Versions.openNBT)
     api("com.google.code.gson", "gson", Versions.gson)
 
     compileOnlyApi("org.yaml", "snakeyaml", Versions.snakeYaml)

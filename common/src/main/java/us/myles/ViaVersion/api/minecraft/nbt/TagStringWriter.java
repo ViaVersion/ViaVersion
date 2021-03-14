@@ -39,6 +39,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 /**
  * See https://github.com/KyoriPowered/adventure.
@@ -72,17 +73,17 @@ import java.io.Writer;
         } else if (tag instanceof StringTag) {
             return this.value(((StringTag) tag).getValue(), Tokens.EOF);
         } else if (tag instanceof ByteTag) {
-            return this.value(Byte.toString(((ByteTag) tag).getValue()), Tokens.TYPE_BYTE);
+            return this.value(Byte.toString(((ByteTag) tag).asByte()), Tokens.TYPE_BYTE);
         } else if (tag instanceof ShortTag) {
-            return this.value(Short.toString(((ShortTag) tag).getValue()), Tokens.TYPE_SHORT);
+            return this.value(Short.toString(((ShortTag) tag).asShort()), Tokens.TYPE_SHORT);
         } else if (tag instanceof IntTag) {
-            return this.value(Integer.toString(((IntTag) tag).getValue()), Tokens.TYPE_INT);
+            return this.value(Integer.toString(((IntTag) tag).asInt()), Tokens.TYPE_INT);
         } else if (tag instanceof LongTag) {
-            return this.value(Long.toString(((LongTag) tag).getValue()), Tokens.TYPE_LONG);
+            return this.value(Long.toString(((LongTag) tag).asLong()), Tokens.TYPE_LONG);
         } else if (tag instanceof FloatTag) {
-            return this.value(Float.toString(((FloatTag) tag).getValue()), Tokens.TYPE_FLOAT);
+            return this.value(Float.toString(((FloatTag) tag).asFloat()), Tokens.TYPE_FLOAT);
         } else if (tag instanceof DoubleTag) {
-            return this.value(Double.toString(((DoubleTag) tag).getValue()), Tokens.TYPE_DOUBLE);
+            return this.value(Double.toString(((DoubleTag) tag).asDouble()), Tokens.TYPE_DOUBLE);
         } else {
             throw new IOException("Unknown tag type: " + tag.getClass().getSimpleName());
             // unknown!
@@ -91,9 +92,9 @@ import java.io.Writer;
 
     private TagStringWriter writeCompound(final CompoundTag tag) throws IOException {
         this.beginCompound();
-        for (Tag t : tag) {
-            this.key(t.getName());
-            this.writeTag(t);
+        for (Map.Entry<String, Tag> entry : tag.entrySet()) {
+            this.key(entry.getKey());
+            this.writeTag(entry.getValue());
         }
         this.endCompound();
         return this;

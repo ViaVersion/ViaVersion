@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.LongTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -131,7 +132,7 @@ public class InventoryPackets {
                 Tag idTag = ownerCompundTag.get("Id");
                 if (idTag instanceof StringTag) {
                     UUID id = UUID.fromString((String) idTag.getValue());
-                    ownerCompundTag.put(new IntArrayTag("Id", UUIDIntArrayType.uuidToIntArray(id)));
+                    ownerCompundTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(id)));
                 }
             }
         }
@@ -153,7 +154,7 @@ public class InventoryPackets {
                 Tag idTag = ownerCompundTag.get("Id");
                 if (idTag instanceof IntArrayTag) {
                     UUID id = UUIDIntArrayType.uuidFromIntArray((int[]) idTag.getValue());
-                    ownerCompundTag.put(new StringTag("Id", id.toString()));
+                    ownerCompundTag.put("Id", new StringTag(id.toString()));
                 }
             }
         }
@@ -174,8 +175,8 @@ public class InventoryPackets {
             Tag leastTag = attribute.get("UUIDLeast");
             if (leastTag != null) {
                 Tag mostTag = attribute.get("UUIDMost");
-                int[] uuidIntArray = UUIDIntArrayType.bitsToIntArray(((Number) leastTag.getValue()).longValue(), ((Number) mostTag.getValue()).longValue());
-                attribute.put(new IntArrayTag("UUID", uuidIntArray));
+                int[] uuidIntArray = UUIDIntArrayType.bitsToIntArray(((NumberTag) leastTag).asLong(), ((NumberTag) mostTag).asLong());
+                attribute.put("UUID", new IntArrayTag(uuidIntArray));
             }
         }
     }
@@ -193,8 +194,8 @@ public class InventoryPackets {
             IntArrayTag uuidTag = attribute.get("UUID");
             if (uuidTag != null) {
                 UUID uuid = UUIDIntArrayType.uuidFromIntArray(uuidTag.getValue());
-                attribute.put(new LongTag("UUIDLeast", uuid.getLeastSignificantBits()));
-                attribute.put(new LongTag("UUIDMost", uuid.getMostSignificantBits()));
+                attribute.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
+                attribute.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
             }
         }
     }

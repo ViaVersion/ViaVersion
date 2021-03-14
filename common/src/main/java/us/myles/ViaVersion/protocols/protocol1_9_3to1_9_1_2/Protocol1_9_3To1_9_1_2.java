@@ -59,13 +59,13 @@ public class Protocol1_9_3To1_9_1_2 extends Protocol<ClientboundPackets1_9, Clie
                         wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
 
                         //Create nbt
-                        CompoundTag tag = new CompoundTag("");
-                        tag.put(new StringTag("id", "Sign"));
-                        tag.put(new IntTag("x", position.getX()));
-                        tag.put(new IntTag("y", position.getY()));
-                        tag.put(new IntTag("z", position.getZ()));
+                        CompoundTag tag = new CompoundTag();
+                        tag.put("id", new StringTag("Sign"));
+                        tag.put("x", new IntTag(position.getX()));
+                        tag.put("y", new IntTag(position.getY()));
+                        tag.put("z", new IntTag(position.getZ()));
                         for (int i = 0; i < lines.length; i++) {
-                            tag.put(new StringTag("Text" + (i + 1), lines[i].toString()));
+                            tag.put("Text" + (i + 1), new StringTag(lines[i].toString()));
                         }
 
                         wrapper.write(Type.NBT, tag);

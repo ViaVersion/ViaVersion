@@ -176,9 +176,9 @@ public class WorldPackets {
                             section.setNonAirBlocksCount(nonAirBlockCount);
                         }
 
-                        CompoundTag heightMap = new CompoundTag("");
-                        heightMap.put(new LongArrayTag("MOTION_BLOCKING", encodeHeightMap(motionBlocking)));
-                        heightMap.put(new LongArrayTag("WORLD_SURFACE", encodeHeightMap(worldSurface)));
+                        CompoundTag heightMap = new CompoundTag();
+                        heightMap.put("MOTION_BLOCKING", new LongArrayTag(encodeHeightMap(motionBlocking)));
+                        heightMap.put("WORLD_SURFACE", new LongArrayTag(encodeHeightMap(worldSurface)));
                         chunk.setHeightMap(heightMap);
 
                         PacketWrapper lightPacket = wrapper.create(0x24);

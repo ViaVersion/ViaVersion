@@ -116,12 +116,12 @@ public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, Clie
                                         // Is this a bed?
                                         if (block == 26) {
                                             //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
-                                            CompoundTag tag = new CompoundTag("");
-                                            tag.put(new IntTag("color", 14)); // Set color to red (Default in previous versions)
-                                            tag.put(new IntTag("x", x + (chunk.getX() << 4)));
-                                            tag.put(new IntTag("y", y + (i << 4)));
-                                            tag.put(new IntTag("z", z + (chunk.getZ() << 4)));
-                                            tag.put(new StringTag("id", "minecraft:bed"));
+                                            CompoundTag tag = new CompoundTag();
+                                            tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
+                                            tag.put("x", new IntTag(x + (chunk.getX() << 4)));
+                                            tag.put("y", new IntTag(y + (i << 4)));
+                                            tag.put("z", new IntTag(z + (chunk.getZ() << 4)));
+                                            tag.put("id", new StringTag("minecraft:bed"));
 
                                             // Add a fake block entity
                                             chunk.getBlockEntities().add(tag);

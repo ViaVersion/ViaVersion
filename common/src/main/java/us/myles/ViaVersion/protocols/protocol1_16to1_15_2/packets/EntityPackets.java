@@ -46,83 +46,83 @@ public class EntityPackets {
         wrapper.write(Type.STRING, dimensionName); // dimension
         wrapper.write(Type.STRING, dimensionName); // world
     };
-    public static final CompoundTag DIMENSIONS_TAG = new CompoundTag("");
+    public static final CompoundTag DIMENSIONS_TAG = new CompoundTag();
     private static final String[] WORLD_NAMES = {"minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"};
 
     static {
-        ListTag list = new ListTag("dimension", CompoundTag.class);
+        ListTag list = new ListTag(CompoundTag.class);
         list.add(createOverworldEntry());
         list.add(createOverworldCavesEntry());
         list.add(createNetherEntry());
         list.add(createEndEntry());
-        DIMENSIONS_TAG.put(list);
+        DIMENSIONS_TAG.put("dimension", list);
     }
 
     private static CompoundTag createOverworldEntry() {
-        CompoundTag tag = new CompoundTag("");
-        tag.put(new StringTag("name", "minecraft:overworld"));
-        tag.put(new ByteTag("has_ceiling", (byte) 0));
+        CompoundTag tag = new CompoundTag();
+        tag.put("name", new StringTag("minecraft:overworld"));
+        tag.put("has_ceiling", new ByteTag((byte) 0));
         addSharedOverwaldEntries(tag);
         return tag;
     }
 
     private static CompoundTag createOverworldCavesEntry() {
-        CompoundTag tag = new CompoundTag("");
-        tag.put(new StringTag("name", "minecraft:overworld_caves"));
-        tag.put(new ByteTag("has_ceiling", (byte) 1));
+        CompoundTag tag = new CompoundTag();
+        tag.put("name", new StringTag("minecraft:overworld_caves"));
+        tag.put("has_ceiling", new ByteTag((byte) 1));
         addSharedOverwaldEntries(tag);
         return tag;
     }
 
     private static void addSharedOverwaldEntries(CompoundTag tag) {
-        tag.put(new ByteTag("piglin_safe", (byte) 0));
-        tag.put(new ByteTag("natural", (byte) 1));
-        tag.put(new FloatTag("ambient_light", 0));
-        tag.put(new StringTag("infiniburn", "minecraft:infiniburn_overworld"));
-        tag.put(new ByteTag("respawn_anchor_works", (byte) 0));
-        tag.put(new ByteTag("has_skylight", (byte) 1));
-        tag.put(new ByteTag("bed_works", (byte) 1));
-        tag.put(new ByteTag("has_raids", (byte) 1));
-        tag.put(new IntTag("logical_height", 256));
-        tag.put(new ByteTag("shrunk", (byte) 0));
-        tag.put(new ByteTag("ultrawarm", (byte) 0));
+        tag.put("piglin_safe", new ByteTag((byte) 0));
+        tag.put("natural", new ByteTag((byte) 1));
+        tag.put("ambient_light", new FloatTag(0));
+        tag.put("infiniburn", new StringTag("minecraft:infiniburn_overworld"));
+        tag.put("respawn_anchor_works", new ByteTag((byte) 0));
+        tag.put("has_skylight", new ByteTag((byte) 1));
+        tag.put("bed_works", new ByteTag((byte) 1));
+        tag.put("has_raids", new ByteTag((byte) 1));
+        tag.put("logical_height", new IntTag(256));
+        tag.put("shrunk", new ByteTag((byte) 0));
+        tag.put("ultrawarm", new ByteTag((byte) 0));
     }
 
     private static CompoundTag createNetherEntry() {
-        CompoundTag tag = new CompoundTag("");
-        tag.put(new ByteTag("piglin_safe", (byte) 1));
-        tag.put(new ByteTag("natural", (byte) 0));
-        tag.put(new FloatTag("ambient_light", 0.1F));
-        tag.put(new StringTag("infiniburn", "minecraft:infiniburn_nether"));
-        tag.put(new ByteTag("respawn_anchor_works", (byte) 1));
-        tag.put(new ByteTag("has_skylight", (byte) 0));
-        tag.put(new ByteTag("bed_works", (byte) 0));
-        tag.put(new LongTag("fixed_time", 18000));
-        tag.put(new ByteTag("has_raids", (byte) 0));
-        tag.put(new StringTag("name", "minecraft:the_nether"));
-        tag.put(new IntTag("logical_height", 128));
-        tag.put(new ByteTag("shrunk", (byte) 1));
-        tag.put(new ByteTag("ultrawarm", (byte) 1));
-        tag.put(new ByteTag("has_ceiling", (byte) 1));
+        CompoundTag tag = new CompoundTag();
+        tag.put("piglin_safe", new ByteTag((byte) 1));
+        tag.put("natural", new ByteTag((byte) 0));
+        tag.put("ambient_light",new FloatTag( 0.1F));
+        tag.put("infiniburn", new StringTag("minecraft:infiniburn_nether"));
+        tag.put("respawn_anchor_works", new ByteTag((byte) 1));
+        tag.put("has_skylight", new ByteTag((byte) 0));
+        tag.put("bed_works", new ByteTag((byte) 0));
+        tag.put("fixed_time", new LongTag(18000));
+        tag.put("has_raids", new ByteTag((byte) 0));
+        tag.put("name", new StringTag("minecraft:the_nether"));
+        tag.put("logical_height", new IntTag(128));
+        tag.put("shrunk", new ByteTag((byte) 1));
+        tag.put("ultrawarm", new ByteTag((byte) 1));
+        tag.put("has_ceiling", new ByteTag((byte) 1));
         return tag;
     }
 
     private static CompoundTag createEndEntry() {
-        CompoundTag tag = new CompoundTag("");
-        tag.put(new ByteTag("piglin_safe", (byte) 0));
-        tag.put(new ByteTag("natural", (byte) 0));
-        tag.put(new FloatTag("ambient_light", 0));
-        tag.put(new StringTag("infiniburn", "minecraft:infiniburn_end"));
-        tag.put(new ByteTag("respawn_anchor_works", (byte) 0));
-        tag.put(new ByteTag("has_skylight", (byte) 0));
-        tag.put(new ByteTag("bed_works", (byte) 0));
-        tag.put(new LongTag("fixed_time", 6000));
-        tag.put(new ByteTag("has_raids", (byte) 1));
-        tag.put(new StringTag("name", "minecraft:the_end"));
-        tag.put(new IntTag("logical_height", 256));
-        tag.put(new ByteTag("shrunk", (byte) 0));
-        tag.put(new ByteTag("ultrawarm", (byte) 0));
-        tag.put(new ByteTag("has_ceiling", (byte) 0));
+        CompoundTag tag = new CompoundTag();
+        tag.put("piglin_safe", new ByteTag((byte) 0));
+        tag.put("natural", new ByteTag((byte) 0));
+        tag.put("ambient_light", new FloatTag(0));
+        tag.put("infiniburn", new StringTag("minecraft:infiniburn_end"));
+        tag.put("respawn_anchor_works", new ByteTag((byte) 0));
+        tag.put("has_skylight", new ByteTag((byte) 0));
+        tag.put("bed_works", new ByteTag((byte) 0));
+        tag.put("fixed_time", new LongTag(6000));
+        tag.put("has_raids", new ByteTag((byte) 1));
+        tag.put("name", new StringTag("minecraft:the_end"));
+        tag.put("logical_height", new IntTag(256));
+        tag.put("shrunk", new ByteTag((byte) 0));
+        tag.put("ultrawarm", new ByteTag((byte) 0));
+        tag.put("has_ceiling", new ByteTag((byte) 0));
         return tag;
     }
 

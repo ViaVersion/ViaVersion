@@ -237,14 +237,14 @@ public class ItemRewriter {
             if (item.getIdentifier() == 383 && item.getData() != 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
-                    tag = new CompoundTag("tag");
+                    tag = new CompoundTag();
                 }
-                CompoundTag entityTag = new CompoundTag("EntityTag");
+                CompoundTag entityTag = new CompoundTag();
                 String entityName = ENTTIY_ID_TO_NAME.get((int) item.getData());
                 if (entityName != null) {
-                    StringTag id = new StringTag("id", entityName);
-                    entityTag.put(id);
-                    tag.put(entityTag);
+                    StringTag id = new StringTag(entityName);
+                    entityTag.put("id", id);
+                    tag.put("EntityTag", entityTag);
                 }
                 item.setTag(tag);
                 item.setData((short) 0);
@@ -252,27 +252,27 @@ public class ItemRewriter {
             if (item.getIdentifier() == 373) { // Potion
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
-                    tag = new CompoundTag("tag");
+                    tag = new CompoundTag();
                 }
                 if (item.getData() >= 16384) {
                     item.setIdentifier(438); // splash id
                     item.setData((short) (item.getData() - 8192));
                 }
                 String name = potionNameFromDamage(item.getData());
-                StringTag potion = new StringTag("Potion", "minecraft:" + name);
-                tag.put(potion);
+                StringTag potion = new StringTag("minecraft:" + name);
+                tag.put("Potion", potion);
                 item.setTag(tag);
                 item.setData((short) 0);
             }
             if (item.getIdentifier() == 387) { // WRITTEN_BOOK
                 CompoundTag tag = item.getTag();
                 if (tag == null) {
-                    tag = new CompoundTag("tag");
+                    tag = new CompoundTag();
                 }
                 ListTag pages = tag.get("pages");
                 if (pages == null) {
-                    pages = new ListTag("pages", Collections.<Tag>singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
-                    tag.put(pages);
+                    pages = new ListTag(Collections.singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
+                    tag.put("pages", pages);
                     item.setTag(tag);
                     return;
                 }
