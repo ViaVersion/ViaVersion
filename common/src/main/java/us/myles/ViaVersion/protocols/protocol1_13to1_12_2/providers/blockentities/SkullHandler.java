@@ -40,7 +40,7 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         return id;
     }
 
-    private long getLong(Tag tag) {
-        return ((Integer) tag.getValue()).longValue();
+    private long getLong(NumberTag tag) {
+        return tag.asLong();
     }
 }

@@ -61,7 +61,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
         return blockId;
     }
 
-    private long getLong(Tag tag) {
-        return ((Integer) tag.getValue()).longValue();
+    private long getLong(NumberTag tag) {
+        return tag.asLong();
     }
 }

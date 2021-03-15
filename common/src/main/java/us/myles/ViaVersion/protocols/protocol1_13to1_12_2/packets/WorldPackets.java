@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -426,9 +427,9 @@ public class WorldPackets {
                         for (CompoundTag tag : chunk.getBlockEntities()) {
                             int newId = provider.transform(wrapper.user(), null, tag, false);
                             if (newId != -1) {
-                                int x = (int) tag.get("x").getValue();
-                                int y = (int) tag.get("y").getValue();
-                                int z = (int) tag.get("z").getValue();
+                                int x = ((NumberTag) tag.get("x")).asInt();
+                                int y = ((NumberTag) tag.get("y")).asInt();
+                                int z = ((NumberTag) tag.get("z")).asInt();
 
                                 Position position = new Position(x, (short) y, z);
                                 // Store the replacement blocks for blockupdates

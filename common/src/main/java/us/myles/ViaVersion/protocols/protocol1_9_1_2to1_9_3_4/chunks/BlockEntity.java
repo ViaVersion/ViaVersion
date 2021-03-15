@@ -1,6 +1,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -41,9 +42,9 @@ public class BlockEntity {
                 if (newId == -1)
                     continue;
 
-                int x = (int) tag.get("x").getValue();
-                int y = (int) tag.get("y").getValue();
-                int z = (int) tag.get("z").getValue();
+                int x = ((NumberTag) tag.get("x")).asInt();
+                int y = ((NumberTag) tag.get("y")).asInt();
+                int z = ((NumberTag) tag.get("z")).asInt();
 
                 Position pos = new Position(x, (short) y, z);
 
