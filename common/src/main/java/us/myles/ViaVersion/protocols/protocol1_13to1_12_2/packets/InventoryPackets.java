@@ -479,7 +479,7 @@ public class InventoryPackets {
         if (tag != null) {
             // Check for valid tag
             if (tag.get(NBT_TAG_NAME) instanceof IntTag) {
-                rawId = (Integer) tag.get(NBT_TAG_NAME).getValue();
+                rawId = ((NumberTag) tag.get(NBT_TAG_NAME)).asInt();
                 // Remove the tag
                 tag.remove(NBT_TAG_NAME);
                 gotRawIdFromTag = true;
