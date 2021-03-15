@@ -35,7 +35,7 @@ public class InventoryPackets {
             }
         });
 
-        // This will likely cause desync issues
+        // This will cause desync issues to clients with a high latency
         protocol.registerIncoming(ServerboundPackets1_17.CLICK_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -43,7 +43,7 @@ public class InventoryPackets {
                 map(Type.SHORT); // Slot
                 map(Type.BYTE); // Button
                 create(wrapper -> wrapper.write(Type.SHORT, (short) 0)); // Action id - doesn't matter, as the sent out confirmation packet will be cancelled
-                map(Type.VAR_INT); // Mode
+                map(Type.VAR_INT); // Action
 
                 handler(wrapper -> {
                     // Affected items - throw them away!
@@ -53,13 +53,23 @@ public class InventoryPackets {
                         wrapper.read(Type.FLAT_VAR_INT_ITEM);
                     }
 
-                    // Carried item
-                    toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                    // 1.17 clients send the then carried item, but 1.16 expects the clicked one
+                    Item item = wrapper.read(Type.FLAT_VAR_INT_ITEM);
+                    int action = wrapper.get(Type.VAR_INT, 0);
+                    if (action == 5) {
+                        // Quick craft (= dragging / mouse movement while clicking on an empty slot)
+                        // The server always expects an empty item here
+                        item = null;
+                    } else {
+                        // Use the item sent
+                        toServer(item);
+                    }
+
+                    wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
                 });
             }
         });
 
-        //TODO fix drags not working at all, try to work against desync issues with keepalive abuise
         protocol.registerOutgoing(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, new PacketRemapper() {
             @Override
             public void registerMap() {
