@@ -191,7 +191,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
                 "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals",
                 "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores",
-                "minecraft:coal_ores", "minecraft:copper_ores", "minecraft:emerald_ores");
+                "minecraft:coal_ores", "minecraft:copper_ores", "minecraft:emerald_ores", "minecraft:cluster_max_harvestables");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
                 "minecraft:snow_step_sound_blocks", "minecraft:inside_step_sound_blocks", "minecraft:occludes_vibration_signals", "minecraft:dripstone_replaceable_blocks",
                 "minecraft:cave_vines", "minecraft:lush_plants_replaceable", "minecraft:deepslate_ore_replaceables", "minecraft:lush_ground_replaceable",
