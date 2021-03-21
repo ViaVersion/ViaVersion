@@ -51,7 +51,7 @@ After cloning this repository, build the project with Gradle by running `/gradle
 License:
 --------
 
-MIT License, see LICENSE for more details.
+MIT License, see LICENSE.txt for more details.
 
 
 Special thanks to all our [Contributors](https://github.com/ViaVersion/ViaVersion/graphs/contributors)
