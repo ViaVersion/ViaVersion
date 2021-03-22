@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: ViaVersion Discord Server
-    url: https://discord.gg/casfFyh
-    about: You can also join the Via Discord server for help with smaller issues during setup.
+  - name: Dev builds
+    url: https://ci.viaversion.com/
+    about: Before reporting a bug, please check if using master/dev builds from our ci fixes your issue.
+  - name: ViaVersion Discord
+    url: https://discord.gg/viaversion
+    about: For smaller issues or questions, you can also join our Discord server.

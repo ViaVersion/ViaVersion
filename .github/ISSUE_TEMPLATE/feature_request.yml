@@ -1,0 +1,37 @@
+name: Feature Request
+description: Suggest a feature to be added
+
+body:
+  - type: textarea
+    attributes:
+      label: Problem Description
+      description: |
+        Describe the issue you are facing or why you need the feature to be added.
+      placeholder: |
+        I am always frustrated with...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Solution Description
+      description: |
+        Describe the solution you would like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: |
+        Describe alternatives you have considered.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Info
+      description: |
+        Does the feature apply to any specific version or environment?
+    validations:
+      required: false
