@@ -4,7 +4,7 @@
   "name": "ViaVersion",
   "version": "${version}",
   "description": "${description}",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "contact": {
     "homepage": "https://viaversion.com/",
     "issues": "https://github.com/ViaVersion/ViaVersion/issues",

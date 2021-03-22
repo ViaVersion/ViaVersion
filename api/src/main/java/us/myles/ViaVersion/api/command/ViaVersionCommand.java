@@ -47,4 +47,6 @@ public interface ViaVersionCommand {
      * @return was successful
      */
     List<String> onTabComplete(ViaCommandSender sender, String[] args);
+
+    void showHelp(ViaCommandSender sender);
 }

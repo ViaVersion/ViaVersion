@@ -1,6 +1,6 @@
 package us.myles.ViaVersion.api.command;
 
-import us.myles.ViaVersion.commands.ViaCommandHandler;
+import us.myles.ViaVersion.util.ChatColorUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,18 +60,24 @@ public abstract class ViaSubCommand {
         return Collections.emptyList();
     }
 
-    public String color(String s) {
-        return ViaCommandHandler.color(s);
+    /**
+     * Replaces color codes in a string.
+     *
+     * @param s string to replace
+     * @return output String
+     */
+    public static String color(String s) {
+        return ChatColorUtil.translateAlternateColorCodes(s);
     }
 
     /**
-     * Send message formatted / colored
+     * Send a color coded string with replacements to a user.
      *
-     * @param sender  commands sender
-     * @param message string message
-     * @param args    optional objects
+     * @param sender  target to send the message to
+     * @param message message
+     * @param args    objects to replace
      */
-    public void sendMessage(ViaCommandSender sender, String message, Object... args) {
-        ViaCommandHandler.sendMessage(sender, message, args);
+    public static void sendMessage(ViaCommandSender sender, String message, Object... args) {
+        sender.sendMessage(color(args == null ? message : String.format(message, args)));
     }
 }

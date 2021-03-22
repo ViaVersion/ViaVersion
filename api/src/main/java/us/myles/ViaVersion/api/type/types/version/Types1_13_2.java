@@ -3,7 +3,7 @@ package us.myles.ViaVersion.api.type.types.version;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.types.Particle1_13_2Type;
+import us.myles.ViaVersion.api.type.types.minecraft.Particle1_13_2Type;
 
 import java.util.List;
 
@@ -21,5 +21,5 @@ public class Types1_13_2 {
     /**
      * Particle type for 1.13.2
      */
-    public static Type<Particle> PARTICLE = new Particle1_13_2Type();
+    public static final Type<Particle> PARTICLE = new Particle1_13_2Type();
 }

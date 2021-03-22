@@ -87,7 +87,7 @@ public class ViaConnectionManager {
         if (conn.getProtocolInfo() == null) return null;
         UUID uuid = conn.getProtocolInfo().getUuid();
         UserConnection client = clients.get(uuid);
-        if (client != null && client.equals(conn)) {
+        if (conn.equals(client)) {
             // This is frontend
             return uuid;
         }

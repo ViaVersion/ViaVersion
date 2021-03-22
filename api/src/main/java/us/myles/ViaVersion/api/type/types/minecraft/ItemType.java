@@ -2,7 +2,6 @@ package us.myles.ViaVersion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.Type;
 
 public class ItemType extends BaseItemType {
     public ItemType() {
@@ -19,7 +18,7 @@ public class ItemType extends BaseItemType {
             item.setIdentifier(id);
             item.setAmount(buffer.readByte());
             item.setData(buffer.readShort());
-            item.setTag(Type.NBT.read(buffer));
+            item.setTag(NBT.read(buffer));
             return item;
         }
     }
@@ -32,7 +31,7 @@ public class ItemType extends BaseItemType {
             buffer.writeShort(object.getIdentifier());
             buffer.writeByte(object.getAmount());
             buffer.writeShort(object.getData());
-            Type.NBT.write(buffer, object.getTag());
+            NBT.write(buffer, object.getTag());
         }
     }
 }

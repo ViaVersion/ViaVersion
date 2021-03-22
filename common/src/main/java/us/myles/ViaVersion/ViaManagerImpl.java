@@ -1,3 +1,20 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package us.myles.ViaVersion;
 
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +26,7 @@ import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
+import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
@@ -23,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class ViaManager {
+public class ViaManagerImpl implements ViaManager {
     private final ViaPlatform<?> platform;
     private final ViaProviders providers = new ViaProviders();
     // Internals
@@ -35,7 +53,7 @@ public class ViaManager {
     private TaskId mappingLoadingTask;
     private boolean debug;
 
-    public ViaManager(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
+    public ViaManagerImpl(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
         this.injector = injector;
         this.commandHandler = commandHandler;
@@ -232,6 +250,16 @@ public class ViaManager {
         enableListeners.add(runnable);
     }
 
+    @Override
+    public Protocol getBaseProtocol() {
+        return ProtocolRegistry.BASE_PROTOCOL;
+    }
+
+    @Override
+    public boolean isBaseProtocol(Protocol protocol) {
+        return ProtocolRegistry.isBaseProtocol(protocol);
+    }
+
     public static final class ViaManagerBuilder {
         private ViaPlatform<?> platform;
         private ViaInjector injector;
@@ -258,8 +286,8 @@ public class ViaManager {
             return this;
         }
 
-        public ViaManager build() {
-            return new ViaManager(platform, injector, commandHandler, loader);
+        public ViaManagerImpl build() {
+            return new ViaManagerImpl(platform, injector, commandHandler, loader);
         }
     }
 }

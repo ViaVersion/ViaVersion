@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -15,6 +14,14 @@ import java.util.UUID;
  * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
  */
 public interface ViaAPI<T> {
+
+    /**
+     * Returns the server's protocol version.
+     * In the case of a proxy, this is the lowest supported version.
+     *
+     * @return the server's protocol version
+     */
+    int getServerVersion();
 
     /**
      * Get protocol version number from a player.
@@ -38,8 +45,8 @@ public interface ViaAPI<T> {
      *
      * @param playerUUID UUID of a player
      * @return true if Via has a cached userconnection for this player
-     * @deprecated use {@link #isInjected(UUID)}
      * @see #isInjected(UUID)
+     * @deprecated use {@link #isInjected(UUID)}
      */
     @Deprecated
     default boolean isPorted(UUID playerUUID) {
@@ -105,7 +112,14 @@ public interface ViaAPI<T> {
      * This method removes any blocked protocol versions.
      *
      * @return a list of protocol versions
-     * @see ProtocolRegistry#getSupportedVersions() for full list.
+     * @see #getFullSupportedVersions() for a full list
      */
     SortedSet<Integer> getSupportedVersions();
+
+    /**
+     * Get the supported protocol versions, including blocked protocols.
+     *
+     * @return a list of protocol versions
+     */
+    SortedSet<Integer> getFullSupportedVersions();
 }

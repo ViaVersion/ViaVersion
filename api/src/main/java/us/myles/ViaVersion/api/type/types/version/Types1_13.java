@@ -4,7 +4,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Particle1_13Type;
+import us.myles.ViaVersion.api.type.types.minecraft.Particle1_13Type;
 
 import java.util.List;
 

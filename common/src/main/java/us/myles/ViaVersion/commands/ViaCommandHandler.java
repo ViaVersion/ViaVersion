@@ -1,3 +1,20 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package us.myles.ViaVersion.commands;
 
 import com.google.common.base.Preconditions;
@@ -14,7 +31,6 @@ import us.myles.ViaVersion.commands.defaultsubs.HelpSubCmd;
 import us.myles.ViaVersion.commands.defaultsubs.ListSubCmd;
 import us.myles.ViaVersion.commands.defaultsubs.PPSSubCmd;
 import us.myles.ViaVersion.commands.defaultsubs.ReloadSubCmd;
-import us.myles.ViaVersion.util.ChatColorUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +41,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import static us.myles.ViaVersion.api.command.ViaSubCommand.color;
 
 public abstract class ViaCommandHandler implements ViaVersionCommand {
     private final Map<String, ViaSubCommand> commandMap;
@@ -120,6 +138,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
      *
      * @param sender The sender to send the help to
      */
+    @Override
     public void showHelp(ViaCommandSender sender) {
         Set<ViaSubCommand> allowed = calculateAllowedCommands(sender);
         if (allowed.isEmpty()) {
@@ -155,26 +174,5 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         registerSubCommand(new AutoTeamSubCmd());
         registerSubCommand(new HelpSubCmd());
         registerSubCommand(new ReloadSubCmd());
-    }
-
-    /**
-     * Replaces colour codes in a string
-     *
-     * @param string String to replace
-     * @return The output String
-     */
-    public static String color(String string) {
-        return ChatColorUtil.translateAlternateColorCodes(string);
-    }
-
-    /**
-     * Send a colour coded string with replacements to a user
-     *
-     * @param sender  The target to send the message to
-     * @param message The message
-     * @param args    The objects to replace
-     */
-    public static void sendMessage(ViaCommandSender sender, String message, Object... args) {
-        sender.sendMessage(color(args == null ? message : String.format(message, args)));
     }
 }

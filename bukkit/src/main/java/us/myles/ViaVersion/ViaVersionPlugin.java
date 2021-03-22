@@ -1,3 +1,20 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package us.myles.ViaVersion;
 
 import com.google.gson.JsonObject;
@@ -53,7 +70,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         // Init platform
         BukkitViaInjector injector = new BukkitViaInjector();
 
-        Via.init(ViaManager.builder()
+        Via.init(ViaManagerImpl.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
                 .injector(injector)
@@ -106,14 +123,14 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         getLogger().info("ViaVersion " + getDescription().getVersion() + (compatSpigotBuild ? "compat" : "") + " is now loaded" + (lateBind ? ", waiting for boot. (late-bind)" : ", injecting!"));
         if (!lateBind) {
-            Via.getManager().init();
+            ((ViaManagerImpl) Via.getManager()).init();
         }
     }
 
     @Override
     public void onEnable() {
         if (lateBind) {
-            Via.getManager().init();
+            ((ViaManagerImpl) Via.getManager()).init();
         }
 
         getCommand("viaversion").setExecutor(commandHandler);
@@ -141,7 +158,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onDisable() {
-        Via.getManager().destroy();
+        ((ViaManagerImpl) Via.getManager()).destroy();
     }
 
     @Override

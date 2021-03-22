@@ -2,6 +2,7 @@ rootProject.name = "viaversion-parent"
 
 include("adventure")
 
+setupViaSubproject("api")
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
 setupViaSubproject("bukkit-legacy")

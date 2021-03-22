@@ -2,7 +2,6 @@ package us.myles.ViaVersion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.Type;
 
 public class FlatVarIntItemType extends BaseItemType {
     public FlatVarIntItemType() {
@@ -16,9 +15,9 @@ public class FlatVarIntItemType extends BaseItemType {
             return null;
         } else {
             Item item = new Item();
-            item.setIdentifier(Type.VAR_INT.readPrimitive(buffer));
+            item.setIdentifier(VAR_INT.readPrimitive(buffer));
             item.setAmount(buffer.readByte());
-            item.setTag(Type.NBT.read(buffer));
+            item.setTag(NBT.read(buffer));
             return item;
         }
     }
@@ -29,9 +28,9 @@ public class FlatVarIntItemType extends BaseItemType {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            Type.VAR_INT.writePrimitive(buffer, object.getIdentifier());
+            VAR_INT.writePrimitive(buffer, object.getIdentifier());
             buffer.writeByte(object.getAmount());
-            Type.NBT.write(buffer, object.getTag());
+            NBT.write(buffer, object.getTag());
         }
     }
 }

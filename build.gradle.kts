@@ -40,8 +40,9 @@ subprojects {
     ).map { "viaversion-$it" }
     if (platforms.contains(project.name)) {
         configureShadowJar()
-    }
-    if (project.name == "viaversion") {
+    } else if (project.name == "viaversion-api") {
+        configureShadowJarAPI()
+    } else if (project.name == "viaversion") {
         apply<ShadowPlugin>()
     }
 

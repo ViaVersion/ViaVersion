@@ -8,13 +8,5 @@ blossom {
 }
 
 dependencies {
-    api(project(":adventure", "shadow"))
-    api("it.unimi.dsi", "fastutil", Versions.fastUtil)
-    api("com.viaversion", "opennbt", Versions.openNBT)
-    api("com.google.code.gson", "gson", Versions.gson)
-
-    compileOnlyApi("org.yaml", "snakeyaml", Versions.snakeYaml)
-    compileOnlyApi("io.netty", "netty-all", Versions.netty)
-    compileOnlyApi("com.google.guava", "guava", Versions.guava)
-    compileOnlyApi("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
+    api(project(":viaversion-api"))
 }
