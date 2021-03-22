@@ -410,6 +410,7 @@ public class ProtocolRegistry {
      * adding a {@link CompletableFuture} to the list of data to load bound to their protocols.
      *
      * @param protocolClass protocol class
+     * @param dependsOn     class of the protocol that the data loading depends on
      * @param runnable      runnable to be executed asynchronously
      */
     public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
