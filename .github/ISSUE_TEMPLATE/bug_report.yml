@@ -4,18 +4,18 @@ description: Report a bug or console error
 body:
   - type: markdown
     attributes:
-      value: Before reporting a bug, please see if using master/dev builds from https://ci.viaversion.com/ fixes your issue.
+      value: "**Before reporting a bug, please see if using master/dev builds from https://ci.viaversion.com/ fixes your issue.**"
 
   - type: input
     attributes:
-      label: "'/viaVersion dump' output"
+      label: "'/viaversion dump' output"
       description: Run `/viaversion dump` in the console or in the chat, then copy and paste the given link here.
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: Error
+      label: Console error
       description: |
         If you encounter warnings/errors in your console, **paste them under https://paste.gg/** and put the paste link here.
         If the error is small/less than 10 lines, you may put it directly into this field.
@@ -23,7 +23,6 @@ body:
         ```
         Put the paste.gg link or text here.
         ```
-      placeholder: Please do not remove the grave accents; simply replace the line of text in the middle.
     validations:
       required: false
 
@@ -75,15 +74,17 @@ body:
       label: Checklist
       description: Make sure you have followed each of the steps outlined here.
       options:
-        - label: Via plugins are only running on *either* my backend servers (e.g. Paper) *or* the proxy (e.g. BungeeCord), not on both.
+        - label: Via plugins are only running on **either** the backend servers (e.g. Paper) **or** the proxy (e.g. BungeeCord), **not on both**.
           required: true
         - label: I have included a ViaVersion dump.
           required: true
-        - label: If applicable, I have included a paste (not a screenshot!) of the error.
+        - label: If applicable, I have included a paste (not a screenshot) of the error.
           required: true
         - label: I have tried a build from https://ci.viaversion.com/ and the issue still persists.
           required: true
 
   - type: markdown
     attributes:
-      value: If needed, add **screenshots to help explain your problem** in the comment field below.
+      value: |
+
+        If needed, add **screenshots to help explain your problem** in the comment field below.
