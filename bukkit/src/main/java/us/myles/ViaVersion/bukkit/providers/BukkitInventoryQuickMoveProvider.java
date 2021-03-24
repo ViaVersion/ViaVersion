@@ -24,7 +24,6 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bukkit.tasks.protocol1_12to1_11_1.BukkitInventoryUpdateTask;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
@@ -71,7 +70,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             // windowId is always 0 for player inventory.
             // This has almost definitely something to do with the offhand slot.
             if (slotId >= 36 && slotId <= 44) {
-                int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
+                int protocolId = Via.getAPI().getServerVersion();
                 // this seems to be working just fine.
                 if (protocolId == ProtocolVersion.v1_8.getVersion()) {
                     return false;
@@ -103,7 +102,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         Inventory tinv = inv.getTopInventory();
         InventoryType tinvtype = tinv == null ? null : tinv.getType(); // can this even be null?
         if (tinvtype != null) {
-            int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
+            int protocolId = Via.getAPI().getServerVersion();
             if (protocolId == ProtocolVersion.v1_8.getVersion()) {
                 if (tinvtype == InventoryType.BREWING) {
                     // 1.9 added the blaze powder slot to brewing stand fix for 1.8 servers
@@ -132,7 +131,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             ReflectionUtil.set(packet, "button", 0); // shift + left mouse click
             ReflectionUtil.set(packet, "d", storage.getActionId());
             ReflectionUtil.set(packet, "item", nmsItem);
-            int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
+            int protocolId = Via.getAPI().getServerVersion();
             if (protocolId == ProtocolVersion.v1_8.getVersion()) {
                 ReflectionUtil.set(packet, "shift", 1);
             } else if (protocolId >= ProtocolVersion.v1_9.getVersion()) { // 1.9+
@@ -171,7 +170,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         }
         try {
             this.windowClickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
-            int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
+            int protocolId = Via.getAPI().getServerVersion();
             if (protocolId >= ProtocolVersion.v1_9.getVersion()) {
                 Class<?> eclassz = NMSUtil.nms("InventoryClickType");
                 Object[] constants = eclassz.getEnumConstants();
@@ -200,7 +199,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
     }
 
     private boolean isSupported() {
-        int protocolId = ProtocolRegistry.SERVER_PROTOCOL;
+        int protocolId = Via.getAPI().getServerVersion();
         if (protocolId >= ProtocolVersion.v1_8.getVersion() && protocolId <= ProtocolVersion.v1_11_1.getVersion()) {
             return true; // 1.8-1.11.2
         }

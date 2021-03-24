@@ -19,7 +19,6 @@ package us.myles.ViaVersion.api;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -29,12 +28,12 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 
     @Override
     public int getServerVersion() {
-        return ProtocolRegistry.SERVER_PROTOCOL;
+        return Via.getManager().getProtocolManager().getServerProtocol();
     }
 
     @Override
     public int getPlayerVersion(UUID uuid) {
-        UserConnection connection = Via.getManager().getConnection(uuid);
+        UserConnection connection = Via.getManager().getConnectionManager().getConnectedClient(uuid);
         return connection != null ? connection.getProtocolInfo().getProtocolVersion() : -1;
     }
 
@@ -45,7 +44,7 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 
     @Override
     public boolean isInjected(UUID playerUUID) {
-        return Via.getManager().isClientConnected(playerUUID);
+        return Via.getManager().getConnectionManager().isClientConnected(playerUUID);
     }
 
     @Override
@@ -54,19 +53,19 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
             throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
         }
 
-        UserConnection user = Via.getManager().getConnection(uuid);
+        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(uuid);
         user.sendRawPacket(packet);
     }
 
     @Override
     public SortedSet<Integer> getSupportedVersions() {
-        SortedSet<Integer> outputSet = new TreeSet<>(ProtocolRegistry.getSupportedVersions());
+        SortedSet<Integer> outputSet = new TreeSet<>(Via.getManager().getProtocolManager().getSupportedVersions());
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
         return outputSet;
     }
 
     @Override
     public SortedSet<Integer> getFullSupportedVersions() {
-        return ProtocolRegistry.getSupportedVersions();
+        return Via.getManager().getProtocolManager().getSupportedVersions();
     }
 }

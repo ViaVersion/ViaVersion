@@ -29,7 +29,6 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bungee.commands.BungeeCommand;
 import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
@@ -51,7 +50,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, Listener {
-    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private BungeeViaAPI api;
     private BungeeViaConfig config;
 
@@ -215,10 +213,5 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     @Override
     public boolean isOldClientsAllowed() {
         return true;
-    }
-
-    @Override
-    public ViaConnectionManager getConnectionManager() {
-        return connectionManager;
     }
 }

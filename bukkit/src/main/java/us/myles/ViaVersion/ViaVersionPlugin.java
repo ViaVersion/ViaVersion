@@ -29,7 +29,6 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
 import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
@@ -50,7 +49,6 @@ import java.util.UUID;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static ViaVersionPlugin instance;
-    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private final BukkitCommandHandler commandHandler;
     private final BukkitViaConfig conf;
     private final ViaAPI<Player> api = new BukkitViaAPI(this);
@@ -310,10 +308,5 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     public static ViaVersionPlugin getInstance() {
         return instance;
-    }
-
-    @Override
-    public ViaConnectionManager getConnectionManager() {
-        return connectionManager;
     }
 }

@@ -39,7 +39,7 @@ public abstract class ViaListener {
      */
     @Nullable
     protected UserConnection getUserConnection(UUID uuid) {
-        return Via.getManager().getConnection(uuid);
+        return Via.getManager().getConnectionManager().getConnectedClient(uuid);
     }
 
     /**

@@ -35,7 +35,6 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
@@ -72,7 +71,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     private File spongeConfig;
 
     public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character('§').extractUrls().build();
-    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private final SpongeViaAPI api = new SpongeViaAPI();
     private SpongeViaConfig conf;
     private Logger logger;
@@ -241,11 +239,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Override
     public boolean isOldClientsAllowed() {
         return true;
-    }
-
-    @Override
-    public ViaConnectionManager getConnectionManager() {
-        return connectionManager;
     }
 
     @Override

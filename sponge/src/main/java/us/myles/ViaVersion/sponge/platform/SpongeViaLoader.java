@@ -24,7 +24,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
@@ -67,7 +66,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         registerListener(new UpdateListener());
 
         /* 1.9 client to 1.8 server */
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
             try {
                 Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
                 storeListener(new Sponge4ArmorListener()).register();
@@ -84,7 +83,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
         }
 
         /* Providers */
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new SpongeViaBulkChunkTranslator());
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new SpongeViaMovementTransmitter());
 

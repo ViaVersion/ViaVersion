@@ -24,7 +24,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -65,7 +64,7 @@ public class BaseProtocol extends SimpleProtocol {
 
                     // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
                     if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
-                        protocols = ProtocolRegistry.getProtocolPath(info.getProtocolVersion(), serverProtocol);
+                        protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocol);
                     }
 
                     ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
@@ -73,7 +72,7 @@ public class BaseProtocol extends SimpleProtocol {
                         for (Pair<Integer, Protocol> prot : protocols) {
                             pipeline.add(prot.getValue());
                             // Ensure mapping data has already been loaded
-                            ProtocolRegistry.completeMappingDataLoading(prot.getValue().getClass());
+                            Via.getManager().getProtocolManager().completeMappingDataLoading(prot.getValue().getClass());
                         }
 
                         // Set the original snapshot version if present
@@ -82,7 +81,7 @@ public class BaseProtocol extends SimpleProtocol {
                     }
 
                     // Add Base Protocol
-                    pipeline.add(ProtocolRegistry.getBaseProtocol(serverProtocol));
+                    pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
 
                     // Change state
                     if (state == 1) {

@@ -34,7 +34,6 @@ import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -79,7 +78,6 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     private VelocityViaAPI api;
     private java.util.logging.Logger logger;
     private VelocityViaConfig conf;
-    private ViaConnectionManager connectionManager;
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
@@ -89,7 +87,6 @@ public class VelocityPlugin implements ViaPlatform<Player> {
         api = new VelocityViaAPI();
         conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
-        connectionManager = new ViaConnectionManager();
         Via.init(ViaManagerImpl.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
@@ -239,10 +236,5 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public java.util.logging.Logger getLogger() {
         return logger;
-    }
-
-    @Override
-    public ViaConnectionManager getConnectionManager() {
-        return connectionManager;
     }
 }

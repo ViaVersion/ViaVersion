@@ -40,7 +40,7 @@ public class ElytraPatch implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerConnected(ServerConnectedEvent event) {
-        UserConnection user = Via.getManager().getConnection(event.getPlayer().getUniqueId());
+        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
         if (user == null) return;
 
         try {

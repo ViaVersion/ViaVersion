@@ -21,7 +21,6 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
@@ -38,7 +37,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         Object plugin = VelocityPlugin.PROXY.getPluginManager()
                 .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new VelocityMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
         }

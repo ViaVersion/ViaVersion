@@ -27,7 +27,6 @@ import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 
 public class Via {
-    private static ViaPlatform platform;
     private static ViaManager manager;
 
     /**
@@ -37,19 +36,17 @@ public class Via {
      */
     public static void init(ViaManager viaManager) {
         Preconditions.checkArgument(manager == null, "ViaManager is already set");
-
-        Via.platform = viaManager.getPlatform();
         Via.manager = viaManager;
     }
 
     /**
-     * Get the API associated with the current platform.
+     * Returns the API associated with the current platform.
      *
      * @return API instance
      */
     public static ViaAPI getAPI() {
-        Preconditions.checkArgument(platform != null, "ViaVersion has not loaded the Platform");
-        return Via.platform.getApi();
+        Preconditions.checkArgument(manager != null, "ViaVersion has not loaded the platform yet");
+        return manager.getPlatform().getApi();
     }
 
     /**
@@ -58,12 +55,12 @@ public class Via {
      * @return Config instance
      */
     public static ViaVersionConfig getConfig() {
-        Preconditions.checkArgument(platform != null, "ViaVersion has not loaded the Platform");
-        return Via.platform.getConf();
+        Preconditions.checkArgument(manager != null, "ViaVersion has not loaded the platform yet");
+        return manager.getPlatform().getConf();
     }
 
     public static ViaPlatform getPlatform() {
-        return platform;
+        return manager.getPlatform();
     }
 
     public static ViaManager getManager() {

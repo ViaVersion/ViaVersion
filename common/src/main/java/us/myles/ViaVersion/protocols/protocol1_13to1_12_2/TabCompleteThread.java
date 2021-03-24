@@ -24,7 +24,7 @@ import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.TabCompleteTra
 public class TabCompleteThread implements Runnable {
     @Override
     public void run() {
-        for (UserConnection info : Via.getManager().getConnections()) {
+        for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             if (info.getProtocolInfo() == null) continue;
             if (info.getProtocolInfo().getPipeline().contains(Protocol1_13To1_12_2.class)) {
                 if (info.getChannel().isOpen()) {

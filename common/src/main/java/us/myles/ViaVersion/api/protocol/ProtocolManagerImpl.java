@@ -79,28 +79,32 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
-public class ProtocolRegistry {
+public class ProtocolManagerImpl implements ProtocolManager {
     public static final Protocol BASE_PROTOCOL = new BaseProtocol();
-    public static int SERVER_PROTOCOL = -1;
-    public static int maxProtocolPathSize = 50;
+
     // Input Version -> Output Version & Protocol (Allows fast lookup)
-    private static final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
-    private static final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
-    private static final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
-    private static final Set<Integer> supportedVersions = new HashSet<>();
-    private static final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
-    private static final List<Protocol> registerList = new ArrayList<>();
+    private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
+    private final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
+    private final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
+    private final Set<Integer> supportedVersions = new HashSet<>();
+    private final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
+    private final List<Protocol> registerList = new ArrayList<>();
 
-    private static final ReadWriteLock MAPPING_LOADER_LOCK = new ReentrantReadWriteLock();
-    private static Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
-    private static ThreadPoolExecutor mappingLoaderExecutor;
-    private static boolean mappingsLoaded;
+    private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
+    private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
+    private ThreadPoolExecutor mappingLoaderExecutor;
+    private boolean mappingsLoaded;
 
-    static {
+    private int maxProtocolPathSize = 50;
+    private int serverProtocol = -1;
+
+    public ProtocolManagerImpl() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Via-Mappingloader-%d").build();
         mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
         mappingLoaderExecutor.allowCoreThreadTimeOut(true);
+    }
 
+    public void registerProtocols() {
         // Base Protocol
         registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
         registerBaseProtocol(new BaseProtocol1_7(), Range.lessThan(ProtocolVersion.v1_16.getVersion()));
@@ -144,29 +148,13 @@ public class ProtocolRegistry {
         registerProtocol(new Protocol1_17To1_16_4(), ProtocolVersion.v1_17, ProtocolVersion.v1_16_4);
     }
 
-    public static void init() {
-        // Empty method to trigger static initializer once
-    }
-
-    /**
-     * Register a protocol
-     *
-     * @param protocol  The protocol to register.
-     * @param supported Supported client versions.
-     * @param output    The output server version it converts to.
-     */
-    public static void registerProtocol(Protocol protocol, ProtocolVersion supported, ProtocolVersion output) {
+    @Override
+    public void registerProtocol(Protocol protocol, ProtocolVersion supported, ProtocolVersion output) {
         registerProtocol(protocol, Collections.singletonList(supported.getVersion()), output.getVersion());
     }
 
-    /**
-     * Register a protocol
-     *
-     * @param protocol  The protocol to register.
-     * @param supported Supported client versions.
-     * @param output    The output server version it converts to.
-     */
-    public static void registerProtocol(Protocol protocol, List<Integer> supported, int output) {
+    @Override
+    public void registerProtocol(Protocol protocol, List<Integer> supported, int output) {
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
             pathCache.clear();
@@ -197,15 +185,8 @@ public class ProtocolRegistry {
         }
     }
 
-    /**
-     * Registers a base protocol.
-     * Base Protocols registered later have higher priority
-     * Only one base protocol will be added to pipeline
-     *
-     * @param baseProtocol       Base Protocol to register
-     * @param supportedProtocols Versions that baseProtocol supports
-     */
-    public static void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
+    @Override
+    public void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
         if (Via.getPlatform().isPluginEnabled()) {
             baseProtocol.register(Via.getManager().getProviders());
@@ -215,12 +196,12 @@ public class ProtocolRegistry {
         }
     }
 
-    public static void refreshVersions() {
+    public void refreshVersions() {
         supportedVersions.clear();
 
-        supportedVersions.add(ProtocolRegistry.SERVER_PROTOCOL);
+        supportedVersions.add(serverProtocol);
         for (ProtocolVersion versions : ProtocolVersion.getProtocols()) {
-            List<Pair<Integer, Protocol>> paths = getProtocolPath(versions.getVersion(), ProtocolRegistry.SERVER_PROTOCOL);
+            List<Pair<Integer, Protocol>> paths = getProtocolPath(versions.getVersion(), serverProtocol);
             if (paths == null) continue;
             supportedVersions.add(versions.getVersion());
             for (Pair<Integer, Protocol> path : paths) {
@@ -229,47 +210,34 @@ public class ProtocolRegistry {
         }
     }
 
-    /**
-     * Get the versions compatible with the server.
-     *
-     * @return Read-only set of the versions.
-     */
-    public static SortedSet<Integer> getSupportedVersions() {
-        return Collections.unmodifiableSortedSet(new TreeSet<>(supportedVersions));
-    }
-
-    /**
-     * Check if this plugin is useful to the server.
-     *
-     * @return True if there is a useful pipe
-     */
-    public static boolean isWorkingPipe() {
-        for (Int2ObjectMap<Protocol> map : registryMap.values()) {
-            if (map.containsKey(SERVER_PROTOCOL)) return true;
+    @Nullable
+    @Override
+    public List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
+        Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
+        // Check cache
+        List<Pair<Integer, Protocol>> protocolList = pathCache.get(protocolKey);
+        if (protocolList != null) {
+            return protocolList;
         }
-        return false; // No destination for protocol
-    }
-
-    /**
-     * Called when the server is enabled, to register any non registered listeners.
-     */
-    public static void onServerLoaded() {
-        for (Protocol protocol : registerList) {
-            protocol.register(Via.getManager().getProviders());
+        // Generate path
+        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
+        // If it found a path, cache it.
+        if (outputPath != null) {
+            pathCache.put(protocolKey, outputPath);
         }
-        registerList.clear();
+        return outputPath;
     }
 
     /**
-     * Calculate a path to get from an input protocol to the servers protocol.
+     * Calculates a path to get from an input protocol to the server's protocol.
      *
-     * @param current       The current items in the path
-     * @param clientVersion The current input version
-     * @param serverVersion The desired output version
-     * @return The path which has been generated, null if failed.
+     * @param current       current items in the path
+     * @param clientVersion current input version
+     * @param serverVersion desired output version
+     * @return path that has been generated, null if failed
      */
     @Nullable
-    private static List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
+    private List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
         if (clientVersion == serverVersion) return null; // We're already there
         if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
 
@@ -312,42 +280,14 @@ public class ProtocolRegistry {
         return shortest; // null if none found
     }
 
-    /**
-     * Calculate a path from a client version to server version.
-     *
-     * @param clientVersion The input client version
-     * @param serverVersion The desired output server version
-     * @return The path it generated, null if it failed.
-     */
     @Nullable
-    public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
-        Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
-        // Check cache
-        List<Pair<Integer, Protocol>> protocolList = pathCache.get(protocolKey);
-        if (protocolList != null) {
-            return protocolList;
-        }
-        // Generate path
-        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
-        // If it found a path, cache it.
-        if (outputPath != null) {
-            pathCache.put(protocolKey, outputPath);
-        }
-        return outputPath;
-    }
-
-    /**
-     * Returns a protocol instance by its class.
-     *
-     * @param protocolClass class of the protocol
-     * @return protocol if present
-     */
-    @Nullable
-    public static Protocol getProtocol(Class<? extends Protocol> protocolClass) {
+    @Override
+    public Protocol getProtocol(Class<? extends Protocol> protocolClass) {
         return protocols.get(protocolClass);
     }
 
-    public static Protocol getBaseProtocol(int serverVersion) {
+    @Override
+    public Protocol getBaseProtocol(int serverVersion) {
         for (Pair<Range<Integer>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
             if (rangeProtocol.getKey().contains(serverVersion)) {
                 return rangeProtocol.getValue();
@@ -356,7 +296,8 @@ public class ProtocolRegistry {
         throw new IllegalStateException("No Base Protocol for " + serverVersion);
     }
 
-    public static boolean isBaseProtocol(Protocol protocol) {
+    @Override
+    public boolean isBaseProtocol(Protocol protocol) {
         for (Pair<Range<Integer>, Protocol> p : baseProtocols) {
             if (p.getValue() == protocol) {
                 return true;
@@ -365,12 +306,46 @@ public class ProtocolRegistry {
         return false;
     }
 
-    /**
-     * Ensure that mapping data for that protocol has already been loaded, completes it otherwise.
-     *
-     * @param protocolClass protocol class
-     */
-    public static void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
+    @Override
+    public int getServerProtocol() {
+        return serverProtocol;
+    }
+
+    public void setServerProtocol(int serverProtocol) {
+        this.serverProtocol = serverProtocol;
+        ProtocolRegistry.SERVER_PROTOCOL = serverProtocol;
+    }
+
+    @Override
+    public boolean isWorkingPipe() {
+        for (Int2ObjectMap<Protocol> map : registryMap.values()) {
+            if (map.containsKey(serverProtocol)) return true;
+        }
+        return false; // No destination for protocol
+    }
+
+    @Override
+    public SortedSet<Integer> getSupportedVersions() {
+        return Collections.unmodifiableSortedSet(new TreeSet<>(supportedVersions));
+    }
+
+    @Override
+    public int getMaxProtocolPathSize() {
+        return maxProtocolPathSize;
+    }
+
+    @Override
+    public void setMaxProtocolPathSize(int maxProtocolPathSize) {
+        this.maxProtocolPathSize = maxProtocolPathSize;
+    }
+
+    @Override
+    public Protocol getBaseProtocol() {
+        return BASE_PROTOCOL;
+    }
+
+    @Override
+    public void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
         if (mappingsLoaded) return;
 
         CompletableFuture<Void> future = getMappingLoaderFuture(protocolClass);
@@ -380,13 +355,9 @@ public class ProtocolRegistry {
         }
     }
 
-    /**
-     * Shuts down the executor and uncaches mappings if all futures have been completed.
-     *
-     * @return true if the executor has now been shut down
-     */
-    public static boolean checkForMappingCompletion() {
-        MAPPING_LOADER_LOCK.readLock().lock();
+    @Override
+    public boolean checkForMappingCompletion() {
+        mappingLoaderLock.readLock().lock();
         try {
             if (mappingsLoaded) return false;
 
@@ -400,66 +371,57 @@ public class ProtocolRegistry {
             shutdownLoaderExecutor();
             return true;
         } finally {
-            MAPPING_LOADER_LOCK.readLock().unlock();
+            mappingLoaderLock.readLock().unlock();
         }
     }
 
-    /**
-     * Executes the given runnable asynchronously, adding a {@link CompletableFuture}
-     * to the list of data to load bound to their protocols.
-     *
-     * @param protocolClass protocol class
-     * @param runnable      runnable to be executed asynchronously
-     */
-    public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
+    @Override
+    public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
         CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
 
-        MAPPING_LOADER_LOCK.writeLock().lock();
+        mappingLoaderLock.writeLock().lock();
         try {
             mappingLoaderFutures.put(protocolClass, future);
         } finally {
-            MAPPING_LOADER_LOCK.writeLock().unlock();
+            mappingLoaderLock.writeLock().unlock();
         }
     }
 
-    /**
-     * Executes the given runnable asynchronously after the other protocol has finished its data loading,
-     * adding a {@link CompletableFuture} to the list of data to load bound to their protocols.
-     *
-     * @param protocolClass protocol class
-     * @param dependsOn     class of the protocol that the data loading depends on
-     * @param runnable      runnable to be executed asynchronously
-     */
-    public static void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
+    @Override
+    public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
         CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn)
                 .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
 
-        MAPPING_LOADER_LOCK.writeLock().lock();
+        mappingLoaderLock.writeLock().lock();
         try {
             mappingLoaderFutures.put(protocolClass, future);
         } finally {
-            MAPPING_LOADER_LOCK.writeLock().unlock();
+            mappingLoaderLock.writeLock().unlock();
+        }
+    }
+
+    @Nullable
+    @Override
+    public CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
+        mappingLoaderLock.readLock().lock();
+        try {
+            return mappingsLoaded ? null : mappingLoaderFutures.get(protocolClass);
+        } finally {
+            mappingLoaderLock.readLock().unlock();
         }
     }
 
     /**
-     * Returns the data loading future bound to the protocol, or null if all loading is complete.
-     * The future may or may not have already been completed.
-     *
-     * @param protocolClass protocol class
-     * @return data loading future bound to the protocol, or null if all loading is complete
+     * Called when the server is enabled, to register any non-registered listeners.
      */
-    @Nullable
-    public static CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
-        MAPPING_LOADER_LOCK.readLock().lock();
-        try {
-            return mappingsLoaded ? null : mappingLoaderFutures.get(protocolClass);
-        } finally {
-            MAPPING_LOADER_LOCK.readLock().unlock();
+    public void onServerLoaded() {
+        for (Protocol protocol : registerList) {
+            protocol.register(Via.getManager().getProviders());
         }
+        registerList.clear();
     }
 
-    private static void shutdownLoaderExecutor() {
+    private void shutdownLoaderExecutor() {
         Preconditions.checkArgument(!mappingsLoaded);
 
         Via.getPlatform().getLogger().info("Finished mapping loading, shutting down loader executor!");
@@ -473,7 +435,7 @@ public class ProtocolRegistry {
         }
     }
 
-    private static Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
+    private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
         return throwable -> {
             Via.getPlatform().getLogger().severe("Error during mapping loading of " + protocolClass.getSimpleName());
             throwable.printStackTrace();

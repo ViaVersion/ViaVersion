@@ -17,17 +17,15 @@
  */
 package us.myles.ViaVersion;
 
-import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaConnectionManager;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
+import us.myles.ViaVersion.api.protocol.ProtocolManager;
+import us.myles.ViaVersion.api.protocol.ProtocolManagerImpl;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.commands.ViaCommandHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.TabCompleteThread;
@@ -37,14 +35,13 @@ import us.myles.ViaVersion.update.UpdateUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class ViaManagerImpl implements ViaManager {
-    private final ViaPlatform<?> platform;
+    private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
+    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
     private final ViaProviders providers = new ViaProviders();
-    // Internals
+    private final ViaPlatform<?> platform;
     private final ViaInjector injector;
     private final ViaCommandHandler commandHandler;
     private final ViaPlatformLoader loader;
@@ -74,8 +71,8 @@ public class ViaManagerImpl implements ViaManager {
             UpdateUtil.sendUpdateMessage();
         }
 
-        // Force class load
-        ProtocolRegistry.init();
+        // Register protocols
+        protocolManager.registerProtocols();
 
         // Inject
         try {
@@ -101,22 +98,22 @@ public class ViaManagerImpl implements ViaManager {
     public void onServerLoaded() {
         // Load Server Protocol
         try {
-            ProtocolRegistry.SERVER_PROTOCOL = ProtocolVersion.getProtocol(injector.getServerProtocolVersion()).getVersion();
+            protocolManager.setServerProtocol(ProtocolVersion.getProtocol(injector.getServerProtocolVersion()).getVersion());
         } catch (Exception e) {
             platform.getLogger().severe("ViaVersion failed to get the server protocol!");
             e.printStackTrace();
         }
 
         // Check if there are any pipes to this version
-        if (ProtocolRegistry.SERVER_PROTOCOL != -1) {
-            platform.getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(ProtocolRegistry.SERVER_PROTOCOL));
-            if (!ProtocolRegistry.isWorkingPipe() && !platform.isProxy()) {
+        if (protocolManager.getServerProtocol() != -1) {
+            platform.getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(protocolManager.getServerProtocol()));
+            if (!protocolManager.isWorkingPipe() && !platform.isProxy()) {
                 platform.getLogger().warning("ViaVersion does not have any compatible versions for this server version!");
                 platform.getLogger().warning("Please remember that ViaVersion only adds support for versions newer than the server version.");
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
                 platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://jo0001.github.io/ViaSetup");
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
-            } else if (ProtocolRegistry.SERVER_PROTOCOL <= ProtocolVersion.v1_12_2.getVersion() && !platform.isProxy()) {
+            } else if (protocolManager.getServerProtocol() <= ProtocolVersion.v1_12_2.getVersion() && !platform.isProxy()) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
                         + "You will still be able to run Via on this version, but we are unlikely to provide any further fixes or help with problems specific to legacy versions. "
                         + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
@@ -124,30 +121,30 @@ public class ViaManagerImpl implements ViaManager {
         }
 
         // Load Listeners / Tasks
-        ProtocolRegistry.onServerLoaded();
+        protocolManager.onServerLoaded();
 
         // Load Platform
         loader.load();
         // Common tasks
         mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
-            if (ProtocolRegistry.checkForMappingCompletion()) {
+            if (protocolManager.checkForMappingCompletion()) {
                 platform.cancelTask(mappingLoadingTask);
                 mappingLoadingTask = null;
             }
         }, 10L);
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
+        if (protocolManager.getServerProtocol() < ProtocolVersion.v1_9.getVersion()) {
             if (Via.getConfig().isSimulatePlayerTick()) {
                 Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
             }
         }
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_13.getVersion()) {
+        if (protocolManager.getServerProtocol() < ProtocolVersion.v1_13.getVersion()) {
             if (Via.getConfig().get1_13TabCompleteDelay() > 0) {
                 Via.getPlatform().runRepeatingSync(new TabCompleteThread(), 1L);
             }
         }
 
         // Refresh Versions
-        ProtocolRegistry.refreshVersions();
+        protocolManager.refreshVersions();
     }
 
     public void destroy() {
@@ -164,61 +161,47 @@ public class ViaManagerImpl implements ViaManager {
         loader.unload();
     }
 
-    public Set<UserConnection> getConnections() {
-        return platform.getConnectionManager().getConnections();
-    }
-
-    /**
-     * @deprecated use getConnectedClients()
-     */
-    @Deprecated
-    public Map<UUID, UserConnection> getPortedPlayers() {
-        return getConnectedClients();
-    }
-
-    public Map<UUID, UserConnection> getConnectedClients() {
-        return platform.getConnectionManager().getConnectedClients();
-    }
-
-    public UUID getConnectedClientId(UserConnection conn) {
-        return platform.getConnectionManager().getConnectedClientId(conn);
-    }
-
-    /**
-     * @see ViaConnectionManager#isClientConnected(UUID)
-     */
-    public boolean isClientConnected(UUID player) {
-        return platform.getConnectionManager().isClientConnected(player);
-    }
-
-    public void handleLoginSuccess(UserConnection info) {
-        platform.getConnectionManager().onLoginSuccess(info);
-    }
-
+    @Override
     public ViaPlatform<?> getPlatform() {
         return platform;
     }
 
+    @Override
+    public ViaConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
+    @Override
+    public ProtocolManager getProtocolManager() {
+        return protocolManager;
+    }
+
+    @Override
     public ViaProviders getProviders() {
         return providers;
     }
 
+    @Override
     public boolean isDebug() {
         return debug;
     }
 
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
 
+    @Override
     public ViaInjector getInjector() {
         return injector;
     }
 
+    @Override
     public ViaCommandHandler getCommandHandler() {
         return commandHandler;
     }
 
+    @Override
     public ViaPlatformLoader getLoader() {
         return loader;
     }
@@ -234,30 +217,12 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     /**
-     * @see ViaConnectionManager#getConnectedClient(UUID)
-     */
-    @Nullable
-    public UserConnection getConnection(UUID playerUUID) {
-        return platform.getConnectionManager().getConnectedClient(playerUUID);
-    }
-
-    /**
      * Adds a runnable to be executed when ViaVersion has finished its init before the full server load.
      *
      * @param runnable runnable to be executed
      */
     public void addEnableListener(Runnable runnable) {
         enableListeners.add(runnable);
-    }
-
-    @Override
-    public Protocol getBaseProtocol() {
-        return ProtocolRegistry.BASE_PROTOCOL;
-    }
-
-    @Override
-    public boolean isBaseProtocol(Protocol protocol) {
-        return ProtocolRegistry.isBaseProtocol(protocol);
     }
 
     public static final class ViaManagerBuilder {

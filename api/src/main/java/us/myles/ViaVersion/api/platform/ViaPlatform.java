@@ -23,6 +23,8 @@
 package us.myles.ViaVersion.api.platform;
 
 import com.google.gson.JsonObject;
+import us.myles.ViaVersion.ViaManager;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -216,9 +218,10 @@ public interface ViaPlatform<T> {
     boolean isOldClientsAllowed();
 
     /**
-     * Returns the connection manager holding and managing user connections.
-     *
-     * @return connection manager
+     * @deprecated use {@link ViaManager#getConnectionManager()}
      */
-    ViaConnectionManager getConnectionManager();
+    @Deprecated
+    default ViaConnectionManager getConnectionManager() {
+        return Via.getManager().getConnectionManager();
+    }
 }

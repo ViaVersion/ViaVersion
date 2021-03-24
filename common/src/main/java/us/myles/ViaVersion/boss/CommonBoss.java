@@ -94,7 +94,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public BossBar addPlayer(UUID player) {
-        return addConnection(Via.getManager().getConnection(player));
+        return addConnection(Via.getManager().getConnectionManager().getConnectedClient(player));
     }
 
     @Override
@@ -107,7 +107,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public BossBar removePlayer(UUID uuid) {
-        return removeConnection(Via.getManager().getConnection(uuid));
+        return removeConnection(Via.getManager().getConnectionManager().getConnectedClient(uuid));
     }
 
     @Override
@@ -144,7 +144,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     @Override
     public Set<UUID> getPlayers() {
-        return connections.stream().map(conn -> Via.getManager().getConnectedClientId(conn)).filter(Objects::nonNull)
+        return connections.stream().map(conn -> Via.getManager().getConnectionManager().getConnectedClientId(conn)).filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 

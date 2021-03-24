@@ -24,8 +24,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import us.myles.ViaVersion.ViaVersionPlugin;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
@@ -68,7 +68,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
 
 
         // From 1.9 upwards the server hitbox is set in every entity tick, so we have to reset it everytime
-        if (ProtocolRegistry.SERVER_PROTOCOL >= ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion() >= ProtocolVersion.v1_9.getVersion()) {
             sneaking = new WeakHashMap<>();
             useCache = true;
             plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {

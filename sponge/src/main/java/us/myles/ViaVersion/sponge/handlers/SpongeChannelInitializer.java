@@ -22,9 +22,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.lang.reflect.Method;
 
@@ -47,7 +47,7 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel channel) throws Exception {
         // Ensure ViaVersion is loaded
-        if (ProtocolRegistry.SERVER_PROTOCOL != -1
+        if (Via.getAPI().getServerVersion() != -1
                 && channel instanceof SocketChannel) { // channel can be LocalChannel on internal server
             UserConnection info = new UserConnection((SocketChannel) channel);
             // init protocol

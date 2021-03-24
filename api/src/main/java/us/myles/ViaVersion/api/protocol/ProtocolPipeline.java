@@ -47,7 +47,7 @@ public class ProtocolPipeline extends SimpleProtocol {
     protected void registerPackets() {
         protocolList = new CopyOnWriteArrayList<>();
         // This is a pipeline so we register basic pipes
-        protocolList.add(Via.getManager().getBaseProtocol());
+        protocolList.add(Via.getManager().getProtocolManager().getBaseProtocol());
     }
 
     @Override
@@ -78,7 +78,7 @@ public class ProtocolPipeline extends SimpleProtocol {
             // Move base Protocols to the end, so the login packets can be modified by other protocols
             List<Protocol> toMove = new ArrayList<>();
             for (Protocol p : protocolList) {
-                if (Via.getManager().isBaseProtocol(p)) {
+                if (Via.getManager().getProtocolManager().isBaseProtocol(p)) {
                     toMove.add(p);
                 }
             }

@@ -22,7 +22,6 @@ import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.dump.DumpTemplate;
 import us.myles.ViaVersion.dump.VersionInfo;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -54,8 +53,8 @@ public class DumpSubCmd extends ViaSubCommand {
         VersionInfo version = new VersionInfo(
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
-                ProtocolRegistry.SERVER_PROTOCOL,
-                ProtocolRegistry.getSupportedVersions(),
+                Via.getAPI().getServerVersion(),
+                Via.getManager().getProtocolManager().getSupportedVersions(),
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion(),

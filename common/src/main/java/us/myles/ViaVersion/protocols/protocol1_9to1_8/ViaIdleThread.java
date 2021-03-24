@@ -27,7 +27,7 @@ public class ViaIdleThread implements Runnable {
 
     @Override
     public void run() {
-        for (UserConnection info : Via.getManager().getConnections()) {
+        for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             ProtocolInfo protocolInfo = info.getProtocolInfo();
             if (protocolInfo == null || !protocolInfo.getPipeline().contains(Protocol1_9To1_8.class)) continue;
 

@@ -23,12 +23,15 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 import us.myles.ViaVersion.BungeePlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.bungee.handlers.BungeeServerHandler;
 import us.myles.ViaVersion.bungee.listeners.ElytraPatch;
 import us.myles.ViaVersion.bungee.listeners.UpdateListener;
-import us.myles.ViaVersion.bungee.providers.*;
+import us.myles.ViaVersion.bungee.providers.BungeeBossBarProvider;
+import us.myles.ViaVersion.bungee.providers.BungeeEntityIdProvider;
+import us.myles.ViaVersion.bungee.providers.BungeeMainHandProvider;
+import us.myles.ViaVersion.bungee.providers.BungeeMovementTransmitter;
+import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
 import us.myles.ViaVersion.protocols.base.VersionProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
@@ -62,7 +65,7 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         registerListener(new UpdateListener());
         registerListener(new BungeeServerHandler());
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
             registerListener(new ElytraPatch());
         }
 
@@ -70,7 +73,7 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(VersionProvider.class, new BungeeVersionProvider());
         Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
 
-        if (ProtocolRegistry.SERVER_PROTOCOL < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
             Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());
