@@ -24,7 +24,6 @@ package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Range;
 import org.jetbrains.annotations.Nullable;
-import us.myles.ViaVersion.api.Pair;
 
 import java.util.List;
 import java.util.SortedSet;
@@ -87,10 +86,10 @@ public interface ProtocolManager {
      *
      * @param clientVersion input client version
      * @param serverVersion desired output server version
-     * @return path it generated, null if it failed
+     * @return path it generated, null if not supported
      */
     @Nullable
-    List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion);
+    List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
 
     /**
      * Returns the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.

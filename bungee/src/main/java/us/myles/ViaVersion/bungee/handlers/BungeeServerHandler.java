@@ -26,12 +26,12 @@ import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.type.Type;
@@ -92,7 +92,7 @@ public class BungeeServerHandler implements Listener {
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
-        List<Pair<Integer, Protocol>> protocols = Via.getManager().getProtocolManager().getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
+        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
 
         // Check if ViaVersion can support that version
         try {
@@ -175,7 +175,7 @@ public class BungeeServerHandler implements Listener {
                     int previousServerProtocol = info.getServerProtocolVersion();
 
                     // Refresh the pipes
-                    List<Pair<Integer, Protocol>> protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
+                    List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
                     ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
                     user.clearStoredObjects();
                     pipeline.cleanPipes();
@@ -183,8 +183,8 @@ public class BungeeServerHandler implements Listener {
                         // TODO Check Bungee Supported Protocols? *shrugs*
                         protocolId = info.getProtocolVersion();
                     } else {
-                        for (Pair<Integer, Protocol> prot : protocols) {
-                            pipeline.add(prot.getValue());
+                        for (ProtocolPathEntry prot : protocols) {
+                            pipeline.add(prot.getProtocol());
                         }
                     }
 

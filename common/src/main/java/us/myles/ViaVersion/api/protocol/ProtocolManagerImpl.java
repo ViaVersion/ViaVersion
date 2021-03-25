@@ -85,7 +85,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
     private final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
-    private final Map<Pair<Integer, Integer>, List<Pair<Integer, Protocol>>> pathCache = new ConcurrentHashMap<>();
+    private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
     private final Set<Integer> supportedVersions = new HashSet<>();
     private final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
     private final List<Protocol> registerList = new ArrayList<>();
@@ -201,26 +201,27 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
         supportedVersions.add(serverProtocol);
         for (ProtocolVersion versions : ProtocolVersion.getProtocols()) {
-            List<Pair<Integer, Protocol>> paths = getProtocolPath(versions.getVersion(), serverProtocol);
+            List<ProtocolPathEntry> paths = getProtocolPath(versions.getVersion(), serverProtocol);
             if (paths == null) continue;
             supportedVersions.add(versions.getVersion());
-            for (Pair<Integer, Protocol> path : paths) {
-                supportedVersions.add(path.getKey());
+            for (ProtocolPathEntry path : paths) {
+                supportedVersions.add(path.getOutputProtocolVersion());
             }
         }
     }
 
     @Nullable
     @Override
-    public List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
-        Pair<Integer, Integer> protocolKey = new Pair<>(clientVersion, serverVersion);
+    public List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
+        ProtocolPathKey protocolKey = new ProtocolPathKeyImpl(clientVersion, serverVersion);
         // Check cache
-        List<Pair<Integer, Protocol>> protocolList = pathCache.get(protocolKey);
+        List<ProtocolPathEntry> protocolList = pathCache.get(protocolKey);
         if (protocolList != null) {
             return protocolList;
         }
+
         // Generate path
-        List<Pair<Integer, Protocol>> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
+        List<ProtocolPathEntry> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
         // If it found a path, cache it.
         if (outputPath != null) {
             pathCache.put(protocolKey, outputPath);
@@ -237,7 +238,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @return path that has been generated, null if failed
      */
     @Nullable
-    private List<Pair<Integer, Protocol>> getProtocolPath(List<Pair<Integer, Protocol>> current, int clientVersion, int serverVersion) {
+    private List<ProtocolPathEntry> getProtocolPath(List<ProtocolPathEntry> current, int clientVersion, int serverVersion) {
         if (clientVersion == serverVersion) return null; // We're already there
         if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
 
@@ -250,30 +251,31 @@ public class ProtocolManagerImpl implements ProtocolManager {
         // Next check there isn't an obvious path
         Protocol protocol = inputMap.get(serverVersion);
         if (protocol != null) {
-            current.add(new Pair<>(serverVersion, protocol));
+            current.add(new ProtocolPathEntryImpl(serverVersion, protocol));
             return current; // Easy solution
         }
 
         // There might be a more advanced solution... So we'll see if any of the others can get us there
-        List<Pair<Integer, Protocol>> shortest = null;
+        List<ProtocolPathEntry> shortest = null;
         for (Int2ObjectMap.Entry<Protocol> entry : inputMap.int2ObjectEntrySet()) {
             // Ensure it wasn't caught by the other loop
-            if (entry.getIntKey() == (serverVersion)) continue;
+            if (entry.getIntKey() == serverVersion) continue;
 
-            Pair<Integer, Protocol> pair = new Pair<>(entry.getIntKey(), entry.getValue());
+            ProtocolPathEntry pathEntry = new ProtocolPathEntryImpl(entry.getIntKey(), entry.getValue());
             // Ensure no recursion
-            if (current.contains(pair)) continue;
+            if (current.contains(pathEntry)) continue;
 
             // Create a copy
-            List<Pair<Integer, Protocol>> newCurrent = new ArrayList<>(current);
-            newCurrent.add(pair);
-            // Calculate the rest of the protocol using the current
-            newCurrent = getProtocolPath(newCurrent, entry.getKey(), serverVersion);
-            if (newCurrent != null) {
-                // If it's shorter then choose it
-                if (shortest == null || shortest.size() > newCurrent.size()) {
-                    shortest = newCurrent;
-                }
+            List<ProtocolPathEntry> newCurrent = new ArrayList<>(current);
+            newCurrent.add(pathEntry);
+
+            // Calculate the rest of the protocol using the current path entry
+            newCurrent = getProtocolPath(newCurrent, entry.getIntKey(), serverVersion);
+
+            // If it's shorter then choose it
+            if (newCurrent != null
+                    && (shortest == null || shortest.size() > newCurrent.size())) {
+                shortest = newCurrent;
             }
         }
 

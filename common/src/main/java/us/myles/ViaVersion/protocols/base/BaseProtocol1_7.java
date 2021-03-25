@@ -23,10 +23,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolManagerImpl;
+import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -94,7 +93,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                             }
 
                             int protocol = versionProvider.getServerProtocol(wrapper.user());
-                            List<Pair<Integer, Protocol>> protocols = null;
+                            List<ProtocolPathEntry> protocols = null;
 
                             // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
                             if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {

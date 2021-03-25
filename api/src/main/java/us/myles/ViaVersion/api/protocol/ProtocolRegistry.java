@@ -28,6 +28,7 @@ import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
@@ -104,7 +105,16 @@ public class ProtocolRegistry {
      */
     @Nullable
     public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
-        return Via.getManager().getProtocolManager().getProtocolPath(clientVersion, serverVersion);
+        List<ProtocolPathEntry> pathList = Via.getManager().getProtocolManager().getProtocolPath(clientVersion, serverVersion);
+        if (pathList == null) {
+            return null;
+        }
+
+        List<Pair<Integer, Protocol>> list = new ArrayList<>();
+        for (ProtocolPathEntry entry : pathList) {
+            list.add(new Pair<>(entry.getOutputProtocolVersion(), entry.getProtocol()));
+        }
+        return list;
     }
 
     /**

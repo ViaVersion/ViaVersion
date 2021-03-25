@@ -18,11 +18,10 @@
 package us.myles.ViaVersion.protocols.base;
 
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
@@ -60,7 +59,7 @@ public class BaseProtocol extends SimpleProtocol {
                     // Choose the pipe
                     int serverProtocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
                     info.setServerProtocolVersion(serverProtocol);
-                    List<Pair<Integer, Protocol>> protocols = null;
+                    List<ProtocolPathEntry> protocols = null;
 
                     // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
                     if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
@@ -69,10 +68,10 @@ public class BaseProtocol extends SimpleProtocol {
 
                     ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
                     if (protocols != null) {
-                        for (Pair<Integer, Protocol> prot : protocols) {
-                            pipeline.add(prot.getValue());
+                        for (ProtocolPathEntry prot : protocols) {
+                            pipeline.add(prot.getProtocol());
                             // Ensure mapping data has already been loaded
-                            Via.getManager().getProtocolManager().completeMappingDataLoading(prot.getValue().getClass());
+                            Via.getManager().getProtocolManager().completeMappingDataLoading(prot.getProtocol().getClass());
                         }
 
                         // Set the original snapshot version if present
