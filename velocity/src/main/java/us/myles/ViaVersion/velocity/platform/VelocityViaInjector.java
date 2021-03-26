@@ -19,6 +19,8 @@ package us.myles.ViaVersion.velocity.platform;
 
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelInitializer;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import us.myles.ViaVersion.VelocityPlugin;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
@@ -44,7 +46,7 @@ public class VelocityViaInjector implements ViaInjector {
     private ChannelInitializer getInitializer() throws Exception {
         Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
         Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getServerChannelInitializer");
-       return (ChannelInitializer) ReflectionUtil.invoke(channelInitializerHolder, "get");
+        return (ChannelInitializer) ReflectionUtil.invoke(channelInitializerHolder, "get");
     }
 
     private ChannelInitializer getBackendInitializer() throws Exception {
@@ -65,7 +67,7 @@ public class VelocityViaInjector implements ViaInjector {
         Object backendInitializerHolder = ReflectionUtil.invoke(connectionManager, "getBackendChannelInitializer");
         ChannelInitializer backendInitializer = getBackendInitializer();
         backendInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
-            .invoke(backendInitializerHolder, new VelocityChannelInitializer(backendInitializer, true));
+                .invoke(backendInitializerHolder, new VelocityChannelInitializer(backendInitializer, true));
     }
 
     @Override
@@ -79,11 +81,26 @@ public class VelocityViaInjector implements ViaInjector {
         return getLowestSupportedProtocolVersion();
     }
 
+    @Override
+    public IntSortedSet getServerProtocolVersions() throws Exception {
+        int lowestSupportedProtocolVersion = getLowestSupportedProtocolVersion();
+
+        IntSortedSet set = new IntLinkedOpenHashSet();
+        for (com.velocitypowered.api.network.ProtocolVersion version : com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS) {
+            if (version.getProtocol() >= lowestSupportedProtocolVersion) {
+                set.add(version.getProtocol());
+            }
+        }
+        return set;
+    }
+
     public static int getLowestSupportedProtocolVersion() {
         try {
             if (getPlayerInfoForwardingMode != null
                     && ((Enum<?>) getPlayerInfoForwardingMode.invoke(VelocityPlugin.PROXY.getConfiguration()))
-                    .name().equals("MODERN")) return ProtocolVersion.v1_13.getVersion();
+                    .name().equals("MODERN")) {
+                return ProtocolVersion.v1_13.getVersion();
+            }
         } catch (IllegalAccessException | InvocationTargetException ignored) {
         }
         return com.velocitypowered.api.network.ProtocolVersion.MINIMUM_VERSION.getProtocol();

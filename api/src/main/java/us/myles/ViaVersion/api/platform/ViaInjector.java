@@ -23,8 +23,11 @@
 package us.myles.ViaVersion.api.platform;
 
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSets;
 
 public interface ViaInjector {
+
     /**
      * Inject into the current Platform
      *
@@ -40,12 +43,35 @@ public interface ViaInjector {
     void uninject() throws Exception;
 
     /**
-     * Get the server protocol version
+     * Returns true if the protocol version cannot be used in the early init.
+     * Namely, this returns true for forks of Vanilla without extra API to get the protocol version.
      *
-     * @return The server protocol integer
-     * @throws Exception If there is an error with getting this info, eg. not binded.
+     * @return true if the protocol version cannot be used in the early init
+     */
+    default boolean lateProtocolVersionSetting() {
+        return false;
+    }
+
+    /**
+     * Returns the server protocol version.
+     * For proxies, this returns the lowest supported protocol version.
+     *
+     * @return server protocol version
+     * @throws Exception if there is an error with getting this info, eg. not binded
+     * @see ViaPlatform#isProxy()
      */
     int getServerProtocolVersion() throws Exception;
+
+    /**
+     * Returns the supported server protocol versions.
+     *
+     * @return server protocol versions
+     * @throws Exception if there is an error with getting this info, eg. not binded
+     * @see ViaPlatform#isProxy()
+     */
+    default IntSortedSet getServerProtocolVersions() throws Exception {
+        return IntSortedSets.singleton(getServerProtocolVersion());
+    }
 
     /**
      * Get the name of the encoder for then netty pipeline for this platform.

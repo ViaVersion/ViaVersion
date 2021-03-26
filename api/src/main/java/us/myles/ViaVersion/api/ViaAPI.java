@@ -26,6 +26,7 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.protocol.ServerProtocolVersion;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -38,12 +39,11 @@ import java.util.UUID;
 public interface ViaAPI<T> {
 
     /**
-     * Returns the server's protocol version.
-     * In the case of a proxy, this is the lowest supported version.
+     * Returns the server's protocol version info.
      *
-     * @return the server's protocol version
+     * @return the server's protocol version info
      */
-    int getServerVersion();
+    ServerProtocolVersion getServerVersion();
 
     /**
      * Get protocol version number from a player.

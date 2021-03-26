@@ -19,6 +19,7 @@ package us.myles.ViaVersion.api;
 
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.protocol.ServerProtocolVersion;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -27,8 +28,8 @@ import java.util.UUID;
 public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 
     @Override
-    public int getServerVersion() {
-        return Via.getManager().getProtocolManager().getServerProtocol();
+    public ServerProtocolVersion getServerVersion() {
+        return Via.getManager().getProtocolManager().getServerProtocolVersion();
     }
 
     @Override

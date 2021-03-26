@@ -27,6 +27,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.protocol.ProtocolManagerImpl;
 import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import us.myles.ViaVersion.api.protocol.ServerProtocolVersionSingleton;
 import us.myles.ViaVersion.api.protocol.SimpleProtocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -80,9 +81,9 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                                 version.add("supportedVersions", GsonUtil.getGson().toJsonTree(Via.getAPI().getSupportedVersions()));
                             }
 
-                            if (Via.getAPI().getServerVersion() == -1) { // Set the Server protocol if the detection on startup failed
+                            if (!Via.getAPI().getServerVersion().isKnown()) { // Set the Server protocol if the detection on startup failed
                                 ProtocolManagerImpl protocolManager = (ProtocolManagerImpl) Via.getManager().getProtocolManager();
-                                protocolManager.setServerProtocol(ProtocolVersion.getProtocol(protocolVersion).getVersion());
+                                protocolManager.setServerProtocol(new ServerProtocolVersionSingleton(ProtocolVersion.getProtocol(protocolVersion).getVersion()));
                             }
 
                             // Ensure the server has a version provider
@@ -92,16 +93,14 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                                 return;
                             }
 
-                            int protocol = versionProvider.getServerProtocol(wrapper.user());
+                            int closestServerProtocol = versionProvider.getServerProtocol(wrapper.user());
                             List<ProtocolPathEntry> protocols = null;
-
-                            // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
-                            if (info.getProtocolVersion() >= protocol || Via.getPlatform().isOldClientsAllowed()) {
-                                protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocol);
+                            if (info.getProtocolVersion() >= closestServerProtocol || Via.getPlatform().isOldClientsAllowed()) {
+                                protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), closestServerProtocol);
                             }
 
                             if (protocols != null) {
-                                if (protocolVersion == protocol || protocolVersion == 0) { // Fix ServerListPlus
+                                if (protocolVersion == closestServerProtocol || protocolVersion == 0) { // Fix ServerListPlus
                                     ProtocolVersion prot = ProtocolVersion.getProtocol(info.getProtocolVersion());
                                     version.addProperty("protocol", prot.getOriginalVersion());
                                 }

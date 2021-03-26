@@ -27,5 +27,11 @@ import us.myles.ViaVersion.api.platform.providers.Provider;
 
 public interface VersionProvider extends Provider {
 
+    /**
+     * Returns the closest server protocol version to the user's protocol version.
+     *
+     * @param connection connection
+     * @return closest server protocol version to the user's protocol version
+     */
     int getServerProtocol(UserConnection connection) throws Exception;
 }

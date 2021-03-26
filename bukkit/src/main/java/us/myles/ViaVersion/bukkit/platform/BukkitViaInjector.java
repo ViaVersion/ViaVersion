@@ -180,6 +180,11 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     @Override
+    public boolean lateProtocolVersionSetting() {
+        return true;
+    }
+
+    @Override
     public int getServerProtocolVersion() throws Exception {
         try {
             Class<?> serverClazz = NMSUtil.nms("MinecraftServer");

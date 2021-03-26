@@ -47,7 +47,7 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel channel) throws Exception {
         // Ensure ViaVersion is loaded
-        if (Via.getAPI().getServerVersion() != -1
+        if (Via.getAPI().getServerVersion().isKnown()
                 && channel instanceof SocketChannel) { // channel can be LocalChannel on internal server
             UserConnection info = new UserConnection((SocketChannel) channel);
             // init protocol

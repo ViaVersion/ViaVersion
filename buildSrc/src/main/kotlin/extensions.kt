@@ -70,8 +70,6 @@ private fun ShadowJar.configureExcludes() {
     exclude("it/unimi/dsi/fastutil/*/*Char*")
     // Map types
     exclude("it/unimi/dsi/fastutil/*/*Custom*")
-    exclude("it/unimi/dsi/fastutil/*/*Linked*")
-    exclude("it/unimi/dsi/fastutil/*/*Sorted*")
     exclude("it/unimi/dsi/fastutil/*/*Tree*")
     exclude("it/unimi/dsi/fastutil/*/*Heap*")
     exclude("it/unimi/dsi/fastutil/*/*Queue*")

@@ -20,6 +20,8 @@ package us.myles.ViaVersion.bungee.platform;
 import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.bungee.handlers.BungeeChannelInitializer;
@@ -77,7 +79,16 @@ public class BungeeViaInjector implements ViaInjector {
 
     @Override
     public int getServerProtocolVersion() throws Exception {
-        return (int) ReflectionUtil.getStatic(Class.forName("net.md_5.bungee.protocol.ProtocolConstants"), "SUPPORTED_VERSION_IDS", List.class).get(0);
+        return getBungeeSupportedVersions().get(0);
+    }
+
+    @Override
+    public IntSortedSet getServerProtocolVersions() throws Exception {
+        return new IntLinkedOpenHashSet(getBungeeSupportedVersions());
+    }
+
+    private List<Integer> getBungeeSupportedVersions() throws Exception {
+        return ReflectionUtil.getStatic(Class.forName("net.md_5.bungee.protocol.ProtocolConstants"), "SUPPORTED_VERSION_IDS", List.class);
     }
 
     @Override

@@ -95,8 +95,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private ThreadPoolExecutor mappingLoaderExecutor;
     private boolean mappingsLoaded;
 
+    private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(-1);
     private int maxProtocolPathSize = 50;
-    private int serverProtocol = -1;
 
     public ProtocolManagerImpl() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Via-Mappingloader-%d").build();
@@ -199,9 +199,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void refreshVersions() {
         supportedVersions.clear();
 
-        supportedVersions.add(serverProtocol);
+        supportedVersions.add(serverProtocolVersion.lowestSupportedVersion());
         for (ProtocolVersion versions : ProtocolVersion.getProtocols()) {
-            List<ProtocolPathEntry> paths = getProtocolPath(versions.getVersion(), serverProtocol);
+            List<ProtocolPathEntry> paths = getProtocolPath(versions.getVersion(), serverProtocolVersion.lowestSupportedVersion());
             if (paths == null) continue;
             supportedVersions.add(versions.getVersion());
             for (ProtocolPathEntry path : paths) {
@@ -309,19 +309,23 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public int getServerProtocol() {
-        return serverProtocol;
+    public ServerProtocolVersion getServerProtocolVersion() {
+        return serverProtocolVersion;
     }
 
-    public void setServerProtocol(int serverProtocol) {
-        this.serverProtocol = serverProtocol;
-        ProtocolRegistry.SERVER_PROTOCOL = serverProtocol;
+    public void setServerProtocol(ServerProtocolVersion serverProtocolVersion) {
+        this.serverProtocolVersion = serverProtocolVersion;
+        ProtocolRegistry.SERVER_PROTOCOL = serverProtocolVersion.lowestSupportedVersion();
     }
 
     @Override
     public boolean isWorkingPipe() {
         for (Int2ObjectMap<Protocol> map : registryMap.values()) {
-            if (map.containsKey(serverProtocol)) return true;
+            for (int protocolVersion : serverProtocolVersion.supportedVersions()) {
+                if (map.containsKey(protocolVersion)) {
+                    return true;
+                }
+            }
         }
         return false; // No destination for protocol
     }

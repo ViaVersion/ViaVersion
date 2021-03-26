@@ -32,12 +32,11 @@ import java.util.concurrent.CompletableFuture;
 public interface ProtocolManager {
 
     /**
-     * Returns the server protocol version, or -1 if not set.
-     * In the case of proxies, this returns the lowest supported protocol version.
+     * Returns the server protocol version. Its methods will return -1 if not set yet.
      *
-     * @return server protocol version, or -1 if not set
+     * @return server protocol version
      */
-    int getServerProtocol();
+    ServerProtocolVersion getServerProtocolVersion();
 
     /**
      * Returns a protocol instance by its class.

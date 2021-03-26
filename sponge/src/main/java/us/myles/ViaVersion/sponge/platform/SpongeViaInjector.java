@@ -121,6 +121,11 @@ public class SpongeViaInjector implements ViaInjector {
     }
 
     @Override
+    public boolean lateProtocolVersionSetting() {
+        return true;
+    }
+
+    @Override
     public void uninject() {
         // TODO: Uninject from players currently online
         for (ChannelFuture future : injectedFutures) {

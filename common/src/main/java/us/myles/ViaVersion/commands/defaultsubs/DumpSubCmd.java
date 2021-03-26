@@ -53,7 +53,7 @@ public class DumpSubCmd extends ViaSubCommand {
         VersionInfo version = new VersionInfo(
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
-                Via.getAPI().getServerVersion(),
+                Via.getAPI().getServerVersion().lowestSupportedVersion(),
                 Via.getManager().getProtocolManager().getSupportedVersions(),
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),

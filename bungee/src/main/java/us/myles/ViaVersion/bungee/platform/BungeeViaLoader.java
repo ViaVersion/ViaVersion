@@ -65,7 +65,7 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         registerListener(new UpdateListener());
         registerListener(new BungeeServerHandler());
 
-        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
             registerListener(new ElytraPatch());
         }
 
@@ -73,7 +73,7 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(VersionProvider.class, new BungeeVersionProvider());
         Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
 
-        if (Via.getAPI().getServerVersion() < ProtocolVersion.v1_9.getVersion()) {
+        if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
             Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());

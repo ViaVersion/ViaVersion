@@ -15,14 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.base;
+package us.myles.ViaVersion.api.protocol;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSets;
 
-public class BaseVersionProvider implements VersionProvider {
+public class ServerProtocolVersionSingleton implements ServerProtocolVersion {
+    private final int protocolVersion;
 
-    public int getServerProtocol(UserConnection connection) throws Exception {
-        return Via.getAPI().getServerVersion().lowestSupportedVersion();
+    public ServerProtocolVersionSingleton(int protocolVersion) {
+        this.protocolVersion = protocolVersion;
+    }
+
+    @Override
+    public int lowestSupportedVersion() {
+        return protocolVersion;
+    }
+
+    @Override
+    public int highestSupportedVersion() {
+        return protocolVersion;
+    }
+
+    @Override
+    public IntSortedSet supportedVersions() {
+        return IntSortedSets.singleton(protocolVersion);
     }
 }
