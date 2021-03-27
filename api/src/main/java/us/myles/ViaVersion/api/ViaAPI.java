@@ -23,18 +23,26 @@
 package us.myles.ViaVersion.api;
 
 import io.netty.buffer.ByteBuf;
+import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.api.platform.ViaConnectionManager;
+import us.myles.ViaVersion.api.platform.ViaPlatform;
+import us.myles.ViaVersion.api.protocol.ProtocolManager;
 import us.myles.ViaVersion.api.protocol.ServerProtocolVersion;
 
 import java.util.SortedSet;
 import java.util.UUID;
 
 /**
- * Represents the ViaAPI
+ * General api point. For more specialized api methods, see {@link Via#getManager()}.
  *
  * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
+ * @see ViaManager
+ * @see ProtocolManager
+ * @see ViaConnectionManager
+ * @see ViaPlatform
  */
 public interface ViaAPI<T> {
 
@@ -46,19 +54,19 @@ public interface ViaAPI<T> {
     ServerProtocolVersion getServerVersion();
 
     /**
-     * Get protocol version number from a player.
-     * Will also retrieve version from ProtocolSupport if it's being used.
+     * Returns the protocol version from a player.
+     * This will also retrieve the version from ProtocolSupport if it's being used.
      *
-     * @param player Platform player object, eg. Bukkit this is Player
-     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if no longer connected
+     * @param player the platform's player object, e.g. Bukkit this is Player
+     * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if no longer connected
      */
     int getPlayerVersion(T player);
 
     /**
-     * Get protocol number from a player.
+     * Returns the protocol version from a player.
      *
      * @param uuid UUID of a player
-     * @return Protocol ID, For example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if not connected
+     * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if not connected
      */
     int getPlayerVersion(UUID uuid);
 
@@ -76,7 +84,7 @@ public interface ViaAPI<T> {
     }
 
     /**
-     * Returns if Via injected into this player connection
+     * Returns if Via injected into this player connection.
      *
      * @param playerUUID UUID of a player
      * @return true if Via has a cached UserConnection for this player
@@ -84,26 +92,26 @@ public interface ViaAPI<T> {
     boolean isInjected(UUID playerUUID);
 
     /**
-     * Get the version of the plugin
+     * Returns the version of the plugin.
      *
-     * @return Plugin version
+     * @return plugin version
      */
     String getVersion();
 
     /**
-     * Send a raw packet to the player (Use new IDs)
+     * Sends a raw packet to the player.
      *
-     * @param player Platform player object, eg. Bukkit this is Player
-     * @param packet The packet, you need a VarInt ID then the packet contents.
+     * @param player the platform's player object, e.g. for Bukkit this is Player
+     * @param packet the packet; you need a VarInt Id, then the packet contents
      * @throws IllegalArgumentException if the player is not injected by Via
      */
     void sendRawPacket(T player, ByteBuf packet);
 
     /**
-     * Send a raw packet to the player (Use new IDs)
+     * Sends a raw packet to the player.
      *
-     * @param uuid   The uuid from the player to send packet
-     * @param packet The packet, you need a VarInt ID then the packet contents.
+     * @param uuid   the uuid from the player to send packet
+     * @param packet the packet; you need a VarInt Id, then the packet contents
      * @throws IllegalArgumentException if the player is not injected by Via
      */
     void sendRawPacket(UUID uuid, ByteBuf packet);
@@ -130,7 +138,7 @@ public interface ViaAPI<T> {
     BossBar createBossBar(String title, float health, BossColor color, BossStyle style);
 
     /**
-     * Get the supported protocol versions
+     * Returns the supported protocol versions.
      * This method removes any blocked protocol versions.
      *
      * @return a list of protocol versions
@@ -139,7 +147,7 @@ public interface ViaAPI<T> {
     SortedSet<Integer> getSupportedVersions();
 
     /**
-     * Get the supported protocol versions, including blocked protocols.
+     * Returns the supported protocol versions, including blocked protocols.
      *
      * @return a list of protocol versions
      */

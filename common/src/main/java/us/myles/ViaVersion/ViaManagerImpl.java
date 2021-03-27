@@ -115,10 +115,8 @@ public class ViaManagerImpl implements ViaManager {
         ServerProtocolVersion protocolVersion = protocolManager.getServerProtocolVersion();
         if (protocolVersion.isKnown()) {
             if (platform.isProxy()) {
-                platform.getLogger().info("ViaVersion detected lowest supported versions by the proxy: "
-                        + ProtocolVersion.getProtocol(protocolVersion.lowestSupportedVersion())
-                        + "\nHighest supported version by the proxy: "
-                        + ProtocolVersion.getProtocol(protocolVersion.highestSupportedVersion()));
+                platform.getLogger().info("ViaVersion detected lowest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.lowestSupportedVersion()));
+                platform.getLogger().info("Highest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.highestSupportedVersion()));
                 if (debug) {
                     platform.getLogger().info("Supported version range: " + Arrays.toString(protocolVersion.supportedVersions().toArray(new int[0])));
                 }

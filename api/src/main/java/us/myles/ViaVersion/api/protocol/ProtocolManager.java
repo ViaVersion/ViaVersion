@@ -99,7 +99,7 @@ public interface ProtocolManager {
 
     /**
      * Sets the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.
-     * Its default it 50.
+     * Its default is 50.
      *
      * @param maxProtocolPathSize maximum protocol path size
      */
