@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.bungee.platform;
 
+import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -12,13 +13,15 @@ import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
 public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
+
+    private final Set<UUID> disabledShieldBlocking = Sets.newConcurrentHashSet();
 
     @Override
     public int getPlayerVersion(ProxiedPlayer player) {
@@ -74,6 +77,21 @@ public class BungeeViaAPI implements ViaAPI<ProxiedPlayer> {
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
 
         return outputSet;
+    }
+
+    @Override
+    public boolean isShieldBlockingDisabled(UUID uuid) {
+        return disabledShieldBlocking.contains(uuid);
+    }
+
+    @Override
+    public void disableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.add(uuid);
+    }
+
+    @Override
+    public void enableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.remove(uuid);
     }
 
     /**

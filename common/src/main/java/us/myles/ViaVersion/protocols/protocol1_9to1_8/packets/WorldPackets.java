@@ -276,7 +276,7 @@ public class WorldPackets {
                         // Write item in hand
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         // Blocking patch
-                        if (Via.getConfig().isShieldBlocking()) {
+                        if (Via.getConfig().isShieldBlocking() && !Via.getAPI().isShieldBlockingDisabled(wrapper.user().getProtocolInfo().getUuid())) {
                             EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
 
                             if (item != null && Protocol1_9To1_8.isSword(item.getIdentifier())) {

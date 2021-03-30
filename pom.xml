@@ -6,7 +6,7 @@
 
     <groupId>us.myles</groupId>
     <artifactId>viaversion-parent</artifactId>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>3.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>viaversion-parent</name>
@@ -70,7 +70,7 @@
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
         </repository>
-		
+
         <!-- Mojang's Minecraft Libraries -->
         <repository>
             <id>mojang</id>

@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.bukkit.platform;
 
+import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,14 +14,16 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 import us.myles.ViaVersion.boss.ViaBossBar;
 import us.myles.ViaVersion.bukkit.util.ProtocolSupportUtil;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
 public class BukkitViaAPI implements ViaAPI<Player> {
     private final ViaVersionPlugin plugin;
+
+    private final Set<UUID> disabledShieldBlocking = Sets.newConcurrentHashSet();
 
     public BukkitViaAPI(ViaVersionPlugin plugin) {
         this.plugin = plugin;
@@ -84,6 +87,21 @@ public class BukkitViaAPI implements ViaAPI<Player> {
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
 
         return outputSet;
+    }
+
+    @Override
+    public boolean isShieldBlockingDisabled(UUID uuid) {
+        return disabledShieldBlocking.contains(uuid);
+    }
+
+    @Override
+    public void disableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.add(uuid);
+    }
+
+    @Override
+    public void enableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.remove(uuid);
     }
 
     /**

@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.velocity.platform;
 
+import com.google.common.collect.Sets;
 import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.VelocityPlugin;
@@ -10,14 +11,13 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.NoSuchElementException;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 public class VelocityViaAPI implements ViaAPI<Player> {
+
+    private final Set<UUID> disabledShieldBlocking = Sets.newConcurrentHashSet();
+
     @Override
     public int getPlayerVersion(Player player) {
         if (!isInjected(player.getUniqueId()))
@@ -69,6 +69,21 @@ public class VelocityViaAPI implements ViaAPI<Player> {
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
 
         return outputSet;
+    }
+
+    @Override
+    public boolean isShieldBlockingDisabled(UUID uuid) {
+        return disabledShieldBlocking.contains(uuid);
+    }
+
+    @Override
+    public void disableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.add(uuid);
+    }
+
+    @Override
+    public void enableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.remove(uuid);
     }
 
 }

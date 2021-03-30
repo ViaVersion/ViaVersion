@@ -1,5 +1,6 @@
 package us.myles.ViaVersion.sponge.platform;
 
+import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import org.spongepowered.api.entity.living.player.Player;
 import us.myles.ViaVersion.api.Via;
@@ -9,13 +10,15 @@ import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
 public class SpongeViaAPI implements ViaAPI<Player> {
+
+    private final Set<UUID> disabledShieldBlocking = Sets.newConcurrentHashSet();
 
     @Override
     public int getPlayerVersion(Player player) {
@@ -67,5 +70,20 @@ public class SpongeViaAPI implements ViaAPI<Player> {
         outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
 
         return outputSet;
+    }
+
+    @Override
+    public boolean isShieldBlockingDisabled(UUID uuid) {
+        return disabledShieldBlocking.contains(uuid);
+    }
+
+    @Override
+    public void disableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.add(uuid);
+    }
+
+    @Override
+    public void enableShieldBlocking(UUID uuid) {
+        disabledShieldBlocking.remove(uuid);
     }
 }

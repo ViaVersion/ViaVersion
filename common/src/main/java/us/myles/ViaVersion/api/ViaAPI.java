@@ -108,4 +108,26 @@ public interface ViaAPI<T> {
      * @see ProtocolRegistry#getSupportedVersions() for full list.
      */
     SortedSet<Integer> getSupportedVersions();
+
+    /**
+     * Returns if shieldBlocking is disabled for a specific Player
+     *
+     * @param uuid The Player
+     */
+    boolean isShieldBlockingDisabled(UUID uuid);
+
+    /**
+     * Disables shieldBlocking for a specific Player
+     *
+     * @param uuid The Player
+     */
+    void disableShieldBlocking(UUID uuid);
+
+    /**
+     * Enables shieldBlocking for a specific Player
+     *
+     * @param uuid The Player
+     */
+    void enableShieldBlocking(UUID uuid);
+
 }
