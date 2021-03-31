@@ -171,7 +171,9 @@ public class PacketWrapper {
         } else {
             Pair<Type, Object> read = readableObjects.poll();
             Type rtype = read.getKey();
-            if (rtype.equals(type) || (type.getBaseClass().equals(rtype.getBaseClass()) && type.getOutputClass().equals(rtype.getOutputClass()))) {
+            if (rtype.equals(type)
+                    || (type.getBaseClass().equals(rtype.getBaseClass())
+                    && type.getOutputClass().equals(rtype.getOutputClass()))) {
                 return (T) read.getValue();
             } else {
                 if (rtype == Type.NOTHING) {
@@ -202,7 +204,7 @@ public class PacketWrapper {
                 }
             }
         }
-        packetValues.add(new Pair<Type, Object>(type, value));
+        packetValues.add(new Pair<>(type, value));
     }
 
     /**
@@ -229,7 +231,7 @@ public class PacketWrapper {
         packetValues.addAll(readableObjects);
         readableObjects.clear();
         // If the buffer has readable bytes, copy them.
-        if (inputBuffer.readableBytes() > 0) {
+        if (inputBuffer.isReadable()) {
             passthrough(Type.REMAINING_BYTES);
         }
     }
@@ -292,7 +294,7 @@ public class PacketWrapper {
 
     private void writeRemaining(ByteBuf output) {
         if (inputBuffer != null) {
-            output.writeBytes(inputBuffer, inputBuffer.readableBytes());
+            output.writeBytes(inputBuffer);
         }
     }
 
@@ -367,8 +369,12 @@ public class PacketWrapper {
         // Apply other protocols
         apply(direction, user().getProtocolInfo().getState(), index, protocols, reverse);
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-        writeToBuffer(output);
-        return output;
+        try {
+            writeToBuffer(output);
+            return output.retain();
+        } finally {
+            output.release();
+        }
     }
 
     /**
@@ -414,8 +420,12 @@ public class PacketWrapper {
         if (!isCancelled()) {
             // Send
             ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-            writeToBuffer(output);
-            user().sendRawPacket(output);
+            try {
+                writeToBuffer(output);
+                user().sendRawPacket(output.retain());
+            } finally {
+                output.release();
+            }
         }
     }
 
@@ -538,9 +548,13 @@ public class PacketWrapper {
     public void sendToServer() throws Exception {
         if (!isCancelled()) {
             ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-            writeToBuffer(output);
+            try {
+                writeToBuffer(output);
 
-            user().sendRawPacketToServer(output, true);
+                user().sendRawPacketToServer(output.retain(), true);
+            } finally {
+                output.release();
+            }
         }
     }
 

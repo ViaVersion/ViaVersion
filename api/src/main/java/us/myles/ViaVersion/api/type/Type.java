@@ -31,27 +31,7 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.VillagerData;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.types.ArrayType;
-import us.myles.ViaVersion.api.type.types.BooleanType;
-import us.myles.ViaVersion.api.type.types.ByteArrayType;
-import us.myles.ViaVersion.api.type.types.ByteType;
-import us.myles.ViaVersion.api.type.types.ComponentType;
-import us.myles.ViaVersion.api.type.types.DoubleType;
-import us.myles.ViaVersion.api.type.types.FloatType;
-import us.myles.ViaVersion.api.type.types.IntType;
-import us.myles.ViaVersion.api.type.types.LongArrayType;
-import us.myles.ViaVersion.api.type.types.LongType;
-import us.myles.ViaVersion.api.type.types.RemainingBytesType;
-import us.myles.ViaVersion.api.type.types.ShortType;
-import us.myles.ViaVersion.api.type.types.StringType;
-import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
-import us.myles.ViaVersion.api.type.types.UUIDType;
-import us.myles.ViaVersion.api.type.types.UnsignedByteType;
-import us.myles.ViaVersion.api.type.types.UnsignedShortType;
-import us.myles.ViaVersion.api.type.types.VarIntArrayType;
-import us.myles.ViaVersion.api.type.types.VarIntType;
-import us.myles.ViaVersion.api.type.types.VarLongType;
-import us.myles.ViaVersion.api.type.types.VoidType;
+import us.myles.ViaVersion.api.type.types.*;
 import us.myles.ViaVersion.api.type.types.minecraft.BlockChangeRecordType;
 import us.myles.ViaVersion.api.type.types.minecraft.EulerAngleType;
 import us.myles.ViaVersion.api.type.types.minecraft.FlatItemArrayType;
@@ -83,7 +63,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Byte[]> BYTE_ARRAY = new ArrayType<>(Type.BYTE);
     public static final Type<byte[]> BYTE_ARRAY_PRIMITIVE = new ByteArrayType();
-
+    public static final Type<byte[]> SHORT_BYTE_ARRAY = new ShortByteArrayType();
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 
     public static final Type<Short> UNSIGNED_BYTE = new UnsignedByteType();
