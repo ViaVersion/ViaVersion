@@ -32,6 +32,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean useNewDeathmessages;
     private boolean suppressMetadataErrors;
     private boolean shieldBlocking;
+    private boolean noDelayShieldBlocking;
     private boolean hologramPatch;
     private boolean pistonAnimationPatch;
     private boolean bossbarPatch;
@@ -91,6 +92,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         useNewDeathmessages = getBoolean("use-new-deathmessages", true);
         suppressMetadataErrors = getBoolean("suppress-metadata-errors", false);
         shieldBlocking = getBoolean("shield-blocking", true);
+        noDelayShieldBlocking = getBoolean("no-delay-shield-blocking", false);
         hologramPatch = getBoolean("hologram-patch", false);
         pistonAnimationPatch = getBoolean("piston-animation-patch", false);
         bossbarPatch = getBoolean("bossbar-patch", true);
@@ -168,6 +170,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isShieldBlocking() {
         return shieldBlocking;
+    }
+
+    @Override
+    public boolean isNoDelayShieldBlocking() {
+        return noDelayShieldBlocking;
     }
 
     @Override

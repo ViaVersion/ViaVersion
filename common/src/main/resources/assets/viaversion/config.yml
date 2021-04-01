@@ -167,6 +167,9 @@ auto-team: true
 suppress-metadata-errors: false
 # When enabled 1.9+ will be able to block by using shields
 shield-blocking: true
+# If this setting is active, the main hand is used instead of the off hand to trigger the blocking of the player.
+# With the main hand the blocking starts way faster.
+no-delay-shield-blocking: false
 # Enable player tick simulation, this fixes eating, drinking, nether portals.
 simulate-pt: true
 # Should we use nms player to simulate packets, (may fix anti-cheat issues)
