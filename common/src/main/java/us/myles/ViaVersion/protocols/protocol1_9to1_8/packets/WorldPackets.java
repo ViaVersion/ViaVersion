@@ -294,11 +294,9 @@ public class WorldPackets {
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
-                            boolean noDelayBlocking = Via.getConfig().isNoDelayShieldBlocking();
                             EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
 
                             if (item != null && Protocol1_9To1_8.isSword(item.getIdentifier())) {
-                                // Uses sword interaction as block action
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
@@ -306,8 +304,11 @@ public class WorldPackets {
                                         tracker.setSecondHand(shield);
                                     }
                                 }
+
+                                // Uses left or right hand to start blocking depending on the no delay setting
+                                boolean noDelayBlocking = Via.getConfig().isNoDelayShieldBlocking();
+
                                 if (noDelayBlocking && hand == 1 || !noDelayBlocking && hand == 0) {
-                                    // Cancel left hand interactions
                                     wrapper.cancel();
                                 }
                             } else {
