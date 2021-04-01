@@ -77,6 +77,13 @@ public interface ViaVersionConfig {
     boolean isShieldBlocking();
 
     /**
+     * Whether the player can block with the shield without a delay.
+     *
+     * @return {@code true} if non delayed shield blocking is enabled.
+     */
+    boolean isNoDelayShieldBlocking();
+
+    /**
      * Get if armor stand positions are fixed so holograms show up at the correct height in 1.9 &amp; 1.10
      *
      * @return true if hologram patching is enabled

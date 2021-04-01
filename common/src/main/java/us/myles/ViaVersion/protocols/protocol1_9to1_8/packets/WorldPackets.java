@@ -303,6 +303,12 @@ public class WorldPackets {
                                         Item shield = new Item(442, (byte) 1, (short) 0, null);
                                         tracker.setSecondHand(shield);
                                     }
+                                }
+
+                                // Uses left or right hand to start blocking depending on the no delay setting
+                                boolean noDelayBlocking = Via.getConfig().isNoDelayShieldBlocking();
+
+                                if (noDelayBlocking && hand == 1 || !noDelayBlocking && hand == 0) {
                                     wrapper.cancel();
                                 }
                             } else {
