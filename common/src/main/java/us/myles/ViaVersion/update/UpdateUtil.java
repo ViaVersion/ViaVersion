@@ -19,6 +19,7 @@ package us.myles.ViaVersion.update;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
@@ -27,17 +28,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
 
 public class UpdateUtil {
 
-    public static final String PREFIX = "§a§l[ViaVersion] §a";
-    private static final String URL = "https://api.spiget.org/v2/resources/";
-    private static final int PLUGIN = 19254;
-    private static final String LATEST_VERSION = "/versions/latest";
+    public static final String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[ViaVersion] " + ChatColor.GREEN;
+    private static final String URL = "https://api.github.com/repos/ViaVersion/ViaVersion/releases/latest";
 
     public static void sendUpdateMessage(final UUID uuid) {
         Via.getPlatform().runAsync(() -> {
@@ -59,7 +57,7 @@ public class UpdateUtil {
 
     @Nullable
     private static String getUpdateMessage(boolean console) {
-        if (Via.getPlatform().getPluginVersion().equals("${version}")) {
+        if (Via.getPlatform().getPluginVersion().equals("${project.version}")) {
             return "You are using a debug/custom version, consider updating.";
         }
         String newestString = getNewestVersion();
@@ -92,28 +90,22 @@ public class UpdateUtil {
     @Nullable
     private static String getNewestVersion() {
         try {
-            URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
+            URL url = new URL(URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
             connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String input;
-            StringBuilder builder = new StringBuilder();
-            while ((input = br.readLine()) != null) {
-                builder.append(input);
-            }
+            String input = br.readLine();
             br.close();
             JsonObject statistics;
             try {
-                statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
+                statistics = GsonUtil.getGson().fromJson(input, JsonObject.class);
             } catch (JsonParseException e) {
                 e.printStackTrace();
                 return null;
             }
-            return statistics.get("name").getAsString();
-        } catch (MalformedURLException e) {
-            return null;
+            return statistics.get("tag_name").getAsString();
         } catch (IOException e) {
             return null;
         }
