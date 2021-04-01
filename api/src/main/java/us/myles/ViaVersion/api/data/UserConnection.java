@@ -22,6 +22,7 @@
  */
 package us.myles.ViaVersion.api.data;
 
+import com.google.common.cache.CacheBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -38,8 +39,12 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.ChatColorUtil;
 import us.myles.ViaVersion.util.PipelineUtil;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -48,8 +53,11 @@ public class UserConnection {
     private final long id = IDS.incrementAndGet();
     private final Channel channel;
     private final boolean clientSide;
-    Map<Class, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    Map<Class<?>, StoredObject> storedObjects = new ConcurrentHashMap<>();
     private ProtocolInfo protocolInfo;
+    private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .<UUID, Boolean>build().asMap());
     private boolean active = true;
     private boolean pendingDisconnect;
     private Object lastPacket;
@@ -285,9 +293,9 @@ public class UserConnection {
                     .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
             try {
                 Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
-            } catch (Exception e) {
-                // Should not happen
-                Via.getPlatform().getLogger().warning("Type.VAR_INT.write thrown an exception: " + e);
+                Type.UUID.write(buf, generatePassthroughToken());
+            } catch (Exception shouldNotHappen) {
+                throw new RuntimeException(shouldNotHappen);
             }
             buf.writeBytes(packet);
             Runnable act = () -> {
@@ -418,7 +426,12 @@ public class UserConnection {
 
     private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
         int id = Type.VAR_INT.readPrimitive(buf);
-        if (id == PacketWrapper.PASSTHROUGH_ID) return;
+        if (id == PacketWrapper.PASSTHROUGH_ID) {
+            if (!passthroughTokens.remove(Type.UUID.read(buf))) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+            return;
+        }
 
         PacketWrapper wrapper = new PacketWrapper(id, buf, this);
         try {
@@ -459,7 +472,7 @@ public class UserConnection {
         }
     }
 
-    public Map<Class, StoredObject> getStoredObjects() {
+    public Map<Class<?>, StoredObject> getStoredObjects() {
         return storedObjects;
     }
 
@@ -563,5 +576,11 @@ public class UserConnection {
 
     public boolean shouldApplyBlockProtocol() {
         return !clientSide; // Don't apply protocol blocking on client-side
+    }
+
+    public UUID generatePassthroughToken() {
+        UUID token = UUID.randomUUID();
+        passthroughTokens.add(token);
+        return token;
     }
 }
