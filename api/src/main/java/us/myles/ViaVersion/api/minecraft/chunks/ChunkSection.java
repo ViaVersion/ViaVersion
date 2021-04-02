@@ -184,7 +184,7 @@ public class ChunkSection {
      *
      * @param data The value to set the block light to
      */
-    public void setBlockLight(@Nullable byte[] data) {
+    public void setBlockLight(byte @Nullable [] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.blockLight == null) {
             this.blockLight = new NibbleArray(data);
@@ -198,7 +198,7 @@ public class ChunkSection {
      *
      * @param data The value to set the sky light to
      */
-    public void setSkyLight(@Nullable byte[] data) {
+    public void setSkyLight(byte @Nullable [] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.skyLight == null) {
             this.skyLight = new NibbleArray(data);
@@ -207,7 +207,7 @@ public class ChunkSection {
         }
     }
 
-    public @Nullable byte[] getBlockLight() {
+    public byte @Nullable [] getBlockLight() {
         return blockLight == null ? null : blockLight.getHandle();
     }
 
@@ -215,7 +215,7 @@ public class ChunkSection {
         return blockLight;
     }
 
-    public @Nullable byte[] getSkyLight() {
+    public byte @Nullable [] getSkyLight() {
         return skyLight == null ? null : skyLight.getHandle();
     }
 
