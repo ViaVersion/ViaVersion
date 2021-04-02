@@ -23,7 +23,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingData;
@@ -472,8 +472,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
     }
 
-    @Nullable
-    public <T> T get(Class<T> objectClass) {
+    public @Nullable <T> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
@@ -493,8 +492,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         return getMappingData() != null;
     }
 
-    @Nullable
-    public MappingData getMappingData() {
+    public @Nullable MappingData getMappingData() {
         return null; // Let the protocols hold the mappings to still have easy, static singleton access there
     }
 

@@ -23,8 +23,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
-import us.myles.ViaVersion.exception.CancelEncoderException;
 import us.myles.ViaVersion.exception.CancelCodecException;
+import us.myles.ViaVersion.exception.CancelEncoderException;
 
 import java.util.List;
 

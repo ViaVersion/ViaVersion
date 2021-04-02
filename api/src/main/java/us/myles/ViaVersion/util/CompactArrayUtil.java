@@ -46,7 +46,7 @@ public class CompactArrayUtil {
             79536431, 0, 78090314, 78090314, 0, 76695844, 76695844, 0, 75350303, 75350303,
             0, 74051160, 74051160, 0, 72796055, 72796055, 0, 71582788, 71582788, 0,
             70409299, 70409299, 0, 69273666, 69273666, 0, 68174084, 68174084, 0, Integer.MIN_VALUE,
-            0, 5 };
+            0, 5};
 
     private CompactArrayUtil() {
         throw new AssertionError();
@@ -72,6 +72,7 @@ public class CompactArrayUtil {
 
         return data;
     }
+
     public static void iterateCompactArrayWithPadding(int bitsPerEntry, int entries, long[] data, BiIntConsumer consumer) {
         long maxEntryValue = (1L << bitsPerEntry) - 1;
         char valuesPerLong = (char) (64 / bitsPerEntry);

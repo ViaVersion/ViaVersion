@@ -23,7 +23,11 @@ import us.myles.ViaVersion.api.command.ViaSubCommand;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class PPSSubCmd extends ViaSubCommand {
     @Override

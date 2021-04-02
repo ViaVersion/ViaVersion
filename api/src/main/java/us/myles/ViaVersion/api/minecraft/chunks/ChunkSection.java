@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ChunkSection {
 
@@ -207,23 +207,19 @@ public class ChunkSection {
         }
     }
 
-    @Nullable
-    public byte[] getBlockLight() {
+    public @Nullable byte[] getBlockLight() {
         return blockLight == null ? null : blockLight.getHandle();
     }
 
-    @Nullable
-    public NibbleArray getBlockLightNibbleArray() {
+    public @Nullable NibbleArray getBlockLightNibbleArray() {
         return blockLight;
     }
 
-    @Nullable
-    public byte[] getSkyLight() {
+    public @Nullable byte[] getSkyLight() {
         return skyLight == null ? null : skyLight.getHandle();
     }
 
-    @Nullable
-    public NibbleArray getSkyLightNibbleArray() {
+    public @Nullable NibbleArray getSkyLightNibbleArray() {
         return skyLight;
     }
 

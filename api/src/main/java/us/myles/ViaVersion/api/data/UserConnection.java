@@ -27,7 +27,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.ViaVersionConfig;
@@ -96,8 +96,7 @@ public class UserConnection {
      * @param <T>         The type of the class you want to get.
      * @return The requested object
      */
-    @Nullable
-    public <T extends StoredObject> T get(Class<T> objectClass) {
+    public @Nullable <T extends StoredObject> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
@@ -453,13 +452,11 @@ public class UserConnection {
         return id;
     }
 
-    @Nullable
-    public Channel getChannel() {
+    public @Nullable Channel getChannel() {
         return channel;
     }
 
-    @Nullable
-    public ProtocolInfo getProtocolInfo() {
+    public @Nullable ProtocolInfo getProtocolInfo() {
         return protocolInfo;
     }
 
@@ -492,8 +489,7 @@ public class UserConnection {
         this.pendingDisconnect = pendingDisconnect;
     }
 
-    @Nullable
-    public Object getLastPacket() {
+    public @Nullable Object getLastPacket() {
         return lastPacket;
     }
 

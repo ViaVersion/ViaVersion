@@ -26,7 +26,8 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_
 public class InventoryPackets {
 
     public static void register(Protocol1_10To1_9_3_4 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, item -> {}, InventoryPackets::toServerItem);
+        ItemRewriter itemRewriter = new ItemRewriter(protocol, item -> {
+        }, InventoryPackets::toServerItem);
         itemRewriter.registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
     }
 

@@ -19,7 +19,7 @@ package us.myles.ViaVersion.api.rewriters;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
@@ -162,8 +162,7 @@ public class TagRewriter {
         }
     }
 
-    @Nullable
-    public List<TagData> getNewTags(RegistryType tagType) {
+    public @Nullable List<TagData> getNewTags(RegistryType tagType) {
         return newTags.get(tagType);
     }
 
@@ -171,8 +170,7 @@ public class TagRewriter {
         return newTags.computeIfAbsent(tagType, type -> new ArrayList<>());
     }
 
-    @Nullable
-    public IdRewriteFunction getRewriter(RegistryType tagType) {
+    public @Nullable IdRewriteFunction getRewriter(RegistryType tagType) {
         MappingData mappingData = protocol.getMappingData();
         switch (tagType) {
             case BLOCK:

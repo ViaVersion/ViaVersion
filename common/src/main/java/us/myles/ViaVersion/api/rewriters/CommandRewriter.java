@@ -17,7 +17,7 @@
  */
 package us.myles.ViaVersion.api.rewriters;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -122,8 +122,7 @@ public abstract class CommandRewriter {
      * @param argumentType argument type
      * @return new argument type, or null if it should be removed
      */
-    @Nullable
-    protected String handleArgumentType(String argumentType) {
+    protected @Nullable String handleArgumentType(String argumentType) {
         return argumentType;
     }
 

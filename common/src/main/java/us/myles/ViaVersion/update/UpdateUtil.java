@@ -19,7 +19,7 @@ package us.myles.ViaVersion.update;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 
@@ -57,8 +57,7 @@ public class UpdateUtil {
         });
     }
 
-    @Nullable
-    private static String getUpdateMessage(boolean console) {
+    private static @Nullable String getUpdateMessage(boolean console) {
         if (Via.getPlatform().getPluginVersion().equals("${version}")) {
             return "You are using a debug/custom version, consider updating.";
         }
@@ -89,8 +88,7 @@ public class UpdateUtil {
         return null;
     }
 
-    @Nullable
-    private static String getNewestVersion() {
+    private static @Nullable String getNewestVersion() {
         try {
             URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

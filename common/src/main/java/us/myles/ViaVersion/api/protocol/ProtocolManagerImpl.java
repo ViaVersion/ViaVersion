@@ -23,7 +23,7 @@ import com.google.common.collect.Range;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingDataLoader;
@@ -210,9 +210,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
     }
 
-    @Nullable
     @Override
-    public List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
+    public @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
         ProtocolPathKey protocolKey = new ProtocolPathKeyImpl(clientVersion, serverVersion);
         // Check cache
         List<ProtocolPathEntry> protocolList = pathCache.get(protocolKey);
@@ -237,8 +236,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @param serverVersion desired output version
      * @return path that has been generated, null if failed
      */
-    @Nullable
-    private List<ProtocolPathEntry> getProtocolPath(List<ProtocolPathEntry> current, int clientVersion, int serverVersion) {
+    private @Nullable List<ProtocolPathEntry> getProtocolPath(List<ProtocolPathEntry> current, int clientVersion, int serverVersion) {
         if (clientVersion == serverVersion) return null; // We're already there
         if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
 
@@ -282,9 +280,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         return shortest; // null if none found
     }
 
-    @Nullable
     @Override
-    public Protocol getProtocol(Class<? extends Protocol> protocolClass) {
+    public @Nullable Protocol getProtocol(Class<? extends Protocol> protocolClass) {
         return protocols.get(protocolClass);
     }
 
@@ -406,9 +403,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
     }
 
-    @Nullable
     @Override
-    public CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
+    public @Nullable CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
         mappingLoaderLock.readLock().lock();
         try {
             return mappingsLoaded ? null : mappingLoaderFutures.get(protocolClass);

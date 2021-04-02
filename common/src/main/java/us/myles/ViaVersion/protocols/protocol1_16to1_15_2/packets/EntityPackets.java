@@ -109,7 +109,7 @@ public class EntityPackets {
         CompoundTag tag = new CompoundTag();
         tag.put("piglin_safe", new ByteTag((byte) 1));
         tag.put("natural", new ByteTag((byte) 0));
-        tag.put("ambient_light",new FloatTag( 0.1F));
+        tag.put("ambient_light", new FloatTag(0.1F));
         tag.put("infiniburn", new StringTag("minecraft:infiniburn_nether"));
         tag.put("respawn_anchor_works", new ByteTag((byte) 1));
         tag.put("has_skylight", new ByteTag((byte) 0));

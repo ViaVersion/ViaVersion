@@ -23,7 +23,7 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.BitSet;
 import java.util.List;
@@ -65,8 +65,7 @@ public interface Chunk {
      * @return chunk section bit mask, only non-null available for 1.17+ chunks
      * @see #getBitmask()
      */
-    @Nullable
-    BitSet getChunkMask();
+    @Nullable BitSet getChunkMask();
 
     void setChunkMask(BitSet chunkSectionMask);
 
@@ -74,10 +73,9 @@ public interface Chunk {
 
     void setSections(ChunkSection[] sections);
 
-    @Nullable
-    int[] getBiomeData();
+    int @Nullable [] getBiomeData();
 
-    void setBiomeData(int[] biomeData);
+    void setBiomeData(int @Nullable [] biomeData);
 
     CompoundTag getHeightMap();
 

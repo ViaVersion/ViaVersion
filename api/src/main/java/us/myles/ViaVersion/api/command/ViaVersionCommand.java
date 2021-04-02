@@ -22,7 +22,7 @@
  */
 package us.myles.ViaVersion.api.command;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 
@@ -49,8 +49,7 @@ public interface ViaVersionCommand {
      * @param name subcommand name
      * @return ViaSubCommand instance
      */
-    @Nullable
-    ViaSubCommand getSubCommand(String name);
+    @Nullable ViaSubCommand getSubCommand(String name);
 
     /**
      * Executed when the Command sender executes the commands

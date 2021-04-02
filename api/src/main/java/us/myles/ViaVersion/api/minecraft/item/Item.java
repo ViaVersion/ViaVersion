@@ -24,7 +24,7 @@ package us.myles.ViaVersion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
 
@@ -73,8 +73,7 @@ public class Item {
         this.data = data;
     }
 
-    @Nullable
-    public CompoundTag getTag() {
+    public @Nullable CompoundTag getTag() {
         return tag;
     }
 

@@ -48,7 +48,7 @@ public class StringType extends Type<String> {
         int len = Type.VAR_INT.readPrimitive(buffer);
 
         Preconditions.checkArgument(len <= maxLength * maxJavaCharUtf8Length,
-                "Cannot receive string longer than Short.MAX_VALUE * "  + maxJavaCharUtf8Length + " bytes (got %s bytes)", len);
+                "Cannot receive string longer than Short.MAX_VALUE * " + maxJavaCharUtf8Length + " bytes (got %s bytes)", len);
 
         String string = buffer.toString(buffer.readerIndex(), len, StandardCharsets.UTF_8);
         buffer.skipBytes(len);

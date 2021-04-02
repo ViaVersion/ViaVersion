@@ -25,8 +25,8 @@ package us.myles.ViaVersion.api.protocol;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,8 +105,7 @@ public class ProtocolVersion {
         return versions.containsKey(id);
     }
 
-    @NotNull
-    public static ProtocolVersion getProtocol(int id) {
+    public static @NonNull ProtocolVersion getProtocol(int id) {
         ProtocolVersion protocolVersion = versions.get(id);
         if (protocolVersion != null) {
             return protocolVersion;
@@ -123,8 +122,7 @@ public class ProtocolVersion {
         return Collections.unmodifiableList(new ArrayList<>(versions.values()));
     }
 
-    @Nullable
-    public static ProtocolVersion getClosest(String protocol) {
+    public static @Nullable ProtocolVersion getClosest(String protocol) {
         for (ProtocolVersion version : versions.values()) {
             String name = version.getName();
             if (name.equals(protocol)) {
@@ -209,6 +207,10 @@ public class ProtocolVersion {
      */
     public int getOriginalVersion() {
         return snapshotVersion == -1 ? version : ((1 << 30) | snapshotVersion);
+    }
+
+    public boolean isKnown() {
+        return version != -1;
     }
 
     /**

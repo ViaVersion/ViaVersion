@@ -22,7 +22,7 @@
  */
 package us.myles.ViaVersion.api.remapper;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.exception.InformativeException;
@@ -60,8 +60,7 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
         }
     }
 
-    @Nullable
-    public Type<T1> getInputType() {
+    public @Nullable Type<T1> getInputType() {
         return inputType;
     }
 

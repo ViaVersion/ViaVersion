@@ -49,7 +49,7 @@ public interface ServerProtocolVersion {
      * Returns true if the actual protocol version has not yet been identified.
      * In that case, all methods above will returns -1.
      *
-     * @return true if unset
+     * @return true if set, false if unknown (yet)
      */
     default boolean isKnown() {
         return lowestSupportedVersion() != -1 && highestSupportedVersion() != -1;

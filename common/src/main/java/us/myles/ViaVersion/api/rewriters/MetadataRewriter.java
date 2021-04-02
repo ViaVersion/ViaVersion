@@ -19,7 +19,7 @@ package us.myles.ViaVersion.api.rewriters;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.ParticleMappings;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -296,8 +296,7 @@ public abstract class MetadataRewriter {
      */
     protected abstract void handleMetadata(int entityId, @Nullable EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception;
 
-    @Nullable
-    protected Metadata getMetaByIndex(int index, List<Metadata> metadataList) {
+    protected @Nullable Metadata getMetaByIndex(int index, List<Metadata> metadataList) {
         for (Metadata metadata : metadataList) {
             if (metadata.getId() == index) {
                 return metadata;

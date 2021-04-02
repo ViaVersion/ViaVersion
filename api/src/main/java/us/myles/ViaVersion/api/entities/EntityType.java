@@ -22,7 +22,7 @@
  */
 package us.myles.ViaVersion.api.entities;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EntityType {
 
@@ -34,16 +34,16 @@ public interface EntityType {
     /**
      * @return parent entity type if present
      */
-    @Nullable
-    EntityType getParent();
+    @Nullable EntityType getParent();
 
     String name();
 
     default boolean is(EntityType... types) {
-        for (EntityType type : types)
+        for (EntityType type : types) {
             if (this == type) {
                 return true;
             }
+        }
         return false;
     }
 

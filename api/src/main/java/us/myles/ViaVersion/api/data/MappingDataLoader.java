@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.Int2IntBiMap;
@@ -73,8 +73,7 @@ public class MappingDataLoader {
     /**
      * Loads the file from the plugin folder if present, else from the bundled resources.
      */
-    @Nullable
-    public static JsonObject loadFromDataDir(String name) {
+    public static @Nullable JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
         if (!file.exists()) return loadData(name);
 
@@ -94,8 +93,7 @@ public class MappingDataLoader {
     /**
      * Loads the file from the bundled resources. Uses the cache if enabled.
      */
-    @Nullable
-    public static JsonObject loadData(String name) {
+    public static @Nullable JsonObject loadData(String name) {
         return loadData(name, false);
     }
 
@@ -104,8 +102,7 @@ public class MappingDataLoader {
      *
      * @param cacheIfEnabled whether loaded files should be cached
      */
-    @Nullable
-    public static JsonObject loadData(String name, boolean cacheIfEnabled) {
+    public static @Nullable JsonObject loadData(String name, boolean cacheIfEnabled) {
         if (cacheJsonMappings) {
             JsonObject cached = MAPPINGS_CACHE.get(name);
             if (cached != null) {
@@ -233,8 +230,7 @@ public class MappingDataLoader {
         return map;
     }
 
-    @Nullable
-    public static InputStream getResource(String name) {
+    public static @Nullable InputStream getResource(String name) {
         return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
     }
 }

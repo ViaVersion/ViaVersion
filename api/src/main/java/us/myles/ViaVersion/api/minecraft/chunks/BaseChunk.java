@@ -23,7 +23,7 @@
 package us.myles.ViaVersion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.BitSet;
 import java.util.List;
@@ -42,7 +42,7 @@ public class BaseChunk implements Chunk {
     protected final List<CompoundTag> blockEntities;
 
     public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, @Nullable BitSet chunkSectionBitSet,
-                     ChunkSection[] sections, @Nullable int[] biomeData, @Nullable CompoundTag heightMap, List<CompoundTag> blockEntities) {
+                     ChunkSection[] sections, int @Nullable [] biomeData, @Nullable CompoundTag heightMap, List<CompoundTag> blockEntities) {
         this.x = x;
         this.z = z;
         this.fullChunk = fullChunk;
@@ -104,8 +104,7 @@ public class BaseChunk implements Chunk {
     }
 
     @Override
-    @Nullable
-    public BitSet getChunkMask() {
+    public @Nullable BitSet getChunkMask() {
         return chunkSectionBitSet;
     }
 
@@ -125,13 +124,12 @@ public class BaseChunk implements Chunk {
     }
 
     @Override
-    @Nullable
-    public int[] getBiomeData() {
+    public int @Nullable [] getBiomeData() {
         return biomeData;
     }
 
     @Override
-    public void setBiomeData(final int[] biomeData) {
+    public void setBiomeData(int @Nullable [] biomeData) {
         this.biomeData = biomeData;
     }
 
