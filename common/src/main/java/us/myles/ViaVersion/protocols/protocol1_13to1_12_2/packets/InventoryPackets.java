@@ -329,9 +329,10 @@ public class InventoryPackets {
                 ListTag ench = tag.get("ench");
                 ListTag enchantments = new ListTag(CompoundTag.class);
                 for (Tag enchEntry : ench) {
-                    if (enchEntry instanceof CompoundTag) {
+                    NumberTag idTag;
+                    if (enchEntry instanceof CompoundTag && (idTag = ((CompoundTag) enchEntry).get("id")) != null) {
                         CompoundTag enchantmentEntry = new CompoundTag();
-                        short oldId = ((NumberTag) ((CompoundTag) enchEntry).get("id")).asShort();
+                        short oldId = idTag.asShort();
                         String newId = Protocol1_13To1_12_2.MAPPINGS.getOldEnchantmentsIds().get(oldId);
                         if (newId == null) {
                             newId = "viaversion:legacy/" + oldId;
