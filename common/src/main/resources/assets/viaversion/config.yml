@@ -169,7 +169,12 @@ suppress-metadata-errors: false
 shield-blocking: true
 # If this setting is active, the main hand is used instead of the off hand to trigger the blocking of the player.
 # With the main hand the blocking starts way faster.
+# (Requires "show-shield-when-sword-in-hand" to be disabled)
 no-delay-shield-blocking: false
+# If this setting is active, the shield will appear immediately for 1.9+ when you hold a sword in your main hand.
+# The shield disappears when you switch to another item.
+# (Requires "shield-blocking" to be enabled)
+show-shield-when-sword-in-hand: false
 # Enable player tick simulation, this fixes eating, drinking, nether portals.
 simulate-pt: true
 # Should we use nms player to simulate packets, (may fix anti-cheat issues)

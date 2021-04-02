@@ -269,7 +269,9 @@ public class WorldPackets {
                             EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                             if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
-                                entityTracker.setSecondHand(null);
+                                if(!Via.getConfig().isShowShieldWhenSwordInHand()) {
+                                    entityTracker.setSecondHand(null);
+                                }
                             }
                         }
                     }
@@ -296,23 +298,36 @@ public class WorldPackets {
                         if (Via.getConfig().isShieldBlocking()) {
                             EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
 
+                            // Check if the shield is already there or if we have to give it here
+                            boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand();
+
                             if (item != null && Protocol1_9To1_8.isSword(item.getIdentifier())) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
-                                        Item shield = new Item(442, (byte) 1, (short) 0, null);
-                                        tracker.setSecondHand(shield);
+
+                                        // Check if the shield is already in the offhand
+                                        if(!showShieldWhenSwordInHand) {
+
+                                            // Set shield in offhand when interacting with main hand
+                                            Item shield = new Item(442, (byte) 1, (short) 0, null);
+                                            tracker.setSecondHand(shield);
+                                        }
                                     }
                                 }
 
-                                // Uses left or right hand to start blocking depending on the no delay setting
-                                boolean noDelayBlocking = Via.getConfig().isNoDelayShieldBlocking();
+                                // Use the main hand to trigger the blocking
+                                boolean blockUsingMainHand = Via.getConfig().isNoDelayShieldBlocking()
+                                        && !showShieldWhenSwordInHand;
 
-                                if (noDelayBlocking && hand == 1 || !noDelayBlocking && hand == 0) {
+                                if (blockUsingMainHand && hand == 1 || !blockUsingMainHand && hand == 0) {
                                     wrapper.cancel();
                                 }
                             } else {
-                                tracker.setSecondHand(null);
+                                if(!showShieldWhenSwordInHand) {
+                                    // Remove the shield from the offhand
+                                    tracker.setSecondHand(null);
+                                }
                                 tracker.setBlocking(false);
                             }
                         }

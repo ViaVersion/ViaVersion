@@ -498,7 +498,9 @@ public class PlayerPackets {
                             // cancel any blocking >.>
                             EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                             if (tracker.isBlocking()) {
-                                tracker.setSecondHand(null);
+                                if(!Via.getConfig().isShowShieldWhenSwordInHand()) {
+                                    tracker.setSecondHand(null);
+                                }
                                 tracker.setBlocking(false);
                             }
                         }

@@ -20,8 +20,13 @@ package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class InventoryTracker extends StoredObject {
     private String inventory;
+
+    private Map<Short, Integer> slotToItemIdMap = new HashMap<>();
 
     public InventoryTracker(UserConnection user) {
         super(user);
@@ -29,6 +34,14 @@ public class InventoryTracker extends StoredObject {
 
     public String getInventory() {
         return inventory;
+    }
+
+    public Map<Short, Integer> getSlotToItemIdMap() {
+        return this.slotToItemIdMap;
+    }
+
+    public Integer getItemIdInSlot(short slot) {
+        return this.slotToItemIdMap.get(slot);
     }
 
     public void setInventory(String inventory) {

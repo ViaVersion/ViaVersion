@@ -79,9 +79,21 @@ public interface ViaVersionConfig {
     /**
      * Whether the player can block with the shield without a delay.
      *
+     * This option requires {@link #isShowShieldWhenSwordInHand()} to be disabled
+     *
      * @return {@code true} if non delayed shield blocking is enabled.
      */
     boolean isNoDelayShieldBlocking();
+
+    /**
+     * Puts the shield into the second hand when holding a sword.
+     * The shield will disappear when switching to another item.
+     *
+     * This option requires {@link #isShieldBlocking()} to be enabled
+     *
+     * @return {@code true} if the shield should appear when holding a sword
+     */
+    boolean isShowShieldWhenSwordInHand();
 
     /**
      * Get if armor stand positions are fixed so holograms show up at the correct height in 1.9 &amp; 1.10

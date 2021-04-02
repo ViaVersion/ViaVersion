@@ -66,6 +66,7 @@ public class EntityTracker1_9 extends EntityTracker {
     private boolean teamExists = false;
     private GameMode gameMode;
     private String currentTeam;
+    private int heldItemSlot;
 
     public EntityTracker1_9(UserConnection user) {
         super(user, EntityType.PLAYER);
@@ -95,6 +96,25 @@ public class EntityTracker1_9 extends EntityTracker {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * It will set a shield to the offhand if a sword is in the main hand.
+     * The item in the offhand will be cleared if there is no sword in the main hand.
+     */
+    public void syncShieldWithSword() {
+        InventoryTracker inventoryTracker = getUser().get(InventoryTracker.class);
+
+        // Get item in new selected slot
+        int inventorySlot = this.heldItemSlot + 36; // Hotbar slot index to inventory slot
+        Integer itemId = inventoryTracker.getItemIdInSlot((short) inventorySlot);
+        int itemIdentifier = itemId == null ? 0 : itemId;
+
+        boolean isSword = Protocol1_9To1_8.isSword(itemIdentifier);
+        Item shield = new Item(442, (byte) 1, (short) 0, null);
+
+        // Update shield in off hand depending if a sword is in the main hand
+        setSecondHand(isSword ? shield : null);
     }
 
     @Override
@@ -394,5 +414,9 @@ public class EntityTracker1_9 extends EntityTracker {
 
     public void setCurrentTeam(String currentTeam) {
         this.currentTeam = currentTeam;
+    }
+
+    public void setHeldItemSlot(int heldItemSlot) {
+        this.heldItemSlot = heldItemSlot;
     }
 }
