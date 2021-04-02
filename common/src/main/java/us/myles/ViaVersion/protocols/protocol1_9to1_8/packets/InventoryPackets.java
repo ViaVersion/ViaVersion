@@ -298,6 +298,17 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
+
+                        if(Via.getConfig().isShowShieldWhenSwordInHand()) {
+                            byte mode = wrapper.get(Type.BYTE, 1);
+                            short hoverSlot = wrapper.get(Type.SHORT, 0);
+                            byte button = wrapper.get(Type.BYTE, 0);
+
+                            // Move items in inventory to track the sword location
+                            InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                            inventoryTracker.handleWindowClick(mode, hoverSlot, button);
+                        }
+
                         ItemRewriter.toServer(stack);
                     }
                 });
