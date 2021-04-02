@@ -57,7 +57,7 @@ public class UpdateUtil {
 
     @Nullable
     private static String getUpdateMessage(boolean console) {
-        if (Via.getPlatform().getPluginVersion().equals("${project.version}")) {
+        if (Via.getPlatform().getPluginVersion().equals("${version}")) {
             return "You are using a debug/custom version, consider updating.";
         }
         String newestString = getNewestVersion();
