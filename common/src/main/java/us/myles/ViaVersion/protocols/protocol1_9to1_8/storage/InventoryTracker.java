@@ -52,7 +52,6 @@ public class InventoryTracker extends StoredObject {
 
     /**
      * Handle the window click to track the item position in the inventory of the player
-     * https://wiki.vg/index.php?title=Protocol&oldid=7368#Click_Window
      *
      * @param mode Inventory operation mode
      * @param hoverSlot The slot number of the current mouse position
