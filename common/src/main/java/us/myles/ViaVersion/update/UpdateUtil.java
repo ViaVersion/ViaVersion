@@ -78,12 +78,12 @@ public class UpdateUtil {
         }
         Version newest = new Version(newestString);
         if (current.compareTo(newest) < 0)
-            return "There is a newer version available: " + newest.toString() + ", you're on: " + current.toString();
+            return "There is a newer plugin version available: " + newest.toString() + ", you're on: " + current.toString();
         else if (console && current.compareTo(newest) != 0) {
             if (current.getTag().toLowerCase(Locale.ROOT).startsWith("dev") || current.getTag().toLowerCase(Locale.ROOT).startsWith("snapshot")) {
-                return "You are running a development version, please report any bugs to GitHub.";
+                return "You are running a development version of the plugin, please report any bugs to GitHub.";
             } else {
-                return "You are running a newer version than is released!";
+                return "You are running a newer version of the plugin than is released!";
             }
         }
         return null;
