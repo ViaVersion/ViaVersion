@@ -171,6 +171,7 @@ public class InventoryPackets {
 
                         boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                                 && Via.getConfig().isShieldBlocking();
+                        boolean syncShield = false;
 
                         for (short i = 0; i < stacks.length; i++) {
                             Item stack = stacks[i];
@@ -180,11 +181,15 @@ public class InventoryPackets {
                                 // Store items in slots
                                 inventoryTracker.getSlotToItemIdMap().put(i, stack == null ? 0 : stack.getIdentifier());
 
-                                // Sync shield item in offhand with main hand
-                                entityTracker.syncShieldWithSword();
+                                syncShield = true;
                             }
 
                             ItemRewriter.toClient(stack);
+                        }
+
+                        // Sync shield item in offhand with main hand
+                        if(syncShield) {
+                            entityTracker.syncShieldWithSword();
                         }
                     }
                 });

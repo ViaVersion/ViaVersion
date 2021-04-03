@@ -53,84 +53,86 @@ public class InventoryTracker extends StoredObject {
     /**
      * Handle the window click to track the item position in the inventory of the player
      *
-     * @param mode Inventory operation mode
+     * @param mode      Inventory operation mode
      * @param hoverSlot The slot number of the current mouse position
-     * @param button The button to use in the click
+     * @param button    The button to use in the click
      */
     public void handleWindowClick(byte mode, short hoverSlot, byte button) {
         EntityTracker1_9 entityTracker = getUser().get(EntityTracker1_9.class);
 
         // Don't listen to the second hand slot
-        if(hoverSlot != 45) {
-            switch (mode) {
-                case 0: // Click on slot
+        if (hoverSlot == 45) {
+            return;
+        }
 
-                    // The cursor is empty, so we can put an item to it
-                    if (itemIdInCursor == null || itemIdInCursor == 0) {
-                        // Move item to cursor
-                        this.itemIdInCursor = this.slotToItemIdMap.remove(hoverSlot);
+        switch (mode) {
+            case 0: // Click on slot
+
+                // The cursor is empty, so we can put an item to it
+                if (itemIdInCursor == null || itemIdInCursor == 0) {
+                    // Move item to cursor
+                    this.itemIdInCursor = this.slotToItemIdMap.remove(hoverSlot);
+                } else {
+                    // Dropping item
+                    if (hoverSlot == -999) {
+                        this.itemIdInCursor = null;
                     } else {
-                        // Dropping item
-                        if(hoverSlot == -999) {
-                            this.itemIdInCursor = null;
-                        } else {
-                            // Clicking on a slot
-                            Integer hoverItem = this.slotToItemIdMap.get(hoverSlot);
+                        // Clicking on a slot
+                        Integer hoverItem = this.slotToItemIdMap.get(hoverSlot);
 
-                            // An item is already in the cursor, can we empty it in this slot?
-                            if (hoverItem == null || hoverItem == 0) {
-                                // Place item in inventory
-                                this.slotToItemIdMap.put(hoverSlot, this.itemIdInCursor);
-                                this.itemIdInCursor = null;
-                            }
+                        // An item is already in the cursor, can we empty it in this slot?
+                        if (hoverItem == null || hoverItem == 0) {
+                            // Place item in inventory
+                            this.slotToItemIdMap.put(hoverSlot, this.itemIdInCursor);
+                            this.itemIdInCursor = null;
                         }
                     }
-                    break;
-                case 2: // Move item using number keys
-                    short hotkeySlot = (short) (button + 36);
+                }
+                break;
+            case 2: // Move item using number keys
+                short hotkeySlot = (short) (button + 36);
 
-                    // Find move direction
-                    Integer hotkeyItem = this.slotToItemIdMap.get(hotkeySlot);
-                    boolean isHotKeyEmpty = hotkeyItem == null || hotkeyItem == 0;
+                // Find move direction
+                Integer hotkeyItem = this.slotToItemIdMap.get(hotkeySlot);
+                boolean isHotKeyEmpty = hotkeyItem == null || hotkeyItem == 0;
 
-                    // Move item
-                    Integer sourceItem = this.slotToItemIdMap.remove(isHotKeyEmpty ? hoverSlot : hotkeySlot);
-                    this.slotToItemIdMap.put(isHotKeyEmpty ? hotkeySlot : hoverSlot, sourceItem);
+                // Move item
+                Integer sourceItem = this.slotToItemIdMap.remove(isHotKeyEmpty ? hoverSlot : hotkeySlot);
+                this.slotToItemIdMap.put(isHotKeyEmpty ? hotkeySlot : hoverSlot, sourceItem);
 
-                    break;
-                case 4: // Drop item
-                    Integer hoverItem = this.slotToItemIdMap.get(hoverSlot);
+                break;
+            case 4: // Drop item
+                Integer hoverItem = this.slotToItemIdMap.get(hoverSlot);
 
-                    if(hoverItem != null && hoverItem != 0) {
-                        this.slotToItemIdMap.put(hoverSlot, null);
-                    }
+                if (hoverItem != null && hoverItem != 0) {
+                    this.slotToItemIdMap.put(hoverSlot, null);
+                }
 
-                    break;
-                case 5: // Mouse dragging
-                    switch (button) {
-                        case 0: // Start dragging
-                            this.dragging = true;
-                            break;
-                        case 1:
-                            // Check dragging mode and item on cursor
-                            if(this.dragging && itemIdInCursor != null && itemIdInCursor != 0) {
-                                // Place item on cursor in hovering slot
-                                this.slotToItemIdMap.put(hoverSlot, itemIdInCursor);
-                                this.itemIdInCursor = null;
-                            }
-                            break;
-                        case 2: // Stop dragging
-                            this.dragging = false;
-                            break;
-                    }
+                break;
+            case 5: // Mouse dragging
+                switch (button) {
+                    case 0: // Start dragging
+                        this.dragging = true;
+                        break;
+                    case 1:
+                        // Check dragging mode and item on cursor
+                        if (this.dragging && itemIdInCursor != null && itemIdInCursor != 0) {
+                            // Place item on cursor in hovering slot
+                            this.slotToItemIdMap.put(hoverSlot, itemIdInCursor);
+                            this.itemIdInCursor = null;
+                        }
+                        break;
+                    case 2: // Stop dragging
+                        this.dragging = false;
+                        break;
+                }
 
-                    break;
-                default:
-                    break;
-            }
-
-            // Update shield state in offhand
-            entityTracker.syncShieldWithSword();
+                break;
+            default:
+                break;
         }
+
+        // Update shield state in offhand
+        entityTracker.syncShieldWithSword();
     }
 }

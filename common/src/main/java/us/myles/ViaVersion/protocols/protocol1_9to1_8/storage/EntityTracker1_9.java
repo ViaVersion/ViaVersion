@@ -111,10 +111,9 @@ public class EntityTracker1_9 extends EntityTracker {
         int itemIdentifier = itemId == null ? 0 : itemId;
 
         boolean isSword = Protocol1_9To1_8.isSword(itemIdentifier);
-        Item shield = new Item(442, (byte) 1, (short) 0, null);
 
         // Update shield in off hand depending if a sword is in the main hand
-        setSecondHand(isSword ? shield : null);
+        setSecondHand(isSword ? new Item(442, (byte) 1, (short) 0, null) : null);
     }
 
     @Override
