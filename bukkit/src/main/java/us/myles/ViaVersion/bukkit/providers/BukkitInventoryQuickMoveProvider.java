@@ -69,7 +69,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         if (windowId == 0) {
             // windowId is always 0 for player inventory.
             // This has almost definitely something to do with the offhand slot.
-            if (slotId >= 36 && slotId <= 44) {
+            if (slotId >= 36 && slotId <= 45) {
                 int protocolId = Via.getAPI().getServerVersion().lowestSupportedVersion();
                 // this seems to be working just fine.
                 if (protocolId == ProtocolVersion.v1_8.getVersion()) {
