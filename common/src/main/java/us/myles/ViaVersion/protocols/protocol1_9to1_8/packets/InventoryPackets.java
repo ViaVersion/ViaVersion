@@ -119,7 +119,7 @@ public class InventoryPackets {
                                 && Via.getConfig().isShieldBlocking();
 
                         // Check if it is the inventory of the player
-                        if(showShieldWhenSwordInHand && wrapper.get(Type.BYTE, 0) == 0) {
+                        if (showShieldWhenSwordInHand && wrapper.get(Type.BYTE, 0) == 0) {
                             InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                             EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
 
@@ -188,7 +188,7 @@ public class InventoryPackets {
                         }
 
                         // Sync shield item in offhand with main hand
-                        if(syncShield) {
+                        if (syncShield) {
                             entityTracker.syncShieldWithSword();
                         }
                     }
@@ -266,7 +266,7 @@ public class InventoryPackets {
                         boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                                 && Via.getConfig().isShieldBlocking();
 
-                        if(showShieldWhenSwordInHand) {
+                        if (showShieldWhenSwordInHand) {
                             InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                             EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                             short slotID = wrapper.get(Type.SHORT, 0);
@@ -320,7 +320,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
 
-                        if(Via.getConfig().isShowShieldWhenSwordInHand()) {
+                        if (Via.getConfig().isShowShieldWhenSwordInHand()) {
                             byte mode = wrapper.get(Type.BYTE, 1);
                             short hoverSlot = wrapper.get(Type.SHORT, 0);
                             byte button = wrapper.get(Type.BYTE, 0);
