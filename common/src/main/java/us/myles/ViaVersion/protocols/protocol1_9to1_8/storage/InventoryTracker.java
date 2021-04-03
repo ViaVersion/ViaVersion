@@ -111,10 +111,12 @@ public class InventoryTracker extends StoredObject {
                 break;
             case 5: // Mouse dragging
                 switch (button) {
-                    case 0: // Start dragging
+                    case 0: // Start left dragging
+                    case 4: // Start right dragging
                         this.dragging = true;
                         break;
-                    case 1:
+                    case 1: // Place item during left dragging
+                    case 5: // Place item during right dragging
                         // Check dragging mode and item on cursor
                         if (this.dragging && itemIdInCursor != null && itemIdInCursor != 0) {
                             // Place item on cursor in hovering slot
@@ -122,7 +124,8 @@ public class InventoryTracker extends StoredObject {
                             this.itemIdInCursor = null;
                         }
                         break;
-                    case 2: // Stop dragging
+                    case 2: // Stop left dragging
+                    case 6: // Stop right dragging
                         this.dragging = false;
                         break;
                 }
