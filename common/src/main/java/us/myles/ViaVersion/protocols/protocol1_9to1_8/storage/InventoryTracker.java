@@ -48,6 +48,12 @@ public class InventoryTracker extends StoredObject {
 
     public void setInventory(String inventory) {
         this.inventory = inventory;
+
+        // Reset the cursor state of the inventory
+        if (inventory == null) {
+            this.itemIdInCursor = null;
+            this.dragging = false;
+        }
     }
 
     /**
