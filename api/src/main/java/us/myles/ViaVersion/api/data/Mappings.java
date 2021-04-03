@@ -24,7 +24,7 @@ package us.myles.ViaVersion.api.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 

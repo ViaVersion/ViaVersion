@@ -343,7 +343,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        if(wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) {
+                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) {
                             wrapper.cancel();
                         }
                     }

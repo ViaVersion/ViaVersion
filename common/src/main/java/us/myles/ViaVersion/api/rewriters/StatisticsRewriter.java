@@ -17,7 +17,7 @@
  */
 package us.myles.ViaVersion.api.rewriters;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -74,8 +74,7 @@ public class StatisticsRewriter {
         });
     }
 
-    @Nullable
-    protected IdRewriteFunction getRewriter(RegistryType type) {
+    protected @Nullable IdRewriteFunction getRewriter(RegistryType type) {
         switch (type) {
             case BLOCK:
                 return protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
@@ -87,8 +86,7 @@ public class StatisticsRewriter {
         throw new IllegalArgumentException("Unknown registry type in statistics packet: " + type);
     }
 
-    @Nullable
-    public RegistryType getRegistryTypeForStatistic(int statisticsId) {
+    public @Nullable RegistryType getRegistryTypeForStatistic(int statisticsId) {
         switch (statisticsId) {
             case 0:
                 return RegistryType.BLOCK;

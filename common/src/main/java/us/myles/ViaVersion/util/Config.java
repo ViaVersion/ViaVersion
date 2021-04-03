@@ -17,13 +17,17 @@
  */
 package us.myles.ViaVersion.util;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,8 +146,7 @@ public abstract class Config implements ConfigurationProvider {
         return this.config;
     }
 
-    @Nullable
-    public <T> T get(String key, Class<T> clazz, T def) {
+    public @Nullable <T> T get(String key, Class<T> clazz, T def) {
         Object o = this.config.get(key);
         if (o != null) {
             return (T) o;
@@ -161,8 +164,7 @@ public abstract class Config implements ConfigurationProvider {
         }
     }
 
-    @Nullable
-    public String getString(String key, @Nullable String def) {
+    public @Nullable String getString(String key, @Nullable String def) {
         final Object o = this.config.get(key);
         if (o != null) {
             return (String) o;

@@ -16,5 +16,5 @@ dependencies {
     compileOnlyApi("org.yaml", "snakeyaml", Versions.snakeYaml)
     compileOnlyApi("io.netty", "netty-all", Versions.netty)
     compileOnlyApi("com.google.guava", "guava", Versions.guava)
-    compileOnlyApi("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
+    compileOnlyApi("org.checkerframework", "checker-qual", Versions.checkerQual)
 }

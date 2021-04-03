@@ -23,7 +23,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Range;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.SortedSet;
@@ -44,8 +44,7 @@ public interface ProtocolManager {
      * @param protocolClass class of the protocol
      * @return protocol if present
      */
-    @Nullable
-    Protocol getProtocol(Class<? extends Protocol> protocolClass);
+    @Nullable Protocol getProtocol(Class<? extends Protocol> protocolClass);
 
     Protocol getBaseProtocol();
 
@@ -87,8 +86,7 @@ public interface ProtocolManager {
      * @param serverVersion desired output server version
      * @return path it generated, null if not supported
      */
-    @Nullable
-    List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
+    @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
 
     /**
      * Returns the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.
@@ -159,6 +157,5 @@ public interface ProtocolManager {
      * @param protocolClass protocol class
      * @return data loading future bound to the protocol, or null if all loading is complete
      */
-    @Nullable
-    CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass);
+    @Nullable CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass);
 }

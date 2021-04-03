@@ -17,7 +17,7 @@
  */
 package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 
@@ -33,8 +33,7 @@ public class BiomeStorage extends StoredObject {
         super(user);
     }
 
-    @Nullable
-    public String getWorld() {
+    public @Nullable String getWorld() {
         return world;
     }
 
@@ -42,8 +41,7 @@ public class BiomeStorage extends StoredObject {
         this.world = world;
     }
 
-    @Nullable
-    public int[] getBiomes(int x, int z) {
+    public int @Nullable [] getBiomes(int x, int z) {
         return chunkBiomes.get(getChunkSectionIndex(x, z));
     }
 

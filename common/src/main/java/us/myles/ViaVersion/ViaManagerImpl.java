@@ -35,6 +35,7 @@ import us.myles.ViaVersion.commands.ViaCommandHandler;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
 import us.myles.ViaVersion.update.UpdateUtil;
+import us.myles.ViaVersion.util.UnsupportedSoftware;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,10 +133,13 @@ public class ViaManagerImpl implements ViaManager {
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
             } else if (protocolVersion.highestSupportedVersion() <= ProtocolVersion.v1_12_2.getVersion()) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
-                        + "You will still be able to run Via on this version, but we are unlikely to provide any further fixes or help with problems specific to legacy versions. "
+                        + "You will still be able to run Via on this Minecraft version, but we are unlikely to provide any further fixes or help with problems specific to legacy Minecraft versions. "
                         + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
             }
         }
+
+        // Check for unsupported plugins/software
+        unsupportedSoftwareWarning();
 
         // Load Listeners / Tasks
         protocolManager.onServerLoaded();
@@ -196,6 +200,34 @@ public class ViaManagerImpl implements ViaManager {
 
         // Unload
         loader.unload();
+    }
+
+    private void unsupportedSoftwareWarning() {
+        boolean found = false;
+        for (UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
+            try {
+                Class.forName(software.getClassName());
+            } catch (ClassNotFoundException ignored) {
+                continue;
+            }
+
+            // Found something
+            if (!found) {
+                platform.getLogger().severe("************************************************");
+                platform.getLogger().severe("You are using unsupported software and may encounter unforeseeable issues.");
+                platform.getLogger().severe("");
+                found = true;
+            }
+
+            platform.getLogger().severe("We strongly advise against using " + software.getName() + ":");
+            platform.getLogger().severe(software.getReason());
+            platform.getLogger().severe("");
+        }
+
+        if (found) {
+            platform.getLogger().severe("We will not provide support in case you encounter issues possibly related to this software.");
+            platform.getLogger().severe("************************************************");
+        }
     }
 
     @Override

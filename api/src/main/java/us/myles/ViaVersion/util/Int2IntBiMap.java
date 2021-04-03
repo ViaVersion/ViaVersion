@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
 
@@ -106,7 +106,7 @@ public class Int2IntBiMap implements Int2IntMap {
 
     @Override
     @Deprecated
-    public void putAll(@NotNull Map<? extends Integer, ? extends Integer> m) {
+    public void putAll(@NonNull Map<? extends Integer, ? extends Integer> m) {
         throw new UnsupportedOperationException();
     }
 
@@ -127,14 +127,12 @@ public class Int2IntBiMap implements Int2IntMap {
     }
 
     @Override
-    @NotNull
-    public IntSet keySet() {
+    public @NonNull IntSet keySet() {
         return map.keySet();
     }
 
     @Override
-    @NotNull
-    public IntSet values() {
+    public @NonNull IntSet values() {
         return inverse.map.keySet();
     }
 

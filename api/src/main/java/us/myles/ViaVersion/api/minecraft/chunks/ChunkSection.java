@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ChunkSection {
 
@@ -184,7 +184,7 @@ public class ChunkSection {
      *
      * @param data The value to set the block light to
      */
-    public void setBlockLight(@Nullable byte[] data) {
+    public void setBlockLight(byte @Nullable [] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.blockLight == null) {
             this.blockLight = new NibbleArray(data);
@@ -198,7 +198,7 @@ public class ChunkSection {
      *
      * @param data The value to set the sky light to
      */
-    public void setSkyLight(@Nullable byte[] data) {
+    public void setSkyLight(byte @Nullable [] data) {
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.skyLight == null) {
             this.skyLight = new NibbleArray(data);
@@ -207,23 +207,19 @@ public class ChunkSection {
         }
     }
 
-    @Nullable
-    public byte[] getBlockLight() {
+    public byte @Nullable [] getBlockLight() {
         return blockLight == null ? null : blockLight.getHandle();
     }
 
-    @Nullable
-    public NibbleArray getBlockLightNibbleArray() {
+    public @Nullable NibbleArray getBlockLightNibbleArray() {
         return blockLight;
     }
 
-    @Nullable
-    public byte[] getSkyLight() {
+    public byte @Nullable [] getSkyLight() {
         return skyLight == null ? null : skyLight.getHandle();
     }
 
-    @Nullable
-    public NibbleArray getSkyLightNibbleArray() {
+    public @Nullable NibbleArray getSkyLightNibbleArray() {
         return skyLight;
     }
 

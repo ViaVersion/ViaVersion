@@ -42,8 +42,11 @@ import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
 import us.myles.ViaVersion.bukkit.util.NMSUtil;
 import us.myles.ViaVersion.dump.PluginInfo;
 import us.myles.ViaVersion.util.GsonUtil;
+import us.myles.ViaVersion.util.UnsupportedSoftware;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -292,6 +295,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public ViaAPI<Player> getApi() {
         return api;
+    }
+
+    @Override
+    public final Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
+        List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
+        list.add(new UnsupportedSoftware("Yatopia", "org.yatopiamc.yatopia.server.YatopiaConfig", UnsupportedSoftware.Reason.DANGEROUS_SERVER_SOFTWARE));
+        return Collections.unmodifiableList(list);
     }
 
     public boolean isCompatSpigotBuild() {

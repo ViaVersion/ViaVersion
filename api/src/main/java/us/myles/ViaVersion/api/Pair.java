@@ -22,7 +22,7 @@
  */
 package us.myles.ViaVersion.api;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
 

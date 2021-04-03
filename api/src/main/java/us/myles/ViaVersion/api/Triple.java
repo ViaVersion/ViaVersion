@@ -22,7 +22,7 @@
  */
 package us.myles.ViaVersion.api;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
 
@@ -37,18 +37,15 @@ public class Triple<A, B, C> {
         this.third = third;
     }
 
-    @Nullable
-    public A getFirst() {
+    public @Nullable A getFirst() {
         return first;
     }
 
-    @Nullable
-    public B getSecond() {
+    public @Nullable B getSecond() {
         return second;
     }
 
-    @Nullable
-    public C getThird() {
+    public @Nullable C getThird() {
         return third;
     }
 

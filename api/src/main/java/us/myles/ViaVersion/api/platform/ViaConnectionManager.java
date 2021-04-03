@@ -23,11 +23,15 @@
 package us.myles.ViaVersion.api.platform;
 
 import io.netty.channel.ChannelFutureListener;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,7 +48,7 @@ public class ViaConnectionManager {
         if (isFrontEnd(connection)) {
             UUID id = connection.getProtocolInfo().getUuid();
             if (clients.put(id, connection) != null) {
-                Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! ("+id+")");
+                Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! (" + id + ")");
             }
         }
 
@@ -90,8 +94,7 @@ public class ViaConnectionManager {
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
      */
-    @Nullable
-    public UserConnection getConnectedClient(UUID clientIdentifier) {
+    public @Nullable UserConnection getConnectedClient(UUID clientIdentifier) {
         return clients.get(clientIdentifier);
     }
 
@@ -104,8 +107,7 @@ public class ViaConnectionManager {
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
      */
-    @Nullable
-    public UUID getConnectedClientId(UserConnection conn) {
+    public @Nullable UUID getConnectedClientId(UserConnection conn) {
         if (conn.getProtocolInfo() == null) return null;
         UUID uuid = conn.getProtocolInfo().getUuid();
         UserConnection client = clients.get(uuid);

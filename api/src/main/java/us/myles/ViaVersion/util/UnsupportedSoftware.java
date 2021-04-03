@@ -20,52 +20,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.entities;
+package us.myles.ViaVersion.util;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+public final class UnsupportedSoftware {
 
-public interface EntityType {
+    private final String name;
+    private final String className;
+    private final String reason;
 
-    /**
-     * @return entity id
-     */
-    int getId();
-
-    /**
-     * @return parent entity type if present
-     */
-    @Nullable EntityType getParent();
-
-    String name();
-
-    default boolean is(EntityType... types) {
-        for (EntityType type : types) {
-            if (this == type) {
-                return true;
-            }
-        }
-        return false;
+    public UnsupportedSoftware(String name, String className, String reason) {
+        this.name = name;
+        this.className = className;
+        this.reason = reason;
     }
 
-    default boolean is(EntityType type) {
-        return this == type;
+    public String getName() {
+        return name;
     }
 
-    /**
-     * @param type entity type to check against
-     * @return true if the current type is equal to the given type, or has it as a parent type
-     */
-    default boolean isOrHasParent(EntityType type) {
-        EntityType parent = this;
+    public String getClassName() {
+        return className;
+    }
 
-        do {
-            if (parent == type) {
-                return true;
-            }
+    public String getReason() {
+        return reason;
+    }
 
-            parent = parent.getParent();
-        } while (parent != null);
+    public static final class Reason {
 
-        return false;
+        public static final String DANGEROUS_SERVER_SOFTWARE = "You are using server software that - outside of possibly breaking ViaVersion - can also cause severe damage to your server's integrity as a whole.";
     }
 }

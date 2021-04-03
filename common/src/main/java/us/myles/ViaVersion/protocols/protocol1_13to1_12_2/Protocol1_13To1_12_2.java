@@ -119,7 +119,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
                         wrapper.write(Type.VAR_INT, 2); // Size
                         // Write root node
                         wrapper.write(Type.BYTE, (byte) 0); // Mark as command
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {1}); // 1 child at index 1
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
 
                         // Write arg node
                         wrapper.write(Type.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command

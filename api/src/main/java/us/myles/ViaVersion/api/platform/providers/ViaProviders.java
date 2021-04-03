@@ -22,7 +22,7 @@
  */
 package us.myles.ViaVersion.api.platform.providers;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,8 +46,7 @@ public class ViaProviders {
         providers.put(provider, value);
     }
 
-    @Nullable
-    public <T extends Provider> T get(Class<T> provider) {
+    public @Nullable <T extends Provider> T get(Class<T> provider) {
         Provider rawProvider = providers.get(provider);
         if (rawProvider != null) {
             return (T) rawProvider;

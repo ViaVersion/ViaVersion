@@ -17,7 +17,7 @@
  */
 package us.myles.ViaVersion.api.rewriters;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +43,7 @@ public enum RegistryType {
         return VALUES;
     }
 
-    @Nullable
-    public static RegistryType getByKey(String resourceKey) {
+    public static @Nullable RegistryType getByKey(String resourceKey) {
         return MAP.get(resourceKey);
     }
 

@@ -23,7 +23,7 @@
 package us.myles.ViaVersion.api.data;
 
 import com.google.gson.JsonObject;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.util.Int2IntBiMap;
 
@@ -97,46 +97,38 @@ public class MappingData {
         return checkValidity(id, particleMappings.getMappings().getNewId(id), "particles");
     }
 
-    @Nullable
-    public Int2IntBiMap getItemMappings() {
+    public @Nullable Int2IntBiMap getItemMappings() {
         return itemMappings;
     }
 
-    @Nullable
-    public ParticleMappings getParticleMappings() {
+    public @Nullable ParticleMappings getParticleMappings() {
         return particleMappings;
     }
 
-    @Nullable
-    public Mappings getBlockMappings() {
+    public @Nullable Mappings getBlockMappings() {
         return blockMappings;
     }
 
-    @Nullable
-    public Mappings getBlockStateMappings() {
+    public @Nullable Mappings getBlockStateMappings() {
         return blockStateMappings;
     }
 
-    @Nullable
-    public Mappings getSoundMappings() {
+    public @Nullable Mappings getSoundMappings() {
         return soundMappings;
     }
 
-    @Nullable
-    public Mappings getStatisticsMappings() {
+    public @Nullable Mappings getStatisticsMappings() {
         return statisticsMappings;
     }
 
-    @Nullable
-    protected Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+    protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
         if (!oldMappings.has(key) || !newMappings.has(key)) return null;
 
         JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
         return new Mappings(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), diff);
     }
 
-    @Nullable
-    protected Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+    protected @Nullable Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
         if (!oldMappings.has(key) || !newMappings.has(key)) return null;
 
         JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;

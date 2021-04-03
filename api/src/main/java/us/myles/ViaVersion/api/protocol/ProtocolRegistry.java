@@ -23,7 +23,7 @@
 package us.myles.ViaVersion.api.protocol;
 
 import com.google.common.collect.Range;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -103,8 +103,7 @@ public class ProtocolRegistry {
      * @param serverVersion The desired output server version
      * @return The path it generated, null if it failed.
      */
-    @Nullable
-    public static List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
+    public static @Nullable List<Pair<Integer, Protocol>> getProtocolPath(int clientVersion, int serverVersion) {
         List<ProtocolPathEntry> pathList = Via.getManager().getProtocolManager().getProtocolPath(clientVersion, serverVersion);
         if (pathList == null) {
             return null;
@@ -123,8 +122,7 @@ public class ProtocolRegistry {
      * @param protocolClass class of the protocol
      * @return protocol if present
      */
-    @Nullable
-    public static Protocol getProtocol(Class<? extends Protocol> protocolClass) {
+    public static @Nullable Protocol getProtocol(Class<? extends Protocol> protocolClass) {
         return Via.getManager().getProtocolManager().getProtocol(protocolClass);
     }
 

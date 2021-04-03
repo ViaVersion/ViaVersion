@@ -11,8 +11,8 @@ object Versions {
     const val guava = "17.0"
     const val snakeYaml = "1.18"
 
-    const val jetbrainsAnnotations = "20.1.0"
     const val jUnit = "5.6.3"
+    const val checkerQual = "3.12.0"
 
     // Platforms
     const val spigot = "1.16.5-R0.1-SNAPSHOT"

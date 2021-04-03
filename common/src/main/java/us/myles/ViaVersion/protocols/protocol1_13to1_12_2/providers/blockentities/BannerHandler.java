@@ -17,7 +17,12 @@
  */
 package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -64,7 +69,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
                 if (pattern instanceof CompoundTag) {
                     Tag c = ((CompoundTag) pattern).get("Color");
                     if (c instanceof IntTag) {
-                        ((IntTag)c).setValue(15 - (int) c.getValue()); // Invert color id
+                        ((IntTag) c).setValue(15 - (int) c.getValue()); // Invert color id
                     }
                 }
             }
