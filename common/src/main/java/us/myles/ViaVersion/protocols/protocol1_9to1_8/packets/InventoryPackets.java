@@ -262,6 +262,22 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
+
+                        boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
+                                && Via.getConfig().isShieldBlocking();
+
+                        if(showShieldWhenSwordInHand) {
+                            InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                            EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                            short slotID = wrapper.get(Type.SHORT, 0);
+
+                            // Update item in slot
+                            inventoryTracker.getSlotToItemIdMap().put(slotID, stack == null ? 0 : stack.getIdentifier());
+
+                            // Sync shield item in offhand with main hand
+                            entityTracker.syncShieldWithSword();
+                        }
+
                         ItemRewriter.toServer(stack);
                     }
                 });
