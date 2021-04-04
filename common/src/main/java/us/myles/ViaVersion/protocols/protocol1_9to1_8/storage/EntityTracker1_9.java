@@ -106,9 +106,8 @@ public class EntityTracker1_9 extends EntityTracker {
     /**
      * It will set a shield to the offhand if a sword is in the main hand.
      * The item in the offhand will be cleared if there is no sword in the main hand.
-     * @param forceUpdate Ignore the previous state of the second hand and force sync the shield
      */
-    public void syncShieldWithSword(boolean forceUpdate) {
+    public void syncShieldWithSword() {
         InventoryTracker inventoryTracker = getUser().get(InventoryTracker.class);
 
         // Get item in new selected slot
@@ -118,7 +117,7 @@ public class EntityTracker1_9 extends EntityTracker {
         boolean isSword = Protocol1_9To1_8.isSword(itemIdentifier);
 
         // Update if the state changed
-        if (forceUpdate || isSword == (this.itemInSecondHand == null)) {
+        if (isSword == (this.itemInSecondHand == null)) {
 
             // Update shield in off hand depending if a sword is in the main hand
             setSecondHand(isSword ? new Item(442, (byte) 1, (short) 0, null) : null);

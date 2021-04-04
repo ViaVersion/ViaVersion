@@ -51,7 +51,6 @@ public class InventoryTracker extends StoredObject {
             // Remove window from cache (Except players window)
             if (windowId != 0) {
                 this.windowItemCache.remove(windowId);
-                System.out.println("cleared window " + windowId + ", we have " + windowItemCache.size() + " remaining");
             }
         }
     }
@@ -178,6 +177,6 @@ public class InventoryTracker extends StoredObject {
         }
 
         // Update shield state in offhand
-        entityTracker.syncShieldWithSword(false);
+        entityTracker.syncShieldWithSword();
     }
 }

@@ -130,7 +130,7 @@ public class InventoryPackets {
                             inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.getIdentifier());
 
                             // Sync shield item in offhand with main hand
-                            entityTracker.syncShieldWithSword(false);
+                            entityTracker.syncShieldWithSword();
                         }
 
                         ItemRewriter.toClient(stack);
@@ -186,7 +186,7 @@ public class InventoryPackets {
 
                         // Sync shield item in offhand with main hand
                         if (showShieldWhenSwordInHand) {
-                            entityTracker.syncShieldWithSword(false);
+                            entityTracker.syncShieldWithSword();
                         }
                     }
                 });
@@ -273,7 +273,7 @@ public class InventoryPackets {
                             inventoryTracker.setItemId((short) 0, slotID, stack == null ? 0 : stack.getIdentifier());
 
                             // Sync shield item in offhand with main hand
-                            entityTracker.syncShieldWithSword(false);
+                            entityTracker.syncShieldWithSword();
                         }
 
                         ItemRewriter.toServer(stack);
@@ -415,7 +415,7 @@ public class InventoryPackets {
                             entityTracker.setHeldItemSlot(wrapper.get(Type.SHORT, 0));
 
                             // Sync shield item in offhand with main hand
-                            entityTracker.syncShieldWithSword(false);
+                            entityTracker.syncShieldWithSword();
                         }
                     }
                 });
