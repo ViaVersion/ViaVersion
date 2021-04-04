@@ -269,7 +269,7 @@ public class WorldPackets {
                             EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                             if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
-                                if(!Via.getConfig().isShowShieldWhenSwordInHand()) {
+                                if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
                                     entityTracker.setSecondHand(null);
                                 }
                             }
@@ -307,7 +307,7 @@ public class WorldPackets {
                                         tracker.setBlocking(true);
 
                                         // Check if the shield is already in the offhand
-                                        if(!showShieldWhenSwordInHand) {
+                                        if (!showShieldWhenSwordInHand || tracker.getItemInSecondHand() == null) {
 
                                             // Set shield in offhand when interacting with main hand
                                             Item shield = new Item(442, (byte) 1, (short) 0, null);
@@ -324,7 +324,7 @@ public class WorldPackets {
                                     wrapper.cancel();
                                 }
                             } else {
-                                if(!showShieldWhenSwordInHand) {
+                                if (!showShieldWhenSwordInHand) {
                                     // Remove the shield from the offhand
                                     tracker.setSecondHand(null);
                                 }

@@ -26,8 +26,8 @@ import java.util.Map;
 public class InventoryTracker extends StoredObject {
     private String inventory;
 
-    private final Map<Short, Integer> slotToItemIdMap = new HashMap<>();
-    private Integer itemIdInCursor = null;
+    private final Map<Short, Map<Short, Integer>> windowItemCache = new HashMap<>();
+    private int itemIdInCursor = 0;
     private boolean dragging = false;
 
     public InventoryTracker(UserConnection user) {
@@ -38,80 +38,112 @@ public class InventoryTracker extends StoredObject {
         return inventory;
     }
 
-    public Map<Short, Integer> getSlotToItemIdMap() {
-        return this.slotToItemIdMap;
-    }
-
-    public Integer getItemIdInSlot(short slot) {
-        return this.slotToItemIdMap.get(slot);
-    }
-
     public void setInventory(String inventory) {
         this.inventory = inventory;
+    }
 
+    public void resetInventory(short windowId) {
         // Reset the cursor state of the inventory
         if (inventory == null) {
-            this.itemIdInCursor = null;
+            this.itemIdInCursor = 0;
             this.dragging = false;
+
+            // Remove window from cache (Except players window)
+            if (windowId != 0) {
+                this.windowItemCache.remove(windowId);
+                System.out.println("cleared window " + windowId + ", we have " + windowItemCache.size() + " remaining");
+            }
+        }
+    }
+
+    public int getItemId(short windowId, short slot) {
+        Map<Short, Integer> itemMap = this.windowItemCache.get(windowId);
+        if (itemMap == null) {
+            return 0;
+        }
+
+        return itemMap.getOrDefault(slot, 0);
+    }
+
+    public void setItemId(short windowId, short slot, int itemId) {
+        if (windowId == -1 && slot == -1) {
+            // Set the cursor item
+            this.itemIdInCursor = itemId;
+        } else {
+            // Set item in normal inventory
+            this.windowItemCache.computeIfAbsent(windowId, k -> new HashMap<>()).put(slot, itemId);
         }
     }
 
     /**
-     * Handle the window click to track the item position in the inventory of the player
+     * Handle the window click to track the position of the sword
      *
+     * @param windowId  Id of the current inventory
      * @param mode      Inventory operation mode
      * @param hoverSlot The slot number of the current mouse position
      * @param button    The button to use in the click
      */
-    public void handleWindowClick(byte mode, short hoverSlot, byte button) {
+    public void handleWindowClick(short windowId, byte mode, short hoverSlot, byte button) {
         EntityTracker1_9 entityTracker = getUser().get(EntityTracker1_9.class);
 
-        // Don't listen to the second hand slot
-        if (hoverSlot == 45) {
+        // Skip inventory background clicks
+        if (hoverSlot == -1) {
             return;
         }
+
+        // Interaction with the offhand slot
+        if (hoverSlot == 45) {
+            entityTracker.setSecondHand(null); // Remove it so we know that we can update it on ITEM_USE
+            return;
+        }
+
+        // It is not possible to put a sword into the armor or crafting result slot
+        boolean isArmorOrResultSlot = hoverSlot >= 5 && hoverSlot <= 8 || hoverSlot == 0;
 
         switch (mode) {
             case 0: // Click on slot
 
                 // The cursor is empty, so we can put an item to it
-                if (itemIdInCursor == null || itemIdInCursor == 0) {
+                if (this.itemIdInCursor == 0) {
                     // Move item to cursor
-                    this.itemIdInCursor = this.slotToItemIdMap.remove(hoverSlot);
+                    this.itemIdInCursor = getItemId(windowId, hoverSlot);
+
+                    // Remove item in slot
+                    setItemId(windowId, hoverSlot, 0);
                 } else {
                     // Dropping item
                     if (hoverSlot == -999) {
-                        this.itemIdInCursor = null;
-                    } else {
-                        // Clicking on a slot
-                        Integer hoverItem = this.slotToItemIdMap.get(hoverSlot);
+                        this.itemIdInCursor = 0;
+                    } else if (!isArmorOrResultSlot) {
+                        int previousItem = getItemId(windowId, hoverSlot);
 
-                        // An item is already in the cursor, can we empty it in this slot?
-                        if (hoverItem == null || hoverItem == 0) {
-                            // Place item in inventory
-                            this.slotToItemIdMap.put(hoverSlot, this.itemIdInCursor);
-                            this.itemIdInCursor = null;
-                        }
+                        // Place item in inventory
+                        setItemId(windowId, hoverSlot, this.itemIdInCursor);
+
+                        // Pick up the other item
+                        this.itemIdInCursor = previousItem;
                     }
                 }
                 break;
             case 2: // Move item using number keys
-                short hotkeySlot = (short) (button + 36);
+                if (!isArmorOrResultSlot) {
+                    short hotkeySlot = (short) (button + 36);
 
-                // Find move direction
-                Integer hotkeyItem = this.slotToItemIdMap.get(hotkeySlot);
-                boolean isHotKeyEmpty = hotkeyItem == null || hotkeyItem == 0;
+                    // Get items to swap
+                    int sourceItem = getItemId(windowId, hoverSlot);
+                    int destinationItem = getItemId(windowId, hotkeySlot);
 
-                // Move item
-                Integer sourceItem = this.slotToItemIdMap.remove(isHotKeyEmpty ? hoverSlot : hotkeySlot);
-                this.slotToItemIdMap.put(isHotKeyEmpty ? hotkeySlot : hoverSlot, sourceItem);
+                    // Swap
+                    setItemId(windowId, hotkeySlot, sourceItem);
+                    setItemId(windowId, hoverSlot, destinationItem);
+                }
 
                 break;
             case 4: // Drop item
-                Integer hoverItem = this.slotToItemIdMap.get(hoverSlot);
+                int hoverItem = getItemId(windowId, hoverSlot);
 
-                if (hoverItem != null && hoverItem != 0) {
-                    this.slotToItemIdMap.put(hoverSlot, null);
+                if (hoverItem != 0) {
+                    setItemId(windowId, hoverSlot, 0);
                 }
 
                 break;
@@ -124,10 +156,14 @@ public class InventoryTracker extends StoredObject {
                     case 1: // Place item during left dragging
                     case 5: // Place item during right dragging
                         // Check dragging mode and item on cursor
-                        if (this.dragging && itemIdInCursor != null && itemIdInCursor != 0) {
+                        if (this.dragging && this.itemIdInCursor != 0 && !isArmorOrResultSlot) {
+                            int previousItem = getItemId(windowId, hoverSlot);
+
                             // Place item on cursor in hovering slot
-                            this.slotToItemIdMap.put(hoverSlot, itemIdInCursor);
-                            this.itemIdInCursor = null;
+                            setItemId(windowId, hoverSlot, this.itemIdInCursor);
+
+                            // Pick up the other item
+                            this.itemIdInCursor = previousItem;
                         }
                         break;
                     case 2: // Stop left dragging
@@ -142,6 +178,6 @@ public class InventoryTracker extends StoredObject {
         }
 
         // Update shield state in offhand
-        entityTracker.syncShieldWithSword();
+        entityTracker.syncShieldWithSword(false);
     }
 }

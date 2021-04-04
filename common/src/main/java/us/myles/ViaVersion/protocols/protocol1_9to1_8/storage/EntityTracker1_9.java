@@ -67,6 +67,7 @@ public class EntityTracker1_9 extends EntityTracker {
     private GameMode gameMode;
     private String currentTeam;
     private int heldItemSlot;
+    private Item itemInSecondHand = null;
 
     public EntityTracker1_9(UserConnection user) {
         super(user, EntityType.PLAYER);
@@ -90,7 +91,7 @@ public class EntityTracker1_9 extends EntityTracker {
         PacketWrapper wrapper = new PacketWrapper(0x3C, null, getUser());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
-        wrapper.write(Type.ITEM, item);
+        wrapper.write(Type.ITEM, this.itemInSecondHand = item);
         try {
             wrapper.send(Protocol1_9To1_8.class);
         } catch (Exception e) {
@@ -98,22 +99,30 @@ public class EntityTracker1_9 extends EntityTracker {
         }
     }
 
+    public Item getItemInSecondHand() {
+        return itemInSecondHand;
+    }
+
     /**
      * It will set a shield to the offhand if a sword is in the main hand.
      * The item in the offhand will be cleared if there is no sword in the main hand.
+     * @param forceUpdate Ignore the previous state of the second hand and force sync the shield
      */
-    public void syncShieldWithSword() {
+    public void syncShieldWithSword(boolean forceUpdate) {
         InventoryTracker inventoryTracker = getUser().get(InventoryTracker.class);
 
         // Get item in new selected slot
         int inventorySlot = this.heldItemSlot + 36; // Hotbar slot index to inventory slot
-        Integer itemId = inventoryTracker.getItemIdInSlot((short) inventorySlot);
-        int itemIdentifier = itemId == null ? 0 : itemId;
+        int itemIdentifier = inventoryTracker.getItemId((short) 0, (short) inventorySlot);
 
         boolean isSword = Protocol1_9To1_8.isSword(itemIdentifier);
 
-        // Update shield in off hand depending if a sword is in the main hand
-        setSecondHand(isSword ? new Item(442, (byte) 1, (short) 0, null) : null);
+        // Update if the state changed
+        if (forceUpdate || isSword == (this.itemInSecondHand == null)) {
+
+            // Update shield in off hand depending if a sword is in the main hand
+            setSecondHand(isSword ? new Item(442, (byte) 1, (short) 0, null) : null);
+        }
     }
 
     @Override
