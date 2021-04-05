@@ -18,6 +18,7 @@
 package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
 
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -113,6 +114,25 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
+
+                        boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
+                                && Via.getConfig().isShieldBlocking();
+
+                        // Check if it is the inventory of the player
+                        if (showShieldWhenSwordInHand) {
+                            InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                            EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+
+                            short slotID = wrapper.get(Type.SHORT, 0);
+                            short windowId = wrapper.get(Type.BYTE, 0);
+
+                            // Store item in slot
+                            inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.getIdentifier());
+
+                            // Sync shield item in offhand with main hand
+                            entityTracker.syncShieldWithSword();
+                        }
+
                         ItemRewriter.toClient(stack);
                     }
                 });
@@ -145,8 +165,29 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item[] stacks = wrapper.get(Type.ITEM_ARRAY, 0);
-                        for (Item stack : stacks)
+                        Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+
+                        InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+
+                        boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
+                                && Via.getConfig().isShieldBlocking();
+
+                        for (short i = 0; i < stacks.length; i++) {
+                            Item stack = stacks[i];
+
+                            // Store items in slots
+                            if (showShieldWhenSwordInHand) {
+                                inventoryTracker.setItemId(windowId, i, stack == null ? 0 : stack.getIdentifier());
+                            }
+
                             ItemRewriter.toClient(stack);
+                        }
+
+                        // Sync shield item in offhand with main hand
+                        if (showShieldWhenSwordInHand) {
+                            entityTracker.syncShieldWithSword();
+                        }
                     }
                 });
                 // Brewing Patch
@@ -185,6 +226,7 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                         inventoryTracker.setInventory(null);
+                        inventoryTracker.resetInventory(wrapper.get(Type.UNSIGNED_BYTE, 0));
                     }
                 });
             }
@@ -218,6 +260,22 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
+
+                        boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
+                                && Via.getConfig().isShieldBlocking();
+
+                        if (showShieldWhenSwordInHand) {
+                            InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                            EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                            short slotID = wrapper.get(Type.SHORT, 0);
+
+                            // Update item in slot
+                            inventoryTracker.setItemId((short) 0, slotID, stack == null ? 0 : stack.getIdentifier());
+
+                            // Sync shield item in offhand with main hand
+                            entityTracker.syncShieldWithSword();
+                        }
+
                         ItemRewriter.toServer(stack);
                     }
                 });
@@ -259,6 +317,18 @@ public class InventoryPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
+
+                        if (Via.getConfig().isShowShieldWhenSwordInHand()) {
+                            Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                            byte mode = wrapper.get(Type.BYTE, 1);
+                            short hoverSlot = wrapper.get(Type.SHORT, 0);
+                            byte button = wrapper.get(Type.BYTE, 0);
+
+                            // Move items in inventory to track the sword location
+                            InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                            inventoryTracker.handleWindowClick(windowId, mode, hoverSlot, button);
+                        }
+
                         ItemRewriter.toServer(stack);
                     }
                 });
@@ -305,12 +375,15 @@ public class InventoryPackets {
 
             @Override
             public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+
                 // Inventory tracking
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                         inventoryTracker.setInventory(null);
+                        inventoryTracker.resetInventory(wrapper.get(Type.UNSIGNED_BYTE, 0));
                     }
                 });
             }
@@ -319,14 +392,30 @@ public class InventoryPackets {
         protocol.registerIncoming(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
+                map(Type.SHORT); // 0 - Slot id
+
                 // Blocking patch
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
+                        boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
+                                && Via.getConfig().isShieldBlocking();
+
                         EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
                         if (entityTracker.isBlocking()) {
                             entityTracker.setBlocking(false);
-                            entityTracker.setSecondHand(null);
+
+                            if (!showShieldWhenSwordInHand) {
+                                entityTracker.setSecondHand(null);
+                            }
+                        }
+
+                        if (showShieldWhenSwordInHand) {
+                            // Update current held item slot index
+                            entityTracker.setHeldItemSlot(wrapper.get(Type.SHORT, 0));
+
+                            // Sync shield item in offhand with main hand
+                            entityTracker.syncShieldWithSword();
                         }
                     }
                 });

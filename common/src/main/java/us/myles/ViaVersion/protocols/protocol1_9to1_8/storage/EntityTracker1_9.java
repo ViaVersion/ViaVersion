@@ -66,6 +66,8 @@ public class EntityTracker1_9 extends EntityTracker {
     private boolean teamExists = false;
     private GameMode gameMode;
     private String currentTeam;
+    private int heldItemSlot;
+    private Item itemInSecondHand = null;
 
     public EntityTracker1_9(UserConnection user) {
         super(user, EntityType.PLAYER);
@@ -89,11 +91,36 @@ public class EntityTracker1_9 extends EntityTracker {
         PacketWrapper wrapper = new PacketWrapper(0x3C, null, getUser());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
-        wrapper.write(Type.ITEM, item);
+        wrapper.write(Type.ITEM, this.itemInSecondHand = item);
         try {
             wrapper.send(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public Item getItemInSecondHand() {
+        return itemInSecondHand;
+    }
+
+    /**
+     * It will set a shield to the offhand if a sword is in the main hand.
+     * The item in the offhand will be cleared if there is no sword in the main hand.
+     */
+    public void syncShieldWithSword() {
+        InventoryTracker inventoryTracker = getUser().get(InventoryTracker.class);
+
+        // Get item in new selected slot
+        int inventorySlot = this.heldItemSlot + 36; // Hotbar slot index to inventory slot
+        int itemIdentifier = inventoryTracker.getItemId((short) 0, (short) inventorySlot);
+
+        boolean isSword = Protocol1_9To1_8.isSword(itemIdentifier);
+
+        // Update if the state changed
+        if (isSword == (this.itemInSecondHand == null)) {
+
+            // Update shield in off hand depending if a sword is in the main hand
+            setSecondHand(isSword ? new Item(442, (byte) 1, (short) 0, null) : null);
         }
     }
 
@@ -394,5 +421,9 @@ public class EntityTracker1_9 extends EntityTracker {
 
     public void setCurrentTeam(String currentTeam) {
         this.currentTeam = currentTeam;
+    }
+
+    public void setHeldItemSlot(int heldItemSlot) {
+        this.heldItemSlot = heldItemSlot;
     }
 }
