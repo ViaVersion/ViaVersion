@@ -49,6 +49,12 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         } else if (metadata.getMetaType() == MetaType1_17.PARTICLE) {
             rewriteParticle((Particle) metadata.getValue());
+        } else if (metadata.getMetaType() == MetaType1_17.Pose) {
+            int pose = metadata.getCastedValue();
+            if (pose > 5) {
+                // Added LONG_JUMP at 6
+                metadata.setValue(pose + 1);
+            }
         }
 
         if (type == null) return;
