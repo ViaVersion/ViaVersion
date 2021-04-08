@@ -205,6 +205,8 @@ public class MappingDataLoader {
     }
 
     /**
+     * Returns a map of the object entries hashed by their id value.
+     *
      * @param object json object
      * @return map with indexes hashed by their id value
      */
@@ -218,6 +220,8 @@ public class MappingDataLoader {
     }
 
     /**
+     * Returns a map of the array entries hashed by their id value.
+     *
      * @param array json array
      * @return map with indexes hashed by their id value
      */

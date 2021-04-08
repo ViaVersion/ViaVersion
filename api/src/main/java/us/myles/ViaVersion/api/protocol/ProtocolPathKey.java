@@ -25,11 +25,15 @@ package us.myles.ViaVersion.api.protocol;
 public interface ProtocolPathKey {
 
     /**
+     * Returns the client protocol version.
+     *
      * @return client protocol version
      */
     int getClientProtocolVersion();
 
     /**
+     * Returns the server protocol version.
+     *
      * @return server protocol version
      */
     int getServerProtocolVersion();

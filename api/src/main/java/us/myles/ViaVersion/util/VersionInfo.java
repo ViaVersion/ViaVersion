@@ -22,7 +22,14 @@
  */
 package us.myles.ViaVersion.util;
 
+import us.myles.ViaVersion.api.platform.ViaPlatform;
+
 public class VersionInfo {
 
+    /**
+     * Plugin version.
+     *
+     * @see ViaPlatform#getPluginVersion()
+     */
     public static final String VERSION = "$VERSION";
 }

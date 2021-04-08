@@ -34,14 +34,29 @@ public final class UnsupportedSoftware {
         this.reason = reason;
     }
 
+    /**
+     * Returns the software name.
+     *
+     * @return software name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the fully qualified class name.
+     *
+     * @return fully qualified class name
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Returns the reason for being unsupported by Via.
+     *
+     * @return reason for being unsupported
+     */
     public String getReason() {
         return reason;
     }

@@ -35,12 +35,16 @@ public interface Chunk {
     int getZ();
 
     /**
-     * @return whether this chunk holds biome data, always true for 1.17+ chunks
+     * Returns whether this chunk holds biome data, always true for 1.17+ chunks.
+     *
+     * @return true if this chunk holds biome data
      */
     boolean isBiomeData();
 
     /**
-     * @return whether this is a full chunk, always true for 1.17+ chunks
+     * Returns whether this is a full chunk, always true for 1.17+ chunks.
+     *
+     * @return true if this is a full chunk
      */
     boolean isFullChunk();
 
@@ -54,6 +58,8 @@ public interface Chunk {
     void setIgnoreOldLightData(boolean ignoreOldLightData);
 
     /**
+     * Returns the chunk section bit mask for chunks &lt; 1.17.
+     *
      * @return chunk section bit mask for chunks &lt; 1.17
      * @see #getChunkMask()
      */
@@ -62,7 +68,9 @@ public interface Chunk {
     void setBitmask(int bitmask);
 
     /**
-     * @return chunk section bit mask, only non-null available for 1.17+ chunks
+     * Returns the chunk section bit mask, only non-null for 1.17+ chunks.
+     *
+     * @return chunk section bit mask, only non-null for 1.17+ chunks
      * @see #getBitmask()
      */
     @Nullable BitSet getChunkMask();

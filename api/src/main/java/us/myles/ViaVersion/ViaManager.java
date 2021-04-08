@@ -34,22 +34,67 @@ import java.util.Set;
 
 public interface ViaManager {
 
+    /**
+     * Returns the protocol manager for registering/getting protocols and their mapping data loading.
+     *
+     * @return protocol manager
+     */
     ProtocolManager getProtocolManager();
 
+    /**
+     * Returns platform for handling platform specific configuration, tasks, and plugin data.
+     *
+     * @return platform
+     */
     ViaPlatform<?> getPlatform();
 
+    /**
+     * Returns the userconnection manager for handling clients connected to the server.
+     *
+     * @return userconnection manager
+     */
     ViaConnectionManager getConnectionManager();
 
+    /**
+     * Returns the manager for Via providers.
+     *
+     * @return provider manager
+     */
     ViaProviders getProviders();
 
+    /**
+     * Returns the injector for injecting netty handlers and initially getting the server protocol version.
+     *
+     * @return injector
+     */
     ViaInjector getInjector();
 
+    /**
+     * Returns the command handler for managing ViaVersion subcommands.
+     *
+     * @return command handler
+     */
     ViaVersionCommand getCommandHandler();
 
+    /**
+     * Returns the platform loader responsible for registering listeners, providers and such.
+     *
+     * @return platform loader
+     */
     ViaPlatformLoader getLoader();
 
+    /**
+     * If debug is enabled, packets and other otherwise suppressed warnings will be logged.
+     *
+     * @return true if enabled
+     */
     boolean isDebug();
 
+    /**
+     * Sets the debug mode. If enabled, packets and other otherwise suppressed warnings will be logged.
+     *
+     * @param debug whether debug should be enabled
+     */
     void setDebug(boolean debug);
 
     /**

@@ -45,14 +45,29 @@ public class VersionRange {
         this.rangeTo = rangeTo;
     }
 
+    /**
+     * Returns the major version name.
+     *
+     * @return major version name
+     */
     public String getBaseVersion() {
         return baseVersion;
     }
 
+    /**
+     * Returns the lowest included minor version.
+     *
+     * @return lowest included minor version
+     */
     public int getRangeFrom() {
         return rangeFrom;
     }
 
+    /**
+     * Returns the highest included minor version.
+     *
+     * @return highest included minor version
+     */
     public int getRangeTo() {
         return rangeTo;
     }

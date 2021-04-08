@@ -25,21 +25,29 @@ package us.myles.ViaVersion.api.minecraft;
 public interface BlockChangeRecord {
 
     /**
+     * Returns the relative x coordinate within the chunk section.
+     *
      * @return relative x coordinate within the chunk section
      */
     byte getSectionX();
 
     /**
+     * Returns the relative y coordinate within the chunk section.
+     *
      * @return relative y coordinate within the chunk section
      */
     byte getSectionY();
 
     /**
+     * Returns the relative z coordinate within the chunk section.
+     *
      * @return relative z coordinate within the chunk section
      */
     byte getSectionZ();
 
     /**
+     * Returns the absolute y coordinate based on the given chunk section y.
+     *
      * @param chunkSectionY chunk section
      * @return absolute y coordinate
      */

@@ -31,12 +31,16 @@ package us.myles.ViaVersion.api.protocol;
 public interface PacketType {
 
     /**
-     * @return name of the packet, to be consistent over multiple versions
+     * Returns the name of the packet, to be consistent over multiple versions.
+     *
+     * @return name of the packet
      */
     String name();
 
     /**
-     * @return ordinal, being the packet id for the implemented protocol
+     * Returns the ordinal, being the packet id for the implemented protocol.
+     *
+     * @return packet id for the implemented protocol
      */
     int ordinal();
 }

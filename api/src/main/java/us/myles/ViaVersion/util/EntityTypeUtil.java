@@ -31,6 +31,12 @@ import java.util.List;
 
 public class EntityTypeUtil {
 
+    /**
+     * Returns an ordered array with each index representing the actual entity id.
+     *
+     * @param values entity types
+     * @return ordered array with each index representing the actual entity id
+     */
     public static EntityType[] toOrderedArray(EntityType[] values) {
         List<EntityType> types = new ArrayList<>();
         for (EntityType type : values) {
@@ -43,6 +49,14 @@ public class EntityTypeUtil {
         return types.toArray(new EntityType[0]);
     }
 
+    /**
+     * Returns the entity type from id, or the given fallback if out of bounds.
+     *
+     * @param values   sorted entity type array
+     * @param typeId   entity type id
+     * @param fallback fallback/base entity type
+     * @return entity type from id
+     */
     public static EntityType getTypeFromId(EntityType[] values, int typeId, EntityType fallback) {
         EntityType type;
         if (typeId < 0 || typeId >= values.length || (type = values[typeId]) == null) {

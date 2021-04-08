@@ -57,6 +57,7 @@ subprojects {
     }
 
     dependencies {
+        // Note: If manually starting tests doesn't work for you in IJ, change 'Gradle -> Run Tests Using' to 'IntelliJ IDEA'
         testImplementation("io.netty", "netty-all", Versions.netty)
         testImplementation("com.google.guava", "guava", Versions.guava)
         testImplementation("org.junit.jupiter", "junit-jupiter-api", Versions.jUnit)

@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -91,6 +91,15 @@ public class ProtocolVersion {
         return register(version, -1, name, versionRange);
     }
 
+    /**
+     * Registers a protocol version.
+     *
+     * @param version         release protocol version
+     * @param snapshotVersion snapshot protocol version, or -1 if not a snapshot
+     * @param name            version name
+     * @param versionRange    range of versions that are supported by this protocol version, null if not a range
+     * @return registered {@link ProtocolVersion}
+     */
     public static ProtocolVersion register(int version, int snapshotVersion, String name, @Nullable VersionRange versionRange) {
         ProtocolVersion protocol = new ProtocolVersion(version, snapshotVersion, name, versionRange);
         versionList.add(protocol);
@@ -101,10 +110,23 @@ public class ProtocolVersion {
         return protocol;
     }
 
+    /**
+     * Returns whether a protocol with the given protocol version is registered.
+     *
+     * @param id protocol version
+     * @return true if this protocol version has been registered
+     */
     public static boolean isRegistered(int id) {
         return versions.containsKey(id);
     }
 
+    /**
+     * Returns a {@link ProtocolVersion} instance, even if this protocol version
+     * has not been registered. See {@link #isRegistered(int)} berorehand or {@link #isKnown()}.
+     *
+     * @param id protocol version
+     * @return registered or unknown {@link ProtocolVersion}
+     */
     public static @NonNull ProtocolVersion getProtocol(int id) {
         ProtocolVersion protocolVersion = versions.get(id);
         if (protocolVersion != null) {
@@ -114,14 +136,33 @@ public class ProtocolVersion {
         }
     }
 
+    /**
+     * Returns the internal index of the stored protocol version.
+     *
+     * @param version protocol version instance
+     * @return internal index of the stored protocol version
+     */
     public static int getIndex(ProtocolVersion version) {
         return versionList.indexOf(version);
     }
 
+    /**
+     * Returns an immutable list of registered protocol versions.
+     *
+     * @return immutable list of registered protocol versions
+     */
     public static List<ProtocolVersion> getProtocols() {
         return Collections.unmodifiableList(new ArrayList<>(versions.values()));
     }
 
+    /**
+     * Returns the registered protocol version if present, else null.
+     * This accepts the actual registered names (like "1.16.4/5") as well as
+     * included versions for version ranges and wildcards.
+     *
+     * @param protocol version name, e.g. "1.16.3"
+     * @return registered protocol version if present, else null
+     */
     public static @Nullable ProtocolVersion getClosest(String protocol) {
         for (ProtocolVersion version : versions.values()) {
             String name = version.getName();
@@ -150,10 +191,20 @@ public class ProtocolVersion {
     private final boolean versionWildcard;
     private final Set<String> includedVersions;
 
+    /**
+     * @param version protocol version
+     * @param name    version name
+     */
     public ProtocolVersion(int version, String name) {
         this(version, -1, name, null);
     }
 
+    /**
+     * @param version         protocol version
+     * @param snapshotVersion actual snapshot protocol version, -1 if not a snapshot
+     * @param name            version name
+     * @param versionRange    range of versions that are supported by this protocol version, null if not a range
+     */
     public ProtocolVersion(int version, int snapshotVersion, String name, @Nullable VersionRange versionRange) {
         this.version = version;
         this.snapshotVersion = snapshotVersion;
@@ -162,7 +213,7 @@ public class ProtocolVersion {
 
         Preconditions.checkArgument(!versionWildcard || versionRange == null, "A version cannot be a wildcard and a range at the same time!");
         if (versionRange != null) {
-            includedVersions = new HashSet<>();
+            includedVersions = new LinkedHashSet<>();
             for (int i = versionRange.getRangeFrom(); i <= versionRange.getRangeTo(); i++) {
                 if (i == 0) {
                     includedVersions.add(versionRange.getBaseVersion()); // Keep both the base version and with ".0" appended
@@ -176,6 +227,8 @@ public class ProtocolVersion {
     }
 
     /**
+     * Returns the release protocol version.
+     *
      * @return release version
      */
     public int getVersion() {
@@ -183,6 +236,8 @@ public class ProtocolVersion {
     }
 
     /**
+     * Returns the snapshot protocol version without the snapshot indicator bit if this is a snapshot protocol version.
+     *
      * @return snapshot protocol version without the snapshot indicator bit
      * @throws IllegalArgumentException if the version if not a snapshot version
      * @see #isSnapshot()
@@ -193,6 +248,8 @@ public class ProtocolVersion {
     }
 
     /**
+     * Returns the snapshot protocol version with the snapshot indicator bit if this is a snapshot protocol version.
+     *
      * @return snapshot protocol version with the snapshot indicator bit
      * @throws IllegalArgumentException if the version if not a snapshot version
      * @see #isSnapshot()
@@ -203,18 +260,27 @@ public class ProtocolVersion {
     }
 
     /**
+     * Returns the release version if release, snapshot version (with the snapshot indicator bit) if snapshot.
+     *
      * @return release version if release, snapshot version (with the snapshot indicator bit) if snapshot
      */
     public int getOriginalVersion() {
         return snapshotVersion == -1 ? version : ((1 << 30) | snapshotVersion);
     }
 
+    /**
+     * Returns whether the protocol is set. Should only be unknown for unregistered protocols returned by {@link #getProtocol(int)}.
+     *
+     * @return true if the protocol is set
+     */
     public boolean isKnown() {
         return version != -1;
     }
 
     /**
-     * @return true if the protocol includes a range of versions (but not an entire major version range), for example 1.7-1.7.5
+     * Returns whether the protocol includes a range of versions (but not an entire major version range), for example 1.7-1.7.5.
+     *
+     * @return true if the protocol includes a range of versions
      * @see #getIncludedVersions()
      */
     public boolean isRange() {
@@ -234,16 +300,28 @@ public class ProtocolVersion {
     }
 
     /**
-     * @return true if the protocol includes an entire major version range (for example 1.8.x)
+     * Returns whether the protocol includes an entire major version range (for example 1.8.x).
+     *
+     * @return true if the protocol includes an entire major version range
      */
     public boolean isVersionWildcard() {
         return versionWildcard;
     }
 
+    /**
+     * Returns the version name.
+     *
+     * @return version name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns whether this represents a snapshot version.
+     *
+     * @return true if this represents a snapshot version, false otherwise
+     */
     public boolean isSnapshot() {
         return snapshotVersion != -1;
     }
