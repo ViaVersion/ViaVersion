@@ -53,6 +53,13 @@ public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
 
         if (type == null) return;
 
+        if (type.isOrHasParent(Entity1_15Types.MINECART_ABSTRACT)
+                && metadata.getId() == 10) {
+            // Convert to new block id
+            int data = (int) metadata.getValue();
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        }
+
         // Metadata 12 added to abstract_living
         if (metadata.getId() > 11 && type.isOrHasParent(Entity1_15Types.LIVINGENTITY)) {
             metadata.setId(metadata.getId() + 1); //TODO is it 11 or 12? what is it for?

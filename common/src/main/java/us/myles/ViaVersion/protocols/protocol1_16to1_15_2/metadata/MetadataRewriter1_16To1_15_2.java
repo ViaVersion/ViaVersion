@@ -53,6 +53,13 @@ public class MetadataRewriter1_16To1_15_2 extends MetadataRewriter {
 
         if (type == null) return;
 
+        if (type.isOrHasParent(Entity1_16Types.MINECART_ABSTRACT)
+                && metadata.getId() == 10) {
+            // Convert to new block id
+            int data = (int) metadata.getValue();
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        }
+
         if (type.isOrHasParent(Entity1_16Types.ABSTRACT_ARROW)) {
             if (metadata.getId() == 8) {
                 metadatas.remove(metadata);

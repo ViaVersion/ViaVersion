@@ -65,6 +65,13 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
             }
         }
 
+        if (type.isOrHasParent(Entity1_17Types.MINECART_ABSTRACT)
+                && metadata.getId() == 11) {
+            // Convert to new block id
+            int data = (int) metadata.getValue();
+            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        }
+
         if (type == Entity1_17Types.SHULKER) {
             // Attachment position removed
             if (metadata.getId() == 16) {
