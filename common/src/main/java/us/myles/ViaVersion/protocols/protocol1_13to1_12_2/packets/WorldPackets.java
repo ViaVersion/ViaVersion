@@ -335,7 +335,8 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        String newSoundId = NamedSoundRewriter.getNewId(wrapper.get(Type.STRING, 0));
+                        String sound = wrapper.get(Type.STRING, 0).replace("minecraft:", "");
+                        String newSoundId = NamedSoundRewriter.getNewId(sound);
                         wrapper.set(Type.STRING, 0, newSoundId);
                     }
                 });
