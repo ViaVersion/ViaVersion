@@ -24,6 +24,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
+import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
 import us.myles.ViaVersion.api.rewriters.RegistryType;
 import us.myles.ViaVersion.api.rewriters.SoundRewriter;
 import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
@@ -50,7 +51,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_17To1_16_4(this);
+        MetadataRewriter metadataRewriter = new MetadataRewriter1_17To1_16_4(this);
 
         EntityPackets.register(this);
         InventoryPackets.register(this);
@@ -87,7 +88,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
             }
         });
 
-        new StatisticsRewriter(this, null).register(ClientboundPackets1_16_2.STATISTICS);
+        new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_16_2.STATISTICS);
 
         SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
