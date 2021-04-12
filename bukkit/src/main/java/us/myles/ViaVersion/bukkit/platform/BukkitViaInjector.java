@@ -23,6 +23,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import org.bukkit.Bukkit;
+import org.bukkit.UnsafeValues;
 import org.bukkit.plugin.PluginDescriptionFile;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -39,10 +41,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+//TODO screams
 public class BukkitViaInjector implements ViaInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Pair<Field, Object>> injectedLists = new ArrayList<>();
 
+    private final boolean modernPaper = hasServerProtocolMethod();
     private boolean protocolLib;
 
     @Override
@@ -186,6 +190,11 @@ public class BukkitViaInjector implements ViaInjector {
 
     @Override
     public int getServerProtocolVersion() throws Exception {
+        if (modernPaper) {
+            // *Trust me, it's safe*
+            return Bukkit.getUnsafe().getProtocolVersion();
+        }
+
         try {
             Class<?> serverClazz = NMSUtil.nms("MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
@@ -366,5 +375,18 @@ public class BukkitViaInjector implements ViaInjector {
 
     public void setProtocolLib(boolean protocolLib) {
         this.protocolLib = protocolLib;
+    }
+
+    public boolean isModernPaper() {
+        return modernPaper;
+    }
+
+    private static boolean hasServerProtocolMethod() {
+        try {
+            Class.forName("org.bukkit.UnsafeValues").getDeclaredMethod("getProtocolVersion");
+            return true;
+        } catch (ReflectiveOperationException e) {
+            return false;
+        }
     }
 }

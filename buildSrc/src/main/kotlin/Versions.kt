@@ -15,7 +15,7 @@ object Versions {
     const val checkerQual = "3.12.0"
 
     // Platforms
-    const val spigot = "1.16.5-R0.1-SNAPSHOT"
+    const val paper = "1.16.5-R0.1-SNAPSHOT"
     const val legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
     const val bungee = "1.16-R0.5-SNAPSHOT"
     const val sponge = "5.0.0"

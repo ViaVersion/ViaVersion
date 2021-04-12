@@ -42,6 +42,7 @@ public class BungeeViaInjector implements ViaInjector {
             field.setAccessible(true);
 
             // Remove the final modifier (unless removed by a fork)
+            //TODO Fix Java 16 compatibility
             int modifiers = field.getModifiers();
             if (Modifier.isFinal(modifiers)) {
                 try {

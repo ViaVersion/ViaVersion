@@ -47,11 +47,11 @@ subprojects {
     }
 
     repositories {
+        maven("https://repo.viaversion.com")
+        maven("https://papermc.io/repo/repository/maven-public/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
         maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/")
         maven("https://repo.spongepowered.org/repository/maven-public/")
-        maven("https://repo.viaversion.com")
         maven("https://libraries.minecraft.net")
         maven("https://repo.maven.apache.org/maven2/")
     }
