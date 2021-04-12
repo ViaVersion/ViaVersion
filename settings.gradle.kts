@@ -11,6 +11,10 @@ setupViaSubproject("velocity")
 setupViaSubproject("sponge")
 setupViaSubproject("sponge-legacy")
 setupViaSubproject("fabric")
+setupViaSubproject("java-compat-common")
+setupViaSubproject("java-compat-8")
+setupViaSubproject("java-compat-9")
+setupViaSubproject("java-compat-16")
 
 setupSubproject("viaversion") {
     projectDir = file("universal")
