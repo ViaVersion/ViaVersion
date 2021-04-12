@@ -301,13 +301,17 @@ public class WorldPackets {
                             // Check if the shield is already there or if we have to give it here
                             boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand();
 
-                            if (item != null && Protocol1_9To1_8.isSword(item.getIdentifier())) {
+                            // Method to identify the sword in hand
+                            boolean isSword = showShieldWhenSwordInHand ? tracker.hasSwordInHand()
+                                    : item != null && Protocol1_9To1_8.isSword(item.getIdentifier());
+
+                            if (isSword) {
                                 if (hand == 0) {
                                     if (!tracker.isBlocking()) {
                                         tracker.setBlocking(true);
 
                                         // Check if the shield is already in the offhand
-                                        if (!showShieldWhenSwordInHand || tracker.getItemInSecondHand() == null) {
+                                        if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
 
                                             // Set shield in offhand when interacting with main hand
                                             Item shield = new Item(442, (byte) 1, (short) 0, null);
