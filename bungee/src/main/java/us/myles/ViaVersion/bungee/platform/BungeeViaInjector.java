@@ -25,14 +25,51 @@ import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.bungee.handlers.BungeeChannelInitializer;
+import us.myles.ViaVersion.compatibility.FieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.JavaVersionIdentifier;
+import us.myles.ViaVersion.compatibility.jre16.Jre16FieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.jre8.Jre8FieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.jre9.Jre9FieldModifierAccessor;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
 public class BungeeViaInjector implements ViaInjector {
+
+    private final FieldModifierAccessor fieldModifierAccessor;
+
+    public BungeeViaInjector() {
+        FieldModifierAccessor fieldModifierAccessor = null;
+        try {
+            if (JavaVersionIdentifier.IS_JAVA_16) {
+                fieldModifierAccessor = new Jre16FieldModifierAccessor();
+            } else if (JavaVersionIdentifier.IS_JAVA_9) {
+                fieldModifierAccessor = new Jre9FieldModifierAccessor();
+            }
+        } catch (final ReflectiveOperationException outer) {
+            try {
+                fieldModifierAccessor = new Jre8FieldModifierAccessor();
+                Via.getPlatform().getLogger().warning("Had to fall back to the Java 8 field modifier accessor.");
+                outer.printStackTrace();
+            } catch (final ReflectiveOperationException inner) {
+                inner.addSuppressed(outer);
+                throw new IllegalStateException("Cannot create a modifier accessor", inner);
+            }
+        }
+
+        try {
+          if (fieldModifierAccessor == null) {
+              fieldModifierAccessor = new Jre8FieldModifierAccessor();
+          }
+        } catch (final ReflectiveOperationException ex) {
+            throw new IllegalStateException("Cannot create a modifier accessor", ex);
+        }
+
+        // Must be non-null by now.
+        this.fieldModifierAccessor = fieldModifierAccessor;
+    }
 
     @Override
     public void inject() throws Exception {
@@ -42,26 +79,9 @@ public class BungeeViaInjector implements ViaInjector {
             field.setAccessible(true);
 
             // Remove the final modifier (unless removed by a fork)
-            //TODO Fix Java 16 compatibility
             int modifiers = field.getModifiers();
             if (Modifier.isFinal(modifiers)) {
-                try {
-                    Field modifiersField = Field.class.getDeclaredField("modifiers");
-                    modifiersField.setAccessible(true);
-                    modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
-                } catch (NoSuchFieldException e) {
-                    // Java 12 compatibility *this is fine*
-                    Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-                    getDeclaredFields0.setAccessible(true);
-                    Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
-                    for (Field classField : fields) {
-                        if ("modifiers".equals(classField.getName())) {
-                            classField.setAccessible(true);
-                            classField.set(field, modifiers & ~Modifier.FINAL);
-                            break;
-                        }
-                    }
-                }
+                this.fieldModifierAccessor.setModifiers(field, modifiers & ~Modifier.FINAL);
             }
 
             BungeeChannelInitializer newInit = new BungeeChannelInitializer((ChannelInitializer<Channel>) field.get(null));

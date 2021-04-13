@@ -1,6 +1,8 @@
 rootProject.name = "viaversion-parent"
 
 include("adventure")
+include("java-compat", "java-compat:java-compat-common", "java-compat:java-compat-8",
+    "java-compat:java-compat-9", "java-compat:java-compat-16")
 
 setupViaSubproject("api")
 setupViaSubproject("common")
