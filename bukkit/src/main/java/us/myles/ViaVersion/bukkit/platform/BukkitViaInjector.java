@@ -24,7 +24,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
-import org.bukkit.UnsafeValues;
 import org.bukkit.plugin.PluginDescriptionFile;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
