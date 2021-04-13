@@ -4,9 +4,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.util.Objects;
-import us.myles.ViaVersion.compatibility.IFieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.FieldModifierAccessor;
 
-public final class Jre9FieldModifierAccessor implements IFieldModifierAccessor {
+public final class Jre9FieldModifierAccessor implements FieldModifierAccessor {
   private final VarHandle modifiersHandle;
 
   public Jre9FieldModifierAccessor() throws ReflectiveOperationException {

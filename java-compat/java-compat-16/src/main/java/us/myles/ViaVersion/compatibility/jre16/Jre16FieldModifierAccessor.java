@@ -4,13 +4,13 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.util.Objects;
-import us.myles.ViaVersion.compatibility.IFieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.FieldModifierAccessor;
 
 @SuppressWarnings({
     "java:S1191", // SonarLint/-Qube/-Cloud: We (sadly) need Unsafe for the Java 16 impl.
     "java:S3011", // ^: We need to circumvent the access restrictions of fields.
 })
-public final class Jre16FieldModifierAccessor implements IFieldModifierAccessor {
+public final class Jre16FieldModifierAccessor implements FieldModifierAccessor {
   private final VarHandle modifiersHandle;
 
   public Jre16FieldModifierAccessor() throws ReflectiveOperationException {

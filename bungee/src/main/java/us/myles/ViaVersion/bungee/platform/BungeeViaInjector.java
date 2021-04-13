@@ -25,7 +25,7 @@ import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.platform.ViaInjector;
 import us.myles.ViaVersion.bungee.handlers.BungeeChannelInitializer;
-import us.myles.ViaVersion.compatibility.IFieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.FieldModifierAccessor;
 import us.myles.ViaVersion.compatibility.JavaVersionIdentifier;
 import us.myles.ViaVersion.compatibility.jre16.Jre16FieldModifierAccessor;
 import us.myles.ViaVersion.compatibility.jre8.Jre8FieldModifierAccessor;
@@ -33,16 +33,15 @@ import us.myles.ViaVersion.compatibility.jre9.Jre9FieldModifierAccessor;
 import us.myles.ViaVersion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
 public class BungeeViaInjector implements ViaInjector {
 
-    private final IFieldModifierAccessor fieldModifierAccessor;
+    private final FieldModifierAccessor fieldModifierAccessor;
 
     public BungeeViaInjector() {
-        IFieldModifierAccessor fieldModifierAccessor = null;
+        FieldModifierAccessor fieldModifierAccessor = null;
         try {
             if (JavaVersionIdentifier.IS_JAVA_16) {
                 fieldModifierAccessor = new Jre16FieldModifierAccessor();

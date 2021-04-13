@@ -2,10 +2,10 @@ package us.myles.ViaVersion.compatibility.jre8;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-import us.myles.ViaVersion.compatibility.IFieldModifierAccessor;
+import us.myles.ViaVersion.compatibility.FieldModifierAccessor;
 
 @SuppressWarnings("java:S3011") // SonarLint/-Qube/-Cloud: we are intentionally bypassing the setter.
-public final class Jre8FieldModifierAccessor implements IFieldModifierAccessor {
+public final class Jre8FieldModifierAccessor implements FieldModifierAccessor {
   private final Field modifiersField;
 
   public Jre8FieldModifierAccessor() throws ReflectiveOperationException {

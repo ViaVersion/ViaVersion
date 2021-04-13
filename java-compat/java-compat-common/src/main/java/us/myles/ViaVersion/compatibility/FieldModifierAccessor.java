@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  * non-ViaVersion code.
  * </p>
  */
-public interface IFieldModifierAccessor {
+public interface FieldModifierAccessor {
   /**
    * Sets the modifiers of a field.
    * <p>
