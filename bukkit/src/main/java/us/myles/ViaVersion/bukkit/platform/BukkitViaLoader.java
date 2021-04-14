@@ -36,7 +36,6 @@ import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
 import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.BlockListener;
 import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.DeathListener;
 import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.HandItemCache;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
 import us.myles.ViaVersion.bukkit.providers.BukkitBlockConnectionProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
@@ -49,7 +48,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -117,14 +115,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 storeListener(new EntityToggleGlideListener(plugin)).register();
             } catch (ClassNotFoundException ignored) {
             }
-        }
-
-        if ((Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("paper")
-                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("taco")
-                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch"))
-                && serverProtocolVersion < ProtocolVersion.v1_12.getVersion()) {
-            plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
-            storeListener(new PaperPatch(plugin)).register();
         }
 
         /* Providers */
