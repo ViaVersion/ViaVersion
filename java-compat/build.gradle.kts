@@ -1,8 +1,8 @@
 dependencies {
-    api(project(":java-compat:java-compat-common"))
-    api(project(":java-compat:java-compat-8"))
-    api(project(":java-compat:java-compat-9"))
-    api(project(":java-compat:java-compat-16"))
+    api(projects.javaCompat.javaCompatCommon)
+    api(projects.javaCompat.javaCompat8)
+    api(projects.javaCompat.javaCompat9)
+    api(projects.javaCompat.javaCompat16)
 }
 
 configure<JavaPluginConvention> {

@@ -1,22 +1,26 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+plugins {
+    id("com.github.johnrengelman.shadow")
+}
+
 tasks {
     withType<ShadowJar> {
         archiveClassifier.set("")
         archiveFileName.set("ViaVersion-${project.version}.jar")
         destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        arrayOf(
-            "bukkit",
-            "bungee",
-            "fabric",
-            "sponge",
-            "velocity"
-        ).forEach {
-            val subProject = rootProject.project(":viaversion-$it")
-            val shadowJarTask = subProject.tasks.getByName("shadowJar")
-            from(zipTree(shadowJarTask.outputs.files.singleFile))
+        sequenceOf(
+            rootProject.projects.viaversionBukkit,
+            rootProject.projects.viaversionBungee,
+            rootProject.projects.viaversionFabric,
+            rootProject.projects.viaversionSponge,
+            rootProject.projects.viaversionVelocity,
+        ).map { it.dependencyProject }.forEach { subproject ->
+            val shadowJarTask = subproject.tasks.getByName("shadowJar", ShadowJar::class)
             dependsOn(shadowJarTask)
+            dependsOn(subproject.tasks.withType<Jar>())
+            from(zipTree(shadowJarTask.archiveFile))
         }
     }
     build {

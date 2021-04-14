@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":viaversion-common"))
-    compileOnly("com.velocitypowered", "velocity-api", Versions.velocity)
-    annotationProcessor("com.velocitypowered", "velocity-api", Versions.velocity)
+    implementation(projects.viaversionCommon)
+    compileOnly(libs.velocity)
+    annotationProcessor(libs.velocity)
 }
