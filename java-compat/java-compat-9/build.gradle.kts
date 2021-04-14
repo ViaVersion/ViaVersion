@@ -1,8 +1,5 @@
 dependencies {
-    api(project(":java-compat:java-compat-common"))
+    api(projects.javaCompat.javaCompatCommon)
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_9
-    targetCompatibility = JavaVersion.VERSION_1_9
-}
+configureJavaTarget(9)

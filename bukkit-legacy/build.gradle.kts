@@ -1,6 +1,6 @@
 dependencies {
-    implementation(project(":viaversion-common"))
-    compileOnly("org.bukkit", "bukkit", Versions.legacyBukkit) {
+    implementation(projects.viaversionCommon)
+    compileOnly(libs.legacyBukkit) {
         exclude("junit", "junit")
         exclude("com.google.code.gson", "gson")
         exclude("javax.persistence", "persistence-api")

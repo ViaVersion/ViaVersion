@@ -1,10 +1,7 @@
 dependencies {
-    api(project(":java-compat:java-compat-common"))
+    api(projects.javaCompat.javaCompatCommon)
 }
 
-configure<JavaPluginConvention> {
-    // This is for Java 16, but the minimum required for this
-    // is actually just Java 9!
-    sourceCompatibility = JavaVersion.VERSION_1_9
-    targetCompatibility = JavaVersion.VERSION_1_9
-}
+// This is for Java 16, but the minimum required for this
+// is actually just Java 9!
+configureJavaTarget(9)

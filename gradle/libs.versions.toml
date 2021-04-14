@@ -1,0 +1,58 @@
+metadata.format.version = "1.0"
+
+[versions]
+
+adventure = "4.7.0"
+gson = "2.8.6"
+fastutil = "8.3.1"
+openNBT = "2.0-SNAPSHOT"
+javassist = "3.27.0-GA"
+
+# Common provided
+netty = "4.0.20.Final"
+guava = "17.0"
+snakeYaml = "1.18"
+
+junit = "5.6.3"
+checkerQual = "3.12.0"
+
+# Platforms
+paper = "1.16.5-R0.1-SNAPSHOT"
+legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
+bungee = "1.16-R0.5-SNAPSHOT"
+sponge = "5.0.0"
+legacySponge = "4.0.0"
+velocity = "1.1.0-SNAPSHOT"
+
+
+[libraries]
+
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+openNBT = { group = "com.viaversion", name = "opennbt", version.ref = "openNBT" }
+javassist = { group = "org.javassist", name = "javassist", version.ref = "javassist" }
+
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+snakeYaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml" }
+
+jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
+
+paper = { group = "com.destroystokyo.paper", name = "paper-api", version.ref = "paper" }
+legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
+bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
+sponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "sponge" }
+legacySponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "legacySponge" }
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+
+
+[bundles]
+
+adventure = ["adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-legacy"]
+junit = ["jupiter-api", "jupiter-engine"]

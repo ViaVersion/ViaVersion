@@ -1,5 +1,5 @@
 plugins {
-    id("net.kyori.blossom") version "1.2.0"
+    id("net.kyori.blossom")
 }
 
 blossom {
@@ -8,13 +8,15 @@ blossom {
 }
 
 dependencies {
-    api(project(":adventure", "shadow"))
-    api("it.unimi.dsi", "fastutil", Versions.fastUtil)
-    api("com.viaversion", "opennbt", Versions.openNBT)
-    api("com.google.code.gson", "gson", Versions.gson)
+    api(projects.adventure) {
+        targetConfiguration = "shadow"
+    }
+    api(libs.fastutil)
+    api(libs.openNBT)
+    api(libs.gson)
 
-    compileOnlyApi("org.yaml", "snakeyaml", Versions.snakeYaml)
-    compileOnlyApi("io.netty", "netty-all", Versions.netty)
-    compileOnlyApi("com.google.guava", "guava", Versions.guava)
-    compileOnlyApi("org.checkerframework", "checker-qual", Versions.checkerQual)
+    compileOnlyApi(libs.snakeYaml)
+    compileOnlyApi(libs.netty)
+    compileOnlyApi(libs.guava)
+    compileOnlyApi(libs.checkerQual)
 }

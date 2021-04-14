@@ -1,7 +1,7 @@
 dependencies {
-    implementation(project(":viaversion-common"))
-    implementation(project(":java-compat"))
-    compileOnly("net.md-5", "bungeecord-api", Versions.bungee)
+    implementation(projects.viaversionCommon)
+    implementation(projects.javaCompat)
+    compileOnly(libs.bungee)
 }
 
 configure<JavaPluginConvention> {

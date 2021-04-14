@@ -1,8 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.withType
 import java.io.ByteArrayOutputStream
@@ -87,4 +90,11 @@ fun Project.latestCommitHash(): String {
         standardOutput = byteOut
     }
     return byteOut.toString(Charsets.UTF_8.name()).trim()
+}
+
+fun Project.configureJavaTarget(version: Int) {
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JavaVersion.toVersion(version)
+        targetCompatibility = JavaVersion.toVersion(version)
+    }
 }
