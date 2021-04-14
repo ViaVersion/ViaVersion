@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     group = "us.myles"
-    version = "3.3.0-21w14a"
+    version = "3.3.0-21w15a"
     description = "Allow newer clients to join older server versions."
 }
 
