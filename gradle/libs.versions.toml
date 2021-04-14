@@ -1,3 +1,5 @@
+metadata.format.version = "1.0"
+
 [versions]
 
 adventure = "4.7.0"
