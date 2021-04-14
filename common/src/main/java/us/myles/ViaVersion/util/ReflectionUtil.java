@@ -98,7 +98,7 @@ public class ReflectionUtil {
         }
 
         private void scanFields(Class<?> host, boolean recursive) {
-            if (host.getSuperclass() != null && recursive) {
+            if (recursive && host.getSuperclass() != null && host.getSuperclass() != Object.class) {
                 scanFields(host.getSuperclass(), true);
             }
 
@@ -109,7 +109,7 @@ public class ReflectionUtil {
         }
 
         private void scanMethods(Class<?> host, boolean recursive) {
-            if (host.getSuperclass() != null && recursive) {
+            if (recursive && host.getSuperclass() != null && host.getSuperclass() != Object.class) {
                 scanMethods(host.getSuperclass(), true);
             }
 
