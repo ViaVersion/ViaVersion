@@ -17,14 +17,13 @@
  */
 package us.myles.ViaVersion.util;
 
-import com.google.common.collect.Maps;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectionUtil {
 
@@ -38,10 +37,10 @@ public class ReflectionUtil {
         return m.invoke(o);
     }
 
-    public static <T> T getStatic(Class<?> clazz, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+    public static <T> T getStatic(Class<?> clazz, String f, Class<T> type) throws NoSuchFieldException, IllegalAccessException {
         Field field = clazz.getDeclaredField(f);
         field.setAccessible(true);
-        return (T) field.get(null);
+        return type.cast(field.get(null));
     }
 
     public static void setStatic(Class<?> clazz, String f, Object value) throws NoSuchFieldException, IllegalAccessException {
@@ -50,30 +49,29 @@ public class ReflectionUtil {
         field.set(null, value);
     }
 
-    public static <T> T getSuper(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+    public static <T> T getSuper(Object o, String f, Class<T> type) throws NoSuchFieldException, IllegalAccessException {
         Field field = o.getClass().getSuperclass().getDeclaredField(f);
         field.setAccessible(true);
-        return (T) field.get(o);
+        return type.cast(field.get(o));
     }
 
-    public static <T> T get(Object instance, Class<?> clazz, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+    public static <T> T get(Object instance, Class<?> clazz, String f, Class<T> type) throws NoSuchFieldException, IllegalAccessException {
         Field field = clazz.getDeclaredField(f);
         field.setAccessible(true);
-        return (T) field.get(instance);
+        return type.cast(field.get(instance));
     }
 
-    public static <T> T get(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+    public static <T> T get(Object o, String f, Class<T> type) throws NoSuchFieldException, IllegalAccessException {
         Field field = o.getClass().getDeclaredField(f);
         field.setAccessible(true);
-        return (T) field.get(o);
+        return type.cast(field.get(o));
     }
 
-    public static <T> T getPublic(Object o, String f, Class<T> t) throws NoSuchFieldException, IllegalAccessException {
+    public static <T> T getPublic(Object o, String f, Class<T> type) throws NoSuchFieldException, IllegalAccessException {
         Field field = o.getClass().getField(f);
         field.setAccessible(true);
-        return (T) field.get(o);
+        return type.cast(field.get(o));
     }
-
 
     public static void set(Object o, String f, Object value) throws NoSuchFieldException, IllegalAccessException {
         Field field = o.getClass().getDeclaredField(f);
@@ -81,11 +79,10 @@ public class ReflectionUtil {
         field.set(o, value);
     }
 
-
     public static final class ClassReflection {
         private final Class<?> handle;
-        private final Map<String, Field> fields = Maps.newConcurrentMap();
-        private final Map<String, Method> methods = Maps.newConcurrentMap();
+        private final Map<String, Field> fields = new ConcurrentHashMap<>();
+        private final Map<String, Method> methods = new ConcurrentHashMap<>();
 
         public ClassReflection(Class<?> handle) {
             this(handle, true);
@@ -98,7 +95,7 @@ public class ReflectionUtil {
         }
 
         private void scanFields(Class<?> host, boolean recursive) {
-            if (host.getSuperclass() != null && recursive) {
+            if (recursive && host.getSuperclass() != null && host.getSuperclass() != Object.class) {
                 scanFields(host.getSuperclass(), true);
             }
 
@@ -109,7 +106,7 @@ public class ReflectionUtil {
         }
 
         private void scanMethods(Class<?> host, boolean recursive) {
-            if (host.getSuperclass() != null && recursive) {
+            if (recursive && host.getSuperclass() != null && host.getSuperclass() != Object.class) {
                 scanMethods(host.getSuperclass(), true);
             }
 
@@ -119,8 +116,8 @@ public class ReflectionUtil {
             }
         }
 
-        public Object newInstance() throws IllegalAccessException, InstantiationException {
-            return handle.newInstance();
+        public Object newInstance() throws ReflectiveOperationException {
+            return handle.getConstructor().newInstance();
         }
 
         public Field getField(String name) {
