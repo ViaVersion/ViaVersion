@@ -54,7 +54,23 @@ subprojects {
         withSourcesJar()
         withJavadocJar()
     }
+}
 
+// Configure shadow tasks before the publishing task
+sequenceOf(
+        projects.viaversionBukkit,
+        projects.viaversionBungee,
+        projects.viaversionFabric,
+        projects.viaversionSponge,
+        projects.viaversionVelocity
+).map { it.dependencyProject }.forEach { project ->
+    project.configureShadowJar()
+}
+
+projects.viaversionApi.dependencyProject.configureShadowJarAPI()
+projects.viaversion.dependencyProject.apply<ShadowPlugin>()
+
+subprojects {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
@@ -79,18 +95,6 @@ subprojects {
         }
     }
 }
-
-sequenceOf(
-    projects.viaversionBukkit,
-    projects.viaversionBungee,
-    projects.viaversionFabric,
-    projects.viaversionSponge,
-    projects.viaversionVelocity
-).map { it.dependencyProject }.forEach { project ->
-    project.configureShadowJar()
-}
-
-projects.viaversionApi.dependencyProject.configureShadowJarAPI()
 
 tasks {
     // root project has no useful artifacts
