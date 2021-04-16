@@ -50,7 +50,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.CommandBlockStorag
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.List;
@@ -169,8 +168,6 @@ public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, Clientboun
         userConnection.put(new MovementTracker(userConnection));
         // Inventory tracker
         userConnection.put(new InventoryTracker(userConnection));
-        // Place block tracker
-        userConnection.put(new PlaceBlockTracker(userConnection));
         // CommandBlock storage
         userConnection.put(new CommandBlockStorage(userConnection));
     }

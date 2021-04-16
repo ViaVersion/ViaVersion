@@ -40,7 +40,6 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.PlaceBlockTracker;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 
 import java.io.IOException;
@@ -351,7 +350,13 @@ public class WorldPackets {
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 1 - Block Face
-                map(Type.VAR_INT, Type.NOTHING); // 2 - Hand
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        final int hand = wrapper.read(Type.VAR_INT); // 2 - Hand
+                        if (hand != 0) wrapper.cancel();
+                    }
+                });
                 create(new ValueCreator() {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
@@ -362,19 +367,6 @@ public class WorldPackets {
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y
                 map(Type.UNSIGNED_BYTE); // 6 - Z
-
-                // Cancel if item as 1.9 uses Use_Item packet
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Position position = wrapper.get(Type.POSITION, 0);
-                        PlaceBlockTracker tracker = wrapper.user().get(PlaceBlockTracker.class);
-                        if (tracker.getLastPlacedPosition() != null && tracker.getLastPlacedPosition().equals(position) && !tracker.isExpired(50))
-                            wrapper.cancel();
-                        tracker.updateTime();
-                        tracker.setLastPlacedPosition(position);
-                    }
-                });
 
                 //Register block place to fix sounds
                 handler(new PacketHandler() {
