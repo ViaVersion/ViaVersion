@@ -23,11 +23,11 @@
 package us.myles.ViaVersion.api.type.types;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.util.GsonUtil;
 
 public class ComponentType extends Type<JsonElement> {
     private static final StringType STRING_TAG = new StringType(262144);
@@ -40,7 +40,7 @@ public class ComponentType extends Type<JsonElement> {
     public JsonElement read(ByteBuf buffer) throws Exception {
         String s = STRING_TAG.read(buffer);
         try {
-            return GsonUtil.getJsonParser().parse(s);
+            return JsonParser.parseString(s);
         } catch (JsonSyntaxException e) {
             Via.getPlatform().getLogger().severe("Error when trying to parse json: " + s);
             throw e;

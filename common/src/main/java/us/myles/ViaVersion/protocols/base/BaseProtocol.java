@@ -57,7 +57,7 @@ public class BaseProtocol extends SimpleProtocol {
                     }
 
                     // Choose the pipe
-                    int serverProtocol = Via.getManager().getProviders().get(VersionProvider.class).getServerProtocol(wrapper.user());
+                    int serverProtocol = Via.getManager().getProviders().get(VersionProvider.class).getClosestServerProtocol(wrapper.user());
                     info.setServerProtocolVersion(serverProtocol);
                     List<ProtocolPathEntry> protocols = null;
 

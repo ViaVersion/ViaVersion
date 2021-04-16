@@ -25,11 +25,11 @@ package us.myles.ViaVersion.packets;
 public enum Direction {
 
     /**
-     * Outgoing server packets sent to the client.
+     * Clientbound packets sent by the server.
      */
     OUTGOING,
     /**
-     * Incoming server packets send by the client to the server.
+     * Serverbound packets sent by the client.
      */
     INCOMING
 }

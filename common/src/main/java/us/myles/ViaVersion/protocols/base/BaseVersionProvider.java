@@ -22,7 +22,8 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 public class BaseVersionProvider implements VersionProvider {
 
-    public int getServerProtocol(UserConnection connection) throws Exception {
+    @Override
+    public int getClosestServerProtocol(UserConnection connection) throws Exception {
         return Via.getAPI().getServerVersion().lowestSupportedVersion();
     }
 }

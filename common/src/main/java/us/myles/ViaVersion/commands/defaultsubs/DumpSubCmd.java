@@ -18,6 +18,7 @@
 package us.myles.ViaVersion.commands.defaultsubs;
 
 import com.google.common.io.CharStreams;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -85,7 +86,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     con.setDoOutput(true);
 
                     OutputStream out = con.getOutputStream();
-                    out.write(GsonUtil.getGsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(StandardCharsets.UTF_8));
+                    out.write(new GsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(StandardCharsets.UTF_8));
                     out.close();
 
                     if (con.getResponseCode() == 429) {

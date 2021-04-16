@@ -21,10 +21,10 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
-import us.myles.ViaVersion.util.GsonUtil;
 
 public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override
@@ -35,7 +35,7 @@ public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandl
         }
         Tag out = tag.get("LastOutput");
         if (out instanceof StringTag) {
-            JsonElement value = GsonUtil.getJsonParser().parse(((StringTag) out).getValue());
+            JsonElement value = JsonParser.parseString(((StringTag) out).getValue());
             ChatRewriter.processTranslate(value);
             ((StringTag) out).setValue(value.toString());
         }

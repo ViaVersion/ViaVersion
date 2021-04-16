@@ -29,9 +29,18 @@ public interface VersionProvider extends Provider {
 
     /**
      * Returns the closest server protocol version to the user's protocol version.
+     * On non-proxy servers, this returns the actual server version.
      *
      * @param connection connection
      * @return closest server protocol version to the user's protocol version
      */
-    int getServerProtocol(UserConnection connection) throws Exception;
+    int getClosestServerProtocol(UserConnection connection) throws Exception;
+
+    /**
+     * @deprecated misleading name, use {@link #getClosestServerProtocol(UserConnection)}
+     */
+    @Deprecated
+    default int getServerProtocol(UserConnection connection) throws Exception {
+        return getClosestServerProtocol(connection);
+    }
 }

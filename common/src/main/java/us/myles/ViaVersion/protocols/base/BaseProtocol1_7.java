@@ -93,7 +93,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                                 return;
                             }
 
-                            int closestServerProtocol = versionProvider.getServerProtocol(wrapper.user());
+                            int closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
                             List<ProtocolPathEntry> protocols = null;
                             if (info.getProtocolVersion() >= closestServerProtocol || Via.getPlatform().isOldClientsAllowed()) {
                                 protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), closestServerProtocol);

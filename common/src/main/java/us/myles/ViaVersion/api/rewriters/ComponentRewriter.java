@@ -19,6 +19,7 @@ package us.myles.ViaVersion.api.rewriters;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import us.myles.ViaVersion.api.Via;
@@ -118,7 +119,7 @@ public class ComponentRewriter {
 
     public JsonElement processText(String value) {
         try {
-            JsonElement root = GsonUtil.getJsonParser().parse(value);
+            JsonElement root = JsonParser.parseString(value);
             processText(root);
             return root;
         } catch (JsonSyntaxException e) {

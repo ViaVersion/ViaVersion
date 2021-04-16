@@ -43,7 +43,7 @@ public class VelocityVersionProvider extends BaseVersionProvider {
     }
 
     @Override
-    public int getServerProtocol(UserConnection user) throws Exception {
+    public int getClosestServerProtocol(UserConnection user) throws Exception {
         return user.isClientSide() ? getBackProtocol(user) : getFrontProtocol(user);
     }
 

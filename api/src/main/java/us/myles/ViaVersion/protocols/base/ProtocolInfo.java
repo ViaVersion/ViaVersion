@@ -22,6 +22,7 @@
  */
 package us.myles.ViaVersion.protocols.base;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
@@ -42,6 +43,11 @@ public class ProtocolInfo extends StoredObject {
         super(user);
     }
 
+    /**
+     * Returns the protocol state the user is currently in.
+     *
+     * @return protocol state
+     */
     public State getState() {
         return state;
     }
@@ -50,6 +56,12 @@ public class ProtocolInfo extends StoredObject {
         this.state = state;
     }
 
+    /**
+     * Returns the user's protocol version, or -1 if not set.
+     * This is set during the {@link State#HANDSHAKE} state.
+     *
+     * @return protocol version, or -1 if not set
+     */
     public int getProtocolVersion() {
         return protocolVersion;
     }
@@ -60,6 +72,12 @@ public class ProtocolInfo extends StoredObject {
         this.protocolVersion = protocol.getVersion();
     }
 
+    /**
+     * Returns the server protocol version the user is connected to, or -1 if not set.
+     * This is set during the {@link State#HANDSHAKE} state.
+     *
+     * @return server protocol version, or -1 if not set
+     */
     public int getServerProtocolVersion() {
         return serverProtocolVersion;
     }
@@ -69,7 +87,13 @@ public class ProtocolInfo extends StoredObject {
         this.serverProtocolVersion = protocol.getVersion();
     }
 
-    public String getUsername() {
+    /**
+     * Returns the username associated with this connection.
+     * This is set once the connection enters the {@link State#PLAY} state.
+     *
+     * @return username, set when entering the {@link State#PLAY} state
+     */
+    public @MonotonicNonNull String getUsername() {
         return username;
     }
 
@@ -77,6 +101,12 @@ public class ProtocolInfo extends StoredObject {
         this.username = username;
     }
 
+    /**
+     * Returns the uuid associated with this connection.
+     * This is set once the connection enters the {@link State#PLAY} state.
+     *
+     * @return uuid, set when entering the {@link State#PLAY} state
+     */
     public UUID getUuid() {
         return uuid;
     }
@@ -85,6 +115,11 @@ public class ProtocolInfo extends StoredObject {
         this.uuid = uuid;
     }
 
+    /**
+     * Returns the user's pipeline.
+     *
+     * @return protocol pipeline
+     */
     public ProtocolPipeline getPipeline() {
         return pipeline;
     }
