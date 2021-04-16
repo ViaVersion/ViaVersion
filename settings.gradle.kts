@@ -4,8 +4,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("VERSION_CATALOGS")
 
 include("adventure")
-include("java-compat", "java-compat:java-compat-common", "java-compat:java-compat-8",
-    "java-compat:java-compat-9", "java-compat:java-compat-16")
+include("java-compat", "java-compat:java-compat-common", "java-compat:java-compat-unsafe")
 
 setupViaSubproject("api")
 setupViaSubproject("common")
