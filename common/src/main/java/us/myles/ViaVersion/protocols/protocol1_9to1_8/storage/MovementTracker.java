@@ -22,7 +22,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 public class MovementTracker extends StoredObject {
     private static final long IDLE_PACKET_DELAY = 50L; // Update every 50ms (20tps)
-    private static final long IDLE_PACKET_LIMIT = 20; // Max 20 ticks behind
     private long nextIdlePacket = 0L;
     private boolean ground = true;
 
@@ -32,8 +31,7 @@ public class MovementTracker extends StoredObject {
 
     public void incrementIdlePacket() {
         // Notify of next update
-        // Allow a maximum lag spike of 1 second (20 ticks/updates)
-        this.nextIdlePacket = Math.max(nextIdlePacket + IDLE_PACKET_DELAY, System.currentTimeMillis() - IDLE_PACKET_DELAY * IDLE_PACKET_LIMIT);
+        this.nextIdlePacket = Long.max(nextIdlePacket + IDLE_PACKET_DELAY, System.currentTimeMillis() + IDLE_PACKET_DELAY);
     }
 
     public long getNextIdlePacket() {
