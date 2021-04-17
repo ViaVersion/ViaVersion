@@ -31,7 +31,7 @@ public class MovementTracker extends StoredObject {
 
     public void incrementIdlePacket() {
         // Notify of next update
-        this.nextIdlePacket = Long.max(nextIdlePacket + IDLE_PACKET_DELAY, System.currentTimeMillis() + IDLE_PACKET_DELAY);
+        this.nextIdlePacket = Long.max(nextIdlePacket + IDLE_PACKET_DELAY, System.currentTimeMillis());
     }
 
     public long getNextIdlePacket() {
