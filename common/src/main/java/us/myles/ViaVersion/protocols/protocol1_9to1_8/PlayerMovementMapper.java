@@ -27,9 +27,6 @@ public class PlayerMovementMapper implements PacketHandler {
     public void handle(PacketWrapper wrapper) throws Exception {
         MovementTracker tracker = wrapper.user().get(MovementTracker.class);
         tracker.incrementIdlePacket();
-        // If packet has the ground data
-        if (wrapper.is(Type.BOOLEAN, 0)) {
-            tracker.setGround(wrapper.get(Type.BOOLEAN, 0));
-        }
+        tracker.setGround(wrapper.get(Type.BOOLEAN, 0));
     }
 }
