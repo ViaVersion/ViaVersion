@@ -51,25 +51,16 @@ import java.util.function.Function;
 public class UserConnection {
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
-    private final Channel channel;
-    private final boolean clientSide;
-    Map<Class<?>, StoredObject> storedObjects = new ConcurrentHashMap<>();
-    private ProtocolInfo protocolInfo;
+    private final Map<Class<?>, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    private final PacketTracker packetTracker = new PacketTracker(this);
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .<UUID, Boolean>build().asMap());
+    private final Channel channel;
+    private final boolean clientSide;
+    private ProtocolInfo protocolInfo;
     private boolean active = true;
     private boolean pendingDisconnect;
-    private Object lastPacket;
-    private long sentPackets;
-    private long receivedPackets;
-    // Used for tracking pps
-    private long startTime;
-    private long intervalPackets;
-    private long packetsPerSecond = -1L;
-    // Used for handling warnings (over time)
-    private int secondsObserved;
-    private int warnings;
 
     /**
      * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
@@ -188,70 +179,12 @@ public class UserConnection {
     }
 
     /**
-     * Used for incrementing the number of packets sent to the client.
-     */
-    public void incrementSent() {
-        this.sentPackets++;
-    }
-
-    /**
-     * Used for incrementing the number of packets received from the client.
+     * Returns the user's packet tracker used for the inbuilt packet-limiter.
      *
-     * @return true if the interval has reset and can now be checked for the packets sent
+     * @return packet tracker
      */
-    public boolean incrementReceived() {
-        // handle stats
-        long diff = System.currentTimeMillis() - startTime;
-        if (diff >= 1000) {
-            packetsPerSecond = intervalPackets;
-            startTime = System.currentTimeMillis();
-            intervalPackets = 1;
-            return true;
-        } else {
-            intervalPackets++;
-        }
-        // increase total
-        this.receivedPackets++;
-        return false;
-    }
-
-    /**
-     * Checks for packet flood with the packets sent in the last second.
-     * ALWAYS check for {@link #incrementReceived()} before using this method.
-     *
-     * @return true if the packet should be cancelled
-     * @see #incrementReceived()
-     */
-    public boolean exceedsMaxPPS() {
-        if (clientSide) return false; // Don't apply PPS limiting for client-side
-        ViaVersionConfig conf = Via.getConfig();
-        // Max PPS Checker
-        if (conf.getMaxPPS() > 0) {
-            if (packetsPerSecond >= conf.getMaxPPS()) {
-                disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
-                return true; // don't send current packet
-            }
-        }
-
-        // Tracking PPS Checker
-        if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
-            if (secondsObserved > conf.getTrackingPeriod()) {
-                // Reset
-                warnings = 0;
-                secondsObserved = 1;
-            } else {
-                secondsObserved++;
-                if (packetsPerSecond >= conf.getWarningPPS()) {
-                    warnings++;
-                }
-
-                if (warnings >= conf.getMaxWarnings()) {
-                    disconnect(conf.getMaxWarningsKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
-                    return true; // don't send current packet
-                }
-            }
-        }
-        return false;
+    public PacketTracker getPacketTracker() {
+        return packetTracker;
     }
 
     /**
@@ -351,22 +284,22 @@ public class UserConnection {
      */
     public boolean checkIncomingPacket() {
         if (clientSide) {
-            return checkClientBound();
+            return checkClientbound();
         } else {
-            return checkServerBound();
+            return checkServerbound();
         }
     }
 
-    private boolean checkClientBound() {
-        incrementSent();
+    private boolean checkClientbound() {
+        packetTracker.incrementSent();
         return true;
     }
 
-    private boolean checkServerBound() {
+    private boolean checkServerbound() {
         // Ignore if pending disconnect
         if (pendingDisconnect) return false;
         // Increment received + Check PPS
-        return !incrementReceived() || !exceedsMaxPPS();
+        return !packetTracker.incrementReceived() || !packetTracker.exceedsMaxPPS();
     }
 
     /**
@@ -376,9 +309,9 @@ public class UserConnection {
      */
     public boolean checkOutgoingPacket() {
         if (clientSide) {
-            return checkServerBound();
+            return checkServerbound();
         } else {
-            return checkClientBound();
+            return checkClientbound();
         }
     }
 
@@ -448,14 +381,29 @@ public class UserConnection {
         }
     }
 
+    /**
+     * Returns the internal id incremented for each new connection.
+     *
+     * @return internal id
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * Returns the netty channel if present.
+     *
+     * @return netty channel if present
+     */
     public @Nullable Channel getChannel() {
         return channel;
     }
 
+    /**
+     * Returns info containing the current protocol state and userdata.
+     *
+     * @return info containing the current protocol state and userdata
+     */
     public @Nullable ProtocolInfo getProtocolInfo() {
         return protocolInfo;
     }
@@ -469,10 +417,23 @@ public class UserConnection {
         }
     }
 
+    /**
+     * Returns a map of stored objects.
+     *
+     * @return map of stored objects
+     * @see #has(Class)
+     * @see #get(Class)
+     * @see #put(StoredObject)
+     */
     public Map<Class<?>, StoredObject> getStoredObjects() {
         return storedObjects;
     }
 
+    /**
+     * Returns whether the connection has protocols other than the base protocol applied.
+     *
+     * @return whether the connection is active
+     */
     public boolean isActive() {
         return active;
     }
@@ -481,6 +442,11 @@ public class UserConnection {
         this.active = active;
     }
 
+    /**
+     * Returns whether the connection is pending a disconnect, initiated through {@link #disconnect(String)}.
+     *
+     * @return whether the connection is pending a disconnect
+     */
     public boolean isPendingDisconnect() {
         return pendingDisconnect;
     }
@@ -489,68 +455,34 @@ public class UserConnection {
         this.pendingDisconnect = pendingDisconnect;
     }
 
-    public @Nullable Object getLastPacket() {
-        return lastPacket;
+    /**
+     * Returns whether this is a client-side connection (a mod integrated into the client itself).
+     *
+     * @return whether this is a client-side connection
+     */
+    public boolean isClientSide() {
+        return clientSide;
     }
 
-    public void setLastPacket(@Nullable Object lastPacket) {
-        this.lastPacket = lastPacket;
+    /**
+     * Returns whether {@link ViaVersionConfig#getBlockedProtocols()} should be checked for this connection.
+     *
+     * @return whether blocked protocols should be applied
+     */
+    public boolean shouldApplyBlockProtocol() {
+        return !clientSide; // Don't apply protocol blocking on client-side
     }
 
-    public long getSentPackets() {
-        return sentPackets;
-    }
-
-    public void setSentPackets(long sentPackets) {
-        this.sentPackets = sentPackets;
-    }
-
-    public long getReceivedPackets() {
-        return receivedPackets;
-    }
-
-    public void setReceivedPackets(long receivedPackets) {
-        this.receivedPackets = receivedPackets;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getIntervalPackets() {
-        return intervalPackets;
-    }
-
-    public void setIntervalPackets(long intervalPackets) {
-        this.intervalPackets = intervalPackets;
-    }
-
-    public long getPacketsPerSecond() {
-        return packetsPerSecond;
-    }
-
-    public void setPacketsPerSecond(long packetsPerSecond) {
-        this.packetsPerSecond = packetsPerSecond;
-    }
-
-    public int getSecondsObserved() {
-        return secondsObserved;
-    }
-
-    public void setSecondsObserved(int secondsObserved) {
-        this.secondsObserved = secondsObserved;
-    }
-
-    public int getWarnings() {
-        return warnings;
-    }
-
-    public void setWarnings(int warnings) {
-        this.warnings = warnings;
+    /**
+     * Returns a newly generated uuid that will let a packet be passed through without
+     * transformig its contents if used together with {@link PacketWrapper#PASSTHROUGH_ID}.
+     *
+     * @return generated passthrough token
+     */
+    public UUID generatePassthroughToken() {
+        UUID token = UUID.randomUUID();
+        passthroughTokens.add(token);
+        return token;
     }
 
     @Override
@@ -564,19 +496,5 @@ public class UserConnection {
     @Override
     public int hashCode() {
         return Long.hashCode(id);
-    }
-
-    public boolean isClientSide() {
-        return clientSide;
-    }
-
-    public boolean shouldApplyBlockProtocol() {
-        return !clientSide; // Don't apply protocol blocking on client-side
-    }
-
-    public UUID generatePassthroughToken() {
-        UUID token = UUID.randomUUID();
-        passthroughTokens.add(token);
-        return token;
     }
 }

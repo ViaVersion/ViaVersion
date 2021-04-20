@@ -45,6 +45,7 @@ import us.myles.ViaVersion.sponge.platform.SpongeViaConfig;
 import us.myles.ViaVersion.sponge.platform.SpongeViaInjector;
 import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
+import us.myles.ViaVersion.util.ChatColorUtil;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.VersionInfo;
 import us.myles.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -70,7 +71,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @DefaultConfig(sharedRoot = false)
     private File spongeConfig;
 
-    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character('§').extractUrls().build();
+    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character(ChatColorUtil.COLOR_CHAR).extractUrls().build();
     private final SpongeViaAPI api = new SpongeViaAPI();
     private SpongeViaConfig conf;
     private Logger logger;
@@ -192,7 +193,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         return game.getServer().getPlayer(uuid).map(player -> {
-            player.kick(TextSerializers.formattingCode('§').deserialize(message));
+            player.kick(TextSerializers.formattingCode(ChatColorUtil.COLOR_CHAR).deserialize(message));
             return true;
         }).orElse(false);
     }

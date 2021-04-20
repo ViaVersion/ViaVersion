@@ -64,8 +64,6 @@ Please note the [differences in licensing](#license).
 
 Building:
 --------
-You need JDK 9 or higher to build ViaVersion. The plugin works on Java 8, but needs to be compiled with a higher version for compatibility reasons.
-
 After cloning this repository, build the project with Gradle by running `/gradlew build` and take the created jar out of
 the `build/libs` directory.
 

@@ -30,7 +30,6 @@ import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
 import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.UnsupportedSoftware;
 
 import java.io.File;
@@ -159,7 +158,7 @@ public interface ViaPlatform<T> {
      */
     default boolean disconnect(UserConnection connection, String message) {
         if (connection.isClientSide()) return false;
-        UUID uuid = connection.get(ProtocolInfo.class).getUuid();
+        UUID uuid = connection.getProtocolInfo().getUuid();
         if (uuid == null) return false;
         return kickPlayer(uuid, message);
     }

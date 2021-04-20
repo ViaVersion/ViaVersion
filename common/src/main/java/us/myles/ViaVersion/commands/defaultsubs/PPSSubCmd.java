@@ -55,13 +55,13 @@ public class PPSSubCmd extends ViaSubCommand {
         for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
             int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
             if (!playerVersions.containsKey(playerVersion))
-                playerVersions.put(playerVersion, new HashSet<String>());
+                playerVersions.put(playerVersion, new HashSet<>());
             UserConnection uc = Via.getManager().getConnectionManager().getConnectedClient(p.getUUID());
-            if (uc != null && uc.getPacketsPerSecond() > -1) {
-                playerVersions.get(playerVersion).add(p.getName() + " (" + uc.getPacketsPerSecond() + " PPS)");
-                totalPackets += uc.getPacketsPerSecond();
-                if (uc.getPacketsPerSecond() > max) {
-                    max = uc.getPacketsPerSecond();
+            if (uc != null && uc.getPacketTracker().getPacketsPerSecond() > -1) {
+                playerVersions.get(playerVersion).add(p.getName() + " (" + uc.getPacketTracker().getPacketsPerSecond() + " PPS)");
+                totalPackets += uc.getPacketTracker().getPacketsPerSecond();
+                if (uc.getPacketTracker().getPacketsPerSecond() > max) {
+                    max = uc.getPacketTracker().getPacketsPerSecond();
                 }
                 clients++;
             }

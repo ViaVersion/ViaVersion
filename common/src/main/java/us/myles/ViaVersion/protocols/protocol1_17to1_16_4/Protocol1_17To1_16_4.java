@@ -17,7 +17,6 @@
  */
 package us.myles.ViaVersion.protocols.protocol1_17to1_16_4;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.MappingData;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -230,7 +229,7 @@ public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, Cli
     }
 
     @Override
-    public @Nullable MappingData getMappingData() {
+    public MappingData getMappingData() {
         return MAPPINGS;
     }
 }

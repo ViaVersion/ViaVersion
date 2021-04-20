@@ -34,7 +34,7 @@ import java.util.UUID;
 
 public class UpdateUtil {
 
-    public static final String PREFIX = "§a§l[ViaVersion] §a";
+    private static final String PREFIX = "§a§l[ViaVersion] §a";
     private static final String URL = "https://api.spiget.org/v2/resources/";
     private static final int PLUGIN = 19254;
     private static final String LATEST_VERSION = "/versions/latest";
@@ -76,10 +76,11 @@ public class UpdateUtil {
             return "You are using a custom version, consider updating.";
         }
         Version newest = new Version(newestString);
-        if (current.compareTo(newest) < 0)
-            return "There is a newer plugin version available: " + newest.toString() + ", you're on: " + current.toString();
-        else if (console && current.compareTo(newest) != 0) {
-            if (current.getTag().toLowerCase(Locale.ROOT).startsWith("dev") || current.getTag().toLowerCase(Locale.ROOT).startsWith("snapshot")) {
+        if (current.compareTo(newest) < 0) {
+            return "There is a newer plugin version available: " + newest + ", you're on: " + current;
+        } else if (console && current.compareTo(newest) != 0) {
+            String tag = current.getTag().toLowerCase(Locale.ROOT);
+            if (tag.startsWith("dev") || tag.startsWith("snapshot")) {
                 return "You are running a development version of the plugin, please report any bugs to GitHub.";
             } else {
                 return "You are running a newer version of the plugin than is released!";

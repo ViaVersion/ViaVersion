@@ -37,7 +37,7 @@ public class BukkitPacketHandler extends MessageToMessageEncoder {
         // This will prevent issues with several plugins and other protocol handlers due to the chunks being sent twice.
         // It also sends the chunks in the right order possible resolving some issues with added chunks/block/entity data.
         if (!(o instanceof ByteBuf)) {
-            info.setLastPacket(o);
+            info.getPacketTracker().setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
             if (info.isActive()) {
                 if (info.getProtocolInfo().getPipeline().filter(o, list)) {

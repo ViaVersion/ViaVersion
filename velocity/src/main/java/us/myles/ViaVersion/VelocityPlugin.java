@@ -36,6 +36,7 @@ import us.myles.ViaVersion.api.data.MappingDataLoader;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 import us.myles.ViaVersion.dump.PluginInfo;
+import us.myles.ViaVersion.util.ChatColorUtil;
 import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.ViaVersion.util.VersionInfo;
 import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
@@ -64,7 +65,7 @@ import java.util.concurrent.TimeUnit;
         url = "https://viaversion.com"
 )
 public class VelocityPlugin implements ViaPlatform<Player> {
-    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character('§').extractUrls().build();
+    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character(ChatColorUtil.COLOR_CHAR).extractUrls().build();
     public static ProxyServer PROXY;
 
     @Inject
