@@ -57,6 +57,7 @@ public interface ProtocolManager {
      * Returns the base protocol for a specific server protocol version.
      * The standard base protocols deal with status and login packets for userconnection initialization.
      *
+     * @param serverVersion server protocol version
      * @return base protocol for the given server protocol version
      */
     Protocol getBaseProtocol(int serverVersion);
