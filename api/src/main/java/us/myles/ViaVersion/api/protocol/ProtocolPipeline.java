@@ -22,6 +22,7 @@
  */
 package us.myles.ViaVersion.api.protocol;
 
+import com.google.common.base.Preconditions;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -36,6 +37,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 public class ProtocolPipeline extends SimpleProtocol {
+    /**
+     * Protocol list ordered from client to server transforation with the base protocols at the end.
+     */
     private List<Protocol> protocolList;
     private UserConnection userConnection;
 
@@ -66,26 +70,55 @@ public class ProtocolPipeline extends SimpleProtocol {
     }
 
     /**
-     * Add a protocol to the current pipeline
+     * Adds a protocol to the current pipeline.
      * This will call the {@link Protocol#init(UserConnection)} method.
      *
-     * @param protocol The protocol to add to the end
+     * @param protocol protocol to add to the end
      */
     public void add(Protocol protocol) {
-        if (protocolList != null) {
-            protocolList.add(protocol);
+        Preconditions.checkNotNull(protocolList, "Tried to add protocol too early");
+
+        protocolList.add(protocol);
+        protocol.init(userConnection);
+
+        if (!protocol.isBaseProtocol()) {
+            moveBaseProtocolsToTail();
+        }
+    }
+
+    /**
+     * Adds a list of protocols to the current pipeline.
+     * This will call the {@link Protocol#init(UserConnection)} method.
+     *
+     * @param protocols protocols to add to the end
+     */
+    public void add(List<Protocol> protocols) {
+        Preconditions.checkNotNull(protocolList, "Tried to add protocol too early");
+
+        protocolList.addAll(protocols);
+        for (Protocol protocol : protocols) {
             protocol.init(userConnection);
-            // Move base Protocols to the end, so the login packets can be modified by other protocols
-            List<Protocol> toMove = new ArrayList<>();
-            for (Protocol p : protocolList) {
-                if (Via.getManager().getProtocolManager().isBaseProtocol(p)) {
-                    toMove.add(p);
+        }
+
+        moveBaseProtocolsToTail();
+    }
+
+    private void moveBaseProtocolsToTail() {
+        // Move base Protocols to the end, so the login packets can be modified by other protocols
+        List<Protocol> baseProtocols = null;
+        for (Protocol protocol : protocolList) {
+            if (protocol.isBaseProtocol()) {
+                if (baseProtocols == null) {
+                    baseProtocols = new ArrayList<>();
                 }
+
+                baseProtocols.add(protocol);
             }
-            protocolList.removeAll(toMove);
-            protocolList.addAll(toMove);
-        } else {
-            throw new NullPointerException("Tried to add protocol too early");
+        }
+
+        if (baseProtocols != null) {
+            protocolList.removeAll(baseProtocols);
+            protocolList.addAll(baseProtocols);
         }
     }
 

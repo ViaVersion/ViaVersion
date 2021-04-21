@@ -47,6 +47,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -175,17 +176,19 @@ public class BungeeServerHandler implements Listener {
                     int previousServerProtocol = info.getServerProtocolVersion();
 
                     // Refresh the pipes
-                    List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
+                    List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
                     ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
                     user.clearStoredObjects();
                     pipeline.cleanPipes();
-                    if (protocols == null) {
+                    if (protocolPath == null) {
                         // TODO Check Bungee Supported Protocols? *shrugs*
                         protocolId = info.getProtocolVersion();
                     } else {
-                        for (ProtocolPathEntry prot : protocols) {
-                            pipeline.add(prot.getProtocol());
+                        List<Protocol> protocols = new ArrayList<>(protocolPath.size());
+                        for (ProtocolPathEntry entry : protocolPath) {
+                            protocols.add(entry.getProtocol());
                         }
+                        pipeline.add(protocols);
                     }
 
                     info.setServerProtocolVersion(protocolId);
@@ -230,7 +233,7 @@ public class BungeeServerHandler implements Listener {
                     user.put(info);
                     user.put(storage);
 
-                    user.setActive(protocols != null);
+                    user.setActive(protocolPath != null);
 
                     // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
                     for (Protocol protocol : pipeline.pipes()) {

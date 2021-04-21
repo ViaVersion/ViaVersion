@@ -496,6 +496,15 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         return null; // Let the protocols hold the mappings to still have easy, static singleton access there
     }
 
+    /**
+     * Returns whether this protocol is a base protocol.
+     *
+     * @return whether this represents a base protocol
+     */
+    public boolean isBaseProtocol() {
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Protocol:" + getClass().getSimpleName();

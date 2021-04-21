@@ -456,7 +456,8 @@ public class UserConnection {
     }
 
     /**
-     * Returns whether this is a client-side connection (a mod integrated into the client itself).
+     * Returns whether this is a client-side connection.
+     * This is a mod integrated into the client itself, or for example a backend Velocity connection.
      *
      * @return whether this is a client-side connection
      */

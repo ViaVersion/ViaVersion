@@ -199,6 +199,11 @@ public class BaseProtocol1_7 extends SimpleProtocol {
         registerIncoming(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
     }
 
+    @Override
+    public boolean isBaseProtocol() {
+        return true;
+    }
+
     public static String addDashes(String trimmedUUID) {
         StringBuilder idBuff = new StringBuilder(trimmedUUID);
         idBuff.insert(20, '-');

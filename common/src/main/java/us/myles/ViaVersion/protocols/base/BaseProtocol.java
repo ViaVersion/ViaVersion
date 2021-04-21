@@ -21,6 +21,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.providers.ViaProviders;
+import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.protocol.ProtocolVersion;
@@ -30,6 +31,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseProtocol extends SimpleProtocol {
@@ -59,20 +61,25 @@ public class BaseProtocol extends SimpleProtocol {
                     // Choose the pipe
                     int serverProtocol = Via.getManager().getProviders().get(VersionProvider.class).getClosestServerProtocol(wrapper.user());
                     info.setServerProtocolVersion(serverProtocol);
-                    List<ProtocolPathEntry> protocols = null;
+                    List<ProtocolPathEntry> protocolPath = null;
 
-                    // Only allow newer clients or (1.9.2 on 1.9.4 server if the server supports it)
+                    // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
                     if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
-                        protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocol);
+                        protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocol);
                     }
 
                     ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
-                    if (protocols != null) {
-                        for (ProtocolPathEntry prot : protocols) {
-                            pipeline.add(prot.getProtocol());
+                    if (protocolPath != null) {
+                        List<Protocol> protocols = new ArrayList<>(protocolPath.size());
+                        for (ProtocolPathEntry entry : protocolPath) {
+                            protocols.add(entry.getProtocol());
+
                             // Ensure mapping data has already been loaded
-                            Via.getManager().getProtocolManager().completeMappingDataLoading(prot.getProtocol().getClass());
+                            Via.getManager().getProtocolManager().completeMappingDataLoading(entry.getProtocol().getClass());
                         }
+
+                        // Add protocols to pipeline
+                        pipeline.add(protocols);
 
                         // Set the original snapshot version if present
                         ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocol);
@@ -92,6 +99,11 @@ public class BaseProtocol extends SimpleProtocol {
                 });
             }
         });
+    }
+
+    @Override
+    public boolean isBaseProtocol() {
+        return true;
     }
 
     @Override

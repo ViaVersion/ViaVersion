@@ -80,7 +80,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 public class ProtocolManagerImpl implements ProtocolManager {
-    public static final Protocol BASE_PROTOCOL = new BaseProtocol();
+    private static final Protocol BASE_PROTOCOL = new BaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
@@ -187,6 +187,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
+        Preconditions.checkArgument(baseProtocol.isBaseProtocol(), "Protocol is not a base protocol");
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
         if (Via.getPlatform().isPluginEnabled()) {
             baseProtocol.register(Via.getManager().getProviders());
@@ -297,12 +298,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public boolean isBaseProtocol(Protocol protocol) {
-        for (Pair<Range<Integer>, Protocol> p : baseProtocols) {
-            if (p.getValue() == protocol) {
-                return true;
-            }
-        }
-        return false;
+        return protocol.isBaseProtocol();
     }
 
     @Override

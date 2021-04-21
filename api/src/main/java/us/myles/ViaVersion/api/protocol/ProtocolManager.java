@@ -46,10 +46,28 @@ public interface ProtocolManager {
      */
     @Nullable Protocol getProtocol(Class<? extends Protocol> protocolClass);
 
+    /**
+     * Returns the base protocol handling incoming handshake packets.
+     *
+     * @return base protocol
+     */
     Protocol getBaseProtocol();
 
+    /**
+     * Returns the base protocol for a specific server protocol version.
+     * The standard base protocols deal with status and login packets for userconnection initialization.
+     *
+     * @return base protocol for the given server protocol version
+     */
     Protocol getBaseProtocol(int serverVersion);
 
+    /**
+     * Returns whether the given protocol is a base protocol.
+     *
+     * @param protocol protocol
+     * @return whether the protocol is a base protocol
+     * @see Protocol#isBaseProtocol()
+     */
     boolean isBaseProtocol(Protocol protocol);
 
     /**
@@ -76,6 +94,7 @@ public interface ProtocolManager {
      *
      * @param baseProtocol       base protocol to register
      * @param supportedProtocols versions supported by the base protocol
+     * @throws IllegalArgumentException if the protocol is not a base protocol as given by {@link Protocol#isBaseProtocol()}
      */
     void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols);
 
