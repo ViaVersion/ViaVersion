@@ -202,7 +202,6 @@ public class ClassGenerator {
             connectListenerClazz.setSuperclass(toExtend);
             // Import packages
             pool.importPackage("java.util.Arrays");
-            pool.importPackage("us.myles.ViaVersion.api.protocol.ProtocolRegistry");
             pool.importPackage("protocolsupport.api.ProtocolVersion");
             pool.importPackage("protocolsupport.api.ProtocolType");
             pool.importPackage("protocolsupport.api.Connection");
@@ -232,7 +231,7 @@ public class ClassGenerator {
                   ))
                     // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
                     // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.
-                  + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == us.myles.ViaVersion.api.protocol.ProtocolRegistry.SERVER_PROTOCOL) {\n"
+                  + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == us.myles.ViaVersion.api.Via.getAPI().getServerVersion().lowestSupportedVersion()) {\n"
                   + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
                   + "        }\n"
                   + "    }\n"

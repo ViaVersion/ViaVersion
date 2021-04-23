@@ -308,7 +308,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public void setServerProtocol(ServerProtocolVersion serverProtocolVersion) {
         this.serverProtocolVersion = serverProtocolVersion;
-        ProtocolRegistry.SERVER_PROTOCOL = serverProtocolVersion.lowestSupportedVersion();
     }
 
     @Override
