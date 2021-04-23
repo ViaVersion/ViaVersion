@@ -22,6 +22,10 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
+        if (!ctx.channel().isActive()) {
+            return;
+        }
+
         if (!info.checkOutgoingPacket()) throw CancelEncoderException.generate(null);
         if (!info.shouldTransformPacket()) {
             out.add(bytebuf.retain());
