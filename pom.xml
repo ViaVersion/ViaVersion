@@ -111,7 +111,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.0.20.Final</version>
+            <version>5.0.0.Alpha2</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>17.0</version>
+            <version>30.1.1-jre</version>
             <scope>provided</scope>
         </dependency>
 
@@ -152,7 +152,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.18</version>
+            <version>1.27</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
