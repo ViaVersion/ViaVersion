@@ -21,7 +21,7 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         if (!ctx.channel().isActive()) {
-            throw new CancelDecoderException("Connection inactive");
+            throw CancelDecoderException.generate(null);
         }
 
         if (!info.checkIncomingPacket()) throw CancelDecoderException.generate(null);
