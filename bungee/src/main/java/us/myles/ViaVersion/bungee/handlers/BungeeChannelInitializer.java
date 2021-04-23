@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
+import us.myles.ViaVersion.exception.CancelException;
 
 import java.lang.reflect.Method;
 
@@ -24,7 +25,7 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel socketChannel) throws Exception {
         if (!socketChannel.isActive()) {
-            return;
+            throw new CancelException("Connection inactive");
         }
 
         UserConnection info = new UserConnection(socketChannel);

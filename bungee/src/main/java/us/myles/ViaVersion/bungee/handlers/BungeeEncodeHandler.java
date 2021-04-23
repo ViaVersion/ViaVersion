@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.bungee.util.BungeePipelineUtil;
 import us.myles.ViaVersion.exception.CancelEncoderException;
 import us.myles.ViaVersion.exception.CancelCodecException;
+import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     @Override
     protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         if (!ctx.channel().isActive()) {
-            return;
+            throw new CancelException("Connection inactive");
         }
 
         if (!info.checkOutgoingPacket()) throw CancelEncoderException.generate(null);

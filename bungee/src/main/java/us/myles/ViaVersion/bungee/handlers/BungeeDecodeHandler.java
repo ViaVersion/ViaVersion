@@ -7,6 +7,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.exception.CancelDecoderException;
 import us.myles.ViaVersion.exception.CancelCodecException;
+import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
     @Override
     protected void decode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
         if (!ctx.channel().isActive()) {
-            return;
+            throw new CancelException("Connection inactive");
         }
 
         if (!info.checkIncomingPacket()) throw CancelDecoderException.generate(null);
