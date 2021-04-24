@@ -40,6 +40,10 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel socketChannel) throws Exception {
+        if (!socketChannel.isActive()) {
+            return;
+        }
+
         UserConnection info = new UserConnection(socketChannel);
         // init protocol
         new ProtocolPipeline(info);
