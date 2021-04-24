@@ -45,22 +45,16 @@ import java.util.Set;
 import static us.myles.ViaVersion.api.command.ViaSubCommand.color;
 
 public abstract class ViaCommandHandler implements ViaVersionCommand {
-    private final Map<String, ViaSubCommand> commandMap;
+    private final Map<String, ViaSubCommand> commandMap = new HashMap<>();
 
-    public ViaCommandHandler() {
-        commandMap = new HashMap<>();
-        try {
-            registerDefaults();
-        } catch (Exception e) {
-            //ignore never throws exception because it doesn't exists
-        }
+    protected ViaCommandHandler() {
+        registerDefaults();
     }
 
     @Override
-    public void registerSubCommand(ViaSubCommand command) throws Exception {
+    public void registerSubCommand(ViaSubCommand command) {
         Preconditions.checkArgument(command.name().matches("^[a-z0-9_-]{3,15}$"), command.name() + " is not a valid sub-command name.");
-        if (hasSubCommand(command.name()))
-            throw new Exception("ViaSubCommand " + command.name() + " does already exists!"); //Maybe another exception later.
+        Preconditions.checkArgument(!hasSubCommand(command.name()), "ViaSubCommand " + command.name() + " does already exists!");
         commandMap.put(command.name().toLowerCase(Locale.ROOT), command);
     }
 
@@ -95,8 +89,9 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
         String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
         boolean result = handler.execute(sender, subArgs);
-        if (!result)
+        if (!result) {
             sender.sendMessage("Usage: /viaversion " + handler.usage());
+        }
         return result;
     }
 
@@ -108,20 +103,24 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         //SubCommands tabcomplete
         if (args.length == 1) {
             if (!args[0].isEmpty()) {
-                for (ViaSubCommand sub : allowed)
-                    if (sub.name().toLowerCase().startsWith(args[0].toLowerCase(Locale.ROOT)))
+                for (ViaSubCommand sub : allowed) {
+                    if (sub.name().toLowerCase().startsWith(args[0].toLowerCase(Locale.ROOT))) {
                         output.add(sub.name());
+                    }
+                }
             } else {
-                for (ViaSubCommand sub : allowed)
+                for (ViaSubCommand sub : allowed) {
                     output.add(sub.name());
+                }
             }
         }
         //Let the SubCommand handle it
         else if (args.length >= 2) {
             if (getSubCommand(args[0]) != null) {
                 ViaSubCommand sub = getSubCommand(args[0]);
-                if (!allowed.contains(sub))
+                if (!allowed.contains(sub)) {
                     return output;
+                }
 
                 String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
 
@@ -147,16 +146,19 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         }
         sender.sendMessage(color("&aViaVersion &c" + Via.getPlatform().getPluginVersion()));
         sender.sendMessage(color("&6Commands:"));
-        for (ViaSubCommand cmd : allowed)
+        for (ViaSubCommand cmd : allowed) {
             sender.sendMessage(color(String.format("&2/viaversion %s &7- &6%s", cmd.usage(), cmd.description())));
+        }
         allowed.clear();
     }
 
     private Set<ViaSubCommand> calculateAllowedCommands(ViaCommandSender sender) {
         Set<ViaSubCommand> cmds = new HashSet<>();
-        for (ViaSubCommand sub : commandMap.values())
-            if (hasPermission(sender, sub.permission()))
+        for (ViaSubCommand sub : commandMap.values()) {
+            if (hasPermission(sender, sub.permission())) {
                 cmds.add(sub);
+            }
+        }
         return cmds;
     }
 
@@ -164,7 +166,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         return permission == null || sender.hasPermission(permission);
     }
 
-    private void registerDefaults() throws Exception {
+    private void registerDefaults() {
         registerSubCommand(new ListSubCmd());
         registerSubCommand(new PPSSubCmd());
         registerSubCommand(new DebugSubCmd());

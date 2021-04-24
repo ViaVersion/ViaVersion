@@ -7,7 +7,7 @@ plugins {
 }
 
 allprojects {
-    group = "us.myles"
+    group = "com.viaversion"
     version = "4.0.0-21w16a"
     description = "Allow newer clients to join older server versions."
 }

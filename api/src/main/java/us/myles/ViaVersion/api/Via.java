@@ -26,44 +26,56 @@ import com.google.common.base.Preconditions;
 import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.platform.ViaPlatform;
 
-public class Via {
+public final class Via {
     private static ViaManager manager;
+
+    /**
+     * Returns the API associated with the current platform.
+     *
+     * @return API instance
+     * @throws IllegalArgumentException if the platform has not loaded yet
+     */
+    public static ViaAPI getAPI() {
+        return manager().getPlatform().getApi();
+    }
+
+    /**
+     * Returns the ViaManager with methods beyond the simple API {@link ViaAPI} provides.
+     *
+     * @return manager to interact with various Via parts
+     * @throws IllegalArgumentException if the platform has not loaded yet
+     */
+    public static ViaManager getManager() {
+        return manager();
+    }
+
+    /**
+     * Returns the config associated with the current platform.
+     *
+     * @return config instance
+     * @throws IllegalArgumentException if the platform has not loaded yet
+     */
+    public static ViaVersionConfig getConfig() {
+        return manager().getPlatform().getConf();
+    }
+
+    public static ViaPlatform getPlatform() {
+        return manager().getPlatform();
+    }
 
     /**
      * Register the ViaManager associated with the platform.
      *
      * @param viaManager The ViaManager
+     * @throws IllegalArgumentException if the manager has already been set
      */
     public static void init(ViaManager viaManager) {
         Preconditions.checkArgument(manager == null, "ViaManager is already set");
         Via.manager = viaManager;
     }
 
-    /**
-     * Returns the API associated with the current platform.
-     *
-     * @return API instance
-     */
-    public static ViaAPI getAPI() {
+    private static ViaManager manager() {
         Preconditions.checkArgument(manager != null, "ViaVersion has not loaded the platform yet");
-        return manager.getPlatform().getApi();
-    }
-
-    /**
-     * Get the config associated with the current platform.
-     *
-     * @return Config instance
-     */
-    public static ViaVersionConfig getConfig() {
-        Preconditions.checkArgument(manager != null, "ViaVersion has not loaded the platform yet");
-        return manager.getPlatform().getConf();
-    }
-
-    public static ViaPlatform getPlatform() {
-        return manager.getPlatform();
-    }
-
-    public static ViaManager getManager() {
         return manager;
     }
 }
