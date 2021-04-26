@@ -7,6 +7,7 @@ include("adventure")
 include("java-compat", "java-compat:java-compat-common", "java-compat:java-compat-unsafe")
 
 setupViaSubproject("api")
+setupViaSubproject("api-legacy")
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
 setupViaSubproject("bukkit-legacy")
