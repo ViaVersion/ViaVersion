@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
-import com.viaversion.viaversion.api.connection.ViaConnectionManager;
+import com.viaversion.viaversion.api.connection.ConnectionManager;
 
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public interface ViaManager {
      *
      * @return userconnection manager
      */
-    ViaConnectionManager getConnectionManager();
+    ConnectionManager getConnectionManager();
 
     /**
      * Returns the manager for Via providers.

@@ -23,20 +23,19 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,17 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-/**
- * Abstract protocol class handling packet transformation between two protocol versions.
- * Clientbound and serverbount packet types can be set to enforce correct usage of them.
- *
- * @param <C1> old clientbound packet types
- * @param <C2> new clientbound packet types
- * @param <S1> old serverbound packet types
- * @param <S2> new serverbound packet types
- * @see SimpleProtocol for a helper class if you do not want to define any of the types above
- */
-public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType> {
+public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType>
+        implements com.viaversion.viaversion.api.protocol.base.Protocol<C1, C2, S1, S2> {
     private final Map<Packet, ProtocolPacket> incoming = new HashMap<>();
     private final Map<Packet, ProtocolPacket> outgoing = new HashMap<>();
     private final Map<Class, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
@@ -137,26 +127,8 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
     }
 
-    /**
-     * Should this protocol filter an object packet from this class.
-     * Default: false
-     *
-     * @param packetClass The class of the current input
-     * @return True if it should handle the filtering
-     */
-    public boolean isFiltered(Class packetClass) {
-        return false;
-    }
-
-    /**
-     * Filter a packet into the output
-     *
-     * @param info   The current user connection
-     * @param packet The input packet as an object (NMS)
-     * @param output The list to put the object into.
-     * @throws Exception Throws exception if cancelled / error.
-     */
-    protected void filterPacket(UserConnection info, Object packet, List output) throws Exception {
+    @Override
+    public void filterPacket(UserConnection info, Object packet, List output) throws Exception {
         output.add(packet);
     }
 
@@ -166,9 +138,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     protected void registerPackets() {
     }
 
-    /**
-     * Loads the mappingdata.
-     */
+    @Override
     public final void loadMappingData() {
         getMappingData().load();
         onMappingDataLoaded();
@@ -182,50 +152,25 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     protected void onMappingDataLoaded() {
     }
 
-    /**
-     * Handle protocol registration phase, use this to register providers / tasks.
-     * <p>
-     * To be overridden if needed.
-     *
-     * @param providers The current providers
-     */
+    @Override
     public void register(ViaProviders providers) {
     }
 
-    /**
-     * Initialise a user for this protocol setting up objects.
-     * /!\ WARNING - May be called more than once in a single {@link UserConnection}
-     * <p>
-     * To be overridden if needed.
-     *
-     * @param userConnection The user to initialise
-     */
+    @Override
     public void init(UserConnection userConnection) {
     }
 
-    /**
-     * Register an incoming packet, with simple id transformation.
-     *
-     * @param state       The state which the packet is sent in.
-     * @param oldPacketID The old packet ID
-     * @param newPacketID The new packet ID
-     */
+    @Override
     public void registerIncoming(State state, int oldPacketID, int newPacketID) {
         registerIncoming(state, oldPacketID, newPacketID, null);
     }
 
-    /**
-     * Register an incoming packet, with id transformation and remapper.
-     *
-     * @param state          The state which the packet is sent in.
-     * @param oldPacketID    The old packet ID
-     * @param newPacketID    The new packet ID
-     * @param packetRemapper The remapper to use for the packet
-     */
+    @Override
     public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
         registerIncoming(state, oldPacketID, newPacketID, packetRemapper, false);
     }
 
+    @Override
     public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
         Packet packet = new Packet(state, newPacketID);
@@ -236,6 +181,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         incoming.put(packet, protocolPacket);
     }
 
+    @Override
     public void cancelIncoming(State state, int oldPacketID, int newPacketID) {
         registerIncoming(state, oldPacketID, newPacketID, new PacketRemapper() {
             @Override
@@ -245,33 +191,22 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         });
     }
 
+    @Override
     public void cancelIncoming(State state, int newPacketID) {
         cancelIncoming(state, -1, newPacketID);
     }
 
-    /**
-     * Register an outgoing packet, with simple id transformation.
-     *
-     * @param state       The state which the packet is sent in.
-     * @param oldPacketID The old packet ID
-     * @param newPacketID The new packet ID
-     */
+    @Override
     public void registerOutgoing(State state, int oldPacketID, int newPacketID) {
         registerOutgoing(state, oldPacketID, newPacketID, null);
     }
 
-    /**
-     * Register an outgoing packet, with id transformation and remapper.
-     *
-     * @param state          The state which the packet is sent in.
-     * @param oldPacketID    The old packet ID
-     * @param newPacketID    The new packet ID
-     * @param packetRemapper The remapper to use for the packet
-     */
+    @Override
     public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
         registerOutgoing(state, oldPacketID, newPacketID, packetRemapper, false);
     }
 
+    @Override
     public void cancelOutgoing(State state, int oldPacketID, int newPacketID) {
         registerOutgoing(state, oldPacketID, newPacketID, new PacketRemapper() {
             @Override
@@ -281,10 +216,12 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         });
     }
 
+    @Override
     public void cancelOutgoing(State state, int oldPacketID) {
         cancelOutgoing(state, oldPacketID, -1);
     }
 
+    @Override
     public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
         ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
         Packet packet = new Packet(state, oldPacketID);
@@ -296,12 +233,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     }
 
 
-    /**
-     * Registers an outgoing protocol and automatically maps it to the new id.
-     *
-     * @param packetType     clientbound packet type the server sends
-     * @param packetRemapper remapper
-     */
+    @Override
     public void registerOutgoing(C1 packetType, @Nullable PacketRemapper packetRemapper) {
         checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
 
@@ -314,13 +246,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         registerOutgoing(State.PLAY, oldId, newId, packetRemapper);
     }
 
-    /**
-     * Registers an outgoing protocol.
-     *
-     * @param packetType       clientbound packet type the server initially sends
-     * @param mappedPacketType clientbound packet type after transforming for the client
-     * @param packetRemapper   remapper
-     */
+    @Override
     public void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
         checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
         checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == newClientboundPacketEnum);
@@ -328,27 +254,17 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         registerOutgoing(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
     }
 
-    /**
-     * Maps a packet type to another packet type without a packet handler.
-     * Note that this should not be called for simple channel mappings of the same packet; this is already done automatically.
-     *
-     * @param packetType       clientbound packet type the server initially sends
-     * @param mappedPacketType clientbound packet type after transforming for the client
-     */
+    @Override
     public void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType) {
         registerOutgoing(packetType, mappedPacketType, null);
     }
 
+    @Override
     public void cancelOutgoing(C1 packetType) {
         cancelOutgoing(State.PLAY, packetType.ordinal(), packetType.ordinal());
     }
 
-    /**
-     * Registers an incoming protocol and automatically maps it to the server's id.
-     *
-     * @param packetType     serverbound packet type the client sends
-     * @param packetRemapper remapper
-     */
+    @Override
     public void registerIncoming(S2 packetType, @Nullable PacketRemapper packetRemapper) {
         checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
 
@@ -361,13 +277,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         registerIncoming(State.PLAY, oldId, newId, packetRemapper);
     }
 
-    /**
-     * Registers an incoming protocol.
-     *
-     * @param packetType       serverbound packet type initially sent by the client
-     * @param mappedPacketType serverbound packet type after transforming for the server
-     * @param packetRemapper   remapper
-     */
+    @Override
     public void registerIncoming(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
         checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
         checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == oldServerboundPacketEnum);
@@ -375,44 +285,26 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         registerIncoming(State.PLAY, mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetType.ordinal(), packetRemapper);
     }
 
+    @Override
     public void cancelIncoming(S2 packetType) {
         Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
         cancelIncoming(State.PLAY, -1, packetType.ordinal());
     }
 
 
-    /**
-     * Checks if an outgoing packet has already been registered.
-     *
-     * @param state       state which the packet is sent in
-     * @param oldPacketID old packet ID
-     * @return true if already registered
-     */
+    @Override
     public boolean hasRegisteredOutgoing(State state, int oldPacketID) {
         Packet packet = new Packet(state, oldPacketID);
         return outgoing.containsKey(packet);
     }
 
-    /**
-     * Checks if an incoming packet has already been registered.
-     *
-     * @param state       state which the packet is sent in
-     * @param newPacketId packet ID
-     * @return true if already registered
-     */
+    @Override
     public boolean hasRegisteredIncoming(State state, int newPacketId) {
         Packet packet = new Packet(state, newPacketId);
         return incoming.containsKey(packet);
     }
 
-    /**
-     * Transform a packet using this protocol
-     *
-     * @param direction     The direction the packet is going in
-     * @param state         The current protocol state
-     * @param packetWrapper The packet wrapper to transform
-     * @throws Exception Throws exception if it fails to transform
-     */
+    @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
         Packet statePacket = new Packet(state, packetWrapper.getId());
         Map<Packet, ProtocolPacket> packetMap = (direction == Direction.OUTGOING ? outgoing : incoming);
@@ -475,37 +367,19 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
     }
 
+    @Override
     public @Nullable <T> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
+    @Override
     public void put(Object object) {
         storedObjects.put(object.getClass(), object);
     }
 
-    /**
-     * Returns true if this Protocol's {@link #loadMappingData()} method should be called.
-     * <p>
-     * This does *not* necessarily mean that {@link #getMappingData()} is non-null, since this may be
-     * overriden, depending on special cases.
-     *
-     * @return true if this Protocol's {@link #loadMappingData()} method should be called
-     */
+    @Override
     public boolean hasMappingDataToLoad() {
         return getMappingData() != null;
-    }
-
-    public @Nullable MappingData getMappingData() {
-        return null; // Let the protocols hold the mappings to still have easy, static singleton access there
-    }
-
-    /**
-     * Returns whether this protocol is a base protocol.
-     *
-     * @return whether this represents a base protocol
-     */
-    public boolean isBaseProtocol() {
-        return false;
     }
 
     @Override

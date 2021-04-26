@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.sponge.handlers;
 
+import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -24,7 +26,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
@@ -49,9 +50,9 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
         // Ensure ViaVersion is loaded
         if (Via.getAPI().getServerVersion().isKnown()
                 && channel instanceof SocketChannel) { // channel can be LocalChannel on internal server
-            UserConnection info = new UserConnection((SocketChannel) channel);
+            UserConnection info = new UserConnectionImpl((SocketChannel) channel);
             // init protocol
-            new ProtocolPipeline(info);
+            new ProtocolPipelineImpl(info);
             // Add originals
             this.method.invoke(this.original, channel);
             // Add our transformers

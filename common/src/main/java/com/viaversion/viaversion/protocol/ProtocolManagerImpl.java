@@ -21,18 +21,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.base.Protocol;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.base.BaseProtocol;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
@@ -64,6 +63,11 @@ import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.Protocol1_9_1To1_9
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3To1_9_1_2;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
+import com.viaversion.viaversion.util.Pair;
+import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -288,8 +292,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public @Nullable Protocol getProtocol(Class<? extends Protocol> protocolClass) {
-        return protocols.get(protocolClass);
+    public @Nullable <T extends Protocol> T getProtocol(Class<T> protocolClass) {
+        return (T) protocols.get(protocolClass);
     }
 
     @Override
@@ -412,6 +416,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
         } finally {
             mappingLoaderLock.readLock().unlock();
         }
+    }
+
+    @Override
+    public PacketWrapper createPacketWrapper(int packetId, ByteBuf buf, UserConnection connection) {
+        return new PacketWrapperImpl(packetId, buf, connection);
     }
 
     /**

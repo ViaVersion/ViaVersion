@@ -17,6 +17,23 @@
  */
 package com.viaversion.viaversion.bungee.handlers;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
+import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
+import com.viaversion.viaversion.api.protocol.base.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
+import com.viaversion.viaversion.bungee.storage.BungeeStorage;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -25,23 +42,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.PluginMessage;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.ExternalJoinGameListener;
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
-import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
-import com.viaversion.viaversion.bungee.storage.BungeeStorage;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -162,7 +162,7 @@ public class BungeeServerHandler implements Listener {
                             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
                             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                                 for (UUID uuid : storage.getBossbar()) {
-                                    PacketWrapper wrapper = new PacketWrapper(0x0C, null, user);
+                                    PacketWrapper wrapper = PacketWrapper.create(0x0C, null, user);
                                     wrapper.write(Type.UUID, uuid);
                                     wrapper.write(Type.VAR_INT, 1); // remove
                                     wrapper.send(Protocol1_9To1_8.class, true, true);
@@ -230,7 +230,7 @@ public class BungeeServerHandler implements Listener {
                         plMsg.setTag(channel);
                     }
 
-                    user.put(info);
+                    user.setProtocolInfo(info);
                     user.put(storage);
 
                     user.setActive(protocolPath != null);

@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocol;
 
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
+import com.viaversion.viaversion.api.protocol.base.Protocol;
 
 public class ProtocolPathEntryImpl implements ProtocolPathEntry {
     private final int outputProtocolVersion;

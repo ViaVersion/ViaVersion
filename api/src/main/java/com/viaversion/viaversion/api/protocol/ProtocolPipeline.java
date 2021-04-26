@@ -22,52 +22,14 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
-import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.platform.ViaPlatform;
-import com.viaversion.viaversion.api.protocol.packet.Direction;
-import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.base.Protocol;
+import com.viaversion.viaversion.api.protocol.base.SimpleProtocol;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 
-public class ProtocolPipeline extends SimpleProtocol {
-    /**
-     * Protocol list ordered from client to server transforation with the base protocols at the end.
-     */
-    private List<Protocol> protocolList;
-    private UserConnection userConnection;
-
-    public ProtocolPipeline(UserConnection userConnection) {
-        init(userConnection);
-    }
-
-    @Override
-    protected void registerPackets() {
-        protocolList = new CopyOnWriteArrayList<>();
-        // This is a pipeline so we register basic pipes
-        protocolList.add(Via.getManager().getProtocolManager().getBaseProtocol());
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
-        this.userConnection = userConnection;
-
-        ProtocolInfo protocolInfo = new ProtocolInfo(userConnection);
-        protocolInfo.setPipeline(this);
-
-        userConnection.setProtocolInfo(protocolInfo);
-
-        /* Init through all our pipes */
-        for (Protocol protocol : protocolList) {
-            protocol.init(userConnection);
-        }
-    }
+public interface ProtocolPipeline extends SimpleProtocol {
 
     /**
      * Adds a protocol to the current pipeline.
@@ -75,16 +37,7 @@ public class ProtocolPipeline extends SimpleProtocol {
      *
      * @param protocol protocol to add to the end
      */
-    public void add(Protocol protocol) {
-        Preconditions.checkNotNull(protocolList, "Tried to add protocol too early");
-
-        protocolList.add(protocol);
-        protocol.init(userConnection);
-
-        if (!protocol.isBaseProtocol()) {
-            moveBaseProtocolsToTail();
-        }
-    }
+    void add(Protocol protocol);
 
     /**
      * Adds a list of protocols to the current pipeline.
@@ -92,70 +45,7 @@ public class ProtocolPipeline extends SimpleProtocol {
      *
      * @param protocols protocols to add to the end
      */
-    public void add(List<Protocol> protocols) {
-        Preconditions.checkNotNull(protocolList, "Tried to add protocol too early");
-
-        protocolList.addAll(protocols);
-        for (Protocol protocol : protocols) {
-            protocol.init(userConnection);
-        }
-
-        moveBaseProtocolsToTail();
-    }
-
-    private void moveBaseProtocolsToTail() {
-        // Move base Protocols to the end, so the login packets can be modified by other protocols
-        List<Protocol> baseProtocols = null;
-        for (Protocol protocol : protocolList) {
-            if (protocol.isBaseProtocol()) {
-                if (baseProtocols == null) {
-                    baseProtocols = new ArrayList<>();
-                }
-
-                baseProtocols.add(protocol);
-            }
-        }
-
-        if (baseProtocols != null) {
-            protocolList.removeAll(baseProtocols);
-            protocolList.addAll(baseProtocols);
-        }
-    }
-
-    @Override
-    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-        int originalID = packetWrapper.getId();
-
-        // Apply protocols
-        packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.OUTGOING);
-        super.transform(direction, state, packetWrapper);
-
-        if (Via.getManager().isDebug()) {
-            logPacket(direction, state, packetWrapper, originalID);
-        }
-    }
-
-    private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID) {
-        // Debug packet
-        int clientProtocol = userConnection.getProtocolInfo().getProtocolVersion();
-        ViaPlatform platform = Via.getPlatform();
-
-        String actualUsername = packetWrapper.user().getProtocolInfo().getUsername();
-        String username = actualUsername != null ? actualUsername + " " : "";
-
-        platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} (0x{4}) -> {5} (0x{6}) [{7}] {8}",
-                new Object[]{
-                        username,
-                        direction,
-                        state,
-                        originalID,
-                        Integer.toHexString(originalID),
-                        packetWrapper.getId(),
-                        Integer.toHexString(packetWrapper.getId()),
-                        Integer.toString(clientProtocol),
-                        packetWrapper
-                });
-    }
+    void add(List<Protocol> protocols);
 
     /**
      * Check if the pipeline contains a protocol
@@ -163,19 +53,18 @@ public class ProtocolPipeline extends SimpleProtocol {
      * @param pipeClass The class to check
      * @return True if the protocol class is in the pipeline
      */
-    public boolean contains(Class<? extends Protocol> pipeClass) {
-        for (Protocol protocol : protocolList) {
-            if (protocol.getClass().equals(pipeClass)) return true;
-        }
-        return false;
-    }
+    boolean contains(Class<? extends Protocol> pipeClass);
 
-    public <P extends Protocol> P getProtocol(Class<P> pipeClass) {
-        for (Protocol protocol : protocolList) {
-            if (protocol.getClass() == pipeClass) return (P) protocol;
-        }
-        return null;
-    }
+    /**
+     * Returns the protocol from the given class if present in the pipeline.
+     *
+     * @param pipeClass protocol class
+     * @param <P>       protocol
+     * @return protocol from class
+     * @see #contains(Class)
+     * @see ProtocolManager#getProtocol(Class) for a faster alternative
+     */
+    @Nullable <P extends Protocol> P getProtocol(Class<P> pipeClass);
 
     /**
      * Use the pipeline to filter a NMS packet
@@ -185,27 +74,13 @@ public class ProtocolPipeline extends SimpleProtocol {
      * @return If it should not write the input object to te list.
      * @throws Exception If it failed to convert / packet cancelld.
      */
-    public boolean filter(Object o, List list) throws Exception {
-        for (Protocol protocol : protocolList) {
-            if (protocol.isFiltered(o.getClass())) {
-                protocol.filterPacket(userConnection, o, list);
-                return true;
-            }
-        }
+    boolean filter(Object o, List list) throws Exception;
 
-        return false;
-    }
-
-    public List<Protocol> pipes() {
-        return protocolList;
-    }
+    List<Protocol> pipes();
 
     /**
      * Cleans the pipe and adds the base protocol.
      * /!\ WARNING - It doesn't add version-specific base Protocol.
      */
-    public void cleanPipes() {
-        pipes().clear();
-        registerPackets();
-    }
+    void cleanPipes();
 }

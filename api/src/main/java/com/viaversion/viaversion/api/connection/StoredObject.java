@@ -22,10 +22,10 @@
  */
 package com.viaversion.viaversion.api.connection;
 
-public class StoredObject {
+public abstract class StoredObject {
     private final UserConnection user;
 
-    public StoredObject(UserConnection user) {
+    protected StoredObject(UserConnection user) {
         this.user = user;
     }
 

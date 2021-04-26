@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api;
 
-import com.viaversion.viaversion.api.connection.ViaConnectionManager;
+import com.viaversion.viaversion.api.connection.ConnectionManager;
 import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
@@ -40,7 +40,7 @@ import java.util.UUID;
  * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
  * @see ViaManager
  * @see ProtocolManager
- * @see ViaConnectionManager
+ * @see ConnectionManager
  * @see ViaPlatform
  */
 public interface ViaAPI<T> {

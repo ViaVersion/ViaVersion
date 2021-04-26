@@ -60,7 +60,7 @@ public class Sponge4ArmorListener extends ViaListener {
         armor += calculate(player.getLeggings());
         armor += calculate(player.getBoots());
 
-        PacketWrapper wrapper = new PacketWrapper(0x4B, null, getUserConnection(player.getUniqueId()));
+        PacketWrapper wrapper = PacketWrapper.create(0x4B, null, getUserConnection(player.getUniqueId()));
         try {
             wrapper.write(Type.VAR_INT, getEntityId(player)); // Player ID
             wrapper.write(Type.INT, 1); // only 1 property

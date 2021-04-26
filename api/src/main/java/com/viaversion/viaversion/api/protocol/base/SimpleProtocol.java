@@ -20,24 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol;
+package com.viaversion.viaversion.api.protocol.base;
 
-import com.viaversion.viaversion.api.protocol.base.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 
-public interface ProtocolPathEntry {
+/**
+ * Dummy protocol class when there is no need of any of the
+ * existing packet type enums or automated channel mappings.
+ *
+ * @see com.viaversion.viaversion.api.protocol.base.Protocol
+ */
+public interface SimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> {
 
-    /**
-     * Returns the resulting protocol after transformation using
-     * the {@link #getProtocol()} protocol handlers.
-     *
-     * @return output protocol version after transformation
-     */
-    int getOutputProtocolVersion();
-
-    /**
-     * Returns the protocol to be applied with this entry.
-     *
-     * @return protocol to be applied with this entry
-     */
-    Protocol getProtocol();
+    enum DummyPacketTypes implements ClientboundPacketType, ServerboundPacketType {
+    }
 }

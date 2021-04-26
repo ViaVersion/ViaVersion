@@ -17,13 +17,14 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
+import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.classgenerator.HandlerConstructor;
 
@@ -50,9 +51,9 @@ public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        UserConnection info = new UserConnection(socketChannel);
+        UserConnection info = new UserConnectionImpl(socketChannel);
         // init protocol
-        new ProtocolPipeline(info);
+        new ProtocolPipelineImpl(info);
         // Add originals
         this.method.invoke(this.original, socketChannel);
 

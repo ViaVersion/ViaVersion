@@ -62,7 +62,7 @@ public class ConnectionData {
             if (handler == null) continue;
 
             int newBlockState = handler.connect(user, pos, blockState);
-            PacketWrapper blockUpdatePacket = new PacketWrapper(0x0B, null, user);
+            PacketWrapper blockUpdatePacket = PacketWrapper.create(0x0B, null, user);
             blockUpdatePacket.write(Type.POSITION, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
             try {
@@ -135,7 +135,7 @@ public class ConnectionData {
                 }
 
                 if (!updates.isEmpty()) {
-                    PacketWrapper wrapper = new PacketWrapper(0x0F, null, user);
+                    PacketWrapper wrapper = PacketWrapper.create(0x0F, null, user);
                     wrapper.write(Type.INT, chunkX + chunkDeltaX);
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
                     wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));

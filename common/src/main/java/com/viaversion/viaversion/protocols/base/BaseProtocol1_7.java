@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
-import com.viaversion.viaversion.api.protocol.SimpleProtocol;
+import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class BaseProtocol1_7 extends SimpleProtocol {
+public class BaseProtocol1_7 extends AbstractSimpleProtocol {
 
     @Override
     protected void registerPackets() {
@@ -185,7 +185,7 @@ public class BaseProtocol1_7 extends SimpleProtocol {
                             if (!wrapper.user().getChannel().isOpen()) return;
                             if (!wrapper.user().shouldApplyBlockProtocol()) return;
 
-                            PacketWrapper disconnectPacket = new PacketWrapper(0x00, null, wrapper.user()); // Disconnect Packet
+                            PacketWrapper disconnectPacket = PacketWrapper.create(0x00, null, wrapper.user()); // Disconnect Packet
                             Protocol1_9To1_8.FIX_JSON.write(disconnectPacket, ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg()));
                             wrapper.cancel(); // cancel current
 

@@ -17,26 +17,27 @@
  */
 package com.viaversion.viaversion;
 
-import com.viaversion.viaversion.api.ViaManager;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaManager;
+import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.platform.TaskId;
-import com.viaversion.viaversion.api.connection.ViaConnectionManager;
+import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
-import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import com.viaversion.viaversion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.connection.ConnectionManagerImpl;
+import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
-import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ViaIdleThread;
 import com.viaversion.viaversion.update.UpdateUtil;
-import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +47,7 @@ import java.util.Set;
 
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
-    private final ViaConnectionManager connectionManager = new ViaConnectionManager();
+    private final ConnectionManager connectionManager = new ConnectionManagerImpl();
     private final ViaProviders providers = new ViaProviders();
     private final ViaPlatform<?> platform;
     private final ViaInjector injector;
@@ -237,7 +238,7 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     @Override
-    public ViaConnectionManager getConnectionManager() {
+    public ConnectionManager getConnectionManager() {
         return connectionManager;
     }
 

@@ -20,9 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.connection;
+package com.viaversion.viaversion.connection;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ConnectionManager;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.ChannelFutureListener;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,13 +35,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Handles injected UserConnections
- */
-public class ViaConnectionManager {
+public class ConnectionManagerImpl implements ConnectionManager {
     protected final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
     protected final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
+    @Override
     public void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
         connections.add(connection);
@@ -56,6 +56,7 @@ public class ViaConnectionManager {
         }
     }
 
+    @Override
     public void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
         connections.remove(connection);
@@ -66,74 +67,39 @@ public class ViaConnectionManager {
         }
     }
 
-    /**
-     * Frontend connections will have the UUID stored. Override this if your platform isn't always frontend.
-     * UUIDs can't be duplicate between frontend connections.
-     */
-    public boolean isFrontEnd(UserConnection conn) {
-        return !conn.isClientSide();
+    @Override
+    public boolean isFrontEnd(UserConnection connection) {
+        return !connection.isClientSide();
     }
 
-    /**
-     * Returns a map containing the UUIDs and frontend UserConnections from players connected to this proxy server
-     * Returns empty list when there isn't a server
-     * When ViaVersion is reloaded, this method may not return some players.
-     * May not contain ProtocolSupport players.
-     */
+    @Override
     public Map<UUID, UserConnection> getConnectedClients() {
         return Collections.unmodifiableMap(clients);
     }
 
-    /**
-     * Returns the frontend UserConnection from the player connected to this proxy server
-     * Returns null when there isn't a server or connection was not found
-     * When ViaVersion is reloaded, this method may not return some players.
-     * May not return ProtocolSupport players.
-     * <p>
-     * Note that connections are removed as soon as their channel is closed,
-     * so avoid using this method during player quits for example.
-     */
+    @Override
     public @Nullable UserConnection getConnectedClient(UUID clientIdentifier) {
         return clients.get(clientIdentifier);
     }
 
-    /**
-     * Returns the UUID from the frontend connection to this proxy server
-     * Returns null when there isn't a server or this connection isn't frontend or it doesn't have an id
-     * When ViaVersion is reloaded, this method may not return some players.
-     * May not return ProtocolSupport players.
-     * <p>
-     * Note that connections are removed as soon as their channel is closed,
-     * so avoid using this method during player quits for example.
-     */
-    public @Nullable UUID getConnectedClientId(UserConnection conn) {
-        if (conn.getProtocolInfo() == null) return null;
-        UUID uuid = conn.getProtocolInfo().getUuid();
+    @Override
+    public @Nullable UUID getConnectedClientId(UserConnection connection) {
+        if (connection.getProtocolInfo() == null) return null;
+        UUID uuid = connection.getProtocolInfo().getUuid();
         UserConnection client = clients.get(uuid);
-        if (conn.equals(client)) {
+        if (connection.equals(client)) {
             // This is frontend
             return uuid;
         }
         return null;
     }
 
-    /**
-     * Returns all UserConnections which are registered
-     * May contain duplicated UUIDs on multiple ProtocolInfo.
-     * May contain frontend, backend and/or client-sided connections.
-     * When ViaVersion is reloaded, this method may not return some players.
-     * May not contain ProtocolSupport players.
-     */
+    @Override
     public Set<UserConnection> getConnections() {
         return Collections.unmodifiableSet(connections);
     }
 
-    /**
-     * Returns if Via injected into this player connection.
-     *
-     * @param playerId player uuid
-     * @return true if the player is handled by Via
-     */
+    @Override
     public boolean isClientConnected(UUID playerId) {
         return clients.containsKey(playerId);
     }

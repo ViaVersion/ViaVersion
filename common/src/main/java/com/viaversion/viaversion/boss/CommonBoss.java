@@ -226,7 +226,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     private PacketWrapper getPacket(UpdateAction action, UserConnection connection) {
         try {
-            PacketWrapper wrapper = new PacketWrapper(0x0C, null, connection); // TODO don't use fixed packet ids for future support
+            PacketWrapper wrapper = PacketWrapper.create(0x0C, null, connection); // TODO don't use fixed packet ids for future support
             wrapper.write(Type.UUID, uuid);
             wrapper.write(Type.VAR_INT, action.getId());
             switch (action) {

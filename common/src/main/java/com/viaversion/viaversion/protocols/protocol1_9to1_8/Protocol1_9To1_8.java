@@ -154,7 +154,7 @@ public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, Clientboun
     }
 
     @Override
-    protected void filterPacket(UserConnection info, Object packet, List output) throws Exception {
+    public void filterPacket(UserConnection info, Object packet, List output) throws Exception {
         output.addAll(info.get(ClientChunks.class).transformMapChunkBulk(packet));
     }
 

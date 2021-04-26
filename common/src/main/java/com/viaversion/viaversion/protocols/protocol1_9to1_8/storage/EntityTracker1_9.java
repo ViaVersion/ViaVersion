@@ -88,7 +88,7 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public void setSecondHand(int entityID, Item item) {
-        PacketWrapper wrapper = new PacketWrapper(0x3C, null, getUser());
+        PacketWrapper wrapper = PacketWrapper.create(0x3C, null, getUser());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, this.itemInSecondHand = item);
@@ -232,7 +232,7 @@ public class EntityTracker1_9 extends EntityTracker {
                             knownHolograms.add(entityId);
                             try {
                                 // Send movement
-                                PacketWrapper wrapper = new PacketWrapper(0x25, null, getUser());
+                                PacketWrapper wrapper = PacketWrapper.create(0x25, null, getUser());
                                 wrapper.write(Type.VAR_INT, entityId);
                                 wrapper.write(Type.SHORT, (short) 0);
                                 wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
@@ -294,7 +294,7 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public void sendTeamPacket(boolean add, boolean now) {
-        PacketWrapper wrapper = new PacketWrapper(0x41, null, getUser());
+        PacketWrapper wrapper = PacketWrapper.create(0x41, null, getUser());
         wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
         if (add) {
             // add
@@ -334,7 +334,7 @@ public class EntityTracker1_9 extends EntityTracker {
     public void sendMetadataBuffer(int entityId) {
         List<Metadata> metadataList = metadataBuffer.get(entityId);
         if (metadataList != null) {
-            PacketWrapper wrapper = new PacketWrapper(0x39, null, getUser());
+            PacketWrapper wrapper = PacketWrapper.create(0x39, null, getUser());
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
             getUser().getProtocolInfo().getPipeline().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)

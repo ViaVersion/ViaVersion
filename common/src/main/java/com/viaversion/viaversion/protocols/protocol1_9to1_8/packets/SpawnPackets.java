@@ -306,7 +306,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short item = wrapper.read(Type.SHORT);
                         if (item != 0) {
-                            PacketWrapper packet = new PacketWrapper(0x3C, null, wrapper.user());
+                            PacketWrapper packet = PacketWrapper.create(0x3C, null, wrapper.user());
                             packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             packet.write(Type.VAR_INT, 0);
                             packet.write(Type.ITEM, new Item(item, (byte) 1, (short) 0, null));

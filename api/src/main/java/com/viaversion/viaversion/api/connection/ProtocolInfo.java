@@ -23,36 +23,21 @@
 package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import java.util.UUID;
 
-public class ProtocolInfo extends StoredObject {
-    private State state = State.HANDSHAKE;
-    private int protocolVersion = -1;
-    private int serverProtocolVersion = -1;
-    private String username;
-    private UUID uuid;
-    private ProtocolPipeline pipeline;
-
-    public ProtocolInfo(UserConnection user) {
-        super(user);
-    }
+public interface ProtocolInfo {
 
     /**
      * Returns the protocol state the user is currently in.
      *
      * @return protocol state
      */
-    public State getState() {
-        return state;
-    }
+    State getState();
 
-    public void setState(State state) {
-        this.state = state;
-    }
+    void setState(State state);
 
     /**
      * Returns the user's protocol version, or -1 if not set.
@@ -60,15 +45,9 @@ public class ProtocolInfo extends StoredObject {
      *
      * @return protocol version, or -1 if not set
      */
-    public int getProtocolVersion() {
-        return protocolVersion;
-    }
+    int getProtocolVersion();
 
-    public void setProtocolVersion(int protocolVersion) {
-        // Map snapshot versions to the higher/orderer release version
-        ProtocolVersion protocol = ProtocolVersion.getProtocol(protocolVersion);
-        this.protocolVersion = protocol.getVersion();
-    }
+    void setProtocolVersion(int protocolVersion);
 
     /**
      * Returns the server protocol version the user is connected to, or -1 if not set.
@@ -76,14 +55,9 @@ public class ProtocolInfo extends StoredObject {
      *
      * @return server protocol version, or -1 if not set
      */
-    public int getServerProtocolVersion() {
-        return serverProtocolVersion;
-    }
+    int getServerProtocolVersion();
 
-    public void setServerProtocolVersion(int serverProtocolVersion) {
-        ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocolVersion);
-        this.serverProtocolVersion = protocol.getVersion();
-    }
+    void setServerProtocolVersion(int serverProtocolVersion);
 
     /**
      * Returns the username associated with this connection.
@@ -91,13 +65,9 @@ public class ProtocolInfo extends StoredObject {
      *
      * @return username, set when entering the {@link State#PLAY} state
      */
-    public @MonotonicNonNull String getUsername() {
-        return username;
-    }
+    @MonotonicNonNull String getUsername();
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    void setUsername(String username);
 
     /**
      * Returns the uuid associated with this connection.
@@ -105,35 +75,23 @@ public class ProtocolInfo extends StoredObject {
      *
      * @return uuid, set when entering the {@link State#PLAY} state
      */
-    public UUID getUuid() {
-        return uuid;
-    }
+    UUID getUuid();
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
+    void setUuid(UUID uuid);
 
     /**
      * Returns the user's pipeline.
      *
      * @return protocol pipeline
      */
-    public ProtocolPipeline getPipeline() {
-        return pipeline;
-    }
+    ProtocolPipeline getPipeline();
 
-    public void setPipeline(ProtocolPipeline pipeline) {
-        this.pipeline = pipeline;
-    }
+    void setPipeline(ProtocolPipeline pipeline);
 
-    @Override
-    public String toString() {
-        return "ProtocolInfo{" +
-                "state=" + state +
-                ", protocolVersion=" + protocolVersion +
-                ", serverProtocolVersion=" + serverProtocolVersion +
-                ", username='" + username + '\'' +
-                ", uuid=" + uuid +
-                '}';
-    }
+    /**
+     * Returns the user connection this info represents.
+     *
+     * @return user connection
+     */
+    UserConnection getUser();
 }

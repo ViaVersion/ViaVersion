@@ -17,10 +17,11 @@
  */
 package com.viaversion.viaversion.bungee.handlers;
 
+import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;
 
@@ -44,9 +45,9 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
             return;
         }
 
-        UserConnection info = new UserConnection(socketChannel);
+        UserConnection info = new UserConnectionImpl(socketChannel);
         // init protocol
-        new ProtocolPipeline(info);
+        new ProtocolPipelineImpl(info);
         // Add originals
         this.method.invoke(this.original, socketChannel);
 

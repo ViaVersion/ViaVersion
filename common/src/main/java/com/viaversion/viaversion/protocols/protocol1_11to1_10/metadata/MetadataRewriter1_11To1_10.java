@@ -129,7 +129,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
                         tracker.addHologram(entityId);
                         try {
                             // Send movement
-                            PacketWrapper wrapper = new PacketWrapper(0x25, null, connection);
+                            PacketWrapper wrapper = PacketWrapper.create(0x25, null, connection);
                             wrapper.write(Type.VAR_INT, entityId);
                             wrapper.write(Type.SHORT, (short) 0);
                             wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));

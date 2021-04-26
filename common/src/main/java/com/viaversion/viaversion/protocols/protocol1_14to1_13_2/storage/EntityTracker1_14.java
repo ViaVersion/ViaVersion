@@ -94,7 +94,7 @@ public class EntityTracker1_14 extends EntityTracker {
     public void onExternalJoinGame(int playerEntityId) {
         super.onExternalJoinGame(playerEntityId);
 
-        PacketWrapper setViewDistance = new PacketWrapper(0x41, null, getUser());
+        PacketWrapper setViewDistance = PacketWrapper.create(0x41, null, getUser());
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         try {
             setViewDistance.send(Protocol1_14To1_13_2.class, true, true);

@@ -17,26 +17,26 @@
  */
 package com.viaversion.viaversion.protocols.base;
 
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.protocol.SimpleProtocol;
-import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.base.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionProvider;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseProtocol extends SimpleProtocol {
+public class BaseProtocol extends AbstractSimpleProtocol {
 
     @Override
     protected void registerPackets() {

@@ -55,7 +55,7 @@ public class BulkChunkTranslatorProvider implements Provider {
             meta.setData(wrapper.read(customByteType));
 
             // Construct chunk packet
-            PacketWrapper chunkPacket = new PacketWrapper(0x21, null, wrapper.user());
+            PacketWrapper chunkPacket = PacketWrapper.create(0x21, null, wrapper.user());
             chunkPacket.write(Type.INT, meta.getX());
             chunkPacket.write(Type.INT, meta.getZ());
             chunkPacket.write(Type.BOOLEAN, true); // Always ground-up

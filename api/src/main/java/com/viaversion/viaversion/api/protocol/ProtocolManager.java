@@ -23,8 +23,13 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.collect.Range;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.base.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
@@ -44,9 +49,10 @@ public interface ProtocolManager {
      * Returns a protocol instance by its class.
      *
      * @param protocolClass class of the protocol
+     * @param <T>           protocol
      * @return protocol if present
      */
-    @Nullable Protocol getProtocol(Class<? extends Protocol> protocolClass);
+    @Nullable <T extends Protocol> T getProtocol(Class<T> protocolClass);
 
     /**
      * Returns the base protocol handling incoming handshake packets.
@@ -180,4 +186,15 @@ public interface ProtocolManager {
      * @return data loading future bound to the protocol, or null if all loading is complete
      */
     @Nullable CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass);
+
+    /**
+     * Creates a new packet wrapper instance.
+     *
+     * @param packetId   packet id
+     * @param buf        input buffer
+     * @param connection user connection
+     * @return new packet wrapper instance
+     * @see PacketWrapper#create(PacketType, ByteBuf, UserConnection)
+     */
+    PacketWrapper createPacketWrapper(int packetId, ByteBuf buf, UserConnection connection);
 }

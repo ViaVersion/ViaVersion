@@ -176,7 +176,7 @@ public class WorldPackets {
                             try {
                                 output.setId(-1); // -1 for no writing of id
                                 output.writeToBuffer(buffer);
-                                PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, wrapper.user());
+                                PacketWrapper chunkPacket = PacketWrapper.create(0x21, buffer, wrapper.user());
                                 chunkPacket.send(Protocol1_9To1_8.class, false, true);
                             } finally {
                                 buffer.release();
@@ -414,7 +414,7 @@ public class WorldPackets {
                         Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
                         // Send the Update Block Entity packet if present
                         if (tag.isPresent()) {
-                            PacketWrapper updateBlockEntity = new PacketWrapper(0x09, null, wrapper.user());
+                            PacketWrapper updateBlockEntity = PacketWrapper.create(0x09, null, wrapper.user());
 
                             updateBlockEntity.write(Type.POSITION, pos);
                             updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);

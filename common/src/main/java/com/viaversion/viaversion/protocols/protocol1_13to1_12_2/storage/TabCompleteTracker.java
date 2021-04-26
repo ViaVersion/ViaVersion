@@ -35,7 +35,7 @@ public class TabCompleteTracker extends StoredObject {
 
     public void sendPacketToServer() {
         if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) return;
-        PacketWrapper wrapper = new PacketWrapper(0x01, null, getUser());
+        PacketWrapper wrapper = PacketWrapper.create(0x01, null, getUser());
         wrapper.write(Type.STRING, lastTabComplete);
         wrapper.write(Type.BOOLEAN, false);
         wrapper.write(Type.OPTIONAL_POSITION, null);

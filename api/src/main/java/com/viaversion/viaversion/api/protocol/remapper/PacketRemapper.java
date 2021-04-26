@@ -23,10 +23,10 @@
 package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

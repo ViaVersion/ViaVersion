@@ -57,7 +57,7 @@ public class CommandBlockProvider implements Provider {
     public void sendPermission(UserConnection user) throws Exception {
         if (!isEnabled())
             return;
-        PacketWrapper wrapper = new PacketWrapper(0x1B, null, user); // Entity status
+        PacketWrapper wrapper = PacketWrapper.create(0x1B, null, user); // Entity status
 
         wrapper.write(Type.INT, user.get(EntityTracker1_9.class).getProvidedEntityId()); // Entity ID
         wrapper.write(Type.BYTE, (byte) 26); // Hardcoded op permission level

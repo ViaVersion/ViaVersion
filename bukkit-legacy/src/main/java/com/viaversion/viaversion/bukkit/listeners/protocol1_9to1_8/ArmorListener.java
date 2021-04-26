@@ -58,7 +58,7 @@ public class ArmorListener extends ViaBukkitListener {
             armor += ArmorType.findById(stack.getTypeId()).getArmorPoints();
         }
 
-        PacketWrapper wrapper = new PacketWrapper(0x4B, null, getUserConnection(player));
+        PacketWrapper wrapper = PacketWrapper.create(0x4B, null, getUserConnection(player));
         try {
             wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
             wrapper.write(Type.INT, 1); // only 1 property

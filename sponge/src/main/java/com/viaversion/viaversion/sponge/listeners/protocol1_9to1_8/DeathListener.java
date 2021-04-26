@@ -64,7 +64,7 @@ public class DeathListener extends ViaSpongeListener {
         Via.getPlatform().runSync(new Runnable() {
             @Override
             public void run() {
-                PacketWrapper wrapper = new PacketWrapper(0x2C, null, getUserConnection(p.getUniqueId()));
+                PacketWrapper wrapper = PacketWrapper.create(0x2C, null, getUserConnection(p.getUniqueId()));
                 try {
                     int entityId = getEntityId(p);
                     wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
