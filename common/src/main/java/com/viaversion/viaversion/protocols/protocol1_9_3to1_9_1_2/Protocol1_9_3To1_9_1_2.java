@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2;
+package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.gson.JsonElement;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntity;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntity;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
 import java.util.List;
 

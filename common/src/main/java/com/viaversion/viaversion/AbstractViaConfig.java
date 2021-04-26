@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import us.myles.ViaVersion.api.ViaVersionConfig;
-import us.myles.ViaVersion.util.Config;
+import com.viaversion.viaversion.api.ViaVersionConfig;
+import com.viaversion.viaversion.util.Config;
 
 import java.io.File;
 

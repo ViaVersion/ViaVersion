@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft.nbt;
+package com.viaversion.viaversion.api.minecraft.nbt;
 
 /**
  * See https://github.com/KyoriPowered/adventure.

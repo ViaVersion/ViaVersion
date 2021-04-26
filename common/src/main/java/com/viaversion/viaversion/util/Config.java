@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.util;
+package com.viaversion.viaversion.util;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 
 import java.io.File;
 import java.io.FileInputStream;

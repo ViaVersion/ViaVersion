@@ -1,5 +1,5 @@
 name: ViaVersion
-main: us.myles.ViaVersion.BungeePlugin
+main: com.viaversion.viaversion.BungeePlugin
 description: ${description}
 author: _MylesC, creeper123123321, Gerrygames, KennyTV, Matsv
 version: ${version}

@@ -15,33 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_11to1_10;
+package com.viaversion.viaversion.protocols.protocol1_11to1_10;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_11Types;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.api.rewriters.SoundRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.data.PotionColorMapping;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_11Types;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueCreator;
+import com.viaversion.viaversion.api.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.rewriters.SoundRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.data.PotionColorMapping;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
+import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_11To1_10 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {

@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.data;
+package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.data;
 
 import com.google.gson.JsonObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.data.Mappings;
+import com.viaversion.viaversion.api.data.Mappings;
 
-public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
+public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
 
     public MappingData() {
         super("1.14", "1.15", true);

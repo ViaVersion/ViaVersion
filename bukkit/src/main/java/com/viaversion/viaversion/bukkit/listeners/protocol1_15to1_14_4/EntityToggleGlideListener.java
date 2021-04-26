@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.listeners.protocol1_15to1_14_4;
+package com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.potion.PotionEffectType;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
+import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
+import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 
 import java.util.Arrays;
 

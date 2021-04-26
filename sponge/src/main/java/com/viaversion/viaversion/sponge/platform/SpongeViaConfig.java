@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.platform;
+package com.viaversion.viaversion.sponge.platform;
 
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
-import us.myles.ViaVersion.AbstractViaConfig;
+import com.viaversion.viaversion.AbstractViaConfig;
 
 import java.io.File;
 import java.net.URL;

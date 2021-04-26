@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 
 public class PlayerPackets {
 

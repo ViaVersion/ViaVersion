@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.common.protocol;
+package com.viaversion.viaversion.common.protocol;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
 
 public class ProtocolVersionTest {
 

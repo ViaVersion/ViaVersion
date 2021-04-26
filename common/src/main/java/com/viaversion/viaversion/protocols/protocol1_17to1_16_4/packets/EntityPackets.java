@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets;
+package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
-import us.myles.ViaVersion.api.entities.Entity1_17Types;
-import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.api.type.types.version.Types1_17;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
+import com.viaversion.viaversion.api.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
+import com.viaversion.viaversion.api.type.types.version.Types1_17;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
 
 public class EntityPackets {
 

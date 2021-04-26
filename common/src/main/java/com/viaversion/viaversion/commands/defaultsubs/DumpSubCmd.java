@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.commands.defaultsubs;
+package com.viaversion.viaversion.commands.defaultsubs;
 
 import com.google.common.io.CharStreams;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.dump.DumpTemplate;
-import us.myles.ViaVersion.dump.VersionInfo;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.dump.DumpTemplate;
+import com.viaversion.viaversion.dump.VersionInfo;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

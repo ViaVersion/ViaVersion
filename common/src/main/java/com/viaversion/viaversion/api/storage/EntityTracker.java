@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.api.storage;
+package com.viaversion.viaversion.api.storage;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.EntityType;
+import com.viaversion.viaversion.api.data.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.EntityType;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

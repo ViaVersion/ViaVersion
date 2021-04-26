@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.rewriters.CommandRewriter;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.rewriters.CommandRewriter;
 
 public class CommandRewriter1_14 extends CommandRewriter {
 

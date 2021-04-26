@@ -20,20 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.protocol;
+package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.MappingData;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.exception.InformativeException;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.packets.Direction;
+import com.viaversion.viaversion.packets.State;
 
 import java.util.Arrays;
 import java.util.HashMap;

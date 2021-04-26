@@ -20,22 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api;
+package com.viaversion.viaversion.api;
 
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.PacketType;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.TypeConverter;
-import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.exception.InformativeException;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.util.PipelineUtil;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.PacketType;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.ValueCreator;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.TypeConverter;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.packets.Direction;
+import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.util.PipelineUtil;
 
 import java.io.IOException;
 import java.util.ArrayDeque;

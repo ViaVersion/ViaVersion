@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.entities;
+package com.viaversion.viaversion.api.entities;
 
-import us.myles.ViaVersion.api.Via;
+import com.viaversion.viaversion.api.Via;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +47,7 @@ public class Entity1_10Types {
         return type.get();
     }
 
-    public enum EntityType implements us.myles.ViaVersion.api.entities.EntityType {
+    public enum EntityType implements com.viaversion.viaversion.api.entities.EntityType {
         ENTITY(-1),
         DROPPED_ITEM(1, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
@@ -172,7 +172,7 @@ public class Entity1_10Types {
         }
     }
 
-    public enum ObjectType implements us.myles.ViaVersion.api.entities.ObjectType {
+    public enum ObjectType implements com.viaversion.viaversion.api.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.DROPPED_ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),

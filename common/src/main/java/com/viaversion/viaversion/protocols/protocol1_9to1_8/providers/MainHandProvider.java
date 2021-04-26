@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.providers;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.platform.providers.Provider;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.Provider;
 
 public class MainHandProvider implements Provider {
     public void setMainHand(UserConnection user, int hand) {

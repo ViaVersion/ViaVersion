@@ -1,7 +1,7 @@
-package us.myles.ViaVersion.api.type.types;
+package com.viaversion.viaversion.api.type.types;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.type.Type;
 
 /**
  * Byte array with a short prefix, used in 1.7

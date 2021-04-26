@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets;
+package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.ItemRewriter;
-import us.myles.ViaVersion.api.rewriters.RecipeRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.api.rewriters.RecipeRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 
 public class InventoryPackets {
 

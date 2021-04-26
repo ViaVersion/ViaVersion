@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
 import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
@@ -28,7 +28,7 @@ import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.io.DataInput;
 import java.io.DataOutput;

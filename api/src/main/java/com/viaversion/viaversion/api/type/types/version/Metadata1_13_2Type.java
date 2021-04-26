@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.version;
 
-import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_13_2;
-import us.myles.ViaVersion.api.type.types.minecraft.ModernMetaType;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_13_2;
+import com.viaversion.viaversion.api.type.types.minecraft.ModernMetaType;
 
 public class Metadata1_13_2Type extends ModernMetaType {
     @Override

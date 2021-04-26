@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft.metadata.types;
+package com.viaversion.viaversion.api.minecraft.metadata.types;
 
-import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.type.Type;
 
 public enum MetaType1_8 implements MetaType {
     Byte(0, Type.BYTE),

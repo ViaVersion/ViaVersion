@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.EntityNameRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityNameRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 
 public class SpawnerHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override

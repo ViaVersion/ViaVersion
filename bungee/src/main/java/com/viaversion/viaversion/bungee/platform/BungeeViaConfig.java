@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.platform;
+package com.viaversion.viaversion.bungee.platform;
 
-import us.myles.ViaVersion.AbstractViaConfig;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
+import com.viaversion.viaversion.AbstractViaConfig;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 
 import java.io.File;
 import java.net.URL;

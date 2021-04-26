@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_15to1_14_4.packets;
+package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_15Types;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.entities.Entity1_15Types;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
 
 public class PlayerPackets {
 

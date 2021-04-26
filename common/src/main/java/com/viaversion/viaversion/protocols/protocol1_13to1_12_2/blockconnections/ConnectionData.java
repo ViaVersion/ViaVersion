@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -24,19 +24,19 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord1_8;
-import us.myles.ViaVersion.api.minecraft.BlockFace;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
+import com.viaversion.viaversion.api.minecraft.BlockFace;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

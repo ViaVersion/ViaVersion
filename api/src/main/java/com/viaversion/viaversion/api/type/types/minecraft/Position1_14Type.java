@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.type.Type;
 
 public class Position1_14Type extends Type<Position> {
     public Position1_14Type() {

@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.base;
+package com.viaversion.viaversion.protocols.base;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.UUID;
 

@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.listeners;
+package com.viaversion.viaversion.bungee.listeners;
 
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.update.UpdateUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.update.UpdateUtil;
 
 public class UpdateListener implements Listener {
 

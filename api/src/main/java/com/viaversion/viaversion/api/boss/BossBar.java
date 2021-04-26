@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.boss;
+package com.viaversion.viaversion.api.boss;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
 
 import java.util.Set;
 import java.util.UUID;

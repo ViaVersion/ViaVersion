@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
@@ -25,22 +25,22 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
-import us.myles.ViaVersion.api.rewriters.ItemRewriter;
-import us.myles.ViaVersion.api.rewriters.RecipeRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.ComponentRewriter;
+import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.api.rewriters.RecipeRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;

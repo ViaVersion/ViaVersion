@@ -20,14 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.protocols.base;
+package com.viaversion.viaversion.protocols.base;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.packets.State;
 
 import java.util.UUID;
 

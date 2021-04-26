@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.tasks.protocol1_12to1_11_1;
+package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
+import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
 
 import java.util.ArrayList;
 import java.util.Collections;

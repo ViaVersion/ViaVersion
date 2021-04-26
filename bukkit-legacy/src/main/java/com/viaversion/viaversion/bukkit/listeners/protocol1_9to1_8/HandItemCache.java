@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8;
+package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import us.myles.ViaVersion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;

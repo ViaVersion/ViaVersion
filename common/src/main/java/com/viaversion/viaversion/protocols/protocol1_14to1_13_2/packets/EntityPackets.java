@@ -15,25 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_13Types;
-import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.entities.EntityType;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_14;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_13_2;
-import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 
 import java.util.LinkedList;
 import java.util.List;

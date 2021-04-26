@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.util;
+package com.viaversion.viaversion.util;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.EntityType;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.entities.EntityType;
 
 import java.util.ArrayList;
 import java.util.Comparator;

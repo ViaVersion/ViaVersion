@@ -20,16 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.protocol;
+package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.packets.Direction;
+import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.List;

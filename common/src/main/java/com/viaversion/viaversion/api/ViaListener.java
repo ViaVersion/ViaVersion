@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.api;
+package com.viaversion.viaversion.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.util.UUID;
 

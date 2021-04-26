@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.exception;
+package com.viaversion.viaversion.exception;
 
 import io.netty.handler.codec.CodecException;
-import us.myles.ViaVersion.api.Via;
+import com.viaversion.viaversion.api.Via;
 
 /**
  * Thrown during packet transformation to cancel the packet.
@@ -57,7 +57,7 @@ public class CancelException extends Exception {
     }
 
     /**
-     * Returns a cached CancelException or a new instance when {@link us.myles.ViaVersion.ViaManager#isDebug()} is true.
+     * Returns a cached CancelException or a new instance when {@link com.viaversion.viaversion.ViaManager#isDebug()} is true.
      *
      * @return a CancelException instance
      */

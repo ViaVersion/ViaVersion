@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.providers;
+package com.viaversion.viaversion.bungee.providers;
 
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ProxyServer;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.base.BaseVersionProvider;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

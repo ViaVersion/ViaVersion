@@ -15,34 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_12to1_11_1;
+package com.viaversion.viaversion.protocols.protocol1_12to1_11_1;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.gson.JsonElement;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.api.rewriters.SoundRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_12;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.rewriters.SoundRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_12;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
+import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 

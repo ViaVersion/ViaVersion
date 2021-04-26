@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_12to1_11_1.metadata;
+package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_12Types;
-import us.myles.ViaVersion.api.entities.EntityType;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.BedRewriter;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_12Types;
+import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.BedRewriter;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
 
 import java.util.List;
 

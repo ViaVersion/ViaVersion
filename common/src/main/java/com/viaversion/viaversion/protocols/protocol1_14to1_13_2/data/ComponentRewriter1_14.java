@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data;
 
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 
 public class ComponentRewriter1_14 extends ComponentRewriter1_13 {
 

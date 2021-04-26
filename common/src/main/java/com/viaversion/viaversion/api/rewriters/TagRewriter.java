@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.api.rewriters;
+package com.viaversion.viaversion.api.rewriters;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.MappingData;
-import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft.nbt;
+package com.viaversion.viaversion.api.minecraft.nbt;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;

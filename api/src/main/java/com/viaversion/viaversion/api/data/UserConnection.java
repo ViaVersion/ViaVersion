@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.data;
+package com.viaversion.viaversion.api.data;
 
 import com.google.common.cache.CacheBuilder;
 import io.netty.buffer.ByteBuf;
@@ -28,16 +28,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaVersionConfig;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.exception.InformativeException;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.util.ChatColorUtil;
-import us.myles.ViaVersion.util.PipelineUtil;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaVersionConfig;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.packets.Direction;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.PipelineUtil;
 
 import java.util.Collections;
 import java.util.Map;

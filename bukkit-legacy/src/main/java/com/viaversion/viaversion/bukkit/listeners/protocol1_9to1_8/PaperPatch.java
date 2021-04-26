@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8;
+package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,8 +24,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.Plugin;
-import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class PaperPatch extends ViaBukkitListener {
 

@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_11to1_10.metadata;
+package com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_11Types;
-import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.EntityIdRewriter;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
-import us.myles.ViaVersion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_11Types;
+import com.viaversion.viaversion.api.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.EntityIdRewriter;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
     }
 
     @Override
-    protected void handleMetadata(int entityId, us.myles.ViaVersion.api.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
+    protected void handleMetadata(int entityId, com.viaversion.viaversion.api.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         if (metadata.getValue() instanceof Item) {
             // Apply rewrite
             EntityIdRewriter.toClientItem((Item) metadata.getValue());
@@ -147,12 +147,12 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
     }
 
     @Override
-    protected us.myles.ViaVersion.api.entities.EntityType getTypeFromId(int type) {
+    protected com.viaversion.viaversion.api.entities.EntityType getTypeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected us.myles.ViaVersion.api.entities.EntityType getObjectTypeFromId(int type) {
+    protected com.viaversion.viaversion.api.entities.EntityType getObjectTypeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, true);
     }
 

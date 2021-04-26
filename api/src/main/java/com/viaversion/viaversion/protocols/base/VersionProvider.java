@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.protocols.base;
+package com.viaversion.viaversion.protocols.base;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.platform.providers.Provider;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.Provider;
 
 public interface VersionProvider extends Provider {
 

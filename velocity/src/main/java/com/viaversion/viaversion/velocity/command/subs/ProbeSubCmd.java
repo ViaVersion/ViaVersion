@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.command.subs;
+package com.viaversion.viaversion.velocity.command.subs;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.velocity.platform.VelocityViaConfig;
-import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.velocity.platform.VelocityViaConfig;
+import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 
 public class ProbeSubCmd extends ViaSubCommand {
     @Override

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.util;
+package com.viaversion.viaversion.velocity.util;
 
 import org.slf4j.Logger;
 

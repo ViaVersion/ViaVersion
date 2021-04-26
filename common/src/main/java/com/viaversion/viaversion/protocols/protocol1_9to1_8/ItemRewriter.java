@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
@@ -23,7 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import us.myles.ViaVersion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 
 import java.util.Collections;
 import java.util.HashMap;

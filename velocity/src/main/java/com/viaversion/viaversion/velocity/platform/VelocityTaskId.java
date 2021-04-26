@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.platform;
+package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import us.myles.ViaVersion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.TaskId;
 
 public class VelocityTaskId implements TaskId {
     private final ScheduledTask object;

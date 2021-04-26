@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.boss;
+package com.viaversion.viaversion.boss;
 
 import com.google.common.base.Preconditions;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossFlag;
-import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.boss.BossBar;
+import com.viaversion.viaversion.api.boss.BossColor;
+import com.viaversion.viaversion.api.boss.BossFlag;
+import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.*;
 import java.util.stream.Collectors;

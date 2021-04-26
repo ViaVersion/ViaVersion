@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types;
+package com.viaversion.viaversion.api.type.types;
 
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.LinkedList;
 import java.util.List;

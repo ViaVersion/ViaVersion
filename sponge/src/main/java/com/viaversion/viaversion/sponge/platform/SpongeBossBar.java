@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.platform;
+package com.viaversion.viaversion.sponge.platform;
 
 import org.spongepowered.api.entity.living.player.Player;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.boss.CommonBoss;
+import com.viaversion.viaversion.api.boss.BossBar;
+import com.viaversion.viaversion.api.boss.BossColor;
+import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.boss.CommonBoss;
 
 public class SpongeBossBar extends CommonBoss<Player> {
 

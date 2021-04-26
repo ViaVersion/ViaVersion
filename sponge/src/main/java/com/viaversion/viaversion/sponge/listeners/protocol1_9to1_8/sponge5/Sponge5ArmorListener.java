@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge5;
+package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5;
 
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -28,13 +28,13 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
-import us.myles.ViaVersion.SpongePlugin;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.sponge.listeners.ViaSpongeListener;
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ArmorType;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.sponge.listeners.ViaSpongeListener;
 
 import java.util.Optional;
 import java.util.UUID;

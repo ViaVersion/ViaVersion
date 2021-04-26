@@ -49,7 +49,7 @@ You can find official dev builds here:
 **API-artifact:**
 ```xml
 <dependency>
-    <groupId>us.myles</groupId>
+    <groupId>com.viaversion</groupId>
     <artifactId>viaversion-api</artifactId>
     <version>LATEST</version>
     <scope>provided</scope>

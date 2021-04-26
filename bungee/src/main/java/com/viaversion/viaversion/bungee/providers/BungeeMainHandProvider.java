@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.providers;
+package com.viaversion.viaversion.bungee.providers;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MainHandProvider;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

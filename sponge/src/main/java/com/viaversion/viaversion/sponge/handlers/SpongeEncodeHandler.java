@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.handlers;
+package com.viaversion.viaversion.sponge.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.exception.CancelEncoderException;
-import us.myles.ViaVersion.exception.CancelCodecException;
-import us.myles.ViaVersion.handlers.ChannelHandlerContextWrapper;
-import us.myles.ViaVersion.handlers.ViaHandler;
-import us.myles.ViaVersion.util.PipelineUtil;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.exception.CancelEncoderException;
+import com.viaversion.viaversion.exception.CancelCodecException;
+import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
+import com.viaversion.viaversion.handlers.ViaHandler;
+import com.viaversion.viaversion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 

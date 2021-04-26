@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.providers;
+package com.viaversion.viaversion.bungee.providers;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 
 public class BungeeMovementTransmitter extends MovementTransmitterProvider {
     @Override

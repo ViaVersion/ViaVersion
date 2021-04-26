@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.platform;
+package com.viaversion.viaversion.bukkit.platform;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -25,14 +25,14 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.bukkit.handlers.BukkitChannelInitializer;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
-import us.myles.ViaVersion.util.ConcurrentList;
-import us.myles.ViaVersion.util.ListWrapper;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
+import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import com.viaversion.viaversion.util.ConcurrentList;
+import com.viaversion.viaversion.util.ListWrapper;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

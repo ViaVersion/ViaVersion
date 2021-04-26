@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8;
+package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.world.Location;
-import us.myles.ViaVersion.SpongePlugin;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import us.myles.ViaVersion.sponge.listeners.ViaSpongeListener;
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.sponge.listeners.ViaSpongeListener;
 
 public class BlockListener extends ViaSpongeListener {
 

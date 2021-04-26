@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
@@ -23,26 +23,26 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
-import us.myles.ViaVersion.bukkit.commands.BukkitCommandHandler;
-import us.myles.ViaVersion.bukkit.commands.BukkitCommandSender;
-import us.myles.ViaVersion.bukkit.listeners.ProtocolLibEnableListener;
-import us.myles.ViaVersion.bukkit.platform.BukkitTaskId;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaAPI;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaConfig;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaInjector;
-import us.myles.ViaVersion.bukkit.platform.BukkitViaLoader;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
-import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.util.UnsupportedSoftware;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
+import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
+import com.viaversion.viaversion.bukkit.commands.BukkitCommandSender;
+import com.viaversion.viaversion.bukkit.listeners.ProtocolLibEnableListener;
+import com.viaversion.viaversion.bukkit.platform.BukkitTaskId;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
+import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.UnsupportedSoftware;
 
 import java.util.ArrayList;
 import java.util.Collection;

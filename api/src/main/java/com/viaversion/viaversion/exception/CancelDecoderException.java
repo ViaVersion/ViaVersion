@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.exception;
+package com.viaversion.viaversion.exception;
 
 import io.netty.handler.codec.DecoderException;
-import us.myles.ViaVersion.api.Via;
+import com.viaversion.viaversion.api.Via;
 
 /**
  * Thrown during packet decoding when an incoming packet should be cancelled.
@@ -54,7 +54,7 @@ public class CancelDecoderException extends DecoderException implements CancelCo
     }
 
     /**
-     * Returns a cached CancelDecoderException or a new instance when {@link us.myles.ViaVersion.ViaManager#isDebug()} is true.
+     * Returns a cached CancelDecoderException or a new instance when {@link com.viaversion.viaversion.ViaManager#isDebug()} is true.
      *
      * @param cause cause for being used when a new instance is creeated
      * @return a CancelDecoderException instance

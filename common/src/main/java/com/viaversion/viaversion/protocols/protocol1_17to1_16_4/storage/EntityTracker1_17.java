@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage;
+package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_17Types;
-import us.myles.ViaVersion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.storage.EntityTracker;
 
 public class EntityTracker1_17 extends EntityTracker {
 

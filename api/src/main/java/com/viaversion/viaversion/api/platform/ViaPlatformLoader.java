@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.platform;
+package com.viaversion.viaversion.api.platform;
 
 public interface ViaPlatformLoader {
 

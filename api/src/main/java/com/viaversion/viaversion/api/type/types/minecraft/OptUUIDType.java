@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.UUID;
 

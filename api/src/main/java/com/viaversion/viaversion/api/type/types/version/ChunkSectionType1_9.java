@@ -20,12 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.version;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.util.CompactArrayUtil;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.CompactArrayUtil;
 
 public class ChunkSectionType1_9 extends Type<ChunkSection> {
     private static final int GLOBAL_PALETTE = 13;

@@ -15,29 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.platform;
+package com.viaversion.viaversion.bungee.platform;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import us.myles.ViaVersion.BungeePlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bungee.handlers.BungeeServerHandler;
-import us.myles.ViaVersion.bungee.listeners.ElytraPatch;
-import us.myles.ViaVersion.bungee.listeners.UpdateListener;
-import us.myles.ViaVersion.bungee.providers.BungeeBossBarProvider;
-import us.myles.ViaVersion.bungee.providers.BungeeEntityIdProvider;
-import us.myles.ViaVersion.bungee.providers.BungeeMainHandProvider;
-import us.myles.ViaVersion.bungee.providers.BungeeMovementTransmitter;
-import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
-import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
-import us.myles.ViaVersion.protocols.base.VersionProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MainHandProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.BungeePlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.bungee.handlers.BungeeServerHandler;
+import com.viaversion.viaversion.bungee.listeners.ElytraPatch;
+import com.viaversion.viaversion.bungee.listeners.UpdateListener;
+import com.viaversion.viaversion.bungee.providers.BungeeBossBarProvider;
+import com.viaversion.viaversion.bungee.providers.BungeeEntityIdProvider;
+import com.viaversion.viaversion.bungee.providers.BungeeMainHandProvider;
+import com.viaversion.viaversion.bungee.providers.BungeeMovementTransmitter;
+import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
+import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
+import com.viaversion.viaversion.protocols.base.VersionProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.platform;
+package com.viaversion.viaversion.velocity.platform;
 
-import us.myles.ViaVersion.AbstractViaConfig;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.AbstractViaConfig;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
 
 import java.io.File;
 import java.net.URL;

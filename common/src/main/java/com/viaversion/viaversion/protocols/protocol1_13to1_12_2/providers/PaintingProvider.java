@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers;
 
-import us.myles.ViaVersion.api.platform.providers.Provider;
+import com.viaversion.viaversion.api.platform.providers.Provider;
 
 import java.util.HashMap;
 import java.util.Locale;

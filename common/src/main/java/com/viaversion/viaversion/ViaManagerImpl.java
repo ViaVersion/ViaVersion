@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
-import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.ProtocolManager;
-import us.myles.ViaVersion.api.protocol.ProtocolManagerImpl;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.api.protocol.ServerProtocolVersion;
-import us.myles.ViaVersion.api.protocol.ServerProtocolVersionRange;
-import us.myles.ViaVersion.api.protocol.ServerProtocolVersionSingleton;
-import us.myles.ViaVersion.commands.ViaCommandHandler;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.TabCompleteThread;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ViaIdleThread;
-import us.myles.ViaVersion.update.UpdateUtil;
-import us.myles.ViaVersion.util.UnsupportedSoftware;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.ViaConnectionManager;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.ProtocolManager;
+import com.viaversion.viaversion.api.protocol.ProtocolManagerImpl;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.ServerProtocolVersion;
+import com.viaversion.viaversion.api.protocol.ServerProtocolVersionRange;
+import com.viaversion.viaversion.api.protocol.ServerProtocolVersionSingleton;
+import com.viaversion.viaversion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.TabCompleteThread;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ViaIdleThread;
+import com.viaversion.viaversion.update.UpdateUtil;
+import com.viaversion.viaversion.util.UnsupportedSoftware;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data;
+package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.rewriters.ItemRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
 
 public class RecipeRewriter1_16 extends RecipeRewriter1_14 {
 

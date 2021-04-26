@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.platform;
+package com.viaversion.viaversion.sponge.platform;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -25,12 +25,12 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.sponge.handlers.SpongeChannelInitializer;
-import us.myles.ViaVersion.util.ListWrapper;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.sponge.handlers.SpongeChannelInitializer;
+import com.viaversion.viaversion.util.ListWrapper;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

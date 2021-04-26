@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.storage;
+package com.viaversion.viaversion.bungee.storage;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
 
 import java.lang.reflect.Field;
 import java.util.Objects;

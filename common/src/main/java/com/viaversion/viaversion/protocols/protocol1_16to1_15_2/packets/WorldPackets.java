@@ -15,25 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.BlockRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.UUIDIntArrayType;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
-import us.myles.ViaVersion.util.CompactArrayUtil;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.BlockRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
+import com.viaversion.viaversion.util.CompactArrayUtil;
 
 import java.util.Map;
 import java.util.UUID;

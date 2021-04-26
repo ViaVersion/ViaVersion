@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.command;
+package com.viaversion.viaversion.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
-import us.myles.ViaVersion.commands.ViaCommandHandler;
-import us.myles.ViaVersion.velocity.command.subs.ProbeSubCmd;
+import com.viaversion.viaversion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.velocity.command.subs.ProbeSubCmd;
 
 import java.util.List;
 

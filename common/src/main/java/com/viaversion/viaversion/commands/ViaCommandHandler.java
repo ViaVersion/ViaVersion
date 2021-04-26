@@ -15,22 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.commands;
+package com.viaversion.viaversion.commands;
 
 import com.google.common.base.Preconditions;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.api.command.ViaVersionCommand;
-import us.myles.ViaVersion.commands.defaultsubs.AutoTeamSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.DebugSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.DisplayLeaksSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.DontBugMeSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.DumpSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.HelpSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.ListSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.PPSSubCmd;
-import us.myles.ViaVersion.commands.defaultsubs.ReloadSubCmd;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.api.command.ViaVersionCommand;
+import com.viaversion.viaversion.commands.defaultsubs.AutoTeamSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.DebugSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.DisplayLeaksSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.DontBugMeSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.DumpSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.HelpSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.ReloadSubCmd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static us.myles.ViaVersion.api.command.ViaSubCommand.color;
+import static com.viaversion.viaversion.api.command.ViaSubCommand.color;
 
 public abstract class ViaCommandHandler implements ViaVersionCommand {
     private final Map<String, ViaSubCommand> commandMap = new HashMap<>();

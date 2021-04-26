@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.chat;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.chat;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 public class ChatRewriter {
     /**

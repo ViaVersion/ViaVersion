@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.protocol;
+package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.collect.Range;
 import org.checkerframework.checker.nullness.qual.Nullable;

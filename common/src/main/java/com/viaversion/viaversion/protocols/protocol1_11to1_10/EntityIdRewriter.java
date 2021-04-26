@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_11to1_10;
+package com.viaversion.viaversion.protocols.protocol1_11to1_10;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import us.myles.ViaVersion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 
 public class EntityIdRewriter {
     private static final BiMap<String, String> oldToNewNames = HashBiMap.create();

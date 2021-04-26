@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_11to1_10.storage;
+package com.viaversion.viaversion.protocols.protocol1_11to1_10.storage;
 
 import com.google.common.collect.Sets;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_11Types.EntityType;
-import us.myles.ViaVersion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.api.storage.EntityTracker;
 
 import java.util.Set;
 

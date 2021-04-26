@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.update;
+package com.viaversion.viaversion.update;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.entities.EntityType;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.api.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 
 import java.util.HashMap;
 import java.util.Optional;
 
-import static us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType.*;
+import static com.viaversion.viaversion.api.entities.Entity1_10Types.EntityType.*;
 
 public enum MetaIndex {
 

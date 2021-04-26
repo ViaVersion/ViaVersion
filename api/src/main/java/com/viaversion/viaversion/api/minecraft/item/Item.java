@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft.item;
+package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;

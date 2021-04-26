@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.data;
+package com.viaversion.viaversion.api.data;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaVersionConfig;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaVersionConfig;
 
 public class PacketTracker {
     private final UserConnection connection;

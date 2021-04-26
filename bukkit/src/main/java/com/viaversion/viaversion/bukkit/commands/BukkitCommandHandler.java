@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.commands;
+package com.viaversion.viaversion.bukkit.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import us.myles.ViaVersion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.commands.ViaCommandHandler;
 
 import java.util.List;
 

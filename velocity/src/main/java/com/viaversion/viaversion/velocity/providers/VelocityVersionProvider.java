@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.providers;
+package com.viaversion.viaversion.velocity.providers;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import io.netty.channel.ChannelHandler;
-import us.myles.ViaVersion.VelocityPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.base.BaseVersionProvider;
-import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
-import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
+import com.viaversion.viaversion.VelocityPlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
+import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
+import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

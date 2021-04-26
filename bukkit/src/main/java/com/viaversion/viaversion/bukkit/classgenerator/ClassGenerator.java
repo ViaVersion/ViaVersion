@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.classgenerator;
+package com.viaversion.viaversion.bukkit.classgenerator;
 
 import javassist.*;
 import javassist.expr.ConstructorCall;
@@ -27,10 +27,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler;
-import us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
+import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
+import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
+import com.viaversion.viaversion.bukkit.util.NMSUtil;
 
 import java.lang.reflect.Method;
 
@@ -78,14 +78,14 @@ public class ClassGenerator {
 
 
                 // Implement Constructor
-                CtClass generated = pool.makeClass("us.myles.ViaVersion.classgenerator.generated.GeneratedConstructor");
+                CtClass generated = pool.makeClass("com.viaversion.viaversion.classgenerator.generated.GeneratedConstructor");
                 CtClass handlerInterface = pool.get(HandlerConstructor.class.getName());
 
                 generated.setInterfaces(new CtClass[]{handlerInterface});
                 // Import required classes
-                pool.importPackage("us.myles.ViaVersion.classgenerator.generated");
-                pool.importPackage("us.myles.ViaVersion.classgenerator");
-                pool.importPackage("us.myles.ViaVersion.api.data");
+                pool.importPackage("com.viaversion.viaversion.classgenerator.generated");
+                pool.importPackage("com.viaversion.viaversion.classgenerator");
+                pool.importPackage("com.viaversion.viaversion.api.data");
                 pool.importPackage("io.netty.handler.codec");
                 // Implement Methods
                 generated.addMethod(CtMethod.make("public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {\n" +
@@ -111,7 +111,7 @@ public class ClassGenerator {
     }
 
     private static Class addSpigotCompatibility(ClassPool pool, Class input, Class superclass) {
-        String newName = "us.myles.ViaVersion.classgenerator.generated." + input.getSimpleName();
+        String newName = "com.viaversion.viaversion.classgenerator.generated." + input.getSimpleName();
 
         try {
             CtClass generated = pool.getAndRename(input.getName(), newName);
@@ -147,7 +147,7 @@ public class ClassGenerator {
 
     private static Class addPSCompatibility(ClassPool pool, Class input, Class superclass) {
         boolean newPS = getOldPSPackage().equals("unknown");
-        String newName = "us.myles.ViaVersion.classgenerator.generated." + input.getSimpleName();
+        String newName = "com.viaversion.viaversion.classgenerator.generated." + input.getSimpleName();
 
         try {
             CtClass generated = pool.getAndRename(input.getName(), newName);
@@ -198,7 +198,7 @@ public class ClassGenerator {
         try {
             // Reference classes
             CtClass toExtend = pool.get("protocolsupport.api.Connection$PacketListener");
-            CtClass connectListenerClazz = pool.makeClass("us.myles.ViaVersion.classgenerator.generated.ProtocolSupportConnectListener");
+            CtClass connectListenerClazz = pool.makeClass("com.viaversion.viaversion.classgenerator.generated.ProtocolSupportConnectListener");
             connectListenerClazz.setSuperclass(toExtend);
             // Import packages
             pool.importPackage("java.util.Arrays");
@@ -231,7 +231,7 @@ public class ClassGenerator {
                   ))
                     // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
                     // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.
-                  + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == us.myles.ViaVersion.api.Via.getAPI().getServerVersion().lowestSupportedVersion()) {\n"
+                  + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == com.viaversion.viaversion.api.Via.getAPI().getServerVersion().lowestSupportedVersion()) {\n"
                   + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
                   + "        }\n"
                   + "    }\n"

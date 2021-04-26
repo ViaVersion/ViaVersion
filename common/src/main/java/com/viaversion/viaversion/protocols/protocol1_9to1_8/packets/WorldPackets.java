@@ -15,32 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.Effect;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.sounds.SoundEffect;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueCreator;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.Effect;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 
 import java.io.IOException;
 import java.util.List;

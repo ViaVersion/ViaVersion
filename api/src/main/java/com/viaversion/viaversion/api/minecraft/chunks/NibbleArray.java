@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft.chunks;
+package com.viaversion.viaversion.api.minecraft.chunks;
 
 import java.util.Arrays;
 

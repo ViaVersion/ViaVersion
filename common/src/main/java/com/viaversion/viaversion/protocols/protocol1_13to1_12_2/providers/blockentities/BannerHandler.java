@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.blockentities;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
@@ -23,12 +23,12 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 
 public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
     private static final int WALL_BANNER_START = 7110; // 4 each

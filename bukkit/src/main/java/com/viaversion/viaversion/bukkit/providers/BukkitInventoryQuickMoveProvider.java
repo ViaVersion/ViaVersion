@@ -15,22 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.providers;
+package com.viaversion.viaversion.bukkit.providers;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bukkit.tasks.protocol1_12to1_11_1.BukkitInventoryUpdateTask;
-import us.myles.ViaVersion.bukkit.util.NMSUtil;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1.BukkitInventoryUpdateTask;
+import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

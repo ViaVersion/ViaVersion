@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_12_1to1_12;
+package com.viaversion.viaversion.protocols.protocol1_12_1to1_12;
 
-import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
 
 public enum ClientboundPackets1_12_1 implements ClientboundPacketType {
 

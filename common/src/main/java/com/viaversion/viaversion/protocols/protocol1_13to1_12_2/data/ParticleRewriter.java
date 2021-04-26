@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.util.ArrayList;
 import java.util.Arrays;

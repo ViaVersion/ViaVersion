@@ -20,13 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.version;
 
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.api.type.types.minecraft.Particle1_13Type;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.types.minecraft.Particle1_13Type;
 
 import java.util.List;
 

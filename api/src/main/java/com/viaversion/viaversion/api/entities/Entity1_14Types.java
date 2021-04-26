@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.entities;
+package com.viaversion.viaversion.api.entities;
 
-import us.myles.ViaVersion.util.EntityTypeUtil;
+import com.viaversion.viaversion.util.EntityTypeUtil;
 
 public enum Entity1_14Types implements EntityType {
 

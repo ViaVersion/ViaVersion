@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage;
+package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage;
 
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.Environment;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Environment;
 
 /**
  * Stored up until 1.14 to be used in chunk sending.

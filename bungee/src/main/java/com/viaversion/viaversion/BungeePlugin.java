@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.ProxyServer;
@@ -23,24 +23,24 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.bungee.commands.BungeeCommand;
-import us.myles.ViaVersion.bungee.commands.BungeeCommandHandler;
-import us.myles.ViaVersion.bungee.commands.BungeeCommandSender;
-import us.myles.ViaVersion.bungee.platform.BungeeTaskId;
-import us.myles.ViaVersion.bungee.platform.BungeeViaAPI;
-import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
-import us.myles.ViaVersion.bungee.platform.BungeeViaInjector;
-import us.myles.ViaVersion.bungee.platform.BungeeViaLoader;
-import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
-import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.bungee.commands.BungeeCommand;
+import com.viaversion.viaversion.bungee.commands.BungeeCommandHandler;
+import com.viaversion.viaversion.bungee.commands.BungeeCommandSender;
+import com.viaversion.viaversion.bungee.platform.BungeeTaskId;
+import com.viaversion.viaversion.bungee.platform.BungeeViaAPI;
+import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
+import com.viaversion.viaversion.bungee.platform.BungeeViaInjector;
+import com.viaversion.viaversion.bungee.platform.BungeeViaLoader;
+import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
+import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;

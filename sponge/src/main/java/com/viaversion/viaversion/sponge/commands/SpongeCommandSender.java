@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.commands;
+package com.viaversion.viaversion.sponge.commands;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Identifiable;
-import us.myles.ViaVersion.SpongePlugin;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 

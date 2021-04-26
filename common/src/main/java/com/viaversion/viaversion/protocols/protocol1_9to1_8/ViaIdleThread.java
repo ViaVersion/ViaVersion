@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 
 public class ViaIdleThread implements Runnable {
 

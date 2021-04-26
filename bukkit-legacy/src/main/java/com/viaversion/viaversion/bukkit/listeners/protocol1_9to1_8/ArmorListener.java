@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8;
+package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -32,12 +32,12 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ArmorType;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ArmorType;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.UUID;
 

@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.util;
+package com.viaversion.viaversion.util;
 
-import us.myles.ViaVersion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
 
 public class VersionInfo {
 

@@ -15,29 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets;
+package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_17Types;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.BlockRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.BlockRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 
 import java.util.ArrayList;
 import java.util.BitSet;

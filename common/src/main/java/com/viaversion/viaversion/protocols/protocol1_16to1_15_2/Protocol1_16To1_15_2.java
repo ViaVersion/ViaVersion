@@ -15,35 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16to1_15_2;
+package com.viaversion.viaversion.protocols.protocol1_16to1_15_2;
 
 import com.google.common.base.Joiner;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.ComponentRewriter;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.api.rewriters.RegistryType;
-import us.myles.ViaVersion.api.rewriters.SoundRewriter;
-import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
-import us.myles.ViaVersion.api.rewriters.TagRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data.TranslationMappings;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.ComponentRewriter;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.rewriters.RegistryType;
+import com.viaversion.viaversion.api.rewriters.SoundRewriter;
+import com.viaversion.viaversion.api.rewriters.StatisticsRewriter;
+import com.viaversion.viaversion.api.rewriters.TagRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.MappingData;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.TranslationMappings;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

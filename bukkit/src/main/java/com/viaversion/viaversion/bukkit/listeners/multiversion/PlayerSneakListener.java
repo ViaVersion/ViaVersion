@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.listeners.multiversion;
+package com.viaversion.viaversion.bukkit.listeners.multiversion;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -23,12 +23,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bukkit.listeners.ViaBukkitListener;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

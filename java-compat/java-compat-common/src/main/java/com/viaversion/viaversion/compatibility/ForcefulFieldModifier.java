@@ -1,4 +1,4 @@
-package us.myles.ViaVersion.compatibility;
+package com.viaversion.viaversion.compatibility;
 
 import java.lang.reflect.Field;
 

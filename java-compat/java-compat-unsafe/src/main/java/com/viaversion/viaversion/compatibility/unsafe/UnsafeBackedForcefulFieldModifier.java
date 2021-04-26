@@ -1,6 +1,6 @@
-package us.myles.ViaVersion.compatibility.unsafe;
+package com.viaversion.viaversion.compatibility.unsafe;
 
-import us.myles.ViaVersion.compatibility.ForcefulFieldModifier;
+import com.viaversion.viaversion.compatibility.ForcefulFieldModifier;
 
 import java.lang.reflect.Field;
 import java.util.Objects;

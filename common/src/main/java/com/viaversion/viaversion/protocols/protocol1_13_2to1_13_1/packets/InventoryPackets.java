@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.packets;
+package com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 
 public class InventoryPackets {
 

@@ -20,12 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.data;
+package com.viaversion.viaversion.api.data;
 
 import com.google.gson.JsonObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.util.Int2IntBiMap;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.util.Int2IntBiMap;
 
 public class MappingData {
     protected final String oldVersion;

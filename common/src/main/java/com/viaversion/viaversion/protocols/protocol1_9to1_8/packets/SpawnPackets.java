@@ -15,26 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.packets;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueCreator;
+import com.viaversion.viaversion.api.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.ArrayList;
 import java.util.List;

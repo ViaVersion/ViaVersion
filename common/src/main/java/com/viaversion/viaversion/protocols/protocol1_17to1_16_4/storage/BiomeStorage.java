@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage;
+package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
 
 import java.util.HashMap;
 import java.util.Map;

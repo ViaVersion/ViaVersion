@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.protocol;
+package com.viaversion.viaversion.api.protocol;
 
 /**
  * Dummy protocol class when there is no need of any of the

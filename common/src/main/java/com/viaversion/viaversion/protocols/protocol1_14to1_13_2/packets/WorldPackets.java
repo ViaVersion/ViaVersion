@@ -15,29 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.minecraft.BlockFace;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.rewriters.BlockRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.util.CompactArrayUtil;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.minecraft.BlockFace;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueCreator;
+import com.viaversion.viaversion.api.rewriters.BlockRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.util.CompactArrayUtil;
 
 import java.util.Arrays;
 

@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.listeners;
+package com.viaversion.viaversion.bukkit.listeners;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.update.UpdateUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.update.UpdateUtil;
 
 public class UpdateListener implements Listener {
 

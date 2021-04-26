@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.classgenerator;
+package com.viaversion.viaversion.bukkit.classgenerator;
 
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.data.UserConnection;
 
 public interface HandlerConstructor {
     public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder);

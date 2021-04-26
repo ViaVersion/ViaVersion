@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.providers;
+package com.viaversion.viaversion.velocity.providers;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import us.myles.ViaVersion.velocity.storage.VelocityStorage;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.velocity.storage.VelocityStorage;
 
 import java.util.UUID;
 

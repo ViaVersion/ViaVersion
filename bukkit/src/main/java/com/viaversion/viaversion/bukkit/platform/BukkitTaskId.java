@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.platform;
+package com.viaversion.viaversion.bukkit.platform;
 
-import us.myles.ViaVersion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.TaskId;
 
 public class BukkitTaskId implements TaskId {
     private final Integer object;

@@ -15,22 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.entities.EntityType;
-import us.myles.ViaVersion.api.minecraft.EulerAngle;
-import us.myles.ViaVersion.api.minecraft.Vector;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.EulerAngle;
+import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.util.List;
 import java.util.UUID;

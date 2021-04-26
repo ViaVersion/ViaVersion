@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.common.entities;
+package com.viaversion.viaversion.common.entities;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.entities.Entity1_15Types;
-import us.myles.ViaVersion.api.entities.Entity1_16Types;
-import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
-import us.myles.ViaVersion.api.entities.Entity1_17Types;
-import us.myles.ViaVersion.api.entities.EntityType;
+import com.viaversion.viaversion.api.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.entities.Entity1_15Types;
+import com.viaversion.viaversion.api.entities.Entity1_16Types;
+import com.viaversion.viaversion.api.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.entities.EntityType;
 
 import java.util.function.Function;
 

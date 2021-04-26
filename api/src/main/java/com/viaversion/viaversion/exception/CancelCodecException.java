@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.exception;
+package com.viaversion.viaversion.exception;
 
 /**
  * Shared dummy interface for {@link CancelDecoderException} and {@link CancelEncoderException}.

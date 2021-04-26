@@ -20,12 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.remapper;
+package com.viaversion.viaversion.api.remapper;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.InformativeException;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.InformativeException;
 
 public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
     private final Type<T1> inputType;

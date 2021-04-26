@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.listeners;
+package com.viaversion.viaversion.sponge.listeners;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import us.myles.ViaVersion.SpongePlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaListener;
-import us.myles.ViaVersion.api.protocol.Protocol;
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaListener;
+import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.lang.reflect.Field;
 

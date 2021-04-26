@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.platform;
+package com.viaversion.viaversion.bukkit.platform;
 
 import org.bukkit.plugin.Plugin;
-import us.myles.ViaVersion.AbstractViaConfig;
-import us.myles.ViaVersion.api.Via;
+import com.viaversion.viaversion.AbstractViaConfig;
+import com.viaversion.viaversion.api.Via;
 
 import java.io.File;
 import java.net.URL;

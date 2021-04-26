@@ -15,29 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.storage;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_10Types.EntityType;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.api.storage.EntityTracker;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chat.GameMode;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.boss.BossBar;
+import com.viaversion.viaversion.api.boss.BossColor;
+import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_10Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.GameMode;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -159,7 +159,7 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public void handleMetadata(int entityId, List<Metadata> metadataList) {
-        us.myles.ViaVersion.api.entities.EntityType type = getEntity(entityId);
+        com.viaversion.viaversion.api.entities.EntityType type = getEntity(entityId);
         if (type == null) {
             return;
         }

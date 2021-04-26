@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
@@ -27,21 +27,21 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.ItemRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ChatRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.BlockIdData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SoundSource;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.BlockIdData;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SoundSource;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

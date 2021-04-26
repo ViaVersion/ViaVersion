@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.base;
+package com.viaversion.viaversion.protocols.base;
 
 import com.google.common.base.Joiner;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.netty.channel.ChannelFuture;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.protocol.ProtocolManagerImpl;
-import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.api.protocol.ServerProtocolVersionSingleton;
-import us.myles.ViaVersion.api.protocol.SimpleProtocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.util.ChatColorUtil;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.ProtocolManagerImpl;
+import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.ServerProtocolVersionSingleton;
+import com.viaversion.viaversion.api.protocol.SimpleProtocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.util.List;
 import java.util.UUID;

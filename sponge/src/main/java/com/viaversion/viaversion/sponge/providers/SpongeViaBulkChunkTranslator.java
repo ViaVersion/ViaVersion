@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.providers;
+package com.viaversion.viaversion.sponge.providers;
 
 import com.google.common.collect.Lists;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.util.List;
 import java.util.logging.Level;

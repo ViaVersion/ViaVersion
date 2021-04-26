@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
@@ -24,19 +24,19 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.LongTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_16Types;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.entities.Entity1_16Types;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 
 import java.util.UUID;
 
@@ -235,7 +235,7 @@ public class EntityPackets {
                         String attributeIdentifier = protocol.getMappingData().getAttributeMappings().get(key);
                         if (attributeIdentifier == null) {
                             attributeIdentifier = "minecraft:" + key;
-                            if (!us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
+                            if (!com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
                                 if (!Via.getConfig().isSuppressConversionWarnings()) {
                                     Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
                                 }

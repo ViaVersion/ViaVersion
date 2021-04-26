@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.data;
+package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonObject;
 
-public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
+public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
     private final BiMap<String, String> attributeMappings = HashBiMap.create();
 
     public MappingData() {

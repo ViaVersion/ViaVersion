@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.platform;
+package com.viaversion.viaversion.sponge.platform;
 
 import org.spongepowered.api.scheduler.Task;
-import us.myles.ViaVersion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.TaskId;
 
 public class SpongeTaskId implements TaskId {
     private final Task object;

@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14_1to1_14;
+package com.viaversion.viaversion.protocols.protocol1_14_1to1_14;
 
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.metadata.MetadataRewriter1_14_1To1_14;
-import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_14_1to1_14.storage.EntityTracker1_14_1;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.protocols.protocol1_14_1to1_14.metadata.MetadataRewriter1_14_1To1_14;
+import com.viaversion.viaversion.protocols.protocol1_14_1to1_14.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_14_1to1_14.storage.EntityTracker1_14_1;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 
 public class Protocol1_14_1To1_14 extends Protocol<ClientboundPackets1_14, ClientboundPackets1_14, ServerboundPackets1_14, ServerboundPackets1_14> {
 

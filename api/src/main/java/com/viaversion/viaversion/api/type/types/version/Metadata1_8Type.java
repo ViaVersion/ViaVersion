@@ -20,13 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.version;
 
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaTypeTemplate;
 
 public class Metadata1_8Type extends MetaTypeTemplate {
 

@@ -54,10 +54,10 @@ fun Project.configureShadowJar() {
 }
 
 private fun ShadowJar.configureRelocations() {
-    relocate("javassist", "us.myles.viaversion.libs.javassist")
-    relocate("com.google.gson", "us.myles.viaversion.libs.gson")
-    relocate("com.github.steveice10.opennbt", "us.myles.viaversion.libs.opennbt")
-    relocate("it.unimi.dsi.fastutil", "us.myles.viaversion.libs.fastutil")
+    relocate("javassist", "com.viaversion.viaversion.libs.javassist")
+    relocate("com.google.gson", "com.viaversion.viaversion.libs.gson")
+    relocate("com.github.steveice10.opennbt", "com.viaversion.viaversion.libs.opennbt")
+    relocate("it.unimi.dsi.fastutil", "com.viaversion.viaversion.libs.fastutil")
 }
 
 private fun ShadowJar.configureExcludes() {

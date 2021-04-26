@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.platform;
+package com.viaversion.viaversion.velocity.platform;
 
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelInitializer;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import us.myles.ViaVersion.VelocityPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.util.ReflectionUtil;
-import us.myles.ViaVersion.velocity.handlers.VelocityChannelInitializer;
+import com.viaversion.viaversion.VelocityPlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.util.ReflectionUtil;
+import com.viaversion.viaversion.velocity.handlers.VelocityChannelInitializer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

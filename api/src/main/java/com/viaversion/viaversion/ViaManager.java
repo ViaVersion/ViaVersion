@@ -20,15 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
-import us.myles.ViaVersion.api.command.ViaVersionCommand;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
-import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.ProtocolManager;
+import com.viaversion.viaversion.api.command.ViaVersionCommand;
+import com.viaversion.viaversion.api.platform.ViaConnectionManager;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.ProtocolManager;
 
 import java.util.Set;
 

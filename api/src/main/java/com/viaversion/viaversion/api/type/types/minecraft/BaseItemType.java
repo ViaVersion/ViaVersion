@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
 
 public abstract class BaseItemType extends Type<Item> {
     public BaseItemType() {

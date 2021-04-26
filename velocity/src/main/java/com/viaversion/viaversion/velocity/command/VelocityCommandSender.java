@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.command;
+package com.viaversion.viaversion.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import us.myles.ViaVersion.VelocityPlugin;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.VelocityPlugin;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 

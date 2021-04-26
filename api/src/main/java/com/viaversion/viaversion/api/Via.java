@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api;
+package com.viaversion.viaversion.api;
 
 import com.google.common.base.Preconditions;
-import us.myles.ViaVersion.ViaManager;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.ViaManager;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
 
 public final class Via {
     private static ViaManager manager;

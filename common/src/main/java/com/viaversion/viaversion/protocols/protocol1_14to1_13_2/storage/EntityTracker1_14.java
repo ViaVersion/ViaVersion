@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.storage;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_14Types;
-import us.myles.ViaVersion.api.storage.EntityTracker;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import us.myles.ViaVersion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

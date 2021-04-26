@@ -15,22 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.data;
+package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.minecraft.nbt.BinaryTagIO;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
+public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
     private final Map<String, CompoundTag> dimensionDataMap = new HashMap<>();
     private CompoundTag dimensionRegistry;
 

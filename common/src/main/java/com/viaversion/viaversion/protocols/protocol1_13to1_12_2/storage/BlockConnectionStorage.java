@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
+import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

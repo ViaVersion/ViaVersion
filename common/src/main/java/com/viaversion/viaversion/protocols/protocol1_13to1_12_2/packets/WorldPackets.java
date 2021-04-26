@@ -15,36 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.Particle;
-import us.myles.ViaVersion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import us.myles.ViaVersion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.List;
 import java.util.Optional;

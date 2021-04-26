@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.platform;
+package com.viaversion.viaversion.bungee.platform;
 
-import us.myles.ViaVersion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.TaskId;
 
 public class BungeeTaskId implements TaskId {
     private final Integer object;

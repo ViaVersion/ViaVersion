@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.commands.defaultsubs;
+package com.viaversion.viaversion.commands.defaultsubs;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.command.ViaSubCommand;
 
 public class HelpSubCmd extends ViaSubCommand {
     @Override

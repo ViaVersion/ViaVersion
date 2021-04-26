@@ -15,28 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13_1to1_13;
+package com.viaversion.viaversion.protocols.protocol1_13_1to1_13;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.MappingData;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.rewriters.RegistryType;
-import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
-import us.myles.ViaVersion.api.rewriters.TagRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketHandler;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriters.RegistryType;
+import com.viaversion.viaversion.api.rewriters.StatisticsRewriter;
+import com.viaversion.viaversion.api.rewriters.TagRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
+import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class Protocol1_13_1To1_13 extends Protocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
 

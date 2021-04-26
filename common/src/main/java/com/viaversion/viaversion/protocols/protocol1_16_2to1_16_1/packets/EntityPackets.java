@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.packets;
+package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_16_2Types;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_14;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.storage.EntityTracker1_16_2;
-import us.myles.ViaVersion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.storage.EntityTracker1_16_2;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 
 public class EntityPackets {
 

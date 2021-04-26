@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.data;
+package com.viaversion.viaversion.api.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,9 +30,9 @@ import com.google.gson.JsonSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.util.Int2IntBiMap;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.Int2IntBiMap;
 
 import java.io.File;
 import java.io.FileReader;

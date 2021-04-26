@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.BlockFace;
-import us.myles.ViaVersion.api.minecraft.Position;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockFace;
+import com.viaversion.viaversion.api.minecraft.Position;
 
 import java.util.HashSet;
 import java.util.Set;

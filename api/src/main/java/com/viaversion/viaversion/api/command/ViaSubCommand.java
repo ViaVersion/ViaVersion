@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.command;
+package com.viaversion.viaversion.api.command;
 
-import us.myles.ViaVersion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.ChatColorUtil;
 
 import java.util.Collections;
 import java.util.List;

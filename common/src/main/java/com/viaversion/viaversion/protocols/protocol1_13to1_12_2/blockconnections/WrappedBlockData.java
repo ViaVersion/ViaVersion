@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import us.myles.ViaVersion.api.Via;
+import com.viaversion.viaversion.api.Via;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;

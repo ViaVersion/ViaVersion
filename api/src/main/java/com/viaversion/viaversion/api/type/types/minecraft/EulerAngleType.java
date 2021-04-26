@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.EulerAngle;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.EulerAngle;
+import com.viaversion.viaversion.api.type.Type;
 
 public class EulerAngleType extends Type<EulerAngle> {
     public EulerAngleType() {

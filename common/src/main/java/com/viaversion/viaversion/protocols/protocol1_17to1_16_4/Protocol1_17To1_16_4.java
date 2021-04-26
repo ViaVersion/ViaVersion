@@ -15,28 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_17to1_16_4;
+package com.viaversion.viaversion.protocols.protocol1_17to1_16_4;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.MappingData;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.api.rewriters.RegistryType;
-import us.myles.ViaVersion.api.rewriters.SoundRewriter;
-import us.myles.ViaVersion.api.rewriters.StatisticsRewriter;
-import us.myles.ViaVersion.api.rewriters.TagRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
-import us.myles.ViaVersion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
-import us.myles.ViaVersion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.rewriters.RegistryType;
+import com.viaversion.viaversion.api.rewriters.SoundRewriter;
+import com.viaversion.viaversion.api.rewriters.StatisticsRewriter;
+import com.viaversion.viaversion.api.rewriters.TagRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
 public class Protocol1_17To1_16_4 extends Protocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 

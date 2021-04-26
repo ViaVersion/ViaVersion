@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.handlers;
+package com.viaversion.viaversion.bungee.handlers;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -25,23 +25,23 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.PluginMessage;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.protocol.ProtocolPathEntry;
-import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
-import us.myles.ViaVersion.bungee.storage.BungeeStorage;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
+import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
+import com.viaversion.viaversion.bungee.storage.BungeeStorage;
+import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -8,7 +8,7 @@ plugins {
 // relocated adventure without breaking native platform's adventure usage with project wide relocation
 tasks {
     withType<ShadowJar> {
-        relocate("net.kyori", "us.myles.viaversion.libs.kyori")
+        relocate("net.kyori", "com.viaversion.viaversion.libs.kyori")
     }
     getByName("build") {
         dependsOn(withType<ShadowJar>())

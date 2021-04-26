@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.remapper;
+package com.viaversion.viaversion.api.remapper;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.exception.InformativeException;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.exception.InformativeException;
 
 @FunctionalInterface
 public interface ValueCreator extends ValueWriter {

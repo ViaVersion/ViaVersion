@@ -20,17 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api;
+package com.viaversion.viaversion.api;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.ViaManager;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.platform.ViaConnectionManager;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.api.protocol.ProtocolManager;
-import us.myles.ViaVersion.api.protocol.ServerProtocolVersion;
+import com.viaversion.viaversion.ViaManager;
+import com.viaversion.viaversion.api.boss.BossBar;
+import com.viaversion.viaversion.api.boss.BossColor;
+import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.platform.ViaConnectionManager;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.protocol.ProtocolManager;
+import com.viaversion.viaversion.api.protocol.ServerProtocolVersion;
 
 import java.util.SortedSet;
 import java.util.UUID;

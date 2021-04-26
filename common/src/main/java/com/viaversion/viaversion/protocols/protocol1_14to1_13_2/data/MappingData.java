@@ -15,20 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_14to1_13_2.data;
+package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
+public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
     private IntSet motionBlocking;
     private IntSet nonFullBlocks;
 

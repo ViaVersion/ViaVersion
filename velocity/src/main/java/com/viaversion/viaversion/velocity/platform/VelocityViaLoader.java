@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.platform;
+package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.plugin.PluginContainer;
-import us.myles.ViaVersion.VelocityPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.base.VersionProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import us.myles.ViaVersion.velocity.listeners.UpdateListener;
-import us.myles.ViaVersion.velocity.providers.VelocityBossBarProvider;
-import us.myles.ViaVersion.velocity.providers.VelocityMovementTransmitter;
-import us.myles.ViaVersion.velocity.providers.VelocityVersionProvider;
-import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
+import com.viaversion.viaversion.VelocityPlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.protocols.base.VersionProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.velocity.listeners.UpdateListener;
+import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
+import com.viaversion.viaversion.velocity.providers.VelocityMovementTransmitter;
+import com.viaversion.viaversion.velocity.providers.VelocityVersionProvider;
+import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 
 public class VelocityViaLoader implements ViaPlatformLoader {
     @Override

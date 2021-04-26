@@ -15,38 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.platform;
+package com.viaversion.viaversion.bukkit.platform;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
-import us.myles.ViaVersion.bukkit.listeners.UpdateListener;
-import us.myles.ViaVersion.bukkit.listeners.multiversion.PlayerSneakListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.BlockListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.DeathListener;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.HandItemCache;
-import us.myles.ViaVersion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
-import us.myles.ViaVersion.bukkit.providers.BukkitBlockConnectionProvider;
-import us.myles.ViaVersion.bukkit.providers.BukkitInventoryQuickMoveProvider;
-import us.myles.ViaVersion.bukkit.providers.BukkitViaBulkChunkTranslator;
-import us.myles.ViaVersion.bukkit.providers.BukkitViaMovementTransmitter;
-import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
-import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
+import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
+import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.BlockListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.DeathListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.HandItemCache;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
+import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
+import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
+import com.viaversion.viaversion.bukkit.providers.BukkitViaBulkChunkTranslator;
+import com.viaversion.viaversion.bukkit.providers.BukkitViaMovementTransmitter;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
 import java.util.HashSet;
 import java.util.Locale;

@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.api.rewriters;
+package com.viaversion.viaversion.api.rewriters;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.protocol.ClientboundPacketType;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.GsonUtil;
 
 /**
  * Handles json chat components, containing methods to override certain parts of the handling.

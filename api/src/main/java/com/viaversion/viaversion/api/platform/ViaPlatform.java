@@ -20,17 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.platform;
+package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.ViaManager;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.ViaVersionConfig;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.util.UnsupportedSoftware;
+import com.viaversion.viaversion.ViaManager;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.ViaVersionConfig;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.util.UnsupportedSoftware;
 
 import java.io.File;
 import java.util.Collection;

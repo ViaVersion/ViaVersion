@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.listeners;
+package com.viaversion.viaversion.velocity.listeners;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.update.UpdateUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.update.UpdateUtil;
 
 public class UpdateListener {
     @Subscribe

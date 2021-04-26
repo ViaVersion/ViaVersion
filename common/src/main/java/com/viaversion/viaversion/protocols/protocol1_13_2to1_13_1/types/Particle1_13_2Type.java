@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13_2to1_13_1.types;
+package com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.types;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.Particle;
 
 @Deprecated
 public class Particle1_13_2Type extends Type<Particle> {

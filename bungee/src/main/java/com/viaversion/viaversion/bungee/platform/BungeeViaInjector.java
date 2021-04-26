@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.platform;
+package com.viaversion.viaversion.bungee.platform;
 
 import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.platform.ViaInjector;
-import us.myles.ViaVersion.bungee.handlers.BungeeChannelInitializer;
-import us.myles.ViaVersion.compatibility.ForcefulFieldModifier;
-import us.myles.ViaVersion.compatibility.unsafe.UnsafeBackedForcefulFieldModifier;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.bungee.handlers.BungeeChannelInitializer;
+import com.viaversion.viaversion.compatibility.ForcefulFieldModifier;
+import com.viaversion.viaversion.compatibility.unsafe.UnsafeBackedForcefulFieldModifier;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;

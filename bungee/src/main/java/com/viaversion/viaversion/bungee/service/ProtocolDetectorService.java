@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.service;
+package com.viaversion.viaversion.bungee.service;
 
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
-import us.myles.ViaVersion.BungeePlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
-import us.myles.ViaVersion.bungee.providers.BungeeVersionProvider;
+import com.viaversion.viaversion.BungeePlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
+import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 
 import java.util.HashMap;
 import java.util.Map;

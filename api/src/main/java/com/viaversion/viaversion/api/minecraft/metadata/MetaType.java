@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft.metadata;
+package com.viaversion.viaversion.api.minecraft.metadata;
 
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.type.Type;
 
 public interface MetaType {
 

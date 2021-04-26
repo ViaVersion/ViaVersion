@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -30,25 +30,25 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.serializer.TextSerializers;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.sponge.commands.SpongeCommandHandler;
-import us.myles.ViaVersion.sponge.commands.SpongeCommandSender;
-import us.myles.ViaVersion.sponge.platform.SpongeTaskId;
-import us.myles.ViaVersion.sponge.platform.SpongeViaAPI;
-import us.myles.ViaVersion.sponge.platform.SpongeViaConfig;
-import us.myles.ViaVersion.sponge.platform.SpongeViaInjector;
-import us.myles.ViaVersion.sponge.platform.SpongeViaLoader;
-import us.myles.ViaVersion.sponge.util.LoggerWrapper;
-import us.myles.ViaVersion.util.ChatColorUtil;
-import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.util.VersionInfo;
-import us.myles.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.sponge.commands.SpongeCommandHandler;
+import com.viaversion.viaversion.sponge.commands.SpongeCommandSender;
+import com.viaversion.viaversion.sponge.platform.SpongeTaskId;
+import com.viaversion.viaversion.sponge.platform.SpongeViaAPI;
+import com.viaversion.viaversion.sponge.platform.SpongeViaConfig;
+import com.viaversion.viaversion.sponge.platform.SpongeViaInjector;
+import com.viaversion.viaversion.sponge.platform.SpongeViaLoader;
+import com.viaversion.viaversion.sponge.util.LoggerWrapper;
+import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.VersionInfo;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.File;
 import java.util.ArrayList;

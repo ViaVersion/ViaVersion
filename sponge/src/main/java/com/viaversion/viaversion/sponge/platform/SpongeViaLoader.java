@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.platform;
+package com.viaversion.viaversion.sponge.platform;
 
 import org.spongepowered.api.Sponge;
-import us.myles.ViaVersion.SpongePlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaPlatformLoader;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import us.myles.ViaVersion.sponge.listeners.UpdateListener;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.BlockListener;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.DeathListener;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.HandItemCache;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
-import us.myles.ViaVersion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
-import us.myles.ViaVersion.sponge.providers.SpongeViaBulkChunkTranslator;
-import us.myles.ViaVersion.sponge.providers.SpongeViaMovementTransmitter;
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.sponge.listeners.UpdateListener;
+import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.BlockListener;
+import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.DeathListener;
+import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.HandItemCache;
+import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
+import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
+import com.viaversion.viaversion.sponge.providers.SpongeViaBulkChunkTranslator;
+import com.viaversion.viaversion.sponge.providers.SpongeViaMovementTransmitter;
 
 import java.util.HashSet;
 import java.util.Set;

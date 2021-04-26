@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bungee.commands.subs;
+package com.viaversion.viaversion.bungee.commands.subs;
 
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.command.ViaSubCommand;
-import us.myles.ViaVersion.bungee.platform.BungeeViaConfig;
-import us.myles.ViaVersion.bungee.service.ProtocolDetectorService;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
+import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 
 public class ProbeSubCmd extends ViaSubCommand {
     @Override

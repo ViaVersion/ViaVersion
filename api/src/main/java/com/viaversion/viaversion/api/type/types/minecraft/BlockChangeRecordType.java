@@ -20,12 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord1_8;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
+import com.viaversion.viaversion.api.type.Type;
 
 public class BlockChangeRecordType extends Type<BlockChangeRecord> {
 

@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8.providers;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.platform.providers.Provider;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.platform.providers.Provider;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 
 import java.util.ArrayList;
 import java.util.List;

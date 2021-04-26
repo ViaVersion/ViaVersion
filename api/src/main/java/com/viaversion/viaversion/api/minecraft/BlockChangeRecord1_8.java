@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.minecraft;
+package com.viaversion.viaversion.api.minecraft;
 
 public class BlockChangeRecord1_8 implements BlockChangeRecord {
     private final byte sectionX;

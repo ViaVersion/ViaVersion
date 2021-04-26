@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_13to1_12_2.data;
+package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -25,10 +25,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.data.Mappings;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.data.Mappings;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingData extends us.myles.ViaVersion.api.data.MappingData {
+public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
     private final Map<String, Integer[]> blockTags = new HashMap<>();
     private final Map<String, Integer[]> itemTags = new HashMap<>();
     private final Map<String, Integer[]> fluidTags = new HashMap<>();

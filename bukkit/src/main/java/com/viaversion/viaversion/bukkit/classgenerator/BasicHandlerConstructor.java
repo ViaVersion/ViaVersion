@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.classgenerator;
+package com.viaversion.viaversion.bukkit.classgenerator;
 
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.bukkit.handlers.BukkitDecodeHandler;
-import us.myles.ViaVersion.bukkit.handlers.BukkitEncodeHandler;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
+import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 
 public class BasicHandlerConstructor implements HandlerConstructor {
     @Override

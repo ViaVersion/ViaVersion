@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.handlers;
+package com.viaversion.viaversion.sponge.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.data.UserConnection;
 
 import java.util.List;
 

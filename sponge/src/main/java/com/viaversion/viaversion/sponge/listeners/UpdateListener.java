@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.listeners;
+package com.viaversion.viaversion.sponge.listeners;
 
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.update.UpdateUtil;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.update.UpdateUtil;
 
 public class UpdateListener {
     @Listener

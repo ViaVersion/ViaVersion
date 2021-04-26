@@ -20,14 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type.types;
+package com.viaversion.viaversion.api.type.types;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.type.Type;
 
 public class ComponentType extends Type<JsonElement> {
     private static final StringType STRING_TAG = new StringType(262144);

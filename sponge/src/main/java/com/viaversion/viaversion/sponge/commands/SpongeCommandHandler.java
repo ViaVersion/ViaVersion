@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.sponge.commands;
+package com.viaversion.viaversion.sponge.commands;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandCallable;
@@ -25,7 +25,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import us.myles.ViaVersion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.commands.ViaCommandHandler;
 
 import java.util.List;
 import java.util.Optional;

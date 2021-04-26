@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.handlers;
+package com.viaversion.viaversion.bukkit.handlers;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
-import us.myles.ViaVersion.bukkit.classgenerator.ClassGenerator;
-import us.myles.ViaVersion.bukkit.classgenerator.HandlerConstructor;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
+import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
+import com.viaversion.viaversion.bukkit.classgenerator.HandlerConstructor;
 
 import java.lang.reflect.Method;
 

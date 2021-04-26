@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.velocity.storage;
+package com.viaversion.viaversion.velocity.storage;
 
 import com.velocitypowered.api.proxy.Player;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.util.ReflectionUtil;
+import com.viaversion.viaversion.api.data.StoredObject;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

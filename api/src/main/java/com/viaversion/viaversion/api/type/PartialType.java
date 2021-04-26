@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package us.myles.ViaVersion.api.type;
+package com.viaversion.viaversion.api.type;
 
 import io.netty.buffer.ByteBuf;
 

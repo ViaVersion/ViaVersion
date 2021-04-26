@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_16to1_15_2.types;
+package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.chunks.BaseChunk;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.minecraft.BaseChunkType;
-import us.myles.ViaVersion.api.type.types.version.Types1_16;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
+import com.viaversion.viaversion.api.type.types.version.Types1_16;
 
 import java.util.ArrayList;
 import java.util.Arrays;

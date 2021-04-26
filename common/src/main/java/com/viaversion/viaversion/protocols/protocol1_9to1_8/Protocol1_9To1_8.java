@@ -15,42 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.protocols.protocol1_9to1_8;
+package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.rewriters.MetadataRewriter;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_8.ClientboundPackets1_8;
-import us.myles.ViaVersion.protocols.protocol1_8.ServerboundPackets1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.EntityPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.InventoryPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.PlayerPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.SpawnPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.packets.WorldPackets;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MainHandProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.InventoryTracker;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.PlayerPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.SpawnPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.util.List;
 

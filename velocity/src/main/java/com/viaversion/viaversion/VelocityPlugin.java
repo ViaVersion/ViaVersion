@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion;
+package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -29,25 +29,25 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.slf4j.Logger;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.command.ViaCommandSender;
-import us.myles.ViaVersion.api.configuration.ConfigurationProvider;
-import us.myles.ViaVersion.api.data.MappingDataLoader;
-import us.myles.ViaVersion.api.platform.TaskId;
-import us.myles.ViaVersion.api.platform.ViaPlatform;
-import us.myles.ViaVersion.dump.PluginInfo;
-import us.myles.ViaVersion.util.ChatColorUtil;
-import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.ViaVersion.util.VersionInfo;
-import us.myles.ViaVersion.velocity.command.VelocityCommandHandler;
-import us.myles.ViaVersion.velocity.command.VelocityCommandSender;
-import us.myles.ViaVersion.velocity.platform.VelocityTaskId;
-import us.myles.ViaVersion.velocity.platform.VelocityViaAPI;
-import us.myles.ViaVersion.velocity.platform.VelocityViaConfig;
-import us.myles.ViaVersion.velocity.platform.VelocityViaInjector;
-import us.myles.ViaVersion.velocity.platform.VelocityViaLoader;
-import us.myles.ViaVersion.velocity.service.ProtocolDetectorService;
-import us.myles.ViaVersion.velocity.util.LoggerWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.VersionInfo;
+import com.viaversion.viaversion.velocity.command.VelocityCommandHandler;
+import com.viaversion.viaversion.velocity.command.VelocityCommandSender;
+import com.viaversion.viaversion.velocity.platform.VelocityTaskId;
+import com.viaversion.viaversion.velocity.platform.VelocityViaAPI;
+import com.viaversion.viaversion.velocity.platform.VelocityViaConfig;
+import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
+import com.viaversion.viaversion.velocity.platform.VelocityViaLoader;
+import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
+import com.viaversion.viaversion.velocity.util.LoggerWrapper;
 
 import java.io.File;
 import java.nio.file.Path;

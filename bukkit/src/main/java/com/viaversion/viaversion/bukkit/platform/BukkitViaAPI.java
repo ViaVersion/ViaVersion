@@ -15,20 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.bukkit.platform;
+package com.viaversion.viaversion.bukkit.platform;
 
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import us.myles.ViaVersion.ViaVersionPlugin;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaAPIBase;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.boss.ViaBossBar;
-import us.myles.ViaVersion.bukkit.util.ProtocolSupportUtil;
+import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPIBase;
+import com.viaversion.viaversion.api.boss.BossBar;
+import com.viaversion.viaversion.api.boss.BossColor;
+import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.boss.ViaBossBar;
+import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
 
 import java.util.UUID;
 
