@@ -18,15 +18,15 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.common.collect.ImmutableList;
-import com.viaversion.viaversion.api.PacketWrapper;
-import com.viaversion.viaversion.api.Pair;
-import com.viaversion.viaversion.api.Triple;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.util.Triple;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.remapper.PacketHandler;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;

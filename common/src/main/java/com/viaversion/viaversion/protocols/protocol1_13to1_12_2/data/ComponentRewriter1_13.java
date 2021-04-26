@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.rewriters.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 

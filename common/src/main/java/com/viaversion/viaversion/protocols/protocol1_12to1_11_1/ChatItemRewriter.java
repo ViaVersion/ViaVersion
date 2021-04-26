@@ -21,7 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 
 import java.util.regex.Pattern;
 

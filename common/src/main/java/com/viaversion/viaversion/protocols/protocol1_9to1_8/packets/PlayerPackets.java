@@ -18,13 +18,13 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.remapper.PacketHandler;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.remapper.ValueCreator;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;

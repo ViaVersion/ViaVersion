@@ -20,7 +20,7 @@ package com.viaversion.viaversion.velocity.service;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.velocity.platform.VelocityViaConfig;
 
 import java.util.HashMap;

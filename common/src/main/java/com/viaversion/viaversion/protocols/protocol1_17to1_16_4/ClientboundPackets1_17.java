@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4;
 
-import com.viaversion.viaversion.api.protocol.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 
 public enum ClientboundPackets1_17 implements ClientboundPacketType {
 

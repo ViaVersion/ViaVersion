@@ -20,16 +20,16 @@ package com.viaversion.viaversion.sponge.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
-import com.viaversion.viaversion.handlers.ViaHandler;
+import com.viaversion.viaversion.handlers.ViaCodecHandler;
 import com.viaversion.viaversion.util.PipelineUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class SpongeEncodeHandler extends MessageToByteEncoder<Object> implements ViaHandler {
+public class SpongeEncodeHandler extends MessageToByteEncoder<Object> implements ViaCodecHandler {
     private final UserConnection info;
     private final MessageToByteEncoder<?> minecraftEncoder;
 

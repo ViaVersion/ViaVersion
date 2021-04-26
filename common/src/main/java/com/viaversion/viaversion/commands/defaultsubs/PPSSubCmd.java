@@ -20,8 +20,8 @@ package com.viaversion.viaversion.commands.defaultsubs;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
 import java.util.HashMap;
 import java.util.HashSet;

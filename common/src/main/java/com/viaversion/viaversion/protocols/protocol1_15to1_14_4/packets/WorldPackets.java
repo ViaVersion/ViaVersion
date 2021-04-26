@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets;
 
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.remapper.PacketHandler;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriters.BlockRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;

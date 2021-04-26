@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_12to1_11_1;
 
-import com.viaversion.viaversion.api.protocol.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 
 public enum ServerboundPackets1_12 implements ServerboundPacketType {
 

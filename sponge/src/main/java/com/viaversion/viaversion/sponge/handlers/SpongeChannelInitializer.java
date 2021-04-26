@@ -23,7 +23,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;

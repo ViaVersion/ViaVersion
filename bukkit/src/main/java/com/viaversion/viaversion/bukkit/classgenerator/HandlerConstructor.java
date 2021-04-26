@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bukkit.classgenerator;
 
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 
 public interface HandlerConstructor {
     public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder);

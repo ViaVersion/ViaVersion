@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.exception;
 
+import com.viaversion.viaversion.api.ViaManager;
 import io.netty.handler.codec.CodecException;
 import com.viaversion.viaversion.api.Via;
 
@@ -57,7 +58,7 @@ public class CancelException extends Exception {
     }
 
     /**
-     * Returns a cached CancelException or a new instance when {@link com.viaversion.viaversion.ViaManager#isDebug()} is true.
+     * Returns a cached CancelException or a new instance when {@link ViaManager#isDebug()} is true.
      *
      * @return a CancelException instance
      */

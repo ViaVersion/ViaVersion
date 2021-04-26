@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.velocity.platform;
 
-import com.viaversion.viaversion.AbstractViaConfig;
-import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.configuration.AbstractViaConfig;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
 import java.io.File;
 import java.net.URL;

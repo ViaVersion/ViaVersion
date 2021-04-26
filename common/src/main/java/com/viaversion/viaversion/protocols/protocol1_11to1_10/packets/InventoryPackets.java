@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.packets;
 
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.remapper.PacketHandler;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10;

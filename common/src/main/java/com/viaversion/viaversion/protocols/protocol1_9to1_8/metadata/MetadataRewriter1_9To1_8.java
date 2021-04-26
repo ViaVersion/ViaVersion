@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_10Types;
-import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;

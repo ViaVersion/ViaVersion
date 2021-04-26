@@ -23,14 +23,14 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.ViaManager;
+import com.viaversion.viaversion.api.protocol.connection.ViaConnectionManager;
+import com.viaversion.viaversion.api.ViaManager;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.ViaVersionConfig;
+import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.util.UnsupportedSoftware;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 
 import java.io.File;
 import java.util.Collection;

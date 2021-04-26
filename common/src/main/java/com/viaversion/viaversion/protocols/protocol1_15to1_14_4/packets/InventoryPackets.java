@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;

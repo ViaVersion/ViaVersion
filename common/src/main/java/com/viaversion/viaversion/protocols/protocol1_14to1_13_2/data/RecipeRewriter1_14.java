@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data;
 
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.rewriters.ItemRewriter;
+import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 

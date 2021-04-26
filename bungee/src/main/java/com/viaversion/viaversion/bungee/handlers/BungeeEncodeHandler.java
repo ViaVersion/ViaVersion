@@ -21,7 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.bungee.util.BungeePipelineUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;

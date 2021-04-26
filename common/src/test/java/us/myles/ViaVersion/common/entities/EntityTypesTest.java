@@ -19,12 +19,12 @@ package com.viaversion.viaversion.common.entities;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import com.viaversion.viaversion.api.entities.Entity1_14Types;
-import com.viaversion.viaversion.api.entities.Entity1_15Types;
-import com.viaversion.viaversion.api.entities.Entity1_16Types;
-import com.viaversion.viaversion.api.entities.Entity1_16_2Types;
-import com.viaversion.viaversion.api.entities.Entity1_17Types;
-import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 
 import java.util.function.Function;
 

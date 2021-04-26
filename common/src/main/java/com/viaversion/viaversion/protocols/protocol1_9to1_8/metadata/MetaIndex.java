@@ -17,16 +17,16 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import com.viaversion.viaversion.api.Pair;
-import com.viaversion.viaversion.api.entities.Entity1_10Types;
-import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 
 import java.util.HashMap;
 import java.util.Optional;
 
-import static com.viaversion.viaversion.api.entities.Entity1_10Types.EntityType.*;
+import static com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType.*;
 
 public enum MetaIndex {
 

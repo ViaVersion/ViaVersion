@@ -23,13 +23,13 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
-import com.viaversion.viaversion.packets.Direction;
-import com.viaversion.viaversion.packets.State;
-import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
 import java.util.ArrayList;
 import java.util.List;

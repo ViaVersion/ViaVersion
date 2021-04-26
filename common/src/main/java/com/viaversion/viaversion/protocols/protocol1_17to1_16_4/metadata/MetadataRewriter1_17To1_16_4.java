@@ -17,14 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata;
 
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_16_2Types;
-import com.viaversion.viaversion.api.entities.Entity1_17Types;
-import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_17;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;

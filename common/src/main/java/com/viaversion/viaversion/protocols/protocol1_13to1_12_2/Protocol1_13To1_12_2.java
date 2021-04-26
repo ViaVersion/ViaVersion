@@ -21,22 +21,22 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.remapper.PacketHandler;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.remapper.ValueCreator;
-import com.viaversion.viaversion.api.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
-import com.viaversion.viaversion.api.rewriters.SoundRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
+import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
@@ -1058,7 +1058,7 @@ public class Protocol1_13To1_12_2 extends Protocol<ClientboundPackets1_12_1, Cli
     }
 
     @Override
-    protected void register(ViaProviders providers) {
+    public void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
     }

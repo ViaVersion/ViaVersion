@@ -19,18 +19,18 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_10Types.EntityType;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
-import com.viaversion.viaversion.api.storage.EntityTracker;
+import com.viaversion.viaversion.data.EntityTracker;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -159,7 +159,7 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public void handleMetadata(int entityId, List<Metadata> metadataList) {
-        com.viaversion.viaversion.api.entities.EntityType type = getEntity(entityId);
+        com.viaversion.viaversion.api.minecraft.entities.EntityType type = getEntity(entityId);
         if (type == null) {
             return;
         }

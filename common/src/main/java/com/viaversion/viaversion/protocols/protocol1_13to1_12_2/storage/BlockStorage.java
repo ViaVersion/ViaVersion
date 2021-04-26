@@ -19,8 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import com.viaversion.viaversion.api.data.StoredObject;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.StoredObject;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 
 import java.util.Map;

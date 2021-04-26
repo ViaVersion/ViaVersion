@@ -22,6 +22,9 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+
 /**
  * Dummy protocol class when there is no need of any of the
  * existing packet type enums or automated channel mappings.

@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.velocity.storage;
 
 import com.velocitypowered.api.proxy.Player;
-import com.viaversion.viaversion.api.data.StoredObject;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.StoredObject;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;

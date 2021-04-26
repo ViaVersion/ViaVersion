@@ -17,15 +17,15 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata;
 
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_11Types;
-import com.viaversion.viaversion.api.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
@@ -41,7 +41,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
     }
 
     @Override
-    protected void handleMetadata(int entityId, com.viaversion.viaversion.api.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
+    protected void handleMetadata(int entityId, com.viaversion.viaversion.api.minecraft.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         if (metadata.getValue() instanceof Item) {
             // Apply rewrite
             EntityIdRewriter.toClientItem((Item) metadata.getValue());
@@ -147,12 +147,12 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
     }
 
     @Override
-    protected com.viaversion.viaversion.api.entities.EntityType getTypeFromId(int type) {
+    protected com.viaversion.viaversion.api.minecraft.entities.EntityType getTypeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected com.viaversion.viaversion.api.entities.EntityType getObjectTypeFromId(int type) {
+    protected com.viaversion.viaversion.api.minecraft.entities.EntityType getObjectTypeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, true);
     }
 

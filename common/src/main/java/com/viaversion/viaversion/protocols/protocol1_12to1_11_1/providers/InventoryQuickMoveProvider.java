@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers;
 
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 
 public class InventoryQuickMoveProvider implements Provider {

@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_12_2to1_12_1;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;

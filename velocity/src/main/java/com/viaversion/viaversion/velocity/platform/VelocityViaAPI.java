@@ -19,7 +19,7 @@ package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.proxy.Player;
 import io.netty.buffer.ByteBuf;
-import com.viaversion.viaversion.api.ViaAPIBase;
+import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;

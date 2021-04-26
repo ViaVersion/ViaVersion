@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_13Types.EntityType;
-import com.viaversion.viaversion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types.EntityType;
+import com.viaversion.viaversion.data.EntityTracker;
 
 public class EntityTracker1_13 extends EntityTracker {
 

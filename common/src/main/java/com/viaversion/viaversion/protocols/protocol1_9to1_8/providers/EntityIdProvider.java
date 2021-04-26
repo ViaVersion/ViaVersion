@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 

@@ -23,6 +23,8 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.collect.Range;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;

@@ -32,7 +32,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;

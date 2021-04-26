@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.bukkit.platform;
 
 import org.bukkit.plugin.Plugin;
-import com.viaversion.viaversion.AbstractViaConfig;
+import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import com.viaversion.viaversion.api.Via;
 
 import java.io.File;

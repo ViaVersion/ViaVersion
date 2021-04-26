@@ -21,17 +21,17 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.remapper.PacketHandler;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
-import com.viaversion.viaversion.api.rewriters.SoundRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
@@ -249,14 +249,15 @@ public class Protocol1_12To1_11_1 extends Protocol<ClientboundPackets1_9_3, Clie
     }
 
     @Override
-    protected void register(ViaProviders providers) {
+    public void register(ViaProviders providers) {
         providers.register(InventoryQuickMoveProvider.class, new InventoryQuickMoveProvider());
     }
 
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new EntityTracker1_12(userConnection));
-        if (!userConnection.has(ClientWorld.class))
+        if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
+        }
     }
 }

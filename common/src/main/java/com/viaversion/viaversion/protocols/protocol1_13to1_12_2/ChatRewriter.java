@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.rewriters.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
 import com.viaversion.viaversion.libs.kyori.adventure.text.format.TextDecoration;

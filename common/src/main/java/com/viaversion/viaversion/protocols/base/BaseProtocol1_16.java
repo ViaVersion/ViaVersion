@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.base;
 
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 
 import java.util.UUID;

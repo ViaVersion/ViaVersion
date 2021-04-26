@@ -25,7 +25,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
-import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.sponge.handlers.SpongeChannelInitializer;

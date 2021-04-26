@@ -205,11 +205,11 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     private final Class<? super T> outputClass;
     private final String typeName;
 
-    public Type(Class<? super T> outputClass) {
+    protected Type(Class<? super T> outputClass) {
         this(outputClass.getSimpleName(), outputClass);
     }
 
-    public Type(String typeName, Class<? super T> outputClass) {
+    protected Type(String typeName, Class<? super T> outputClass) {
         this.outputClass = outputClass;
         this.typeName = typeName;
     }

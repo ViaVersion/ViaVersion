@@ -23,17 +23,20 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
-import com.viaversion.viaversion.packets.Direction;
-import com.viaversion.viaversion.packets.State;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -166,7 +169,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     /**
      * Loads the mappingdata.
      */
-    protected final void loadMappingData() {
+    public final void loadMappingData() {
         getMappingData().load();
         onMappingDataLoaded();
     }
@@ -186,7 +189,7 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      *
      * @param providers The current providers
      */
-    protected void register(ViaProviders providers) {
+    public void register(ViaProviders providers) {
     }
 
     /**

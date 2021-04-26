@@ -34,9 +34,9 @@ import java.net.SocketAddress;
 
 public class ChannelHandlerContextWrapper implements ChannelHandlerContext {
     private final ChannelHandlerContext base;
-    private final ViaHandler handler;
+    private final ViaCodecHandler handler;
 
-    public ChannelHandlerContextWrapper(ChannelHandlerContext base, ViaHandler handler) {
+    public ChannelHandlerContextWrapper(ChannelHandlerContext base, ViaCodecHandler handler) {
         this.base = base;
         this.handler = handler;
     }

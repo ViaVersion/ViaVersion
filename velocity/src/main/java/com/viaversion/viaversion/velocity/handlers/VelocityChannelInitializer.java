@@ -19,7 +19,7 @@ package com.viaversion.viaversion.velocity.handlers;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 
 import java.lang.reflect.Method;

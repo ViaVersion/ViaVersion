@@ -21,20 +21,20 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
-import com.viaversion.viaversion.handlers.ViaHandler;
-import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.handlers.ViaCodecHandler;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.util.PipelineUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaHandler {
+public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaCodecHandler {
     private static Field versionField;
 
     static {

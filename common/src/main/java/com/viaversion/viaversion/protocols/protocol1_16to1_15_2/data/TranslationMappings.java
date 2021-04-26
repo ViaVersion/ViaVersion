@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.rewriters.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.ComponentRewriter;
 
 import java.util.HashMap;
 import java.util.Map;

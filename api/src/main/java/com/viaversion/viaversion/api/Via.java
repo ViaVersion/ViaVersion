@@ -23,7 +23,7 @@
 package com.viaversion.viaversion.api;
 
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.ViaManager;
+import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 
 public final class Via {

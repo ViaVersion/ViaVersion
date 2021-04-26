@@ -17,14 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1;
 
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
-import com.viaversion.viaversion.api.rewriters.RegistryType;
-import com.viaversion.viaversion.api.rewriters.SoundRewriter;
-import com.viaversion.viaversion.api.rewriters.StatisticsRewriter;
-import com.viaversion.viaversion.api.rewriters.TagRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.RegistryType;
+import com.viaversion.viaversion.rewriter.SoundRewriter;
+import com.viaversion.viaversion.rewriter.StatisticsRewriter;
+import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;

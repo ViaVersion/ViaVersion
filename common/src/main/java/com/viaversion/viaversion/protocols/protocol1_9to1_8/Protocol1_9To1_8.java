@@ -19,17 +19,17 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.rewriters.MetadataRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -137,7 +137,7 @@ public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, Clientboun
     }
 
     @Override
-    protected void register(ViaProviders providers) {
+    public void register(ViaProviders providers) {
         providers.register(HandItemProvider.class, new HandItemProvider());
         providers.register(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
         providers.register(CommandBlockProvider.class, new CommandBlockProvider());

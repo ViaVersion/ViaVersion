@@ -25,7 +25,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
-import com.viaversion.viaversion.api.Pair;
+import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;

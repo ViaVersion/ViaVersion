@@ -17,25 +17,26 @@
  */
 package com.viaversion.viaversion;
 
+import com.viaversion.viaversion.api.ViaManager;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.TaskId;
-import com.viaversion.viaversion.api.platform.ViaConnectionManager;
+import com.viaversion.viaversion.api.protocol.connection.ViaConnectionManager;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
-import com.viaversion.viaversion.api.protocol.ProtocolManagerImpl;
-import com.viaversion.viaversion.api.protocol.ProtocolVersion;
-import com.viaversion.viaversion.api.protocol.ServerProtocolVersion;
-import com.viaversion.viaversion.api.protocol.ServerProtocolVersionRange;
-import com.viaversion.viaversion.api.protocol.ServerProtocolVersionSingleton;
+import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
+import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ViaIdleThread;
 import com.viaversion.viaversion.update.UpdateUtil;
-import com.viaversion.viaversion.util.UnsupportedSoftware;
+import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 
 import java.util.ArrayList;
 import java.util.Arrays;

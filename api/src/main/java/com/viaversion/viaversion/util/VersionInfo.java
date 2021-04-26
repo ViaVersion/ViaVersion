@@ -24,7 +24,7 @@ package com.viaversion.viaversion.util;
 
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 
-public class VersionInfo {
+public final class VersionInfo {
 
     /**
      * Plugin version.

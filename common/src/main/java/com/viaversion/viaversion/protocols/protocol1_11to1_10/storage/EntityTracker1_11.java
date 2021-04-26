@@ -18,9 +18,9 @@
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.storage;
 
 import com.google.common.collect.Sets;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_11Types.EntityType;
-import com.viaversion.viaversion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.data.EntityTracker;
 
 import java.util.Set;
 

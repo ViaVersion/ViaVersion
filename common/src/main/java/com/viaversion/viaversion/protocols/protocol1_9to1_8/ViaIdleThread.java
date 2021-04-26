@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.ProtocolInfo;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 

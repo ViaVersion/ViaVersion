@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.bungee.platform;
 
-import com.viaversion.viaversion.AbstractViaConfig;
-import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.configuration.AbstractViaConfig;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 
 import java.io.File;

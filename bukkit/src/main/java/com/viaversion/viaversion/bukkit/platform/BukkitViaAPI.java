@@ -22,11 +22,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.ViaAPIBase;
+import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.boss.ViaBossBar;
 import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
 

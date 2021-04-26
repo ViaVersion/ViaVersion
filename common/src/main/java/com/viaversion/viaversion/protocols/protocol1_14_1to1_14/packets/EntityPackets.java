@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14_1to1_14.packets;
 
-import com.viaversion.viaversion.api.entities.Entity1_14Types;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_14_1to1_14.Protocol1_14_1To1_14;

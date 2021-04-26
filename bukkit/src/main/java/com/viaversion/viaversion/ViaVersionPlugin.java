@@ -42,7 +42,7 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.GsonUtil;
-import com.viaversion.viaversion.util.UnsupportedSoftware;
+import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 
 import java.util.ArrayList;
 import java.util.Collection;

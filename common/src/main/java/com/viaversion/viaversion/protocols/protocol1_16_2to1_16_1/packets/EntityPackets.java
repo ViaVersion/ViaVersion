@@ -19,8 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.entities.Entity1_16_2Types;
-import com.viaversion.viaversion.api.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;

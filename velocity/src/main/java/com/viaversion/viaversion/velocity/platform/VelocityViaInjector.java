@@ -24,7 +24,7 @@ import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
-import com.viaversion.viaversion.api.protocol.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import com.viaversion.viaversion.velocity.handlers.VelocityChannelInitializer;
 

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.exception;
 
+import com.viaversion.viaversion.api.ViaManager;
 import io.netty.handler.codec.DecoderException;
 import com.viaversion.viaversion.api.Via;
 
@@ -54,7 +55,7 @@ public class CancelDecoderException extends DecoderException implements CancelCo
     }
 
     /**
-     * Returns a cached CancelDecoderException or a new instance when {@link com.viaversion.viaversion.ViaManager#isDebug()} is true.
+     * Returns a cached CancelDecoderException or a new instance when {@link ViaManager#isDebug()} is true.
      *
      * @param cause cause for being used when a new instance is creeated
      * @return a CancelDecoderException instance

@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.chat;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 public class ChatRewriter {

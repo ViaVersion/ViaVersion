@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage;
 
-import com.viaversion.viaversion.api.PacketWrapper;
-import com.viaversion.viaversion.api.data.UserConnection;
-import com.viaversion.viaversion.api.entities.Entity1_14Types;
-import com.viaversion.viaversion.api.storage.EntityTracker;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.data.EntityTracker;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;

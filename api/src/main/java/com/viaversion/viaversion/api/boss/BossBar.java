@@ -23,7 +23,7 @@
 package com.viaversion.viaversion.api.boss;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 
 import java.util.Set;
 import java.util.UUID;

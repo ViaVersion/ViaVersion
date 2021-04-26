@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.data.StoredObject;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.StoredObject;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 
 import java.util.HashMap;
 import java.util.Map;

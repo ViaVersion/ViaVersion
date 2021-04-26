@@ -23,7 +23,7 @@
 package com.viaversion.viaversion.util;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -20,7 +20,7 @@ package com.viaversion.viaversion.bukkit.providers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.UserConnection;
+import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
