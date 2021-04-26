@@ -23,14 +23,11 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.protocol.connection.ViaConnectionManager;
-import com.viaversion.viaversion.api.ViaManager;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
 import java.io.File;
 import java.util.Collection;
@@ -218,14 +215,6 @@ public interface ViaPlatform<T> {
      * @return True if allowed
      */
     boolean isOldClientsAllowed();
-
-    /**
-     * @deprecated use {@link ViaManager#getConnectionManager()}
-     */
-    @Deprecated
-    default ViaConnectionManager getConnectionManager() {
-        return Via.getManager().getConnectionManager();
-    }
 
     /**
      * Returns an immutable collection of classes to be checked as unsupported software with their software name.

@@ -24,7 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;

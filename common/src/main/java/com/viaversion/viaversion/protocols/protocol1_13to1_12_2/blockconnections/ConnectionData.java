@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;

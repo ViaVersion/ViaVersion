@@ -19,8 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.connection.StoredObject;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;

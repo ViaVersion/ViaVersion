@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bukkit.classgenerator;
 
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 

@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4;
 
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.rewriter.MetadataRewriter;

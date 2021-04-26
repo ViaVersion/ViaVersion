@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.exception.CancelException;

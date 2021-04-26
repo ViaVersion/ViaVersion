@@ -21,7 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.viaversion.viaversion.api.protocol.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import io.netty.channel.ChannelFuture;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;

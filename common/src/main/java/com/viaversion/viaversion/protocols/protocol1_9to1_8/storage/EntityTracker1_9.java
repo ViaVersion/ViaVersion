@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;

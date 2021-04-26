@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol.connection;
+package com.viaversion.viaversion.api.connection;
 
 public class StoredObject {
     private final UserConnection user;

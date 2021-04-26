@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.bungee.storage;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import com.viaversion.viaversion.api.protocol.connection.StoredObject;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
 import java.lang.reflect.Field;
 import java.util.Objects;

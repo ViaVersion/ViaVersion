@@ -20,7 +20,7 @@ package com.viaversion.viaversion.sponge.platform;
 import org.spongepowered.api.Sponge;
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.TaskId;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;

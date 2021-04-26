@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 

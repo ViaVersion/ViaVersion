@@ -20,12 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol.connection;
+package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.Via;
 import io.netty.channel.ChannelFutureListener;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
 
 import java.util.Collections;
 import java.util.Map;

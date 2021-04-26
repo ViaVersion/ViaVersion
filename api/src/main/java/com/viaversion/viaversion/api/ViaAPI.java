@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api;
 
-import com.viaversion.viaversion.api.protocol.connection.ViaConnectionManager;
+import com.viaversion.viaversion.api.connection.ViaConnectionManager;
 import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
@@ -68,19 +68,6 @@ public interface ViaAPI<T> {
      * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if not connected
      */
     int getPlayerVersion(UUID uuid);
-
-    /**
-     * Returns if the player is ported by Via.
-     *
-     * @param playerUUID UUID of a player
-     * @return true if Via has a cached userconnection for this player
-     * @see #isInjected(UUID)
-     * @deprecated use {@link #isInjected(UUID)}
-     */
-    @Deprecated
-    default boolean isPorted(UUID playerUUID) {
-        return isInjected(playerUUID);
-    }
 
     /**
      * Returns if Via injected into this player connection.

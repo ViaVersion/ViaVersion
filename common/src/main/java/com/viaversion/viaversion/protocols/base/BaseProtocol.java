@@ -19,10 +19,10 @@ package com.viaversion.viaversion.protocols.base;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;

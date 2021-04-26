@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage;
 
-import com.viaversion.viaversion.api.protocol.connection.StoredObject;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
 public class InventoryTracker1_16 extends StoredObject {
     private short inventory = -1;

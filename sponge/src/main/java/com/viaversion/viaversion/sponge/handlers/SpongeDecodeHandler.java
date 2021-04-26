@@ -20,7 +20,7 @@ package com.viaversion.viaversion.sponge.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.util.PipelineUtil;

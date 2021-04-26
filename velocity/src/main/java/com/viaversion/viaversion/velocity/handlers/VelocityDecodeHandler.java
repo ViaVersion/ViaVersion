@@ -22,7 +22,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.util.PipelineUtil;

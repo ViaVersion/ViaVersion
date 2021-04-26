@@ -20,8 +20,8 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.api.protocol.connection.StoredObject;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 
 import java.util.Map;

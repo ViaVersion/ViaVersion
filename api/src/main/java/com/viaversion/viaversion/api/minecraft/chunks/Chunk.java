@@ -48,11 +48,6 @@ public interface Chunk {
      */
     boolean isFullChunk();
 
-    @Deprecated
-    default boolean isGroundUp() {
-        return isFullChunk();
-    }
-
     boolean isIgnoreOldLightData();
 
     void setIgnoreOldLightData(boolean ignoreOldLightData);

@@ -20,7 +20,7 @@ package com.viaversion.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import io.netty.buffer.ByteBuf;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 
 import java.util.SortedSet;

@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import com.viaversion.viaversion.ViaListener;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 
 public class ViaBukkitListener extends ViaListener implements Listener {

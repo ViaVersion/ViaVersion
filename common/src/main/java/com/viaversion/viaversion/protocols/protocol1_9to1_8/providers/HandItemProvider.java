@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 

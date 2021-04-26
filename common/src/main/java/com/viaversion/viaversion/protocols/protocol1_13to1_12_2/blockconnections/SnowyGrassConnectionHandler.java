@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 

@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.block
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 
 import java.util.Map;

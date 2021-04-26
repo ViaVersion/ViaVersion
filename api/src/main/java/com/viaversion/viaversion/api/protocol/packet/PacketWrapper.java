@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;

@@ -23,7 +23,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;

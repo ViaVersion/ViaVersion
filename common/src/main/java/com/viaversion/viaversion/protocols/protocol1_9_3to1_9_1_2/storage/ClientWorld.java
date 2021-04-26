@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage;
 
-import com.viaversion.viaversion.api.protocol.connection.StoredObject;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Environment;
 
 /**

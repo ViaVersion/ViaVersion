@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossFlag;
 import com.viaversion.viaversion.api.boss.BossStyle;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 

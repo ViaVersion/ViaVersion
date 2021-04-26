@@ -19,7 +19,7 @@ package com.viaversion.viaversion;
 
 import com.viaversion.viaversion.api.Via;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.util.UUID;

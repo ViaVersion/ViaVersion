@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata;
 
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;

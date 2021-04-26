@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol.connection;
+package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;

@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.storage;
 
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.data.EntityTracker;
 

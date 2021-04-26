@@ -22,7 +22,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.classgenerator.HandlerConstructor;

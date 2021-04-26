@@ -24,7 +24,6 @@ package com.viaversion.viaversion.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 
 public final class GsonUtil {
     private static final Gson GSON = new GsonBuilder().create();
@@ -36,15 +35,5 @@ public final class GsonUtil {
      */
     public static Gson getGson() {
         return GSON;
-    }
-
-    @Deprecated
-    public static GsonBuilder getGsonBuilder() {
-        return new GsonBuilder();
-    }
-
-    @Deprecated
-    public static JsonParser getJsonParser() {
-        return new JsonParser();
     }
 }

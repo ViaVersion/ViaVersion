@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers;
 
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 

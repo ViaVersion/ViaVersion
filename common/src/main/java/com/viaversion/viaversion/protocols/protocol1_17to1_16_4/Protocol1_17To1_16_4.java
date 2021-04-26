@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_17to1_16_4;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;

@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.ViaManager;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.TaskId;
-import com.viaversion.viaversion.api.protocol.connection.ViaConnectionManager;
+import com.viaversion.viaversion.api.connection.ViaConnectionManager;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;

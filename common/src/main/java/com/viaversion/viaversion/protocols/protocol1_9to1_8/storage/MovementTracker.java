@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
-import com.viaversion.viaversion.api.protocol.connection.StoredObject;
-import com.viaversion.viaversion.api.protocol.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
 public class MovementTracker extends StoredObject {
     private static final long IDLE_PACKET_DELAY = 50L; // Update every 50ms (20tps)
