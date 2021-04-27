@@ -17,17 +17,23 @@
  */
 package com.viaversion.viaversion.bungee.platform;
 
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-public class BungeeTaskId implements TaskId {
-    private final Integer object;
+public class BungeeTaskId implements PlatformTask<ScheduledTask> {
+    private final ScheduledTask task;
 
-    public BungeeTaskId(Integer object) {
-        this.object = object;
+    public BungeeTaskId(ScheduledTask task) {
+        this.task = task;
     }
 
     @Override
-    public Integer getObject() {
-        return object;
+    public ScheduledTask getObject() {
+        return task;
+    }
+
+    @Override
+    public void cancel() {
+        task.cancel();
     }
 }

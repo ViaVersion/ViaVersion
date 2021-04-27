@@ -23,6 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
+public class MappingData extends MappingDataBase {
     private final Map<String, CompoundTag> dimensionDataMap = new HashMap<>();
     private CompoundTag dimensionRegistry;
 

@@ -20,8 +20,9 @@ package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 
-public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
+public class MappingData extends MappingDataBase {
     private final BiMap<String, String> attributeMappings = HashBiMap.create();
 
     public MappingData() {

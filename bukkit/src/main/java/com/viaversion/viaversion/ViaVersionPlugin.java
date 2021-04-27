@@ -18,17 +18,13 @@
 package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
+import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
@@ -42,7 +38,11 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.GsonUtil;
-import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -178,9 +178,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public TaskId runAsync(Runnable runnable) {
+    public PlatformTask runAsync(Runnable runnable) {
         if (isPluginEnabled()) {
-            return new BukkitTaskId(getServer().getScheduler().runTaskAsynchronously(this, runnable).getTaskId());
+            return new BukkitTaskId(getServer().getScheduler().runTaskAsynchronously(this, runnable));
         } else {
             asyncQueuedTasks.add(runnable);
             return new BukkitTaskId(null);
@@ -188,9 +188,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public TaskId runSync(Runnable runnable) {
+    public PlatformTask runSync(Runnable runnable) {
         if (isPluginEnabled()) {
-            return new BukkitTaskId(getServer().getScheduler().runTask(this, runnable).getTaskId());
+            return new BukkitTaskId(getServer().getScheduler().runTask(this, runnable));
         } else {
             queuedTasks.add(runnable);
             return new BukkitTaskId(null);
@@ -198,22 +198,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public TaskId runSync(Runnable runnable, Long ticks) {
-        return new BukkitTaskId(getServer().getScheduler().runTaskLater(this, runnable, ticks).getTaskId());
+    public PlatformTask runSync(Runnable runnable, Long ticks) {
+        return new BukkitTaskId(getServer().getScheduler().runTaskLater(this, runnable, ticks));
     }
 
     @Override
-    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
-        return new BukkitTaskId(getServer().getScheduler().runTaskTimer(this, runnable, 0, ticks).getTaskId());
-    }
-
-    @Override
-    public void cancelTask(TaskId taskId) {
-        if (taskId == null) return;
-        if (taskId.getObject() == null) return;
-        if (taskId instanceof BukkitTaskId) {
-            getServer().getScheduler().cancelTask((Integer) taskId.getObject());
-        }
+    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
+        return new BukkitTaskId(getServer().getScheduler().runTaskTimer(this, runnable, 0, ticks));
     }
 
     @Override

@@ -24,11 +24,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.IntArrayMappings;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.util.GsonUtil;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
+public class MappingData extends MappingDataBase {
     private final Map<String, Integer[]> blockTags = new HashMap<>();
     private final Map<String, Integer[]> itemTags = new HashMap<>();
     private final Map<String, Integer[]> fluidTags = new HashMap<>();
@@ -58,22 +60,21 @@ public class MappingData extends com.viaversion.viaversion.api.data.MappingData 
         loadTags(fluidTags, newMappings.getAsJsonObject("fluid_tags"));
 
         loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("enchantments"));
-        enchantmentMappings = new Mappings(72, oldMappings.getAsJsonObject("enchantments"), newMappings.getAsJsonObject("enchantments"));
+        enchantmentMappings = new IntArrayMappings(72, oldMappings.getAsJsonObject("enchantments"), newMappings.getAsJsonObject("enchantments"));
 
         // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
         if (Via.getConfig().isSnowCollisionFix()) {
-            blockMappings.getOldToNew()[1248] = 3416;
+            blockMappings.setNewId(1248, 3416);
         }
 
         // Remap infested blocks, as they are instantly breakabale in 1.13+ and can't be broken by those clients on older servers
         if (Via.getConfig().isInfestedBlocksFix()) {
-            int[] oldToNew = blockMappings.getOldToNew();
-            oldToNew[1552] = 1; // stone
-            oldToNew[1553] = 14; // cobblestone
-            oldToNew[1554] = 3983; // stone bricks
-            oldToNew[1555] = 3984; // mossy stone bricks
-            oldToNew[1556] = 3985; // cracked stone bricks
-            oldToNew[1557] = 3986; // chiseled stone bricks
+            blockMappings.setNewId(1552, 1); // stone
+            blockMappings.setNewId(1553, 14); // cobblestone
+            blockMappings.setNewId(1554, 3983); // stone bricks
+            blockMappings.setNewId(1555, 3984); // mossy stone bricks
+            blockMappings.setNewId(1556, 3985); // cracked stone bricks
+            blockMappings.setNewId(1557, 3986); // chiseled stone bricks
         }
 
         JsonObject object = MappingDataLoader.loadFromDataDir("channelmappings-1.13.json");
@@ -125,7 +126,7 @@ public class MappingData extends com.viaversion.viaversion.api.data.MappingData 
     protected Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
         if (key.equals("blocks")) {
             // Need to use a custom size since there are larger gaps in ids
-            return new Mappings(4084, oldMappings.getAsJsonObject("blocks"), newMappings.getAsJsonObject("blockstates"));
+            return new IntArrayMappings(4084, oldMappings.getAsJsonObject("blocks"), newMappings.getAsJsonObject("blockstates"));
         } else {
             return super.loadFromObject(oldMappings, newMappings, diffMappings, key);
         }

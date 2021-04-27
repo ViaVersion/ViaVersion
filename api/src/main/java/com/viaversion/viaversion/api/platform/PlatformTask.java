@@ -22,12 +22,25 @@
  */
 package com.viaversion.viaversion.api.platform;
 
-public interface TaskId {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * @param <T> task type
+ */
+public interface PlatformTask<T> {
+
     /**
-     * Returns the actual object represented by this TaskId
+     * Returns the actual object represented by this task/task id.
      * Null if task cannot be cancelled.
      *
-     * @return Platform based Object (don't assume)
+     * @return platform based object, or null if not cancellable
      */
-    Object getObject();
+    @Nullable T getObject();
+
+    /**
+     * Cancels the task.
+     *
+     * @throws IllegalArgumentException if the task is not cancellable
+     */
+    void cancel();
 }

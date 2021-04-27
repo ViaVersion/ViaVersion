@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.UUID;
 
@@ -65,7 +65,7 @@ public interface ProtocolInfo {
      *
      * @return username, set when entering the {@link State#PLAY} state
      */
-    @MonotonicNonNull String getUsername();
+    @Nullable String getUsername();
 
     void setUsername(String username);
 
@@ -75,7 +75,7 @@ public interface ProtocolInfo {
      *
      * @return uuid, set when entering the {@link State#PLAY} state
      */
-    UUID getUuid();
+    @Nullable UUID getUuid();
 
     void setUuid(UUID uuid);
 

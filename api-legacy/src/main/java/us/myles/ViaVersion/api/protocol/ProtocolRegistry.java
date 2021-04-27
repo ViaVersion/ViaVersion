@@ -20,41 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
-
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Map;
+package us.myles.ViaVersion.api.protocol;
 
 /**
- * Simple wrapper class for two {@link Int2IntMap}s.
- *
- * @see #inverse() to get the inversed map
+ * @deprecated may be removed at some point, use {@link com.viaversion.viaversion.api.protocol.ProtocolManager}
  */
-public interface Int2IntBiMap extends Int2IntMap {
+@Deprecated
+public class ProtocolRegistry {
 
-    /**
-     * Returns the inverse of this bimap.
-     *
-     * @return the inverse of this bimap
-     */
-    Int2IntBiMap inverse();
-
-    /**
-     * Puts the key and value into the maps.
-     *
-     * @param key   key
-     * @param value value
-     * @return old value if present
-     * @throws IllegalArgumentException if the value already exists in the map
-     */
-    @Override
-    int put(int key, int value);
-
-    @Override
     @Deprecated
-    default void putAll(@NonNull Map<? extends Integer, ? extends Integer> m) {
-        throw new UnsupportedOperationException();
-    }
+    public static int SERVER_PROTOCOL = -1;
 }

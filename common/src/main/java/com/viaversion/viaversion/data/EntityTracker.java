@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.data;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.data.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.platform.ExternalJoinGameListener;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;

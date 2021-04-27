@@ -17,17 +17,26 @@
  */
 package com.viaversion.viaversion.bukkit.platform;
 
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.platform.PlatformTask;
+import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class BukkitTaskId implements TaskId {
-    private final Integer object;
+public class BukkitTaskId implements PlatformTask<BukkitTask> {
+    private final BukkitTask task;
 
-    public BukkitTaskId(Integer object) {
-        this.object = object;
+    public BukkitTaskId(@Nullable BukkitTask task) {
+        this.task = task;
     }
 
     @Override
-    public Integer getObject() {
-        return object;
+    public @Nullable BukkitTask getObject() {
+        return task;
+    }
+
+    @Override
+    public void cancel() {
+        Preconditions.checkArgument(task != null, "Task cannot be cancelled");
+        task.cancel();
     }
 }

@@ -22,7 +22,7 @@ import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
@@ -45,7 +45,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
     private final SpongePlugin plugin;
 
     private final Set<Object> listeners = new HashSet<>();
-    private final Set<TaskId> tasks = new HashSet<>();
+    private final Set<PlatformTask> tasks = new HashSet<>();
 
     public SpongeViaLoader(SpongePlugin plugin) {
         this.plugin = plugin;

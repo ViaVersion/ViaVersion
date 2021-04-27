@@ -19,24 +19,14 @@ package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.viaversion.viaversion.sponge.commands.SpongeCommandHandler;
 import com.viaversion.viaversion.sponge.commands.SpongeCommandSender;
 import com.viaversion.viaversion.sponge.platform.SpongeTaskId;
@@ -48,7 +38,17 @@ import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.VersionInfo;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public TaskId runAsync(Runnable runnable) {
+    public PlatformTask runAsync(Runnable runnable) {
         return new SpongeTaskId(
                 Task.builder()
                         .execute(runnable)
@@ -137,7 +137,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public TaskId runSync(Runnable runnable) {
+    public PlatformTask runSync(Runnable runnable) {
         return new SpongeTaskId(
                 Task.builder()
                         .execute(runnable)
@@ -146,7 +146,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public TaskId runSync(Runnable runnable, Long ticks) {
+    public PlatformTask runSync(Runnable runnable, Long ticks) {
         return new SpongeTaskId(
                 Task.builder()
                         .execute(runnable)
@@ -156,22 +156,13 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
+    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
         return new SpongeTaskId(
                 Task.builder()
                         .execute(runnable)
                         .intervalTicks(ticks)
                         .submit(this)
         );
-    }
-
-    @Override
-    public void cancelTask(TaskId taskId) {
-        if (taskId == null) return;
-        if (taskId.getObject() == null) return;
-        if (taskId instanceof SpongeTaskId) {
-            ((SpongeTaskId) taskId).getObject().cancel();
-        }
     }
 
     @Override

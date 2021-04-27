@@ -22,138 +22,65 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.google.gson.JsonObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.Int2IntBiMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class MappingData {
-    protected final String oldVersion;
-    protected final String newVersion;
-    protected final boolean hasDiffFile;
-    protected Int2IntBiMap itemMappings;
-    protected ParticleMappings particleMappings;
-    protected Mappings blockMappings;
-    protected Mappings blockStateMappings;
-    protected Mappings soundMappings;
-    protected Mappings statisticsMappings;
-    protected boolean loadItems = true;
-
-    public MappingData(String oldVersion, String newVersion) {
-        this(oldVersion, newVersion, false);
-    }
-
-    public MappingData(String oldVersion, String newVersion, boolean hasDiffFile) {
-        this.oldVersion = oldVersion;
-        this.newVersion = newVersion;
-        this.hasDiffFile = hasDiffFile;
-    }
-
-    public void load() {
-        Via.getPlatform().getLogger().info("Loading " + oldVersion + " -> " + newVersion + " mappings...");
-        JsonObject diffmapping = hasDiffFile ? loadDiffFile() : null;
-        JsonObject oldMappings = MappingDataLoader.loadData("mapping-" + oldVersion + ".json", true);
-        JsonObject newMappings = MappingDataLoader.loadData("mapping-" + newVersion + ".json", true);
-
-        blockMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blocks");
-        blockStateMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blockstates");
-        soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
-        statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
-
-        Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
-        if (particles != null) {
-            particleMappings = new ParticleMappings(oldMappings.getAsJsonArray("particles"), particles);
-        }
-
-        if (loadItems && newMappings.has("items")) {
-            itemMappings = new Int2IntBiMap();
-            itemMappings.defaultReturnValue(-1);
-            MappingDataLoader.mapIdentifiers(itemMappings, oldMappings.getAsJsonObject("items"), newMappings.getAsJsonObject("items"),
-                    diffmapping != null ? diffmapping.getAsJsonObject("items") : null);
-        }
-
-        loadExtras(oldMappings, newMappings, diffmapping);
-    }
-
-    public int getNewBlockStateId(int id) {
-        return checkValidity(id, blockStateMappings.getNewId(id), "blockstate");
-    }
-
-    public int getNewBlockId(int id) {
-        return checkValidity(id, blockMappings.getNewId(id), "block");
-    }
-
-    public int getNewItemId(int id) {
-        return checkValidity(id, itemMappings.get(id), "item");
-    }
-
-    public int getOldItemId(int id) {
-        int oldId = itemMappings.inverse().get(id);
-        // Remap new items to stone
-        return oldId != -1 ? oldId : 1;
-    }
-
-    public int getNewParticleId(int id) {
-        return checkValidity(id, particleMappings.getMappings().getNewId(id), "particles");
-    }
-
-    public @Nullable Int2IntBiMap getItemMappings() {
-        return itemMappings;
-    }
-
-    public @Nullable ParticleMappings getParticleMappings() {
-        return particleMappings;
-    }
-
-    public @Nullable Mappings getBlockMappings() {
-        return blockMappings;
-    }
-
-    public @Nullable Mappings getBlockStateMappings() {
-        return blockStateMappings;
-    }
-
-    public @Nullable Mappings getSoundMappings() {
-        return soundMappings;
-    }
-
-    public @Nullable Mappings getStatisticsMappings() {
-        return statisticsMappings;
-    }
-
-    protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        if (!oldMappings.has(key) || !newMappings.has(key)) return null;
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return new Mappings(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), diff);
-    }
-
-    protected @Nullable Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        if (!oldMappings.has(key) || !newMappings.has(key)) return null;
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return new Mappings(oldMappings.getAsJsonObject(key), newMappings.getAsJsonObject(key), diff);
-    }
-
-    protected JsonObject loadDiffFile() {
-        return MappingDataLoader.loadData("mappingdiff-" + oldVersion + "to" + newVersion + ".json");
-    }
-
-    protected int checkValidity(int id, int mappedId, String type) {
-        if (mappedId == -1) {
-            Via.getPlatform().getLogger().warning(String.format("Missing %s %s for %s %s %d", newVersion, type, oldVersion, type, id));
-            return 0;
-        }
-        return mappedId;
-    }
+public interface MappingData {
 
     /**
-     * To be overridden.
-     *
-     * @param oldMappings  old mappings
-     * @param newMappings  new mappings
-     * @param diffMappings diff mappings if present
+     * Loads the mapping data.
      */
-    protected void loadExtras(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings) {
-    }
+    void load();
+
+    /**
+     * Returns the mapped block state id, or -1 if unmapped.
+     *
+     * @param id unmapped block state id
+     * @return mapped block state id, or -1 if unmapped
+     */
+    int getNewBlockStateId(int id);
+
+    /**
+     * Returns the mapped block id, or -1 if unmapped.
+     *
+     * @param id unmapped block id
+     * @return mapped block id, or -1 if unmapped
+     */
+    int getNewBlockId(int id);
+
+    /**
+     * Returns the mapped item id, or -1 if unmapped.
+     *
+     * @param id unmapped item id
+     * @return mapped item id, or -1 if unmapped
+     */
+    int getNewItemId(int id);
+
+    /**
+     * Returns the backwards mapped item id, or -1 if unmapped.
+     *
+     * @param id mapped item id
+     * @return backwards mapped item id, or -1 if unmapped
+     */
+    int getOldItemId(int id);
+
+    /**
+     * Returns the mapped particle id, or -1 if unmapped.
+     *
+     * @param id unmapped particle id
+     * @return mapped particle id, or -1 if unmapped
+     */
+    int getNewParticleId(int id);
+
+    @Nullable Int2IntBiMap getItemMappings();
+
+    @Nullable ParticleMappings getParticleMappings();
+
+    @Nullable Mappings getBlockMappings();
+
+    @Nullable Mappings getBlockStateMappings();
+
+    @Nullable Mappings getSoundMappings();
+
+    @Nullable Mappings getStatisticsMappings();
 }

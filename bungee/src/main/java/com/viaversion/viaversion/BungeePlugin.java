@@ -18,17 +18,12 @@
 package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.protocol.ProtocolConstants;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bungee.commands.BungeeCommand;
 import com.viaversion.viaversion.bungee.commands.BungeeCommandHandler;
@@ -41,6 +36,11 @@ import com.viaversion.viaversion.bungee.platform.BungeeViaLoader;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.GsonUtil;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,32 +112,23 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     }
 
     @Override
-    public TaskId runAsync(Runnable runnable) {
-        return new BungeeTaskId(getProxy().getScheduler().runAsync(this, runnable).getId());
+    public PlatformTask runAsync(Runnable runnable) {
+        return new BungeeTaskId(getProxy().getScheduler().runAsync(this, runnable));
     }
 
     @Override
-    public TaskId runSync(Runnable runnable) {
+    public PlatformTask runSync(Runnable runnable) {
         return runAsync(runnable);
     }
 
     @Override
-    public TaskId runSync(Runnable runnable, Long ticks) {
-        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS).getId());
+    public PlatformTask runSync(Runnable runnable, Long ticks) {
+        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override
-    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
-        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS).getId());
-    }
-
-    @Override
-    public void cancelTask(TaskId taskId) {
-        if (taskId == null) return;
-        if (taskId.getObject() == null) return;
-        if (taskId instanceof BungeeTaskId) {
-            getProxy().getScheduler().cancel((Integer) taskId.getObject());
-        }
+    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
+        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override

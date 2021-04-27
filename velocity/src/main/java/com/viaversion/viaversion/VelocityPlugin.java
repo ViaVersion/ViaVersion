@@ -27,13 +27,11 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.slf4j.Logger;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.ChatColorUtil;
@@ -48,6 +46,8 @@ import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
 import com.viaversion.viaversion.velocity.platform.VelocityViaLoader;
 import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 import com.viaversion.viaversion.velocity.util.LoggerWrapper;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -127,17 +127,17 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public TaskId runAsync(Runnable runnable) {
+    public PlatformTask runAsync(Runnable runnable) {
         return runSync(runnable);
     }
 
     @Override
-    public TaskId runSync(Runnable runnable) {
+    public PlatformTask runSync(Runnable runnable) {
         return runSync(runnable, 0L);
     }
 
     @Override
-    public TaskId runSync(Runnable runnable, Long ticks) {
+    public PlatformTask runSync(Runnable runnable, Long ticks) {
         return new VelocityTaskId(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)
@@ -146,19 +146,12 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public TaskId runRepeatingSync(Runnable runnable, Long ticks) {
+    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
         return new VelocityTaskId(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)
                         .repeat(ticks * 50, TimeUnit.MILLISECONDS).schedule()
         );
-    }
-
-    @Override
-    public void cancelTask(TaskId taskId) {
-        if (taskId instanceof VelocityTaskId) {
-            ((VelocityTaskId) taskId).getObject().cancel();
-        }
     }
 
     @Override

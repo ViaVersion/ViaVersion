@@ -27,12 +27,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Int2IntBiMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.io.FileReader;
@@ -62,8 +62,9 @@ public class MappingDataLoader {
     }
 
     /**
-     * Returns the cached mappings. Cleared after Via has been fully loaded.
+     * Returns the cached mappings. Cleared after ViaVersion has been fully loaded.
      *
+     * @return cached mapping file json objects
      * @see #isCacheJsonMappings()
      */
     public static Map<String, JsonObject> getMappingsCache() {
@@ -72,6 +73,8 @@ public class MappingDataLoader {
 
     /**
      * Loads the file from the plugin folder if present, else from the bundled resources.
+     *
+     * @return loaded json object, or null if not found or invalid
      */
     public static @Nullable JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
@@ -92,6 +95,8 @@ public class MappingDataLoader {
 
     /**
      * Loads the file from the bundled resources. Uses the cache if enabled.
+     *
+     * @return loaded json object from bundled resources if present
      */
     public static @Nullable JsonObject loadData(String name) {
         return loadData(name, false);
@@ -101,6 +106,7 @@ public class MappingDataLoader {
      * Loads the file from the bundled resources. Uses the cache if enabled.
      *
      * @param cacheIfEnabled whether loaded files should be cached
+     * @return loaded json object from bundled resources if present
      */
     public static @Nullable JsonObject loadData(String name, boolean cacheIfEnabled) {
         if (cacheJsonMappings) {
@@ -148,7 +154,7 @@ public class MappingDataLoader {
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers);
             if (value != -1) {
-                output[Integer.parseInt(entry.getKey())] = (short) value;
+                output[Integer.parseInt(entry.getKey())] = value;
             }
         }
     }
@@ -200,7 +206,7 @@ public class MappingDataLoader {
                     continue;
                 }
             }
-            output[i] = (short) mappedId;
+            output[i] = mappedId;
         }
     }
 

@@ -18,10 +18,12 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.data;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.data.IntArrayMappings;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.data.Mappings;
 
-public class MappingData extends com.viaversion.viaversion.api.data.MappingData {
+public class MappingData extends MappingDataBase {
 
     public MappingData() {
         super("1.14", "1.15", true);
@@ -34,6 +36,6 @@ public class MappingData extends com.viaversion.viaversion.api.data.MappingData 
         }
 
         // Ignore removed sounds
-        return new Mappings(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), false);
+        return new IntArrayMappings(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), false);
     }
 }

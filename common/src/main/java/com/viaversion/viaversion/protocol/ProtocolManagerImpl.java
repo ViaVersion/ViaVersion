@@ -68,6 +68,7 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -318,6 +319,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public void setServerProtocol(ServerProtocolVersion serverProtocolVersion) {
         this.serverProtocolVersion = serverProtocolVersion;
+        //noinspection deprecation
+        ProtocolRegistry.SERVER_PROTOCOL = serverProtocolVersion.lowestSupportedVersion();
     }
 
     @Override

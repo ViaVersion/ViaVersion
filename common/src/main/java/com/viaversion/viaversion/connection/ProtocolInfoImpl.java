@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import java.util.UUID;
 
@@ -78,7 +77,7 @@ public class ProtocolInfoImpl extends StoredObject implements ProtocolInfo {
     }
 
     @Override
-    public @MonotonicNonNull String getUsername() {
+    public String getUsername() {
         return username;
     }
 

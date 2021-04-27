@@ -1,0 +1,124 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2021 ViaVersion and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.viaversion.viaversion.util;
+
+import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+public class Int2IntBiHashMap implements Int2IntBiMap {
+
+    private final Int2IntMap map;
+    private final Int2IntBiHashMap inverse;
+
+    public Int2IntBiHashMap() {
+        this.map = new Int2IntOpenHashMap();
+        this.inverse = new Int2IntBiHashMap(this);
+    }
+
+    private Int2IntBiHashMap(Int2IntBiHashMap inverse) {
+        this.map = new Int2IntOpenHashMap();
+        this.inverse = inverse;
+    }
+
+    @Override
+    public Int2IntBiMap inverse() {
+        return inverse;
+    }
+
+    @Override
+    public int put(int key, int value) {
+        if (containsKey(key) && value == get(key)) return value;
+
+        Preconditions.checkArgument(!containsValue(value), "value already present: %s", value);
+        map.put(key, value);
+        inverse.map.put(value, key);
+        return defaultReturnValue();
+    }
+
+    @Override
+    public boolean remove(int key, int value) {
+        map.remove(key, value);
+        return inverse.map.remove(key, value);
+    }
+
+    @Override
+    public int get(int key) {
+        return map.get(key);
+    }
+
+    @Override
+    public void clear() {
+        map.clear();
+        inverse.map.clear();
+    }
+
+    @Override
+    public int size() {
+        return map.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    @Override
+    public void defaultReturnValue(int rv) {
+        map.defaultReturnValue(rv);
+        inverse.map.defaultReturnValue(rv);
+    }
+
+    @Override
+    public int defaultReturnValue() {
+        return map.defaultReturnValue();
+    }
+
+    @Override
+    public ObjectSet<Entry> int2IntEntrySet() {
+        return map.int2IntEntrySet();
+    }
+
+    @Override
+    public @NonNull IntSet keySet() {
+        return map.keySet();
+    }
+
+    @Override
+    public @NonNull IntSet values() {
+        return inverse.map.keySet();
+    }
+
+    @Override
+    public boolean containsKey(int key) {
+        return map.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(int value) {
+        return inverse.map.containsKey(value);
+    }
+}

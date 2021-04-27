@@ -18,17 +18,22 @@
 package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
 
-public class VelocityTaskId implements TaskId {
-    private final ScheduledTask object;
+public class VelocityTaskId implements PlatformTask<ScheduledTask> {
+    private final ScheduledTask task;
 
-    public VelocityTaskId(ScheduledTask object) {
-        this.object = object;
+    public VelocityTaskId(ScheduledTask task) {
+        this.task = task;
     }
 
     @Override
     public ScheduledTask getObject() {
-        return object;
+        return task;
+    }
+
+    @Override
+    public void cancel() {
+        task.cancel();
     }
 }

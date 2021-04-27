@@ -18,17 +18,22 @@
 package com.viaversion.viaversion.sponge.platform;
 
 import org.spongepowered.api.scheduler.Task;
-import com.viaversion.viaversion.api.platform.TaskId;
+import com.viaversion.viaversion.api.platform.PlatformTask;
 
-public class SpongeTaskId implements TaskId {
-    private final Task object;
+public class SpongeTaskId implements PlatformTask<Task> {
+    private final Task task;
 
-    public SpongeTaskId(Task object) {
-        this.object = object;
+    public SpongeTaskId(Task task) {
+        this.task = task;
     }
 
     @Override
     public Task getObject() {
-        return object;
+        return task;
+    }
+
+    @Override
+    public void cancel() {
+        task.cancel();
     }
 }
