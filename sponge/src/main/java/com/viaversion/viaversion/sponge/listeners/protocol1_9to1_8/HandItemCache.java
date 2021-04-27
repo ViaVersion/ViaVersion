@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8;
 
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStack;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ItemGrabber;
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ItemGrabber;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

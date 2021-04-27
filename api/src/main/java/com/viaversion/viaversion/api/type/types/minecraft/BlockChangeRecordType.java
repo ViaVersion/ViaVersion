@@ -22,10 +22,10 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
 public class BlockChangeRecordType extends Type<BlockChangeRecord> {
 

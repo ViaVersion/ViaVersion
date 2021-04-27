@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
+import io.netty.buffer.ByteBuf;
 
 public class Particle1_13Type extends Type<Particle> {
 

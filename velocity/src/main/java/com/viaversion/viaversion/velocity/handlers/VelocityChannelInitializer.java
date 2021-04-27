@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.velocity.handlers;
 
-import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
+import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import com.viaversion.viaversion.api.connection.UserConnection;
 
 import java.lang.reflect.Method;
 

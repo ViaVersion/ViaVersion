@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
-import io.netty.channel.ChannelHandlerContext;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 import com.viaversion.viaversion.util.PipelineUtil;
+import io.netty.channel.ChannelHandlerContext;
 
 public abstract class MovementTransmitterProvider implements Provider {
     public abstract Object getFlyingPacket();

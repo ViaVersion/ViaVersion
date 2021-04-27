@@ -18,10 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
@@ -498,7 +498,7 @@ public class PlayerPackets {
                             // cancel any blocking >.>
                             EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
                             if (tracker.isBlocking()) {
-                                if(!Via.getConfig().isShowShieldWhenSwordInHand()) {
+                                if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
                                     tracker.setSecondHand(null);
                                 }
                                 tracker.setBlocking(false);

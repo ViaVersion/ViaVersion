@@ -19,17 +19,16 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -50,6 +49,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlock
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 
 import java.util.List;

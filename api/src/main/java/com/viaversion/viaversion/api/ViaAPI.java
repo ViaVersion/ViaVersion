@@ -22,14 +22,14 @@
  */
 package com.viaversion.viaversion.api;
 
-import com.viaversion.viaversion.api.connection.ConnectionManager;
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import io.netty.buffer.ByteBuf;
 
 import java.util.SortedSet;
 import java.util.UUID;

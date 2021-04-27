@@ -19,18 +19,18 @@ package com.viaversion.viaversion.sponge.platform;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.sponge.handlers.SpongeChannelInitializer;
+import com.viaversion.viaversion.util.ListWrapper;
+import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.util.ReflectionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
-import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.platform.ViaInjector;
-import com.viaversion.viaversion.sponge.handlers.SpongeChannelInitializer;
-import com.viaversion.viaversion.util.ListWrapper;
-import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

@@ -21,7 +21,11 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 class ChestConnectionHandler extends ConnectionHandler {
     private static final Map<Integer, BlockFace> chestFacings = new HashMap<>();

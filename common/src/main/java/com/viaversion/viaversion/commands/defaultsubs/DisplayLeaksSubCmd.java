@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.commands.defaultsubs;
 
-import io.netty.util.ResourceLeakDetector;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
+import io.netty.util.ResourceLeakDetector;
 
 public class DisplayLeaksSubCmd extends ViaSubCommand {
     @Override

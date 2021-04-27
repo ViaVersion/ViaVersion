@@ -22,10 +22,10 @@
  */
 package com.viaversion.viaversion.api.protocol.remapper;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.InformativeException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
     private final Type<T1> inputType;

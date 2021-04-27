@@ -19,9 +19,9 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.reflect.TypeToken;
+import com.viaversion.viaversion.util.GsonUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import com.viaversion.viaversion.util.GsonUtil;
 
 import java.io.IOException;
 import java.io.InputStream;

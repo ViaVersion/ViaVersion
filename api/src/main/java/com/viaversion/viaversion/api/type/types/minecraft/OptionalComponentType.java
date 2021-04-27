@@ -23,8 +23,8 @@
 package com.viaversion.viaversion.api.type.types.minecraft;
 
 import com.google.gson.JsonElement;
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
 public class OptionalComponentType extends Type<JsonElement> {
 

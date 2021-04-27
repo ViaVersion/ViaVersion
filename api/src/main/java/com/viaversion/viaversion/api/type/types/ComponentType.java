@@ -25,9 +25,9 @@ package com.viaversion.viaversion.api.type.types;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
 public class ComponentType extends Type<JsonElement> {
     private static final StringType STRING_TAG = new StringType(262144);

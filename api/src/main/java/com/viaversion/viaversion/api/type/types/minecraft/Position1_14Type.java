@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
 public class Position1_14Type extends Type<Position> {
     public Position1_14Type() {

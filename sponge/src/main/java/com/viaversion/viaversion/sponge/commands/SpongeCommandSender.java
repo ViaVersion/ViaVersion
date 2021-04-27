@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.sponge.commands;
 
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.command.ViaCommandSender;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Identifiable;
-import com.viaversion.viaversion.SpongePlugin;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 

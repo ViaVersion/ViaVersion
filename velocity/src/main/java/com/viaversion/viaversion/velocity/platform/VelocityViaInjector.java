@@ -18,15 +18,15 @@
 package com.viaversion.viaversion.velocity.platform;
 
 import com.google.gson.JsonObject;
-import io.netty.channel.ChannelInitializer;
-import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import com.viaversion.viaversion.velocity.handlers.VelocityChannelInitializer;
+import io.netty.channel.ChannelInitializer;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSortedSet;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

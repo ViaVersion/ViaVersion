@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.exception;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
 import io.netty.handler.codec.CodecException;
-import com.viaversion.viaversion.api.Via;
 
 /**
  * Thrown during packet transformation to cancel the packet.

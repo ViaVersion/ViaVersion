@@ -23,8 +23,8 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
 

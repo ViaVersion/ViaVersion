@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
-import com.viaversion.viaversion.api.type.Type;
 
 /**
  * For 1.13.2, not 1.13 (1.13 reads recipe type and id in swapped order)!

@@ -22,10 +22,10 @@
  */
 package com.viaversion.viaversion.api.protocol.packet;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PacketTracker {
     private final UserConnection connection;

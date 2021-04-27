@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.boss;
 
-import org.bukkit.entity.Player;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
+import org.bukkit.entity.Player;
 
 public class ViaBossBar extends CommonBoss<Player> {
 

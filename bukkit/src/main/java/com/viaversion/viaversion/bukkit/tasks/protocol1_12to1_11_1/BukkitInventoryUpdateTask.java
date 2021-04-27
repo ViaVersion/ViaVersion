@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;

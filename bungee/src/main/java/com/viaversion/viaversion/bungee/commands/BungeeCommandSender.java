@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.bungee.commands;
 
+import com.viaversion.viaversion.api.command.ViaCommandSender;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 

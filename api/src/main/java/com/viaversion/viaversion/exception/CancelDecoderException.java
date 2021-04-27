@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.exception;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
 import io.netty.handler.codec.DecoderException;
-import com.viaversion.viaversion.api.Via;
 
 /**
  * Thrown during packet decoding when an incoming packet should be cancelled.

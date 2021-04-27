@@ -25,10 +25,10 @@ package com.viaversion.viaversion.api.type.types.minecraft;
 import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import com.viaversion.viaversion.api.type.Type;
 
 import java.io.DataInput;
 import java.io.DataOutput;

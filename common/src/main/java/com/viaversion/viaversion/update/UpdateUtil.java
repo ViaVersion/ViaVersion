@@ -19,9 +19,9 @@ package com.viaversion.viaversion.update;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;

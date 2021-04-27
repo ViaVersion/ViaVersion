@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.sponge.listeners;
 
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.update.UpdateUtil;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 public class UpdateListener {
     @Listener

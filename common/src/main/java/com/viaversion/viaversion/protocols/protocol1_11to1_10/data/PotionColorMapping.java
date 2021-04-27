@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.data;
 
+import com.viaversion.viaversion.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import com.viaversion.viaversion.util.Pair;
 
 public class PotionColorMapping {
 

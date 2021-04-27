@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
+import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
-import com.viaversion.viaversion.configuration.AbstractViaConfig;
 
 import java.io.File;
 import java.net.URL;

@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.sponge.listeners;
 
+import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.ViaListener;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import com.viaversion.viaversion.SpongePlugin;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.ViaListener;
-import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.lang.reflect.Field;
 

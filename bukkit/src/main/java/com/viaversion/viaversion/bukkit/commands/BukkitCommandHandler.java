@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.bukkit.commands;
 
+import com.viaversion.viaversion.commands.ViaCommandHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import com.viaversion.viaversion.commands.ViaCommandHandler;
 
 import java.util.List;
 

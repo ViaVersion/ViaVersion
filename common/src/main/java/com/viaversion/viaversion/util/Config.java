@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 
 import java.io.File;
 import java.io.FileInputStream;

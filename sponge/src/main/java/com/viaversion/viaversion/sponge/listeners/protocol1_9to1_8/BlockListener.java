@@ -17,16 +17,16 @@
  */
 package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8;
 
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.world.Location;
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.sponge.listeners.ViaSpongeListener;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.world.Location;
 
 public class BlockListener extends ViaSpongeListener {
 

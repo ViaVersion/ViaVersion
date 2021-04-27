@@ -78,7 +78,7 @@ public interface ViaVersionConfig {
 
     /**
      * Whether the player can block with the shield without a delay.
-     *
+     * <p>
      * This option requires {@link #isShowShieldWhenSwordInHand()} to be disabled
      *
      * @return {@code true} if non delayed shield blocking is enabled.
@@ -88,7 +88,7 @@ public interface ViaVersionConfig {
     /**
      * Puts the shield into the second hand when holding a sword.
      * The shield will disappear when switching to another item.
-     *
+     * <p>
      * This option requires {@link #isShieldBlocking()} to be enabled
      *
      * @return {@code true} if the shield should appear when holding a sword

@@ -23,11 +23,11 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_13;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 
 import java.util.List;
 

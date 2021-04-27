@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
@@ -30,6 +29,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9_3_4;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.BitSet;

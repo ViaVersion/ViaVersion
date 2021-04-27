@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.bukkit.listeners;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 
 public class ProtocolLibEnableListener implements Listener {
 

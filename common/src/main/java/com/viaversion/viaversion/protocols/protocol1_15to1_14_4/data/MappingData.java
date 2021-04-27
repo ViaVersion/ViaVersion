@@ -20,8 +20,8 @@ package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.data;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.data.IntArrayMappings;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import com.viaversion.viaversion.api.data.Mappings;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingData extends MappingDataBase {
 

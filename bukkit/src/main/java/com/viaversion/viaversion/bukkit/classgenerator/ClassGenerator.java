@@ -17,7 +17,19 @@
  */
 package com.viaversion.viaversion.bukkit.classgenerator;
 
-import javassist.*;
+import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
+import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
+import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.CtNewConstructor;
+import javassist.CtNewMethod;
+import javassist.LoaderClassPath;
+import javassist.NotFoundException;
 import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
 import org.bukkit.Bukkit;
@@ -27,10 +39,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
-import com.viaversion.viaversion.ViaVersionPlugin;
-import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
-import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
-import com.viaversion.viaversion.bukkit.util.NMSUtil;
 
 import java.lang.reflect.Method;
 
@@ -214,31 +222,31 @@ public class ClassGenerator {
             // Bake constructor
             connectListenerClazz.addConstructor(CtNewConstructor.make(
                     "public ProtocolSupportConnectListener (ConnectionImpl connection) {\n"
-                  + "    this.connection = connection;\n"
-                  + "}", connectListenerClazz));
+                            + "    this.connection = connection;\n"
+                            + "}", connectListenerClazz));
             // Add the listening method
             connectListenerClazz.addMethod(CtNewMethod.make(
                     // On packet receive
                     "public void onPacketReceiving(protocolsupport.api.Connection.PacketListener.PacketEvent event) {\n"
-                    // Check if we are getting handshake packet.
-                  + "    if (event.getPacket() instanceof PacketHandshakingInSetProtocol) {\n"
-                    // Get protocol version.
-                  + "        PacketHandshakingInSetProtocol packet = (PacketHandshakingInSetProtocol) event.getPacket();\n"
-                  + (newVersionMethod ? (
-                    "        int protoVersion = packet.getProtocolVersion();\n"
-                  ) : (
-                    "        int protoVersion = packet.b();\n"
-                  ))
-                    // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
-                    // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.
-                  + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == com.viaversion.viaversion.api.Via.getAPI().getServerVersion().lowestSupportedVersion()) {\n"
-                  + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
-                  + "        }\n"
-                  + "    }\n"
-                    // Id version is not serverversion viaversion will not spoof. ProtocolSupport will handle the rest.
-                    // In any case, remove the packet listener and wrap up.
-                  + "    connection.removePacketListener(this);\n"
-                  + "}", connectListenerClazz));
+                            // Check if we are getting handshake packet.
+                            + "    if (event.getPacket() instanceof PacketHandshakingInSetProtocol) {\n"
+                            // Get protocol version.
+                            + "        PacketHandshakingInSetProtocol packet = (PacketHandshakingInSetProtocol) event.getPacket();\n"
+                            + (newVersionMethod ? (
+                            "        int protoVersion = packet.getProtocolVersion();\n"
+                    ) : (
+                            "        int protoVersion = packet.b();\n"
+                    ))
+                            // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
+                            // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.
+                            + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == com.viaversion.viaversion.api.Via.getAPI().getServerVersion().lowestSupportedVersion()) {\n"
+                            + "            connection.setVersion(ProtocolVersion.getLatest(ProtocolType.PC));\n"
+                            + "        }\n"
+                            + "    }\n"
+                            // Id version is not serverversion viaversion will not spoof. ProtocolSupport will handle the rest.
+                            // In any case, remove the packet listener and wrap up.
+                            + "    connection.removePacketListener(this);\n"
+                            + "}", connectListenerClazz));
             return connectListenerClazz.toClass(HandlerConstructor.class.getClassLoader());
         } catch (Exception e) {
             e.printStackTrace();
@@ -250,7 +258,8 @@ public class ClassGenerator {
         if (getPSConnectListener() != null) {
             try {
                 Class<? extends Event> connectionOpenEvent = (Class<? extends Event>) Class.forName("protocolsupport.api.events.ConnectionOpenEvent");
-                Bukkit.getPluginManager().registerEvent(connectionOpenEvent, new Listener() { }, EventPriority.HIGH, new EventExecutor() {
+                Bukkit.getPluginManager().registerEvent(connectionOpenEvent, new Listener() {
+                }, EventPriority.HIGH, new EventExecutor() {
                     @Override
                     public void execute(Listener listener, Event event) throws EventException {
                         try {

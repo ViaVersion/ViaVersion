@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.bungee.providers;
 
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

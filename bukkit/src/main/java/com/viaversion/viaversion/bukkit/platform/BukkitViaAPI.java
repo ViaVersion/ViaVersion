@@ -17,18 +17,18 @@
  */
 package com.viaversion.viaversion.bukkit.platform;
 
-import io.netty.buffer.ByteBuf;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.boss.ViaBossBar;
 import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
+import io.netty.buffer.ByteBuf;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 

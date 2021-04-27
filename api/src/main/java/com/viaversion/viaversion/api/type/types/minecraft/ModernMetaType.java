@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import io.netty.buffer.ByteBuf;
 
 public abstract class ModernMetaType extends MetaTypeTemplate {
     @Override

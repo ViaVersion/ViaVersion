@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
+import io.netty.buffer.ByteBuf;
 
 public class UnsignedByteType extends Type<Short> implements TypeConverter<Short> {
     public UnsignedByteType() {

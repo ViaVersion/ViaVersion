@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
-import org.spongepowered.api.scheduler.Task;
 import com.viaversion.viaversion.api.platform.PlatformTask;
+import org.spongepowered.api.scheduler.Task;
 
 public class SpongeTaskId implements PlatformTask<Task> {
     private final Task task;

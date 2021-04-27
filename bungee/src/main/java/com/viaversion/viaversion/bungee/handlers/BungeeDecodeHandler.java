@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.bungee.handlers;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.exception.CancelCodecException;
+import com.viaversion.viaversion.exception.CancelDecoderException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.exception.CancelCodecException;
-import com.viaversion.viaversion.exception.CancelDecoderException;
 
 import java.util.List;
 

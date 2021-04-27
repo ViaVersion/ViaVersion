@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.bukkit.commands;
 
+import com.viaversion.viaversion.api.command.ViaCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
 
 import java.util.UUID;
 

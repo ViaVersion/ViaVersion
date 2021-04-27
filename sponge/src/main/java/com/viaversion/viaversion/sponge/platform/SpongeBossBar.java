@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
-import org.spongepowered.api.entity.living.player.Player;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.boss.CommonBoss;
+import org.spongepowered.api.entity.living.player.Player;
 
 public class SpongeBossBar extends CommonBoss<Player> {
 

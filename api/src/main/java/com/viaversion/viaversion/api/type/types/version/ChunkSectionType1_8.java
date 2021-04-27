@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteOrder;
 

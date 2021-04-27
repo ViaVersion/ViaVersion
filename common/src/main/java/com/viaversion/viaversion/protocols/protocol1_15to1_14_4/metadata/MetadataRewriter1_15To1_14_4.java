@@ -24,12 +24,12 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_13;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 
 import java.util.List;
 

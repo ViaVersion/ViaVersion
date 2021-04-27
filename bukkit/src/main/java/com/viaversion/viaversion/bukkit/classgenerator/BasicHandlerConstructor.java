@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.bukkit.classgenerator;
 
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 
 public class BasicHandlerConstructor implements HandlerConstructor {
     @Override

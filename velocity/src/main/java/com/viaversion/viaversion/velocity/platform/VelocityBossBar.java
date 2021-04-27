@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.proxy.Player;
-import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.boss.CommonBoss;

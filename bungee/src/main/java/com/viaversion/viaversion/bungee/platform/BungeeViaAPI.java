@@ -17,14 +17,14 @@
  */
 package com.viaversion.viaversion.bungee.platform;
 
-import io.netty.buffer.ByteBuf;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
+import io.netty.buffer.ByteBuf;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
 

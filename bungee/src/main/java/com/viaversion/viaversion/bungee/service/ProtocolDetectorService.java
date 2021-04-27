@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.bungee.service;
 
-import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ServerPing;
-import net.md_5.bungee.api.config.ServerInfo;
 import com.viaversion.viaversion.BungeePlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
+import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.HashMap;
 import java.util.Map;

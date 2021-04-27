@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.bungee.platform;
 
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.boss.CommonBoss;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeBossBar extends CommonBoss<ProxiedPlayer> {
 

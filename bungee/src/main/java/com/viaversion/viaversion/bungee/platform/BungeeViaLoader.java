@@ -17,13 +17,11 @@
  */
 package com.viaversion.viaversion.bungee.platform;
 
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
 import com.viaversion.viaversion.BungeePlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.bungee.handlers.BungeeServerHandler;
 import com.viaversion.viaversion.bungee.listeners.ElytraPatch;
 import com.viaversion.viaversion.bungee.listeners.UpdateListener;
@@ -33,11 +31,13 @@ import com.viaversion.viaversion.bungee.providers.BungeeMainHandProvider;
 import com.viaversion.viaversion.bungee.providers.BungeeMovementTransmitter;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
-import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.util.HashSet;
 import java.util.Set;

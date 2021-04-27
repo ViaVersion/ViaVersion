@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
-import io.netty.buffer.ByteBuf;
-import org.spongepowered.api.entity.living.player.Player;
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.boss.BossBar;
 import com.viaversion.viaversion.api.boss.BossColor;
 import com.viaversion.viaversion.api.boss.BossStyle;
+import io.netty.buffer.ByteBuf;
+import org.spongepowered.api.entity.living.player.Player;
 
 public class SpongeViaAPI extends ViaAPIBase<Player> {
 

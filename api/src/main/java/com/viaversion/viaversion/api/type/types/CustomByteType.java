@@ -22,8 +22,8 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.type.PartialType;
+import io.netty.buffer.ByteBuf;
 
 public class CustomByteType extends PartialType<byte[], Integer> {
 

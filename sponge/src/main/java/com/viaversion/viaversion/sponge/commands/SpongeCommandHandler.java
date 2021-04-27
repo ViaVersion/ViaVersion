@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.sponge.commands;
 
+import com.viaversion.viaversion.commands.ViaCommandHandler;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -25,7 +26,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import com.viaversion.viaversion.commands.ViaCommandHandler;
 
 import java.util.List;
 import java.util.Optional;

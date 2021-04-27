@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.velocity.providers;
 
 import com.velocitypowered.api.proxy.ServerConnection;
-import io.netty.channel.ChannelHandler;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -26,6 +25,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
 import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
 import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
+import io.netty.channel.ChannelHandler;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
-import org.spongepowered.api.Sponge;
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -36,6 +35,7 @@ import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4.Spong
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
 import com.viaversion.viaversion.sponge.providers.SpongeViaBulkChunkTranslator;
 import com.viaversion.viaversion.sponge.providers.SpongeViaMovementTransmitter;
+import org.spongepowered.api.Sponge;
 
 import java.util.HashSet;
 import java.util.Set;

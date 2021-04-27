@@ -22,10 +22,10 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.CompactArrayUtil;
+import io.netty.buffer.ByteBuf;
 
 public class ChunkSectionType1_13 extends Type<ChunkSection> {
     private static final int GLOBAL_PALETTE = 14;

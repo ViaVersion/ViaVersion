@@ -17,16 +17,16 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
-import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
+import com.viaversion.viaversion.bukkit.classgenerator.HandlerConstructor;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
+import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
-import com.viaversion.viaversion.bukkit.classgenerator.HandlerConstructor;
 
 import java.lang.reflect.Method;
 

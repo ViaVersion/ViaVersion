@@ -23,10 +23,10 @@
 package com.viaversion.viaversion.api.type.types.version;
 
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.type.types.minecraft.MetaTypeTemplate;
+import io.netty.buffer.ByteBuf;
 
 public class Metadata1_8Type extends MetaTypeTemplate {
 
