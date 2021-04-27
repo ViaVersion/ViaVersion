@@ -139,11 +139,11 @@ public class MappingDataLoader {
         }
     }
 
-    public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
+    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
         MappingDataLoader.mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
     }
 
-    public static void mapIdentifiers(short[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
+    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
         Object2IntMap newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers);
@@ -173,11 +173,11 @@ public class MappingDataLoader {
         return value;
     }
 
-    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
+    public static void mapIdentifiers(int[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
         mapIdentifiers(output, oldIdentifiers, newIdentifiers, null, warnOnMissing);
     }
 
-    public static void mapIdentifiers(short[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+    public static void mapIdentifiers(int[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(newIdentifiers);
         for (int i = 0; i < oldIdentifiers.size(); i++) {
             JsonElement oldIdentifier = oldIdentifiers.get(i);

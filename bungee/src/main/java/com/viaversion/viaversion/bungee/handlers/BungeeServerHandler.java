@@ -230,7 +230,6 @@ public class BungeeServerHandler implements Listener {
                         plMsg.setTag(channel);
                     }
 
-                    user.setProtocolInfo(info);
                     user.put(storage);
 
                     user.setActive(protocolPath != null);

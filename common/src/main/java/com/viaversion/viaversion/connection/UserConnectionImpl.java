@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.connection;
 
-import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
@@ -58,9 +57,9 @@ public class UserConnectionImpl implements UserConnection {
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .<UUID, Boolean>build().asMap());
+    private final ProtocolInfo protocolInfo = new ProtocolInfoImpl(this);
     private final Channel channel;
     private final boolean clientSide;
-    private ProtocolInfo protocolInfo;
     private boolean active = true;
     private boolean pendingDisconnect;
 
@@ -73,6 +72,7 @@ public class UserConnectionImpl implements UserConnection {
     public UserConnectionImpl(@Nullable Channel channel, boolean clientSide) {
         this.channel = channel;
         this.clientSide = clientSide;
+        storedObjects.put(ProtocolInfo.class, (StoredObject) protocolInfo);
     }
 
     /**
@@ -313,19 +313,8 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public @Nullable ProtocolInfo getProtocolInfo() {
+    public ProtocolInfo getProtocolInfo() {
         return protocolInfo;
-    }
-
-    @Override
-    public void setProtocolInfo(@Nullable ProtocolInfo protocolInfo) {
-        Preconditions.checkArgument(protocolInfo instanceof StoredObject, "ProtocolInfo has to extend StoredObject!");
-        this.protocolInfo = protocolInfo;
-        if (protocolInfo != null) {
-            storedObjects.put(ProtocolInfo.class, (StoredObject) protocolInfo);
-        } else {
-            storedObjects.remove(ProtocolInfo.class);
-        }
     }
 
     @Override

@@ -24,7 +24,6 @@ package com.viaversion.viaversion.protocol;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
@@ -33,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.base.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.connection.ProtocolInfoImpl;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
@@ -42,14 +40,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements ProtocolPipeline {
+    private final UserConnection userConnection;
     /**
      * Protocol list ordered from client to server transforation with the base protocols at the end.
      */
     private List<Protocol> protocolList;
-    private UserConnection userConnection;
 
     public ProtocolPipelineImpl(UserConnection userConnection) {
-        init(userConnection);
+        this.userConnection = userConnection;
+        userConnection.getProtocolInfo().setPipeline(this);
     }
 
     @Override
@@ -61,17 +60,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
     @Override
     public void init(UserConnection userConnection) {
-        this.userConnection = userConnection;
-
-        ProtocolInfo protocolInfo = new ProtocolInfoImpl(userConnection);
-        protocolInfo.setPipeline(this);
-
-        userConnection.setProtocolInfo(protocolInfo);
-
-        /* Init through all our pipes */
-        for (Protocol protocol : protocolList) {
-            protocol.init(userConnection);
-        }
+        throw new UnsupportedOperationException("ProtocolPipeline can only be initialized once");
     }
 
     @Override
@@ -155,7 +144,9 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     @Override
     public boolean contains(Class<? extends Protocol> pipeClass) {
         for (Protocol protocol : protocolList) {
-            if (protocol.getClass().equals(pipeClass)) return true;
+            if (protocol.getClass() == pipeClass) {
+                return true;
+            }
         }
         return false;
     }
@@ -163,7 +154,9 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     @Override
     public @Nullable <P extends Protocol> P getProtocol(Class<P> pipeClass) {
         for (Protocol protocol : protocolList) {
-            if (protocol.getClass() == pipeClass) return (P) protocol;
+            if (protocol.getClass() == pipeClass) {
+                return (P) protocol;
+            }
         }
         return null;
     }
@@ -187,7 +180,6 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
     @Override
     public void cleanPipes() {
-        pipes().clear();
         registerPackets();
     }
 }

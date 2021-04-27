@@ -29,9 +29,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Arrays;
 
 public class Mappings {
-    protected final short[] oldToNew;
+    protected final int[] oldToNew;
 
-    public Mappings(short[] oldToNew) {
+    public Mappings(int[] oldToNew) {
         this.oldToNew = oldToNew;
     }
 
@@ -45,8 +45,8 @@ public class Mappings {
      * @param diffMapping extra mappings that will be used/scanned when an entry cannot be found
      */
     public Mappings(int size, JsonObject oldMapping, JsonObject newMapping, @Nullable JsonObject diffMapping) {
-        oldToNew = new short[size];
-        Arrays.fill(oldToNew, (short) -1);
+        oldToNew = new int[size];
+        Arrays.fill(oldToNew, -1);
         MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, diffMapping);
     }
 
@@ -62,8 +62,8 @@ public class Mappings {
      * @param newMapping mappings to map to
      */
     public Mappings(int size, JsonObject oldMapping, JsonObject newMapping) {
-        oldToNew = new short[size];
-        Arrays.fill(oldToNew, (short) -1);
+        oldToNew = new int[size];
+        Arrays.fill(oldToNew, -1);
         MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping);
     }
 
@@ -81,8 +81,8 @@ public class Mappings {
      * @param warnOnMissing should "No key for x" be printed if there is no matching identifier
      */
     public Mappings(int size, JsonArray oldMapping, JsonArray newMapping, JsonObject diffMapping, boolean warnOnMissing) {
-        oldToNew = new short[size];
-        Arrays.fill(oldToNew, (short) -1);
+        oldToNew = new int[size];
+        Arrays.fill(oldToNew, -1);
         MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, diffMapping, warnOnMissing);
     }
 
@@ -110,7 +110,7 @@ public class Mappings {
         return old >= 0 && old < oldToNew.length ? oldToNew[old] : -1;
     }
 
-    public short[] getOldToNew() {
+    public int[] getOldToNew() {
         return oldToNew;
     }
 }

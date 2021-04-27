@@ -22,8 +22,6 @@
  */
 package com.viaversion.viaversion.api.protocol.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.PacketType;
-
 /**
  * Interface to be implemented by server outgoing packet type enums,
  * representing PLAY state packets, ordered by their packet id.

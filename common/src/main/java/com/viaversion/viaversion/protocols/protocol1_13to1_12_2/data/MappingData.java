@@ -67,7 +67,7 @@ public class MappingData extends com.viaversion.viaversion.api.data.MappingData 
 
         // Remap infested blocks, as they are instantly breakabale in 1.13+ and can't be broken by those clients on older servers
         if (Via.getConfig().isInfestedBlocksFix()) {
-            short[] oldToNew = blockMappings.getOldToNew();
+            int[] oldToNew = blockMappings.getOldToNew();
             oldToNew[1552] = 1; // stone
             oldToNew[1553] = 14; // cobblestone
             oldToNew[1554] = 3983; // stone bricks

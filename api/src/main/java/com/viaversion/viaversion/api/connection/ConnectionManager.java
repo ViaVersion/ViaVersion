@@ -44,6 +44,8 @@ public interface ConnectionManager {
     /**
      * Frontend connections will have the UUID stored. Override this if your platform isn't always frontend.
      * UUIDs can't be duplicate between frontend connections.
+     *
+     * @return true if the user is a frontend connection
      */
     boolean isFrontEnd(UserConnection connection);
 
@@ -55,6 +57,8 @@ public interface ConnectionManager {
      * <p>
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
+     *
+     * @return frontend UserConnection of the player connected to this proxy server
      */
     @Nullable UserConnection getConnectedClient(UUID clientIdentifier);
 
@@ -66,6 +70,8 @@ public interface ConnectionManager {
      * <p>
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
+     *
+     * @return UUID of the frontend connection to this proxy server
      */
     @Nullable UUID getConnectedClientId(UserConnection connection);
 
@@ -75,6 +81,8 @@ public interface ConnectionManager {
      * May contain frontend, backend and/or client-sided connections.
      * When ViaVersion is reloaded, this method may not return some players.
      * May not contain ProtocolSupport players.
+     *
+     * @return connected UserConnections
      */
     Set<UserConnection> getConnections();
 
@@ -83,6 +91,8 @@ public interface ConnectionManager {
      * Returns empty list when there isn't a server
      * When ViaVersion is reloaded, this method may not return some players.
      * May not contain ProtocolSupport players.
+     *
+     * @return map containing the UUIDs and frontend UserConnections from players connected to this proxy server
      */
     Map<UUID, UserConnection> getConnectedClients();
 

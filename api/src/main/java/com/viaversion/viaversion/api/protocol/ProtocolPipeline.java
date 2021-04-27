@@ -76,6 +76,11 @@ public interface ProtocolPipeline extends SimpleProtocol {
      */
     boolean filter(Object o, List list) throws Exception;
 
+    /**
+     * Returns the list of protocols this pipeline contains.
+     *
+     * @return list of protocols in this pipe
+     */
     List<Protocol> pipes();
 
     /**

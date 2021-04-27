@@ -186,9 +186,7 @@ public interface UserConnection {
      *
      * @return info containing the current protocol state and userdata
      */
-    @Nullable ProtocolInfo getProtocolInfo();
-
-    void setProtocolInfo(@Nullable ProtocolInfo protocolInfo);
+    ProtocolInfo getProtocolInfo();
 
     /**
      * Returns a map of stored objects.
