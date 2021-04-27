@@ -28,7 +28,7 @@ public abstract class ViaListener {
     private final Class<? extends Protocol> requiredPipeline;
     private boolean registered;
 
-    public ViaListener(Class<? extends Protocol> requiredPipeline) {
+    protected ViaListener(Class<? extends Protocol> requiredPipeline) {
         this.requiredPipeline = requiredPipeline;
     }
 

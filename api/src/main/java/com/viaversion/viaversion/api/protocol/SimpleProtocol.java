@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol.base;
+package com.viaversion.viaversion.api.protocol;
 
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
  * Dummy protocol class when there is no need of any of the
  * existing packet type enums or automated channel mappings.
  *
- * @see com.viaversion.viaversion.api.protocol.base.Protocol
+ * @see Protocol
  */
 public interface SimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> {
 

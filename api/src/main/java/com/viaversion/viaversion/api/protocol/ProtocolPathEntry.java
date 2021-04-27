@@ -22,8 +22,6 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
-import com.viaversion.viaversion.api.protocol.base.Protocol;
-
 public interface ProtocolPathEntry {
 
     /**

@@ -22,8 +22,6 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
-import com.viaversion.viaversion.api.protocol.base.SimpleProtocol;
-
-public abstract class AbstractSimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes,
+public abstract class AbstractSimpleProtocol extends AbstractProtocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes,
         SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> implements SimpleProtocol {
 }

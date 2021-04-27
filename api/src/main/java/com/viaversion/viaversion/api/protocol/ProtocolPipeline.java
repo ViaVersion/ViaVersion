@@ -23,8 +23,6 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.base.Protocol;
-import com.viaversion.viaversion.api.protocol.base.SimpleProtocol;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
