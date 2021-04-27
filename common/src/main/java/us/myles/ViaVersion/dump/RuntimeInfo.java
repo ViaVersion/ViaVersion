@@ -19,9 +19,14 @@ package us.myles.ViaVersion.dump;
 
 public class RuntimeInfo {
 
-    private final long maxMemory;
-    private final long freeMemory;
-    private final long totalMemory;
+    // Divider to get from bytes to megabytes.
+    private static final double MEMORY_DIVIDER = 1000 * 1000;
+    private static final String MEMORY_INFO_FORMAT = "%.4fMB / %.4fMB (%.4fMB Max)";
+
+    private final double maxMemory;
+    private final double freeMemory;
+    private final double totalMemory;
+    private final String memoryInfo;
 
     public RuntimeInfo() {
         this(Runtime.getRuntime());
@@ -31,22 +36,34 @@ public class RuntimeInfo {
         this(runtime.maxMemory(), runtime.freeMemory(), runtime.totalMemory());
     }
 
+    /**
+     * Constructs a new {@link RuntimeInfo} and converts the passed data nicely.
+     *
+     * @param maxMemory   The maximum amount of memory that the Java virtual machine will attempt to use in bytes.
+     * @param freeMemory  The amount of free memory in the Java Virtual Machine in bytes.
+     * @param totalMemory The total amount of memory in the Java virtual machine in bytes.
+     */
     public RuntimeInfo(long maxMemory, long freeMemory, long totalMemory) {
-        this.maxMemory = maxMemory;
-        this.freeMemory = freeMemory;
-        this.totalMemory = totalMemory;
+        this.maxMemory = maxMemory / MEMORY_DIVIDER;
+        this.freeMemory = freeMemory / MEMORY_DIVIDER;
+        this.totalMemory = totalMemory / MEMORY_DIVIDER;
+        double usedMemory = (totalMemory - freeMemory) / MEMORY_DIVIDER;
+        this.memoryInfo = String.format(MEMORY_INFO_FORMAT, usedMemory, getTotalMemory(), getMaxMemory());
     }
 
-    public long getMaxMemory() {
+    public double getMaxMemory() {
         return maxMemory;
     }
 
-    public long getFreeMemory() {
+    public double getFreeMemory() {
         return freeMemory;
     }
 
-    public long getTotalMemory() {
+    public double getTotalMemory() {
         return totalMemory;
     }
 
+    public String getMemoryInfo() {
+        return memoryInfo;
+    }
 }
