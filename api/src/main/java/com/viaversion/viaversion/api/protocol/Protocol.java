@@ -24,8 +24,6 @@ package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -39,7 +37,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -127,11 +124,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         }
     }
 
-    @Override
-    public void filterPacket(UserConnection info, Object packet, List output) throws Exception {
-        output.add(packet);
-    }
-
     /**
      * Register the packets for this protocol. To be overriden.
      */
@@ -150,24 +142,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
      * To be overridden if needed.
      */
     protected void onMappingDataLoaded() {
-    }
-
-    @Override
-    public void register(ViaProviders providers) {
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
-    }
-
-    @Override
-    public void registerIncoming(State state, int oldPacketID, int newPacketID) {
-        registerIncoming(state, oldPacketID, newPacketID, null);
-    }
-
-    @Override
-    public void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
-        registerIncoming(state, oldPacketID, newPacketID, packetRemapper, false);
     }
 
     @Override
@@ -192,21 +166,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
     }
 
     @Override
-    public void cancelIncoming(State state, int newPacketID) {
-        cancelIncoming(state, -1, newPacketID);
-    }
-
-    @Override
-    public void registerOutgoing(State state, int oldPacketID, int newPacketID) {
-        registerOutgoing(state, oldPacketID, newPacketID, null);
-    }
-
-    @Override
-    public void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
-        registerOutgoing(state, oldPacketID, newPacketID, packetRemapper, false);
-    }
-
-    @Override
     public void cancelOutgoing(State state, int oldPacketID, int newPacketID) {
         registerOutgoing(state, oldPacketID, newPacketID, new PacketRemapper() {
             @Override
@@ -214,11 +173,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
                 handler(PacketWrapper::cancel);
             }
         });
-    }
-
-    @Override
-    public void cancelOutgoing(State state, int oldPacketID) {
-        cancelOutgoing(state, oldPacketID, -1);
     }
 
     @Override
@@ -252,11 +206,6 @@ public abstract class Protocol<C1 extends ClientboundPacketType, C2 extends Clie
         checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == newClientboundPacketEnum);
 
         registerOutgoing(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
-    }
-
-    @Override
-    public void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType) {
-        registerOutgoing(packetType, mappedPacketType, null);
     }
 
     @Override

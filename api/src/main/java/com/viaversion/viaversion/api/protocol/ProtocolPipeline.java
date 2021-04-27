@@ -48,12 +48,12 @@ public interface ProtocolPipeline extends SimpleProtocol {
     void add(List<Protocol> protocols);
 
     /**
-     * Check if the pipeline contains a protocol
+     * Returns whether the protocol is in this pipeline.
      *
-     * @param pipeClass The class to check
-     * @return True if the protocol class is in the pipeline
+     * @param protocolClass protocol class
+     * @return whether the protocol class is in this pipeline
      */
-    boolean contains(Class<? extends Protocol> pipeClass);
+    boolean contains(Class<? extends Protocol> protocolClass);
 
     /**
      * Returns the protocol from the given class if present in the pipeline.
@@ -62,19 +62,9 @@ public interface ProtocolPipeline extends SimpleProtocol {
      * @param <P>       protocol
      * @return protocol from class
      * @see #contains(Class)
-     * @see ProtocolManager#getProtocol(Class) for a faster alternative
+     * @see ProtocolManager#getProtocol(Class) for a faster implementation
      */
     @Nullable <P extends Protocol> P getProtocol(Class<P> pipeClass);
-
-    /**
-     * Use the pipeline to filter a NMS packet
-     *
-     * @param o    The NMS packet object
-     * @param list The output list to write to
-     * @return If it should not write the input object to te list.
-     * @throws Exception If it failed to convert / packet cancelld.
-     */
-    boolean filter(Object o, List list) throws Exception;
 
     /**
      * Returns the list of protocols this pipeline contains.
@@ -82,6 +72,13 @@ public interface ProtocolPipeline extends SimpleProtocol {
      * @return list of protocols in this pipe
      */
     List<Protocol> pipes();
+
+    /**
+     * Returns whether this pipe has protocols that are not base protocols, as given by {@link Protocol#isBaseProtocol()}.
+     *
+     * @return whether this pipe has protocols that are not base protocols
+     */
+    boolean hasNonBaseProtocols();
 
     /**
      * Cleans the pipe and adds the base protocol.

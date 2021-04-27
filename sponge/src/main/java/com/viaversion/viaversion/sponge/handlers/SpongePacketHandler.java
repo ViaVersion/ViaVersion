@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.sponge.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -39,13 +41,23 @@ public class SpongePacketHandler extends MessageToMessageEncoder {
         if (!(o instanceof ByteBuf)) {
             info.getPacketTracker().setLastPacket(o);
             /* This transformer is more for fixing issues which we find hard at packet level :) */
-            if (info.isActive()) {
-                if (info.getProtocolInfo().getPipeline().filter(o, list)) {
-                    return;
-                }
+            if (info.isActive() && filter(o, list)) {
+                return;
             }
         }
 
         list.add(o);
+    }
+
+    @Deprecated
+    public boolean filter(Object o, List list) throws Exception {
+        if (info.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
+            Protocol1_9To1_8 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_9To1_8.class);
+            if (protocol.isFiltered(o.getClass())) {
+                protocol.filterPacket(info, o, list);
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.protocol.base;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -33,8 +32,6 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.List;
 
 /**
  * Abstract protocol class handling packet transformation between two protocol versions.
@@ -44,54 +41,9 @@ import java.util.List;
  * @param <C2> new clientbound packet types
  * @param <S1> old serverbound packet types
  * @param <S2> new serverbound packet types
- * @see AbstractSimpleProtocol for a helper class if you do not want to define any of the types above
+ * @see SimpleProtocol for a helper class if you do not want to define any of the types above
  */
 public interface Protocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType> {
-
-    /**
-     * Should this protocol filter an object packet from this class.
-     * Default: false
-     *
-     * @param packetClass The class of the current input
-     * @return True if it should handle the filtering
-     */
-    default boolean isFiltered(Class packetClass) {
-        return false;
-    }
-
-    /**
-     * Filter a packet into the output
-     *
-     * @param info   The current user connection
-     * @param packet The input packet as an object (NMS)
-     * @param output The list to put the object into.
-     * @throws Exception Throws exception if cancelled / error.
-     */
-    void filterPacket(UserConnection info, Object packet, List output) throws Exception;
-
-    /**
-     * Loads the mappingdata.
-     */
-    void loadMappingData();
-
-    /**
-     * Handle protocol registration phase, use this to register providers / tasks.
-     * <p>
-     * To be overridden if needed.
-     *
-     * @param providers The current providers
-     */
-    void register(ViaProviders providers);
-
-    /**
-     * Initialise a user for this protocol setting up objects.
-     * /!\ WARNING - May be called more than once in a single {@link UserConnection}
-     * <p>
-     * To be overridden if needed.
-     *
-     * @param userConnection The user to initialise
-     */
-    void init(UserConnection userConnection);
 
     /**
      * Register an incoming packet, with simple id transformation.
@@ -100,7 +52,9 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param oldPacketID The old packet ID
      * @param newPacketID The new packet ID
      */
-    void registerIncoming(State state, int oldPacketID, int newPacketID);
+    default void registerIncoming(State state, int oldPacketID, int newPacketID) {
+        registerIncoming(state, oldPacketID, newPacketID, null);
+    }
 
     /**
      * Register an incoming packet, with id transformation and remapper.
@@ -110,13 +64,17 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param newPacketID    The new packet ID
      * @param packetRemapper The remapper to use for the packet
      */
-    void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper);
+    default void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
+        registerIncoming(state, oldPacketID, newPacketID, packetRemapper, false);
+    }
 
     void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
 
     void cancelIncoming(State state, int oldPacketID, int newPacketID);
 
-    void cancelIncoming(State state, int newPacketID);
+    default void cancelIncoming(State state, int newPacketID) {
+        cancelIncoming(state, -1, newPacketID);
+    }
 
     /**
      * Register an outgoing packet, with simple id transformation.
@@ -125,7 +83,9 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param oldPacketID The old packet ID
      * @param newPacketID The new packet ID
      */
-    void registerOutgoing(State state, int oldPacketID, int newPacketID);
+    default void registerOutgoing(State state, int oldPacketID, int newPacketID) {
+        registerOutgoing(state, oldPacketID, newPacketID, null);
+    }
 
     /**
      * Register an outgoing packet, with id transformation and remapper.
@@ -135,11 +95,15 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param newPacketID    The new packet ID
      * @param packetRemapper The remapper to use for the packet
      */
-    void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper);
+    default void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
+        registerOutgoing(state, oldPacketID, newPacketID, packetRemapper, false);
+    }
 
     void cancelOutgoing(State state, int oldPacketID, int newPacketID);
 
-    void cancelOutgoing(State state, int oldPacketID);
+    default void cancelOutgoing(State state, int oldPacketID) {
+        cancelOutgoing(state, oldPacketID, -1);
+    }
 
     void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
 
@@ -167,8 +131,15 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param packetType       clientbound packet type the server initially sends
      * @param mappedPacketType clientbound packet type after transforming for the client
      */
-    void registerOutgoing(C1 packetType, C2 mappedPacketType);
+    default void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType) {
+        registerOutgoing(packetType, mappedPacketType, null);
+    }
 
+    /**
+     * Cancels any clientbound packets from the given type.
+     *
+     * @param packetType clientbound packet type to cancel
+     */
     void cancelOutgoing(C1 packetType);
 
     /**
@@ -186,8 +157,13 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param mappedPacketType serverbound packet type after transforming for the server
      * @param packetRemapper   remapper
      */
-    void registerIncoming(S2 packetType, S1 mappedPacketType, @Nullable PacketRemapper packetRemapper);
+    void registerIncoming(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper);
 
+    /**
+     * Cancels any serverbound packets from the given type.
+     *
+     * @param packetType serverbound packet type to cancel
+     */
     void cancelIncoming(S2 packetType);
 
     /**
@@ -218,8 +194,20 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      */
     void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception;
 
+    /**
+     * Returns a cached object by the given type if present.
+     *
+     * @param objectClass class of the object to get
+     * @param <T>         type
+     * @return object if present, else null
+     */
     @Nullable <T> T get(Class<T> objectClass);
 
+    /**
+     * Caches an object, retrievable by using {@link #get(Class)}.
+     *
+     * @param object object to cache
+     */
     void put(Object object);
 
     /**
@@ -232,6 +220,39 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      */
     boolean hasMappingDataToLoad();
 
+    /**
+     * Loads the protocol's mapping data.
+     *
+     * @throws NullPointerException if this protocol has no mapping data
+     */
+    void loadMappingData();
+
+    /**
+     * Handle protocol registration phase, use this to register providers / tasks.
+     * <p>
+     * To be overridden if needed.
+     *
+     * @param providers The current providers
+     */
+    default void register(ViaProviders providers) {
+    }
+
+    /**
+     * Initialise a user for this protocol setting up objects.
+     * /!\ WARNING - May be called more than once in a single {@link UserConnection}
+     * <p>
+     * To be overridden if needed.
+     *
+     * @param userConnection The user to initialise
+     */
+    default void init(UserConnection userConnection) {
+    }
+
+    /**
+     * Returns the protocol's mapping data if present.
+     *
+     * @return mapping data if present
+     */
     default @Nullable MappingData getMappingData() {
         return null;
     }

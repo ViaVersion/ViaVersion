@@ -338,7 +338,7 @@ public class EntityTracker1_9 extends EntityTracker {
             PacketWrapper wrapper = PacketWrapper.create(0x39, null, getUser());
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
-            getUser().getProtocolInfo().getPipeline().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
+            Via.getManager().getProtocolManager().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
                     .handleMetadata(entityId, metadataList, getUser());
             handleMetadata(entityId, metadataList);
             if (!metadataList.isEmpty()) {

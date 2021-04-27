@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.protocol;
 
-import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
@@ -36,6 +36,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
@@ -45,6 +47,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
      * Protocol list ordered from client to server transforation with the base protocols at the end.
      */
     private List<Protocol> protocolList;
+    private Set<Class<? extends Protocol>> protocolSet;
 
     public ProtocolPipelineImpl(UserConnection userConnection) {
         this.userConnection = userConnection;
@@ -54,8 +57,13 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     @Override
     protected void registerPackets() {
         protocolList = new CopyOnWriteArrayList<>();
+        // Create a backing set for faster contains calls with larger pipes
+        protocolSet = Sets.newSetFromMap(new ConcurrentHashMap<>());
+
         // This is a pipeline so we register basic pipes
-        protocolList.add(Via.getManager().getProtocolManager().getBaseProtocol());
+        Protocol baseProtocol = Via.getManager().getProtocolManager().getBaseProtocol();
+        protocolList.add(baseProtocol);
+        protocolSet.add(baseProtocol.getClass());
     }
 
     @Override
@@ -65,9 +73,8 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
     @Override
     public void add(Protocol protocol) {
-        Preconditions.checkNotNull(protocolList, "Tried to add protocol too early");
-
         protocolList.add(protocol);
+        protocolSet.add(protocol.getClass());
         protocol.init(userConnection);
 
         if (!protocol.isBaseProtocol()) {
@@ -77,11 +84,10 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
     @Override
     public void add(List<Protocol> protocols) {
-        Preconditions.checkNotNull(protocolList, "Tried to add protocol too early");
-
         protocolList.addAll(protocols);
         for (Protocol protocol : protocols) {
             protocol.init(userConnection);
+            this.protocolSet.add(protocol.getClass());
         }
 
         moveBaseProtocolsToTail();
@@ -142,13 +148,8 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     }
 
     @Override
-    public boolean contains(Class<? extends Protocol> pipeClass) {
-        for (Protocol protocol : protocolList) {
-            if (protocol.getClass() == pipeClass) {
-                return true;
-            }
-        }
-        return false;
+    public boolean contains(Class<? extends Protocol> protocolClass) {
+        return protocolSet.contains(protocolClass);
     }
 
     @Override
@@ -162,20 +163,18 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     }
 
     @Override
-    public boolean filter(Object o, List list) throws Exception {
-        for (Protocol protocol : protocolList) {
-            if (protocol.isFiltered(o.getClass())) {
-                protocol.filterPacket(userConnection, o, list);
-                return true;
-            }
-        }
-
-        return false;
+    public List<Protocol> pipes() {
+        return protocolList;
     }
 
     @Override
-    public List<Protocol> pipes() {
-        return protocolList;
+    public boolean hasNonBaseProtocols() {
+        for (Protocol protocol : protocolList) {
+            if (!protocol.isBaseProtocol()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -147,13 +147,24 @@ public class Protocol1_9To1_8 extends Protocol<ClientboundPackets1_8, Clientboun
         providers.require(MovementTransmitterProvider.class);
     }
 
-    @Override
+    /**
+     * Should this protocol filter an object packet from this class.
+     *
+     * @param packetClass The class of the current input
+     * @return True if it should handle the filtering
+     */
     public boolean isFiltered(Class packetClass) {
         return Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).isFiltered(packetClass);
-
     }
 
-    @Override
+    /**
+     * Filter a packet into the output
+     *
+     * @param info   The current user connection
+     * @param packet The input packet as an object (NMS)
+     * @param output The list to put the object into.
+     * @throws Exception Throws exception if cancelled / error.
+     */
     public void filterPacket(UserConnection info, Object packet, List output) throws Exception {
         output.addAll(info.get(ClientChunks.class).transformMapChunkBulk(packet));
     }

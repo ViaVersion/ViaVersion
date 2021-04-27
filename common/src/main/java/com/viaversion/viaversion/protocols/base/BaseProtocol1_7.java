@@ -147,7 +147,7 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
                         // Add to ported clients
                         Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
 
-                        if (info.getPipeline().pipes().stream().allMatch(Via.getManager().getProtocolManager()::isBaseProtocol)) { // Only base protocol
+                        if (!info.getPipeline().hasNonBaseProtocols()) { // Only base protocol
                             wrapper.user().setActive(false);
                         }
 
