@@ -72,7 +72,6 @@ public class UserConnectionImpl implements UserConnection {
     public UserConnectionImpl(@Nullable Channel channel, boolean clientSide) {
         this.channel = channel;
         this.clientSide = clientSide;
-        storedObjects.put(ProtocolInfo.class, (StoredObject) protocolInfo);
     }
 
     /**

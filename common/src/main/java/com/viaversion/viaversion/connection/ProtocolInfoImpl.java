@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.connection;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -31,7 +30,8 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
 import java.util.UUID;
 
-public class ProtocolInfoImpl extends StoredObject implements ProtocolInfo {
+public class ProtocolInfoImpl implements ProtocolInfo {
+    private final UserConnection connection;
     private State state = State.HANDSHAKE;
     private int protocolVersion = -1;
     private int serverProtocolVersion = -1;
@@ -39,8 +39,8 @@ public class ProtocolInfoImpl extends StoredObject implements ProtocolInfo {
     private UUID uuid;
     private ProtocolPipeline pipeline;
 
-    public ProtocolInfoImpl(UserConnection user) {
-        super(user);
+    public ProtocolInfoImpl(UserConnection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -104,6 +104,11 @@ public class ProtocolInfoImpl extends StoredObject implements ProtocolInfo {
     @Override
     public void setPipeline(ProtocolPipeline pipeline) {
         this.pipeline = pipeline;
+    }
+
+    @Override
+    public UserConnection getUser() {
+        return connection;
     }
 
     @Override
