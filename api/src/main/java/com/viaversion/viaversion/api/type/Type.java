@@ -77,7 +77,7 @@ import java.util.UUID;
 
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     /* Defined Types */
-    public static final Type<Byte> BYTE = new ByteType();
+    public static final ByteType BYTE = new ByteType();
     /**
      * @deprecated unreasonable overhead, use BYTE_ARRAY_PRIMITIVE
      */
@@ -87,21 +87,21 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<byte[]> SHORT_BYTE_ARRAY = new ShortByteArrayType();
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 
-    public static final Type<Short> UNSIGNED_BYTE = new UnsignedByteType();
+    public static final UnsignedByteType UNSIGNED_BYTE = new UnsignedByteType();
     /**
      * @deprecated unreasonable overhead
      */
     @Deprecated
     public static final Type<Short[]> UNSIGNED_BYTE_ARRAY = new ArrayType<>(Type.UNSIGNED_BYTE);
 
-    public static final Type<Boolean> BOOLEAN = new BooleanType();
+    public static final BooleanType BOOLEAN = new BooleanType();
     /**
      * @deprecated unreasonable overhead
      */
     @Deprecated
     public static final Type<Boolean[]> BOOLEAN_ARRAY = new ArrayType<>(Type.BOOLEAN);
     /* Number Types */
-    public static final Type<Integer> INT = new IntType();
+    public static final IntType INT = new IntType();
     /**
      * @deprecated unreasonable overhead
      */
@@ -137,7 +137,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Short[]> SHORT_ARRAY = new ArrayType<>(Type.SHORT);
 
-    public static final Type<Integer> UNSIGNED_SHORT = new UnsignedShortType();
+    public static final UnsignedShortType UNSIGNED_SHORT = new UnsignedShortType();
     /**
      * @deprecated unreasonable overhead
      */
@@ -159,7 +159,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Integer[]> VAR_INT_ARRAY = new ArrayType<>(Type.VAR_INT);
     public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
-    public static final Type<Integer> OPTIONAL_VAR_INT = new OptionalVarIntType();
+    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType();
     public static final VarLongType VAR_LONG = new VarLongType();
     /**
      * @deprecated unreasonable overhead
@@ -167,7 +167,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated
     public static final Type<Long[]> VAR_LONG_ARRAY = new ArrayType<>(Type.VAR_LONG);
     /* Special Types */
-    public static final Type<Void> NOTHING = new VoidType(); // This is purely used for remapping.
+    public static final VoidType NOTHING = new VoidType(); // This is purely used for remapping.
     /* MC Types */
     public static final Type<Position> POSITION = new PositionType();
     public static final Type<Position> POSITION1_14 = new Position1_14Type();

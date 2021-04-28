@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.legacy.LegacyViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.legacy.LegacyAPI;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -50,8 +51,13 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
     }
 
     @Override
-    public boolean isInjected(UUID playerUUID) {
-        return Via.getManager().getConnectionManager().isClientConnected(playerUUID);
+    public boolean isInjected(UUID uuid) {
+        return Via.getManager().getConnectionManager().isClientConnected(uuid);
+    }
+
+    @Override
+    public @Nullable UserConnection getConnection(final UUID uuid) {
+        return Via.getManager().getConnectionManager().getConnectedClient(uuid);
     }
 
     @Override

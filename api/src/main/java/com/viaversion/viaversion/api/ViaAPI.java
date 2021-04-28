@@ -23,11 +23,13 @@
 package com.viaversion.viaversion.api;
 
 import com.viaversion.viaversion.api.connection.ConnectionManager;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.LegacyViaAPI;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -35,7 +37,7 @@ import java.util.UUID;
 /**
  * General api point. For more specialized api methods, see {@link Via#getManager()}.
  *
- * @param <T> The player type for the specific platform, for bukkit it's {@code ViaAPI<Player>}
+ * @param <T> player type for the specific platform
  * @see ViaManager
  * @see ProtocolManager
  * @see ConnectionManager
@@ -51,7 +53,7 @@ public interface ViaAPI<T> {
     ServerProtocolVersion getServerVersion();
 
     /**
-     * Returns the protocol version from a player.
+     * Returns the protocol version of a player.
      * This will also retrieve the version from ProtocolSupport if it's being used.
      *
      * @param player the platform's player object, e.g. Bukkit this is Player
@@ -60,7 +62,7 @@ public interface ViaAPI<T> {
     int getPlayerVersion(T player);
 
     /**
-     * Returns the protocol version from a player.
+     * Returns the protocol version of a player.
      *
      * @param uuid UUID of a player
      * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if not connected
@@ -68,12 +70,20 @@ public interface ViaAPI<T> {
     int getPlayerVersion(UUID uuid);
 
     /**
-     * Returns if Via injected into this player connection.
+     * Returns whether Via injected into this player connection.
      *
-     * @param playerUUID UUID of a player
-     * @return true if Via has a cached UserConnection for this player
+     * @param uuid uuid of the player
+     * @return whether Via has a cached a UserConnection for this player
      */
-    boolean isInjected(UUID playerUUID);
+    boolean isInjected(UUID uuid);
+
+    /**
+     * Returns the Via injected UserConnection if present.
+     *
+     * @param uuid uuid of the player
+     * @return user connection if present
+     */
+    @Nullable UserConnection getConnection(UUID uuid);
 
     /**
      * Returns the version of the plugin.
