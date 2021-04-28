@@ -27,7 +27,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPacke
 public class WorldPackets {
 
     public static void register(Protocol protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_PARTICLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID

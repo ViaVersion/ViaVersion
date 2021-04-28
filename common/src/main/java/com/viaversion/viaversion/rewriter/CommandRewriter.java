@@ -77,7 +77,7 @@ public abstract class CommandRewriter {
     }
 
     public void registerDeclareCommands(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

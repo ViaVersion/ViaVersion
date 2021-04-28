@@ -41,7 +41,7 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
             throw CancelDecoderException.generate(null);
         }
 
-        if (!info.checkIncomingPacket()) throw CancelDecoderException.generate(null);
+        if (!info.checkServerboundPacket()) throw CancelDecoderException.generate(null);
         if (!info.shouldTransformPacket()) {
             out.add(bytebuf.retain());
             return;
@@ -49,7 +49,7 @@ public class BungeeDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
 
         ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
-            info.transformIncoming(transformedBuf, CancelDecoderException::generate);
+            info.transformServerbound(transformedBuf, CancelDecoderException::generate);
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();

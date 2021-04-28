@@ -118,6 +118,9 @@ public interface ViaAPI<T> {
 
     /**
      * Returns legacy api only applicable on/to legacy versions.
+     * <p>
+     * These methods are safe to use and are unlikely to be removed,
+     * but it is important to be aware of their limited use.
      *
      * @return legacy api only applicable on/to legacy versions
      */

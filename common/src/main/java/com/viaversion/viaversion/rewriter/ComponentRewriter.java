@@ -53,7 +53,7 @@ public class ComponentRewriter {
      * @param packetType clientbound packet type
      */
     public void registerComponentPacket(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
@@ -66,7 +66,7 @@ public class ComponentRewriter {
     }
 
     public void registerBossBar(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UUID);
@@ -85,7 +85,7 @@ public class ComponentRewriter {
      * Handles sub 1.17 combat event components.
      */
     public void registerCombatEvent(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -103,7 +103,7 @@ public class ComponentRewriter {
      * Handles sub 1.17 title components.
      */
     public void registerTitle(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

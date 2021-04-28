@@ -35,7 +35,7 @@ public class BlockRewriter {
     }
 
     public void registerBlockAction(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(positionType); // Location
@@ -58,7 +58,7 @@ public class BlockRewriter {
     }
 
     public void registerBlockChange(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(positionType);
@@ -69,7 +69,7 @@ public class BlockRewriter {
     }
 
     public void registerMultiBlockChange(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
@@ -84,7 +84,7 @@ public class BlockRewriter {
     }
 
     public void registerVarLongMultiBlockChange(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.LONG); // Chunk position
@@ -104,7 +104,7 @@ public class BlockRewriter {
     }
 
     public void registerEffect(ClientboundPacketType packetType, int playRecordId, int blockBreakId) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id

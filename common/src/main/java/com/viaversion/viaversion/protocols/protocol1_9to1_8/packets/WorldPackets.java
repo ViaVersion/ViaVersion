@@ -48,7 +48,7 @@ import java.util.Optional;
 
 public class WorldPackets {
     public static void register(Protocol protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_8.UPDATE_SIGN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Sign Position
@@ -59,7 +59,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Effect ID
@@ -91,7 +91,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.NAMED_SOUND, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.NAMED_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Sound Name
@@ -126,7 +126,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -153,7 +153,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -187,7 +187,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Block Position
@@ -224,7 +224,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION);
@@ -234,7 +234,7 @@ public class WorldPackets {
 
 
         /* Incoming Packets */
-        protocol.registerIncoming(ServerboundPackets1_9.UPDATE_SIGN, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Sign Position
@@ -245,7 +245,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_DIGGING, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 0 - Status
@@ -278,7 +278,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.USE_ITEM, null, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.USE_ITEM, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -345,7 +345,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position

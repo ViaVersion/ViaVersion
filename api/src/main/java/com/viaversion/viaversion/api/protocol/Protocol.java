@@ -46,83 +46,83 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface Protocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType> {
 
     /**
-     * Register an incoming packet, with simple id transformation.
+     * Register a serverbound packet, with simple id transformation.
      *
      * @param state       The state which the packet is sent in.
      * @param oldPacketID The old packet ID
      * @param newPacketID The new packet ID
      */
-    default void registerIncoming(State state, int oldPacketID, int newPacketID) {
-        registerIncoming(state, oldPacketID, newPacketID, null);
+    default void registerServerbound(State state, int oldPacketID, int newPacketID) {
+        registerServerbound(state, oldPacketID, newPacketID, null);
     }
 
     /**
-     * Register an incoming packet, with id transformation and remapper.
+     * Register a serverbound packet, with id transformation and remapper.
      *
      * @param state          The state which the packet is sent in.
      * @param oldPacketID    The old packet ID
      * @param newPacketID    The new packet ID
      * @param packetRemapper The remapper to use for the packet
      */
-    default void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
-        registerIncoming(state, oldPacketID, newPacketID, packetRemapper, false);
+    default void registerServerbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
+        registerServerbound(state, oldPacketID, newPacketID, packetRemapper, false);
     }
 
-    void registerIncoming(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
+    void registerServerbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
 
-    void cancelIncoming(State state, int oldPacketID, int newPacketID);
+    void cancelServerbound(State state, int oldPacketID, int newPacketID);
 
-    default void cancelIncoming(State state, int newPacketID) {
-        cancelIncoming(state, -1, newPacketID);
+    default void cancelServerbound(State state, int newPacketID) {
+        cancelServerbound(state, -1, newPacketID);
     }
 
     /**
-     * Register an outgoing packet, with simple id transformation.
+     * Register a clientbound packet, with simple id transformation.
      *
      * @param state       The state which the packet is sent in.
      * @param oldPacketID The old packet ID
      * @param newPacketID The new packet ID
      */
-    default void registerOutgoing(State state, int oldPacketID, int newPacketID) {
-        registerOutgoing(state, oldPacketID, newPacketID, null);
+    default void registerClientbound(State state, int oldPacketID, int newPacketID) {
+        registerClientbound(state, oldPacketID, newPacketID, null);
     }
 
     /**
-     * Register an outgoing packet, with id transformation and remapper.
+     * Register a clientbound packet, with id transformation and remapper.
      *
      * @param state          The state which the packet is sent in.
      * @param oldPacketID    The old packet ID
      * @param newPacketID    The new packet ID
      * @param packetRemapper The remapper to use for the packet
      */
-    default void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
-        registerOutgoing(state, oldPacketID, newPacketID, packetRemapper, false);
+    default void registerClientbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
+        registerClientbound(state, oldPacketID, newPacketID, packetRemapper, false);
     }
 
-    void cancelOutgoing(State state, int oldPacketID, int newPacketID);
+    void cancelClientbound(State state, int oldPacketID, int newPacketID);
 
-    default void cancelOutgoing(State state, int oldPacketID) {
-        cancelOutgoing(state, oldPacketID, -1);
+    default void cancelClientbound(State state, int oldPacketID) {
+        cancelClientbound(state, oldPacketID, -1);
     }
 
-    void registerOutgoing(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
+    void registerClientbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
 
     /**
-     * Registers an outgoing protocol and automatically maps it to the new id.
+     * Registers a clientbound protocol and automatically maps it to the new id.
      *
      * @param packetType     clientbound packet type the server sends
      * @param packetRemapper remapper
      */
-    void registerOutgoing(C1 packetType, @Nullable PacketRemapper packetRemapper);
+    void registerClientbound(C1 packetType, @Nullable PacketRemapper packetRemapper);
 
     /**
-     * Registers an outgoing protocol.
+     * Registers a clientbound protocol.
      *
      * @param packetType       clientbound packet type the server initially sends
      * @param mappedPacketType clientbound packet type after transforming for the client
      * @param packetRemapper   remapper
      */
-    void registerOutgoing(C1 packetType, C2 mappedPacketType, @Nullable PacketRemapper packetRemapper);
+    void registerClientbound(C1 packetType, C2 mappedPacketType, @Nullable PacketRemapper packetRemapper);
 
     /**
      * Maps a packet type to another packet type without a packet handler.
@@ -131,8 +131,8 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param packetType       clientbound packet type the server initially sends
      * @param mappedPacketType clientbound packet type after transforming for the client
      */
-    default void registerOutgoing(C1 packetType, @Nullable C2 mappedPacketType) {
-        registerOutgoing(packetType, mappedPacketType, null);
+    default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType) {
+        registerClientbound(packetType, mappedPacketType, null);
     }
 
     /**
@@ -140,49 +140,49 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @param packetType clientbound packet type to cancel
      */
-    void cancelOutgoing(C1 packetType);
+    void cancelClientbound(C1 packetType);
 
     /**
-     * Registers an incoming protocol and automatically maps it to the server's id.
+     * Registers a serverbound protocol and automatically maps it to the server's id.
      *
      * @param packetType     serverbound packet type the client sends
      * @param packetRemapper remapper
      */
-    void registerIncoming(S2 packetType, @Nullable PacketRemapper packetRemapper);
+    void registerServerbound(S2 packetType, @Nullable PacketRemapper packetRemapper);
 
     /**
-     * Registers an incoming protocol.
+     * Registers a serverbound protocol.
      *
      * @param packetType       serverbound packet type initially sent by the client
      * @param mappedPacketType serverbound packet type after transforming for the server
      * @param packetRemapper   remapper
      */
-    void registerIncoming(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper);
+    void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper);
 
     /**
      * Cancels any serverbound packets from the given type.
      *
      * @param packetType serverbound packet type to cancel
      */
-    void cancelIncoming(S2 packetType);
+    void cancelServerbound(S2 packetType);
 
     /**
-     * Checks if an outgoing packet has already been registered.
+     * Checks if a clientbound packet has already been registered.
      *
      * @param state       state which the packet is sent in
      * @param oldPacketID old packet ID
      * @return true if already registered
      */
-    boolean hasRegisteredOutgoing(State state, int oldPacketID);
+    boolean hasRegisteredClientbound(State state, int oldPacketID);
 
     /**
-     * Checks if an incoming packet has already been registered.
+     * Checks if a serverbound packet has already been registered.
      *
      * @param state       state which the packet is sent in
      * @param newPacketId packet ID
      * @return true if already registered
      */
-    boolean hasRegisteredIncoming(State state, int newPacketId);
+    boolean hasRegisteredServerbound(State state, int newPacketId);
 
     /**
      * Transform a packet using this protocol

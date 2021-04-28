@@ -61,7 +61,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
         InventoryPackets.register(this);
 
-        registerOutgoing(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -73,7 +73,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -112,7 +112,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
         new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
 
-        registerOutgoing(ClientboundPackets1_9_3.COLLECT_ITEM, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.COLLECT_ITEM, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Collected entity id
@@ -129,7 +129,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_9.METADATA_LIST);
 
-        registerOutgoing(ClientboundPackets1_9_3.ENTITY_TELEPORT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.ENTITY_TELEPORT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -159,7 +159,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
 
-        registerOutgoing(ClientboundPackets1_9_3.TITLE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.TITLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Action
@@ -178,7 +178,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.BLOCK_ACTION, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position
@@ -201,7 +201,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Position
@@ -224,7 +224,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -255,7 +255,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -268,7 +268,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 });
             }
         });
-        registerOutgoing(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT);
@@ -280,7 +280,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        this.registerOutgoing(ClientboundPackets1_9_3.EFFECT, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_9_3.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 this.map(Type.INT); //effectID
@@ -313,7 +313,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             INCOMING PACKETS
         */
 
-        registerIncoming(ServerboundPackets1_9_3.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_9_3.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Location
@@ -326,7 +326,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerIncoming(ServerboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Message

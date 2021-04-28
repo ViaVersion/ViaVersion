@@ -60,7 +60,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
         new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_14.STATISTICS);
 
-        registerIncoming(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));

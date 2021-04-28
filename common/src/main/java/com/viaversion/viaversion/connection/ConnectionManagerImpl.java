@@ -68,11 +68,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
     }
 
     @Override
-    public boolean isFrontEnd(UserConnection connection) {
-        return !connection.isClientSide();
-    }
-
-    @Override
     public Map<UUID, UserConnection> getConnectedClients() {
         return Collections.unmodifiableMap(clients);
     }

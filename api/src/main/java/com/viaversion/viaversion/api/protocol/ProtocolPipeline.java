@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.protocol;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ProtocolPipeline extends SimpleProtocol {
@@ -38,12 +39,14 @@ public interface ProtocolPipeline extends SimpleProtocol {
     void add(Protocol protocol);
 
     /**
-     * Adds a list of protocols to the current pipeline.
+     * Adds a collection of protocols to the current pipeline.
      * This will call the {@link Protocol#init(UserConnection)} method.
+     * <p>
+     * Callers of this method should make sure the collection is correctly sorted.
      *
-     * @param protocols protocols to add to the end
+     * @param protocols correctly sorted protocols to add to the end
      */
-    void add(List<Protocol> protocols);
+    void add(Collection<Protocol> protocols);
 
     /**
      * Returns whether the protocol is in this pipeline.

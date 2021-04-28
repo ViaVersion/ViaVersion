@@ -55,7 +55,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
         InventoryPackets.register(this);
         WorldPackets.register(this);
 
-        registerIncoming(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -69,7 +69,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerIncoming(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLAT_ITEM);
@@ -93,7 +93,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Transaction id
@@ -119,7 +119,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_13.BOSSBAR, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.BOSSBAR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UUID);

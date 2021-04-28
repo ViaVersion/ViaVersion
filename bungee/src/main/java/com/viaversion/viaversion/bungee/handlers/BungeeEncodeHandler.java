@@ -43,7 +43,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             throw CancelEncoderException.generate(null);
         }
 
-        if (!info.checkOutgoingPacket()) throw CancelEncoderException.generate(null);
+        if (!info.checkClientboundPacket()) throw CancelEncoderException.generate(null);
         if (!info.shouldTransformPacket()) {
             out.add(bytebuf.retain());
             return;
@@ -52,7 +52,7 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
         ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
         try {
             boolean needsCompress = handleCompressionOrder(ctx, transformedBuf);
-            info.transformOutgoing(transformedBuf, CancelEncoderException::generate);
+            info.transformClientbound(transformedBuf, CancelEncoderException::generate);
 
             if (needsCompress) {
                 recompress(ctx, transformedBuf);

@@ -48,7 +48,7 @@ public class WorldPackets {
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_15.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_15.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerOutgoing(ClientboundPackets1_15.UPDATE_LIGHT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.UPDATE_LIGHT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // x
@@ -57,7 +57,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -91,7 +91,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

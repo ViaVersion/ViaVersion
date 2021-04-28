@@ -56,7 +56,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
 
         InventoryPackets.register(this);
 
-        registerOutgoing(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -68,7 +68,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -90,7 +90,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -110,7 +110,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -156,7 +156,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_12.METADATA_LIST);
 
-        registerOutgoing(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT);
@@ -169,7 +169,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 });
             }
         });
-        registerOutgoing(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT);
@@ -185,10 +185,10 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
 
 
         // New packet at 0x01
-        cancelIncoming(ServerboundPackets1_12.PREPARE_CRAFTING_GRID);
+        cancelServerbound(ServerboundPackets1_12.PREPARE_CRAFTING_GRID);
 
         // Client Settings (max length changed)
-        registerIncoming(ServerboundPackets1_12.CLIENT_SETTINGS, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_12.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Locale
@@ -219,10 +219,10 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         });
 
         // New packet at 0x17
-        cancelIncoming(ServerboundPackets1_12.RECIPE_BOOK_DATA);
+        cancelServerbound(ServerboundPackets1_12.RECIPE_BOOK_DATA);
 
         // New packet 0x19
-        cancelIncoming(ServerboundPackets1_12.ADVANCEMENT_TAB);
+        cancelServerbound(ServerboundPackets1_12.ADVANCEMENT_TAB);
     }
 
     private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.

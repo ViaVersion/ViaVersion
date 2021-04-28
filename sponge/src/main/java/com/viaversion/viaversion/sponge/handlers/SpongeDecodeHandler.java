@@ -40,7 +40,7 @@ public class SpongeDecodeHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> list) throws Exception {
-        if (!info.checkIncomingPacket()) {
+        if (!info.checkServerboundPacket()) {
             bytebuf.clear(); // Don't accumulate
             throw CancelDecoderException.generate(null);
         }
@@ -49,7 +49,7 @@ public class SpongeDecodeHandler extends ByteToMessageDecoder {
         try {
             if (info.shouldTransformPacket()) {
                 transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
-                info.transformIncoming(transformedBuf, CancelDecoderException::generate);
+                info.transformServerbound(transformedBuf, CancelDecoderException::generate);
             }
 
             try {

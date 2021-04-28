@@ -39,7 +39,7 @@ public class WorldPackets {
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_14.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerOutgoing(ClientboundPackets1_14.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_14.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -85,7 +85,7 @@ public class WorldPackets {
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_14.EFFECT, 1010, 2001);
-        protocol.registerOutgoing(ClientboundPackets1_14.SPAWN_PARTICLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID

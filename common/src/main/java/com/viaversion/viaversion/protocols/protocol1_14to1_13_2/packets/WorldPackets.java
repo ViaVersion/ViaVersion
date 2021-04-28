@@ -55,7 +55,7 @@ public class WorldPackets {
     public static void register(Protocol1_14To1_13_2 protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, null);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -63,13 +63,13 @@ public class WorldPackets {
                 map(Type.BYTE);
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_ACTION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14); // Location
@@ -84,7 +84,7 @@ public class WorldPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_13.BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
@@ -100,7 +100,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.SERVER_DIFFICULTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SERVER_DIFFICULTY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE);
@@ -115,7 +115,7 @@ public class WorldPackets {
 
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.EXPLOSION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.EXPLOSION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLOAT); // X
@@ -138,7 +138,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -267,7 +267,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id
@@ -288,7 +288,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -331,7 +331,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.MAP_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -346,7 +346,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -374,7 +374,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_POSITION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_POSITION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);

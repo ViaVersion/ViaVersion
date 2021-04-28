@@ -34,14 +34,14 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPacke
 public class PlayerPackets {
 
     public static void register(Protocol protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_13.OPEN_SIGN_EDITOR, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.OPEN_SIGN_EDITOR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_14.QUERY_BLOCK_NBT, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.QUERY_BLOCK_NBT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -49,7 +49,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -77,7 +77,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_14.PLAYER_DIGGING, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -86,7 +86,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_14.RECIPE_BOOK_DATA, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.RECIPE_BOOK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -113,26 +113,26 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_14.UPDATE_COMMAND_BLOCK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.UPDATE_COMMAND_BLOCK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14, Type.POSITION);
             }
         });
-        protocol.registerIncoming(ServerboundPackets1_14.UPDATE_STRUCTURE_BLOCK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.UPDATE_STRUCTURE_BLOCK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14, Type.POSITION);
             }
         });
-        protocol.registerIncoming(ServerboundPackets1_14.UPDATE_SIGN, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14, Type.POSITION);
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_14.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

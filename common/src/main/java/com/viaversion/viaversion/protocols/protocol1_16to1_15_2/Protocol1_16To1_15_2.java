@@ -74,7 +74,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
-        registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+        registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -86,7 +86,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Motd Status - line breaks are no longer allowed for player samples
-        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() {
+        registerClientbound(State.STATUS, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -127,7 +127,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
 
         ComponentRewriter componentRewriter = new TranslationMappings(this);
         // Handle (relevant) component cases for translatable and score changes
-        registerOutgoing(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.COMPONENT);
@@ -146,7 +146,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_15.ENTITY_SOUND);
 
-        registerIncoming(ServerboundPackets1_16.INTERACT_ENTITY, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16.INTERACT_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -170,7 +170,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         if (Via.getConfig().isIgnoreLong1_16ChannelNames()) {
-            registerIncoming(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketRemapper() {
+            registerServerbound(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketRemapper() {
                 @Override
                 public void registerMap() {
                     handler(wrapper -> {
@@ -207,7 +207,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             });
         }
 
-        registerIncoming(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -219,8 +219,8 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        cancelIncoming(ServerboundPackets1_16.GENERATE_JIGSAW);
-        cancelIncoming(ServerboundPackets1_16.UPDATE_JIGSAW_BLOCK);
+        cancelServerbound(ServerboundPackets1_16.GENERATE_JIGSAW);
+        cancelServerbound(ServerboundPackets1_16.UPDATE_JIGSAW_BLOCK);
     }
 
     @Override

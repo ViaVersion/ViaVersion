@@ -114,7 +114,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         MetadataRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
 
         // Disconnect workaround (JSON!)
-        registerOutgoing(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
+        registerClientbound(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

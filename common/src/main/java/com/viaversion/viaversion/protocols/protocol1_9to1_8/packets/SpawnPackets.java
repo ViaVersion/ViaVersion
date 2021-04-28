@@ -48,7 +48,7 @@ public class SpawnPackets {
     };
 
     public static void register(Protocol1_9To1_8 protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -133,7 +133,7 @@ public class SpawnPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_EXPERIENCE_ORB, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_EXPERIENCE_ORB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -157,7 +157,7 @@ public class SpawnPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_GLOBAL_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_GLOBAL_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -180,7 +180,7 @@ public class SpawnPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_MOB, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -247,7 +247,7 @@ public class SpawnPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_PAINTING, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PAINTING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -277,7 +277,7 @@ public class SpawnPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.SPAWN_PLAYER, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -349,7 +349,7 @@ public class SpawnPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketRemapper() {
 
             @Override
             public void registerMap() {

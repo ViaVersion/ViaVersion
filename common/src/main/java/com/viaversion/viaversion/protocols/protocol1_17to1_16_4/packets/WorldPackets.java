@@ -53,7 +53,7 @@ public class WorldPackets {
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.WORLD_BORDER, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.WORLD_BORDER, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -88,7 +88,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // x
@@ -132,7 +132,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -168,7 +168,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Entity ID
@@ -200,7 +200,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -218,7 +218,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.UNLOAD_CHUNK, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.UNLOAD_CHUNK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

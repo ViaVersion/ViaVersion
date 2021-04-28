@@ -31,14 +31,14 @@ public class Protocol1_12_2To1_12_1 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerOutgoing(ClientboundPackets1_12_1.KEEP_ALIVE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.KEEP_ALIVE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT, Type.LONG);
             }
         });
 
-        registerIncoming(ServerboundPackets1_12_1.KEEP_ALIVE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_12_1.KEEP_ALIVE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.LONG, Type.VAR_INT);

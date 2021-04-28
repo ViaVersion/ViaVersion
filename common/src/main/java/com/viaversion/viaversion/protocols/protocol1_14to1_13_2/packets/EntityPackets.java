@@ -43,7 +43,7 @@ public class EntityPackets {
     public static void register(Protocol1_14To1_13_2 protocol) {
         MetadataRewriter1_14To1_13_2 metadataRewriter = protocol.get(MetadataRewriter1_14To1_13_2.class);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -120,7 +120,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_MOB, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -141,7 +141,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_PAINTING, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PAINTING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -152,7 +152,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.SPAWN_PLAYER, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -168,7 +168,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.ENTITY_ANIMATION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_ANIMATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -196,7 +196,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.USE_BED, ClientboundPackets1_14.ENTITY_METADATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.USE_BED, ClientboundPackets1_14.ENTITY_METADATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);

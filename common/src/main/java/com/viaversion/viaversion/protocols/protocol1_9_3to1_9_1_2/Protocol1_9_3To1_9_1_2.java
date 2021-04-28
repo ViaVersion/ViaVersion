@@ -55,7 +55,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     protected void registerPackets() {
         // Sign update packet
-        registerOutgoing(ClientboundPackets1_9.UPDATE_SIGN, null, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -91,7 +91,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -127,7 +127,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -145,7 +145,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -161,7 +161,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
         });
 
         // Sound effect
-        registerOutgoing(ClientboundPackets1_9.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Sound name

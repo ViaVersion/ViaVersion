@@ -40,7 +40,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracke
 
 public class PlayerPackets {
     public static void register(Protocol1_9To1_8 protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_8.CHAT_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
@@ -60,7 +60,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.TAB_LIST, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.TAB_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Header
@@ -68,14 +68,14 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.DISCONNECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.DISCONNECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Reason
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.TITLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.TITLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Action
@@ -93,7 +93,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.PLAYER_POSITION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.PLAYER_POSITION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.DOUBLE); // 0 - Player X
@@ -114,7 +114,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.TEAMS, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.TEAMS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Team Name
@@ -178,7 +178,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Player ID
@@ -237,7 +237,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.PLAYER_INFO, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.PLAYER_INFO, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Action
@@ -289,7 +289,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Channel Name
@@ -331,7 +331,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.UPDATE_HEALTH, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_HEALTH, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLOAT); // 0 - Health
@@ -350,7 +350,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension
@@ -383,7 +383,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.GAME_EVENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.GAME_EVENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); //0 - Reason
@@ -402,11 +402,11 @@ public class PlayerPackets {
         });
 
         /* Removed packets */
-        protocol.cancelOutgoing(ClientboundPackets1_8.SET_COMPRESSION);
+        protocol.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION);
 
 
         /* Incoming Packets */
-        protocol.registerIncoming(ServerboundPackets1_9.TAB_COMPLETE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Requested Command
@@ -414,7 +414,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.CLIENT_SETTINGS, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - locale
@@ -442,18 +442,18 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.ANIMATION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.ANIMATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT, Type.NOTHING); // 0 - Hand
             }
         });
 
-        protocol.cancelIncoming(ServerboundPackets1_9.TELEPORT_CONFIRM);
-        protocol.cancelIncoming(ServerboundPackets1_9.VEHICLE_MOVE);
-        protocol.cancelIncoming(ServerboundPackets1_9.STEER_BOAT);
+        protocol.cancelServerbound(ServerboundPackets1_9.TELEPORT_CONFIRM);
+        protocol.cancelServerbound(ServerboundPackets1_9.VEHICLE_MOVE);
+        protocol.cancelServerbound(ServerboundPackets1_9.STEER_BOAT);
 
-        protocol.registerIncoming(ServerboundPackets1_9.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Channel Name
@@ -486,7 +486,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.CLIENT_STATUS, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLIENT_STATUS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Action ID
@@ -509,7 +509,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_POSITION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_POSITION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.DOUBLE); // 0 - X
@@ -519,7 +519,7 @@ public class PlayerPackets {
                 handler(new PlayerMovementMapper());
             }
         });
-        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_POSITION_AND_ROTATION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_POSITION_AND_ROTATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.DOUBLE); // 0 - X
@@ -531,7 +531,7 @@ public class PlayerPackets {
                 handler(new PlayerMovementMapper());
             }
         });
-        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_ROTATION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_ROTATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLOAT); // 0 - Yaw
@@ -540,7 +540,7 @@ public class PlayerPackets {
                 handler(new PlayerMovementMapper());
             }
         });
-        protocol.registerIncoming(ServerboundPackets1_9.PLAYER_MOVEMENT, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_MOVEMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BOOLEAN); // 0 - Ground

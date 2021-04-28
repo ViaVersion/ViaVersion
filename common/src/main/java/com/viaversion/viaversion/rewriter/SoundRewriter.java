@@ -39,7 +39,7 @@ public class SoundRewriter {
 
     // The same for entity sound
     public void registerSound(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Sound Id

@@ -34,7 +34,7 @@ public class WorldPackets {
     public static void register(Protocol protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -59,7 +59,7 @@ public class WorldPackets {
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_13.EFFECT, 1010, 2001);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -78,7 +78,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID

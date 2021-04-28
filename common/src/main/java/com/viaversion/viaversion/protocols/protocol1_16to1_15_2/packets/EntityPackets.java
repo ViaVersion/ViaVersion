@@ -147,7 +147,7 @@ public class EntityPackets {
         MetadataRewriter1_16To1_15_2 metadataRewriter = protocol.get(MetadataRewriter1_16To1_15_2.class);
 
         // Spawn lightning -> Spawn entity
-        protocol.registerOutgoing(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -178,7 +178,7 @@ public class EntityPackets {
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST);
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_15.DESTROY_ENTITIES);
 
-        protocol.registerOutgoing(ClientboundPackets1_15.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(DIMENSION_HANDLER);
@@ -195,7 +195,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Entity ID
@@ -222,7 +222,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.ENTITY_PROPERTIES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -268,7 +268,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_16.ANIMATION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

@@ -58,7 +58,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
         WorldPackets.register(this);
 
         tagRewriter = new TagRewriter(this, null);
-        registerOutgoing(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -94,7 +94,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16_2.ENTITY_SOUND);
 
-        registerOutgoing(ClientboundPackets1_16_2.RESOURCE_PACK, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -106,7 +106,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_16_2.MAP_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -127,7 +127,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_16_2.TITLE, null, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.TITLE, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -164,7 +164,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_16_2.EXPLOSION, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLOAT); // X
@@ -178,7 +178,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION1_14);
@@ -189,7 +189,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerIncoming(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Locale

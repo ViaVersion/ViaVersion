@@ -86,7 +86,7 @@ public abstract class MetadataRewriter {
     //TODO add respawn/join once they stop changing too much
 
     public void registerTracker(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -98,7 +98,7 @@ public abstract class MetadataRewriter {
     }
 
     public void registerSpawnTrackerWithData(ClientboundPacketType packetType, EntityType fallingBlockType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -123,7 +123,7 @@ public abstract class MetadataRewriter {
     }
 
     public void registerTracker(ClientboundPacketType packetType, EntityType entityType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -136,7 +136,7 @@ public abstract class MetadataRewriter {
     }
 
     public void registerEntityDestroy(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT_ARRAY_PRIMITIVE); // 0 - Entity ids
@@ -151,7 +151,7 @@ public abstract class MetadataRewriter {
     }
 
     public void registerMetadataRewriter(ClientboundPacketType packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID

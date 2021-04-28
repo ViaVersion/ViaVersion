@@ -27,9 +27,9 @@ public enum Direction {
     /**
      * Clientbound packets sent by the server.
      */
-    OUTGOING,
+    CLIENTBOUND,
     /**
      * Serverbound packets sent by the client.
      */
-    INCOMING
+    SERVERBOUND
 }

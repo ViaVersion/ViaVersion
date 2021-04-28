@@ -62,7 +62,7 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
         soundRewriter.registerSound(ClientboundPackets1_16.ENTITY_SOUND);
 
         // Recipe book data has been split into 2 separate packets
-        registerIncoming(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -81,7 +81,7 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        registerIncoming(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

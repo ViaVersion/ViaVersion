@@ -66,7 +66,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         CommandRewriter1_14 commandRewriter = new CommandRewriter1_14(this);
         commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);
 
-        registerOutgoing(ClientboundPackets1_13.TAGS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -130,11 +130,11 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Set Difficulty packet added in 19w11a
-        cancelIncoming(ServerboundPackets1_14.SET_DIFFICULTY);
+        cancelServerbound(ServerboundPackets1_14.SET_DIFFICULTY);
         // Lock Difficulty packet added in 19w11a
-        cancelIncoming(ServerboundPackets1_14.LOCK_DIFFICULTY);
+        cancelServerbound(ServerboundPackets1_14.LOCK_DIFFICULTY);
         // Unknown packet added in 19w13a
-        cancelIncoming(ServerboundPackets1_14.UPDATE_JIGSAW_BLOCK);
+        cancelServerbound(ServerboundPackets1_14.UPDATE_JIGSAW_BLOCK);
     }
 
     @Override

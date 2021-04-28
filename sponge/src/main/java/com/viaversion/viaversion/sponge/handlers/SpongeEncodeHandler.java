@@ -60,9 +60,9 @@ public class SpongeEncodeHandler extends MessageToByteEncoder<Object> implements
 
     @Override
     public void transform(ByteBuf bytebuf) throws Exception {
-        if (!info.checkOutgoingPacket()) throw CancelEncoderException.generate(null);
+        if (!info.checkClientboundPacket()) throw CancelEncoderException.generate(null);
         if (!info.shouldTransformPacket()) return;
-        info.transformOutgoing(bytebuf, CancelEncoderException::generate);
+        info.transformClientbound(bytebuf, CancelEncoderException::generate);
     }
 
     @Override

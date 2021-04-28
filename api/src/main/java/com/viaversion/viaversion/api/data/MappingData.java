@@ -37,6 +37,7 @@ public interface MappingData {
      *
      * @param id unmapped block state id
      * @return mapped block state id, or -1 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold block state mappings
      */
     int getNewBlockStateId(int id);
 
@@ -45,6 +46,7 @@ public interface MappingData {
      *
      * @param id unmapped block id
      * @return mapped block id, or -1 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold block mappings
      */
     int getNewBlockId(int id);
 
@@ -53,6 +55,7 @@ public interface MappingData {
      *
      * @param id unmapped item id
      * @return mapped item id, or -1 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold item mappings
      */
     int getNewItemId(int id);
 
@@ -61,6 +64,7 @@ public interface MappingData {
      *
      * @param id mapped item id
      * @return backwards mapped item id, or -1 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold item mappings
      */
     int getOldItemId(int id);
 
@@ -69,6 +73,7 @@ public interface MappingData {
      *
      * @param id unmapped particle id
      * @return mapped particle id, or -1 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold particle mappings
      */
     int getNewParticleId(int id);
 

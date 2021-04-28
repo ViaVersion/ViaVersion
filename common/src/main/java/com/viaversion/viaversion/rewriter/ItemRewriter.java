@@ -39,7 +39,7 @@ public class ItemRewriter {
     }
 
     public void registerWindowItems(ClientboundPacketType packetType, Type<Item[]> type) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -51,7 +51,7 @@ public class ItemRewriter {
     }
 
     public void registerSetSlot(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -65,7 +65,7 @@ public class ItemRewriter {
 
     // Sub 1.16
     public void registerEntityEquipment(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -79,7 +79,7 @@ public class ItemRewriter {
 
     // 1.16+
     public void registerEntityEquipmentArray(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -97,7 +97,7 @@ public class ItemRewriter {
     }
 
     public void registerCreativeInvAction(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerIncoming(packetType, new PacketRemapper() {
+        protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.SHORT); // 0 - Slot
@@ -109,7 +109,7 @@ public class ItemRewriter {
     }
 
     public void registerClickWindow(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerIncoming(packetType, new PacketRemapper() {
+        protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -125,7 +125,7 @@ public class ItemRewriter {
     }
 
     public void registerClickWindow1_17(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerIncoming(packetType, new PacketRemapper() {
+        protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window Id
@@ -149,7 +149,7 @@ public class ItemRewriter {
     }
 
     public void registerSetCooldown(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -162,7 +162,7 @@ public class ItemRewriter {
 
     // 1.14.4+
     public void registerTradeList(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -192,7 +192,7 @@ public class ItemRewriter {
     }
 
     public void registerAdvancements(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -233,7 +233,7 @@ public class ItemRewriter {
 
     // Not the very best place for this, but has to stay here until *everything* is abstracted
     public void registerSpawnParticle(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID

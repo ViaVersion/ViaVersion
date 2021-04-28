@@ -35,7 +35,7 @@ public class Protocol1_9_1To1_9 extends AbstractProtocol<ClientboundPackets1_9, 
     protected void registerPackets() {
         // Currently supports 1.9.1 and 1.9.2
 
-        registerOutgoing(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Player ID
@@ -49,7 +49,7 @@ public class Protocol1_9_1To1_9 extends AbstractProtocol<ClientboundPackets1_9, 
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Sound ID

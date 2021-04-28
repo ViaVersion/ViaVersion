@@ -50,7 +50,7 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
         /* Outgoing Packets */
 
         // Status Response Packet
-        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() { // Status Response Packet
+        registerClientbound(State.STATUS, 0x00, 0x00, new PacketRemapper() { // Status Response Packet
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -124,13 +124,13 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
             }
         });
 
-        registerOutgoing(State.STATUS, 0x01, 0x01); // Status Pong Packet
+        registerClientbound(State.STATUS, 0x01, 0x01); // Status Pong Packet
 
-        registerOutgoing(State.LOGIN, 0x00, 0x00); // Login Disconnect Packet
-        registerOutgoing(State.LOGIN, 0x01, 0x01); // Encryption Request Packet
+        registerClientbound(State.LOGIN, 0x00, 0x00); // Login Disconnect Packet
+        registerClientbound(State.LOGIN, 0x01, 0x01); // Encryption Request Packet
 
         // Login Success Packet
-        registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+        registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -165,16 +165,16 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
             }
         });
 
-        registerOutgoing(State.LOGIN, 0x03, 0x03); // Login Set Compression Packet
-        registerIncoming(State.LOGIN, 0x04, 0x04); // Plugin Request (1.13)
+        registerClientbound(State.LOGIN, 0x03, 0x03); // Login Set Compression Packet
+        registerServerbound(State.LOGIN, 0x04, 0x04); // Plugin Request (1.13)
 
         /* Incoming Packets */
 
-        registerIncoming(State.STATUS, 0x00, 0x00); // Status Request Packet
-        registerIncoming(State.STATUS, 0x01, 0x01); // Status Ping Packet
+        registerServerbound(State.STATUS, 0x00, 0x00); // Status Request Packet
+        registerServerbound(State.STATUS, 0x01, 0x01); // Status Ping Packet
 
         // Login Start Packet
-        registerIncoming(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
+        registerServerbound(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -197,8 +197,8 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
                 });
             }
         }); // Login Start Packet
-        registerIncoming(State.LOGIN, 0x01, 0x01); // Encryption Response Packet
-        registerIncoming(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
+        registerServerbound(State.LOGIN, 0x01, 0x01); // Encryption Response Packet
+        registerServerbound(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
     }
 
     @Override

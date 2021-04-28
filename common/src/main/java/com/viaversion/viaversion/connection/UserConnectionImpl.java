@@ -231,20 +231,7 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public boolean checkIncomingPacket() {
-        if (clientSide) {
-            return checkClientbound();
-        } else {
-            return checkServerbound();
-        }
-    }
-
-    private boolean checkClientbound() {
-        packetTracker.incrementSent();
-        return true;
-    }
-
-    private boolean checkServerbound() {
+    public boolean checkServerboundPacket() {
         // Ignore if pending disconnect
         if (pendingDisconnect) return false;
         // Increment received + Check PPS
@@ -252,12 +239,9 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public boolean checkOutgoingPacket() {
-        if (clientSide) {
-            return checkServerbound();
-        } else {
-            return checkClientbound();
-        }
+    public boolean checkClientboundPacket() {
+        packetTracker.incrementSent();
+        return true;
     }
 
     @Override
@@ -266,18 +250,18 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        if (!buf.isReadable()) return;
-        transform(buf, clientSide ? Direction.INCOMING : Direction.OUTGOING, cancelSupplier);
+    public void transformClientbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        transform(buf, Direction.CLIENTBOUND, cancelSupplier);
     }
 
     @Override
-    public void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        if (!buf.isReadable()) return;
-        transform(buf, clientSide ? Direction.OUTGOING : Direction.INCOMING, cancelSupplier);
+    public void transformServerbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        transform(buf, Direction.SERVERBOUND, cancelSupplier);
     }
 
     private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (!buf.isReadable()) return;
+
         int id = Type.VAR_INT.readPrimitive(buf);
         if (id == PacketWrapper.PASSTHROUGH_ID) {
             if (!passthroughTokens.remove(Type.UUID.read(buf))) {

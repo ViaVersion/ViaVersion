@@ -24,10 +24,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
@@ -305,11 +305,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
             }
         }
         throw new IllegalStateException("No Base Protocol for " + serverVersion);
-    }
-
-    @Override
-    public boolean isBaseProtocol(Protocol protocol) {
-        return protocol.isBaseProtocol();
     }
 
     @Override

@@ -27,14 +27,15 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
-import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,7 +84,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     }
 
     @Override
-    public void add(List<Protocol> protocols) {
+    public void add(Collection<Protocol> protocols) {
         protocolList.addAll(protocols);
         for (Protocol protocol : protocols) {
             protocol.init(userConnection);
@@ -117,7 +118,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         int originalID = packetWrapper.getId();
 
         // Apply protocols
-        packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.OUTGOING);
+        packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.CLIENTBOUND);
         super.transform(direction, state, packetWrapper);
 
         if (Via.getManager().isDebug()) {

@@ -47,7 +47,9 @@ public interface ConnectionManager {
      *
      * @return true if the user is a frontend connection
      */
-    boolean isFrontEnd(UserConnection connection);
+    default boolean isFrontEnd(UserConnection connection) {
+        return !connection.isClientSide();
+    }
 
     /**
      * Returns the frontend UserConnection from the player connected to this proxy server

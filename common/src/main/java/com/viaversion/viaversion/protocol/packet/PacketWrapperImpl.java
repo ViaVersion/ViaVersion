@@ -248,7 +248,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
             try {
-                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.OUTGOING);
+                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.CLIENTBOUND);
                 user().sendRawPacket(output, currentThread);
             } catch (Exception e) {
                 if (!PipelineUtil.containsCause(e, CancelException.class)) {
@@ -269,7 +269,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
         // Apply current pipeline - for outgoing protocol, the collection will be reversed in the apply method
         Protocol[] protocols = user().getProtocolInfo().getPipeline().pipes().toArray(PROTOCOL_ARRAY);
-        boolean reverse = direction == Direction.OUTGOING;
+        boolean reverse = direction == Direction.CLIENTBOUND;
         int index = -1;
         for (int i = 0; i < protocols.length; i++) {
             if (protocols[i].getClass() == packetProtocol) {
@@ -304,7 +304,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, true, Direction.OUTGOING);
+            ByteBuf output = constructPacket(packetProtocol, true, Direction.CLIENTBOUND);
             return user().sendRawPacketFuture(output);
         }
         return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
@@ -412,7 +412,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
         if (!isCancelled()) {
             try {
-                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.INCOMING);
+                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.SERVERBOUND);
                 user().sendRawPacketToServer(output, currentThread);
             } catch (Exception e) {
                 if (!PipelineUtil.containsCause(e, CancelException.class)) {

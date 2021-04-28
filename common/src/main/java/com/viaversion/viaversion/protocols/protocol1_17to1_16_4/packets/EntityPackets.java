@@ -38,7 +38,7 @@ public class EntityPackets {
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_17.METADATA_LIST);
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_16_2.DESTROY_ENTITIES);
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Entity id
@@ -49,7 +49,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.PLAYER_POSITION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.PLAYER_POSITION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.DOUBLE);
@@ -66,7 +66,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.COMBAT_EVENT, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -93,6 +93,6 @@ public class EntityPackets {
         });
 
         // The parent class of the other entity move packets that is never actually used has finally been removed from the id list
-        protocol.cancelOutgoing(ClientboundPackets1_16_2.ENTITY_MOVEMENT);
+        protocol.cancelClientbound(ClientboundPackets1_16_2.ENTITY_MOVEMENT);
     }
 }

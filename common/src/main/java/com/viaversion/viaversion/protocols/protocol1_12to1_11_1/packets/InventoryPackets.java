@@ -40,7 +40,7 @@ public class InventoryPackets {
         itemRewriter.registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
 
         // Plugin message Packet -> Trading
-        protocol.registerOutgoing(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Channel
@@ -72,7 +72,7 @@ public class InventoryPackets {
         });
 
 
-        protocol.registerIncoming(ServerboundPackets1_12.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_12.CLICK_WINDOW, new PacketRemapper() {
                     @Override
                     public void registerMap() {
                         map(Type.UNSIGNED_BYTE); // 0 - Window ID

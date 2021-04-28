@@ -53,7 +53,7 @@ public class EntityPackets {
 
     public static void register(Protocol1_9To1_8 protocol) {
         // Attach Entity Packet
-        protocol.registerOutgoing(ClientboundPackets1_8.ATTACH_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ATTACH_ENTITY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -89,7 +89,7 @@ public class EntityPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -121,7 +121,7 @@ public class EntityPackets {
 
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -136,7 +136,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 6 - On Ground
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_POSITION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -148,7 +148,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 4 - On Ground
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -196,7 +196,7 @@ public class EntityPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_METADATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_METADATA, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -242,7 +242,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -261,9 +261,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.cancelOutgoing(ClientboundPackets1_8.UPDATE_ENTITY_NBT);
+        protocol.cancelClientbound(ClientboundPackets1_8.UPDATE_ENTITY_NBT);
 
-        protocol.registerOutgoing(ClientboundPackets1_8.COMBAT_EVENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.COMBAT_EVENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); //Event id
@@ -280,7 +280,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT);
@@ -335,7 +335,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.ENTITY_ANIMATION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_ANIMATION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -353,7 +353,7 @@ public class EntityPackets {
 
 
         /* Incoming Packets */
-        protocol.registerIncoming(ServerboundPackets1_9.ENTITY_ACTION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.ENTITY_ACTION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -374,7 +374,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.INTERACT_ENTITY, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.INTERACT_ENTITY, new PacketRemapper() {
 
             @Override
             public void registerMap() {

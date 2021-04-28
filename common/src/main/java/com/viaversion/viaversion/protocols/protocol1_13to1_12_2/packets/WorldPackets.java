@@ -74,7 +74,7 @@ public class WorldPackets {
 
     public static void register(Protocol protocol) {
         // Outgoing packets
-        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -97,7 +97,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // 0 - Location
@@ -129,7 +129,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); // Location
@@ -177,7 +177,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION);
@@ -207,7 +207,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Chunk X
@@ -267,7 +267,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.EXPLOSION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.EXPLOSION, new PacketRemapper() {
             @Override
             public void registerMap() {
                 if (!Via.getConfig().isServersideBlockConnections())
@@ -312,7 +312,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 if (Via.getConfig().isServersideBlockConnections()) {
@@ -328,7 +328,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.NAMED_SOUND, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.NAMED_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -343,7 +343,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -476,7 +476,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_12_1.SPAWN_PARTICLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Particle ID

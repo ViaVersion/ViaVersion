@@ -121,42 +121,55 @@ public interface UserConnection {
     void sendRawPacketToServer(ByteBuf packet);
 
     /**
-     * Monitors incoming packets
+     * Monitors serverbound packets and returns whether a packet can/should be processed.
      *
      * @return false if this packet should be cancelled
      */
-    boolean checkIncomingPacket();
+    boolean checkServerboundPacket();
 
     /**
-     * Monitors outgoing packets
+     * Monitors clientbound packets and returns whether a packet can/should be processed.
      *
      * @return false if this packet should be cancelled
      */
-    boolean checkOutgoingPacket();
+    boolean checkClientboundPacket();
+
+    /**
+     * @see #checkClientboundPacket()
+     * @see #checkServerboundPacket()
+     */
+    default boolean checkIncomingPacket() {
+        return isClientSide() ? checkClientboundPacket() : checkServerboundPacket();
+    }
+
+    /**
+     * @see #checkClientboundPacket()
+     * @see #checkServerboundPacket()
+     */
+    default boolean checkOutgoingPacket() {
+        return isClientSide() ? checkServerboundPacket() : checkClientboundPacket();
+    }
 
     /**
      * Checks if packets needs transforming.
      *
-     * @return if packets should be passed through
+     * @return whether packets should be passed through
      */
     boolean shouldTransformPacket();
 
     /**
-     * Transforms the outgoing packet contained in ByteBuf. When clientSide is true, this packet is considered
-     * serverbound.
+     * Transforms the clientbound packet contained in ByteBuf.
      *
      * @param buf            ByteBuf with packet id and packet contents
-     * @param cancelSupplier Function called with original CancelException for generating the Exception used when
-     *                       packet is cancelled
+     * @param cancelSupplier function called with original CancelException for generating the Exception when the packet is cancelled
      * @throws CancelException      if the packet should be cancelled
      * @throws InformativeException if packet transforming failed
      * @throws Exception            if any other processing outside of transforming fails
      */
-    void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception;
+    void transformClientbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception;
 
     /**
-     * Transforms the incoming packet contained in ByteBuf. When clientSide is true, this packet is considered
-     * clientbound
+     * Transforms the serverbound packet contained in ByteBuf.
      *
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
@@ -165,7 +178,35 @@ public interface UserConnection {
      * @throws InformativeException if packet transforming failed
      * @throws Exception            if any other processing outside of transforming fails
      */
-    void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception;
+    void transformServerbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception;
+
+    /**
+     * Transforms the packet depending on whether the connection is clientside or not.
+     *
+     * @see #transformClientbound(ByteBuf, Function)
+     * @see #transformServerbound(ByteBuf, Function)
+     */
+    default void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (isClientSide()) {
+            transformServerbound(buf, cancelSupplier);
+        } else {
+            transformClientbound(buf, cancelSupplier);
+        }
+    }
+
+    /**
+     * Transforms the packet depending on whether the connection is clientside or not.
+     *
+     * @see #transformClientbound(ByteBuf, Function)
+     * @see #transformServerbound(ByteBuf, Function)
+     */
+    default void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+        if (isClientSide()) {
+            transformClientbound(buf, cancelSupplier);
+        } else {
+            transformServerbound(buf, cancelSupplier);
+        }
+    }
 
     /**
      * Returns the internal id incremented for each new connection.

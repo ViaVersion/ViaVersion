@@ -33,7 +33,7 @@ public class Protocol1_14_3To1_14_2 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerOutgoing(ClientboundPackets1_14.TRADE_LIST, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_14.TRADE_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

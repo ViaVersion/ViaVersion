@@ -169,14 +169,14 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         WorldPackets.register(this);
         InventoryPackets.register(this);
 
-        registerOutgoing(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
+        registerClientbound(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
             }
         });
 
-        registerOutgoing(State.STATUS, 0x00, 0x00, new PacketRemapper() {
+        registerClientbound(State.STATUS, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -201,7 +201,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         // New packet 0x04 - Login Plugin Message
 
         // Statistics
-        registerOutgoing(ClientboundPackets1_12_1.STATISTICS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.STATISTICS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -269,7 +269,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.BOSSBAR, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.BOSSBAR, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UUID);
@@ -285,13 +285,13 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-        registerOutgoing(ClientboundPackets1_12_1.CHAT_MESSAGE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
             }
         });
-        registerOutgoing(ClientboundPackets1_12_1.TAB_COMPLETE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -332,7 +332,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.OPEN_WINDOW, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.OPEN_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Id
@@ -341,7 +341,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.COOLDOWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.COOLDOWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -380,14 +380,14 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.DISCONNECT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.DISCONNECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.EFFECT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // Effect Id
@@ -410,7 +410,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -434,14 +434,14 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
 
-        registerOutgoing(ClientboundPackets1_12_1.CRAFT_RECIPE_RESPONSE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.CRAFT_RECIPE_RESPONSE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE);
                 handler(wrapper -> wrapper.write(Type.STRING, "viaversion:legacy/" + wrapper.read(Type.VAR_INT)));
             }
         });
-        registerOutgoing(ClientboundPackets1_12_1.COMBAT_EVENT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.COMBAT_EVENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Event
@@ -457,7 +457,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-        registerOutgoing(ClientboundPackets1_12_1.MAP_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Map id
@@ -481,7 +481,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-        registerOutgoing(ClientboundPackets1_12_1.UNLOCK_RECIPES, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.UNLOCK_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // action
@@ -567,7 +567,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID
@@ -587,7 +587,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.SCOREBOARD_OBJECTIVE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.SCOREBOARD_OBJECTIVE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Objective name
@@ -610,7 +610,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.TEAMS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.TEAMS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Team Name
@@ -663,7 +663,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
             }
         });
-        registerOutgoing(ClientboundPackets1_12_1.UPDATE_SCORE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.UPDATE_SCORE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -684,7 +684,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.TITLE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.TITLE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Action
@@ -703,7 +703,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
         new SoundRewriter(this).registerSound(ClientboundPackets1_12_1.SOUND);
 
-        registerOutgoing(ClientboundPackets1_12_1.TAB_LIST, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.TAB_LIST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -716,7 +716,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerOutgoing(ClientboundPackets1_12_1.ADVANCEMENTS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.ADVANCEMENTS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -763,13 +763,13 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
         // Incoming packets
         // New packet 0x02 - Login Plugin Message
-        cancelIncoming(State.LOGIN, 0x02);
+        cancelServerbound(State.LOGIN, 0x02);
 
         // New 0x01 - Query Block NBT
-        cancelIncoming(ServerboundPackets1_13.QUERY_BLOCK_NBT);
+        cancelServerbound(ServerboundPackets1_13.QUERY_BLOCK_NBT);
 
         // Tab-Complete
-        registerIncoming(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -810,7 +810,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x0A - Edit book -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -829,10 +829,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x0C - Query Entity NBT
-        cancelIncoming(ServerboundPackets1_13.ENTITY_NBT_REQUEST);
+        cancelServerbound(ServerboundPackets1_13.ENTITY_NBT_REQUEST);
 
         // New 0x15 - Pick Item -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.PICK_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.PICK_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -844,7 +844,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerIncoming(ServerboundPackets1_13.CRAFT_RECIPE_REQUEST, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.CRAFT_RECIPE_REQUEST, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // Window id
@@ -862,7 +862,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerIncoming(ServerboundPackets1_13.RECIPE_BOOK_DATA, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.RECIPE_BOOK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Type
@@ -895,7 +895,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x1C - Name Item -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.RENAME_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.RENAME_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(wrapper -> {
@@ -905,7 +905,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x1F - Select Trade -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(wrapper -> {
@@ -916,7 +916,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x20 - Set Beacon Effect -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.SET_BEACON_EFFECT, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.SET_BEACON_EFFECT, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(wrapper -> {
@@ -928,7 +928,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x22 - Update Command Block -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(wrapper -> wrapper.write(Type.STRING, "MC|AutoCmd"));
@@ -954,7 +954,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x23 - Update Command Block Minecart -> Plugin Message
-        registerIncoming(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK_MINECART, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK_MINECART, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(new ValueCreator() {
@@ -971,7 +971,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         // 0x1B -> 0x24 in InventoryPackets
 
         // New 0x25 - Update Structure Block -> Message Channel
-        registerIncoming(ServerboundPackets1_13.UPDATE_STRUCTURE_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.UPDATE_STRUCTURE_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 create(wrapper -> {

@@ -44,7 +44,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
 
     @Override
     protected void registerPackets() {
-        registerOutgoing(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.POSITION); //Position
@@ -71,7 +71,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -90,7 +90,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID
@@ -109,7 +109,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        registerOutgoing(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Dimension ID

@@ -28,7 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTr
 public class PlayerPackets {
 
     public static void register(Protocol protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_14.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_14.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT);
@@ -36,7 +36,7 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_14.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_14.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.INT); // 0 - Entity ID

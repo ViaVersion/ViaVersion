@@ -75,7 +75,7 @@ public class TagRewriter {
      * @param readUntilType read and process the types until (including) the given registry type
      */
     public void register(ClientboundPacketType packetType, @Nullable RegistryType readUntilType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(getHandler(readUntilType));
@@ -89,7 +89,7 @@ public class TagRewriter {
      * @param packetType packet type
      */
     public void registerGeneric(ClientboundPacketType packetType) {
-        protocol.registerOutgoing(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(getGenericHandler());

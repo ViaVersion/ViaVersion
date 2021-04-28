@@ -31,7 +31,7 @@ public class Protocol1_16_4To1_16_3 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerIncoming(ServerboundPackets1_16_2.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.FLAT_VAR_INT_ITEM);

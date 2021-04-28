@@ -65,7 +65,7 @@ public class InventoryPackets {
         itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
         itemRewriter.registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -144,7 +144,7 @@ public class InventoryPackets {
         itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
         itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerOutgoing(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Channel
@@ -199,7 +199,7 @@ public class InventoryPackets {
         itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
         RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol, InventoryPackets::toClient);
-        protocol.registerOutgoing(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -225,7 +225,7 @@ public class InventoryPackets {
 
         itemRewriter.registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerIncoming(ServerboundPackets1_14.SELECT_TRADE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

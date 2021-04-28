@@ -43,7 +43,7 @@ public class BaseProtocol extends AbstractSimpleProtocol {
         /* Incoming Packets */
 
         // Handshake Packet
-        registerIncoming(State.HANDSHAKE, 0x00, 0x00, new PacketRemapper() {
+        registerServerbound(State.HANDSHAKE, 0x00, 0x00, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -121,7 +121,7 @@ public class BaseProtocol extends AbstractSimpleProtocol {
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
         super.transform(direction, state, packetWrapper);
-        if (direction == Direction.INCOMING && state == State.HANDSHAKE) {
+        if (direction == Direction.SERVERBOUND && state == State.HANDSHAKE) {
             // Disable if it isn't a handshake packet.
             if (packetWrapper.getId() != 0) {
                 packetWrapper.user().setActive(false);

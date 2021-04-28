@@ -45,7 +45,7 @@ public class InventoryPackets {
 
         itemRewriter.registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerIncoming(ServerboundPackets1_17.EDIT_BOOK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
@@ -53,7 +53,7 @@ public class InventoryPackets {
         });
 
         // This will cause desync issues to clients with a high latency
-        protocol.registerIncoming(ServerboundPackets1_17.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window Id
@@ -87,7 +87,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {

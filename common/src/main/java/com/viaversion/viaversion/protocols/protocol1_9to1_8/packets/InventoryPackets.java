@@ -35,7 +35,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTra
 public class InventoryPackets {
 
     public static void register(Protocol protocol) {
-        protocol.registerOutgoing(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -74,7 +74,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.OPEN_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -104,7 +104,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.SET_SLOT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE); // 0 - Window ID
@@ -154,7 +154,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.WINDOW_ITEMS, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_ITEMS, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -215,7 +215,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerOutgoing(ClientboundPackets1_8.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -232,7 +232,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_8.MAP_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.MAP_DATA, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -250,7 +250,7 @@ public class InventoryPackets {
 
 
         /* Incoming Packets */
-        protocol.registerIncoming(ServerboundPackets1_9.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -303,7 +303,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLICK_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -371,7 +371,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLOSE_WINDOW, new PacketRemapper() {
 
             @Override
             public void registerMap() {
@@ -389,7 +389,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.SHORT); // 0 - Slot id

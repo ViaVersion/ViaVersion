@@ -54,7 +54,7 @@ public interface ProtocolManager {
     @Nullable <T extends Protocol> T getProtocol(Class<T> protocolClass);
 
     /**
-     * Returns the base protocol handling incoming handshake packets.
+     * Returns the base protocol handling serverbound handshake packets.
      *
      * @return base protocol
      */
@@ -66,6 +66,7 @@ public interface ProtocolManager {
      *
      * @param serverVersion server protocol version
      * @return base protocol for the given server protocol version
+     * @throws IllegalStateException if no base protocol could be found
      */
     Protocol getBaseProtocol(int serverVersion);
 
@@ -76,7 +77,9 @@ public interface ProtocolManager {
      * @return whether the protocol is a base protocol
      * @see Protocol#isBaseProtocol()
      */
-    boolean isBaseProtocol(Protocol protocol);
+    default boolean isBaseProtocol(Protocol protocol) {
+        return protocol.isBaseProtocol();
+    }
 
     /**
      * Register a protocol.
@@ -107,11 +110,12 @@ public interface ProtocolManager {
     void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols);
 
     /**
-     * Calculates a path from a client version to server version.
+     * Calculates and returns the protocol path from a client version to server version.
+     * Returns null if no path could be found or the path length exceeds the value given by {@link #getMaxProtocolPathSize()}.
      *
      * @param clientVersion input client version
      * @param serverVersion desired output server version
-     * @return path it generated, null if not supported
+     * @return path generated, or null if not supported or the length exceeds {@link #getMaxProtocolPathSize()}
      */
     @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
 

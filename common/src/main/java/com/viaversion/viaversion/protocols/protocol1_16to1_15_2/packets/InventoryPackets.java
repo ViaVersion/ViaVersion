@@ -42,7 +42,7 @@ public class InventoryPackets {
     public static void register(Protocol1_16To1_15_2 protocol) {
         ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
 
-        protocol.registerOutgoing(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Window Id
@@ -61,7 +61,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.CLOSE_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE);
@@ -73,7 +73,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerOutgoing(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window Id
@@ -98,7 +98,7 @@ public class InventoryPackets {
         itemRewriter.registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         itemRewriter.registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerOutgoing(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -116,7 +116,7 @@ public class InventoryPackets {
         itemRewriter.registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         itemRewriter.registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerIncoming(ServerboundPackets1_16.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE);
@@ -128,7 +128,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerIncoming(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
