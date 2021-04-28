@@ -19,9 +19,6 @@ package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.proxy.Player;
 import com.viaversion.viaversion.ViaAPIBase;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import io.netty.buffer.ByteBuf;
 
 public class VelocityViaAPI extends ViaAPIBase<Player> {
@@ -34,15 +31,5 @@ public class VelocityViaAPI extends ViaAPIBase<Player> {
     @Override
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    @Override
-    public BossBar createBossBar(String title, BossColor color, BossStyle style) {
-        return new VelocityBossBar(title, 1F, color, style);
-    }
-
-    @Override
-    public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
-        return new VelocityBossBar(title, health, color, style);
     }
 }

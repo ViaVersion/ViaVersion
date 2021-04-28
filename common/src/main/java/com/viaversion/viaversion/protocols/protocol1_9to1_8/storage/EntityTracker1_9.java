@@ -20,9 +20,9 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
+import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
+import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
@@ -254,7 +254,7 @@ public class EntityTracker1_9 extends EntityTracker {
                         String title = (String) metadata.getValue();
                         title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
                         if (bar == null) {
-                            bar = Via.getAPI().createBossBar(title, BossColor.PINK, BossStyle.SOLID);
+                            bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
                             bar.addConnection(getUser());
                             bar.show();
@@ -271,7 +271,7 @@ public class EntityTracker1_9 extends EntityTracker {
                         float health = Math.max(0.0f, Math.min(((float) metadata.getValue()) / maxHealth, 1.0f));
                         if (bar == null) {
                             String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
-                            bar = Via.getAPI().createBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
+                            bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
                             bar.addConnection(getUser());
                             bar.show();

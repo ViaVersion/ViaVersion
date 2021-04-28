@@ -18,9 +18,6 @@
 package com.viaversion.viaversion.bungee.platform;
 
 import com.viaversion.viaversion.ViaAPIBase;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -36,16 +33,6 @@ public class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
     @Override
     public void sendRawPacket(ProxiedPlayer player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    @Override
-    public BossBar createBossBar(String title, BossColor color, BossStyle style) {
-        return new BungeeBossBar(title, 1F, color, style);
-    }
-
-    @Override
-    public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
-        return new BungeeBossBar(title, health, color, style);
     }
 
     /**

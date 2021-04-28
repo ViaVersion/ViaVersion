@@ -22,10 +22,8 @@
  */
 package com.viaversion.viaversion.api;
 
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
+import com.viaversion.viaversion.api.legacy.LegacyViaAPI;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
@@ -103,27 +101,6 @@ public interface ViaAPI<T> {
     void sendRawPacket(UUID uuid, ByteBuf packet);
 
     /**
-     * Create a new bossbar instance
-     *
-     * @param title The title
-     * @param color The color
-     * @param style The style
-     * @return BossBar instance
-     */
-    BossBar createBossBar(String title, BossColor color, BossStyle style);
-
-    /**
-     * Create a new bossbar instance
-     *
-     * @param title  The title
-     * @param health Number between 0 and 1
-     * @param color  The color
-     * @param style  The style
-     * @return BossBar instance
-     */
-    BossBar createBossBar(String title, float health, BossColor color, BossStyle style);
-
-    /**
      * Returns the supported protocol versions.
      * This method removes any blocked protocol versions.
      *
@@ -138,4 +115,11 @@ public interface ViaAPI<T> {
      * @return a list of protocol versions
      */
     SortedSet<Integer> getFullSupportedVersions();
+
+    /**
+     * Returns legacy api only applicable on/to legacy versions.
+     *
+     * @return legacy api only applicable on/to legacy versions
+     */
+    LegacyViaAPI<T> legacyAPI();
 }

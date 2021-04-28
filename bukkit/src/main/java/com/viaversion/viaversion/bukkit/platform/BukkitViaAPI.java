@@ -20,11 +20,7 @@ package com.viaversion.viaversion.bukkit.platform;
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.boss.ViaBossBar;
 import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
@@ -60,16 +56,6 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
     @Override
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    @Override
-    public BossBar<Player> createBossBar(String title, BossColor color, BossStyle style) {
-        return new ViaBossBar(title, 1F, color, style);
-    }
-
-    @Override
-    public BossBar<Player> createBossBar(String title, float health, BossColor color, BossStyle style) {
-        return new ViaBossBar(title, health, color, style);
     }
 
     /**

@@ -28,9 +28,9 @@ import java.util.UUID;
 @Deprecated
 public class BossBar<T> {
 
-    private final com.viaversion.viaversion.api.boss.BossBar<T> bossBar;
+    private final com.viaversion.viaversion.api.legacy.bossbar.BossBar bossBar;
 
-    public BossBar(com.viaversion.viaversion.api.boss.BossBar<T> bossBar) {
+    public BossBar(com.viaversion.viaversion.api.legacy.bossbar.BossBar bossBar) {
         this.bossBar = bossBar;
     }
 
@@ -57,7 +57,7 @@ public class BossBar<T> {
     }
 
     public BossBar setColor(BossColor color) {
-        bossBar.setColor(com.viaversion.viaversion.api.boss.BossColor.values()[color.ordinal()]);
+        bossBar.setColor(com.viaversion.viaversion.api.legacy.bossbar.BossColor.values()[color.ordinal()]);
         return this;
     }
 
@@ -66,12 +66,12 @@ public class BossBar<T> {
     }
 
     public BossBar setStyle(BossStyle style) {
-        bossBar.setStyle(com.viaversion.viaversion.api.boss.BossStyle.values()[style.ordinal()]);
+        bossBar.setStyle(com.viaversion.viaversion.api.legacy.bossbar.BossStyle.values()[style.ordinal()]);
         return this;
     }
 
+    @Deprecated
     public BossBar addPlayer(T player) {
-        bossBar.addPlayer(player);
         return this;
     }
 
@@ -82,13 +82,11 @@ public class BossBar<T> {
 
     @Deprecated
     public BossBar addPlayers(T... players) {
-        bossBar.addPlayers(players);
         return this;
     }
 
     @Deprecated
     public BossBar removePlayer(T player) {
-        bossBar.removePlayer(player);
         return this;
     }
 
@@ -98,17 +96,17 @@ public class BossBar<T> {
     }
 
     public BossBar addFlag(BossFlag flag) {
-        bossBar.addFlag(com.viaversion.viaversion.api.boss.BossFlag.values()[flag.ordinal()]);
+        bossBar.addFlag(com.viaversion.viaversion.api.legacy.bossbar.BossFlag.values()[flag.ordinal()]);
         return this;
     }
 
     public BossBar removeFlag(BossFlag flag) {
-        bossBar.removeFlag(com.viaversion.viaversion.api.boss.BossFlag.values()[flag.ordinal()]);
+        bossBar.removeFlag(com.viaversion.viaversion.api.legacy.bossbar.BossFlag.values()[flag.ordinal()]);
         return this;
     }
 
     public boolean hasFlag(BossFlag flag) {
-        return bossBar.hasFlag(com.viaversion.viaversion.api.boss.BossFlag.values()[flag.ordinal()]);
+        return bossBar.hasFlag(com.viaversion.viaversion.api.legacy.bossbar.BossFlag.values()[flag.ordinal()]);
     }
 
     public Set<UUID> getPlayers() {

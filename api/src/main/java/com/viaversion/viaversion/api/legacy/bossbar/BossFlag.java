@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.boss;
+package com.viaversion.viaversion.api.legacy.bossbar;
 
 public enum BossFlag {
 

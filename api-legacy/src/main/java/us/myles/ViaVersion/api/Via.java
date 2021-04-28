@@ -78,16 +78,16 @@ public class Via<T> implements ViaAPI<T> {
 
     @Override
     public BossBar createBossBar(String title, BossColor color, BossStyle style) {
-        return new BossBar(com.viaversion.viaversion.api.Via.getAPI().createBossBar(title,
-                com.viaversion.viaversion.api.boss.BossColor.values()[color.ordinal()],
-                com.viaversion.viaversion.api.boss.BossStyle.values()[style.ordinal()]));
+        return new BossBar(com.viaversion.viaversion.api.Via.getAPI().legacyAPI().createLegacyBossBar(title,
+                com.viaversion.viaversion.api.legacy.bossbar.BossColor.values()[color.ordinal()],
+                com.viaversion.viaversion.api.legacy.bossbar.BossStyle.values()[style.ordinal()]));
     }
 
     @Override
     public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
-        return new BossBar(com.viaversion.viaversion.api.Via.getAPI().createBossBar(title, health,
-                com.viaversion.viaversion.api.boss.BossColor.values()[color.ordinal()],
-                com.viaversion.viaversion.api.boss.BossStyle.values()[style.ordinal()]));
+        return new BossBar(com.viaversion.viaversion.api.Via.getAPI().legacyAPI().createLegacyBossBar(title, health,
+                com.viaversion.viaversion.api.legacy.bossbar.BossColor.values()[color.ordinal()],
+                com.viaversion.viaversion.api.legacy.bossbar.BossStyle.values()[style.ordinal()]));
     }
 
     @Override

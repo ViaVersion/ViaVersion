@@ -15,17 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.boss;
+package com.viaversion.viaversion.legacy.bossbar;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossFlag;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
+import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
+import com.viaversion.viaversion.api.legacy.bossbar.BossFlag;
+import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
-public abstract class CommonBoss<T> extends BossBar<T> {
+public class CommonBoss implements BossBar {
     private final UUID uuid;
     private final Set<UserConnection> connections;
     private final Set<BossFlag> flags;
@@ -127,8 +128,9 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     @Override
     public BossBar addFlag(BossFlag flag) {
         Preconditions.checkNotNull(flag);
-        if (!hasFlag(flag))
+        if (!hasFlag(flag)) {
             flags.add(flag);
+        }
         sendPacket(CommonBoss.UpdateAction.UPDATE_FLAGS);
         return this;
     }
@@ -136,8 +138,9 @@ public abstract class CommonBoss<T> extends BossBar<T> {
     @Override
     public BossBar removeFlag(BossFlag flag) {
         Preconditions.checkNotNull(flag);
-        if (hasFlag(flag))
+        if (hasFlag(flag)) {
             flags.remove(flag);
+        }
         sendPacket(CommonBoss.UpdateAction.UPDATE_FLAGS);
         return this;
     }
@@ -232,7 +235,7 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     private PacketWrapper getPacket(UpdateAction action, UserConnection connection) {
         try {
-            PacketWrapper wrapper = PacketWrapper.create(0x0C, null, connection); // TODO don't use fixed packet ids for future support
+            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, connection);
             wrapper.write(Type.UUID, uuid);
             wrapper.write(Type.VAR_INT, action.getId());
             switch (action) {
@@ -269,8 +272,9 @@ public abstract class CommonBoss<T> extends BossBar<T> {
 
     private int flagToBytes() {
         int bitmask = 0;
-        for (BossFlag flag : flags)
+        for (BossFlag flag : flags) {
             bitmask |= flag.getId();
+        }
         return bitmask;
     }
 

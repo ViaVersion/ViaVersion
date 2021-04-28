@@ -20,21 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.boss;
+package com.viaversion.viaversion.api.legacy.bossbar;
 
-public enum BossColor {
+public enum BossStyle {
 
-    PINK(0),
-    BLUE(1),
-    RED(2),
-    GREEN(3),
-    YELLOW(4),
-    PURPLE(5),
-    WHITE(6);
+    SOLID(0),
+    SEGMENTED_6(1),
+    SEGMENTED_10(2),
+    SEGMENTED_12(3),
+    SEGMENTED_20(4);
 
     private final int id;
 
-    BossColor(int id) {
+    BossStyle(int id) {
         this.id = id;
     }
 

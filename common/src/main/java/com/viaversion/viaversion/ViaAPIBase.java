@@ -20,7 +20,9 @@ package com.viaversion.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.legacy.LegacyViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import com.viaversion.viaversion.legacy.LegacyAPI;
 import io.netty.buffer.ByteBuf;
 
 import java.util.SortedSet;
@@ -28,6 +30,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 public abstract class ViaAPIBase<T> implements ViaAPI<T> {
+
+    private final LegacyAPI<T> legacy = new LegacyAPI<>();
 
     @Override
     public ServerProtocolVersion getServerVersion() {
@@ -70,5 +74,10 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
     @Override
     public SortedSet<Integer> getFullSupportedVersions() {
         return Via.getManager().getProtocolManager().getSupportedVersions();
+    }
+
+    @Override
+    public LegacyViaAPI<T> legacyAPI() {
+        return legacy;
     }
 }

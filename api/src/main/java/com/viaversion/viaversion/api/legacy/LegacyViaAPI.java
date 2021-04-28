@@ -20,23 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.boss;
+package com.viaversion.viaversion.api.legacy;
 
-public enum BossStyle {
+import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
+import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
+import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 
-    SOLID(0),
-    SEGMENTED_6(1),
-    SEGMENTED_10(2),
-    SEGMENTED_12(3),
-    SEGMENTED_20(4);
+/**
+ * API only applicable on or to legacy versions of Minecraft.
+ *
+ * @param <T> player type
+ */
+public interface LegacyViaAPI<T> {
 
-    private final int id;
+    /**
+     * Creates a new bossbar instance. This only works on pre 1.9 servers for 1.9+ clients.
+     *
+     * @param title  title
+     * @param health health, between 0 and 1 (inclusive)
+     * @param color  color
+     * @param style  style
+     * @return new bossbar instance
+     */
+    BossBar createLegacyBossBar(String title, float health, BossColor color, BossStyle style);
 
-    BossStyle(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
+    /**
+     * Creates a new bossbar instance with full health. This only works on pre 1.9 servers for 1.9+ clients.
+     *
+     * @param title title
+     * @param color color
+     * @param style style
+     * @return new bossbar instance
+     */
+    default BossBar createLegacyBossBar(String title, BossColor color, BossStyle style) {
+        return createLegacyBossBar(title, 1F, color, style);
     }
 }

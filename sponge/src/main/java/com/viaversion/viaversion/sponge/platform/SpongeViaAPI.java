@@ -18,9 +18,6 @@
 package com.viaversion.viaversion.sponge.platform;
 
 import com.viaversion.viaversion.ViaAPIBase;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import io.netty.buffer.ByteBuf;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -34,15 +31,5 @@ public class SpongeViaAPI extends ViaAPIBase<Player> {
     @Override
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    @Override
-    public BossBar createBossBar(String title, BossColor color, BossStyle style) {
-        return new SpongeBossBar(title, 1F, color, style);
-    }
-
-    @Override
-    public BossBar createBossBar(String title, float health, BossColor color, BossStyle style) {
-        return new SpongeBossBar(title, health, color, style);
     }
 }
