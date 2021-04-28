@@ -78,7 +78,7 @@ public enum ClientboundPackets1_17 implements ClientboundPacketType {
     FACE_PLAYER, // 0x36
     PLAYER_POSITION, // 0x37
     UNLOCK_RECIPES, // 0x38
-    DESTROY_ENTITIES, // 0x39
+    REMOVE_ENTITY, // 0x39
     REMOVE_ENTITY_EFFECT, // 0x3A
     RESOURCE_PACK, // 0x3B
     RESPAWN, // 0x3C

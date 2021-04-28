@@ -135,6 +135,11 @@ public abstract class MetadataRewriter {
         });
     }
 
+    /**
+     * Sub 1.17 method for entity remove packets.
+     *
+     * @param packetType remove entities packet type
+     */
     public void registerEntityDestroy(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
@@ -145,6 +150,24 @@ public abstract class MetadataRewriter {
                     for (int entity : wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0)) {
                         entityTracker.removeEntity(entity);
                     }
+                });
+            }
+        });
+    }
+
+    /**
+     * 1.17+ method for entity remove packets.
+     *
+     * @param packetType remove entities packet type
+     */
+    public void registerRemoveEntity(ClientboundPacketType packetType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Entity ids
+                handler(wrapper -> {
+                    int entity = wrapper.get(Type.VAR_INT, 0);
+                    wrapper.user().get(entityTrackerClass).removeEntity(entity);
                 });
             }
         });

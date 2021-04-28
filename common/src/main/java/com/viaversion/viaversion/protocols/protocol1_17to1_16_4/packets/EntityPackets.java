@@ -19,14 +19,17 @@ package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
+import com.viaversion.viaversion.data.EntityTracker;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
 public class EntityPackets {
 
@@ -36,7 +39,26 @@ public class EntityPackets {
         metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_MOB);
         metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_17.METADATA_LIST);
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_16_2.DESTROY_ENTITIES);
+
+        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, ClientboundPackets1_17.REMOVE_ENTITY, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+                    wrapper.cancel();
+
+                    EntityTracker entityTracker = wrapper.user().get(EntityTracker1_17.class);
+                    for (int entityId : entityIds) {
+                        entityTracker.removeEntity(entityId);
+
+                        // Send individual remove packets
+                        PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
+                        newPacket.write(Type.VAR_INT, entityId);
+                        newPacket.send(Protocol1_17To1_16_4.class);
+                    }
+                });
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketRemapper() {
             @Override
