@@ -51,20 +51,23 @@ public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        UserConnection info = new UserConnectionImpl(socketChannel);
-        // init protocol
-        new ProtocolPipelineImpl(info);
         // Add originals
         this.method.invoke(this.original, socketChannel);
+        afterChannelInitialize(socketChannel);
+    }
 
-        HandlerConstructor constructor = ClassGenerator.getConstructor();
+    public static void afterChannelInitialize(Channel channel) {
+        UserConnection connection = new UserConnectionImpl(channel);
+        new ProtocolPipelineImpl(connection);
+
         // Add our transformers
-        MessageToByteEncoder encoder = constructor.newEncodeHandler(info, (MessageToByteEncoder) socketChannel.pipeline().get("encoder"));
-        ByteToMessageDecoder decoder = constructor.newDecodeHandler(info, (ByteToMessageDecoder) socketChannel.pipeline().get("decoder"));
-        BukkitPacketHandler chunkHandler = new BukkitPacketHandler(info);
+        HandlerConstructor constructor = ClassGenerator.getConstructor();
+        MessageToByteEncoder encoder = constructor.newEncodeHandler(connection, (MessageToByteEncoder) channel.pipeline().get("encoder"));
+        ByteToMessageDecoder decoder = constructor.newDecodeHandler(connection, (ByteToMessageDecoder) channel.pipeline().get("decoder"));
 
-        socketChannel.pipeline().replace("encoder", "encoder", encoder);
-        socketChannel.pipeline().replace("decoder", "decoder", decoder);
-        socketChannel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
+        BukkitPacketHandler chunkHandler = new BukkitPacketHandler(connection);
+        channel.pipeline().replace("encoder", "encoder", encoder);
+        channel.pipeline().replace("decoder", "decoder", decoder);
+        channel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
     }
 }

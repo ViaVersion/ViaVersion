@@ -45,11 +45,15 @@ public class BukkitViaInjector implements ViaInjector {
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
     private final List<Pair<Field, Object>> injectedLists = new ArrayList<>();
 
-    private final boolean modernPaper = hasServerProtocolMethod();
     private boolean protocolLib;
 
     @Override
     public void inject() throws Exception {
+        if (PaperViaInjector.PAPER_INJECTION_METHOD) {
+            PaperViaInjector.setPaperChannelInitializeListener();
+            return;
+        }
+
         try {
             Object connection = getServerConnection();
             if (connection == null) {
@@ -189,7 +193,7 @@ public class BukkitViaInjector implements ViaInjector {
 
     @Override
     public int getServerProtocolVersion() throws Exception {
-        if (modernPaper) {
+        if (PaperViaInjector.PAPER_PROTOCOL_METHOD) {
             // *Trust me, it's safe*
             return Bukkit.getUnsafe().getProtocolVersion();
         }
@@ -266,6 +270,7 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     public static boolean isBinded() {
+        if (PaperViaInjector.PAPER_INJECTION_METHOD) return true;
         try {
             Object connection = getServerConnection();
             if (connection == null) {
@@ -354,6 +359,8 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     public static void patchLists() throws Exception {
+        if (PaperViaInjector.PAPER_INJECTION_METHOD) return;
+
         Object connection = getServerConnection();
         if (connection == null) {
             Via.getPlatform().getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
@@ -374,18 +381,5 @@ public class BukkitViaInjector implements ViaInjector {
 
     public void setProtocolLib(boolean protocolLib) {
         this.protocolLib = protocolLib;
-    }
-
-    public boolean isModernPaper() {
-        return modernPaper;
-    }
-
-    private static boolean hasServerProtocolMethod() {
-        try {
-            Class.forName("org.bukkit.UnsafeValues").getDeclaredMethod("getProtocolVersion");
-            return true;
-        } catch (ReflectiveOperationException e) {
-            return false;
-        }
     }
 }
