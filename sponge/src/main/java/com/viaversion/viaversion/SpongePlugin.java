@@ -146,7 +146,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, Long ticks) {
+    public PlatformTask runSync(Runnable runnable, long ticks) {
         return new SpongeTaskId(
                 Task.builder()
                         .execute(runnable)
@@ -156,7 +156,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
+    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
         return new SpongeTaskId(
                 Task.builder()
                         .execute(runnable)

@@ -122,12 +122,12 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, Long ticks) {
+    public PlatformTask runSync(Runnable runnable, long ticks) {
         return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
+    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
         return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
     }
 

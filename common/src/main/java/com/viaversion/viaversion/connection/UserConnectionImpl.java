@@ -143,11 +143,6 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public void sendRawPacket(ByteBuf packet) {
-        sendRawPacket(packet, false);
-    }
-
-    @Override
     public PacketTracker getPacketTracker() {
         return packetTracker;
     }
@@ -222,11 +217,6 @@ public class UserConnectionImpl implements UserConnection {
                 packet.release(); // Couldn't schedule
             }
         }
-    }
-
-    @Override
-    public void sendRawPacketToServer(ByteBuf packet) {
-        sendRawPacketToServer(packet, false);
     }
 
     @Override

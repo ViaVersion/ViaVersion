@@ -27,7 +27,7 @@ import io.netty.buffer.ByteBuf;
 public abstract class PartialType<T, X> extends Type<T> {
     private final X param;
 
-    public PartialType(X param, Class<T> type) {
+    protected PartialType(X param, Class<T> type) {
         super(type);
         this.param = param;
     }

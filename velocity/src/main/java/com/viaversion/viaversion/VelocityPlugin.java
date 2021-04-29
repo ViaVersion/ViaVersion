@@ -137,7 +137,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, Long ticks) {
+    public PlatformTask runSync(Runnable runnable, long ticks) {
         return new VelocityTaskId(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)
@@ -146,7 +146,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, Long ticks) {
+    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
         return new VelocityTaskId(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)

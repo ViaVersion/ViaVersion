@@ -103,7 +103,7 @@ public interface ViaPlatform<T> {
      * @param ticks    The interval to run it after
      * @return The Task ID
      */
-    PlatformTask runSync(Runnable runnable, Long ticks);
+    PlatformTask runSync(Runnable runnable, long ticks);
 
     /**
      * Run a task at a repeating interval.
@@ -113,7 +113,7 @@ public interface ViaPlatform<T> {
      * @param ticks    The interval to run it at
      * @return The Task ID
      */
-    PlatformTask runRepeatingSync(Runnable runnable, Long ticks);
+    PlatformTask runRepeatingSync(Runnable runnable, long ticks);
 
     /**
      * Cancels a task.

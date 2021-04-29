@@ -77,19 +77,21 @@ public interface UserConnection {
     void sendRawPacket(ByteBuf packet, boolean currentThread);
 
     /**
+     * Send a raw packet to the player (netty thread).
+     *
+     * @param packet The packet to send
+     */
+    default void sendRawPacket(ByteBuf packet) {
+        sendRawPacket(packet, false);
+    }
+
+    /**
      * Send a raw packet to the player with returning the future.
      *
      * @param packet The raw packet to send
      * @return ChannelFuture of the packet being sent
      */
     ChannelFuture sendRawPacketFuture(ByteBuf packet);
-
-    /**
-     * Send a raw packet to the player (netty thread).
-     *
-     * @param packet The packet to send
-     */
-    void sendRawPacket(ByteBuf packet);
 
     /**
      * Returns the user's packet tracker used for the inbuilt packet-limiter.
@@ -118,7 +120,9 @@ public interface UserConnection {
      *
      * @param packet Raw packet to be sent
      */
-    void sendRawPacketToServer(ByteBuf packet);
+    default void sendRawPacketToServer(ByteBuf packet) {
+        sendRawPacketToServer(packet, false);
+    }
 
     /**
      * Monitors serverbound packets and returns whether a packet can/should be processed.
