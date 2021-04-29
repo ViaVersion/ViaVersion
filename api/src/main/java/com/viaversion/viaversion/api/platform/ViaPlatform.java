@@ -116,17 +116,6 @@ public interface ViaPlatform<T> {
     PlatformTask runRepeatingSync(Runnable runnable, long ticks);
 
     /**
-     * Cancels a task.
-     *
-     * @param task task to cancel
-     */
-    default void cancelTask(PlatformTask task) {
-        if (task.getObject() != null) {
-            task.cancel();
-        }
-    }
-
-    /**
      * Get the online players
      *
      * @return Array of ViaCommandSender

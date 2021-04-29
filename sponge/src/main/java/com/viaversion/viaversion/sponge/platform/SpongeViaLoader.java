@@ -103,7 +103,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
     public void unload() {
         listeners.forEach(Sponge.getEventManager()::unregisterListeners);
         listeners.clear();
-        tasks.forEach(Via.getPlatform()::cancelTask);
+        tasks.forEach(PlatformTask::cancel);
         tasks.clear();
     }
 }

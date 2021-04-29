@@ -39,7 +39,7 @@ import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.VersionInfo;
 import com.viaversion.viaversion.velocity.command.VelocityCommandHandler;
 import com.viaversion.viaversion.velocity.command.VelocityCommandSender;
-import com.viaversion.viaversion.velocity.platform.VelocityTaskId;
+import com.viaversion.viaversion.velocity.platform.VelocityViaTask;
 import com.viaversion.viaversion.velocity.platform.VelocityViaAPI;
 import com.viaversion.viaversion.velocity.platform.VelocityViaConfig;
 import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
@@ -138,7 +138,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Override
     public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new VelocityTaskId(
+        return new VelocityViaTask(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)
                         .delay(ticks * 50, TimeUnit.MILLISECONDS).schedule()
@@ -147,7 +147,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new VelocityTaskId(
+        return new VelocityViaTask(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)
                         .repeat(ticks * 50, TimeUnit.MILLISECONDS).schedule()

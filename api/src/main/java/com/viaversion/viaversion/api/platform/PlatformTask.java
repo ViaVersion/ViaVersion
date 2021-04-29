@@ -31,9 +31,9 @@ public interface PlatformTask<T> {
 
     /**
      * Returns the actual object represented by this task/task id.
-     * Null if task cannot be cancelled.
+     * Null if task cannot be instantly tracked.
      *
-     * @return platform based object, or null if not cancellable
+     * @return platform based object, or null if not tracked/cancellable
      */
     @Nullable T getObject();
 

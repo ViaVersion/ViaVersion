@@ -15,25 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bungee.platform;
+package com.viaversion.viaversion.bukkit.platform;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.platform.PlatformTask;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
+import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class BungeeTaskId implements PlatformTask<ScheduledTask> {
-    private final ScheduledTask task;
+public class BukkitViaTask implements PlatformTask<BukkitTask> {
+    private final BukkitTask task;
 
-    public BungeeTaskId(ScheduledTask task) {
+    public BukkitViaTask(@Nullable BukkitTask task) {
         this.task = task;
     }
 
     @Override
-    public ScheduledTask getObject() {
+    public @Nullable BukkitTask getObject() {
         return task;
     }
 
     @Override
     public void cancel() {
+        Preconditions.checkArgument(task != null, "Task cannot be cancelled");
         task.cancel();
     }
 }

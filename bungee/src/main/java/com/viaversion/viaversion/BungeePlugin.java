@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bungee.commands.BungeeCommand;
 import com.viaversion.viaversion.bungee.commands.BungeeCommandHandler;
 import com.viaversion.viaversion.bungee.commands.BungeeCommandSender;
-import com.viaversion.viaversion.bungee.platform.BungeeTaskId;
+import com.viaversion.viaversion.bungee.platform.BungeeViaTask;
 import com.viaversion.viaversion.bungee.platform.BungeeViaAPI;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.platform.BungeeViaInjector;
@@ -113,7 +113,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
 
     @Override
     public PlatformTask runAsync(Runnable runnable) {
-        return new BungeeTaskId(getProxy().getScheduler().runAsync(this, runnable));
+        return new BungeeViaTask(getProxy().getScheduler().runAsync(this, runnable));
     }
 
     @Override
@@ -123,12 +123,12 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
 
     @Override
     public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS));
+        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new BungeeTaskId(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
+        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override

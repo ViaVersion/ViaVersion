@@ -15,28 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bukkit.platform;
+package com.viaversion.viaversion.sponge.platform;
 
-import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.platform.PlatformTask;
-import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.scheduler.Task;
 
-public class BukkitTaskId implements PlatformTask<BukkitTask> {
-    private final BukkitTask task;
+public class SpongeViaTask implements PlatformTask<Task> {
+    private final Task task;
 
-    public BukkitTaskId(@Nullable BukkitTask task) {
+    public SpongeViaTask(Task task) {
         this.task = task;
     }
 
     @Override
-    public @Nullable BukkitTask getObject() {
+    public Task getObject() {
         return task;
     }
 
     @Override
     public void cancel() {
-        Preconditions.checkArgument(task != null, "Task cannot be cancelled");
         task.cancel();
     }
 }

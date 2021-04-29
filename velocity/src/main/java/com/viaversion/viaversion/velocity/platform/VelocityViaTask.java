@@ -20,10 +20,10 @@ package com.viaversion.viaversion.velocity.platform;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 
-public class VelocityTaskId implements PlatformTask<ScheduledTask> {
+public class VelocityViaTask implements PlatformTask<ScheduledTask> {
     private final ScheduledTask task;
 
-    public VelocityTaskId(ScheduledTask task) {
+    public VelocityViaTask(ScheduledTask task) {
         this.task = task;
     }
 

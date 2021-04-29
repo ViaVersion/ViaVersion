@@ -15,20 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.sponge.platform;
+package com.viaversion.viaversion.bungee.platform;
 
 import com.viaversion.viaversion.api.platform.PlatformTask;
-import org.spongepowered.api.scheduler.Task;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-public class SpongeTaskId implements PlatformTask<Task> {
-    private final Task task;
+public class BungeeViaTask implements PlatformTask<ScheduledTask> {
+    private final ScheduledTask task;
 
-    public SpongeTaskId(Task task) {
+    public BungeeViaTask(ScheduledTask task) {
         this.task = task;
     }
 
     @Override
-    public Task getObject() {
+    public ScheduledTask getObject() {
         return task;
     }
 

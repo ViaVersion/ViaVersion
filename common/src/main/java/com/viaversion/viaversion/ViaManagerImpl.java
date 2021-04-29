@@ -151,7 +151,7 @@ public class ViaManagerImpl implements ViaManager {
         // Common tasks
         mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
             if (protocolManager.checkForMappingCompletion()) {
-                platform.cancelTask(mappingLoadingTask);
+                mappingLoadingTask.cancel();
                 mappingLoadingTask = null;
             }
         }, 10L);

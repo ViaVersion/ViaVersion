@@ -29,7 +29,7 @@ import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.viaversion.viaversion.sponge.commands.SpongeCommandHandler;
 import com.viaversion.viaversion.sponge.commands.SpongeCommandSender;
-import com.viaversion.viaversion.sponge.platform.SpongeTaskId;
+import com.viaversion.viaversion.sponge.platform.SpongeViaTask;
 import com.viaversion.viaversion.sponge.platform.SpongeViaAPI;
 import com.viaversion.viaversion.sponge.platform.SpongeViaConfig;
 import com.viaversion.viaversion.sponge.platform.SpongeViaInjector;
@@ -128,7 +128,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public PlatformTask runAsync(Runnable runnable) {
-        return new SpongeTaskId(
+        return new SpongeViaTask(
                 Task.builder()
                         .execute(runnable)
                         .async()
@@ -138,7 +138,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public PlatformTask runSync(Runnable runnable) {
-        return new SpongeTaskId(
+        return new SpongeViaTask(
                 Task.builder()
                         .execute(runnable)
                         .submit(this)
@@ -147,7 +147,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new SpongeTaskId(
+        return new SpongeViaTask(
                 Task.builder()
                         .execute(runnable)
                         .delayTicks(ticks)
@@ -157,7 +157,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new SpongeTaskId(
+        return new SpongeViaTask(
                 Task.builder()
                         .execute(runnable)
                         .intervalTicks(ticks)

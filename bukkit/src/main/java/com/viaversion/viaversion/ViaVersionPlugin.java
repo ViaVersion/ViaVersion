@@ -30,7 +30,7 @@ import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandSender;
 import com.viaversion.viaversion.bukkit.listeners.ProtocolLibEnableListener;
-import com.viaversion.viaversion.bukkit.platform.BukkitTaskId;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
@@ -180,31 +180,31 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public PlatformTask runAsync(Runnable runnable) {
         if (isPluginEnabled()) {
-            return new BukkitTaskId(getServer().getScheduler().runTaskAsynchronously(this, runnable));
+            return new BukkitViaTask(getServer().getScheduler().runTaskAsynchronously(this, runnable));
         } else {
             asyncQueuedTasks.add(runnable);
-            return new BukkitTaskId(null);
+            return new BukkitViaTask(null);
         }
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable) {
         if (isPluginEnabled()) {
-            return new BukkitTaskId(getServer().getScheduler().runTask(this, runnable));
+            return new BukkitViaTask(getServer().getScheduler().runTask(this, runnable));
         } else {
             queuedTasks.add(runnable);
-            return new BukkitTaskId(null);
+            return new BukkitViaTask(null);
         }
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new BukkitTaskId(getServer().getScheduler().runTaskLater(this, runnable, ticks));
+        return new BukkitViaTask(getServer().getScheduler().runTaskLater(this, runnable, ticks));
     }
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new BukkitTaskId(getServer().getScheduler().runTaskTimer(this, runnable, 0, ticks));
+        return new BukkitViaTask(getServer().getScheduler().runTaskTimer(this, runnable, 0, ticks));
     }
 
     @Override
