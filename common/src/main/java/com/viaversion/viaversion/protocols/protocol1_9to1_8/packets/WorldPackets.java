@@ -29,11 +29,12 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.Effect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
@@ -41,9 +42,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_9to1_8Type;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 public class WorldPackets {
@@ -136,7 +136,7 @@ public class WorldPackets {
                         Chunk1_9to1_8Type type = new Chunk1_9to1_8Type(clientChunks);
                         Chunk1_8 chunk = (Chunk1_8) wrapper.read(type);
                         if (chunk.isUnloadPacket()) {
-                            wrapper.setId(0x1D);
+                            wrapper.setId(ClientboundPackets1_9.UNLOAD_CHUNK);
 
                             wrapper.write(Type.INT, chunk.getX());
                             wrapper.write(Type.INT, chunk.getZ());
@@ -156,29 +156,42 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.cancel(); // Cancel the packet from being sent
-                        BulkChunkTranslatorProvider provider = Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class);
+                handler(wrapper -> {
+                    wrapper.cancel(); // Cancel the packet from being sent
 
-                        // Don't read the packet
-                        if (!provider.isPacketLevel())
-                            return;
+                    boolean skyLight = wrapper.read(Type.BOOLEAN);
+                    int count = wrapper.read(Type.VAR_INT);
 
-                        List<Object> list = provider.transformMapChunkBulk(wrapper, wrapper.user().get(ClientChunks.class));
-                        for (Object obj : list) {
-                            if (!(obj instanceof PacketWrapper))
-                                throw new IOException("transformMapChunkBulk returned the wrong object type");
+                    ChunkBulkSection[] chunks = new ChunkBulkSection[count];
+                    for (int i = 0; i < count; i++) {
+                        chunks[i] = new ChunkBulkSection(wrapper, skyLight);
+                    }
 
-                            PacketWrapper output = (PacketWrapper) obj;
-                            ByteBuf buffer = wrapper.user().getChannel().alloc().buffer();
-                            try {
-                                output.setId(-1); // -1 for no writing of id
-                                output.writeToBuffer(buffer);
-                                PacketWrapper chunkPacket = PacketWrapper.create(0x21, buffer, wrapper.user());
-                                chunkPacket.send(Protocol1_9To1_8.class, false, true);
-                            } finally {
+                    ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+                    for (ChunkBulkSection chunk : chunks) {
+                        // Data is at the end
+                        CustomByteType customByteType = new CustomByteType(chunk.getLength());
+                        chunk.setData(wrapper.read(customByteType));
+
+                        clientChunks.getBulkChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ())); // Store for later
+
+                        // Construct chunk packet
+                        ByteBuf buffer = null;
+                        try {
+                            buffer = wrapper.user().getChannel().alloc().buffer();
+
+                            Type.INT.write(buffer, chunk.getX());
+                            Type.INT.write(buffer, chunk.getZ());
+                            Type.BOOLEAN.write(buffer, true); // Always ground-up
+                            Type.UNSIGNED_SHORT.write(buffer, chunk.getBitMask());
+                            Type.VAR_INT.writePrimitive(buffer, chunk.getLength());
+                            customByteType.write(buffer, chunk.getData());
+
+                            // Send through this protocol again
+                            PacketWrapper chunkPacket = PacketWrapper.create(ClientboundPackets1_8.CHUNK_DATA, buffer, wrapper.user());
+                            chunkPacket.send(Protocol1_9To1_8.class, false, true);
+                        } finally {
+                            if (buffer != null) {
                                 buffer.release();
                             }
                         }
@@ -427,5 +440,46 @@ public class WorldPackets {
 
             }
         });
+    }
+
+    public static final class ChunkBulkSection {
+        private final int x;
+        private final int z;
+        private final int bitMask;
+        private final int length;
+        private byte[] data;
+
+        public ChunkBulkSection(PacketWrapper wrapper, boolean skylight) throws Exception {
+            x = wrapper.read(Type.INT);
+            z = wrapper.read(Type.INT);
+            bitMask = wrapper.read(Type.UNSIGNED_SHORT);
+
+            int bitCount = Integer.bitCount(bitMask);
+            length = (bitCount * ((4096 * 2) + 2048)) + (skylight ? bitCount * 2048 : 0) + 256; // Thanks MCProtocolLib
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getZ() {
+            return z;
+        }
+
+        public int getBitMask() {
+            return bitMask;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public byte @Nullable [] getData() {
+            return data;
+        }
+
+        public void setData(byte[] data) {
+            this.data = data;
+        }
     }
 }

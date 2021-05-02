@@ -34,12 +34,10 @@ import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.HandItemCache
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
 import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
-import com.viaversion.viaversion.bukkit.providers.BukkitViaBulkChunkTranslator;
 import com.viaversion.viaversion.bukkit.providers.BukkitViaMovementTransmitter;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import org.bukkit.Bukkit;
@@ -129,7 +127,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
         /* Providers */
         if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
-            Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BukkitViaBulkChunkTranslator());
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
 
             Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {

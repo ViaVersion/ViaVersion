@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.sponge.listeners.UpdateListener;
@@ -33,7 +32,6 @@ import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.DeathListener
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.HandItemCache;
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
-import com.viaversion.viaversion.sponge.providers.SpongeViaBulkChunkTranslator;
 import com.viaversion.viaversion.sponge.providers.SpongeViaMovementTransmitter;
 import org.spongepowered.api.Sponge;
 
@@ -84,7 +82,6 @@ public class SpongeViaLoader implements ViaPlatformLoader {
 
         /* Providers */
         if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
-            Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new SpongeViaBulkChunkTranslator());
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new SpongeViaMovementTransmitter());
 
             Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {

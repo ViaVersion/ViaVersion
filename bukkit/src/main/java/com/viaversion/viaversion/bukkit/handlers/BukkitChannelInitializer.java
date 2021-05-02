@@ -65,9 +65,7 @@ public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> 
         MessageToByteEncoder encoder = constructor.newEncodeHandler(connection, (MessageToByteEncoder) channel.pipeline().get("encoder"));
         ByteToMessageDecoder decoder = constructor.newDecodeHandler(connection, (ByteToMessageDecoder) channel.pipeline().get("decoder"));
 
-        BukkitPacketHandler chunkHandler = new BukkitPacketHandler(connection);
         channel.pipeline().replace("encoder", "encoder", encoder);
         channel.pipeline().replace("decoder", "decoder", decoder);
-        channel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
     }
 }

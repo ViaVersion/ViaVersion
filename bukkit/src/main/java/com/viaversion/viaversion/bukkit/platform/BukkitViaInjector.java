@@ -139,8 +139,13 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     @Override
-    public void uninject() {
+    public void uninject() throws Exception {
         // TODO: Uninject from players currently online to prevent protocol lib issues.
+        if (PaperViaInjector.PAPER_INJECTION_METHOD) {
+            PaperViaInjector.removePaperChannelInitializeListener();
+            return;
+        }
+
         for (ChannelFuture future : injectedFutures) {
             List<String> names = future.channel().pipeline().names();
             ChannelHandler bootstrapAcceptor = null;

@@ -48,6 +48,12 @@ public final class PaperViaInjector {
         addListenerMethod.invoke(null, Key.key("viaversion", "injector"), channelInitializeListener);
     }
 
+    public static void removePaperChannelInitializeListener() throws ReflectiveOperationException {
+        Class<?> holderClass = Class.forName("io.papermc.paper.network.ChannelInitializeListenerHolder");
+        Method addListenerMethod = holderClass.getDeclaredMethod("removeListener", Key.class);
+        addListenerMethod.invoke(null, Key.key("viaversion", "injector"));
+    }
+
     private static boolean hasServerProtocolMethod() {
         try {
             Class.forName("org.bukkit.UnsafeValues").getDeclaredMethod("getProtocolVersion");

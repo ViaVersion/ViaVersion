@@ -18,12 +18,9 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
 import com.google.common.collect.Sets;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 
-import java.util.List;
 import java.util.Set;
 
 public class ClientChunks extends StoredObject {
@@ -36,10 +33,6 @@ public class ClientChunks extends StoredObject {
 
     public static long toLong(int msw, int lsw) {
         return ((long) msw << 32) + lsw - -2147483648L;
-    }
-
-    public List<Object> transformMapChunkBulk(Object packet) throws Exception {
-        return Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).transformMapChunkBulk(packet, this);
     }
 
     public Set<Long> getLoadedChunks() {

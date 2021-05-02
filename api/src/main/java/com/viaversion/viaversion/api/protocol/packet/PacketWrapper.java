@@ -323,4 +323,8 @@ public interface PacketWrapper {
     int getId();
 
     void setId(int id);
+
+    default void setId(PacketType packetType) {
+        setId(packetType.ordinal());
+    }
 }

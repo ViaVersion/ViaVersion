@@ -58,11 +58,9 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
             // Add our transformers
             MessageToByteEncoder encoder = new SpongeEncodeHandler(info, (MessageToByteEncoder) channel.pipeline().get("encoder"));
             ByteToMessageDecoder decoder = new SpongeDecodeHandler(info, (ByteToMessageDecoder) channel.pipeline().get("decoder"));
-            SpongePacketHandler chunkHandler = new SpongePacketHandler(info);
 
             channel.pipeline().replace("encoder", "encoder", encoder);
             channel.pipeline().replace("decoder", "decoder", decoder);
-            channel.pipeline().addAfter("packet_handler", "viaversion_packet_handler", chunkHandler);
         } else {
             this.method.invoke(this.original, channel);
         }

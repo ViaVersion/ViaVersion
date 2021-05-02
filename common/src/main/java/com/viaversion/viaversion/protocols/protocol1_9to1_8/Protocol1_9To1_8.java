@@ -38,7 +38,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.PlayerPacket
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.SpawnPackets;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
@@ -51,8 +50,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTra
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
-
-import java.util.List;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
     public static final ValueTransformer<String, JsonElement> FIX_JSON = new ValueTransformer<String, JsonElement>(Type.COMPONENT) {
@@ -139,34 +136,11 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     @Override
     public void register(ViaProviders providers) {
         providers.register(HandItemProvider.class, new HandItemProvider());
-        providers.register(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
         providers.register(CommandBlockProvider.class, new CommandBlockProvider());
         providers.register(EntityIdProvider.class, new EntityIdProvider());
         providers.register(BossBarProvider.class, new BossBarProvider());
         providers.register(MainHandProvider.class, new MainHandProvider());
         providers.require(MovementTransmitterProvider.class);
-    }
-
-    /**
-     * Should this protocol filter an object packet from this class.
-     *
-     * @param packetClass The class of the current input
-     * @return True if it should handle the filtering
-     */
-    public boolean isFiltered(Class packetClass) {
-        return Via.getManager().getProviders().get(BulkChunkTranslatorProvider.class).isFiltered(packetClass);
-    }
-
-    /**
-     * Filter a packet into the output
-     *
-     * @param info   The current user connection
-     * @param packet The input packet as an object (NMS)
-     * @param output The list to put the object into.
-     * @throws Exception Throws exception if cancelled / error.
-     */
-    public void filterPacket(UserConnection info, Object packet, List output) throws Exception {
-        output.addAll(info.get(ClientChunks.class).transformMapChunkBulk(packet));
     }
 
     @Override
