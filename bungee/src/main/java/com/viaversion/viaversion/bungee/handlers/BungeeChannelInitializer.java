@@ -51,6 +51,7 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
         // Add originals
         this.method.invoke(this.original, socketChannel);
 
+        if (!socketChannel.isActive()) return; // Don't inject if inactive
         if (socketChannel.pipeline().get("packet-encoder") == null) return; // Don't inject if no packet-encoder
         if (socketChannel.pipeline().get("packet-decoder") == null) return; // Don't inject if no packet-decoder
         // Add our transformers
