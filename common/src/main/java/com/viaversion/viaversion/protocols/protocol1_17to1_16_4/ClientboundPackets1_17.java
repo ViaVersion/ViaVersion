@@ -122,5 +122,15 @@ public enum ClientboundPackets1_17 implements ClientboundPacketType {
     ENTITY_PROPERTIES, // 0x62
     ENTITY_EFFECT, // 0x63
     DECLARE_RECIPES, // 0x64
-    TAGS, // 0x65
+    TAGS; // 0x65
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

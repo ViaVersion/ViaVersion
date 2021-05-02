@@ -100,5 +100,15 @@ public enum ClientboundPackets1_12_1 implements ClientboundPacketType {
     ENTITY_TELEPORT, // 0x4C
     ADVANCEMENTS, // 0x4D
     ENTITY_PROPERTIES, // 0x4E
-    ENTITY_EFFECT, // 0x4F
+    ENTITY_EFFECT; // 0x4F
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

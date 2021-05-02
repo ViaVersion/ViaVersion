@@ -113,5 +113,15 @@ public enum ClientboundPackets1_14 implements ClientboundPacketType {
     ENTITY_EFFECT, // 0x59
     DECLARE_RECIPES, // 0x5A
     TAGS, // 0x5B
-    ACKNOWLEDGE_PLAYER_DIGGING, // 0x5C
+    ACKNOWLEDGE_PLAYER_DIGGING; // 0x5C
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

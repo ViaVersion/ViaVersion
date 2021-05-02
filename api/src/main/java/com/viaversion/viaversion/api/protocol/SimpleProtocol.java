@@ -34,5 +34,16 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 public interface SimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> {
 
     enum DummyPacketTypes implements ClientboundPacketType, ServerboundPacketType {
+        ;
+
+        @Override
+        public int getId() {
+            return ordinal();
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
     }
 }

@@ -83,7 +83,7 @@ public class WorldPackets {
                             throw new IllegalArgumentException("Invalid world border type received: " + type);
                     }
 
-                    wrapper.setId(packetType.ordinal());
+                    wrapper.setId(packetType.getId());
                 });
             }
         });

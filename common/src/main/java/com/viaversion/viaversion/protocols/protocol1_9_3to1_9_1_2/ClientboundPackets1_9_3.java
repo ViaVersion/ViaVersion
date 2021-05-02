@@ -96,5 +96,15 @@ public enum ClientboundPackets1_9_3 implements ClientboundPacketType {
     COLLECT_ITEM, // 0x4A
     ENTITY_TELEPORT, // 0x4B
     ENTITY_PROPERTIES, // 0x4C
-    ENTITY_EFFECT, // 0x4D
+    ENTITY_EFFECT; // 0x4D
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

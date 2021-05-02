@@ -46,5 +46,15 @@ public enum ServerboundPackets1_8 implements ServerboundPacketType {
     CLIENT_STATUS, // 0x16
     PLUGIN_MESSAGE, // 0x17
     SPECTATE, // 0x18
-    RESOURCE_PACK_STATUS, // 0x19
+    RESOURCE_PACK_STATUS; // 0x19
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

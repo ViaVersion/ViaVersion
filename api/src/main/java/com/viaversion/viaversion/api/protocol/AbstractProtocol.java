@@ -80,12 +80,12 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         ClientboundPacketType[] newConstants = newClientboundPacketEnum.getEnumConstants();
         Map<String, ClientboundPacketType> newClientboundPackets = new HashMap<>(newConstants.length);
         for (ClientboundPacketType newConstant : newConstants) {
-            newClientboundPackets.put(newConstant.name(), newConstant);
+            newClientboundPackets.put(newConstant.getName(), newConstant);
         }
 
         for (ClientboundPacketType packet : oldClientboundPacketEnum.getEnumConstants()) {
-            ClientboundPacketType mappedPacket = newClientboundPackets.get(packet.name());
-            int oldId = packet.ordinal();
+            ClientboundPacketType mappedPacket = newClientboundPackets.get(packet.getName());
+            int oldId = packet.getId();
             if (mappedPacket == null) {
                 // Packet doesn't exist on new client
                 Preconditions.checkArgument(hasRegisteredClientbound(State.PLAY, oldId),
@@ -93,7 +93,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
                 continue;
             }
 
-            int newId = mappedPacket.ordinal();
+            int newId = mappedPacket.getId();
             if (!hasRegisteredClientbound(State.PLAY, oldId)) {
                 registerClientbound(State.PLAY, oldId, newId);
             }
@@ -104,12 +104,12 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         ServerboundPacketType[] oldConstants = oldServerboundPacketEnum.getEnumConstants();
         Map<String, ServerboundPacketType> oldServerboundConstants = new HashMap<>(oldConstants.length);
         for (ServerboundPacketType oldConstant : oldConstants) {
-            oldServerboundConstants.put(oldConstant.name(), oldConstant);
+            oldServerboundConstants.put(oldConstant.getName(), oldConstant);
         }
 
         for (ServerboundPacketType packet : newServerboundPacketEnum.getEnumConstants()) {
-            ServerboundPacketType mappedPacket = oldServerboundConstants.get(packet.name());
-            int newId = packet.ordinal();
+            ServerboundPacketType mappedPacket = oldServerboundConstants.get(packet.getName());
+            int newId = packet.getId();
             if (mappedPacket == null) {
                 // Packet doesn't exist on old server
                 Preconditions.checkArgument(hasRegisteredServerbound(State.PLAY, newId),
@@ -117,7 +117,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
                 continue;
             }
 
-            int oldId = mappedPacket.ordinal();
+            int oldId = mappedPacket.getId();
             if (!hasRegisteredServerbound(State.PLAY, newId)) {
                 registerServerbound(State.PLAY, oldId, newId);
             }
@@ -192,11 +192,11 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
 
         ClientboundPacketType mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? packetType
-                : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.name().equals(packetType.name())).findAny().orElse(null);
+                : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.getName().equals(packetType.getName())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
 
-        int oldId = packetType.ordinal();
-        int newId = mappedPacket.ordinal();
+        int oldId = packetType.getId();
+        int newId = mappedPacket.getId();
         registerClientbound(State.PLAY, oldId, newId, packetRemapper);
     }
 
@@ -205,12 +205,12 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
         checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == newClientboundPacketEnum);
 
-        registerClientbound(State.PLAY, packetType.ordinal(), mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetRemapper);
+        registerClientbound(State.PLAY, packetType.getId(), mappedPacketType != null ? mappedPacketType.getId() : -1, packetRemapper);
     }
 
     @Override
     public void cancelClientbound(C1 packetType) {
-        cancelClientbound(State.PLAY, packetType.ordinal(), packetType.ordinal());
+        cancelClientbound(State.PLAY, packetType.getId(), packetType.getId());
     }
 
     @Override
@@ -218,11 +218,11 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
 
         ServerboundPacketType mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? packetType
-                : Arrays.stream(oldServerboundPacketEnum.getEnumConstants()).filter(en -> en.name().equals(packetType.name())).findAny().orElse(null);
+                : Arrays.stream(oldServerboundPacketEnum.getEnumConstants()).filter(en -> en.getName().equals(packetType.getName())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
 
-        int oldId = mappedPacket.ordinal();
-        int newId = packetType.ordinal();
+        int oldId = mappedPacket.getId();
+        int newId = packetType.getId();
         registerServerbound(State.PLAY, oldId, newId, packetRemapper);
     }
 
@@ -231,13 +231,13 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
         checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == oldServerboundPacketEnum);
 
-        registerServerbound(State.PLAY, mappedPacketType != null ? mappedPacketType.ordinal() : -1, packetType.ordinal(), packetRemapper);
+        registerServerbound(State.PLAY, mappedPacketType != null ? mappedPacketType.getId() : -1, packetType.getId(), packetRemapper);
     }
 
     @Override
     public void cancelServerbound(S2 packetType) {
         Preconditions.checkArgument(packetType.getClass() == newServerboundPacketEnum);
-        cancelServerbound(State.PLAY, -1, packetType.ordinal());
+        cancelServerbound(State.PLAY, -1, packetType.getId());
     }
 
 

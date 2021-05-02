@@ -31,16 +31,16 @@ package com.viaversion.viaversion.api.protocol.packet;
 public interface PacketType {
 
     /**
+     * Returns the packet id for the implemented protocol.
+     *
+     * @return packet id for the implemented protocol
+     */
+    int getId();
+
+    /**
      * Returns the name of the packet, to be consistent over multiple versions.
      *
      * @return name of the packet
      */
-    String name();
-
-    /**
-     * Returns the ordinal, being the packet id for the implemented protocol.
-     *
-     * @return packet id for the implemented protocol
-     */
-    int ordinal();
+    String getName();
 }

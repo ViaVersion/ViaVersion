@@ -322,7 +322,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public PacketWrapperImpl create(PacketType packetType) {
-        return new PacketWrapperImpl(packetType.ordinal(), null, user());
+        return new PacketWrapperImpl(packetType.getId(), null, user());
     }
 
     @Override

@@ -46,7 +46,7 @@ public interface PacketWrapper {
      * @return new packet wrapper
      */
     static PacketWrapper create(PacketType packetType, UserConnection connection) {
-        return create(packetType.ordinal(), null, connection);
+        return create(packetType.getId(), null, connection);
     }
 
     /**
@@ -58,7 +58,7 @@ public interface PacketWrapper {
      * @return new packet wrapper
      */
     static PacketWrapper create(PacketType packetType, @Nullable ByteBuf inputBuffer, UserConnection connection) {
-        return create(packetType.ordinal(), inputBuffer, connection);
+        return create(packetType.getId(), inputBuffer, connection);
     }
 
     /**
@@ -320,11 +320,26 @@ public interface PacketWrapper {
         sendToServer(packetProtocol, true);
     }
 
+    /**
+     * Returns the packet id.
+     *
+     * @return packet id
+     */
     int getId();
 
-    void setId(int id);
-
+    /**
+     * Sets the packet id. If set to -1, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.
+     *
+     * @param packetType packet type
+     */
     default void setId(PacketType packetType) {
-        setId(packetType.ordinal());
+        setId(packetType.getId());
     }
+
+    /**
+     * Sets the packet id. If set to -1, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.
+     *
+     * @param id packet id
+     */
+    void setId(int id);
 }

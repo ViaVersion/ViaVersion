@@ -63,5 +63,15 @@ public enum ServerboundPackets1_13 implements ServerboundPacketType {
     ANIMATION, // 0x27
     SPECTATE, // 0x28
     PLAYER_BLOCK_PLACEMENT, // 0x29
-    USE_ITEM, // 0x2A
+    USE_ITEM; // 0x2A
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

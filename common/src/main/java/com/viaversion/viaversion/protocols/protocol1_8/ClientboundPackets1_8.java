@@ -94,5 +94,15 @@ public enum ClientboundPackets1_8 implements ClientboundPacketType {
     SET_COMPRESSION, // 0x46
     TAB_LIST, // 0x47
     RESOURCE_PACK, // 0x48
-    UPDATE_ENTITY_NBT, // 0x49
+    UPDATE_ENTITY_NBT; // 0x49
+
+    @Override
+    public int getId() {
+        return ordinal();
+    }
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }
