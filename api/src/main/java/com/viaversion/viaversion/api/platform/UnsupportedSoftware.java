@@ -22,15 +22,24 @@
  */
 package com.viaversion.viaversion.api.platform;
 
+import java.util.Collections;
+import java.util.List;
+
 public final class UnsupportedSoftware {
 
     private final String name;
-    private final String className;
+    private final List<String> classNames;
     private final String reason;
+
+    public UnsupportedSoftware(String name, List<String> classNames, String reason) {
+        this.name = name;
+        this.classNames = Collections.unmodifiableList(classNames);
+        this.reason = reason;
+    }
 
     public UnsupportedSoftware(String name, String className, String reason) {
         this.name = name;
-        this.className = className;
+        this.classNames = Collections.singletonList(className);
         this.reason = reason;
     }
 
@@ -44,12 +53,12 @@ public final class UnsupportedSoftware {
     }
 
     /**
-     * Returns the fully qualified class name.
+     * Returns an immutable list of the fully qualified class name.
      *
-     * @return fully qualified class name
+     * @return immutable list of fully qualified class name
      */
-    public String getClassName() {
-        return className;
+    public List<String> getClassNames() {
+        return classNames;
     }
 
     /**
@@ -59,6 +68,22 @@ public final class UnsupportedSoftware {
      */
     public String getReason() {
         return reason;
+    }
+
+    /**
+     * Returns whether at least one of the held class names exists.
+     *
+     * @return true if at least one of the classes exists
+     */
+    public boolean findMatch() {
+        for (String className : classNames) {
+            try {
+                Class.forName(className);
+                return true;
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        return false;
     }
 
     public static final class Reason {
