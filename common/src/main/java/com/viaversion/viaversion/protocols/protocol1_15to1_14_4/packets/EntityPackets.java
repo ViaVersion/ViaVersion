@@ -21,12 +21,14 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 
 import java.util.List;
 
@@ -84,6 +86,8 @@ public class EntityPackets {
 
                     List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
                     metadataRewriter.handleMetadata(entityId, metadata, wrapper.user());
+                    if (wrapper.user().getProtocolInfo().getProtocolVersion() >= ProtocolVersion.v1_17.getVersion())
+                        metadata.add(MetadataRewriter.DUMMY_META_FOR_1_17);
                     PacketWrapper metadataUpdate = wrapper.create(0x44);
                     metadataUpdate.write(Type.VAR_INT, entityId);
                     metadataUpdate.write(Types1_14.METADATA_LIST, metadata);

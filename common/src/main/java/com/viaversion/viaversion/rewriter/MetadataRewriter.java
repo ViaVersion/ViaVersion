@@ -20,12 +20,15 @@ package com.viaversion.viaversion.rewriter;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_17;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.data.EntityTracker;
@@ -38,6 +41,7 @@ import java.util.logging.Logger;
 
 public abstract class MetadataRewriter {
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
+    public static final Metadata DUMMY_META_FOR_1_17 = new Metadata(-1, MetaType1_17.Byte, null);
     private final Class<? extends EntityTracker> entityTrackerClass;
     protected final Protocol protocol;
     private Int2IntMap typeMapping;
@@ -50,6 +54,11 @@ public abstract class MetadataRewriter {
 
     public final void handleMetadata(int entityId, List<Metadata> metadatas, UserConnection connection) {
         EntityType type = connection.get(entityTrackerClass).getEntity(entityId);
+
+        if (connection.getProtocolInfo().getProtocolVersion() >= ProtocolVersion.v1_17.getVersion()
+                && metadatas.contains(DUMMY_META_FOR_1_17))
+            type = Entity1_17Types.PLAYER;
+
         for (Metadata metadata : metadatas.toArray(EMPTY_ARRAY)) {
             try {
                 handleMetadata(entityId, type, metadata, metadatas, connection);

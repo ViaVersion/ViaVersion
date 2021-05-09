@@ -58,6 +58,10 @@ public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
         }
 
         if (type == null) return;
+        if (metadata == MetadataRewriter.DUMMY_META_FOR_1_17) {
+            metadatas.remove(metadata);
+            return;
+        }
 
         if (type.isOrHasParent(Entity1_17Types.ENTITY)) {
             if (metadata.getId() >= 7) {
