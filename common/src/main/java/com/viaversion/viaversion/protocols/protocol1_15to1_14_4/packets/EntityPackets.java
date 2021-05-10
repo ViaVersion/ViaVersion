@@ -24,9 +24,11 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
+import com.viaversion.viaversion.rewriter.MetadataRewriter;
 
 import java.util.List;
 
@@ -54,15 +56,7 @@ public class EntityPackets {
                 map(Type.SHORT); // 11 - Velocity Z
 
                 handler(metadataRewriter.getTracker());
-                handler(wrapper -> {
-                    int entityId = wrapper.get(Type.VAR_INT, 0);
-                    List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
-                    metadataRewriter.handleMetadata(entityId, metadata, wrapper.user());
-                    PacketWrapper metadataUpdate = wrapper.create(0x44);
-                    metadataUpdate.write(Type.VAR_INT, entityId);
-                    metadataUpdate.write(Types1_14.METADATA_LIST, metadata);
-                    metadataUpdate.send(Protocol1_15To1_14_4.class);
-                });
+                handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Type.VAR_INT, 0), metadataRewriter));
             }
         });
 
@@ -79,21 +73,32 @@ public class EntityPackets {
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
-                    Entity1_15Types entityType = Entity1_15Types.PLAYER;
-                    wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, entityType);
+                    wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, Entity1_15Types.PLAYER);
 
-                    List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
-                    metadataRewriter.handleMetadata(entityId, metadata, wrapper.user());
-                    PacketWrapper metadataUpdate = wrapper.create(0x44);
-                    metadataUpdate.write(Type.VAR_INT, entityId);
-                    metadataUpdate.write(Types1_14.METADATA_LIST, metadata);
-                    metadataUpdate.send(Protocol1_15To1_14_4.class);
+                    sendMetadataPacket(wrapper, entityId, metadataRewriter);
                 });
             }
         });
 
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.ENTITY_METADATA, Types1_14.METADATA_LIST);
         metadataRewriter.registerEntityDestroy(ClientboundPackets1_14.DESTROY_ENTITIES);
+    }
+
+    private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, MetadataRewriter rewriter) throws Exception {
+        // Meta is no longer included in the spawn packets, but sent separately
+        List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
+
+        // Send the spawn packet manually
+        wrapper.send(Protocol1_15To1_14_4.class, true, true);
+        wrapper.cancel();
+
+        // Handle meta
+        rewriter.handleMetadata(entityId, metadata, wrapper.user());
+
+        PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.ENTITY_METADATA, wrapper.user());
+        metadataPacket.write(Type.VAR_INT, entityId);
+        metadataPacket.write(Types1_14.METADATA_LIST, metadata);
+        metadataPacket.send(Protocol1_15To1_14_4.class, true, true);
     }
 
     public static int getNewEntityId(int oldId) {

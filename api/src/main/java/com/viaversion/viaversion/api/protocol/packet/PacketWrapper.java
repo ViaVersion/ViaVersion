@@ -228,7 +228,7 @@ public interface PacketWrapper {
     /**
      * Create a new packet for the target of this packet.
      *
-     * @param packetType packet type of the new packedt
+     * @param packetType packet type of the new packet
      * @return The newly created packet wrapper
      */
     PacketWrapper create(PacketType packetType);
