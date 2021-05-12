@@ -35,7 +35,7 @@ import java.util.function.Function;
 public abstract class PacketRemapper {
     private final List<Pair<ValueReader, ValueWriter>> valueRemappers = new ArrayList<>();
 
-    public PacketRemapper() {
+    protected PacketRemapper() {
         registerMap();
     }
 
