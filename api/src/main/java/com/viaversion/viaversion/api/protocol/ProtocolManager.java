@@ -199,5 +199,5 @@ public interface ProtocolManager {
      * @return new packet wrapper instance
      * @see PacketWrapper#create(PacketType, ByteBuf, UserConnection)
      */
-    PacketWrapper createPacketWrapper(int packetId, ByteBuf buf, UserConnection connection);
+    PacketWrapper createPacketWrapper(int packetId, @Nullable ByteBuf buf, UserConnection connection);
 }

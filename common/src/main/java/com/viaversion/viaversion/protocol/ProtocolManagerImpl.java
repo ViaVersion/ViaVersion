@@ -417,7 +417,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public PacketWrapper createPacketWrapper(int packetId, ByteBuf buf, UserConnection connection) {
+    public PacketWrapper createPacketWrapper(int packetId, @Nullable ByteBuf buf, UserConnection connection) {
         return new PacketWrapperImpl(packetId, buf, connection);
     }
 

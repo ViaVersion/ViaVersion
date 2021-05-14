@@ -30,13 +30,14 @@ import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandSender;
 import com.viaversion.viaversion.bukkit.listeners.ProtocolLibEnableListener;
-import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.unsupported.UnsupportedSoftwareImpl;
 import com.viaversion.viaversion.util.GsonUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -291,7 +292,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public final Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
         List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
-        list.add(new UnsupportedSoftware("Yatopia", "org.yatopiamc.yatopia.server.YatopiaConfig", UnsupportedSoftware.Reason.DANGEROUS_SERVER_SOFTWARE));
+        list.add(new UnsupportedSoftwareImpl.Builder().name("Yatopia").reason(UnsupportedSoftwareImpl.Reason.DANGEROUS_SERVER_SOFTWARE)
+                .addClassName("org.yatopiamc.yatopia.server.YatopiaConfig")
+                .addClassName("net.yatopia.api.event.PlayerAttackEntityEvent")
+                .addClassName("yatopiamc.org.yatopia.server.YatopiaConfig") // Only the best kind of software relocates its own classes to hide itself :tinfoilhat:
+                .addMethod("org.bukkit.Server", "getLastTickTime").build());
         return Collections.unmodifiableList(list);
     }
 

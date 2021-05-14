@@ -34,6 +34,7 @@ import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -52,8 +53,8 @@ public class PacketWrapperImpl implements PacketWrapper {
     private final Deque<Pair<Type, Object>> readableObjects = new ArrayDeque<>();
     private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
 
-    public PacketWrapperImpl(int packetID, ByteBuf inputBuffer, UserConnection userConnection) {
-        this.id = packetID;
+    public PacketWrapperImpl(int packetId, @Nullable ByteBuf inputBuffer, UserConnection userConnection) {
+        this.id = packetId;
         this.inputBuffer = inputBuffer;
         this.userConnection = userConnection;
     }
@@ -426,7 +427,8 @@ public class PacketWrapperImpl implements PacketWrapper {
     public void setId(int id) {
         this.id = id;
     }
-    
+
+    @Nullable
     public ByteBuf getInputBuffer() {
         return inputBuffer;
     }
