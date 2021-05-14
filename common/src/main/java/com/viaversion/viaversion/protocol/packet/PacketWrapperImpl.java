@@ -426,6 +426,10 @@ public class PacketWrapperImpl implements PacketWrapper {
     public void setId(int id) {
         this.id = id;
     }
+    
+    public ByteBuf getInputBuffer() {
+        return inputBuffer;
+    }
 
     @Override
     public String toString() {
