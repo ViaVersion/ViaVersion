@@ -21,6 +21,8 @@ import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import com.viaversion.viaversion.classgenerator.generated.BasicHandlerConstructor;
+import com.viaversion.viaversion.classgenerator.generated.HandlerConstructor;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -144,7 +146,7 @@ public class ClassGenerator {
                     }
                 }
             }
-            return generated.toClass(HandlerConstructor.class.getClassLoader());
+            return generated.toClass(HandlerConstructor.class);
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (CannotCompileException e) {
@@ -153,7 +155,7 @@ public class ClassGenerator {
         return null;
     }
 
-    private static Class addPSCompatibility(ClassPool pool, Class input, Class superclass) {
+    private static void addPSCompatibility(ClassPool pool, Class input, Class superclass) {
         boolean newPS = getOldPSPackage().equals("unknown");
         String newName = "com.viaversion.viaversion.classgenerator.generated." + input.getSimpleName();
 
@@ -193,13 +195,12 @@ public class ClassGenerator {
                     }
                 }
             }
-            return generated.toClass(HandlerConstructor.class.getClassLoader());
+            generated.toClass(HandlerConstructor.class);
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (CannotCompileException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private static Class makePSConnectListener(ClassPool pool, boolean newVersionMethod) {
@@ -247,7 +248,7 @@ public class ClassGenerator {
                             // In any case, remove the packet listener and wrap up.
                             + "    connection.removePacketListener(this);\n"
                             + "}", connectListenerClazz));
-            return connectListenerClazz.toClass(HandlerConstructor.class.getClassLoader());
+            return connectListenerClazz.toClass(HandlerConstructor.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

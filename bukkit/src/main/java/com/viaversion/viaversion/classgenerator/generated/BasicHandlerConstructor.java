@@ -15,14 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bukkit.classgenerator;
+package com.viaversion.viaversion.classgenerator.generated;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
+import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public interface HandlerConstructor {
-    public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder);
+public class BasicHandlerConstructor implements HandlerConstructor {
+    @Override
+    public BukkitEncodeHandler newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
+        return new BukkitEncodeHandler(info, minecraftEncoder);
+    }
 
-    public ByteToMessageDecoder newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder);
+    @Override
+    public BukkitDecodeHandler newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
+        return new BukkitDecodeHandler(info, minecraftDecoder);
+    }
 }

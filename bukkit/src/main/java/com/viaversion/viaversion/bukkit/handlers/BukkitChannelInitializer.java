@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bukkit.handlers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
-import com.viaversion.viaversion.bukkit.classgenerator.HandlerConstructor;
+import com.viaversion.viaversion.classgenerator.generated.HandlerConstructor;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;

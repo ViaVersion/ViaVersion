@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.util;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -79,17 +77,7 @@ public class ConcurrentList<E> extends ArrayList<E> {
     @Override
     public Object clone() {
         synchronized (lock) {
-            try {
-                ConcurrentList<E> clist = (ConcurrentList<E>) super.clone();
-                clist.modCount = 0;
-                Field f = ArrayList.class.getDeclaredField("elementData");
-                f.setAccessible(true);
-                f.set(clist, Arrays.copyOf((Object[]) f.get(this), this.size()));
-
-                return clist;
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
+            return super.clone();
         }
     }
 
