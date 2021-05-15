@@ -199,7 +199,7 @@ public class BukkitViaInjector implements ViaInjector {
     @Override
     public int getServerProtocolVersion() throws Exception {
         if (PaperViaInjector.PAPER_PROTOCOL_METHOD) {
-            // *Trust me, it's safe*
+            //noinspection deprecation
             return Bukkit.getUnsafe().getProtocolVersion();
         }
 

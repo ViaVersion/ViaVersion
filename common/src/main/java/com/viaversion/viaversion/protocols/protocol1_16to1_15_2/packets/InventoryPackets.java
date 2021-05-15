@@ -209,7 +209,7 @@ public class InventoryPackets {
             rewriteAttributeName(attribute, "AttributeName", true);
             rewriteAttributeName(attribute, "Name", true);
             IntArrayTag uuidTag = attribute.get("UUID");
-            if (uuidTag != null) {
+            if (uuidTag != null && uuidTag.getValue().length == 4) {
                 UUID uuid = UUIDIntArrayType.uuidFromIntArray(uuidTag.getValue());
                 attribute.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
                 attribute.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
