@@ -46,6 +46,7 @@ import java.lang.reflect.Method;
 
 //TODO maybe clean this up a bit 👀
 public class ClassGenerator {
+    private static final boolean useModules = hasModuleMethod();
     private static HandlerConstructor constructor = new BasicHandlerConstructor();
     private static String psPackage;
     private static Class psConnectListener;
@@ -95,7 +96,7 @@ public class ClassGenerator {
                 // Import required classes
                 pool.importPackage("com.viaversion.viaversion.classgenerator.generated");
                 pool.importPackage("com.viaversion.viaversion.classgenerator");
-                pool.importPackage("com.viaversion.viaversion.api.data");
+                pool.importPackage("com.viaversion.viaversion.api.connection");
                 pool.importPackage("io.netty.handler.codec");
                 // Implement Methods
                 generated.addMethod(CtMethod.make("public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {\n" +
@@ -105,22 +106,14 @@ public class ClassGenerator {
                         "        return new BukkitDecodeHandler(info, minecraftDecoder);\n" +
                         "    }", generated));
 
-                constructor = (HandlerConstructor) generated.toClass(HandlerConstructor.class.getClassLoader()).newInstance();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (CannotCompileException e) {
-                e.printStackTrace();
-            } catch (NotFoundException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+                constructor = (HandlerConstructor) toClass(generated).newInstance();
+            } catch (ReflectiveOperationException | CannotCompileException | NotFoundException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static Class addSpigotCompatibility(ClassPool pool, Class input, Class superclass) {
+    private static void addSpigotCompatibility(ClassPool pool, Class input, Class superclass) {
         String newName = "com.viaversion.viaversion.classgenerator.generated." + input.getSimpleName();
 
         try {
@@ -146,13 +139,12 @@ public class ClassGenerator {
                     }
                 }
             }
-            return generated.toClass(HandlerConstructor.class);
+            toClass(generated);
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (CannotCompileException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private static void addPSCompatibility(ClassPool pool, Class input, Class superclass) {
@@ -195,7 +187,7 @@ public class ClassGenerator {
                     }
                 }
             }
-            generated.toClass(HandlerConstructor.class);
+            toClass(generated);
         } catch (NotFoundException e) {
             e.printStackTrace();
         } catch (CannotCompileException e) {
@@ -248,7 +240,7 @@ public class ClassGenerator {
                             // In any case, remove the packet listener and wrap up.
                             + "    connection.removePacketListener(this);\n"
                             + "}", connectListenerClazz));
-            return connectListenerClazz.toClass(HandlerConstructor.class);
+            return toClass(connectListenerClazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -318,4 +310,17 @@ public class ClassGenerator {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    private static Class<?> toClass(CtClass ctClass) throws CannotCompileException {
+        return useModules ? ctClass.toClass(HandlerConstructor.class) : ctClass.toClass(HandlerConstructor.class.getClassLoader());
+    }
+
+    private static boolean hasModuleMethod() {
+        try {
+            Class.class.getDeclaredMethod("getModule");
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
 }
