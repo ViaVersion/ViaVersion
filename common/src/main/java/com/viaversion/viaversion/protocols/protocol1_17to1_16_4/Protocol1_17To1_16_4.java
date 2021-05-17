@@ -31,7 +31,6 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.Metadat
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 import com.viaversion.viaversion.rewriter.MetadataRewriter;
 import com.viaversion.viaversion.rewriter.RegistryType;
@@ -235,7 +234,6 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection user) {
-        user.put(new BiomeStorage(user));
         user.put(new EntityTracker1_17(user));
     }
 

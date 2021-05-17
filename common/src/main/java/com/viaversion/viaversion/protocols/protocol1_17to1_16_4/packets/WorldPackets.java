@@ -21,8 +21,9 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_16_2;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
@@ -34,7 +35,6 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.BiomeStorage;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -137,24 +137,19 @@ public class WorldPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     Chunk chunk = wrapper.read(new Chunk1_16_2Type());
+                    if (!chunk.isFullChunk()) {
+                        // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
+                        // Construct multi block change packets instead
+                        writeMultiBlockChangePacket(wrapper, chunk);
+                        wrapper.cancel();
+                        return;
+                    }
+
+                    // Normal full chunk writing
                     wrapper.write(new Chunk1_17Type(chunk.getSections().length), chunk);
 
                     // 1.17 uses a bitset for the mask
                     chunk.setChunkMask(BitSet.valueOf(new long[]{chunk.getBitmask()}));
-
-                    BiomeStorage biomeStorage = wrapper.user().get(BiomeStorage.class);
-                    if (chunk.isFullChunk()) {
-                        biomeStorage.setBiomes(chunk.getX(), chunk.getZ(), chunk.getBiomeData());
-                    } else {
-                        // Biomes always have to be sent now
-                        int[] biomes = biomeStorage.getBiomes(chunk.getX(), chunk.getZ());
-                        if (biomes != null) {
-                            chunk.setBiomeData(biomes);
-                        } else {
-                            Via.getPlatform().getLogger().warning("Biome data not found for chunk at " + chunk.getX() + ", " + chunk.getZ());
-                            chunk.setBiomeData(new int[chunk.getSections().length * 64]);
-                        }
-                    }
 
                     for (int s = 0; s < chunk.getSections().length; s++) {
                         ChunkSection section = chunk.getSections()[s];
@@ -190,11 +185,7 @@ public class WorldPackets {
                     CompoundTag currentDimensionTag = wrapper.get(Type.NBT, 1);
                     addNewDimensionData(currentDimensionTag);
 
-                    // Tracking
-                    String world = wrapper.passthrough(Type.STRING);
-
                     UserConnection user = wrapper.user();
-                    user.get(BiomeStorage.class).setWorld(world);
                     user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.PLAYER);
                 });
             }
@@ -206,30 +197,41 @@ public class WorldPackets {
                 handler(wrapper -> {
                     CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
                     addNewDimensionData(dimensionData);
-
-                    String world = wrapper.passthrough(Type.STRING);
-                    BiomeStorage biomeStorage = wrapper.user().get(BiomeStorage.class);
-                    if (!world.equals(biomeStorage.getWorld())) {
-                        biomeStorage.clearBiomes();
-                    }
-
-                    biomeStorage.setWorld(world);
-                });
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_16_2.UNLOAD_CHUNK, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int x = wrapper.passthrough(Type.INT);
-                    int z = wrapper.passthrough(Type.INT);
-                    wrapper.user().get(BiomeStorage.class).clearBiomes(x, z);
                 });
             }
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_16_2.EFFECT, 1010, 2001);
+    }
+
+    private static void writeMultiBlockChangePacket(PacketWrapper wrapper, Chunk chunk) throws Exception {
+        long chunkPosition = (chunk.getX() & 0x3FFFFFL) << 42;
+        chunkPosition |= (chunk.getZ() & 0x3FFFFFL) << 20;
+
+        ChunkSection[] sections = chunk.getSections();
+        for (int chunkY = 0; chunkY < sections.length; chunkY++) {
+            ChunkSection section = sections[chunkY];
+            if (section == null) continue;
+
+            PacketWrapper blockChangePacket = wrapper.create(ClientboundPackets1_17.MULTI_BLOCK_CHANGE);
+            blockChangePacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
+            blockChangePacket.write(Type.BOOLEAN, true); // Suppress light updates
+
+            //TODO this can be optimized
+            BlockChangeRecord[] blockChangeRecords = new BlockChangeRecord[4096];
+            int j = 0;
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        int blockStateId = Protocol1_17To1_16_4.MAPPINGS.getNewBlockStateId(section.getFlatBlock(x, y, z));
+                        blockChangeRecords[j++] = new BlockChangeRecord1_16_2(x, y, z, blockStateId);
+                    }
+                }
+            }
+
+            blockChangePacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, blockChangeRecords);
+            blockChangePacket.send(Protocol1_17To1_16_4.class, true, true);
+        }
     }
 
     private static void addNewDimensionData(CompoundTag tag) {
