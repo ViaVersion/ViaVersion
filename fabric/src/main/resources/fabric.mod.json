@@ -23,9 +23,13 @@
     "fabricloader": ">=0.4.0"
   },
   "recommends": {
-    "viafabric": ">=0.2.0-SNAPSHOT"
+    "viafabric": ">=0.3.99"
   },
   "custom": {
-    "modmenu:api": true
+    "modmenu:api": true,
+    "modmenu": {
+      "badges": [ "library" ],
+      "parent": "viafabric"
+    }
   }
 }
