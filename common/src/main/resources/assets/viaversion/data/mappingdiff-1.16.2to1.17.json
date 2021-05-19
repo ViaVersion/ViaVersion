@@ -2,6 +2,9 @@
   "blocks": {
     "498": "dirt_path"
   },
+  "sounds": {
+    "item.sweet_berries.pick_from_bush": "block.sweet_berry_bush.pick_berries"
+  },
   "blockstates": {
     "1305": "minecraft:powered_rail[powered=true,shape=north_south,waterlogged=false]",
     "1306": "minecraft:powered_rail[powered=true,shape=east_west,waterlogged=false]",

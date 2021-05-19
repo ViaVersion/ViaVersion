@@ -23362,7 +23362,7 @@
     "entity.stray.step",
     "block.sweet_berry_bush.break",
     "block.sweet_berry_bush.place",
-    "item.sweet_berries.pick_from_bush",
+    "block.sweet_berry_bush.pick_berries",
     "enchant.thorns.hit",
     "entity.tnt.primed",
     "item.totem.use",
