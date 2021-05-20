@@ -57,9 +57,9 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
 
             ChunkSection section = Types1_13.CHUNK_SECTION.read(data);
             sections[i] = section;
-            section.readBlockLight(data);
+            section.getLight().readBlockLight(data);
             if (world.getEnvironment() == Environment.NORMAL) {
-                section.readSkyLight(data);
+                section.getLight().readSkyLight(data);
             }
         }
 
@@ -101,10 +101,10 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
                 ChunkSection section = chunk.getSections()[i];
                 if (section == null) continue; // Section not set
                 Types1_13.CHUNK_SECTION.write(buf, section);
-                section.writeBlockLight(buf);
+                section.getLight().writeBlockLight(buf);
 
-                if (!section.hasSkyLight()) continue; // No sky light, we're done here.
-                section.writeSkyLight(buf);
+                if (!section.getLight().hasSkyLight()) continue; // No sky light, we're done here.
+                section.getLight().writeSkyLight(buf);
 
             }
             buf.readerIndex(0);

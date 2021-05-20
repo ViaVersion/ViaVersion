@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
@@ -198,7 +199,7 @@ public class WorldPackets {
                         heightMap.put("WORLD_SURFACE", new LongArrayTag(encodeHeightMap(worldSurface)));
                         chunk.setHeightMap(heightMap);
 
-                        PacketWrapper lightPacket = wrapper.create(0x24);
+                        PacketWrapper lightPacket = wrapper.create(ClientboundPackets1_14.UPDATE_LIGHT);
                         lightPacket.write(Type.VAR_INT, chunk.getX());
                         lightPacket.write(Type.VAR_INT, chunk.getZ());
 
@@ -207,7 +208,7 @@ public class WorldPackets {
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection sec = chunk.getSections()[i];
                             if (sec == null) continue;
-                            if (!chunk.isFullChunk() && sec.hasSkyLight()) {
+                            if (!chunk.isFullChunk() && sec.getLight().hasSkyLight()) {
                                 skyLightMask |= (1 << (i + 1));
                             }
                             blockLightMask |= (1 << (i + 1));
@@ -223,20 +224,20 @@ public class WorldPackets {
                         if (chunk.isFullChunk())
                             lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk below 0
                         for (ChunkSection section : chunk.getSections()) {
-                            if (section == null || !section.hasSkyLight()) {
+                            if (section == null || !section.getLight().hasSkyLight()) {
                                 if (chunk.isFullChunk()) {
                                     lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT);
                                 }
                                 continue;
                             }
-                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getSkyLight());
+                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getLight().getSkyLight());
                         }
                         if (chunk.isFullChunk())
                             lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk above 255
 
                         for (ChunkSection section : chunk.getSections()) {
                             if (section == null) continue;
-                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getBlockLight());
+                            lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getLight().getBlockLight());
                         }
 
                         EntityTracker1_14 entityTracker = wrapper.user().get(EntityTracker1_14.class);
@@ -254,6 +255,13 @@ public class WorldPackets {
                         }
 
                         lightPacket.send(Protocol1_14To1_13_2.class, true, true);
+
+                        // Remove light references from chunk sections
+                        for (ChunkSection section : chunk.getSections()) {
+                            if (section != null) {
+                                section.setLight(null);
+                            }
+                        }
                     }
 
                     private Byte[] fromPrimitiveArray(byte[] bytes) {
@@ -390,8 +398,8 @@ public class WorldPackets {
         int skyLight = 0;
         int blockLight = 0;
         for (BlockFace blockFace : BlockFace.values()) {
-            NibbleArray skyLightArray = section.getSkyLightNibbleArray();
-            NibbleArray blockLightArray = section.getBlockLightNibbleArray();
+            NibbleArray skyLightArray = section.getLight().getSkyLightNibbleArray();
+            NibbleArray blockLightArray = section.getLight().getBlockLightNibbleArray();
             int neighbourX = x + blockFace.getModX();
             int neighbourY = y + blockFace.getModY();
             int neighbourZ = z + blockFace.getModZ();
@@ -414,8 +422,8 @@ public class WorldPackets {
                     ChunkSection newSection = chunk.getSections()[ySection];
                     if (newSection == null) continue;
 
-                    skyLightArray = newSection.getSkyLightNibbleArray();
-                    blockLightArray = newSection.getBlockLightNibbleArray();
+                    skyLightArray = newSection.getLight().getSkyLightNibbleArray();
+                    blockLightArray = newSection.getLight().getBlockLightNibbleArray();
                 }
             } else if (blockFace.getModZ() != 0) {
                 // Another chunk, nothing we can do without an unnecessary amount of caching
@@ -447,15 +455,15 @@ public class WorldPackets {
         }
 
         if (skyLight != 0) {
-            if (!section.hasSkyLight()) {
+            if (!section.getLight().hasSkyLight()) {
                 byte[] newSkyLight = new byte[2028];
-                section.setSkyLight(newSkyLight);
+                section.getLight().setSkyLight(newSkyLight);
             }
 
-            section.getSkyLightNibbleArray().set(x, y, z, skyLight);
+            section.getLight().getSkyLightNibbleArray().set(x, y, z, skyLight);
         }
         if (blockLight != 0) {
-            section.getBlockLightNibbleArray().set(x, y, z, blockLight);
+            section.getLight().getBlockLightNibbleArray().set(x, y, z, blockLight);
         }
     }
 

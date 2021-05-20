@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import io.netty.buffer.ByteBuf;
@@ -48,12 +49,12 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
         ChunkSection chunkSection;
         if (bitsPerBlock != GLOBAL_PALETTE) {
             int paletteLength = Type.VAR_INT.readPrimitive(buffer);
-            chunkSection = new ChunkSection(paletteLength);
+            chunkSection = new ChunkSectionImpl(false, paletteLength);
             for (int i = 0; i < paletteLength; i++) {
                 chunkSection.addPaletteEntry(Type.VAR_INT.readPrimitive(buffer));
             }
         } else {
-            chunkSection = new ChunkSection();
+            chunkSection = new ChunkSectionImpl(false);
         }
 
         // Read blocks

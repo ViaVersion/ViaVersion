@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
@@ -36,7 +37,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
-        ChunkSection chunkSection = new ChunkSection();
+        ChunkSection chunkSection = new ChunkSectionImpl(true);
         // 0 index needs to be air in 1.9
         chunkSection.addPaletteEntry(0);
 
@@ -46,7 +47,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
             int mask = littleEndianView.readShort();
             int type = mask >> 4;
             int data = mask & 0xF;
-            chunkSection.setBlock(i, type, data);
+            chunkSection.setBlockWithData(i, type, data);
         }
 
         return chunkSection;

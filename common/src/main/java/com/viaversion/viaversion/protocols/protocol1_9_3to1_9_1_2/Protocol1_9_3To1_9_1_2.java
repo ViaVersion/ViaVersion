@@ -111,7 +111,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                             for (int y = 0; y < 16; y++) {
                                 for (int z = 0; z < 16; z++) {
                                     for (int x = 0; x < 16; x++) {
-                                        int block = section.getBlockId(x, y, z);
+                                        int block = section.getBlockWithoutData(x, y, z);
                                         if (FakeTileEntity.hasBlock(block)) {
                                             tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
                                         }

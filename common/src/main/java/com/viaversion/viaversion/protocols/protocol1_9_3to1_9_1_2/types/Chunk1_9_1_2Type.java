@@ -67,9 +67,9 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             if (!usedSections.get(i)) continue; // Section not set
             ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
             sections[i] = section;
-            section.readBlockLight(input);
+            section.getLight().readBlockLight(input);
             if (world.getEnvironment() == Environment.NORMAL) {
-                section.readSkyLight(input);
+                section.getLight().readSkyLight(input);
             }
             if (replacePistons) {
                 section.replacePaletteEntry(36, replacementId);
@@ -100,10 +100,10 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
                 ChunkSection section = chunk.getSections()[i];
                 if (section == null) continue; // Section not set
                 Types1_9.CHUNK_SECTION.write(buf, section);
-                section.writeBlockLight(buf);
+                section.getLight().writeBlockLight(buf);
 
-                if (!section.hasSkyLight()) continue; // No sky light, we're done here.
-                section.writeSkyLight(buf);
+                if (!section.getLight().hasSkyLight()) continue; // No sky light, we're done here.
+                section.getLight().writeSkyLight(buf);
 
             }
             buf.readerIndex(0);

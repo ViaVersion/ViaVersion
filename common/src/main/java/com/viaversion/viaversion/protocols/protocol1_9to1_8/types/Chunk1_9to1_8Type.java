@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
@@ -113,16 +114,16 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
         // Read block light
         for (int i = 0; i < SECTION_COUNT; i++) {
             if (!usedSections.get(i)) continue; // Section not set, has no light
-            sections[i].readBlockLight(input);
+            sections[i].getLight().readBlockLight(input);
         }
 
         // Read sky light
         int bytesLeft = dataLength - (input.readerIndex() - startIndex);
-        if (bytesLeft >= ChunkSection.LIGHT_LENGTH) {
+        if (bytesLeft >= ChunkSectionLight.LIGHT_LENGTH) {
             for (int i = 0; i < SECTION_COUNT; i++) {
                 if (!usedSections.get(i)) continue; // Section not set, has no light
-                sections[i].readSkyLight(input);
-                bytesLeft -= ChunkSection.LIGHT_LENGTH;
+                sections[i].getLight().readSkyLight(input);
+                bytesLeft -= ChunkSectionLight.LIGHT_LENGTH;
             }
         }
 
@@ -162,10 +163,10 @@ public class Chunk1_9to1_8Type extends PartialType<Chunk, ClientChunks> {
                 ChunkSection section = chunk.getSections()[i];
                 if (section == null) continue; // Section not set
                 Types1_9.CHUNK_SECTION.write(buf, section);
-                section.writeBlockLight(buf);
+                section.getLight().writeBlockLight(buf);
 
-                if (!section.hasSkyLight()) continue; // No sky light, we're done here.
-                section.writeSkyLight(buf);
+                if (!section.getLight().hasSkyLight()) continue; // No sky light, we're done here.
+                section.getLight().writeSkyLight(buf);
             }
             buf.readerIndex(0);
             Type.VAR_INT.writePrimitive(output, buf.readableBytes() + (chunk.hasBiomeData() ? 256 : 0));
