@@ -140,6 +140,8 @@ public class WorldPackets {
                     if (!chunk.isFullChunk()) {
                         // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
                         // Construct multi block change packets instead
+                        // Height map updates are lost (unless we want to fully cache and resend entire chunks)
+                        // Block entities are always empty for non-full chunks in Vanilla
                         writeMultiBlockChangePacket(wrapper, chunk);
                         wrapper.cancel();
                         return;
