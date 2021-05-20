@@ -33,35 +33,65 @@ public interface ChunkSectionLight {
     int LIGHT_LENGTH = 16 * 16 * 16 / 2; // Dimensions / 2 (nibble bit count)
 
     /**
-     * Check if sky light is present
+     * Returns whether the section has sky light.
      *
-     * @return True if skylight is present
+     * @return true if skylight is present
      */
     boolean hasSkyLight();
 
+    /**
+     * Returns whether the section has block light.
+     * This returns true unless specifically set to null.
+     *
+     * @return true if skylight is present
+     */
     boolean hasBlockLight();
 
+    /**
+     * Returns the nibblearray's raw sky light byte array if present.
+     *
+     * @return the nibblearray's raw sky light byte array if present
+     * @see #hasSkyLight()
+     */
     byte @Nullable [] getSkyLight();
 
+    /**
+     * Returns the nibblearray's raw block light byte array if present.
+     *
+     * @return the nibblearray's raw block light byte array if present
+     * @see #hasBlockLight()
+     */
     byte @Nullable [] getBlockLight();
 
     /**
-     * Set the sky light array
+     * Set the sky light array.
      *
-     * @param data The value to set the sky light to
+     * @param data raw sky light data
      */
     void setSkyLight(byte[] data);
 
     /**
-     * Set the block light array
+     * Set the block light array.
      *
-     * @param data The value to set the block light to
+     * @param data raw block light data
      */
     void setBlockLight(byte[] data);
 
-    @Nullable NibbleArray getBlockLightNibbleArray();
-
+    /**
+     * Returns the sky light nibblearray.
+     *
+     * @return sky light nibblearray
+     * @see #hasSkyLight()
+     */
     @Nullable NibbleArray getSkyLightNibbleArray();
+
+    /**
+     * Returns the block light nibblearray.
+     *
+     * @return block light nibblearray
+     * @see #hasBlockLight()
+     */
+    @Nullable NibbleArray getBlockLightNibbleArray();
 
     void readSkyLight(ByteBuf input);
 
@@ -70,14 +100,14 @@ public interface ChunkSectionLight {
     /**
      * Write the sky light to a buffer.
      *
-     * @param output The buffer to write to
+     * @param output buffer to write to
      */
     void writeSkyLight(ByteBuf output);
 
     /**
      * Write the block light to a buffer.
      *
-     * @param output The buffer to write to
+     * @param output buffer to write to
      */
     void writeBlockLight(ByteBuf output);
 }

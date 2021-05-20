@@ -134,7 +134,7 @@ public class BaseChunk implements Chunk {
     }
 
     @Override
-    public CompoundTag getHeightMap() {
+    public @Nullable CompoundTag getHeightMap() {
         return heightMap;
     }
 

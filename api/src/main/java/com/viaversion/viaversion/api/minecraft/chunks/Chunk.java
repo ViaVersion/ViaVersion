@@ -30,8 +30,18 @@ import java.util.List;
 
 public interface Chunk {
 
+    /**
+     * Returns the chunk x coordinate.
+     *
+     * @return chunk x coordinate
+     */
     int getX();
 
+    /**
+     * Returns the chunk z coordinate.
+     *
+     * @return chunk z coordinate
+     */
     int getZ();
 
     /**
@@ -72,17 +82,37 @@ public interface Chunk {
 
     void setChunkMask(BitSet chunkSectionMask);
 
-    ChunkSection[] getSections();
+    /**
+     * Returns an array of nullable chunk section entries.
+     *
+     * @return array of nullable chunk sections
+     */
+    @Nullable ChunkSection[] getSections();
 
     void setSections(ChunkSection[] sections);
 
+    /**
+     * Returns the chunk's raw biome data. The format the biomes are stored may vary.
+     *
+     * @return raw biome data
+     */
     int @Nullable [] getBiomeData();
 
     void setBiomeData(int @Nullable [] biomeData);
 
-    CompoundTag getHeightMap();
+    /**
+     * Returns a compoundtag containing the chunk's heightmaps if present.
+     *
+     * @return compoundtag containing heightmaps if present
+     */
+    @Nullable CompoundTag getHeightMap();
 
-    void setHeightMap(CompoundTag heightMap);
+    void setHeightMap(@Nullable CompoundTag heightMap);
 
+    /**
+     * Returns a list of block entities.
+     *
+     * @return list of block entities
+     */
     List<CompoundTag> getBlockEntities();
 }

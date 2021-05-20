@@ -43,21 +43,46 @@ public interface ChunkSection {
         return y << 8 | z << 4 | x;
     }
 
+    /**
+     * Returns the block state of the given index.
+     *
+     * @param idx block index within the section
+     * @return block state of the given index
+     */
     int getFlatBlock(int idx);
 
-    int getFlatBlock(int x, int y, int z);
+    /**
+     * Returns the block state of the section coordinate.
+     *
+     * @param x section x
+     * @param y section y
+     * @param z section z
+     * @return block state of the given section coordinate
+     */
+    default int getFlatBlock(int x, int y, int z) {
+        return getFlatBlock(index(x, y, z));
+    }
 
     /**
-     * Set a block state in the chunk
-     * This method will not update non-air blocks count
+     * Set a block state in the chunk section.
+     * This method will not update non-air blocks count.
      *
-     * @param idx Index
-     * @param id  The raw or flat id of the block
+     * @param idx block index within the section
+     * @param id  raw or flat id of the block state
      */
     void setFlatBlock(int idx, int id);
 
-    default void setFlatBlock(int x, int y, int z, int type) {
-        setFlatBlock(index(x, y, z), type);
+    /**
+     * Set a block state in the chunk section.
+     * This method will not update non-air blocks count.
+     *
+     * @param x  section x
+     * @param y  section y
+     * @param z  section z
+     * @param id raw or flat id of the block state
+     */
+    default void setFlatBlock(int x, int y, int z, int id) {
+        setFlatBlock(index(x, y, z), id);
     }
 
     default int getBlockWithoutData(int x, int y, int z) {
@@ -69,8 +94,8 @@ public interface ChunkSection {
     }
 
     /**
-     * Set a block in the chunks
-     * This method will not update non-air blocks count
+     * Set a block in the chunks.
+     * This method will not update non-air blocks count.
      *
      * @param x    Block X
      * @param y    Block Y
@@ -86,26 +111,80 @@ public interface ChunkSection {
         setFlatBlock(idx, type << 4 | (data & 0xF));
     }
 
+    /**
+     * Sets a block to the given palette index.
+     *
+     * @param idx   block index
+     * @param index palette index
+     */
     void setPaletteIndex(int idx, int index);
 
+    /**
+     * Returns the palette index of the given block index.
+     *
+     * @param idx block index
+     * @return palette index of the given block index
+     */
     int getPaletteIndex(int idx);
 
+    /**
+     * Returns the size of the palette.
+     *
+     * @return palette size
+     */
     int getPaletteSize();
 
+    /**
+     * Returns the block state assigned to the given palette index.
+     *
+     * @param index palette index
+     * @return block state assigned to the given palette index
+     */
     int getPaletteEntry(int index);
 
+    /**
+     * Assigns a block state assigned to the given palette index.
+     *
+     * @param index palette index
+     * @param id    block state
+     */
     void setPaletteEntry(int index, int id);
 
+    /**
+     * Replaces a block state in the palette.
+     *
+     * @param oldId old block state
+     * @param newId new block state
+     */
     void replacePaletteEntry(int oldId, int newId);
 
+    /**
+     * Adds a new block state to the palette.
+     *
+     * @param id block state
+     */
     void addPaletteEntry(int id);
 
+    /**
+     * Clears the palette.
+     */
     void clearPalette();
 
+    /**
+     * Returns the number of non-air blocks in this section.
+     *
+     * @return non-air blocks in this section
+     */
     int getNonAirBlocksCount();
 
     void setNonAirBlocksCount(int nonAirBlocksCount);
 
+    /**
+     * Returns whether this section holds light data.
+     * Only true for &lt 1.14 clients.
+     *
+     * @return whether this section holds light data
+     */
     default boolean hasLight() {
         return getLight() != null;
     }

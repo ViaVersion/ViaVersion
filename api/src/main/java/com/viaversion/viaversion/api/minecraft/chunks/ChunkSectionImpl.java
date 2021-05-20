@@ -65,12 +65,6 @@ public class ChunkSectionImpl implements ChunkSection {
     }
 
     @Override
-    public int getFlatBlock(int x, int y, int z) {
-        int index = blocks[ChunkSection.index(x, y, z)];
-        return palette.getInt(index);
-    }
-
-    @Override
     public void setFlatBlock(int idx, int id) {
         int index = inversePalette.get(id);
         if (index == -1) {
