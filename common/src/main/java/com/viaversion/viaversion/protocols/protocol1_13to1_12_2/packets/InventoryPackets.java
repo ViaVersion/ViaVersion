@@ -595,7 +595,7 @@ public class InventoryPackets {
                         }
                         if (oldId != null) {
                             enchEntry.put("id", new ShortTag(oldId));
-                            enchEntry.put("lvl", new ShortTag((Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                            enchEntry.put("lvl", new ShortTag(((NumberTag) ((CompoundTag) enchantmentEntry).get("lvl")).asShort()));
                             ench.add(enchEntry);
                         }
                     }
@@ -616,7 +616,7 @@ public class InventoryPackets {
                         }
                         if (oldId != null) {
                             enchEntry.put("id", new ShortTag(oldId));
-                            enchEntry.put("lvl", new ShortTag((Short) ((CompoundTag) enchantmentEntry).get("lvl").getValue()));
+                            enchEntry.put("lvl", new ShortTag(((NumberTag) ((CompoundTag) enchantmentEntry).get("lvl")).asShort()));
                             newStoredEnch.add(enchEntry);
                         }
                     }
