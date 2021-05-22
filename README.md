@@ -64,7 +64,7 @@ Please note the [differences in licensing](#license).
 
 Building:
 --------
-After cloning this repository, build the project with Gradle by running `/gradlew build` and take the created jar out of
+After cloning this repository, build the project with Gradle by running `./gradlew build` and take the created jar out of
 the `build/libs` directory.
 
 
