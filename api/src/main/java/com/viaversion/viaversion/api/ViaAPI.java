@@ -46,6 +46,16 @@ import java.util.UUID;
 public interface ViaAPI<T> {
 
     /**
+     * Returns the API version incremented with meaningful API changes.
+     * This includes breaking changes to existing API and larger additions.
+     *
+     * @return API version incremented with meaningful API changes
+     */
+    default int apiVersion() {
+        return 1;
+    }
+
+    /**
      * Returns the server's protocol version info.
      *
      * @return the server's protocol version info

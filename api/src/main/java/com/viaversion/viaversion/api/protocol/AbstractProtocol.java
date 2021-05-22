@@ -336,7 +336,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         return "Protocol:" + getClass().getSimpleName();
     }
 
-    public static class Packet {
+    public static final class Packet {
         private final State state;
         private final int packetId;
 
@@ -374,7 +374,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         }
     }
 
-    public static class ProtocolPacket {
+    public static final class ProtocolPacket {
         private final State state;
         private final int oldID;
         private final int newID;

@@ -181,7 +181,7 @@ public interface ChunkSection {
 
     /**
      * Returns whether this section holds light data.
-     * Only true for &lt 1.14 clients.
+     * Only true for &lt; 1.14 chunks.
      *
      * @return whether this section holds light data
      */
@@ -189,6 +189,12 @@ public interface ChunkSection {
         return getLight() != null;
     }
 
+    /**
+     * Returns the light of the chunk section.
+     * Only present for &lt; 1.14 chunks, otherwise sent separately.
+     *
+     * @return chunk section light if present
+     */
     @Nullable ChunkSectionLight getLight();
 
     void setLight(@Nullable ChunkSectionLight light);
