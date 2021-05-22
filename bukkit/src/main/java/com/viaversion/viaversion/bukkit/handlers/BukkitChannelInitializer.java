@@ -24,18 +24,17 @@ import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.lang.reflect.Method;
 
-public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> {
+public class BukkitChannelInitializer extends ChannelInitializer<Channel> {
 
-    private final ChannelInitializer<SocketChannel> original;
+    private final ChannelInitializer<Channel> original;
     private Method method;
 
-    public BukkitChannelInitializer(ChannelInitializer<SocketChannel> oldInit) {
+    public BukkitChannelInitializer(ChannelInitializer<Channel> oldInit) {
         this.original = oldInit;
         try {
             this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
@@ -45,15 +44,15 @@ public class BukkitChannelInitializer extends ChannelInitializer<SocketChannel> 
         }
     }
 
-    public ChannelInitializer<SocketChannel> getOriginal() {
+    public ChannelInitializer<Channel> getOriginal() {
         return original;
     }
 
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
+    protected void initChannel(Channel channel) throws Exception {
         // Add originals
-        this.method.invoke(this.original, socketChannel);
-        afterChannelInitialize(socketChannel);
+        this.method.invoke(this.original, channel);
+        afterChannelInitialize(channel);
     }
 
     public static void afterChannelInitialize(Channel channel) {

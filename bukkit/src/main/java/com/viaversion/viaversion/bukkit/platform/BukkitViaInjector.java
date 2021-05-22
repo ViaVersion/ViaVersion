@@ -27,10 +27,10 @@ import com.viaversion.viaversion.util.ConcurrentList;
 import com.viaversion.viaversion.util.ListWrapper;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.ReflectionUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -116,7 +116,7 @@ public class BukkitViaInjector implements ViaInjector {
                 bootstrapAcceptor = future.channel().pipeline().first();
             }
             try {
-                ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
                 ChannelInitializer newInit = new BukkitChannelInitializer(oldInit);
 
                 ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
@@ -153,7 +153,7 @@ public class BukkitViaInjector implements ViaInjector {
             for (String name : names) {
                 ChannelHandler handler = future.channel().pipeline().get(name);
                 try {
-                    ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
+                    ChannelInitializer<Channel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
                     if (oldInit instanceof BukkitChannelInitializer) {
                         bootstrapAcceptor = handler;
                     }
@@ -167,7 +167,7 @@ public class BukkitViaInjector implements ViaInjector {
             }
 
             try {
-                ChannelInitializer<SocketChannel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
                 if (oldInit instanceof BukkitChannelInitializer) {
                     ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((BukkitChannelInitializer) oldInit).getOriginal());
                 }
