@@ -90,7 +90,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     out.close();
 
                     if (con.getResponseCode() == 429) {
-                        sender.sendMessage("§4You can only paste ones every minute to protect our systems.");
+                        sender.sendMessage("§4You can only paste once every minute to protect our systems.");
                         return;
                     }
 
