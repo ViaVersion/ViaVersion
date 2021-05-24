@@ -20,11 +20,11 @@ package com.viaversion.viaversion.protocols.protocol1_11to1_10.storage;
 import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
-import com.viaversion.viaversion.data.EntityTracker;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 
 import java.util.Set;
 
-public class EntityTracker1_11 extends EntityTracker {
+public class EntityTracker1_11 extends EntityTrackerBase {
     private final Set<Integer> holograms = Sets.newConcurrentHashSet();
 
     public EntityTracker1_11(UserConnection user) {

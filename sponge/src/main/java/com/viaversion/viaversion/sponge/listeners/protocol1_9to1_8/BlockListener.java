@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8;
 
 import com.viaversion.viaversion.SpongePlugin;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
@@ -38,9 +39,8 @@ public class BlockListener extends ViaSpongeListener {
     public void placeBlock(ChangeBlockEvent.Place e, @Root Player player) {
         if (isOnPipe(player.getUniqueId())) {
             Location loc = e.getTransactions().get(0).getFinal().getLocation().get();
-            getUserConnection(player.getUniqueId())
-                    .get(EntityTracker1_9.class)
-                    .addBlockInteraction(new Position(loc.getBlockX(), (short) loc.getBlockY(), loc.getBlockZ()));
+            EntityTracker1_9 tracker = getUserConnection(player.getUniqueId()).getEntityTracker(Protocol1_9To1_8.class);
+            tracker.addBlockInteraction(new Position(loc.getBlockX(), (short) loc.getBlockY(), loc.getBlockZ()));
         }
     }
 }

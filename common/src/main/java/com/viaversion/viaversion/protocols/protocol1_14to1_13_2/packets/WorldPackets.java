@@ -240,7 +240,7 @@ public class WorldPackets {
                             lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getLight().getBlockLight());
                         }
 
-                        EntityTracker1_14 entityTracker = wrapper.user().get(EntityTracker1_14.class);
+                        EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
                         int diffX = Math.abs(entityTracker.getChunkCenterX() - chunk.getX());
                         int diffZ = Math.abs(entityTracker.getChunkCenterZ() - chunk.getZ());
                         if (entityTracker.isForceSendCenterChunk()
@@ -315,7 +315,7 @@ public class WorldPackets {
 
                         Entity1_14Types entType = Entity1_14Types.PLAYER;
                         // Register Type ID
-                        EntityTracker1_14 tracker = wrapper.user().get(EntityTracker1_14.class);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
                         tracker.addEntity(entityId, entType);
                         tracker.setClientEntityId(entityId);
                     }
@@ -364,7 +364,7 @@ public class WorldPackets {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 0);
                         clientWorld.setEnvironment(dimensionId);
-                        EntityTracker1_14 entityTracker = wrapper.user().get(EntityTracker1_14.class);
+                        EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
                         // The client may reset the center chunk if dimension is changed
                         entityTracker.setForceSendCenterChunk(true);
                     }

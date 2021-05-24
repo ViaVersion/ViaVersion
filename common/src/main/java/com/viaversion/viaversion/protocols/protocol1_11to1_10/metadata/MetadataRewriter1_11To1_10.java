@@ -29,15 +29,15 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 import java.util.Optional;
 
-public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
+public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_10> {
 
     public MetadataRewriter1_11To1_10(Protocol1_11To1_10 protocol) {
-        super(protocol, EntityTracker1_11.class);
+        super(protocol);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
 
         if (type == null) return;
         if (type.is(EntityType.ELDER_GUARDIAN) || type.is(EntityType.GUARDIAN)) { // Guardians
-            int oldid = metadata.getId();
+            int oldid = metadata.id();
             if (oldid == 12) {
                 metadata.setMetaType(MetaType1_9.Boolean);
                 boolean val = (((byte) metadata.getValue()) & 0x02) == 0x02;
@@ -58,7 +58,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
         }
 
         if (type.isOrHasParent(EntityType.ABSTRACT_SKELETON)) { // Skeletons
-            int oldid = metadata.getId();
+            int oldid = metadata.id();
             if (oldid == 12) {
                 metadatas.remove(metadata);
             }
@@ -68,13 +68,13 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
         }
 
         if (type.isOrHasParent(EntityType.ZOMBIE)) { // Zombie | Zombie Villager | Husk
-            if (type.is(EntityType.ZOMBIE, EntityType.HUSK) && metadata.getId() == 14) {
+            if (type.is(EntityType.ZOMBIE, EntityType.HUSK) && metadata.id() == 14) {
                 metadatas.remove(metadata);
             } else {
-                if (metadata.getId() == 15) {
+                if (metadata.id() == 15) {
                     metadata.setId(14);
                 } else {
-                    if (metadata.getId() == 14) {
+                    if (metadata.id() == 14) {
                         metadata.setId(15);
                     }
                 }
@@ -83,7 +83,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
 
         if (type.isOrHasParent(EntityType.ABSTRACT_HORSE)) { // Horses
             // Remap metadata id
-            int oldid = metadata.getId();
+            int oldid = metadata.id();
             if (oldid == 14) { // Type
                 metadatas.remove(metadata);
             }
@@ -99,13 +99,13 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
                 // Normal Horse
             } else {
                 // Remove 15, 16
-                if (metadata.getId() == 15 || metadata.getId() == 16) {
+                if (metadata.id() == 15 || metadata.id() == 16) {
                     metadatas.remove(metadata);
                 }
             }
             if (type.is(EntityType.DONKEY, EntityType.MULE)) {
                 // Chested Horse
-                if (metadata.getId() == 13) {
+                if (metadata.id() == 13) {
                     if ((((byte) metadata.getValue()) & 0x08) == 0x08) {
                         metadatas.add(new Metadata(15, MetaType1_9.Boolean, true));
                     } else {
@@ -116,15 +116,15 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
         }
 
         if (type.is(EntityType.ARMOR_STAND) && Via.getConfig().isHologramPatch()) {
-            Metadata flags = getMetaByIndex(11, metadatas);
-            Metadata customName = getMetaByIndex(2, metadatas);
-            Metadata customNameVisible = getMetaByIndex(3, metadatas);
-            if (metadata.getId() == 0 && flags != null && customName != null && customNameVisible != null) {
+            Metadata flags = metaByIndex(11, metadatas);
+            Metadata customName = metaByIndex(2, metadatas);
+            Metadata customNameVisible = metaByIndex(3, metadatas);
+            if (metadata.id() == 0 && flags != null && customName != null && customNameVisible != null) {
                 byte data = (byte) metadata.getValue();
                 // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
                 if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
                         && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
-                    EntityTracker1_11 tracker = connection.get(EntityTracker1_11.class);
+                    EntityTracker1_11 tracker = tracker(connection);
                     if (!tracker.isHologram(entityId)) {
                         tracker.addHologram(entityId);
                         try {
@@ -147,12 +147,12 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
     }
 
     @Override
-    protected com.viaversion.viaversion.api.minecraft.entities.EntityType getTypeFromId(int type) {
+    protected com.viaversion.viaversion.api.minecraft.entities.EntityType typeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected com.viaversion.viaversion.api.minecraft.entities.EntityType getObjectTypeFromId(int type) {
+    protected com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, true);
     }
 
@@ -240,7 +240,7 @@ public class MetadataRewriter1_11To1_10 extends MetadataRewriter {
 
     public static Optional<Metadata> getById(List<Metadata> metadatas, int id) {
         for (Metadata metadata : metadatas) {
-            if (metadata.getId() == id) return Optional.of(metadata);
+            if (metadata.id() == id) return Optional.of(metadata);
         }
         return Optional.empty();
     }

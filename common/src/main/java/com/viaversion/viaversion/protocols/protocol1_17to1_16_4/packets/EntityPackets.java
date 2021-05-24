@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -24,18 +25,16 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
-import com.viaversion.viaversion.data.EntityTracker;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 
 public class EntityPackets {
 
     public static void register(Protocol1_17To1_16_4 protocol) {
         MetadataRewriter1_17To1_16_4 metadataRewriter = protocol.get(MetadataRewriter1_17To1_16_4.class);
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_16_2.SPAWN_ENTITY, Entity1_17Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16_2.SPAWN_ENTITY, Entity1_17Types.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_MOB);
         metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_17.METADATA_LIST);
@@ -47,7 +46,7 @@ public class EntityPackets {
                     int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
                     wrapper.cancel();
 
-                    EntityTracker entityTracker = wrapper.user().get(EntityTracker1_17.class);
+                    EntityTracker entityTracker = wrapper.user().getEntityTracker(Protocol1_17To1_16_4.class);
                     for (int entityId : entityIds) {
                         entityTracker.removeEntity(entityId);
 

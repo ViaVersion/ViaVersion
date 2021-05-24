@@ -32,7 +32,7 @@ public class EntityPackets {
     public static void register(Protocol protocol) {
         final PacketHandler metaTypeHandler = wrapper -> {
             for (Metadata metadata : wrapper.get(Types1_13_2.METADATA_LIST, 0)) {
-                metadata.setMetaType(MetaType1_13_2.byId(metadata.getMetaType().getTypeID()));
+                metadata.setMetaType(MetaType1_13_2.byId(metadata.metaType().typeId()));
             }
         };
 

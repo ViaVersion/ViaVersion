@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.minecraft.metadata;
 
 import java.util.Objects;
 
-public class Metadata {
+public final class Metadata {
     private int id;
     private MetaType metaType;
     private Object value;
@@ -35,7 +35,7 @@ public class Metadata {
         this.value = value;
     }
 
-    public int getId() {
+    public int id() {
         return id;
     }
 
@@ -43,7 +43,7 @@ public class Metadata {
         this.id = id;
     }
 
-    public MetaType getMetaType() {
+    public MetaType metaType() {
         return metaType;
     }
 
@@ -51,12 +51,12 @@ public class Metadata {
         this.metaType = metaType;
     }
 
-    public Object getValue() {
-        return value;
+    public <T> T value() {
+        return (T) value;
     }
 
-    public <T> T getCastedValue() {
-        return (T) value;
+    public Object getValue() {
+        return value;
     }
 
     public void setValue(Object value) {
@@ -70,7 +70,7 @@ public class Metadata {
 
         Metadata metadata = (Metadata) o;
         if (id != metadata.id) return false;
-        if (!Objects.equals(metaType, metadata.metaType)) return false;
+        if (metaType != metaType) return false;
         return Objects.equals(value, metadata.value);
     }
 

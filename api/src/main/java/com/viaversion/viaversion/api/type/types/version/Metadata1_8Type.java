@@ -37,13 +37,13 @@ public class Metadata1_8Type extends MetaTypeTemplate {
         int typeID = (item & 0xE0) >> 5;
         MetaType1_8 type = MetaType1_8.byId(typeID);
         int id = item & 0x1F;
-        return new Metadata(id, type, type.getType().read(buffer));
+        return new Metadata(id, type, type.type().read(buffer));
     }
 
     @Override
     public void write(ByteBuf buffer, Metadata meta) throws Exception {
-        byte item = (byte) (meta.getMetaType().getTypeID() << 5 | meta.getId() & 0x1F);
+        byte item = (byte) (meta.metaType().typeId() << 5 | meta.id() & 0x1F);
         buffer.writeByte(item);
-        meta.getMetaType().getType().write(buffer, meta.getValue());
+        meta.metaType().type().write(buffer, meta.getValue());
     }
 }

@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 
 public class EntityPackets {
 
@@ -85,7 +84,7 @@ public class EntityPackets {
                                 wrapper.set(Type.INT, 0, data);
 
                                 // Register Type ID
-                                wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, entType);
+                                wrapper.user().getEntityTracker(Protocol1_13To1_12_2.class).addEntity(entityId, entType);
                             }
                         }
                     }
@@ -110,7 +109,7 @@ public class EntityPackets {
                 map(Type.SHORT); // 11 - Velocity Z
                 map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 12 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_13.METADATA_LIST));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST));
             }
         });
 
@@ -126,11 +125,11 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_13.METADATA_LIST, Entity1_13Types.EntityType.PLAYER));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, Entity1_13Types.EntityType.PLAYER));
             }
         });
 
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_12_1.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_12_1.DESTROY_ENTITIES);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_12_1.ENTITY_METADATA, Types1_12.METADATA_LIST, Types1_13.METADATA_LIST);
     }
 }

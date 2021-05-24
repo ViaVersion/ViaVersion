@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -139,7 +140,7 @@ public class PlayerPackets {
 
                         if (mode == 0 || mode == 3 || mode == 4) {
                             String[] players = wrapper.passthrough(Type.STRING_ARRAY); // Players
-                            final EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                            final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             String myName = wrapper.user().getProtocolInfo().getUsername();
                             String teamName = wrapper.get(Type.STRING, 0);
                             for (String player : players) {
@@ -161,7 +162,7 @@ public class PlayerPackets {
                         }
 
                         if (mode == 1) { // Remove team
-                            final EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                            final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             String teamName = wrapper.get(Type.STRING, 0);
                             if (entityTracker.isAutoTeam()
                                     && teamName.equals(entityTracker.getCurrentTeam())) {
@@ -187,7 +188,7 @@ public class PlayerPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityId = wrapper.get(Type.INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityId, Entity1_10Types.EntityType.PLAYER);
                         tracker.setClientEntityId(entityId);
                     }
@@ -202,7 +203,7 @@ public class PlayerPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.setGameMode(GameMode.getById(wrapper.get(Type.UNSIGNED_BYTE, 0))); //Set player gamemode
                     }
                 });
@@ -221,7 +222,7 @@ public class PlayerPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         if (Via.getConfig().isAutoTeam()) {
                             entityTracker.setAutoTeam(true);
                             // Workaround for packet order issue
@@ -367,7 +368,8 @@ public class PlayerPackets {
                         cc.getLoadedChunks().clear();
 
                         int gamemode = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        wrapper.user().get(EntityTracker1_9.class).setGameMode(GameMode.getById(gamemode));
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        tracker.setGameMode(GameMode.getById(gamemode));
                     }
                 });
 
@@ -394,7 +396,8 @@ public class PlayerPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) { //Change gamemode
                             int gamemode = wrapper.get(Type.FLOAT, 0).intValue();
-                            wrapper.user().get(EntityTracker1_9.class).setGameMode(GameMode.getById(gamemode));
+                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                            tracker.setGameMode(GameMode.getById(gamemode));
                         }
                     }
                 });
@@ -496,7 +499,7 @@ public class PlayerPackets {
                         int action = wrapper.get(Type.VAR_INT, 0);
                         if (action == 2) {
                             // cancel any blocking >.>
-                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             if (tracker.isBlocking()) {
                                 if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
                                     tracker.setSecondHand(null);

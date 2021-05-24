@@ -59,7 +59,8 @@ public class CommandBlockProvider implements Provider {
             return;
         PacketWrapper wrapper = PacketWrapper.create(0x1B, null, user); // Entity status
 
-        wrapper.write(Type.INT, user.get(EntityTracker1_9.class).getProvidedEntityId()); // Entity ID
+        EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
+        wrapper.write(Type.INT, tracker.getProvidedEntityId()); // Entity ID
         wrapper.write(Type.BYTE, (byte) 26); // Hardcoded op permission level
 
         wrapper.send(Protocol1_9To1_8.class);

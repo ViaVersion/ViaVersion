@@ -18,9 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.data.MappingData;
@@ -29,8 +31,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPa
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.WorldPackets;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -47,7 +48,8 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
+        metadataRewriter.register();
 
         EntityPackets.register(this);
         PlayerPackets.register(this);
@@ -58,7 +60,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_14.ENTITY_SOUND); // Entity Sound Effect (added somewhere in 1.14)
         soundRewriter.registerSound(ClientboundPackets1_14.SOUND);
 
-        new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_14.STATISTICS);
+        new StatisticsRewriter(this, metadataRewriter::newEntityId).register(ClientboundPackets1_14.STATISTICS);
 
         registerServerbound(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
@@ -82,8 +84,8 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker1_15(userConnection));
+    public void init(UserConnection connection) {
+        addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_15Types.PLAYER));
     }
 
     @Override

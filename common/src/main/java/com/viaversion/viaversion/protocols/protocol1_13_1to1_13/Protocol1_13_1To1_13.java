@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_13_1to1_13;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -27,13 +28,13 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -49,7 +50,8 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        new MetadataRewriter1_13_1To1_13(this);
+        MetadataRewriter1_13_1To1_13 metadataRewriter = new MetadataRewriter1_13_1To1_13(this);
+        metadataRewriter.register();
 
         EntityPackets.register(this);
         InventoryPackets.register(this);
@@ -148,7 +150,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker1_13(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_13Types.EntityType.PLAYER));
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }

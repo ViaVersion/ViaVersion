@@ -57,7 +57,7 @@ public class SpawnPackets {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                     }
                 });
@@ -69,7 +69,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         int typeID = wrapper.get(Type.BYTE, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityID, Entity1_10Types.getTypeFromId(typeID, true));
                         tracker.sendMetadataBuffer(entityID);
                     }
@@ -143,7 +143,7 @@ public class SpawnPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
                         tracker.sendMetadataBuffer(entityID);
                     }
@@ -168,7 +168,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // Currently only lightning uses this
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityID, Entity1_10Types.EntityType.LIGHTNING);
                         tracker.sendMetadataBuffer(entityID);
                     }
@@ -189,7 +189,7 @@ public class SpawnPackets {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                     }
                 });
@@ -201,7 +201,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         int typeID = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityID, Entity1_10Types.getTypeFromId(typeID, false));
                         tracker.sendMetadataBuffer(entityID);
                     }
@@ -225,7 +225,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         if (tracker.hasEntity(entityId)) {
                             protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
@@ -240,7 +240,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.handleMetadata(entityID, metadataList);
                     }
                 });
@@ -257,7 +257,7 @@ public class SpawnPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityID, Entity1_10Types.EntityType.PAINTING);
                         tracker.sendMetadataBuffer(entityID);
                     }
@@ -266,7 +266,7 @@ public class SpawnPackets {
                     @Override
                     public void write(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                     }
                 });
@@ -288,7 +288,7 @@ public class SpawnPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addEntity(entityID, Entity1_10Types.EntityType.PLAYER);
                         tracker.sendMetadataBuffer(entityID);
                     }
@@ -326,7 +326,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         if (tracker.hasEntity(entityId)) {
                             protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
@@ -342,7 +342,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.handleMetadata(entityID, metadataList);
                     }
                 });
@@ -361,7 +361,7 @@ public class SpawnPackets {
                         int[] entities = wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0);
                         for (int entity : entities) {
                             // EntityTracker
-                            wrapper.user().get(EntityTracker1_9.class).removeEntity(entity);
+                            wrapper.user().getEntityTracker(Protocol1_9To1_8.class).removeEntity(entity);
                         }
                     }
                 });

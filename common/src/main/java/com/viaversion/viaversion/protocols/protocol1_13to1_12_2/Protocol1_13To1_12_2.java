@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
@@ -53,10 +54,9 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockE
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -162,7 +162,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_13To1_12_2(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_13To1_12_2(this);
+        metadataRewriter.register();
 
         // Register grouped packet changes
         EntityPackets.register(this);
@@ -422,7 +423,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // Store the player
                         int entityId = wrapper.get(Type.INT, 0);
-                        wrapper.user().get(EntityTracker1_13.class).addEntity(entityId, Entity1_13Types.EntityType.PLAYER);
+                        wrapper.user().getEntityTracker(Protocol1_13To1_12_2.class).addEntity(entityId, Entity1_13Types.EntityType.PLAYER);
 
                         ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
@@ -1045,7 +1046,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker1_13(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_13Types.EntityType.PLAYER));
         userConnection.put(new TabCompleteTracker(userConnection));
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));

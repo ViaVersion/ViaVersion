@@ -18,18 +18,19 @@
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.metadata.MetadataRewriter1_16_2To1_16_1;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.WorldPackets;
-import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.storage.EntityTracker1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -46,16 +47,17 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
+        metadataRewriter.register();
 
         EntityPackets.register(this);
         WorldPackets.register(this);
         InventoryPackets.register(this);
 
-        tagRewriter = new TagRewriter(this, metadataRewriter::getNewEntityId);
+        tagRewriter = new TagRewriter(this, metadataRewriter::newEntityId);
         tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
 
-        new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_16.STATISTICS);
+        new StatisticsRewriter(this, metadataRewriter::newEntityId).register(ClientboundPackets1_16.STATISTICS);
 
         SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
@@ -112,7 +114,7 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker1_16_2(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_16_2Types.PLAYER));
     }
 
     @Override

@@ -26,48 +26,47 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_13;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.InventoryPackets;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 
-public class MetadataRewriter1_13_1To1_13 extends MetadataRewriter {
+public class MetadataRewriter1_13_1To1_13 extends EntityRewriter<Protocol1_13_1To1_13> {
 
     public MetadataRewriter1_13_1To1_13(Protocol1_13_1To1_13 protocol) {
-        super(protocol, EntityTracker1_13.class);
+        super(protocol);
     }
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         // 1.13 changed item to flat item (no data)
-        if (metadata.getMetaType() == MetaType1_13.Slot) {
+        if (metadata.metaType() == MetaType1_13.Slot) {
             InventoryPackets.toClient((Item) metadata.getValue());
-        } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
+        } else if (metadata.metaType() == MetaType1_13.BlockID) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.getMetaType() == MetaType1_13.PARTICLE) {
+        } else if (metadata.metaType() == MetaType1_13.PARTICLE) {
             rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
+        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
             // New block format
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.getId() >= 7) {
-            metadata.setId(metadata.getId() + 1); // New shooter UUID
+        } else if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.id() >= 7) {
+            metadata.setId(metadata.id() + 1); // New shooter UUID
         }
     }
 
     @Override
-    protected EntityType getTypeFromId(int type) {
+    protected EntityType typeFromId(int type) {
         return Entity1_13Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected EntityType getObjectTypeFromId(int type) {
+    protected EntityType objectTypeFromId(int type) {
         return Entity1_13Types.getTypeFromId(type, true);
     }
 }

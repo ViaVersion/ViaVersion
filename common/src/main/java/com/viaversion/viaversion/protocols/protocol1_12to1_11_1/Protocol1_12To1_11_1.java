@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_12Types;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -32,16 +33,16 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
-import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
@@ -52,7 +53,8 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+        metadataRewriter.register();
 
         InventoryPackets.register(this);
 
@@ -64,7 +66,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 map(Type.BYTE); // 2 - Type
 
                 // Track Entity
-                handler(metadataRewriter.getObjectTracker());
+                handler(metadataRewriter.objectTrackerHandler());
             }
         });
 
@@ -86,7 +88,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 map(Types1_12.METADATA_LIST); // 12 - Metadata
 
                 // Track mob and rewrite metadata
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_12.METADATA_LIST));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_12.METADATA_LIST));
             }
         });
 
@@ -153,7 +155,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_12.METADATA_LIST);
 
         registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
@@ -255,7 +257,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker1_12(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_12Types.EntityType.PLAYER));
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }

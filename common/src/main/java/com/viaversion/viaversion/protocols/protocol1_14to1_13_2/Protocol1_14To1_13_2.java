@@ -36,7 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPac
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 
@@ -50,7 +50,8 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
+        metadataRewriter.register();
 
         InventoryPackets.register(this);
         EntityPackets.register(this);
@@ -58,7 +59,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         PlayerPackets.register(this);
 
         new SoundRewriter(this).registerSound(ClientboundPackets1_13.SOUND);
-        new StatisticsRewriter(this, metadataRewriter::getNewEntityId).register(ClientboundPackets1_13.STATISTICS);
+        new StatisticsRewriter(this, metadataRewriter::newEntityId).register(ClientboundPackets1_13.STATISTICS);
 
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
         componentRewriter.registerChatMessage(ClientboundPackets1_13.CHAT_MESSAGE);
@@ -146,7 +147,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new EntityTracker1_14(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTracker1_14(userConnection));
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }

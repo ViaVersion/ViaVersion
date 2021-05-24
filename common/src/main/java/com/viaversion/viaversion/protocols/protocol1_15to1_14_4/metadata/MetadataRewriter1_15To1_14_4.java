@@ -28,41 +28,40 @@ import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 
-public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
+public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<Protocol1_15To1_14_4> {
 
     public MetadataRewriter1_15To1_14_4(Protocol1_15To1_14_4 protocol) {
-        super(protocol, EntityTracker1_15.class);
+        super(protocol);
     }
 
     @Override
     public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-        if (metadata.getMetaType() == MetaType1_14.Slot) {
+        if (metadata.metaType() == MetaType1_14.Slot) {
             InventoryPackets.toClient((Item) metadata.getValue());
-        } else if (metadata.getMetaType() == MetaType1_14.BlockID) {
+        } else if (metadata.metaType() == MetaType1_14.BlockID) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.getMetaType() == MetaType1_13.PARTICLE) {
+        } else if (metadata.metaType() == MetaType1_13.PARTICLE) {
             rewriteParticle((Particle) metadata.getValue());
         }
 
         if (type == null) return;
 
         if (type.isOrHasParent(Entity1_15Types.MINECART_ABSTRACT)
-                && metadata.getId() == 10) {
+                && metadata.id() == 10) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
         // Metadata 12 added to abstract_living
-        if (metadata.getId() > 11 && type.isOrHasParent(Entity1_15Types.LIVINGENTITY)) {
-            metadata.setId(metadata.getId() + 1); //TODO is it 11 or 12? what is it for?
+        if (metadata.id() > 11 && type.isOrHasParent(Entity1_15Types.LIVINGENTITY)) {
+            metadata.setId(metadata.id() + 1); //TODO is it 11 or 12? what is it for?
         }
 
         //NOTES:
@@ -70,21 +69,21 @@ public class MetadataRewriter1_15To1_14_4 extends MetadataRewriter {
         //new boolean with id 17 for enderman
 
         if (type.isOrHasParent(Entity1_15Types.WOLF)) {
-            if (metadata.getId() == 18) {
+            if (metadata.id() == 18) {
                 metadatas.remove(metadata);
-            } else if (metadata.getId() > 18) {
-                metadata.setId(metadata.getId() - 1);
+            } else if (metadata.id() > 18) {
+                metadata.setId(metadata.id() - 1);
             }
         }
     }
 
     @Override
-    public int getNewEntityId(final int oldId) {
+    public int newEntityId(final int oldId) {
         return EntityPackets.getNewEntityId(oldId);
     }
 
     @Override
-    protected EntityType getTypeFromId(int type) {
+    protected EntityType typeFromId(int type) {
         return Entity1_15Types.getTypeFromId(type);
     }
 }

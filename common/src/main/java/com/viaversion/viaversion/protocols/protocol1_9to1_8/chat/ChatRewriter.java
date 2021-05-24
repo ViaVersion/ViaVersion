@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.chat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 
 public class ChatRewriter {
@@ -32,7 +33,8 @@ public class ChatRewriter {
     public static void toClient(JsonObject obj, UserConnection user) {
         //Check gamemode change
         if (obj.get("translate") != null && obj.get("translate").getAsString().equals("gameMode.changed")) {
-            String gameMode = user.get(EntityTracker1_9.class).getGameMode().getText();
+            EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
+            String gameMode = tracker.getGameMode().getText();
 
             JsonObject gameModeObject = new JsonObject();
             gameModeObject.addProperty("text", gameMode);

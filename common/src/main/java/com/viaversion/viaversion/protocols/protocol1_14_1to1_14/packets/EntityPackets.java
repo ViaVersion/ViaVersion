@@ -47,11 +47,11 @@ public class EntityPackets {
                 map(Type.SHORT); // 11 - Velocity Z
                 map(Types1_14.METADATA_LIST); // 12 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_14.METADATA_LIST));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST));
             }
         });
 
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_14.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.DESTROY_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_14.SPAWN_PLAYER, new PacketRemapper() {
             @Override
@@ -65,7 +65,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_14.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_14.METADATA_LIST, Entity1_14Types.PLAYER));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST, Entity1_14Types.PLAYER));
             }
         });
 

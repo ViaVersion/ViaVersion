@@ -20,41 +20,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.metadata.types;
+package com.viaversion.viaversion.api.data.entity;
 
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public enum MetaType1_8 implements MetaType {
-    Byte(0, Type.BYTE),
-    Short(1, Type.SHORT),
-    Int(2, Type.INT),
-    Float(3, Type.FLOAT),
-    String(4, Type.STRING),
-    Slot(5, Type.ITEM),
-    Position(6, Type.VECTOR),
-    Rotation(7, Type.ROTATION),
-    NonExistent(-1, Type.NOTHING);
+public interface StoredEntityData {
 
-    private final int typeID;
-    private final Type type;
+    /**
+     * Returns the entity type of the stored entity.
+     *
+     * @return entity type
+     */
+    EntityType type();
 
-    MetaType1_8(int typeID, Type type) {
-        this.typeID = typeID;
-        this.type = type;
-    }
+    /**
+     * Checks if the storage contains an object of the given type.
+     *
+     * @param objectClass object class to check
+     * @return whether an object of the given type is in the storage
+     */
+    boolean has(Class<?> objectClass);
 
-    public static MetaType1_8 byId(int id) {
-        return values()[id];
-    }
+    /**
+     * Returns an object from the storage if present.
+     *
+     * @param objectClass class of the object to get
+     * @param <T>         object type
+     * @return object if present
+     */
+    @Nullable <T> T get(Class<T> objectClass);
 
-    @Override
-    public int typeId() {
-        return typeID;
-    }
-
-    @Override
-    public Type type() {
-        return type;
-    }
+    /**
+     * Stores an object based on its class.
+     *
+     * @param object object to store
+     */
+    void put(Object object);
 }

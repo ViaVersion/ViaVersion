@@ -24,15 +24,14 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.BedRewriter;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
-import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.EntityTracker1_12;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 
-public class MetadataRewriter1_12To1_11_1 extends MetadataRewriter {
+public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<Protocol1_12To1_11_1> {
 
     public MetadataRewriter1_12To1_11_1(Protocol1_12To1_11_1 protocol) {
-        super(protocol, EntityTracker1_12.class);
+        super(protocol);
     }
 
     @Override
@@ -45,19 +44,19 @@ public class MetadataRewriter1_12To1_11_1 extends MetadataRewriter {
         if (type == null) return;
         // Evocation Illager aggressive property became 13
         if (type == Entity1_12Types.EntityType.EVOCATION_ILLAGER) {
-            if (metadata.getId() == 12) {
+            if (metadata.id() == 12) {
                 metadata.setId(13);
             }
         }
     }
 
     @Override
-    protected EntityType getTypeFromId(int type) {
+    protected EntityType typeFromId(int type) {
         return Entity1_12Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected EntityType getObjectTypeFromId(int type) {
+    protected EntityType objectTypeFromId(int type) {
         return Entity1_12Types.getTypeFromId(type, true);
     }
 }

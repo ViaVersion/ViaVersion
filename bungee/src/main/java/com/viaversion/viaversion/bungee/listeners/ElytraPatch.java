@@ -45,7 +45,8 @@ public class ElytraPatch implements Listener {
 
         try {
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
-                int entityId = user.get(EntityTracker1_9.class).getProvidedEntityId();
+                EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
+                int entityId = tracker.getProvidedEntityId();
 
                 PacketWrapper wrapper = PacketWrapper.create(0x39, null, user);
 

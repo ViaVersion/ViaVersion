@@ -54,12 +54,12 @@ public enum MetaType1_9 implements MetaType {
     }
 
     @Override
-    public int getTypeID() {
+    public int typeId() {
         return typeID;
     }
 
     @Override
-    public Type getType() {
+    public Type type() {
         return type;
     }
 }

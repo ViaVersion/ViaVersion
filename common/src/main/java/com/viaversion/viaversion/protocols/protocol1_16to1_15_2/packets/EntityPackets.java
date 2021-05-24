@@ -35,7 +35,6 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.EntityTracker1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 
 import java.util.UUID;
@@ -152,7 +151,7 @@ public class EntityPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     int entityId = wrapper.passthrough(Type.VAR_INT);
-                    wrapper.user().get(EntityTracker1_16.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
+                    wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
 
                     wrapper.write(Type.UUID, UUID.randomUUID()); // uuid
                     wrapper.write(Type.VAR_INT, Entity1_16Types.LIGHTNING_BOLT.getId()); // entity type
@@ -172,11 +171,11 @@ public class EntityPackets {
             }
         });
 
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_MOB);
         metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, Entity1_16Types.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST);
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_15.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_15.DESTROY_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketRemapper() {
             @Override
@@ -209,7 +208,7 @@ public class EntityPackets {
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Max players
                 handler(wrapper -> {
-                    wrapper.user().get(EntityTracker1_16.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.PLAYER);
+                    wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.PLAYER);
 
                     final String type = wrapper.read(Type.STRING);// level type
                     wrapper.passthrough(Type.VAR_INT); // View distance

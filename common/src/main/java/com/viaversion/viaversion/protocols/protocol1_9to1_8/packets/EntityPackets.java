@@ -64,7 +64,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN, new ValueTransformer<Boolean, Void>(Type.NOTHING) {
                     @Override
                     public Void transform(PacketWrapper wrapper, Boolean inputValue) throws Exception {
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         if (!inputValue) {
                             int passenger = wrapper.get(Type.INT, 0);
                             int vehicle = wrapper.get(Type.INT, 1);
@@ -108,7 +108,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (Via.getConfig().isHologramPatch()) {
-                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             if (tracker.getKnownHolograms().contains(entityID)) {
                                 Double newValue = wrapper.get(Type.DOUBLE, 1);
                                 newValue += (Via.getConfig().getHologramYOffset());
@@ -158,7 +158,7 @@ public class EntityPackets {
                     @Override
                     public Integer transform(PacketWrapper wrapper, Short slot) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        int receiverId = wrapper.user().get(EntityTracker1_9.class).getClientEntityId();
+                        int receiverId = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId();
                         // Normally, 0 = hand and 1-4 = armor
                         // ... but if the sent id is equal to the receiver's id, 0-3 will instead mark the armor slots
                         // (In 1.9+, every client treats the received the same: 0=hand, 1=offhand, 2-5=armor)
@@ -181,7 +181,7 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         Item stack = wrapper.get(Type.ITEM, 0);
 
@@ -207,7 +207,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         if (tracker.hasEntity(entityId)) {
                             protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                         } else {
@@ -224,7 +224,7 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
                         int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.handleMetadata(entityID, metadataList);
                     }
                 });
@@ -288,7 +288,9 @@ public class EntityPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         if (!Via.getConfig().isMinimizeCooldown()) return;
-                        if (wrapper.get(Type.VAR_INT, 0) != wrapper.user().get(EntityTracker1_9.class).getProvidedEntityId()) {
+
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        if (wrapper.get(Type.VAR_INT, 0) != tracker.getProvidedEntityId()) {
                             return;
                         }
                         int propertiesToRead = wrapper.read(Type.INT);

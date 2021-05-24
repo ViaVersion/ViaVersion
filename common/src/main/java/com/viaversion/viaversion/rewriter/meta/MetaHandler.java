@@ -1,5 +1,5 @@
 /*
- * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * This file is part of ViaBackwards - https://github.com/ViaVersion/ViaBackwards
  * Copyright (C) 2016-2021 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,15 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_14_1to1_14.storage;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
-import com.viaversion.viaversion.data.EntityTracker;
+package com.viaversion.viaversion.rewriter.meta;
 
-public class EntityTracker1_14_1 extends EntityTracker {
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 
-    public EntityTracker1_14_1(UserConnection user) {
-        super(user, Entity1_14Types.PLAYER);
-    }
+@FunctionalInterface
+public interface MetaHandler {
+
+    /**
+     * Handles a metadata entry of an entity.
+     *
+     * @param event metadata event
+     * @param meta  metadata, convenience field for {@link MetaHandlerEvent#meta()}
+     */
+    void handle(MetaHandlerEvent event, Metadata meta);
 }

@@ -48,7 +48,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlock
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
@@ -108,7 +108,8 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
+        metadataRewriter.register();
 
         // Disconnect workaround (JSON!)
         registerClientbound(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
@@ -146,7 +147,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     @Override
     public void init(UserConnection userConnection) {
         // Entity tracker
-        userConnection.put(new EntityTracker1_9(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTracker1_9(userConnection));
         // Chunk tracker
         userConnection.put(new ClientChunks(userConnection));
         // Movement tracker

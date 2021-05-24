@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.platform;
+package com.viaversion.viaversion.api.data.entity;
 
-public interface ExternalJoinGameListener {
+public interface ClientEntityIdChangeListener {
 
-    void onExternalJoinGame(int playerEntityId);
+    void setClientEntityId(int entityId);
 }

@@ -20,10 +20,10 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -32,7 +32,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.data.EntityTracker;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.GameMode;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -48,7 +48,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class EntityTracker1_9 extends EntityTracker {
+public class EntityTracker1_9 extends EntityTrackerBase {
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
@@ -84,11 +84,11 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public void setSecondHand(Item item) {
-        setSecondHand(getClientEntityId(), item);
+        setSecondHand(clientEntityId(), item);
     }
 
     public void setSecondHand(int entityID, Item item) {
-        PacketWrapper wrapper = PacketWrapper.create(0x3C, null, getUser());
+        PacketWrapper wrapper = PacketWrapper.create(0x3C, null, user());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, this.itemInSecondHand = item);
@@ -124,7 +124,7 @@ public class EntityTracker1_9 extends EntityTracker {
      * @return player has a sword in the main hand
      */
     public boolean hasSwordInHand() {
-        InventoryTracker inventoryTracker = getUser().get(InventoryTracker.class);
+        InventoryTracker inventoryTracker = user().get(InventoryTracker.class);
 
         // Get item in new selected slot
         int inventorySlot = this.heldItemSlot + 36; // Hotbar slot index to inventory slot
@@ -147,7 +147,7 @@ public class EntityTracker1_9 extends EntityTracker {
         if (bar != null) {
             bar.hide();
             // Send to provider
-            Via.getManager().getProviders().get(BossBarProvider.class).handleRemove(getUser(), bar.getId());
+            Via.getManager().getProviders().get(BossBarProvider.class).handleRemove(user(), bar.getId());
         }
     }
 
@@ -160,7 +160,7 @@ public class EntityTracker1_9 extends EntityTracker {
     }
 
     public void handleMetadata(int entityId, List<Metadata> metadataList) {
-        com.viaversion.viaversion.api.minecraft.entities.EntityType type = getEntity(entityId);
+        com.viaversion.viaversion.api.minecraft.entities.EntityType type = entityType(entityId);
         if (type == null) {
             return;
         }
@@ -168,14 +168,14 @@ public class EntityTracker1_9 extends EntityTracker {
         for (Metadata metadata : new ArrayList<>(metadataList)) {
             // Fix: wither (crash fix)
             if (type == EntityType.WITHER) {
-                if (metadata.getId() == 10) {
+                if (metadata.id() == 10) {
                     metadataList.remove(metadata);
                     //metadataList.add(new Metadata(10, NewType.Byte.getTypeID(), Type.BYTE, 0));
                 }
             }
             // Fix: enderdragon (crash fix)
             if (type == EntityType.ENDER_DRAGON) {
-                if (metadata.getId() == 11) {
+                if (metadata.id() == 11) {
                     metadataList.remove(metadata);
                     //   metadataList.add(new Metadata(11, NewType.Byte.getTypeID(), Type.VAR_INT, 0));
                 }
@@ -190,12 +190,12 @@ public class EntityTracker1_9 extends EntityTracker {
             //ECHOPET Patch
             if (type == EntityType.HORSE) {
                 // Wrong metadata value from EchoPet, patch since it's discontinued. (https://github.com/DSH105/EchoPet/blob/06947a8b08ce40be9a518c2982af494b3b99d140/modules/API/src/main/java/com/dsh105/echopet/compat/api/entity/HorseArmour.java#L22)
-                if (metadata.getId() == 16 && (int) metadata.getValue() == Integer.MIN_VALUE)
+                if (metadata.id() == 16 && (int) metadata.getValue() == Integer.MIN_VALUE)
                     metadata.setValue(0);
             }
 
             if (type == EntityType.PLAYER) {
-                if (metadata.getId() == 0) {
+                if (metadata.id() == 0) {
                     // Byte
                     byte data = (byte) metadata.getValue();
                     if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
@@ -211,7 +211,7 @@ public class EntityTracker1_9 extends EntityTracker {
                         }
                     }
                 }
-                if (metadata.getId() == 12 && Via.getConfig().isLeftHandedHandling()) { // Player model
+                if (metadata.id() == 12 && Via.getConfig().isLeftHandedHandling()) { // Player model
                     metadataList.add(new Metadata(
                             13, // Main hand
                             MetaType1_9.Byte,
@@ -220,7 +220,7 @@ public class EntityTracker1_9 extends EntityTracker {
                 }
             }
             if (type == EntityType.ARMOR_STAND && Via.getConfig().isHologramPatch()) {
-                if (metadata.getId() == 0 && getMetaByIndex(metadataList, 10) != null) {
+                if (metadata.id() == 0 && getMetaByIndex(metadataList, 10) != null) {
                     Metadata meta = getMetaByIndex(metadataList, 10); //Only happens if the armorstand is small
                     byte data = (byte) metadata.getValue();
                     // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
@@ -233,7 +233,7 @@ public class EntityTracker1_9 extends EntityTracker {
                             knownHolograms.add(entityId);
                             try {
                                 // Send movement
-                                PacketWrapper wrapper = PacketWrapper.create(0x25, null, getUser());
+                                PacketWrapper wrapper = PacketWrapper.create(0x25, null, user());
                                 wrapper.write(Type.VAR_INT, entityId);
                                 wrapper.write(Type.SHORT, (short) 0);
                                 wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
@@ -249,22 +249,22 @@ public class EntityTracker1_9 extends EntityTracker {
             // Boss bar
             if (Via.getConfig().isBossbarPatch()) {
                 if (type == EntityType.ENDER_DRAGON || type == EntityType.WITHER) {
-                    if (metadata.getId() == 2) {
+                    if (metadata.id() == 2) {
                         BossBar bar = bossBarMap.get(entityId);
                         String title = (String) metadata.getValue();
                         title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
                         if (bar == null) {
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
-                            bar.addConnection(getUser());
+                            bar.addConnection(user());
                             bar.show();
 
                             // Send to provider
-                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(getUser(), bar.getId());
+                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(user(), bar.getId());
                         } else {
                             bar.setTitle(title);
                         }
-                    } else if (metadata.getId() == 6 && !Via.getConfig().isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
+                    } else if (metadata.id() == 6 && !Via.getConfig().isBossbarAntiflicker()) { // If anti flicker is enabled, don't update health
                         BossBar bar = bossBarMap.get(entityId);
                         // Make health range between 0 and 1
                         float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
@@ -273,10 +273,10 @@ public class EntityTracker1_9 extends EntityTracker {
                             String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
-                            bar.addConnection(getUser());
+                            bar.addConnection(user());
                             bar.show();
                             // Send to provider
-                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(getUser(), bar.getId());
+                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(user(), bar.getId());
                         } else {
                             bar.setHealth(health);
                         }
@@ -288,14 +288,14 @@ public class EntityTracker1_9 extends EntityTracker {
 
     public Metadata getMetaByIndex(List<Metadata> list, int index) {
         for (Metadata meta : list)
-            if (index == meta.getId()) {
+            if (index == meta.id()) {
                 return meta;
             }
         return null;
     }
 
     public void sendTeamPacket(boolean add, boolean now) {
-        PacketWrapper wrapper = PacketWrapper.create(0x41, null, getUser());
+        PacketWrapper wrapper = PacketWrapper.create(0x41, null, user());
         wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
         if (add) {
             // add
@@ -311,7 +311,7 @@ public class EntityTracker1_9 extends EntityTracker {
             } else {
                 wrapper.write(Type.BYTE, (byte) 3);
             }
-            wrapper.write(Type.STRING_ARRAY, new String[]{getUser().getProtocolInfo().getUsername()});
+            wrapper.write(Type.STRING_ARRAY, new String[]{user().getProtocolInfo().getUsername()});
         } else {
             wrapper.write(Type.BYTE, (byte) 1); // remove team
         }
@@ -335,11 +335,11 @@ public class EntityTracker1_9 extends EntityTracker {
     public void sendMetadataBuffer(int entityId) {
         List<Metadata> metadataList = metadataBuffer.get(entityId);
         if (metadataList != null) {
-            PacketWrapper wrapper = PacketWrapper.create(0x39, null, getUser());
+            PacketWrapper wrapper = PacketWrapper.create(0x39, null, user());
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
             Via.getManager().getProtocolManager().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
-                    .handleMetadata(entityId, metadataList, getUser());
+                    .handleMetadata(entityId, metadataList, user());
             handleMetadata(entityId, metadataList);
             if (!metadataList.isEmpty()) {
                 try {
@@ -354,9 +354,9 @@ public class EntityTracker1_9 extends EntityTracker {
 
     public int getProvidedEntityId() {
         try {
-            return Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(getUser());
+            return Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(user());
         } catch (Exception e) {
-            return getClientEntityId();
+            return clientEntityId();
         }
     }
 

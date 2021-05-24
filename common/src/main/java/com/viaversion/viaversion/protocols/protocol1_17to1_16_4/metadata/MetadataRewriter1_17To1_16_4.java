@@ -17,73 +17,51 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_17;
-import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-import java.util.List;
-
-public class MetadataRewriter1_17To1_16_4 extends MetadataRewriter {
+public class MetadataRewriter1_17To1_16_4 extends EntityRewriter {
 
     public MetadataRewriter1_17To1_16_4(Protocol1_17To1_16_4 protocol) {
-        super(protocol, EntityTracker1_17.class);
+        super(protocol);
         mapTypes(Entity1_16_2Types.values(), Entity1_17Types.class);
     }
 
     @Override
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-        metadata.setMetaType(MetaType1_17.byId(metadata.getMetaType().getTypeID()));
-        if (metadata.getMetaType() == MetaType1_17.Slot) {
-            InventoryPackets.toClient((Item) metadata.getValue());
-        } else if (metadata.getMetaType() == MetaType1_17.BlockID) {
-            int data = (int) metadata.getValue();
-            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.getMetaType() == MetaType1_17.PARTICLE) {
-            rewriteParticle((Particle) metadata.getValue());
-        } else if (metadata.getMetaType() == MetaType1_17.Pose) {
-            int pose = metadata.getCastedValue();
-            if (pose > 5) {
-                // Added LONG_JUMP at 6
-                metadata.setValue(pose + 1);
+    protected void registerRewrites() {
+        filter().handler((event, meta) -> {
+            meta.setMetaType(MetaType1_17.byId(meta.metaType().typeId()));
+
+            if (meta.metaType() == MetaType1_17.Pose) {
+                int pose = meta.value();
+                if (pose > 5) {
+                    // Added LONG_JUMP at 6
+                    meta.setValue(pose + 1);
+                }
             }
-        }
+        });
+        registerDumMetaTypeHandler(MetaType1_17.Slot, MetaType1_17.BlockID, MetaType1_17.PARTICLE, InventoryPackets::toClient);
 
-        if (type == null) return;
+        // Ticks frozen added with id 7
+        filter().filterFamily(Entity1_17Types.ENTITY).addIndex(7);
 
-        if (type.isOrHasParent(Entity1_17Types.ENTITY)) {
-            if (metadata.getId() >= 7) {
-                metadata.setId(metadata.getId() + 1); // Ticks frozen added with id 7
-            }
-        }
-
-        if (type.isOrHasParent(Entity1_17Types.MINECART_ABSTRACT)
-                && metadata.getId() == 11) {
+        filter().filterFamily(Entity1_17Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
-            int data = (int) metadata.getValue();
-            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        }
+            int data = (int) meta.getValue();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
 
-        if (type == Entity1_17Types.SHULKER) {
-            // Attachment position removed
-            if (metadata.getId() == 16) {
-                metadatas.remove(metadata);
-            } else if (metadata.getId() > 16) {
-                metadata.setId(metadata.getId() - 1);
-            }
-        }
+        // Attachment position removed
+        filter().type(Entity1_17Types.SHULKER).removeIndex(16);
     }
 
     @Override
-    protected EntityType getTypeFromId(int type) {
+    protected EntityType typeFromId(int type) {
         return Entity1_17Types.getTypeFromId(type);
     }
 }

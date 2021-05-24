@@ -23,6 +23,8 @@
 package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.exception.CancelException;
@@ -32,6 +34,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -61,6 +64,30 @@ public interface UserConnection {
      * @param object The object to store.
      */
     void put(StoredObject object);
+
+    /**
+     * Returns a collection of entity trackers currently registered.
+     *
+     * @return collection of entity trackers currently registered
+     */
+    Collection<EntityTracker> getEntityTrackers();
+
+    /**
+     * Returns the entity tracker by the given protocol class if present.
+     *
+     * @param protocolClass protocol class
+     * @param <T>           entity tracker type
+     * @return entity tracker if present
+     */
+    @Nullable <T extends EntityTracker> T getEntityTracker(Class<? extends Protocol> protocolClass);
+
+    /**
+     * Adds an entity tracker to the user connection.
+     *
+     * @param protocolClass protocol class
+     * @param tracker       entity tracker
+     */
+    void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
 
     /**
      * Clear all the stored objects.

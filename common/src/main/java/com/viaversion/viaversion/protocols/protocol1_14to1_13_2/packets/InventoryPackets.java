@@ -158,7 +158,8 @@ public class InventoryPackets {
                             wrapper.read(Type.STRING); // Remove channel
 
                             int windowId = wrapper.read(Type.INT);
-                            wrapper.user().get(EntityTracker1_14.class).setLatestTradeWindowId(windowId);
+                            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
+                            tracker.setLatestTradeWindowId(windowId);
                             wrapper.write(Type.VAR_INT, windowId);
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
@@ -233,7 +234,8 @@ public class InventoryPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         // Selecting trade now moves the items, we need to resync the inventory
                         PacketWrapper resyncPacket = wrapper.create(0x08);
-                        resyncPacket.write(Type.UNSIGNED_BYTE, ((short) wrapper.user().get(EntityTracker1_14.class).getLatestTradeWindowId())); // 0 - Window ID
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
+                        resyncPacket.write(Type.UNSIGNED_BYTE, ((short) tracker.getLatestTradeWindowId())); // 0 - Window ID
                         resyncPacket.write(Type.SHORT, ((short) -999)); // 1 - Slot
                         resyncPacket.write(Type.BYTE, (byte) 2); // 2 - Button - End left click
                         resyncPacket.write(Type.SHORT, ((short) ThreadLocalRandom.current().nextInt())); // 3 - Action number

@@ -113,7 +113,7 @@ public class WorldPackets {
                         wrapper.set(Type.STRING, 0, newname);
                         wrapper.write(Type.VAR_INT, catid); // Write Category ID
                         if (effect != null && effect.isBreaksound()) {
-                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             int x = wrapper.passthrough(Type.INT); //Position X
                             int y = wrapper.passthrough(Type.INT); //Position Y
                             int z = wrapper.passthrough(Type.INT); //Position Z
@@ -278,7 +278,7 @@ public class WorldPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
                         if (status == 5 || status == 4 || status == 3) {
-                            EntityTracker1_9 entityTracker = wrapper.user().get(EntityTracker1_9.class);
+                            EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             if (entityTracker.isBlocking()) {
                                 entityTracker.setBlocking(false);
                                 if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
@@ -308,7 +308,7 @@ public class WorldPackets {
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         // Blocking patch
                         if (Via.getConfig().isShieldBlocking()) {
-                            EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
 
                             // Check if the shield is already there or if we have to give it here
                             boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand();
@@ -412,7 +412,7 @@ public class WorldPackets {
                                 x++;
                                 break;
                         }
-                        EntityTracker1_9 tracker = wrapper.user().get(EntityTracker1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.addBlockInteraction(new Position(x, y, z));
                     }
                 });

@@ -22,6 +22,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -35,7 +37,9 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -48,6 +52,7 @@ public class UserConnectionImpl implements UserConnection {
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
     private final Map<Class<?>, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new HashMap<>();
     private final PacketTracker packetTracker = new PacketTracker(this);
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
@@ -89,6 +94,21 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public void put(StoredObject object) {
         storedObjects.put(object.getClass(), object);
+    }
+
+    @Override
+    public Collection<EntityTracker> getEntityTrackers() {
+        return entityTrackers.values();
+    }
+
+    @Override
+    public @Nullable <T extends EntityTracker> T getEntityTracker(Class<? extends Protocol> protocolClass) {
+        return (T) entityTrackers.get(protocolClass);
+    }
+
+    @Override
+    public void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker) {
+        entityTrackers.put(protocolClass, tracker);
     }
 
     @Override

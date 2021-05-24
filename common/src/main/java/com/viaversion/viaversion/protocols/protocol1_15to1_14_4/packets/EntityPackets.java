@@ -27,8 +27,7 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage.EntityTracker1_15;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class EntityPackets {
     public static void register(Protocol1_15To1_14_4 protocol) {
         MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
 
-        metadataRewriter.registerSpawnTrackerWithData(ClientboundPackets1_14.SPAWN_ENTITY, Entity1_15Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_14.SPAWN_ENTITY, Entity1_15Types.FALLING_BLOCK);
 
         protocol.registerClientbound(ClientboundPackets1_14.SPAWN_MOB, new PacketRemapper() {
             @Override
@@ -55,7 +54,7 @@ public class EntityPackets {
                 map(Type.SHORT); // 10 - Velocity Y
                 map(Type.SHORT); // 11 - Velocity Z
 
-                handler(metadataRewriter.getTracker());
+                handler(metadataRewriter.trackerHandler());
                 handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Type.VAR_INT, 0), metadataRewriter));
             }
         });
@@ -73,7 +72,7 @@ public class EntityPackets {
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker1_15.class).addEntity(entityId, Entity1_15Types.PLAYER);
+                    wrapper.user().getEntityTracker(Protocol1_15To1_14_4.class).addEntity(entityId, Entity1_15Types.PLAYER);
 
                     sendMetadataPacket(wrapper, entityId, metadataRewriter);
                 });
@@ -81,10 +80,10 @@ public class EntityPackets {
         });
 
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.ENTITY_METADATA, Types1_14.METADATA_LIST);
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_14.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.DESTROY_ENTITIES);
     }
 
-    private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, MetadataRewriter rewriter) throws Exception {
+    private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, EntityRewriter rewriter) throws Exception {
         // Meta is no longer included in the spawn packets, but sent separately
         List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
 

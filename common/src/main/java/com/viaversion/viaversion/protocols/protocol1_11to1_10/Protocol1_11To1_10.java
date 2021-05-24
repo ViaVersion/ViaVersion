@@ -39,7 +39,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
 
@@ -57,7 +57,8 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
     @Override
     protected void registerPackets() {
-        MetadataRewriter metadataRewriter = new MetadataRewriter1_11To1_10(this);
+        EntityRewriter metadataRewriter = new MetadataRewriter1_11To1_10(this);
+        metadataRewriter.register();
 
         InventoryPackets.register(this);
 
@@ -69,7 +70,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.BYTE); // 2 - Type
 
                 // Track Entity
-                handler(metadataRewriter.getObjectTracker());
+                handler(metadataRewriter.objectTrackerHandler());
             }
         });
 
@@ -102,7 +103,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                             wrapper.set(Type.VAR_INT, 1, entType.getId());
 
                             // Register Type ID
-                            wrapper.user().get(EntityTracker1_11.class).addEntity(entityId, entType);
+                            wrapper.user().getEntityTracker(Protocol1_11To1_10.class).addEntity(entityId, entType);
                             metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
                         }
                     }
@@ -145,7 +146,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         if (Via.getConfig().isHologramPatch()) {
-                            EntityTracker1_11 tracker = wrapper.user().get(EntityTracker1_11.class);
+                            EntityTracker1_11 tracker = wrapper.user().getEntityTracker(Protocol1_11To1_10.class);
                             if (tracker.isHologram(entityID)) {
                                 Double newValue = wrapper.get(Type.DOUBLE, 1);
                                 newValue -= (Via.getConfig().getHologramYOffset());
@@ -157,7 +158,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_9_3.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
 
         registerClientbound(ClientboundPackets1_9_3.TITLE, new PacketRemapper() {
             @Override
@@ -377,7 +378,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
     @Override
     public void init(UserConnection userConnection) {
         // Entity tracker
-        userConnection.put(new EntityTracker1_11(userConnection));
+        userConnection.addEntityTracker(this.getClass(), new EntityTracker1_11(userConnection));
 
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));

@@ -30,28 +30,27 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityTypeR
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.EntityTracker1_13;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 
-public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
+public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1_12_2> {
 
     public MetadataRewriter1_13To1_12_2(Protocol1_13To1_12_2 protocol) {
-        super(protocol, EntityTracker1_13.class);
+        super(protocol);
     }
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
         // Handle new MetaTypes
-        if (metadata.getMetaType().getTypeID() > 4) {
-            metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID() + 1));
+        if (metadata.metaType().typeId() > 4) {
+            metadata.setMetaType(MetaType1_13.byId(metadata.metaType().typeId() + 1));
         } else {
-            metadata.setMetaType(MetaType1_13.byId(metadata.getMetaType().getTypeID()));
+            metadata.setMetaType(MetaType1_13.byId(metadata.metaType().typeId()));
         }
 
         // Handle String -> Chat DisplayName
-        if (metadata.getId() == 2) {
+        if (metadata.id() == 2) {
             metadata.setMetaType(MetaType1_13.OptChat);
             if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
                 metadata.setValue(ChatRewriter.legacyTextToJson((String) metadata.getValue()));
@@ -61,7 +60,7 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
         }
 
         // Remap held block to match new format for remapping to flat block
-        if (type == Entity1_13Types.EntityType.ENDERMAN && metadata.getId() == 12) {
+        if (type == Entity1_13Types.EntityType.ENDERMAN && metadata.id() == 12) {
             int stateId = (int) metadata.getValue();
             int id = stateId & 4095;
             int data = stateId >> 12 & 15;
@@ -69,10 +68,10 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
         }
 
         // 1.13 changed item to flat item (no data)
-        if (metadata.getMetaType() == MetaType1_13.Slot) {
+        if (metadata.metaType() == MetaType1_13.Slot) {
             metadata.setMetaType(MetaType1_13.Slot);
             InventoryPackets.toClient((Item) metadata.getValue());
-        } else if (metadata.getMetaType() == MetaType1_13.BlockID) {
+        } else if (metadata.metaType() == MetaType1_13.BlockID) {
             // Convert to new block id
             metadata.setValue(WorldPackets.toNewId((int) metadata.getValue()));
         }
@@ -81,18 +80,18 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
         if (type == null) return;
 
         // Handle new colors
-        if (type == Entity1_13Types.EntityType.WOLF && metadata.getId() == 17) {
+        if (type == Entity1_13Types.EntityType.WOLF && metadata.id() == 17) {
             metadata.setValue(15 - (int) metadata.getValue());
         }
 
         // Handle new zombie meta (INDEX 15 - Boolean - Zombie is shaking while enabled)
         if (type.isOrHasParent(Entity1_13Types.EntityType.ZOMBIE)) {
-            if (metadata.getId() > 14)
-                metadata.setId(metadata.getId() + 1);
+            if (metadata.id() > 14)
+                metadata.setId(metadata.id() + 1);
         }
 
         // Handle Minecart inner block
-        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.getId() == 9) {
+        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
             // New block format
             int oldId = (int) metadata.getValue();
             int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
@@ -102,10 +101,10 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
 
         // Handle other changes
         if (type == Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) {
-            if (metadata.getId() == 9) {
+            if (metadata.id() == 9) {
                 int particleId = (int) metadata.getValue();
-                Metadata parameter1Meta = getMetaByIndex(10, metadatas);
-                Metadata parameter2Meta = getMetaByIndex(11, metadatas);
+                Metadata parameter1Meta = metaByIndex(10, metadatas);
+                Metadata parameter2Meta = metaByIndex(11, metadatas);
                 int parameter1 = parameter1Meta != null ? (int) parameter1Meta.getValue() : 0;
                 int parameter2 = parameter2Meta != null ? (int) parameter2Meta.getValue() : 0;
 
@@ -115,11 +114,11 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
                 }
             }
 
-            if (metadata.getId() >= 9)
+            if (metadata.id() >= 9)
                 metadatas.remove(metadata); // Remove
         }
 
-        if (metadata.getId() == 0) {
+        if (metadata.id() == 0) {
             metadata.setValue((byte) ((byte) metadata.getValue() & ~0x10)); // Previously unused, now swimming
         }
 
@@ -127,17 +126,17 @@ public class MetadataRewriter1_13To1_12_2 extends MetadataRewriter {
     }
 
     @Override
-    public int getNewEntityId(final int oldId) {
+    public int newEntityId(final int oldId) {
         return EntityTypeRewriter.getNewId(oldId);
     }
 
     @Override
-    protected EntityType getTypeFromId(int type) {
+    protected EntityType typeFromId(int type) {
         return Entity1_13Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected EntityType getObjectTypeFromId(int type) {
+    protected EntityType objectTypeFromId(int type) {
         return Entity1_13Types.getTypeFromId(type, true);
     }
 }

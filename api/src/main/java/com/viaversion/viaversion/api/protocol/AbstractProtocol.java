@@ -24,6 +24,8 @@ package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -142,6 +144,10 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
      * To be overridden if needed.
      */
     protected void onMappingDataLoaded() {
+    }
+
+    public void addEntityTracker(UserConnection connection, EntityTracker tracker) {
+        connection.addEntityTracker(this.getClass(), tracker);
     }
 
     @Override

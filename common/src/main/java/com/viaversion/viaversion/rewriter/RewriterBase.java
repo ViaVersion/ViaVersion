@@ -15,15 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.storage;
+package com.viaversion.viaversion.rewriter;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
-import com.viaversion.viaversion.data.EntityTracker;
+import com.viaversion.viaversion.api.protocol.Protocol;
 
-public class EntityTracker1_15 extends EntityTracker {
+public abstract class RewriterBase<T extends Protocol> implements Rewriter<T> {
+    protected final T protocol;
 
-    public EntityTracker1_15(UserConnection user) {
-        super(user, Entity1_15Types.PLAYER);
+    protected RewriterBase(T protocol) {
+        this.protocol = protocol;
+    }
+
+    @Override
+    public void register() {
+        registerPackets();
+        registerRewrites();
+    }
+
+    /**
+     * To be overriden. Called when initializing the EntityRewriter.
+     */
+    protected void registerPackets() {
+    }
+
+    /**
+     * To be overriden. Called when initializing the EntityRewriter.
+     */
+    protected void registerRewrites() {
+    }
+
+    @Override
+    public T protocol() {
+        return protocol;
     }
 }

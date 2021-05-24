@@ -29,21 +29,20 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import com.viaversion.viaversion.rewriter.MetadataRewriter;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 import java.util.UUID;
 
-public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
+public class MetadataRewriter1_9To1_8 extends EntityRewriter<Protocol1_9To1_8> {
 
     public MetadataRewriter1_9To1_8(Protocol1_9To1_8 protocol) {
-        super(protocol, EntityTracker1_9.class);
+        super(protocol);
     }
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-        MetaIndex metaIndex = MetaIndex.searchIndex(type, metadata.getId());
+        MetaIndex metaIndex = MetaIndex.searchIndex(type, metadata.id());
         if (metaIndex == null) {
             throw new Exception("Could not find valid metadata");
         }
@@ -139,12 +138,12 @@ public class MetadataRewriter1_9To1_8 extends MetadataRewriter {
     }
 
     @Override
-    protected EntityType getTypeFromId(int type) {
+    protected EntityType typeFromId(int type) {
         return Entity1_10Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected EntityType getObjectTypeFromId(int type) {
+    protected EntityType objectTypeFromId(int type) {
         return Entity1_10Types.getTypeFromId(type, true);
     }
 }

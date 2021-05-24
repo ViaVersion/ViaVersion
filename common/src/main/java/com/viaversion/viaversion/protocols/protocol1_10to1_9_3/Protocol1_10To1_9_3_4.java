@@ -48,8 +48,8 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         public List<Metadata> transform(PacketWrapper wrapper, List<Metadata> inputValue) throws Exception {
             List<Metadata> metaList = new CopyOnWriteArrayList<>(inputValue);
             for (Metadata m : metaList) {
-                if (m.getId() >= 5)
-                    m.setId(m.getId() + 1);
+                if (m.id() >= 5)
+                    m.setId(m.id() + 1);
             }
             return metaList;
         }

@@ -21,14 +21,14 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.data.EntityTracker;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker1_14 extends EntityTracker {
+public class EntityTracker1_14 extends EntityTrackerBase {
     private final Map<Integer, Byte> insentientData = new ConcurrentHashMap<>();
     // 0x1 = sleeping, 0x2 = riptide
     private final Map<Integer, Byte> sleepingAndRiptideData = new ConcurrentHashMap<>();
@@ -91,10 +91,10 @@ public class EntityTracker1_14 extends EntityTracker {
     }
 
     @Override
-    public void onExternalJoinGame(int playerEntityId) {
-        super.onExternalJoinGame(playerEntityId);
+    public void setClientEntityId(int playerEntityId) {
+        super.setClientEntityId(playerEntityId);
 
-        PacketWrapper setViewDistance = PacketWrapper.create(0x41, null, getUser());
+        PacketWrapper setViewDistance = PacketWrapper.create(0x41, null, user());
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         try {
             setViewDistance.send(Protocol1_14To1_13_2.class, true, true);

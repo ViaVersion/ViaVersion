@@ -35,7 +35,6 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.EntityTracker1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 
@@ -188,7 +187,7 @@ public class WorldPackets {
                     addNewDimensionData(currentDimensionTag);
 
                     UserConnection user = wrapper.user();
-                    user.get(EntityTracker1_17.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.PLAYER);
+                    user.getEntityTracker(Protocol1_17To1_16_4.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.PLAYER);
                 });
             }
         });

@@ -31,12 +31,12 @@ public interface MetaType {
      *
      * @return Type instance
      */
-    Type getType();
+    Type type();
 
     /**
      * Get type id from the specific MetaDataType
      *
      * @return Type id as an integer
      */
-    int getTypeID();
+    int typeId();
 }

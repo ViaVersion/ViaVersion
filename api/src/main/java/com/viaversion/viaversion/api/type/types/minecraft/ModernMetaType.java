@@ -32,7 +32,7 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
         final short index = buffer.readUnsignedByte();
         if (index == 0xff) return null; // End of metadata
         final MetaType type = this.getType(buffer.readByte());
-        return new Metadata(index, type, type.getType().read(buffer));
+        return new Metadata(index, type, type.type().read(buffer));
     }
 
     protected abstract MetaType getType(final int index);
@@ -42,10 +42,10 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
         if (object == null) {
             buffer.writeByte(0xff);
         } else {
-            buffer.writeByte(object.getId());
-            final MetaType type = object.getMetaType();
-            buffer.writeByte(type.getTypeID());
-            type.getType().write(buffer, object.getValue());
+            buffer.writeByte(object.id());
+            final MetaType type = object.metaType();
+            buffer.writeByte(type.typeId());
+            type.type().write(buffer, object.getValue());
         }
     }
 }

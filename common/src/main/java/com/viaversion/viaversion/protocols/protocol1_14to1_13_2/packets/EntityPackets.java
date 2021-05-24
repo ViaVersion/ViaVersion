@@ -67,7 +67,7 @@ public class EntityPackets {
                         int typeId = wrapper.get(Type.VAR_INT, 1);
 
                         Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
-                        typeId = metadataRewriter.getNewEntityId(type1_13.getId());
+                        typeId = metadataRewriter.newEntityId(type1_13.getId());
                         EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
 
                         if (type1_14 != null) {
@@ -111,7 +111,7 @@ public class EntityPackets {
                             }
 
                             // Register Type ID
-                            wrapper.user().get(EntityTracker1_14.class).addEntity(entityId, type1_14);
+                            wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class).addEntity(entityId, type1_14);
                         }
 
                         wrapper.set(Type.VAR_INT, 1, typeId);
@@ -137,7 +137,7 @@ public class EntityPackets {
                 map(Type.SHORT); // 11 - Velocity Z
                 map(Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST); // 12 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_14.METADATA_LIST));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST));
             }
         });
 
@@ -164,7 +164,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.getTrackerAndRewriter(Types1_14.METADATA_LIST, Entity1_14Types.PLAYER));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST, Entity1_14Types.PLAYER));
             }
         });
 
@@ -177,14 +177,14 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short animation = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         if (animation == 2) {  //Leave bed
-                            EntityTracker1_14 tracker = wrapper.user().get(EntityTracker1_14.class);
+                            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
                             int entityId = wrapper.get(Type.VAR_INT, 0);
                             tracker.setSleeping(entityId, false);
 
                             PacketWrapper metadataPacket = wrapper.create(0x43);
                             metadataPacket.write(Type.VAR_INT, entityId);
                             List<Metadata> metadataList = new LinkedList<>();
-                            if (tracker.getClientEntityId() != entityId) {
+                            if (tracker.clientEntityId() != entityId) {
                                 metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
                             }
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
@@ -203,14 +203,14 @@ public class EntityPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker1_14 tracker = wrapper.user().get(EntityTracker1_14.class);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         tracker.setSleeping(entityId, true);
 
                         Position position = wrapper.read(Type.POSITION);
                         List<Metadata> metadataList = new LinkedList<>();
                         metadataList.add(new Metadata(12, MetaType1_14.OptPosition, position));
-                        if (tracker.getClientEntityId() != entityId) {
+                        if (tracker.clientEntityId() != entityId) {
                             metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
                         }
                         wrapper.write(Types1_14.METADATA_LIST, metadataList);
@@ -219,7 +219,7 @@ public class EntityPackets {
             }
         });
 
-        metadataRewriter.registerEntityDestroy(ClientboundPackets1_13.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_13.DESTROY_ENTITIES);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_13.ENTITY_METADATA, Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST);
     }
 }

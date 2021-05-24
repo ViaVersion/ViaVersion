@@ -58,12 +58,12 @@ public enum MetaType1_13_2 implements MetaType {
     }
 
     @Override
-    public int getTypeID() {
+    public int typeId() {
         return typeID;
     }
 
     @Override
-    public Type getType() {
+    public Type type() {
         return type;
     }
 }

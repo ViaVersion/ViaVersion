@@ -21,10 +21,11 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.platform.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
@@ -125,9 +126,15 @@ public class BungeeServerHandler implements Listener {
         } catch (Exception ex) {
             return; // Ignored
         }
-        for (StoredObject storedObject : userConnection.getStoredObjects().values()) {
-            if (storedObject instanceof ExternalJoinGameListener) {
-                ((ExternalJoinGameListener) storedObject).onExternalJoinGame(playerId);
+
+        for (EntityTracker tracker : userConnection.getEntityTrackers()) {
+            tracker.setClientEntityId(playerId);
+        }
+
+        // For ViaRewind
+        for (StoredObject object : userConnection.getStoredObjects().values()) {
+            if (object instanceof ClientEntityIdChangeListener) {
+                ((ClientEntityIdChangeListener) object).setClientEntityId(playerId);
             }
         }
     }
@@ -143,7 +150,7 @@ public class BungeeServerHandler implements Listener {
             if (e.getServer() != null) {
                 if (!e.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
                     // Clear auto-team
-                    EntityTracker1_9 oldEntityTracker = user.get(EntityTracker1_9.class);
+                    EntityTracker1_9 oldEntityTracker = user.getEntityTracker(Protocol1_9To1_8.class);
                     if (oldEntityTracker != null) {
                         if (oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
                             oldEntityTracker.sendTeamPacket(false, true);
@@ -239,7 +246,7 @@ public class BungeeServerHandler implements Listener {
                         protocol.init(user);
                     }
 
-                    EntityTracker1_9 newTracker = user.get(EntityTracker1_9.class);
+                    EntityTracker1_9 newTracker = user.getEntityTracker(Protocol1_9To1_8.class);
                     if (newTracker != null) {
                         if (Via.getConfig().isAutoTeam()) {
                             String currentTeam = null;
