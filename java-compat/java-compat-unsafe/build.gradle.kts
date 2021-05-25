@@ -1,3 +1,3 @@
 dependencies {
-    api(project(":java-compat:java-compat-common"))
+    api(projects.javaCompat.javaCompatCommon)
 }

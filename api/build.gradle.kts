@@ -1,5 +1,6 @@
 plugins {
     id("net.kyori.blossom")
+    id("via.shadow-conventions")
 }
 
 blossom {

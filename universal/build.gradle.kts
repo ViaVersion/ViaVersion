@@ -1,7 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+plugins {
+    id("com.github.johnrengelman.shadow")
+}
+
 tasks {
-    withType<ShadowJar> {
+    shadowJar {
         archiveClassifier.set("")
         archiveFileName.set("ViaVersion-${project.version}.jar")
         destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
@@ -13,13 +17,15 @@ tasks {
             rootProject.projects.viaversionSponge,
             rootProject.projects.viaversionVelocity,
         ).map { it.dependencyProject }.forEach { subproject ->
-            val shadowJarTask = subproject.tasks.getByName("shadowJar", ShadowJar::class)
+            val shadowJarTask = subproject.tasks.named<ShadowJar>("shadowJar").forUseAtConfigurationTime().get()
             dependsOn(shadowJarTask)
             dependsOn(subproject.tasks.withType<Jar>())
             from(zipTree(shadowJarTask.archiveFile))
         }
     }
     build {
-        dependsOn(withType<ShadowJar>())
+        dependsOn(shadowJar)
     }
 }
+
+publishShadowJar()
