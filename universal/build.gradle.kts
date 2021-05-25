@@ -29,8 +29,9 @@ tasks {
         dependsOn(shadowJar)
     }
     sourcesJar {
-        platforms.forEach { platform ->
-            val platformSourcesJarTask = platform.tasks.sourcesJar.forUseAtConfigurationTime().get()
+        rootProject.subprojects.forEach { subproject ->
+            if (subproject == project) return@forEach
+            val platformSourcesJarTask = subproject.tasks.findByName("sourcesJar") as? Jar ?: return@forEach
             dependsOn(platformSourcesJarTask)
             from(zipTree(platformSourcesJarTask.archiveFile))
         }
