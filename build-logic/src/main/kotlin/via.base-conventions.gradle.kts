@@ -12,6 +12,7 @@ tasks {
     }
     javadoc {
         options.encoding = Charsets.UTF_8.name()
+        (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
     }
     compileJava {
         options.encoding = Charsets.UTF_8.name()
