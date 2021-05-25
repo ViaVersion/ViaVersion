@@ -22,7 +22,6 @@ tasks {
 java {
     javaTarget(8)
     withSourcesJar()
-    withJavadocJar() // todo: do we need javadoc enabled for every module?
 }
 
 publishing {
