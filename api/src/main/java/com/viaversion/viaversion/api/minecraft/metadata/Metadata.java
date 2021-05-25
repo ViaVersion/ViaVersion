@@ -22,6 +22,9 @@
  */
 package com.viaversion.viaversion.api.minecraft.metadata;
 
+import com.google.common.base.Preconditions;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Objects;
 
 public final class Metadata {
@@ -29,10 +32,20 @@ public final class Metadata {
     private MetaType metaType;
     private Object value;
 
-    public Metadata(int id, MetaType metaType, Object value) {
+    /**
+     * Creates a new metadata instance.
+     *
+     * @param id       metadata index
+     * @param metaType metadata type
+     * @param value    value if present
+     * @throws NullPointerException     if the given metaType is null
+     * @throws IllegalArgumentException if the value and metaType are incompatible
+     */
+    public Metadata(int id, MetaType metaType, @Nullable Object value) {
+        Preconditions.checkNotNull(metaType);
         this.id = id;
         this.metaType = metaType;
-        this.value = value;
+        this.value = checkValue(value);
     }
 
     public int id() {
@@ -47,7 +60,14 @@ public final class Metadata {
         return metaType;
     }
 
+    /**
+     * Sets the metadata type.
+     * Update the value with {@link #setValue(Object)} in case value and type are no longer compatible.
+     *
+     * @param metaType metadata type
+     */
     public void setMetaType(MetaType metaType) {
+        Preconditions.checkNotNull(metaType);
         this.metaType = metaType;
     }
 
@@ -55,12 +75,26 @@ public final class Metadata {
         return (T) value;
     }
 
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    /**
+     * Sets the metadata value.
+     * Always call {@link #setMetaType(MetaType)} first if the output type changes.
+     *
+     * @param value value
+     * @throws IllegalArgumentException if the value and metaType are incompatible
+     */
+    public void setValue(@Nullable Object value) {
+        this.value = checkValue(value);
+    }
+
+    private Object checkValue(Object value) {
+        if (value != null && !metaType.type().getOutputClass().isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("Metadata value and metaType are incompatible. Type=" + metaType + ", value=" + value);
+        }
+        return value;
     }
 
     @Override

@@ -46,7 +46,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         implements Protocol<C1, C2, S1, S2> {
     private final Map<Packet, ProtocolPacket> serverbound = new HashMap<>();
     private final Map<Packet, ProtocolPacket> clientbound = new HashMap<>();
-    private final Map<Class, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
+    private final Map<Class<?>, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
     protected final Class<C1> oldClientboundPacketEnum;
     protected final Class<C2> newClientboundPacketEnum;
     protected final Class<S1> oldServerboundPacketEnum;

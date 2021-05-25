@@ -139,14 +139,14 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
         } else if (type.is(Entity1_14Types.VILLAGER)) {
             if (metadata.id() == 15) {
                 // plains
-                metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                 metadata.setMetaType(MetaType1_14.VillagerData);
+                metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
         } else if (type.is(Entity1_14Types.ZOMBIE_VILLAGER)) {
             if (metadata.id() == 18) {
                 // plains
-                metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
                 metadata.setMetaType(MetaType1_14.VillagerData);
+                metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
         } else if (type.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
             if (metadata.id() >= 9) { // New piercing
@@ -154,9 +154,10 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
             }
         } else if (type.is(Entity1_14Types.FIREWORK_ROCKET)) {
             if (metadata.id() == 8) {
-                if (metadata.getValue().equals(0))
-                    metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
                 metadata.setMetaType(MetaType1_14.OptVarInt);
+                if (metadata.getValue().equals(0)) {
+                    metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
+                }
             }
         } else if (type.isOrHasParent(Entity1_14Types.ABSTRACT_SKELETON)) {
             if (metadata.id() == 14) {
