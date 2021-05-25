@@ -21,3 +21,7 @@ dependencies {
     compileOnlyApi(libs.guava)
     compileOnlyApi(libs.checkerQual)
 }
+
+java {
+    withJavadocJar()
+}
