@@ -27,7 +27,7 @@ public interface MetaHandler {
      * Handles a metadata entry of an entity.
      *
      * @param event metadata event
-     * @param meta  metadata, convenience field for {@link MetaHandlerEvent#meta()}
+     * @param meta  metadata, convenience parameter for {@link MetaHandlerEvent#meta()}
      */
     void handle(MetaHandlerEvent event, Metadata meta);
 }

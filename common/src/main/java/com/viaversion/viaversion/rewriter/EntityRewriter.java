@@ -110,37 +110,41 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
                 continue;
             }
 
+            MetaHandlerEvent event = null;
             for (MetaFilter filter : metadataFilters) {
-                if (filter.isFiltered(type, metadata)) {
-                    MetaHandlerEvent event = new MetaHandlerEventImpl(connection, type, entityId, metadata.id(), metadata, metadataList);
-                    try {
-                        filter.handler().handle(event, metadata);
-                    } catch (Exception e) {
-                        logException(e, type, metadataList, metadata);
-                        metadataList.remove(i--);
-                        break;
-                    }
-
-                    if (event.cancelled()) {
-                        // Remove meta, decrease list index counter, and break current filter loop
-                        metadataList.remove(i--);
-                        break;
-                    }
-
-                    Preconditions.checkArgument(event.index() == event.meta().id(), "Meta event id desync: Calls to meta().setId() are illegal");
-                    if (event.extraMeta() != null) {
-                        // Add newly created meta
-                        metadataList.addAll(event.extraMeta());
-                        event.clearExtraMeta();
-                    }
+                if (!filter.isFiltered(type, metadata)) {
+                    continue;
                 }
+                if (event == null) {
+                    // Only initialize when needed and share event instance
+                    event = new MetaHandlerEventImpl(connection, type, entityId, metadata, metadataList);
+                }
+
+                try {
+                    filter.handler().handle(event, metadata);
+                } catch (Exception e) {
+                    logException(e, type, metadataList, metadata);
+                    metadataList.remove(i--);
+                    break;
+                }
+
+                if (event.cancelled()) {
+                    // Remove meta, decrease list index counter, and break current filter loop
+                    metadataList.remove(i--);
+                    break;
+                }
+            }
+
+            if (event != null && event.extraMeta() != null) {
+                // Finally add newly created meta
+                metadataList.addAll(event.extraMeta());
             }
             i++;
         }
     }
 
     @Deprecated
-    private boolean callOldMetaHandler(int entityId, EntityType type, Metadata metadata, List<Metadata> metadataList, UserConnection connection) {
+    private boolean callOldMetaHandler(int entityId, @Nullable EntityType type, Metadata metadata, List<Metadata> metadataList, UserConnection connection) {
         try {
             handleMetadata(entityId, type, metadata, metadataList, connection);
             return true;
@@ -498,14 +502,14 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * Returns the entity tracker for the current protocol.
      *
      * @param connection user connection
-     * @param <T>        entity tracker type
+     * @param <E>        entity tracker type
      * @return entity tracker
      */
-    public <T extends EntityTracker> T tracker(UserConnection connection) {
+    public <E extends EntityTracker> E tracker(UserConnection connection) {
         return connection.getEntityTracker(protocol.getClass());
     }
 
-    private void logException(Exception e, EntityType type, List<Metadata> metadataList, Metadata metadata) {
+    private void logException(Exception e, @Nullable EntityType type, List<Metadata> metadataList, Metadata metadata) {
         if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
             Logger logger = Via.getPlatform().getLogger();
             logger.warning("An error occurred with entity metadata handler");

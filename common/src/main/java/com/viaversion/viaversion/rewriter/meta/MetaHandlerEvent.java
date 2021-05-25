@@ -41,25 +41,29 @@ public interface MetaHandlerEvent {
     int entityId();
 
     /**
-     * Returns the entity type of the entity the metadata belongs to.
+     * Returns the entity type of the entity the metadata belongs to if tracked.
      *
-     * @return entity type of the entity
+     * @return entity type of the entity if tracked, else null
      */
-    EntityType entityType();
+    @Nullable EntityType entityType();
 
     /**
      * Returns the metadata index.
      *
      * @return return meta index
      */
-    int index();
+    default int index() {
+        return meta().id();
+    }
 
     /**
      * Sets the metadata index.
      *
      * @param index new metadata index
      */
-    void setIndex(int index);
+    default void setIndex(int index) {
+        meta().setId(index);
+    }
 
     /**
      * Returns the metadata by the given index if present.
@@ -71,7 +75,6 @@ public interface MetaHandlerEvent {
 
     /**
      * Returns the metadata.
-     * Do NOT call {@link Metadata#setId(int)} and instead use {@link MetaHandlerEvent#setIndex(int)}.
      *
      * @return return metadata
      */
@@ -113,9 +116,4 @@ public interface MetaHandlerEvent {
      * @param metadata metadata
      */
     void createExtraMeta(Metadata metadata);
-
-    /**
-     * Clears the additional metadata.
-     */
-    void clearExtraMeta();
 }

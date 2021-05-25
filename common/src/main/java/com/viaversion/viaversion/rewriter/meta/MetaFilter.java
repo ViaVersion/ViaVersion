@@ -83,10 +83,12 @@ public class MetaFilter {
      * @param metadata metadata
      * @return whether the meta should be filtered
      */
-    public boolean isFiltered(EntityType type, Metadata metadata) {
+    public boolean isFiltered(@Nullable EntityType type, Metadata metadata) {
         // First check if the filter has no type or the type is equal or part of the filtered parent types
         // Applicable if no specific index is filtered or the indexes are equal
-        return (this.type == null || (filterFamily ? type.isOrHasParent(this.type) : this.type == type)) && (index == -1 || metadata.id() == index);
+        return (this.type == null
+                || type != null && (this.filterFamily ? type.isOrHasParent(this.type) : this.type == type))
+                && (this.index == -1 || metadata.id() == this.index);
     }
 
     @Override

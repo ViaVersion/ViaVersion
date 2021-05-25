@@ -34,14 +34,12 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
     private final List<Metadata> metadataList;
     private final Metadata meta;
     private List<Metadata> extraData;
-    private int index;
     private boolean cancel;
 
-    public MetaHandlerEventImpl(UserConnection connection, EntityType entityType, int entityId, int index, Metadata meta, List<Metadata> metadataList) {
+    public MetaHandlerEventImpl(UserConnection connection, @Nullable EntityType entityType, int entityId, Metadata meta, List<Metadata> metadataList) {
         this.connection = connection;
         this.entityType = entityType;
         this.entityId = entityId;
-        this.index = index;
         this.meta = meta;
         this.metadataList = metadataList;
     }
@@ -67,19 +65,8 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
     }
 
     @Override
-    public EntityType entityType() {
+    public @Nullable EntityType entityType() {
         return entityType;
-    }
-
-    @Override
-    public int index() {
-        return index;
-    }
-
-    @Override
-    public void setIndex(int index) {
-        this.index = index;
-        meta.setId(index);
     }
 
     @Override
@@ -110,10 +97,5 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
     @Override
     public void createExtraMeta(Metadata metadata) {
         (extraData != null ? extraData : (extraData = new ArrayList<>())).add(metadata);
-    }
-
-    @Override
-    public void clearExtraMeta() {
-        extraData = null;
     }
 }
