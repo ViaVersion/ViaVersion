@@ -24,8 +24,10 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public class InventoryPackets {
@@ -96,9 +98,35 @@ public class InventoryPackets {
                     short confirmationId = wrapper.read(Type.SHORT);
                     boolean accepted = wrapper.read(Type.BOOLEAN);
                     if (!accepted) {
+                        // Use the new ping packet to replace the removed acknowledgement, extra bit for fast dismissal
+                        // Hope the client actually answers it /shrug
+                        int id = (1 << 30) | (inventoryId << 16) | confirmationId;
+                        wrapper.user().get(InventoryAcknowledgements.class).addId(id);
+
+                        PacketWrapper pingPacket = wrapper.create(ClientboundPackets1_17.PING);
+                        pingPacket.write(Type.INT, id);
+                        pingPacket.send(Protocol1_17To1_16_4.class, true, true);
+                    }
+
+                    wrapper.cancel();
+                });
+            }
+        });
+
+        // New pong packet
+        protocol.registerServerbound(ServerboundPackets1_17.PONG, null, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    int id = wrapper.read(Type.INT);
+                    // Check extra bit for fast dismissal
+                    if ((id & (1 << 30)) != 0 && wrapper.user().get(InventoryAcknowledgements.class).removeId(id)) {
+                        // Decode inventory acknowledgement
+                        int inventoryId = (id >> 16) & 0xFF;
+                        int confirmationId = id & 0xFFFF;
                         PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
-                        packet.write(Type.UNSIGNED_BYTE, inventoryId);
-                        packet.write(Type.SHORT, confirmationId);
+                        packet.write(Type.UNSIGNED_BYTE, (short) inventoryId);
+                        packet.write(Type.SHORT, (short) confirmationId);
                         packet.write(Type.BYTE, (byte) 1); // Accept
                         packet.sendToServer(Protocol1_17To1_16_4.class, true, true);
                     }

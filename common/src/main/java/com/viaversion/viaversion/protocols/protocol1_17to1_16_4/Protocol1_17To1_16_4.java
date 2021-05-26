@@ -33,6 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.Metadat
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -204,9 +205,6 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-
-        // Ping
-        cancelServerbound(ServerboundPackets1_17.PONG);
     }
 
     @Override
@@ -240,6 +238,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection user) {
         user.addEntityTracker(this.getClass(), new EntityTrackerBase(user, Entity1_17Types.PLAYER));
+        user.put(new InventoryAcknowledgements());
     }
 
     @Override
