@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface EntityTracker extends ClientEntityIdChangeListener {
+public interface EntityTracker {
 
     /**
      * User connection the tracker belongs to.

@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.util.Pair;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -54,11 +55,11 @@ public enum MetaIndex {
     STAND_RL_POS(ARMOR_STAND, 16, MetaType1_8.Rotation, MetaType1_9.Vector3F),
     // human, discountined?
     PLAYER_SKIN_FLAGS(ENTITY_HUMAN, 10, MetaType1_8.Byte, 12, MetaType1_9.Byte), // unsigned on 1.8
-    PLAYER_HUMAN_BYTE(ENTITY_HUMAN, 16, MetaType1_8.Byte, MetaType1_9.Discontinued), // unused on 1.8
+    PLAYER_HUMAN_BYTE(ENTITY_HUMAN, 16, MetaType1_8.Byte, null), // unused on 1.8
     PLAYER_ADDITIONAL_HEARTS(ENTITY_HUMAN, 17, MetaType1_8.Float, 10, MetaType1_9.Float),
     PLAYER_SCORE(ENTITY_HUMAN, 18, MetaType1_8.Int, 11, MetaType1_9.VarInt),
     PLAYER_HAND(ENTITY_HUMAN, -1, MetaType1_8.NonExistent, 5, MetaType1_9.Byte), // new in 1.9
-    SOMETHING_ANTICHEAT_PLUGINS_FOR_SOME_REASON_USE(ENTITY_HUMAN, 11, MetaType1_8.Byte, MetaType1_9.Discontinued), //For what we know, This doesn't exists. If you think it exists and knows what it does. Please tell us.
+    SOMETHING_ANTICHEAT_PLUGINS_FOR_SOME_REASON_USE(ENTITY_HUMAN, 11, MetaType1_8.Byte, null), //For what we know, This doesn't exists. If you think it exists and knows what it does. Please tell us.
     // horse
     HORSE_INFO(HORSE, 16, MetaType1_8.Int, 12, MetaType1_9.Byte),
     HORSE_TYPE(HORSE, 19, MetaType1_8.Byte, 13, MetaType1_9.VarInt),
@@ -86,7 +87,7 @@ public enum MetaIndex {
     VILLAGER_PROFESSION(VILLAGER, 16, MetaType1_8.Int, 12, MetaType1_9.VarInt),
     // enderman
     ENDERMAN_BLOCKSTATE(ENDERMAN, 16, MetaType1_8.Short, 11, MetaType1_9.BlockID),
-    ENDERMAN_BLOCKDATA(ENDERMAN, 17, MetaType1_8.Byte, MetaType1_9.Discontinued), //always 0 when sent, never read by the client
+    ENDERMAN_BLOCKDATA(ENDERMAN, 17, MetaType1_8.Byte, null), //always 0 when sent, never read by the client
     ENDERMAN_ISSCREAMING(ENDERMAN, 18, MetaType1_8.Byte, 12, MetaType1_9.Boolean),
     // zombie
     ZOMBIE_ISCHILD(ZOMBIE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),
@@ -117,7 +118,7 @@ public enum MetaIndex {
     WITHER_TARGET3(WITHER, 19, MetaType1_8.Int, 13, MetaType1_9.VarInt),
     WITHER_INVULN_TIME(WITHER, 20, MetaType1_8.Int, 14, MetaType1_9.VarInt),
     WITHER_PROPERTIES(WITHER, 10, MetaType1_8.Byte, MetaType1_9.Byte),
-    WITHER_UNKNOWN(WITHER, 11, MetaType1_8.Byte, MetaType1_9.Discontinued),
+    WITHER_UNKNOWN(WITHER, 11, MetaType1_8.Byte, null),
     // wither skull
     WITHERSKULL_INVULN(WITHER_SKULL, 10, MetaType1_8.Byte, 5, MetaType1_9.Boolean),
     // guardian
@@ -150,12 +151,12 @@ public enum MetaIndex {
     ITEMFRAME_ITEM(ITEM_FRAME, 8, MetaType1_8.Slot, 5, MetaType1_9.Slot),
     ITEMFRAME_ROTATION(ITEM_FRAME, 9, MetaType1_8.Byte, 6, MetaType1_9.VarInt),
     // ender crystal
-    ENDERCRYSTAL_HEALTH(ENDER_CRYSTAL, 8, MetaType1_8.Int, MetaType1_9.Discontinued),
+    ENDERCRYSTAL_HEALTH(ENDER_CRYSTAL, 8, MetaType1_8.Int, null),
     // Ender dragon boss bar issues
-    ENDERDRAGON_UNKNOWN(ENDER_DRAGON, 5, MetaType1_8.Byte, MetaType1_9.Discontinued),
-    ENDERDRAGON_NAME(ENDER_DRAGON, 10, MetaType1_8.String, MetaType1_9.Discontinued),
+    ENDERDRAGON_UNKNOWN(ENDER_DRAGON, 5, MetaType1_8.Byte, null),
+    ENDERDRAGON_NAME(ENDER_DRAGON, 10, MetaType1_8.String, null),
     // Normal Ender dragon
-    ENDERDRAGON_FLAG(ENDER_DRAGON, 15, MetaType1_8.Byte, MetaType1_9.Discontinued),
+    ENDERDRAGON_FLAG(ENDER_DRAGON, 15, MetaType1_8.Byte, null),
     ENDERDRAGON_PHASE(ENDER_DRAGON, 11, MetaType1_8.Byte, MetaType1_9.VarInt);
 
     private static final HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
@@ -171,7 +172,7 @@ public enum MetaIndex {
     private final MetaType1_8 oldType;
     private final int index;
 
-    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, MetaType1_9 newType) {
+    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, @Nullable MetaType1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.newIndex = index;
@@ -179,7 +180,7 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, int newIndex, MetaType1_9 newType) {
+    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, int newIndex, @Nullable MetaType1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.oldType = oldType;
@@ -195,7 +196,7 @@ public enum MetaIndex {
         return newIndex;
     }
 
-    public MetaType1_9 getNewType() {
+    public @Nullable MetaType1_9 getNewType() {
         return newType;
     }
 

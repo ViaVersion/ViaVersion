@@ -51,9 +51,8 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_1
         if (type.is(EntityType.ELDER_GUARDIAN) || type.is(EntityType.GUARDIAN)) { // Guardians
             int oldid = metadata.id();
             if (oldid == 12) {
-                metadata.setMetaType(MetaType1_9.Boolean);
                 boolean val = (((byte) metadata.getValue()) & 0x02) == 0x02;
-                metadata.setValue(val);
+                metadata.setTypeAndValue(MetaType1_9.Boolean, val);
             }
         }
 

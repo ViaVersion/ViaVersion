@@ -27,32 +27,31 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 
 public enum MetaType1_17 implements MetaType {
-    Byte(0, Type.BYTE),
-    VarInt(1, Type.VAR_INT),
-    Float(2, Type.FLOAT),
-    String(3, Type.STRING),
-    Chat(4, Type.COMPONENT),
-    OptChat(5, Type.OPTIONAL_COMPONENT),
-    Slot(6, Type.FLAT_VAR_INT_ITEM),
-    Boolean(7, Type.BOOLEAN),
-    Vector3F(8, Type.ROTATION),
-    Position(9, Type.POSITION1_14),
-    OptPosition(10, Type.OPTIONAL_POSITION_1_14),
-    Direction(11, Type.VAR_INT),
-    OptUUID(12, Type.OPTIONAL_UUID),
-    BlockID(13, Type.VAR_INT),
-    NBTTag(14, Type.NBT),
+    BYTE(0, Type.BYTE),
+    VAR_INT(1, Type.VAR_INT),
+    FLOAT(2, Type.FLOAT),
+    STRING(3, Type.STRING),
+    COMPONENT(4, Type.COMPONENT),
+    OPT_COMPONENT(5, Type.OPTIONAL_COMPONENT),
+    ITEM(6, Type.FLAT_VAR_INT_ITEM),
+    BOOLEAN(7, Type.BOOLEAN),
+    ROTATION(8, Type.ROTATION),
+    POSITION(9, Type.POSITION1_14),
+    OPT_POSITION(10, Type.OPTIONAL_POSITION_1_14),
+    DIRECTION(11, Type.VAR_INT),
+    OPT_UUID(12, Type.OPTIONAL_UUID),
+    BLOCK_STATE(13, Type.VAR_INT),
+    NBT(14, Type.NBT),
     PARTICLE(15, Types1_17.PARTICLE),
-    VillagerData(16, Type.VILLAGER_DATA),
-    OptVarInt(17, Type.OPTIONAL_VAR_INT),
-    Pose(18, Type.VAR_INT),
-    Discontinued(99, null);
+    VILLAGER_DATA(16, Type.VILLAGER_DATA),
+    OPT_VAR_INT(17, Type.OPTIONAL_VAR_INT),
+    POSE(18, Type.VAR_INT);
 
-    private final int typeID;
+    private final int typeId;
     private final Type type;
 
-    MetaType1_17(int typeID, Type type) {
-        this.typeID = typeID;
+    MetaType1_17(int typeId, Type type) {
+        this.typeId = typeId;
         this.type = type;
     }
 
@@ -62,7 +61,7 @@ public enum MetaType1_17 implements MetaType {
 
     @Override
     public int typeId() {
-        return typeID;
+        return typeId;
     }
 
     @Override

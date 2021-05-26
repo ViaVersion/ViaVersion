@@ -139,14 +139,12 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
         } else if (type.is(Entity1_14Types.VILLAGER)) {
             if (metadata.id() == 15) {
                 // plains
-                metadata.setMetaType(MetaType1_14.VillagerData);
-                metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
+                metadata.setTypeAndValue(MetaType1_14.VillagerData, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
         } else if (type.is(Entity1_14Types.ZOMBIE_VILLAGER)) {
             if (metadata.id() == 18) {
                 // plains
-                metadata.setMetaType(MetaType1_14.VillagerData);
-                metadata.setValue(new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
+                metadata.setTypeAndValue(MetaType1_14.VillagerData, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
         } else if (type.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
             if (metadata.id() >= 9) { // New piercing

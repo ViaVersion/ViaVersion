@@ -38,8 +38,7 @@ public enum MetaType1_9 implements MetaType {
     OptPosition(9, Type.OPTIONAL_POSITION),
     Direction(10, Type.VAR_INT),
     OptUUID(11, Type.OPTIONAL_UUID),
-    BlockID(12, Type.VAR_INT),
-    Discontinued(99, null);
+    BlockID(12, Type.VAR_INT);
 
     private final int typeID;
     private final Type type;

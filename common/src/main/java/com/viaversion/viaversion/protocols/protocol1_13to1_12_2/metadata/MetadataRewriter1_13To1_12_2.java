@@ -51,11 +51,10 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1
 
         // Handle String -> Chat DisplayName
         if (metadata.id() == 2) {
-            metadata.setMetaType(MetaType1_13.OptChat);
             if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                metadata.setValue(ChatRewriter.legacyTextToJson((String) metadata.getValue()));
+                metadata.setTypeAndValue(MetaType1_13.OptChat, ChatRewriter.legacyTextToJson((String) metadata.getValue()));
             } else {
-                metadata.setValue(null);
+                metadata.setTypeAndValue(MetaType1_13.OptChat, null);
             }
         }
 

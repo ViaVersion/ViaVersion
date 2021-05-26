@@ -37,7 +37,7 @@ public class MetadataRewriter1_17To1_16_4 extends EntityRewriter {
         filter().handler((event, meta) -> {
             meta.setMetaType(MetaType1_17.byId(meta.metaType().typeId()));
 
-            if (meta.metaType() == MetaType1_17.Pose) {
+            if (meta.metaType() == MetaType1_17.POSE) {
                 int pose = meta.value();
                 if (pose > 5) {
                     // Added LONG_JUMP at 6
@@ -45,7 +45,7 @@ public class MetadataRewriter1_17To1_16_4 extends EntityRewriter {
                 }
             }
         });
-        registerDumMetaTypeHandler(MetaType1_17.Slot, MetaType1_17.BlockID, MetaType1_17.PARTICLE, InventoryPackets::toClient);
+        registerDumMetaTypeHandler(MetaType1_17.ITEM, MetaType1_17.BLOCK_STATE, MetaType1_17.PARTICLE, InventoryPackets::toClient);
 
         // Ticks frozen added with id 7
         filter().filterFamily(Entity1_17Types.ENTITY).addIndex(7);

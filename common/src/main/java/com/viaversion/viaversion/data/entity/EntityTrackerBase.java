@@ -20,6 +20,7 @@ package com.viaversion.viaversion.data.entity;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -28,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTrackerBase implements EntityTracker {
+public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
     private final Map<Integer, EntityType> entityTypes = new ConcurrentHashMap<>();
     private final Map<Integer, StoredEntityData> entityData;
     private final UserConnection connection;
@@ -68,9 +69,9 @@ public class EntityTrackerBase implements EntityTracker {
     }
 
     @Override
-    public StoredEntityData entityData(int id) {
+    public @Nullable StoredEntityData entityData(int id) {
         EntityType type = entityType(id);
-        return entityData.computeIfAbsent(id, s -> new StoredEntityImpl(type));
+        return type != null ? entityData.computeIfAbsent(id, s -> new StoredEntityImpl(type)) : null;
     }
 
     @Override

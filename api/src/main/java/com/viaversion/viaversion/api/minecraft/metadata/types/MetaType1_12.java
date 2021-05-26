@@ -39,8 +39,7 @@ public enum MetaType1_12 implements MetaType {
     Direction(10, Type.VAR_INT),
     OptUUID(11, Type.OPTIONAL_UUID),
     BlockID(12, Type.VAR_INT),
-    NBTTag(13, Type.NBT),
-    Discontinued(99, null);
+    NBTTag(13, Type.NBT);
 
     private final int typeID;
     private final Type type;

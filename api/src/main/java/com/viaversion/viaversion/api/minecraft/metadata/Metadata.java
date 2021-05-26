@@ -38,14 +38,12 @@ public final class Metadata {
      * @param id       metadata index
      * @param metaType metadata type
      * @param value    value if present
-     * @throws NullPointerException     if the given metaType is null
      * @throws IllegalArgumentException if the value and metaType are incompatible
      */
     public Metadata(int id, MetaType metaType, @Nullable Object value) {
-        Preconditions.checkNotNull(metaType);
         this.id = id;
         this.metaType = metaType;
-        this.value = checkValue(value);
+        this.value = checkValue(metaType, value);
     }
 
     public int id() {
@@ -61,13 +59,14 @@ public final class Metadata {
     }
 
     /**
-     * Sets the metadata type.
-     * Update the value with {@link #setValue(Object)} in case value and type are no longer compatible.
+     * Sets the metadata type if compatible with the current value.
      *
      * @param metaType metadata type
+     * @throws IllegalArgumentException if the metadata type and current value are incompatible
+     * @see #setTypeAndValue(MetaType, Object)
      */
     public void setMetaType(MetaType metaType) {
-        Preconditions.checkNotNull(metaType);
+        checkValue(metaType, this.value);
         this.metaType = metaType;
     }
 
@@ -80,28 +79,46 @@ public final class Metadata {
     }
 
     /**
-     * Sets the metadata value.
-     * Always call {@link #setMetaType(MetaType)} first if the output type changes.
+     * Sets the metadata value if compatible with the current meta type.
      *
      * @param value value
-     * @throws IllegalArgumentException if the value and metaType are incompatible
+     * @throws IllegalArgumentException if the value and current metaType are incompatible
+     * @see #setTypeAndValue(MetaType, Object)
      */
     public void setValue(@Nullable Object value) {
-        this.value = checkValue(value);
+        this.value = checkValue(this.metaType, value);
     }
 
-    private Object checkValue(Object value) {
+    /**
+     * Sets metadata type and value.
+     *
+     * @param metaType metadata type
+     * @param value    value
+     * @throws IllegalArgumentException if the value and metaType are incompatible
+     */
+    public void setTypeAndValue(MetaType metaType, @Nullable Object value) {
+        this.value = checkValue(metaType, value);
+        this.metaType = metaType;
+    }
+
+    private Object checkValue(MetaType metaType, @Nullable Object value) {
+        Preconditions.checkNotNull(metaType);
         if (value != null && !metaType.type().getOutputClass().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Metadata value and metaType are incompatible. Type=" + metaType + ", value=" + value);
+            throw new IllegalArgumentException("Metadata value and metaType are incompatible. Type=" + metaType
+                    + ", value=" + (value != null ? value + " (" + value.getClass().getSimpleName() + ")" : "null"));
         }
         return value;
+    }
+
+    @Deprecated
+    public void setMetaTypeUnsafe(MetaType type) {
+        this.metaType = type;
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Metadata metadata = (Metadata) o;
         if (id != metadata.id) return false;
         if (metaType != metaType) return false;
@@ -111,7 +128,7 @@ public final class Metadata {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (metaType != null ? metaType.hashCode() : 0);
+        result = 31 * result + metaType.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }

@@ -34,6 +34,7 @@ public enum MetaType1_8 implements MetaType {
     Slot(5, Type.ITEM),
     Position(6, Type.VECTOR),
     Rotation(7, Type.ROTATION),
+    @Deprecated
     NonExistent(-1, Type.NOTHING);
 
     private final int typeID;

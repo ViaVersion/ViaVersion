@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -47,13 +46,13 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<Protocol1_9To1_8> {
             throw new Exception("Could not find valid metadata");
         }
 
-        if (metaIndex.getNewType() == MetaType1_9.Discontinued) {
+        if (metaIndex.getNewType() == null) {
             metadatas.remove(metadata);
             return;
         }
 
         metadata.setId(metaIndex.getNewIndex());
-        metadata.setMetaType(metaIndex.getNewType());
+        metadata.setMetaTypeUnsafe(metaIndex.getNewType());
 
         Object value = metadata.getValue();
         switch (metaIndex.getNewType()) {

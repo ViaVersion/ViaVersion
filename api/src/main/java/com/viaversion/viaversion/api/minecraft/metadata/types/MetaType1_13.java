@@ -42,8 +42,7 @@ public enum MetaType1_13 implements MetaType {
     OptUUID(12, Type.OPTIONAL_UUID),
     BlockID(13, Type.VAR_INT),
     NBTTag(14, Type.NBT),
-    PARTICLE(15, Types1_13.PARTICLE),
-    Discontinued(99, null);
+    PARTICLE(15, Types1_13.PARTICLE);
 
     private final int typeID;
     private final Type type;
