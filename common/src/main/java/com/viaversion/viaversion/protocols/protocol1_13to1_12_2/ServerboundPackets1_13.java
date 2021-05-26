@@ -36,10 +36,10 @@ public enum ServerboundPackets1_13 implements ServerboundPacketType {
     ENTITY_NBT_REQUEST, // 0x0C
     INTERACT_ENTITY, // 0x0D
     KEEP_ALIVE, // 0x0E
-    PLAYER_MOVEMENT, // 0x12
-    PLAYER_POSITION, // 0x0F
-    PLAYER_POSITION_AND_ROTATION, // 0x10
-    PLAYER_ROTATION, // 0x11
+    PLAYER_MOVEMENT, // 0x0F
+    PLAYER_POSITION, // 0x10
+    PLAYER_POSITION_AND_ROTATION, // 0x11
+    PLAYER_ROTATION, // 0x12
     VEHICLE_MOVE, // 0x13
     STEER_BOAT, // 0x14
     PICK_ITEM, // 0x15
