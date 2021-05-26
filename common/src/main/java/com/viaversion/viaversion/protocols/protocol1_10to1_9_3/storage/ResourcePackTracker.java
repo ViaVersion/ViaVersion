@@ -17,15 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_10to1_9_3.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class ResourcePackTracker extends StoredObject {
+public class ResourcePackTracker implements StorableObject {
     private String lastHash = "";
-
-    public ResourcePackTracker(UserConnection user) {
-        super(user);
-    }
 
     public String getLastHash() {
         return lastHash;

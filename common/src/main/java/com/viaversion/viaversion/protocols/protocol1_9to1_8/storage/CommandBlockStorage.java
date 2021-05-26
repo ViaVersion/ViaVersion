@@ -19,8 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.util.Pair;
 
@@ -28,13 +27,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CommandBlockStorage extends StoredObject {
+public class CommandBlockStorage implements StorableObject {
     private final Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
     private boolean permissions = false;
-
-    public CommandBlockStorage(UserConnection user) {
-        super(user);
-    }
 
     public void unloadChunk(int x, int z) {
         Pair<Integer, Integer> chunkPos = new Pair<>(x, z);

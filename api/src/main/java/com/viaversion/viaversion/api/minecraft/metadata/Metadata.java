@@ -70,7 +70,7 @@ public final class Metadata {
         this.metaType = metaType;
     }
 
-    public <T> T value() {
+    public @Nullable <T> T value() {
         return (T) value;
     }
 

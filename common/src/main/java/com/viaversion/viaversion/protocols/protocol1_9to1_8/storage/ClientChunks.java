@@ -27,8 +27,8 @@ public class ClientChunks extends StoredObject {
     private final Set<Long> loadedChunks = Sets.newConcurrentHashSet();
     private final Set<Long> bulkChunks = Sets.newConcurrentHashSet();
 
-    public ClientChunks(UserConnection user) {
-        super(user);
+    public ClientChunks(UserConnection connection) {
+        super(connection);
     }
 
     public static long toLong(int msw, int lsw) {

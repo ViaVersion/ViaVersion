@@ -151,10 +151,10 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         // Chunk tracker
         userConnection.put(new ClientChunks(userConnection));
         // Movement tracker
-        userConnection.put(new MovementTracker(userConnection));
+        userConnection.put(new MovementTracker());
         // Inventory tracker
-        userConnection.put(new InventoryTracker(userConnection));
+        userConnection.put(new InventoryTracker());
         // CommandBlock storage
-        userConnection.put(new CommandBlockStorage(userConnection));
+        userConnection.put(new CommandBlockStorage());
     }
 }

@@ -17,23 +17,19 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class InventoryTracker extends StoredObject {
+public class InventoryTracker implements StorableObject {
     private String inventory;
 
     private final Map<Short, Map<Short, Integer>> windowItemCache = new HashMap<>();
     private int itemIdInCursor = 0;
     private boolean dragging = false;
-
-    public InventoryTracker(UserConnection user) {
-        super(user);
-    }
 
     public String getInventory() {
         return inventory;
@@ -83,8 +79,8 @@ public class InventoryTracker extends StoredObject {
      * @param hoverSlot The slot number of the current mouse position
      * @param button    The button to use in the click
      */
-    public void handleWindowClick(short windowId, byte mode, short hoverSlot, byte button) {
-        EntityTracker1_9 entityTracker = getUser().getEntityTracker(Protocol1_9To1_8.class);
+    public void handleWindowClick(UserConnection user, short windowId, byte mode, short hoverSlot, byte button) {
+        EntityTracker1_9 entityTracker = user.getEntityTracker(Protocol1_9To1_8.class);
 
         // Skip inventory background clicks
         if (hoverSlot == -1) {

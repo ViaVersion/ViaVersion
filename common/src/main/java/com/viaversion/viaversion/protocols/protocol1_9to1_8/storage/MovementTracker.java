@@ -17,18 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class MovementTracker extends StoredObject {
+public class MovementTracker implements StorableObject {
     private static final long IDLE_PACKET_DELAY = 50L; // Update every 50ms (20tps)
     private static final long IDLE_PACKET_LIMIT = 20; // Max 20 ticks behind
     private long nextIdlePacket = 0L;
     private boolean ground = true;
-
-    public MovementTracker(UserConnection user) {
-        super(user);
-    }
 
     public void incrementIdlePacket() {
         // Notify of next update

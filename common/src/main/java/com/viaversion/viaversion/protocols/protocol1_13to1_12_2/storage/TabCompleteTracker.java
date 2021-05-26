@@ -17,25 +17,21 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 
-public class TabCompleteTracker extends StoredObject {
+public class TabCompleteTracker implements StorableObject {
     private int transactionId;
     private String input;
     private String lastTabComplete;
     private long timeToSend;
 
-    public TabCompleteTracker(UserConnection user) {
-        super(user);
-    }
-
-    public void sendPacketToServer() {
+    public void sendPacketToServer(UserConnection connection) {
         if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) return;
-        PacketWrapper wrapper = PacketWrapper.create(0x01, null, getUser());
+        PacketWrapper wrapper = PacketWrapper.create(0x01, null, connection);
         wrapper.write(Type.STRING, lastTabComplete);
         wrapper.write(Type.BOOLEAN, false);
         wrapper.write(Type.OPTIONAL_POSITION, null);

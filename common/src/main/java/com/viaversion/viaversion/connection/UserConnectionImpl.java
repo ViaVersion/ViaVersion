@@ -20,7 +20,7 @@ package com.viaversion.viaversion.connection;
 import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -51,7 +51,7 @@ import java.util.function.Function;
 public class UserConnectionImpl implements UserConnection {
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
-    private final Map<Class<?>, StoredObject> storedObjects = new ConcurrentHashMap<>();
+    private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>();
     private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new HashMap<>();
     private final PacketTracker packetTracker = new PacketTracker(this);
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
@@ -82,17 +82,17 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public @Nullable <T extends StoredObject> T get(Class<T> objectClass) {
+    public @Nullable <T extends StorableObject> T get(Class<T> objectClass) {
         return (T) storedObjects.get(objectClass);
     }
 
     @Override
-    public boolean has(Class<? extends StoredObject> objectClass) {
+    public boolean has(Class<? extends StorableObject> objectClass) {
         return storedObjects.containsKey(objectClass);
     }
 
     @Override
-    public void put(StoredObject object) {
+    public void put(StorableObject object) {
         storedObjects.put(object.getClass(), object);
     }
 
@@ -306,7 +306,7 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public Map<Class<?>, StoredObject> getStoredObjects() {
+    public Map<Class<?>, StorableObject> getStoredObjects() {
         return storedObjects;
     }
 

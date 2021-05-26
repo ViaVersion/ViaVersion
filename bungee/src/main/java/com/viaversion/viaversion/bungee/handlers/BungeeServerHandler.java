@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bungee.handlers;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
@@ -90,7 +90,7 @@ public class BungeeServerHandler implements Listener {
         UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
         if (user == null) return;
         if (!user.has(BungeeStorage.class)) {
-            user.put(new BungeeStorage(user, e.getPlayer()));
+            user.put(new BungeeStorage(e.getPlayer()));
         }
 
         int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
@@ -132,7 +132,7 @@ public class BungeeServerHandler implements Listener {
         }
 
         // For ViaRewind
-        for (StoredObject object : userConnection.getStoredObjects().values()) {
+        for (StorableObject object : userConnection.getStoredObjects().values()) {
             if (object instanceof ClientEntityIdChangeListener) {
                 ((ClientEntityIdChangeListener) object).setClientEntityId(playerId);
             }

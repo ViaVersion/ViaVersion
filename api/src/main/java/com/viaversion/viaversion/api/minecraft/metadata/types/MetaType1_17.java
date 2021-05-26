@@ -47,6 +47,7 @@ public enum MetaType1_17 implements MetaType {
     OPT_VAR_INT(17, Type.OPTIONAL_VAR_INT),
     POSE(18, Type.VAR_INT);
 
+    private static final MetaType1_17[] VALUES = values();
     private final int typeId;
     private final Type type;
 
@@ -56,7 +57,7 @@ public enum MetaType1_17 implements MetaType {
     }
 
     public static MetaType1_17 byId(int id) {
-        return values()[id];
+        return VALUES[id];
     }
 
     @Override

@@ -17,8 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -26,7 +25,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BlockStorage extends StoredObject {
+public class BlockStorage implements StorableObject {
     private static final IntSet WHITELIST = new IntOpenHashSet(46, 1F);
     private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
 
@@ -53,10 +52,6 @@ public class BlockStorage extends StoredObject {
         for (int i = 0; i < 5; i++) {
             WHITELIST.add(5447 + i);
         }
-    }
-
-    public BlockStorage(UserConnection user) {
-        super(user);
     }
 
     public void store(Position position, int block) {

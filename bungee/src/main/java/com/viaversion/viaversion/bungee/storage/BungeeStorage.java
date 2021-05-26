@@ -17,8 +17,7 @@
  */
 package com.viaversion.viaversion.bungee.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.Field;
@@ -26,7 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public class BungeeStorage extends StoredObject {
+public class BungeeStorage implements StorableObject {
     private static Field bossField;
 
     static {
@@ -45,8 +44,7 @@ public class BungeeStorage extends StoredObject {
     private String currentServer;
     private Set<UUID> bossbar;
 
-    public BungeeStorage(UserConnection user, ProxiedPlayer player) {
-        super(user);
+    public BungeeStorage(ProxiedPlayer player) {
         this.player = player;
         this.currentServer = "";
 

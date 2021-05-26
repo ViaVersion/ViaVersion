@@ -194,6 +194,6 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new ResourcePackTracker(userConnection));
+        userConnection.put(new ResourcePackTracker());
     }
 }

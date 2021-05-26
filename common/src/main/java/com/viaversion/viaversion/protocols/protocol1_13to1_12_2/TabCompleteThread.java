@@ -28,7 +28,7 @@ public class TabCompleteThread implements Runnable {
             if (info.getProtocolInfo() == null) continue;
             if (info.getProtocolInfo().getPipeline().contains(Protocol1_13To1_12_2.class)) {
                 if (info.getChannel().isOpen()) {
-                    info.get(TabCompleteTracker.class).sendPacketToServer();
+                    info.get(TabCompleteTracker.class).sendPacketToServer(info);
                 }
             }
         }

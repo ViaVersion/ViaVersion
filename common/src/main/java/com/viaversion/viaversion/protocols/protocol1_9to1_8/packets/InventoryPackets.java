@@ -326,7 +326,7 @@ public class InventoryPackets {
 
                             // Move items in inventory to track the sword location
                             InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                            inventoryTracker.handleWindowClick(windowId, mode, hoverSlot, button);
+                            inventoryTracker.handleWindowClick(wrapper.user(), windowId, mode, hoverSlot, button);
                         }
 
                         ItemRewriter.toServer(stack);

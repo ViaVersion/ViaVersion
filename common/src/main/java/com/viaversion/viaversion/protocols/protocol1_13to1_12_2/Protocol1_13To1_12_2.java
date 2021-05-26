@@ -1047,13 +1047,13 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_13Types.EntityType.PLAYER));
-        userConnection.put(new TabCompleteTracker(userConnection));
+        userConnection.put(new TabCompleteTracker());
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
-        userConnection.put(new BlockStorage(userConnection));
+        userConnection.put(new BlockStorage());
         if (Via.getConfig().isServersideBlockConnections()) {
             if (Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
-                userConnection.put(new BlockConnectionStorage(userConnection));
+                userConnection.put(new BlockConnectionStorage());
             }
         }
     }

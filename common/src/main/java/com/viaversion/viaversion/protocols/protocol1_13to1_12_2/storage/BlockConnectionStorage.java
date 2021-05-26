@@ -18,8 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
@@ -32,7 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockConnectionStorage extends StoredObject {
+public class BlockConnectionStorage implements StorableObject {
     private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8582];
     private static Constructor<?> fastUtilLongObjectHashMap;
 
@@ -54,10 +53,6 @@ public class BlockConnectionStorage extends StoredObject {
                 REVERSE_BLOCK_MAPPINGS[newBlock] = (short) i;
             }
         }
-    }
-
-    public BlockConnectionStorage(UserConnection user) {
-        super(user);
     }
 
     public void store(int x, int y, int z, int blockState) {

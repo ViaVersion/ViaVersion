@@ -48,7 +48,7 @@ public interface UserConnection {
      * @param <T>         The type of the class you want to get.
      * @return The requested object
      */
-    @Nullable <T extends StoredObject> T get(Class<T> objectClass);
+    @Nullable <T extends StorableObject> T get(Class<T> objectClass);
 
     /**
      * Check if the storage has an object.
@@ -56,14 +56,14 @@ public interface UserConnection {
      * @param objectClass The object class to check
      * @return True if the object is in the storage
      */
-    boolean has(Class<? extends StoredObject> objectClass);
+    boolean has(Class<? extends StorableObject> objectClass);
 
     /**
      * Put an object into the stored objects based on class.
      *
      * @param object The object to store.
      */
-    void put(StoredObject object);
+    void put(StorableObject object);
 
     /**
      * Returns a collection of entity trackers currently registered.
@@ -266,9 +266,9 @@ public interface UserConnection {
      * @return map of stored objects
      * @see #has(Class)
      * @see #get(Class)
-     * @see #put(StoredObject)
+     * @see #put(StorableObject)
      */
-    Map<Class<?>, StoredObject> getStoredObjects();
+    Map<Class<?>, StorableObject> getStoredObjects();
 
     /**
      * Returns whether the connection has protocols other than the base protocol applied.

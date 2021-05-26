@@ -22,14 +22,11 @@
  */
 package com.viaversion.viaversion.api.connection;
 
-public abstract class StoredObject implements StorableObject {
-    private final UserConnection user;
-
-    protected StoredObject(UserConnection user) {
-        this.user = user;
-    }
-
-    public UserConnection getUser() {
-        return user;
-    }
+/**
+ * Dummy interface used to explicitly identify objects storable in user connections.
+ *
+ * @see UserConnection#get(Class)
+ * @see UserConnection#put(StorableObject)
+ */
+public interface StorableObject {
 }

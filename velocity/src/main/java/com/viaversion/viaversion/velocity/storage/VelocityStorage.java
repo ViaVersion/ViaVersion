@@ -18,8 +18,7 @@
 package com.viaversion.viaversion.velocity.storage;
 
 import com.velocitypowered.api.proxy.Player;
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class VelocityStorage extends StoredObject {
+public class VelocityStorage implements StorableObject {
     private final Player player;
     private String currentServer;
     private List<UUID> cachedBossbar;
@@ -48,8 +47,7 @@ public class VelocityStorage extends StoredObject {
         }
     }
 
-    public VelocityStorage(UserConnection user, Player player) {
-        super(user);
+    public VelocityStorage(Player player) {
         this.player = player;
         this.currentServer = "";
     }

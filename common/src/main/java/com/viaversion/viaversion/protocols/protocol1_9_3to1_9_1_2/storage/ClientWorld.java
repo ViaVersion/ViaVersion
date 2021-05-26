@@ -27,8 +27,8 @@ import com.viaversion.viaversion.api.minecraft.Environment;
 public class ClientWorld extends StoredObject {
     private Environment environment;
 
-    public ClientWorld(UserConnection user) {
-        super(user);
+    public ClientWorld(final UserConnection connection) {
+        super(connection);
     }
 
     public Environment getEnvironment() {
