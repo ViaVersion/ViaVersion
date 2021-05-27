@@ -1,6 +1,7 @@
 import org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME
 
 plugins {
+    base
     id("via.build-logic")
 }
 
