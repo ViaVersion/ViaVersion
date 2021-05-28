@@ -19,11 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,19 +83,6 @@ public class EntityTracker1_14 extends EntityTrackerBase {
             sleepingAndRiptideData.remove(player);
         } else {
             sleepingAndRiptideData.put(player, newValue);
-        }
-    }
-
-    @Override
-    public void setClientEntityId(int playerEntityId) {
-        super.setClientEntityId(playerEntityId);
-
-        PacketWrapper setViewDistance = PacketWrapper.create(0x41, null, user());
-        setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
-        try {
-            setViewDistance.send(Protocol1_14To1_13_2.class, true, true);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

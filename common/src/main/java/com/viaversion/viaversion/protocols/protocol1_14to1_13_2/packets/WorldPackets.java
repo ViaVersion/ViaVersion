@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -246,7 +247,7 @@ public class WorldPackets {
                         if (entityTracker.isForceSendCenterChunk()
                                 || diffX >= SERVERSIDE_VIEW_DISTANCE
                                 || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
-                            PacketWrapper fakePosLook = wrapper.create(0x40); // Set center chunk
+                            PacketWrapper fakePosLook = wrapper.create(ClientboundPackets1_14.UPDATE_VIEW_POSITION); // Set center chunk
                             fakePosLook.write(Type.VAR_INT, chunk.getX());
                             fakePosLook.write(Type.VAR_INT, chunk.getZ());
                             fakePosLook.send(Protocol1_14To1_13_2.class, true, true);
@@ -302,7 +303,6 @@ public class WorldPackets {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -320,12 +320,11 @@ public class WorldPackets {
                         tracker.setClientEntityId(entityId);
                     }
                 });
-
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
-                        PacketWrapper difficultyPacket = wrapper.create(0x0D);
+                        PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
                         difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                         difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
                         difficultyPacket.send(protocol.getClass());
@@ -335,6 +334,14 @@ public class WorldPackets {
 
                         wrapper.write(Type.VAR_INT, SERVERSIDE_VIEW_DISTANCE);  // Serverside view distance, added in 19w13a
                     }
+                });
+                handler(wrapper -> {
+                    // Manually send the packet
+                    wrapper.send(Protocol1_14To1_13_2.class, true, true);
+                    wrapper.cancel();
+
+                    // View distance has to be sent after the join packet
+                    sendViewDistancePacket(wrapper.user());
                 });
             }
         });
@@ -373,11 +380,17 @@ public class WorldPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
-                        PacketWrapper difficultyPacket = wrapper.create(0x0D);
+                        PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
                         difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                         difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
                         difficultyPacket.send(protocol.getClass());
                     }
+                });
+                handler(wrapper -> {
+                    // Manually send the packet and update the viewdistance after
+                    wrapper.send(Protocol1_14To1_13_2.class, true, true);
+                    wrapper.cancel();
+                    sendViewDistancePacket(wrapper.user());
                 });
             }
         });
@@ -388,6 +401,12 @@ public class WorldPackets {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
+    }
+
+    private static void sendViewDistancePacket(UserConnection connection) throws Exception {
+        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, null, connection);
+        setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
+        setViewDistance.send(Protocol1_14To1_13_2.class, true, true);
     }
 
     private static long[] encodeHeightMap(int[] heightMap) {

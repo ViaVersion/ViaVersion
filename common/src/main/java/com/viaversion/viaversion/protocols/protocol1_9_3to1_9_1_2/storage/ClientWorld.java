@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Environment;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Stored up until 1.14 to be used in chunk sending.
@@ -31,7 +32,7 @@ public class ClientWorld extends StoredObject {
         super(connection);
     }
 
-    public Environment getEnvironment() {
+    public @Nullable Environment getEnvironment() {
         return environment;
     }
 
