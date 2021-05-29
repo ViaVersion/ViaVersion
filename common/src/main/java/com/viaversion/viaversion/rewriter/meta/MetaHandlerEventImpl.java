@@ -45,16 +45,6 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
     }
 
     @Override
-    public @Nullable Metadata getMetaByIndex(int index) {
-        for (Metadata meta : metadataList) {
-            if (index == meta.id()) {
-                return meta;
-            }
-        }
-        return null;
-    }
-
-    @Override
     public UserConnection user() {
         return connection;
     }
@@ -82,6 +72,16 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
     @Override
     public boolean cancelled() {
         return cancel;
+    }
+
+    @Override
+    public @Nullable Metadata metaAtIndex(int index) {
+        for (Metadata meta : metadataList) {
+            if (index == meta.id()) {
+                return meta;
+            }
+        }
+        return null;
     }
 
     @Override

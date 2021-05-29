@@ -32,8 +32,9 @@ subprojects {
         else -> plugins.apply("via.standard-conventions")
     }
 
+    // Note: If manually starting tests doesn't work for you in IJ, change 'Gradle -> Run Tests Using' to 'IntelliJ IDEA'
     dependencies {
-        // Note: If manually starting tests doesn't work for you in IJ, change 'Gradle -> Run Tests Using' to 'IntelliJ IDEA'
+        // The alternative to this long boi is writing "testImplementation", including the quotes
         TEST_IMPLEMENTATION_CONFIGURATION_NAME(rootProject.libs.netty)
         TEST_IMPLEMENTATION_CONFIGURATION_NAME(rootProject.libs.guava)
         TEST_IMPLEMENTATION_CONFIGURATION_NAME(rootProject.libs.bundles.junit)

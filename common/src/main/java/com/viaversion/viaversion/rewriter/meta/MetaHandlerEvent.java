@@ -66,14 +66,6 @@ public interface MetaHandlerEvent {
     }
 
     /**
-     * Returns the metadata by the given index if present.
-     *
-     * @param index metadata index
-     * @return metadata by index if present
-     */
-    @Nullable Metadata getMetaByIndex(int index);
-
-    /**
      * Returns the metadata.
      *
      * @return return metadata
@@ -93,9 +85,19 @@ public interface MetaHandlerEvent {
     boolean cancelled();
 
     /**
+     * Returns metadata by the given index if present.
+     *
+     * @param index metadata index
+     * @return metadata if present, else null
+     */
+    @Nullable Metadata metaAtIndex(int index);
+
+    /**
      * Returns an immutable metadata view.
+     * This list is not sorted or indexed by the actual metadata indexes.
      *
      * @return immutable metadata list
+     * @see #metaAtIndex(int)
      * @see #cancel()
      * @see #createExtraMeta(Metadata)
      */

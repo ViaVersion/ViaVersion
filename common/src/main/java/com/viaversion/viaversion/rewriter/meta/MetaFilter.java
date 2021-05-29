@@ -84,11 +84,14 @@ public class MetaFilter {
      * @return whether the meta should be filtered
      */
     public boolean isFiltered(@Nullable EntityType type, Metadata metadata) {
-        // First check if the filter has no type or the type is equal or part of the filtered parent types
-        // Applicable if no specific index is filtered or the indexes are equal
-        return (this.type == null
-                || type != null && (this.filterFamily ? type.isOrHasParent(this.type) : this.type == type))
-                && (this.index == -1 || metadata.id() == this.index);
+        // Check if no specific index is filtered or the indexes are equal
+        // Then check if the filter has no entity type or the type is equal to or part of the filtered parent type
+        return (this.index == -1 || metadata.id() == this.index)
+                && (this.type == null || matchesType(type));
+    }
+
+    private boolean matchesType(@Nullable EntityType type) {
+        return type != null && (this.filterFamily ? type.isOrHasParent(this.type) : this.type == type);
     }
 
     @Override
@@ -162,6 +165,7 @@ public class MetaFilter {
          * Should always be called last.
          *
          * @param handler metadata handler
+         * @throws IllegalArgumentException if a handler has already been set
          */
         public void handler(MetaHandler handler) {
             Preconditions.checkArgument(this.handler == null);

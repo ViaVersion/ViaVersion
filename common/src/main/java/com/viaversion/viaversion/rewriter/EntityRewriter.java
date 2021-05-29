@@ -73,7 +73,6 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * Returns a meta filter builder.
      * <p>
      * Calling {@link MetaFilter.Builder#register()} will automatically register the filter on this rewriter.
-     * Don't forget to call {@link MetaFilter.Builder#register()}.
      *
      * @return meta filter builder
      */

@@ -150,7 +150,7 @@ public class MappingDataBase implements MappingData {
         return new IntArrayMappings(oldMappings.getAsJsonObject(key), newMappings.getAsJsonObject(key), diff);
     }
 
-    protected JsonObject loadDiffFile() {
+    protected @Nullable JsonObject loadDiffFile() {
         return MappingDataLoader.loadData("mappingdiff-" + oldVersion + "to" + newVersion + ".json");
     }
 
