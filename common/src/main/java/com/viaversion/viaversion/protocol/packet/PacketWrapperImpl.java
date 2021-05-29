@@ -63,12 +63,11 @@ public class PacketWrapperImpl implements PacketWrapper {
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.getKey() == type) { // Ref check
-                if (currentIndex == index) {
-                    return (T) packetValue.getValue();
-                }
-                currentIndex++;
+            if (packetValue.getKey() != type) continue;
+            if (currentIndex == index) {
+                return (T) packetValue.getValue();
             }
+            currentIndex++;
         }
 
         Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
@@ -79,12 +78,11 @@ public class PacketWrapperImpl implements PacketWrapper {
     public boolean is(Type type, int index) {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.getKey() == type) { // Ref check
-                if (currentIndex == index) {
-                    return true;
-                }
-                currentIndex++;
+            if (packetValue.getKey() != type) continue;
+            if (currentIndex == index) {
+                return true;
             }
+            currentIndex++;
         }
         return false;
     }
@@ -93,12 +91,11 @@ public class PacketWrapperImpl implements PacketWrapper {
     public boolean isReadable(Type type, int index) {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : readableObjects) {
-            if (packetValue.getKey().getBaseClass() == type.getBaseClass()) { // Ref check
-                if (currentIndex == index) {
-                    return true;
-                }
-                currentIndex++;
+            if (packetValue.getKey().getBaseClass() != type.getBaseClass()) continue;
+            if (currentIndex == index) {
+                return true;
             }
+            currentIndex++;
         }
         return false;
     }
@@ -108,13 +105,12 @@ public class PacketWrapperImpl implements PacketWrapper {
     public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.getKey() == type) { // Ref check
-                if (currentIndex == index) {
-                    packetValue.setValue(value);
-                    return;
-                }
-                currentIndex++;
+            if (packetValue.getKey() != type) continue;
+            if (currentIndex == index) {
+                packetValue.setValue(attemptTransform(type, value));
+                return;
             }
+            currentIndex++;
         }
         Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
         throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId());
@@ -131,37 +127,44 @@ public class PacketWrapperImpl implements PacketWrapper {
             } catch (Exception e) {
                 throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
             }
+        }
+
+        Pair<Type, Object> read = readableObjects.poll();
+        Type rtype = read.getKey();
+        if (rtype == type
+                || (type.getBaseClass() == rtype.getBaseClass()
+                && type.getOutputClass() == rtype.getOutputClass())) {
+            return (T) read.getValue();
+        } else if (rtype == Type.NOTHING) {
+            return read(type); // retry
         } else {
-            Pair<Type, Object> read = readableObjects.poll();
-            Type rtype = read.getKey();
-            if (rtype.equals(type)
-                    || (type.getBaseClass().equals(rtype.getBaseClass())
-                    && type.getOutputClass().equals(rtype.getOutputClass()))) {
-                return (T) read.getValue();
-            } else {
-                if (rtype == Type.NOTHING) {
-                    return read(type); // retry
-                } else {
-                    Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
-                    throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
-                }
-            }
+            Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
+            throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
         }
     }
 
     @Override
     public <T> void write(Type<T> type, T value) {
-        if (value != null) {
-            if (!type.getOutputClass().isAssignableFrom(value.getClass())) {
-                // attempt conversion
-                if (type instanceof TypeConverter) {
-                    value = (T) ((TypeConverter) type).from(value);
-                } else {
-                    Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + type.getOutputClass());
-                }
+        packetValues.add(new Pair<>(type, attemptTransform(type, value)));
+    }
+
+    /**
+     * Returns the value if already matching, else the converted value or possibly unmatched value.
+     *
+     * @param expectedType expected type
+     * @param value        value
+     * @return value if already matching, else the converted value or possibly unmatched value
+     */
+    private @Nullable Object attemptTransform(Type<?> expectedType, @Nullable Object value) {
+        if (value != null && !expectedType.getOutputClass().isAssignableFrom(value.getClass())) {
+            // Attempt conversion
+            if (expectedType instanceof TypeConverter) {
+                return ((TypeConverter) expectedType).from(value);
             }
+
+            Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + expectedType.getOutputClass());
         }
-        packetValues.add(new Pair<>(type, value));
+        return value;
     }
 
     @Override
@@ -195,18 +198,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         int index = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
             try {
-                Object value = packetValue.getValue();
-                if (value != null) {
-                    if (!packetValue.getKey().getOutputClass().isAssignableFrom(value.getClass())) {
-                        // attempt conversion
-                        if (packetValue.getKey() instanceof TypeConverter) {
-                            value = ((TypeConverter) packetValue.getKey()).from(value);
-                        } else {
-                            Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + packetValue.getKey().getOutputClass());
-                        }
-                    }
-                }
-                packetValue.getKey().write(buffer, value);
+                packetValue.getKey().write(buffer, packetValue.getValue());
             } catch (Exception e) {
                 throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
             }
@@ -428,8 +420,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         this.id = id;
     }
 
-    @Nullable
-    public ByteBuf getInputBuffer() {
+    public @Nullable ByteBuf getInputBuffer() {
         return inputBuffer;
     }
 

@@ -26,11 +26,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.Type;
 
 public abstract class BaseChunkType extends Type<Chunk> {
-    public BaseChunkType() {
+
+    protected BaseChunkType() {
         super(Chunk.class);
     }
 
-    public BaseChunkType(String typeName) {
+    protected BaseChunkType(String typeName) {
         super(typeName, Chunk.class);
     }
 

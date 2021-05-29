@@ -55,13 +55,14 @@ public class BaseProtocol extends AbstractSimpleProtocol {
                     ProtocolInfo info = wrapper.user().getProtocolInfo();
                     info.setProtocolVersion(protocolVersion);
                     // Ensure the server has a version provider
-                    if (Via.getManager().getProviders().get(VersionProvider.class) == null) {
+                    VersionProvider versionProvider = Via.getManager().getProviders().get(VersionProvider.class);
+                    if (versionProvider == null) {
                         wrapper.user().setActive(false);
                         return;
                     }
 
                     // Choose the pipe
-                    int serverProtocol = Via.getManager().getProviders().get(VersionProvider.class).getClosestServerProtocol(wrapper.user());
+                    int serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
                     info.setServerProtocolVersion(serverProtocol);
                     List<ProtocolPathEntry> protocolPath = null;
 
@@ -94,8 +95,7 @@ public class BaseProtocol extends AbstractSimpleProtocol {
                     // Change state
                     if (state == 1) {
                         info.setState(State.STATUS);
-                    }
-                    if (state == 2) {
+                    } else if (state == 2) {
                         info.setState(State.LOGIN);
                     }
                 });

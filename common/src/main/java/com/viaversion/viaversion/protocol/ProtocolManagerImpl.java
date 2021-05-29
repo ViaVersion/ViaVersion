@@ -160,12 +160,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void registerProtocol(Protocol protocol, ProtocolVersion supported, ProtocolVersion output) {
-        registerProtocol(protocol, Collections.singletonList(supported.getVersion()), output.getVersion());
+    public void registerProtocol(Protocol protocol, ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
+        registerProtocol(protocol, Collections.singletonList(clientVersion.getVersion()), serverVersion.getVersion());
     }
 
     @Override
-    public void registerProtocol(Protocol protocol, List<Integer> supported, int output) {
+    public void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion) {
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
             pathCache.clear();
@@ -173,9 +173,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
         protocols.put(protocol.getClass(), protocol);
 
-        for (int version : supported) {
+        for (int version : supportedClientVersion) {
             Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(version, s -> new Int2ObjectOpenHashMap<>(2));
-            protocolMap.put(output, protocol);
+            protocolMap.put(serverVersion, protocol);
         }
 
         if (Via.getPlatform().isPluginEnabled()) {
@@ -249,6 +249,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @return path that has been generated, null if failed
      */
     private @Nullable List<ProtocolPathEntry> getProtocolPath(List<ProtocolPathEntry> current, int clientVersion, int serverVersion) {
+        //TODO optimize?
         if (clientVersion == serverVersion) return null; // We're already there
         if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
 
@@ -295,6 +296,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public @Nullable <T extends Protocol> T getProtocol(Class<T> protocolClass) {
         return (T) protocols.get(protocolClass);
+    }
+
+    @Override
+    public @Nullable Protocol getProtocol(int clientVersion, int serverVersion) {
+        Int2ObjectMap<Protocol> map = registryMap.get(clientVersion);
+        return map != null ? map.get(serverVersion) : null;
     }
 
     @Override

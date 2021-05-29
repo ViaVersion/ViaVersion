@@ -26,11 +26,12 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 
 public abstract class BaseItemType extends Type<Item> {
-    public BaseItemType() {
+
+    protected BaseItemType() {
         super(Item.class);
     }
 
-    public BaseItemType(String typeName) {
+    protected BaseItemType(String typeName) {
         super(typeName, Item.class);
     }
 

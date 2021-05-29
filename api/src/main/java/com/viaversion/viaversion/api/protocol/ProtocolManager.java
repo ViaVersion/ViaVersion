@@ -54,6 +54,28 @@ public interface ProtocolManager {
     @Nullable <T extends Protocol> T getProtocol(Class<T> protocolClass);
 
     /**
+     * Returns a protocol transforming packets for server version to the given client version.
+     *
+     * @param clientVersion client protocol version
+     * @param serverVersion server protocol version
+     * @return protocol if present, else null
+     * @see #getProtocolPath(int, int) to get a full path of Protocols between a larger gap of versions
+     */
+    default @Nullable Protocol getProtocol(ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
+        return getProtocol(clientVersion.getVersion(), serverVersion.getVersion());
+    }
+
+    /**
+     * Returns a protocol transforming packets for server version to the given client version.
+     *
+     * @param clientVersion client protocol version
+     * @param serverVersion server protocol version
+     * @return protocol if present, else null
+     * @see #getProtocolPath(int, int) to get a full path of Protocols between a larger gap of versions
+     */
+    @Nullable Protocol getProtocol(int clientVersion, int serverVersion);
+
+    /**
      * Returns the base protocol handling serverbound handshake packets.
      *
      * @return base protocol
@@ -84,37 +106,37 @@ public interface ProtocolManager {
     /**
      * Register a protocol.
      *
-     * @param protocol  protocol to register
-     * @param supported supported client versions
-     * @param output    output server version the protocol converts to
+     * @param protocol      protocol to register
+     * @param clientVersion supported client protocol versions
+     * @param serverVersion output server protocol version the protocol converts to
      */
-    void registerProtocol(Protocol protocol, ProtocolVersion supported, ProtocolVersion output);
+    void registerProtocol(Protocol protocol, ProtocolVersion clientVersion, ProtocolVersion serverVersion);
 
     /**
      * Register a protocol.
      *
-     * @param protocol  protocol to register
-     * @param supported supported client versions
-     * @param output    output server version the protocol converts to
+     * @param protocol               protocol to register
+     * @param supportedClientVersion supported client protocol versions
+     * @param serverVersion          output server protocol version the protocol converts to
      */
-    void registerProtocol(Protocol protocol, List<Integer> supported, int output);
+    void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion);
 
     /**
      * Registers a base protocol. Base Protocols registered later have higher priority.
      * Only base protocol will always be added to pipeline.
      *
      * @param baseProtocol       base protocol to register
-     * @param supportedProtocols versions supported by the base protocol
+     * @param supportedProtocols protocol versions supported by the base protocol
      * @throws IllegalArgumentException if the protocol is not a base protocol as given by {@link Protocol#isBaseProtocol()}
      */
     void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols);
 
     /**
-     * Calculates and returns the protocol path from a client version to server version.
+     * Calculates and returns the protocol path from a client protocol version to server protocol version.
      * Returns null if no path could be found or the path length exceeds the value given by {@link #getMaxProtocolPathSize()}.
      *
-     * @param clientVersion input client version
-     * @param serverVersion desired output server version
+     * @param clientVersion input client protocol version
+     * @param serverVersion desired output server protocol version
      * @return path generated, or null if not supported or the length exceeds {@link #getMaxProtocolPathSize()}
      */
     @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
@@ -135,9 +157,9 @@ public interface ProtocolManager {
     void setMaxProtocolPathSize(int maxProtocolPathSize);
 
     /**
-     * Returns the versions compatible with the server.
+     * Returns the protocol versions compatible with the server.
      *
-     * @return sorted, immutable set of supported versions
+     * @return sorted, immutable set of supported protocol versions
      */
     SortedSet<Integer> getSupportedVersions();
 
