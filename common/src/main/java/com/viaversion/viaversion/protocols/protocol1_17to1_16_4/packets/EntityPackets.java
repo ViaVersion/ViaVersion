@@ -39,7 +39,7 @@ public class EntityPackets {
         metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_17.METADATA_LIST);
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, ClientboundPackets1_17.REMOVE_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
@@ -53,7 +53,7 @@ public class EntityPackets {
                         // Send individual remove packets
                         PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
                         newPacket.write(Type.VAR_INT, entityId);
-                        newPacket.send(Protocol1_17To1_16_4.class);
+                        newPacket.send(Protocol1_17To1_16_4.class, true, true);
                     }
                 });
             }
