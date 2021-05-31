@@ -243,7 +243,7 @@ public class InventoryPackets {
                         CompoundTag tag = new CompoundTag();
                         tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
                         resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new Item(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
-                        resyncPacket.sendToServer(Protocol1_14To1_13_2.class, true, false);
+                        resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
                     }
                 });
             }

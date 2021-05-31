@@ -72,7 +72,7 @@ public class DeathListener extends ViaSpongeListener {
                     wrapper.write(Type.INT, entityId); // Entity ID
                     Protocol1_9To1_8.FIX_JSON.write(wrapper, msg); // Message
 
-                    wrapper.send(Protocol1_9To1_8.class);
+                    wrapper.scheduleSend(Protocol1_9To1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

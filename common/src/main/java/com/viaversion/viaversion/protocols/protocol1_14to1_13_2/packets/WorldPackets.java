@@ -250,12 +250,12 @@ public class WorldPackets {
                             PacketWrapper fakePosLook = wrapper.create(ClientboundPackets1_14.UPDATE_VIEW_POSITION); // Set center chunk
                             fakePosLook.write(Type.VAR_INT, chunk.getX());
                             fakePosLook.write(Type.VAR_INT, chunk.getZ());
-                            fakePosLook.send(Protocol1_14To1_13_2.class, true, true);
+                            fakePosLook.send(Protocol1_14To1_13_2.class);
                             entityTracker.setChunkCenterX(chunk.getX());
                             entityTracker.setChunkCenterZ(chunk.getZ());
                         }
 
-                        lightPacket.send(Protocol1_14To1_13_2.class, true, true);
+                        lightPacket.send(Protocol1_14To1_13_2.class);
 
                         // Remove light references from chunk sections
                         for (ChunkSection section : chunk.getSections()) {
@@ -337,7 +337,7 @@ public class WorldPackets {
                 });
                 handler(wrapper -> {
                     // Manually send the packet
-                    wrapper.send(Protocol1_14To1_13_2.class, true, true);
+                    wrapper.send(Protocol1_14To1_13_2.class);
                     wrapper.cancel();
 
                     // View distance has to be sent after the join packet
@@ -388,7 +388,7 @@ public class WorldPackets {
                 });
                 handler(wrapper -> {
                     // Manually send the packet and update the viewdistance after
-                    wrapper.send(Protocol1_14To1_13_2.class, true, true);
+                    wrapper.send(Protocol1_14To1_13_2.class);
                     wrapper.cancel();
                     sendViewDistancePacket(wrapper.user());
                 });
@@ -406,7 +406,7 @@ public class WorldPackets {
     private static void sendViewDistancePacket(UserConnection connection) throws Exception {
         PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, null, connection);
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
-        setViewDistance.send(Protocol1_14To1_13_2.class, true, true);
+        setViewDistance.send(Protocol1_14To1_13_2.class);
     }
 
     private static long[] encodeHeightMap(int[] heightMap) {

@@ -65,7 +65,7 @@ public class DeathListener extends ViaBukkitListener {
                         wrapper.write(Type.INT, p.getEntityId()); // Entity ID
                         Protocol1_9To1_8.FIX_JSON.write(wrapper, msg); // Message
 
-                        wrapper.send(Protocol1_9To1_8.class);
+                        wrapper.scheduleSend(Protocol1_9To1_8.class);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

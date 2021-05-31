@@ -53,7 +53,7 @@ public class EntityPackets {
                         // Send individual remove packets
                         PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
                         newPacket.write(Type.VAR_INT, entityId);
-                        newPacket.send(Protocol1_17To1_16_4.class, true, true);
+                        newPacket.send(Protocol1_17To1_16_4.class);
                     }
                 });
             }

@@ -117,7 +117,16 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
+    public void sendRawPacket(ByteBuf packet) {
+        sendRawPacket(packet, true);
+    }
+
+    @Override
+    public void scheduleSendRawPacket(ByteBuf packet) {
+        sendRawPacket(packet, false);
+    }
+
+    private void sendRawPacket(final ByteBuf packet, boolean currentThread) {
         Runnable act;
         if (clientSide) {
             // We'll just assume that Via decoder isn't wrapping the original decoder
@@ -141,20 +150,12 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
         if (clientSide) {
-            return sendRawPacketFutureClientSide(packet);
+            // Assume that decoder isn't wrapping
+            getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
+            return getChannel().newSucceededFuture();
         } else {
-            return sendRawPacketFutureServerSide(packet);
+            return channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
         }
-    }
-
-    private ChannelFuture sendRawPacketFutureServerSide(final ByteBuf packet) {
-        return channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
-    }
-
-    private ChannelFuture sendRawPacketFutureClientSide(final ByteBuf packet) {
-        // Assume that decoder isn't wrapping
-        getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
-        return getChannel().newSucceededFuture();
     }
 
     @Override
@@ -175,11 +176,20 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public void sendRawPacketToServer(final ByteBuf packet, boolean currentThread) {
+    public void sendRawPacketToServer(ByteBuf packet) {
         if (clientSide) {
-            sendRawPacketToServerClientSide(packet, currentThread);
+            sendRawPacketToServerClientSide(packet, true);
         } else {
-            sendRawPacketToServerServerSide(packet, currentThread);
+            sendRawPacketToServerServerSide(packet, true);
+        }
+    }
+
+    @Override
+    public void scheduleSendRawPacketToServer(ByteBuf packet) {
+        if (clientSide) {
+            sendRawPacketToServerClientSide(packet, false);
+        } else {
+            sendRawPacketToServerServerSide(packet, false);
         }
     }
 

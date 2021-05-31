@@ -85,7 +85,7 @@ public class BlockEntityProvider implements Provider {
         wrapper.write(Type.POSITION, position);
         wrapper.write(Type.VAR_INT, blockId);
 
-        wrapper.send(Protocol1_13To1_12_2.class, true, true);
+        wrapper.send(Protocol1_13To1_12_2.class);
     }
 
     public interface BlockEntityHandler {

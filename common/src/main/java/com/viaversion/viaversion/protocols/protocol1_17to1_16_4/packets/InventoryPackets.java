@@ -105,7 +105,7 @@ public class InventoryPackets {
 
                         PacketWrapper pingPacket = wrapper.create(ClientboundPackets1_17.PING);
                         pingPacket.write(Type.INT, id);
-                        pingPacket.send(Protocol1_17To1_16_4.class, true, true);
+                        pingPacket.send(Protocol1_17To1_16_4.class);
                     }
 
                     wrapper.cancel();
@@ -128,7 +128,7 @@ public class InventoryPackets {
                         packet.write(Type.UNSIGNED_BYTE, (short) inventoryId);
                         packet.write(Type.SHORT, (short) confirmationId);
                         packet.write(Type.BYTE, (byte) 1); // Accept
-                        packet.sendToServer(Protocol1_17To1_16_4.class, true, true);
+                        packet.sendToServer(Protocol1_17To1_16_4.class);
                     }
 
                     wrapper.cancel();

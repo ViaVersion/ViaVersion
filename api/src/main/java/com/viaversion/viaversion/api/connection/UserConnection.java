@@ -96,21 +96,18 @@ public interface UserConnection {
     void clearStoredObjects();
 
     /**
-     * Send a raw packet to the player.
+     * Sends a raw packet to the connection on the current thread.
      *
-     * @param packet        The raw packet to send
-     * @param currentThread Should it run in the same thread
+     * @param packet raw packet to send
      */
-    void sendRawPacket(ByteBuf packet, boolean currentThread);
+    void sendRawPacket(ByteBuf packet);
 
     /**
-     * Send a raw packet to the player (netty thread).
+     * Send a raw packet to the player, submitted to the netty event loop.
      *
-     * @param packet The packet to send
+     * @param packet raw packet to send
      */
-    default void sendRawPacket(ByteBuf packet) {
-        sendRawPacket(packet, false);
-    }
+    void scheduleSendRawPacket(ByteBuf packet);
 
     /**
      * Send a raw packet to the player with returning the future.
@@ -135,21 +132,18 @@ public interface UserConnection {
     void disconnect(String reason);
 
     /**
-     * Sends a raw packet to the server.
+     * Sends a raw packet to the server on the current thread.
      *
-     * @param packet        Raw packet to be sent
-     * @param currentThread If {@code true} executes immediately, {@code false} submits a task to EventLoop
+     * @param packet raw packet to be sent
      */
-    void sendRawPacketToServer(ByteBuf packet, boolean currentThread);
+    void sendRawPacketToServer(ByteBuf packet);
 
     /**
-     * Sends a raw packet to the server. It will submit a task to EventLoop.
+     * Sends a raw packet to the server, submitted to the netty event loop.
      *
-     * @param packet Raw packet to be sent
+     * @param packet raw packet to be sent
      */
-    default void sendRawPacketToServer(ByteBuf packet) {
-        sendRawPacketToServer(packet, false);
-    }
+    void scheduleSendRawPacketToServer(ByteBuf packet);
 
     /**
      * Monitors serverbound packets and returns whether a packet can/should be processed.

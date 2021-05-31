@@ -561,7 +561,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                         }
                                     }
                                 }
-                            }).send(Protocol1_13To1_12_2.class, true, true);
+                            }).send(Protocol1_13To1_12_2.class);
                         }
                     }
                 });

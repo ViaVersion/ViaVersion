@@ -53,7 +53,7 @@ public class ElytraPatch implements Listener {
                 wrapper.write(Type.VAR_INT, entityId);
                 wrapper.write(Types1_9.METADATA_LIST, Collections.singletonList(new Metadata(0, MetaType1_9.Byte, (byte) 0)));
 
-                wrapper.send(Protocol1_9To1_8.class);
+                wrapper.scheduleSend(Protocol1_9To1_8.class);
             }
         } catch (Exception e) {
             e.printStackTrace();

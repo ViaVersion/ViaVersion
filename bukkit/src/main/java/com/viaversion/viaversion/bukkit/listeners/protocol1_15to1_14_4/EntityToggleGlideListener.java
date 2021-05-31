@@ -83,7 +83,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
 
                 // leave 0x80 as 0 to stop gliding
                 packet.write(Types1_14.METADATA_LIST, Arrays.asList(new Metadata(0, MetaType1_14.Byte, bitmask)));
-                packet.send(Protocol1_15To1_14_4.class);
+                packet.scheduleSend(Protocol1_15To1_14_4.class);
             } catch (Exception e) {
                 e.printStackTrace();
             }

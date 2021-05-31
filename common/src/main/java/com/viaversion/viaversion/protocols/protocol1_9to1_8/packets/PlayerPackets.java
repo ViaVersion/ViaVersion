@@ -148,7 +148,7 @@ public class PlayerPackets {
                                     if (mode == 4) {
                                         // since removing add to auto team
                                         // Workaround for packet order issue
-                                        wrapper.send(Protocol1_9To1_8.class, true, true);
+                                        wrapper.send(Protocol1_9To1_8.class);
                                         wrapper.cancel();
                                         entityTracker.sendTeamPacket(true, true);
                                         entityTracker.setCurrentTeam("viaversion");
@@ -168,7 +168,7 @@ public class PlayerPackets {
                                     && teamName.equals(entityTracker.getCurrentTeam())) {
                                 // team was removed
                                 // Workaround for packet order issue
-                                wrapper.send(Protocol1_9To1_8.class, true, true);
+                                wrapper.send(Protocol1_9To1_8.class);
                                 wrapper.cancel();
                                 entityTracker.sendTeamPacket(true, true);
                                 entityTracker.setCurrentTeam("viaversion");
@@ -226,7 +226,7 @@ public class PlayerPackets {
                         if (Via.getConfig().isAutoTeam()) {
                             entityTracker.setAutoTeam(true);
                             // Workaround for packet order issue
-                            wrapper.send(Protocol1_9To1_8.class, true, true);
+                            wrapper.send(Protocol1_9To1_8.class);
                             wrapper.cancel();
                             entityTracker.sendTeamPacket(true, true);
                             entityTracker.setCurrentTeam("viaversion");
@@ -437,7 +437,7 @@ public class PlayerPackets {
                                     (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80)
                             );
                         }
-                        wrapper.sendToServer(Protocol1_9To1_8.class, true, true);
+                        wrapper.sendToServer(Protocol1_9To1_8.class);
                         wrapper.cancel();
                         Via.getManager().getProviders().get(MainHandProvider.class).setMainHand(wrapper.user(), hand);
                     }

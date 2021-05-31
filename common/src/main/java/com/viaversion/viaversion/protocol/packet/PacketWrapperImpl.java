@@ -228,20 +228,28 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
-        send(packetProtocol, skipCurrentPipeline, false);
+    public void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+        send0(protocol, skipCurrentPipeline, true);
     }
 
     @Override
-    public void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
-        if (!isCancelled()) {
-            try {
-                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.CLIENTBOUND);
-                user().sendRawPacket(output, currentThread);
-            } catch (Exception e) {
-                if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw e;
-                }
+    public void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+        send0(protocol, skipCurrentPipeline, false);
+    }
+
+    private void send0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+        if (isCancelled()) return;
+
+        try {
+            ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
+            if (currentThread) {
+                user().sendRawPacket(output);
+            } else {
+                user().scheduleSendRawPacket(output);
+            }
+        } catch (Exception e) {
+            if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                throw e;
             }
         }
     }
@@ -301,15 +309,15 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     @Deprecated
     public void send() throws Exception {
-        if (!isCancelled()) {
-            // Send
-            ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-            try {
-                writeToBuffer(output);
-                user().sendRawPacket(output.retain());
-            } finally {
-                output.release();
-            }
+        if (isCancelled()) return;
+
+        // Send
+        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        try {
+            writeToBuffer(output);
+            user().sendRawPacket(output.retain());
+        } finally {
+            output.release();
         }
     }
 
@@ -384,28 +392,40 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     @Deprecated
     public void sendToServer() throws Exception {
-        if (!isCancelled()) {
-            ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
-            try {
-                writeToBuffer(output);
+        if (isCancelled()) return;
 
-                user().sendRawPacketToServer(output.retain(), true);
-            } finally {
-                output.release();
-            }
+        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        try {
+            writeToBuffer(output);
+            user().sendRawPacketToServer(output.retain());
+        } finally {
+            output.release();
         }
     }
 
     @Override
-    public void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
-        if (!isCancelled()) {
-            try {
-                ByteBuf output = constructPacket(packetProtocol, skipCurrentPipeline, Direction.SERVERBOUND);
-                user().sendRawPacketToServer(output, currentThread);
-            } catch (Exception e) {
-                if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw e;
-                }
+    public void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+        sendToServer0(protocol, skipCurrentPipeline, true);
+    }
+
+    @Override
+    public void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+        sendToServer0(protocol, skipCurrentPipeline, false);
+    }
+
+    private void sendToServer0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+        if (isCancelled()) return;
+
+        try {
+            ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
+            if (currentThread) {
+                user().sendRawPacketToServer(output);
+            } else {
+                user().scheduleSendRawPacketToServer(output);
+            }
+        } catch (Exception e) {
+            if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                throw e;
             }
         }
     }

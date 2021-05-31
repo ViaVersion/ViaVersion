@@ -169,7 +169,7 @@ public class WorldPackets {
                             PacketWrapper blockChange = wrapper.create(0x0B); // block change
                             blockChange.write(Type.POSITION, new Position(pos)); // Clone because position is mutable
                             blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
-                            blockChange.send(Protocol1_13To1_12_2.class, true, true);
+                            blockChange.send(Protocol1_13To1_12_2.class);
                         }
                         wrapper.set(Type.VAR_INT, 0, blockId);
                     }
@@ -197,7 +197,7 @@ public class WorldPackets {
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
                         if (Via.getConfig().isServersideBlockConnections()) {
                             // Workaround for packet order issue
-                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.send(Protocol1_13To1_12_2.class);
                             wrapper.cancel();
                             ConnectionData.update(userConnection, position);
                         }
@@ -250,7 +250,7 @@ public class WorldPackets {
                                 }
                             }
                             // Workaround for packet order issue
-                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.send(Protocol1_13To1_12_2.class);
                             wrapper.cancel();
 
                             for (BlockChangeRecord record : records) {
@@ -301,7 +301,7 @@ public class WorldPackets {
                         }
 
                         // Workaround for packet order issue
-                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                        wrapper.send(Protocol1_13To1_12_2.class);
                         wrapper.cancel();
 
                         for (int i = 0; i < recordCount; i++) {
@@ -463,7 +463,7 @@ public class WorldPackets {
                         if (Via.getConfig().isServersideBlockConnections()) {
                             ConnectionData.connectBlocks(wrapper.user(), chunk);
                             // Workaround for packet order issue
-                            wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                            wrapper.send(Protocol1_13To1_12_2.class);
                             wrapper.cancel();
                             for (int i = 0; i < chunk.getSections().length; i++) {
                                 ChunkSection section = chunk.getSections()[i];

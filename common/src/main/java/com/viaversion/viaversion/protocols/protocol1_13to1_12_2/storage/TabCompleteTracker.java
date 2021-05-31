@@ -36,7 +36,7 @@ public class TabCompleteTracker implements StorableObject {
         wrapper.write(Type.BOOLEAN, false);
         wrapper.write(Type.OPTIONAL_POSITION, null);
         try {
-            wrapper.sendToServer(Protocol1_13To1_12_2.class);
+            wrapper.scheduleSendToServer(Protocol1_13To1_12_2.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

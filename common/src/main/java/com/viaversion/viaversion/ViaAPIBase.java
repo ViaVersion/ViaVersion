@@ -67,7 +67,7 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
         }
 
         UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(uuid);
-        user.sendRawPacket(packet);
+        user.scheduleSendRawPacket(packet);
     }
 
     @Override

@@ -93,7 +93,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, this.itemInSecondHand = item);
         try {
-            wrapper.send(Protocol1_9To1_8.class);
+            wrapper.scheduleSend(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -239,7 +239,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                                 wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
                                 wrapper.write(Type.SHORT, (short) 0);
                                 wrapper.write(Type.BOOLEAN, true);
-                                wrapper.send(Protocol1_9To1_8.class, true, false);
+                                wrapper.scheduleSend(Protocol1_9To1_8.class);
                             } catch (Exception ignored) {
                             }
                         }
@@ -317,7 +317,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         }
         teamExists = add;
         try {
-            wrapper.send(Protocol1_9To1_8.class, true, now);
+            if (now) {
+                wrapper.send(Protocol1_9To1_8.class);
+            } else {
+                wrapper.scheduleSend(Protocol1_9To1_8.class);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -343,7 +347,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
             handleMetadata(entityId, metadataList);
             if (!metadataList.isEmpty()) {
                 try {
-                    wrapper.send(Protocol1_9To1_8.class);
+                    wrapper.scheduleSend(Protocol1_9To1_8.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

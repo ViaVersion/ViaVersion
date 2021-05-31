@@ -172,7 +172,7 @@ public class BungeeServerHandler implements Listener {
                                     PacketWrapper wrapper = PacketWrapper.create(0x0C, null, user);
                                     wrapper.write(Type.UUID, uuid);
                                     wrapper.write(Type.VAR_INT, 1); // remove
-                                    wrapper.send(Protocol1_9To1_8.class, true, true);
+                                    wrapper.send(Protocol1_9To1_8.class);
                                 }
                             }
                             storage.getBossbar().clear();

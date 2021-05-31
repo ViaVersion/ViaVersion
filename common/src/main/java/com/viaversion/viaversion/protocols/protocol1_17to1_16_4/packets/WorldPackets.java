@@ -231,7 +231,7 @@ public class WorldPackets {
             }
 
             blockChangePacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, blockChangeRecords);
-            blockChangePacket.send(Protocol1_17To1_16_4.class, true, true);
+            blockChangePacket.send(Protocol1_17To1_16_4.class);
         }
     }
 

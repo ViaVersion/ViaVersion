@@ -88,7 +88,7 @@ public class EntityPackets {
         List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
 
         // Send the spawn packet manually
-        wrapper.send(Protocol1_15To1_14_4.class, true, true);
+        wrapper.send(Protocol1_15To1_14_4.class);
         wrapper.cancel();
 
         // Handle meta
@@ -97,7 +97,7 @@ public class EntityPackets {
         PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.ENTITY_METADATA, wrapper.user());
         metadataPacket.write(Type.VAR_INT, entityId);
         metadataPacket.write(Types1_14.METADATA_LIST, metadata);
-        metadataPacket.send(Protocol1_15To1_14_4.class, true, true);
+        metadataPacket.send(Protocol1_15To1_14_4.class);
     }
 
     public static int getNewEntityId(int oldId) {

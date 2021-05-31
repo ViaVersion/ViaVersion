@@ -168,38 +168,50 @@ public interface PacketWrapper {
     void clearPacket();
 
     /**
-     * Send this packet to the associated user.
-     * Be careful not to send packets twice.
-     * (Sends it after current)
+     * Send this packet to the connection on the current thread, skipping the current protocol.
      *
-     * @param packetProtocol      The protocol version of the packet.
-     * @param skipCurrentPipeline Skip the current pipeline
+     * @param protocol protocol to be sent through
      * @throws Exception if it fails to write
      */
-    void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception;
+    default void send(Class<? extends Protocol> protocol) throws Exception {
+        send(protocol, true);
+    }
 
     /**
-     * Send this packet to the associated user.
-     * Be careful not to send packets twice.
-     * (Sends it after current)
+     * Send this packet to the connection on the current thread.
      *
-     * @param packetProtocol      The protocol version of the packet.
-     * @param skipCurrentPipeline Skip the current pipeline
-     * @param currentThread       Run in the same thread
+     * @param protocol            protocol to be sent through
+     * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
      * @throws Exception if it fails to write
      */
-    void send(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception;
+    void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
 
     /**
-     * Send this packet to the associated user.
-     * Be careful not to send packets twice.
-     * (Sends it after current)
+     * Send this packet to the connection, submitted to netty's event loop and skipping the current protocol.
      *
-     * @param packetProtocol The protocol version of the packet.
+     * @param protocol protocol to be sent through
      * @throws Exception if it fails to write
      */
-    default void send(Class<? extends Protocol> packetProtocol) throws Exception {
-        send(packetProtocol, true);
+    default void scheduleSend(Class<? extends Protocol> protocol) throws Exception {
+        scheduleSend(protocol, true);
+    }
+
+    /**
+     * Send this packet to the connection, submitted to netty's event loop.
+     *
+     * @param protocol            protocol to be sent through
+     * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
+     * @throws Exception if it fails to write
+     */
+    void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+
+    @Deprecated
+    default void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+        if (currentThread) {
+            send(protocol, skipCurrentPipeline);
+        } else {
+            scheduleSend(protocol, skipCurrentPipeline);
+        }
     }
 
     /**
@@ -303,21 +315,50 @@ public interface PacketWrapper {
     void sendToServer() throws Exception;
 
     /**
-     * Send this packet to the server.
+     * Send this packet to the server on the current thread, skipping the current protocol.
      *
-     * @param packetProtocol      The protocol version of the packet.
-     * @param skipCurrentPipeline Skip the current pipeline
-     * @param currentThread       Run in the same thread
+     * @param protocol protocol to be sent through
      * @throws Exception if it fails to write
      */
-    void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception;
-
-    default void sendToServer(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) throws Exception {
-        sendToServer(packetProtocol, skipCurrentPipeline, false);
+    default void sendToServer(Class<? extends Protocol> protocol) throws Exception {
+        sendToServer(protocol, true);
     }
 
-    default void sendToServer(Class<? extends Protocol> packetProtocol) throws Exception {
-        sendToServer(packetProtocol, true);
+    /**
+     * Send this packet to the server on the current thread.
+     *
+     * @param protocol            protocol to be sent through
+     * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
+     * @throws Exception if it fails to write
+     */
+    void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+
+    /**
+     * Send this packet to the server, submitted to netty's event loop and skipping the current protocol.
+     *
+     * @param protocol protocol to be sent through
+     * @throws Exception if it fails to write
+     */
+    default void scheduleSendToServer(Class<? extends Protocol> protocol) throws Exception {
+        scheduleSendToServer(protocol, true);
+    }
+
+    /**
+     * Send this packet to the server, submitted to netty's event loop.
+     *
+     * @param protocol            protocol to be sent through
+     * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
+     * @throws Exception if it fails to write
+     */
+    void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+
+    @Deprecated
+    default void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+        if (currentThread) {
+            sendToServer(protocol, skipCurrentPipeline);
+        } else {
+            scheduleSendToServer(protocol, skipCurrentPipeline);
+        }
     }
 
     /**

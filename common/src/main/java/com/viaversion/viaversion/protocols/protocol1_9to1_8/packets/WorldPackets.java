@@ -189,7 +189,7 @@ public class WorldPackets {
 
                             // Send through this protocol again
                             PacketWrapper chunkPacket = PacketWrapper.create(ClientboundPackets1_8.CHUNK_DATA, buffer, wrapper.user());
-                            chunkPacket.send(Protocol1_9To1_8.class, false, true);
+                            chunkPacket.send(Protocol1_9To1_8.class, false);
                         } finally {
                             if (buffer != null) {
                                 buffer.release();

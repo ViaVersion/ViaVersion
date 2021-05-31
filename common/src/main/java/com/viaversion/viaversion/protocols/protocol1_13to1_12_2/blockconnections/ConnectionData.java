@@ -66,7 +66,7 @@ public class ConnectionData {
             blockUpdatePacket.write(Type.POSITION, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
             try {
-                blockUpdatePacket.send(Protocol1_13To1_12_2.class, true, true);
+                blockUpdatePacket.send(Protocol1_13To1_12_2.class);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -140,7 +140,7 @@ public class ConnectionData {
                     wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
                     wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
                     try {
-                        wrapper.send(Protocol1_13To1_12_2.class, true, true);
+                        wrapper.send(Protocol1_13To1_12_2.class);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

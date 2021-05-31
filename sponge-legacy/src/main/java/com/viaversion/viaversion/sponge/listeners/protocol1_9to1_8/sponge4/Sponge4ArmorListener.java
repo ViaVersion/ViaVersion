@@ -71,7 +71,7 @@ public class Sponge4ArmorListener extends ViaListener {
             wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
             wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 is add number
 
-            wrapper.send(Protocol1_9To1_8.class);
+            wrapper.scheduleSend(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -227,7 +227,7 @@ public class CommonBoss implements BossBar {
             return;
         }
         try {
-            wrapper.send(Protocol1_9To1_8.class);
+            wrapper.scheduleSend(Protocol1_9To1_8.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
