@@ -54,8 +54,7 @@ public class LongType extends Type<Long> implements TypeConverter<Long> {
     public Long from(Object o) {
         if (o instanceof Number) {
             return ((Number) o).longValue();
-        }
-        if (o instanceof Boolean) {
+        } else if (o instanceof Boolean) {
             return ((Boolean) o) ? 1L : 0;
         }
         return (Long) o;

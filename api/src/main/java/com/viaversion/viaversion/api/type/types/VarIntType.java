@@ -86,8 +86,7 @@ public class VarIntType extends Type<Integer> implements TypeConverter<Integer> 
     public Integer from(Object o) {
         if (o instanceof Number) {
             return ((Number) o).intValue();
-        }
-        if (o instanceof Boolean) {
+        } else if (o instanceof Boolean) {
             return ((Boolean) o) ? 1 : 0;
         }
         return (Integer) o;

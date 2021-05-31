@@ -62,8 +62,7 @@ public class ShortType extends Type<Short> implements TypeConverter<Short> {
     public Short from(Object o) {
         if (o instanceof Number) {
             return ((Number) o).shortValue();
-        }
-        if (o instanceof Boolean) {
+        } else if (o instanceof Boolean) {
             return ((Boolean) o) ? (short) 1 : 0;
         }
         return (Short) o;

@@ -46,8 +46,7 @@ public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
     public Byte from(Object o) {
         if (o instanceof Number) {
             return ((Number) o).byteValue();
-        }
-        if (o instanceof Boolean) {
+        } else if (o instanceof Boolean) {
             return (Boolean) o ? (byte) 1 : 0;
         }
         return (Byte) o;

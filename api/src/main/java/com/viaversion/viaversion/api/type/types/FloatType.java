@@ -62,8 +62,7 @@ public class FloatType extends Type<Float> implements TypeConverter<Float> {
     public Float from(Object o) {
         if (o instanceof Number) {
             return ((Number) o).floatValue();
-        }
-        if (o instanceof Boolean) {
+        } else if (o instanceof Boolean) {
             return ((Boolean) o) ? 1F : 0;
         }
         return (Float) o;

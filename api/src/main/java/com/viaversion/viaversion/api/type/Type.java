@@ -75,99 +75,75 @@ import com.viaversion.viaversion.api.type.types.minecraft.VillagerDataType;
 
 import java.util.UUID;
 
+/**
+ * Type for buffer reading and writing.
+ *
+ * @param <T> read/written type
+ */
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
-    /* Defined Types */
+
     public static final ByteType BYTE = new ByteType();
-    /**
-     * @deprecated unreasonable overhead, use BYTE_ARRAY_PRIMITIVE
-     */
-    @Deprecated
-    public static final Type<Byte[]> BYTE_ARRAY = new ArrayType<>(Type.BYTE);
+    public static final UnsignedByteType UNSIGNED_BYTE = new UnsignedByteType();
     public static final Type<byte[]> BYTE_ARRAY_PRIMITIVE = new ByteArrayType();
     public static final Type<byte[]> SHORT_BYTE_ARRAY = new ShortByteArrayType();
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 
-    public static final UnsignedByteType UNSIGNED_BYTE = new UnsignedByteType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Short[]> UNSIGNED_BYTE_ARRAY = new ArrayType<>(Type.UNSIGNED_BYTE);
+    public static final ShortType SHORT = new ShortType();
+    public static final UnsignedShortType UNSIGNED_SHORT = new UnsignedShortType();
 
-    public static final BooleanType BOOLEAN = new BooleanType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Boolean[]> BOOLEAN_ARRAY = new ArrayType<>(Type.BOOLEAN);
-    /* Number Types */
     public static final IntType INT = new IntType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Integer[]> INT_ARRAY = new ArrayType<>(Type.INT);
-
+    public static final FloatType FLOAT = new FloatType();
     public static final DoubleType DOUBLE = new DoubleType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Double[]> DOUBLE_ARRAY = new ArrayType<>(Type.DOUBLE);
 
     public static final LongType LONG = new LongType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Long[]> LONG_ARRAY = new ArrayType<>(Type.LONG);
     public static final Type<long[]> LONG_ARRAY_PRIMITIVE = new LongArrayType();
 
-    public static final FloatType FLOAT = new FloatType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Float[]> FLOAT_ARRAY = new ArrayType<>(Type.FLOAT);
+    public static final BooleanType BOOLEAN = new BooleanType();
 
-    public static final ShortType SHORT = new ShortType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Short[]> SHORT_ARRAY = new ArrayType<>(Type.SHORT);
-
-    public static final UnsignedShortType UNSIGNED_SHORT = new UnsignedShortType();
-    /**
-     * @deprecated unreasonable overhead
-     */
-    @Deprecated
-    public static final Type<Integer[]> UNSIGNED_SHORT_ARRAY = new ArrayType<>(Type.UNSIGNED_SHORT);
     /* Other Types */
     public static final Type<JsonElement> COMPONENT = new ComponentType();
+    public static final Type<JsonElement> OPTIONAL_COMPONENT = new OptionalComponentType();
+
     public static final Type<String> STRING = new StringType();
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);
 
     public static final Type<UUID> UUID = new UUIDType();
+    public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
     public static final Type<UUID> UUID_INT_ARRAY = new UUIDIntArrayType();
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
-    /* Variable Types */
+
     public static final VarIntType VAR_INT = new VarIntType();
-    /**
-     * @deprecated unreasonable overhead, use VAR_INT_ARRAY_PRIMITIVE
-     */
+    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType();
+    public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
+    public static final VarLongType VAR_LONG = new VarLongType();
+
+    /* Boxed number array types */
+    @Deprecated
+    public static final Type<Byte[]> BYTE_ARRAY = new ArrayType<>(Type.BYTE);
+    @Deprecated
+    public static final Type<Short[]> UNSIGNED_BYTE_ARRAY = new ArrayType<>(Type.UNSIGNED_BYTE);
+    @Deprecated
+    public static final Type<Boolean[]> BOOLEAN_ARRAY = new ArrayType<>(Type.BOOLEAN);
+    @Deprecated
+    public static final Type<Integer[]> INT_ARRAY = new ArrayType<>(Type.INT);
+    @Deprecated
+    public static final Type<Short[]> SHORT_ARRAY = new ArrayType<>(Type.SHORT);
+    @Deprecated
+    public static final Type<Integer[]> UNSIGNED_SHORT_ARRAY = new ArrayType<>(Type.UNSIGNED_SHORT);
+    @Deprecated
+    public static final Type<Double[]> DOUBLE_ARRAY = new ArrayType<>(Type.DOUBLE);
+    @Deprecated
+    public static final Type<Long[]> LONG_ARRAY = new ArrayType<>(Type.LONG);
+    @Deprecated
+    public static final Type<Float[]> FLOAT_ARRAY = new ArrayType<>(Type.FLOAT);
     @Deprecated
     public static final Type<Integer[]> VAR_INT_ARRAY = new ArrayType<>(Type.VAR_INT);
-    public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
-    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType();
-    public static final VarLongType VAR_LONG = new VarLongType();
-    /**
-     * @deprecated unreasonable overhead
-     */
     @Deprecated
     public static final Type<Long[]> VAR_LONG_ARRAY = new ArrayType<>(Type.VAR_LONG);
+
     /* Special Types */
     public static final VoidType NOTHING = new VoidType(); // This is purely used for remapping.
+
     /* MC Types */
     public static final Type<Position> POSITION = new PositionType();
     public static final Type<Position> POSITION1_14 = new Position1_14Type();
@@ -176,13 +152,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<CompoundTag> NBT = new NBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
 
-    public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
-    public static final Type<JsonElement> OPTIONAL_COMPONENT = new OptionalComponentType();
     public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
     public static final Type<Position> OPTIONAL_POSITION_1_14 = new OptPosition1_14Type();
-
-    public static final Type<Item> ITEM = new ItemType();
-    public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
 
     public static final Type<BlockChangeRecord> BLOCK_CHANGE_RECORD = new BlockChangeRecordType();
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.BLOCK_CHANGE_RECORD);
@@ -191,6 +162,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<BlockChangeRecord[]> VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.VAR_LONG_BLOCK_CHANGE_RECORD);
 
     public static final Type<VillagerData> VILLAGER_DATA = new VillagerDataType();
+
+    public static final Type<Item> ITEM = new ItemType();
+    public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
 
     /* 1.13 Flat Item (no data) */
     public static final Type<Item> FLAT_ITEM = new FlatItemType();
@@ -201,7 +175,6 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Item[]> FLAT_VAR_INT_ITEM_ARRAY_VAR_INT = new ArrayType<>(FLAT_VAR_INT_ITEM);
 
     /* Actual Class */
-
     private final Class<? super T> outputClass;
     private final String typeName;
 
@@ -214,14 +187,30 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
         this.typeName = typeName;
     }
 
+    /**
+     * Returns the output class type.
+     *
+     * @return output class type
+     */
     public Class<? super T> getOutputClass() {
         return outputClass;
     }
 
+    /**
+     * Returns the type name.
+     *
+     * @return type name
+     */
     public String getTypeName() {
         return typeName;
     }
 
+    /**
+     * Returns the base class, useful when the output class is insufficient for type comparison.
+     * One such case are types with {{@link java.util.List}} as their output type.
+     *
+     * @return base class
+     */
     public Class<? extends Type> getBaseClass() {
         return this.getClass();
     }

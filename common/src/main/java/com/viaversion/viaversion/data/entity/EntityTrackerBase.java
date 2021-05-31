@@ -96,7 +96,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     public void setClientEntityId(int clientEntityId) {
         Preconditions.checkNotNull(playerType);
         entityTypes.put(clientEntityId, playerType);
-        if (entityData != null) {
+        if (this.clientEntityId != -1 && entityData != null) {
             StoredEntityData data = entityData.remove(this.clientEntityId);
             if (data != null) {
                 entityData.put(clientEntityId, data);
