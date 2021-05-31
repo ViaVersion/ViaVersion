@@ -57,7 +57,7 @@ public class MetadataRewriter1_17To1_16_4 extends EntityRewriter {
         });
 
         // Attachment position removed
-        filter().type(Entity1_17Types.SHULKER).removeIndex(16);
+        filter().type(Entity1_17Types.SHULKER).removeIndex(17);
     }
 
     @Override
