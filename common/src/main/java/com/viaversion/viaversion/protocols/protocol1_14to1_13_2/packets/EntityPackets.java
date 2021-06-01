@@ -107,7 +107,7 @@ public class EntityPackets {
                                 velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 0));
                                 velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 1));
                                 velocity.write(Type.SHORT, wrapper.get(Type.SHORT, 2));
-                                velocity.send(Protocol1_14To1_13_2.class);
+                                velocity.scheduleSend(Protocol1_14To1_13_2.class);
                             }
 
                             // Register Type ID
@@ -181,7 +181,7 @@ public class EntityPackets {
                             int entityId = wrapper.get(Type.VAR_INT, 0);
                             tracker.setSleeping(entityId, false);
 
-                            PacketWrapper metadataPacket = wrapper.create(0x43);
+                            PacketWrapper metadataPacket = wrapper.create(ClientboundPackets1_14.ENTITY_METADATA);
                             metadataPacket.write(Type.VAR_INT, entityId);
                             List<Metadata> metadataList = new LinkedList<>();
                             if (tracker.clientEntityId() != entityId) {
@@ -189,7 +189,7 @@ public class EntityPackets {
                             }
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
                             metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
-                            metadataPacket.send(Protocol1_14To1_13_2.class);
+                            metadataPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
                         }
                     }
                 });

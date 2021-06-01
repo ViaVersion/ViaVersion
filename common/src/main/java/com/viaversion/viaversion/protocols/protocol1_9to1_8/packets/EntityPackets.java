@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
@@ -71,7 +72,7 @@ public class EntityPackets {
 
                             wrapper.cancel(); // Don't send current packet
 
-                            PacketWrapper passengerPacket = wrapper.create(0x40); // Passenger Packet ID
+                            PacketWrapper passengerPacket = wrapper.create(ClientboundPackets1_9.SET_PASSENGERS);
                             if (vehicle == -1) {
                                 if (!tracker.getVehicleMap().containsKey(passenger))
                                     return null; // Cancel

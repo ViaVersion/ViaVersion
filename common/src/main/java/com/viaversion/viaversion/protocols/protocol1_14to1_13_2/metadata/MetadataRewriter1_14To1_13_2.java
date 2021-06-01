@@ -134,7 +134,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                 equipmentPacket.write(Type.VAR_INT, entityId);
                 equipmentPacket.write(Type.VAR_INT, 4);
                 equipmentPacket.write(Type.FLAT_VAR_INT_ITEM, armorItem);
-                equipmentPacket.send(Protocol1_14To1_13_2.class);
+                equipmentPacket.scheduleSend(Protocol1_14To1_13_2.class);
             }
         } else if (type.is(Entity1_14Types.VILLAGER)) {
             if (metadata.id() == 15) {

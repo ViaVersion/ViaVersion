@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
@@ -169,7 +170,7 @@ public class BungeeServerHandler implements Listener {
                             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
                             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                                 for (UUID uuid : storage.getBossbar()) {
-                                    PacketWrapper wrapper = PacketWrapper.create(0x0C, null, user);
+                                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, user);
                                     wrapper.write(Type.UUID, uuid);
                                     wrapper.write(Type.VAR_INT, 1); // remove
                                     wrapper.send(Protocol1_9To1_8.class);

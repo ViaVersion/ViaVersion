@@ -327,7 +327,7 @@ public class WorldPackets {
                         PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
                         difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                         difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
-                        difficultyPacket.send(protocol.getClass());
+                        difficultyPacket.scheduleSend(protocol.getClass());
 
                         wrapper.passthrough(Type.UNSIGNED_BYTE); // Max Players
                         wrapper.passthrough(Type.STRING); // Level Type
@@ -383,7 +383,7 @@ public class WorldPackets {
                         PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
                         difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                         difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
-                        difficultyPacket.send(protocol.getClass());
+                        difficultyPacket.scheduleSend(protocol.getClass());
                     }
                 });
                 handler(wrapper -> {

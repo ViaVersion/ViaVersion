@@ -129,7 +129,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
 
                     wrapper.write(Type.VAR_INT, 0); // Root node index
-                }).send(Protocol1_13To1_12_2.class);
+                }).scheduleSend(Protocol1_13To1_12_2.class);
 
                 // Send tags packet
                 w.create(ClientboundPackets1_13.TAGS, wrapper -> {
@@ -151,7 +151,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                         // Needs copy as other protocols may modify it
                         wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
                     }
-                }).send(Protocol1_13To1_12_2.class);
+                }).scheduleSend(Protocol1_13To1_12_2.class);
             };
 
     @Override
@@ -349,7 +349,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                             for (int i = 0; i < 44; i++) {
                                 Integer newItem = getMappingData().getItemMappings().get(item << 16 | i);
                                 if (newItem != null) {
-                                    PacketWrapper packet = wrapper.create(0x18);
+                                    PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
                                     packet.write(Type.VAR_INT, newItem);
                                     packet.write(Type.VAR_INT, ticks);
                                     packet.send(Protocol1_13To1_12_2.class);
@@ -361,7 +361,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                             for (int i = 0; i < 16; i++) {
                                 int newItem = getMappingData().getItemMappings().get(item << 4 | i);
                                 if (newItem != -1) {
-                                    PacketWrapper packet = wrapper.create(0x18);
+                                    PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
                                     packet.write(Type.VAR_INT, newItem);
                                     packet.write(Type.VAR_INT, ticks);
                                     packet.send(Protocol1_13To1_12_2.class);
@@ -502,7 +502,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                             wrapper.write(Type.STRING_ARRAY, stringIds);
                         }
                         if (action == 0) {
-                            wrapper.create(0x54, new ValueCreator() { // Declare recipes
+                            wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, new ValueCreator() { // Declare recipes
                                 @Override
                                 public void write(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.VAR_INT, RecipeData.recipes.size());

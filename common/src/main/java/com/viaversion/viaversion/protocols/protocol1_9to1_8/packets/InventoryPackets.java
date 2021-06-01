@@ -63,7 +63,7 @@ public class InventoryPackets {
                                             wrapper.write(Type.SHORT, property);
                                             wrapper.write(Type.SHORT, enchantID);
                                         }
-                                    }).send(Protocol1_9To1_8.class);
+                                    }).scheduleSend(Protocol1_9To1_8.class);
 
                                     wrapper.set(Type.SHORT, 0, (short) (property + 3));
                                     wrapper.set(Type.SHORT, 1, level);
@@ -360,7 +360,7 @@ public class InventoryPackets {
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);
                                 }
-                            }).send(Protocol1_9To1_8.class);
+                            }).scheduleSend(Protocol1_9To1_8.class);
                             // Finally reset to simulate throwing item
                             wrapper.set(Type.BYTE, 0, (byte) 0); // Set button to 0
                             wrapper.set(Type.BYTE, 1, (byte) 0); // Set mode to 0

@@ -126,7 +126,7 @@ public class SpawnPackets {
                                     wrapper.write(Types1_9.METADATA_LIST, meta);
                                 }
                             });
-                            metaPacket.send(Protocol1_9To1_8.class);
+                            metaPacket.scheduleSend(Protocol1_9To1_8.class);
                         }
                     }
                 });

@@ -433,7 +433,7 @@ public class WorldPackets {
                             updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
                             updateBlockEntity.write(Type.NBT, tag.get());
 
-                            updateBlockEntity.send(Protocol1_9To1_8.class);
+                            updateBlockEntity.scheduleSend(Protocol1_9To1_8.class);
                         }
                     }
                 });
