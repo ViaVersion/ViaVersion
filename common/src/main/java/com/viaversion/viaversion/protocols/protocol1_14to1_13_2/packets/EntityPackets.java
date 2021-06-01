@@ -189,7 +189,7 @@ public class EntityPackets {
                             }
                             metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
                             metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
-                            metadataPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
+                            metadataPacket.scheduleSend(Protocol1_14To1_13_2.class);
                         }
                     }
                 });
