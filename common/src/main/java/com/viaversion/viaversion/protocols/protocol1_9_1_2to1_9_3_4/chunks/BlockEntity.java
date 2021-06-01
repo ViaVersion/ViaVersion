@@ -79,6 +79,6 @@ public class BlockEntity {
         wrapper.write(Type.POSITION, pos);
         wrapper.write(Type.UNSIGNED_BYTE, id);
         wrapper.write(Type.NBT, tag);
-        wrapper.send(Protocol1_9_1_2To1_9_3_4.class, false);
+        wrapper.scheduleSend(Protocol1_9_1_2To1_9_3_4.class, false);
     }
 }
