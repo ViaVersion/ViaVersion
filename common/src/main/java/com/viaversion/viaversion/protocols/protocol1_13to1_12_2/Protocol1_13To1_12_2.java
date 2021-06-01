@@ -113,49 +113,43 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     private static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
             w -> {
                 // Send fake declare commands
-                w.create(0x11, new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) {
-                        wrapper.write(Type.VAR_INT, 2); // Size
-                        // Write root node
-                        wrapper.write(Type.BYTE, (byte) 0); // Mark as command
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
+                w.create(ClientboundPackets1_13.DECLARE_COMMANDS, wrapper -> {
+                    wrapper.write(Type.VAR_INT, 2); // Size
+                    // Write root node
+                    wrapper.write(Type.BYTE, (byte) 0); // Mark as command
+                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
 
-                        // Write arg node
-                        wrapper.write(Type.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // No children
-                        // Extra data
-                        wrapper.write(Type.STRING, "args"); // Arg name
-                        wrapper.write(Type.STRING, "brigadier:string");
-                        wrapper.write(Type.VAR_INT, 2); // Greedy
-                        wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
+                    // Write arg node
+                    wrapper.write(Type.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command
+                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // No children
+                    // Extra data
+                    wrapper.write(Type.STRING, "args"); // Arg name
+                    wrapper.write(Type.STRING, "brigadier:string");
+                    wrapper.write(Type.VAR_INT, 2); // Greedy
+                    wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
 
-                        wrapper.write(Type.VAR_INT, 0); // Root node index
-                    }
+                    wrapper.write(Type.VAR_INT, 0); // Root node index
                 }).send(Protocol1_13To1_12_2.class);
 
                 // Send tags packet
-                w.create(0x55, new ValueCreator() {
-                    @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
-                        for (Map.Entry<String, Integer[]> tag : MAPPINGS.getBlockTags().entrySet()) {
-                            wrapper.write(Type.STRING, tag.getKey());
-                            // Needs copy as other protocols may modify it
-                            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
-                        }
-                        wrapper.write(Type.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
-                        for (Map.Entry<String, Integer[]> tag : MAPPINGS.getItemTags().entrySet()) {
-                            wrapper.write(Type.STRING, tag.getKey());
-                            // Needs copy as other protocols may modify it
-                            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
-                        }
-                        wrapper.write(Type.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
-                        for (Map.Entry<String, Integer[]> tag : MAPPINGS.getFluidTags().entrySet()) {
-                            wrapper.write(Type.STRING, tag.getKey());
-                            // Needs copy as other protocols may modify it
-                            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
-                        }
+                w.create(ClientboundPackets1_13.TAGS, wrapper -> {
+                    wrapper.write(Type.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
+                    for (Map.Entry<String, Integer[]> tag : MAPPINGS.getBlockTags().entrySet()) {
+                        wrapper.write(Type.STRING, tag.getKey());
+                        // Needs copy as other protocols may modify it
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
+                    }
+                    wrapper.write(Type.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
+                    for (Map.Entry<String, Integer[]> tag : MAPPINGS.getItemTags().entrySet()) {
+                        wrapper.write(Type.STRING, tag.getKey());
+                        // Needs copy as other protocols may modify it
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
+                    }
+                    wrapper.write(Type.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
+                    for (Map.Entry<String, Integer[]> tag : MAPPINGS.getFluidTags().entrySet()) {
+                        wrapper.write(Type.STRING, tag.getKey());
+                        // Needs copy as other protocols may modify it
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
                     }
                 }).send(Protocol1_13To1_12_2.class);
             };

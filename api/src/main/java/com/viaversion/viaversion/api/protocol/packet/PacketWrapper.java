@@ -238,30 +238,44 @@ public interface PacketWrapper {
     void send() throws Exception;
 
     /**
-     * Create a new packet for the target of this packet.
+     * Creates a new packet for the target of this packet.
      *
      * @param packetType packet type of the new packet
      * @return The newly created packet wrapper
      */
-    PacketWrapper create(PacketType packetType);
+    default PacketWrapper create(PacketType packetType) {
+        return create(packetType.getId());
+    }
 
     /**
-     * Create a new packet for the target of this packet.
+     * Creates a new packet with values.
      *
-     * @param packetID The ID of the new packet
-     * @return The newly created packet wrapper
+     * @param packetType   packet type of the new packet
+     * @param valueCreator ValueCreator to write to the packet
+     * @return newly created packet wrapper
+     * @throws Exception if it failed to write the values from the ValueCreator.
      */
-    PacketWrapper create(int packetID);
+    default PacketWrapper create(PacketType packetType, ValueCreator valueCreator) throws Exception {
+        return create(packetType.getId(), valueCreator);
+    }
 
     /**
-     * Create a new packet with values.
+     * Creates a new packet for the target of this packet.
      *
-     * @param packetID The ID of the new packet
-     * @param init     A ValueCreator to write to the packet.
-     * @return The newly created packet wrapper
-     * @throws Exception If it failed to write the values from the ValueCreator.
+     * @param packetId id of the packet
+     * @return newly created packet wrapper
      */
-    PacketWrapper create(int packetID, ValueCreator init) throws Exception;
+    PacketWrapper create(int packetId);
+
+    /**
+     * Creates a new packet with values.
+     *
+     * @param packetId     id of the packet
+     * @param valueCreator ValueCreator to write to the packet.
+     * @return newly created packet wrapper
+     * @throws Exception if it failed to write the values from the ValueCreator.
+     */
+    PacketWrapper create(int packetId, ValueCreator valueCreator) throws Exception;
 
     /**
      * Applies a pipeline from an index to the wrapper.

@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
-import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
@@ -322,19 +321,14 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public PacketWrapperImpl create(PacketType packetType) {
-        return new PacketWrapperImpl(packetType.getId(), null, user());
+    public PacketWrapperImpl create(int packetId) {
+        return new PacketWrapperImpl(packetId, null, user());
     }
 
     @Override
-    public PacketWrapperImpl create(int packetID) {
-        return new PacketWrapperImpl(packetID, null, user());
-    }
-
-    @Override
-    public PacketWrapperImpl create(int packetID, ValueCreator init) throws Exception {
-        PacketWrapperImpl wrapper = create(packetID);
-        init.write(wrapper);
+    public PacketWrapperImpl create(int packetId, ValueCreator valueCreator) throws Exception {
+        PacketWrapperImpl wrapper = create(packetId);
+        valueCreator.write(wrapper);
         return wrapper;
     }
 
