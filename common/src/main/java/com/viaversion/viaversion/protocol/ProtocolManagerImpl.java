@@ -65,8 +65,10 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_9_1.Protocol1_9To1_9_1;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
@@ -107,6 +109,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private boolean mappingsLoaded;
 
     private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(-1);
+    private boolean onlyCheckLoweringPathEntries = true;
     private int maxProtocolPathSize = 50;
 
     public ProtocolManagerImpl() {
@@ -173,8 +176,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
         protocols.put(protocol.getClass(), protocol);
 
-        for (int version : supportedClientVersion) {
-            Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(version, s -> new Int2ObjectOpenHashMap<>(2));
+        for (int clientVersion : supportedClientVersion) {
+            // Throw an error if supported client version = server version
+            Preconditions.checkArgument(clientVersion != serverVersion);
+
+            Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(clientVersion, s -> new Int2ObjectOpenHashMap<>(2));
             protocolMap.put(serverVersion, protocol);
         }
 
@@ -212,32 +218,40 @@ public class ProtocolManagerImpl implements ProtocolManager {
         supportedVersions.clear();
 
         supportedVersions.add(serverProtocolVersion.lowestSupportedVersion());
-        for (ProtocolVersion versions : ProtocolVersion.getProtocols()) {
-            List<ProtocolPathEntry> paths = getProtocolPath(versions.getVersion(), serverProtocolVersion.lowestSupportedVersion());
-            if (paths == null) continue;
-            supportedVersions.add(versions.getVersion());
-            for (ProtocolPathEntry path : paths) {
-                supportedVersions.add(path.getOutputProtocolVersion());
+        for (ProtocolVersion version : ProtocolVersion.getProtocols()) {
+            List<ProtocolPathEntry> protocolPath = getProtocolPath(version.getVersion(), serverProtocolVersion.lowestSupportedVersion());
+            if (protocolPath == null) continue;
+
+            supportedVersions.add(version.getVersion());
+            for (ProtocolPathEntry pathEntry : protocolPath) {
+                supportedVersions.add(pathEntry.getOutputProtocolVersion());
             }
         }
     }
 
     @Override
     public @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
-        ProtocolPathKey protocolKey = new ProtocolPathKeyImpl(clientVersion, serverVersion);
+        if (clientVersion == serverVersion) return null; // Nothing to do!
+
         // Check cache
+        ProtocolPathKey protocolKey = new ProtocolPathKeyImpl(clientVersion, serverVersion);
         List<ProtocolPathEntry> protocolList = pathCache.get(protocolKey);
         if (protocolList != null) {
             return protocolList;
         }
 
-        // Generate path
-        List<ProtocolPathEntry> outputPath = getProtocolPath(new ArrayList<>(), clientVersion, serverVersion);
-        // If it found a path, cache it.
-        if (outputPath != null) {
-            pathCache.put(protocolKey, outputPath);
+        // Calculate path
+        Int2ObjectSortedMap<Protocol> outputPath = getProtocolPath(new Int2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
+        if (outputPath == null) {
+            return null;
         }
-        return outputPath;
+
+        List<ProtocolPathEntry> path = new ArrayList<>(outputPath.size());
+        for (Int2ObjectMap.Entry<Protocol> entry : outputPath.int2ObjectEntrySet()) {
+            path.add(new ProtocolPathEntryImpl(entry.getIntKey(), entry.getValue()));
+        }
+        pathCache.put(protocolKey, path);
+        return path;
     }
 
     /**
@@ -248,44 +262,41 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @param serverVersion desired output version
      * @return path that has been generated, null if failed
      */
-    private @Nullable List<ProtocolPathEntry> getProtocolPath(List<ProtocolPathEntry> current, int clientVersion, int serverVersion) {
-        //TODO optimize?
-        if (clientVersion == serverVersion) return null; // We're already there
+    private @Nullable Int2ObjectSortedMap<Protocol> getProtocolPath(Int2ObjectSortedMap<Protocol> current, int clientVersion, int serverVersion) {
         if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
 
-        // First check if there is any protocols for this
-        Int2ObjectMap<Protocol> inputMap = registryMap.get(clientVersion);
-        if (inputMap == null) {
+        // First, check if there is any protocols for this
+        Int2ObjectMap<Protocol> toServerProtocolMap = registryMap.get(clientVersion);
+        if (toServerProtocolMap == null) {
             return null; // Not supported
         }
 
-        // Next check there isn't an obvious path
-        Protocol protocol = inputMap.get(serverVersion);
+        // Next, check if there is a direct, single Protocol path
+        Protocol protocol = toServerProtocolMap.get(serverVersion);
         if (protocol != null) {
-            current.add(new ProtocolPathEntryImpl(serverVersion, protocol));
+            current.put(serverVersion, protocol);
             return current; // Easy solution
         }
 
         // There might be a more advanced solution... So we'll see if any of the others can get us there
-        List<ProtocolPathEntry> shortest = null;
-        for (Int2ObjectMap.Entry<Protocol> entry : inputMap.int2ObjectEntrySet()) {
-            // Ensure it wasn't caught by the other loop
-            if (entry.getIntKey() == serverVersion) continue;
+        Int2ObjectSortedMap<Protocol> shortest = null;
+        for (Int2ObjectMap.Entry<Protocol> entry : toServerProtocolMap.int2ObjectEntrySet()) {
+            // Ensure we don't go back to already contained versions
+            int translatedToVersion = entry.getIntKey();
+            if (current.containsKey(translatedToVersion)) continue;
 
-            ProtocolPathEntry pathEntry = new ProtocolPathEntryImpl(entry.getIntKey(), entry.getValue());
-            // Ensure no recursion
-            if (current.contains(pathEntry)) continue;
+            // Check if the new version is farther away than the current client version
+            if (onlyCheckLoweringPathEntries && Math.abs(serverVersion - translatedToVersion) > Math.abs(serverVersion - clientVersion)) {
+                continue;
+            }
 
             // Create a copy
-            List<ProtocolPathEntry> newCurrent = new ArrayList<>(current);
-            newCurrent.add(pathEntry);
+            Int2ObjectSortedMap<Protocol> newCurrent = new Int2ObjectLinkedOpenHashMap<>(current);
+            newCurrent.put(translatedToVersion, entry.getValue());
 
-            // Calculate the rest of the protocol using the current path entry
-            newCurrent = getProtocolPath(newCurrent, entry.getIntKey(), serverVersion);
-
-            // If it's shorter then choose it
-            if (newCurrent != null
-                    && (shortest == null || shortest.size() > newCurrent.size())) {
+            // Calculate the rest of the protocol starting from translatedToVersion and take the shortest
+            newCurrent = getProtocolPath(newCurrent, translatedToVersion, serverVersion);
+            if (newCurrent != null && (shortest == null || newCurrent.size() < shortest.size())) {
                 shortest = newCurrent;
             }
         }
@@ -340,6 +351,16 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public SortedSet<Integer> getSupportedVersions() {
         return Collections.unmodifiableSortedSet(new TreeSet<>(supportedVersions));
+    }
+
+    @Override
+    public void setOnlyCheckLoweringPathEntries(boolean onlyCheckLoweringPathEntries) {
+        this.onlyCheckLoweringPathEntries = onlyCheckLoweringPathEntries;
+    }
+
+    @Override
+    public boolean onlyCheckLoweringPathEntries() {
+        return onlyCheckLoweringPathEntries;
     }
 
     @Override

@@ -113,26 +113,26 @@ public class ProtocolVersion {
     /**
      * Returns whether a protocol with the given protocol version is registered.
      *
-     * @param id protocol version
+     * @param version protocol version
      * @return true if this protocol version has been registered
      */
-    public static boolean isRegistered(int id) {
-        return VERSIONS.containsKey(id);
+    public static boolean isRegistered(int version) {
+        return VERSIONS.containsKey(version);
     }
 
     /**
      * Returns a {@link ProtocolVersion} instance, even if this protocol version
      * has not been registered. See {@link #isRegistered(int)} berorehand or {@link #isKnown()}.
      *
-     * @param id protocol version
+     * @param version protocol version
      * @return registered or unknown {@link ProtocolVersion}
      */
-    public static @NonNull ProtocolVersion getProtocol(int id) {
-        ProtocolVersion protocolVersion = VERSIONS.get(id);
+    public static @NonNull ProtocolVersion getProtocol(int version) {
+        ProtocolVersion protocolVersion = VERSIONS.get(version);
         if (protocolVersion != null) {
             return protocolVersion;
         } else {
-            return new ProtocolVersion(id, "Unknown (" + id + ")");
+            return new ProtocolVersion(version, "Unknown (" + version + ")");
         }
     }
 

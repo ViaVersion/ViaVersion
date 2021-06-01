@@ -109,6 +109,7 @@ public interface ProtocolManager {
      * @param protocol      protocol to register
      * @param clientVersion supported client protocol versions
      * @param serverVersion output server protocol version the protocol converts to
+     * @throws IllegalArgumentException if the client protocol version is equal to the server protocol version
      */
     void registerProtocol(Protocol protocol, ProtocolVersion clientVersion, ProtocolVersion serverVersion);
 
@@ -118,6 +119,7 @@ public interface ProtocolManager {
      * @param protocol               protocol to register
      * @param supportedClientVersion supported client protocol versions
      * @param serverVersion          output server protocol version the protocol converts to
+     * @throws IllegalArgumentException if a supported client protocol version is equal to the server protocol version
      */
     void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion);
 
@@ -140,6 +142,37 @@ public interface ProtocolManager {
      * @return path generated, or null if not supported or the length exceeds {@link #getMaxProtocolPathSize()}
      */
     @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
+
+    /**
+     * Returns whether protocol path calculation expects the path to come closer to the expected version with each entry, true by default.
+     * <p>
+     * In practice, this means a path will never go to a protocol version that puts it farther from the desired
+     * server protocol version, even if a path existed.
+     * If this is set to false, *all* possible paths will be checked until a fitting one is found.
+     * <p>
+     * Negative examples if this returns true:
+     * <ul>
+     *     A possible path from 3 to 5 in order of 3->10->5 will be dismissed.
+     *     A possible path from 5 to 3 in order of 5->0->3 will be dismissed.
+     * </ul>
+     * <p>
+     * Negative examples if this returns false:
+     * <ul>
+     *     While searching for a path from 3 to 5, 3->2->1 could be checked first before 3->4->5 is found.
+     *     While searching for a path from 5 to 3, 5->6->7 could be checked first before 5->4->3 is found.
+     * </ul>
+     *
+     * @return whether protocol path calculation expects the path to come closer to the expected version with each entry
+     */
+    boolean onlyCheckLoweringPathEntries();
+
+    /**
+     * Sets whether protocol path calculation expects the path to come closer to the expected version with each entry.
+     *
+     * @param onlyCheckLoweringPathEntries whether protocol path calculation expects the path to come closer to the expected version with each entry
+     * @see #onlyCheckLoweringPathEntries()
+     */
+    void setOnlyCheckLoweringPathEntries(boolean onlyCheckLoweringPathEntries);
 
     /**
      * Returns the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.
