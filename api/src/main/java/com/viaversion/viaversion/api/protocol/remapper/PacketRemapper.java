@@ -44,8 +44,7 @@ public abstract class PacketRemapper {
      * @param type type to map
      */
     public void map(Type type) {
-        TypeRemapper remapper = new TypeRemapper(type);
-        map(remapper, remapper);
+        handler(wrapper -> wrapper.write(type, wrapper.read(type)));
     }
 
     /**
@@ -55,7 +54,7 @@ public abstract class PacketRemapper {
      * @param newType new type
      */
     public void map(Type oldType, Type newType) {
-        map(new TypeRemapper(oldType), new TypeRemapper(newType));
+        handler(wrapper -> wrapper.write(newType, wrapper.read(oldType)));
     }
 
     /**
@@ -68,7 +67,7 @@ public abstract class PacketRemapper {
      * @param transformer transformer to produce the new type
      */
     public <T1, T2> void map(Type<T1> oldType, Type<T2> newType, Function<T1, T2> transformer) {
-        map(new TypeRemapper<>(oldType), new ValueTransformer<T1, T2>(newType) {
+        map(oldType, new ValueTransformer<T1, T2>(newType) {
             @Override
             public T2 transform(PacketWrapper wrapper, T1 inputValue) throws Exception {
                 return transformer.apply(inputValue);
@@ -99,7 +98,7 @@ public abstract class PacketRemapper {
      * @param transformer transformer to produce the new type
      */
     public <T1, T2> void map(Type<T1> oldType, ValueTransformer<T1, T2> transformer) {
-        map(new TypeRemapper(oldType), transformer);
+        map(new TypeRemapper<>(oldType), transformer);
     }
 
     /**
@@ -110,7 +109,7 @@ public abstract class PacketRemapper {
      * @param <T>          read/write type
      */
     public <T> void map(ValueReader<T> inputReader, ValueWriter<T> outputWriter) {
-        valueRemappers.add(new ReadWriteValueHandler(inputReader, outputWriter));
+        handler(wrapper -> outputWriter.write(wrapper, inputReader.read(wrapper)));
     }
 
     /**
@@ -129,7 +128,7 @@ public abstract class PacketRemapper {
      * @param value value to write
      */
     public <T> void create(Type<T> type, T value) {
-        valueRemappers.add(wrapper -> wrapper.write(type, value));
+        handler(wrapper -> wrapper.write(type, value));
     }
 
     /**
@@ -138,7 +137,7 @@ public abstract class PacketRemapper {
      * @param type type to read
      */
     public void read(Type type) {
-        valueRemappers.add(wrapper -> wrapper.read(type));
+        handler(wrapper -> wrapper.read(type));
     }
 
     /**

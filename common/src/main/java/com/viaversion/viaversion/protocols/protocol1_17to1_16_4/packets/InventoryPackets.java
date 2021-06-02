@@ -119,11 +119,11 @@ public class InventoryPackets {
                     // Check extra bit for fast dismissal
                     if ((id & (1 << 30)) != 0 && wrapper.user().get(InventoryAcknowledgements.class).removeId(id)) {
                         // Decode our requested inventory acknowledgement
-                        int inventoryId = (id >> 16) & 0xFF;
-                        int confirmationId = id & 0xFFFF;
+                        short inventoryId = (short) ((id >> 16) & 0xFF);
+                        short confirmationId = (short) (id & 0xFFFF);
                         PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
-                        packet.write(Type.UNSIGNED_BYTE, (short) inventoryId);
-                        packet.write(Type.SHORT, (short) confirmationId);
+                        packet.write(Type.UNSIGNED_BYTE, inventoryId);
+                        packet.write(Type.SHORT, confirmationId);
                         packet.write(Type.BYTE, (byte) 1); // Accept
                         packet.sendToServer(Protocol1_17To1_16_4.class);
                     }
