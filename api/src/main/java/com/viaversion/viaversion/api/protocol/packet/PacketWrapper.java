@@ -205,15 +205,6 @@ public interface PacketWrapper {
      */
     void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
 
-    @Deprecated
-    default void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
-        if (currentThread) {
-            send(protocol, skipCurrentPipeline);
-        } else {
-            scheduleSend(protocol, skipCurrentPipeline);
-        }
-    }
-
     /**
      * Send this packet to the associated user.
      * Be careful not to send packets twice.
@@ -365,15 +356,6 @@ public interface PacketWrapper {
      * @throws Exception if it fails to write
      */
     void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
-
-    @Deprecated
-    default void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
-        if (currentThread) {
-            sendToServer(protocol, skipCurrentPipeline);
-        } else {
-            scheduleSendToServer(protocol, skipCurrentPipeline);
-        }
-    }
 
     /**
      * Returns the packet id.
