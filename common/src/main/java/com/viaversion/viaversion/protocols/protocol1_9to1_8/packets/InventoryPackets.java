@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
@@ -56,9 +55,9 @@ public class InventoryPackets {
                                     // Send 2 properties, splitting it into enchantID & level
                                     final short level = (short) (value >> 8);
                                     final short enchantID = (short) (value & 0xFF);
-                                    wrapper.create(wrapper.getId(), new ValueCreator() {
+                                    wrapper.create(wrapper.getId(), new PacketHandler() {
                                         @Override
-                                        public void write(PacketWrapper wrapper) throws Exception {
+                                        public void handle(PacketWrapper wrapper) throws Exception {
                                             wrapper.write(Type.UNSIGNED_BYTE, windowId);
                                             wrapper.write(Type.SHORT, property);
                                             wrapper.write(Type.SHORT, enchantID);
@@ -238,9 +237,9 @@ public class InventoryPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Map ID
                 map(Type.BYTE); // 1 - Map Scale
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) {
                         wrapper.write(Type.BOOLEAN, true); // 2 - Show marker
                     }
                 });
@@ -287,9 +286,9 @@ public class InventoryPackets {
                         boolean throwItem = (slot == 45);
                         if (throwItem) {
                             // Send a packet wiping the slot
-                            wrapper.create(0x16, new ValueCreator() {
+                            wrapper.create(0x16, new PacketHandler() {
                                 @Override
-                                public void write(PacketWrapper wrapper) throws Exception {
+                                public void handle(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.BYTE, (byte) 0);
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);
@@ -353,9 +352,9 @@ public class InventoryPackets {
 
                         if (throwItem) {
                             // Send a packet wiping the slot
-                            wrapper.create(0x16, new ValueCreator() {
+                            wrapper.create(0x16, new PacketHandler() {
                                 @Override
-                                public void write(PacketWrapper wrapper) throws Exception {
+                                public void handle(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.BYTE, (byte) windowID);
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);

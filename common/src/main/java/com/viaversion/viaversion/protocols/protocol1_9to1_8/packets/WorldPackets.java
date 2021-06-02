@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -370,9 +369,9 @@ public class WorldPackets {
                         if (hand != 0) wrapper.cancel();
                     }
                 });
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
                         wrapper.write(Type.ITEM, item); // 3 - Item
                     }

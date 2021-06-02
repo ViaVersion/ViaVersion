@@ -19,13 +19,11 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
@@ -106,9 +104,9 @@ public class PlayerPackets {
 
                 map(Type.BYTE); // 5 - Player Flags
 
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) {
+                    public void handle(PacketWrapper wrapper) {
                         wrapper.write(Type.VAR_INT, 0); // 6 - Teleport ID was added
                     }
                 });

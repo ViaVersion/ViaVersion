@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
@@ -106,9 +105,9 @@ public class WorldPackets {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE);
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.BOOLEAN, false);  // Added in 19w11a. Maybe https://bugs.mojang.com/browse/MC-44471 ?
                     }
                 });
@@ -352,9 +351,9 @@ public class WorldPackets {
                 map(Type.VAR_INT);
                 map(Type.BYTE);
                 map(Type.BOOLEAN);
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.BOOLEAN, false);  // new value, probably if the map is locked (added in 19w02a), old maps are not locked
                     }
                 });

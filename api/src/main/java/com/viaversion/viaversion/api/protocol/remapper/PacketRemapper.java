@@ -26,23 +26,22 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
-import com.viaversion.viaversion.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 public abstract class PacketRemapper {
-    private final List<Pair<ValueReader, ValueWriter>> valueRemappers = new ArrayList<>();
+    private final List<PacketHandler> valueRemappers = new ArrayList<>();
 
     protected PacketRemapper() {
         registerMap();
     }
 
     /**
-     * Map a type to the same type.
+     * Reads and writes the given type.
      *
-     * @param type Type to map
+     * @param type type to map
      */
     public void map(Type type) {
         TypeRemapper remapper = new TypeRemapper(type);
@@ -50,23 +49,23 @@ public abstract class PacketRemapper {
     }
 
     /**
-     * Map a type from an old type to a new type
+     * Reads the first given type and writes the second given type.
      *
-     * @param oldType The old type
-     * @param newType The new type
+     * @param oldType old type
+     * @param newType new type
      */
     public void map(Type oldType, Type newType) {
         map(new TypeRemapper(oldType), new TypeRemapper(newType));
     }
 
     /**
-     * Map a type from an old type to a transformed new type.
+     * Maps a type from an old type to a transformed new type.
      *
-     * @param oldType     The old type
-     * @param <T1>        The old return type.
-     * @param newType     The new type
-     * @param <T2>        The new return type.
-     * @param transformer The transformer to use to produce the new type.
+     * @param <T1>        old value type
+     * @param <T2>        new value type
+     * @param oldType     old type
+     * @param newType     new type
+     * @param transformer transformer to produce the new type
      */
     public <T1, T2> void map(Type<T1> oldType, Type<T2> newType, Function<T1, T2> transformer) {
         map(new TypeRemapper<>(oldType), new ValueTransformer<T1, T2>(newType) {
@@ -78,11 +77,11 @@ public abstract class PacketRemapper {
     }
 
     /**
-     * Map a type from an old type to a transformed new type.
+     * Maps a type from an old type to a transformed new type based on their input type.
      *
-     * @param <T1>        The old return type.
-     * @param transformer The transformer to use to produce the new type.
-     * @param <T2>        The new return type.
+     * @param <T1>        old value type
+     * @param <T2>        new value type
+     * @param transformer transformer to produce the new type
      */
     public <T1, T2> void map(ValueTransformer<T1, T2> transformer) {
         if (transformer.getInputType() == null) {
@@ -92,72 +91,78 @@ public abstract class PacketRemapper {
     }
 
     /**
-     * Map a type from an old type to a transformed new type.
+     * Maps a type from an old type to a transformed new type.
      *
-     * @param oldType     The old type
-     * @param <T1>        The old return type.
-     * @param transformer The transformer to use to produce the new type.
-     * @param <T2>        The new return type.
+     * @param <T1>        old value type
+     * @param <T2>        new value type
+     * @param oldType     old type
+     * @param transformer transformer to produce the new type
      */
     public <T1, T2> void map(Type<T1> oldType, ValueTransformer<T1, T2> transformer) {
         map(new TypeRemapper(oldType), transformer);
     }
 
     /**
-     * Map a type using a basic ValueReader to a ValueWriter
+     * Maps a type using a basic ValueReader to a ValueWriter.
      *
-     * @param inputReader  The reader to read with.
-     * @param outputWriter The writer to write with
-     * @param <T>          The return type
+     * @param inputReader  reader to read with
+     * @param outputWriter writer to write with
+     * @param <T>          read/write type
      */
     public <T> void map(ValueReader<T> inputReader, ValueWriter<T> outputWriter) {
-        valueRemappers.add(new Pair<>(inputReader, outputWriter));
+        valueRemappers.add(new ReadWriteValueHandler(inputReader, outputWriter));
     }
 
     /**
-     * Create a value
+     * Adds a packet handler.
      *
-     * @param creator The creator to used to make the value(s).
-     */
-    public void create(ValueCreator creator) {
-        map(new TypeRemapper(Type.NOTHING), creator);
-    }
-
-    /**
-     * Create a handler
-     *
-     * @param handler The handler to use to handle the current packet.
+     * @param handler packet handler
      */
     public void handler(PacketHandler handler) {
-        map(new TypeRemapper(Type.NOTHING), handler);
+        valueRemappers.add(handler);
     }
 
     /**
-     * Register the mappings for this packet
+     * Writes a value.
+     *
+     * @param type  type to write
+     * @param value value to write
+     */
+    public <T> void create(Type<T> type, T value) {
+        valueRemappers.add(wrapper -> wrapper.write(type, value));
+    }
+
+    /**
+     * Reads (and thus removes) the given type.
+     *
+     * @param type type to read
+     */
+    public void read(Type type) {
+        valueRemappers.add(wrapper -> wrapper.read(type));
+    }
+
+    /**
+     * Registers the handlers for this packet.
      */
     public abstract void registerMap();
 
     /**
-     * Remap a packet wrapper
+     * Processes a packet wrapper.
      *
-     * @param packetWrapper The wrapper to remap
-     * @throws InformativeException if it fails to write / read to the packet
+     * @param packetWrapper packet wrapper to remap
+     * @throws InformativeException if packet reading or writing fails
      * @throws CancelException      if the packet should be cancelled
      */
     public void remap(PacketWrapper packetWrapper) throws Exception {
         try {
-            // Read all the current values
-            for (Pair<ValueReader, ValueWriter> valueRemapper : valueRemappers) {
-                Object object = valueRemapper.getKey().read(packetWrapper);
-                // Convert object to write type :O!!!
-                valueRemapper.getValue().write(packetWrapper, object);
+            for (PacketHandler handler : valueRemappers) {
+                handler.handle(packetWrapper);
             }
-            // If we had handlers we'd put them here
-        } catch (InformativeException e) {
-            e.addSource(this.getClass());
-            throw e;
         } catch (CancelException e) {
             // Pass through CancelExceptions
+            throw e;
+        } catch (InformativeException e) {
+            e.addSource(this.getClass());
             throw e;
         } catch (Exception e) {
             // Wrap other exceptions during packet handling

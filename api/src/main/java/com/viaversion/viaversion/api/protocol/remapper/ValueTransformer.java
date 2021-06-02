@@ -31,12 +31,12 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
     private final Type<T1> inputType;
     private final Type<T2> outputType;
 
-    public ValueTransformer(@Nullable Type<T1> inputType, Type<T2> outputType) {
+    protected ValueTransformer(@Nullable Type<T1> inputType, Type<T2> outputType) {
         this.inputType = inputType;
         this.outputType = outputType;
     }
 
-    public ValueTransformer(Type<T2> outputType) {
+    protected ValueTransformer(Type<T2> outputType) {
         this(null, outputType);
     }
 

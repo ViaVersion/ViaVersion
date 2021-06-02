@@ -23,25 +23,18 @@
 package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.exception.InformativeException;
 
-@FunctionalInterface
-public interface ValueCreator extends ValueWriter {
-    /**
-     * Write new values to a Packet.
-     *
-     * @param wrapper The packet to write to
-     * @throws Exception Throws exception if it fails to write.
-     */
-    void write(PacketWrapper wrapper) throws Exception;
+public final class ReadWriteValueHandler implements PacketHandler {
+    private final ValueReader reader;
+    private final ValueWriter writer;
+
+    public ReadWriteValueHandler(ValueReader reader, ValueWriter writer) {
+        this.reader = reader;
+        this.writer = writer;
+    }
 
     @Override
-    default void write(PacketWrapper writer, Object inputValue) throws Exception {
-        try {
-            write(writer);
-        } catch (InformativeException e) {
-            e.addSource(this.getClass());
-            throw e;
-        }
+    public void handle(PacketWrapper wrapper) throws Exception {
+        writer.write(wrapper, reader.read(wrapper));
     }
 }

@@ -23,25 +23,15 @@
 package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.exception.InformativeException;
 
 @FunctionalInterface
-public interface PacketHandler extends ValueWriter {
+public interface PacketHandler {
+
     /**
-     * Handle a packet
+     * Handles a packet.
      *
-     * @param wrapper The associated wrapper
-     * @throws Exception Throws exception if it failed to handle the packet
+     * @param wrapper packet wrapper
+     * @throws Exception if an error occurs during the packet handling
      */
     void handle(PacketWrapper wrapper) throws Exception;
-
-    @Override
-    default void write(PacketWrapper writer, Object inputValue) throws Exception {
-        try {
-            handle(writer);
-        } catch (InformativeException e) {
-            e.addSource(this.getClass());
-            throw e;
-        }
-    }
 }

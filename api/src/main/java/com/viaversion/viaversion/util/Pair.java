@@ -35,11 +35,11 @@ public class Pair<X, Y> {
         this.value = value;
     }
 
-    public X getKey() {
+    public @Nullable X getKey() {
         return key;
     }
 
-    public Y getValue() {
+    public @Nullable Y getValue() {
         return value;
     }
 

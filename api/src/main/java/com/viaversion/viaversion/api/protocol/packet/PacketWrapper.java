@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.protocol.packet;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.InformativeException;
 import io.netty.buffer.ByteBuf;
@@ -241,13 +241,13 @@ public interface PacketWrapper {
     /**
      * Creates a new packet with values.
      *
-     * @param packetType   packet type of the new packet
-     * @param valueCreator ValueCreator to write to the packet
+     * @param packetType packet type of the new packet
+     * @param handler    handler to write to the packet
      * @return newly created packet wrapper
-     * @throws Exception if it failed to write the values from the ValueCreator.
+     * @throws Exception if it failed to write the values from the ValueCreator
      */
-    default PacketWrapper create(PacketType packetType, ValueCreator valueCreator) throws Exception {
-        return create(packetType.getId(), valueCreator);
+    default PacketWrapper create(PacketType packetType, PacketHandler handler) throws Exception {
+        return create(packetType.getId(), handler);
     }
 
     /**
@@ -261,12 +261,12 @@ public interface PacketWrapper {
     /**
      * Creates a new packet with values.
      *
-     * @param packetId     id of the packet
-     * @param valueCreator ValueCreator to write to the packet.
+     * @param packetId id of the packet
+     * @param handler  handler to write to the packet
      * @return newly created packet wrapper
-     * @throws Exception if it failed to write the values from the ValueCreator.
+     * @throws Exception if it failed to write the values from the ValueCreator
      */
-    PacketWrapper create(int packetId, ValueCreator valueCreator) throws Exception;
+    PacketWrapper create(int packetId, PacketHandler handler) throws Exception;
 
     /**
      * Applies a pipeline from an index to the wrapper.

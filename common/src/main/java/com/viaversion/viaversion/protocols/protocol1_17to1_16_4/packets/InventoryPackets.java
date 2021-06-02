@@ -60,7 +60,7 @@ public class InventoryPackets {
                 map(Type.UNSIGNED_BYTE); // Window Id
                 map(Type.SHORT); // Slot
                 map(Type.BYTE); // Button
-                create(wrapper -> wrapper.write(Type.SHORT, (short) 0)); // Action id - doesn't matter, as the sent out confirmation packet will be cancelled
+                handler(wrapper -> wrapper.write(Type.SHORT, (short) 0)); // Action id - doesn't matter, as the sent out confirmation packet will be cancelled
                 map(Type.VAR_INT); // Action
 
                 handler(wrapper -> {

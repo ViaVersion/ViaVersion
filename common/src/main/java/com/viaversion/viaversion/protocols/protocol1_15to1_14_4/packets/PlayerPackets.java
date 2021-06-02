@@ -33,7 +33,7 @@ public class PlayerPackets {
             @Override
             public void registerMap() {
                 map(Type.INT);
-                create(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
+                handler(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
             }
         });
 
@@ -50,14 +50,14 @@ public class PlayerPackets {
                     int entityId = wrapper.get(Type.INT, 0);
                     tracker.addEntity(entityId, Entity1_15Types.PLAYER);
                 });
-                create(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
+                handler(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
 
                 map(Type.UNSIGNED_BYTE); // 3 - Max Players
                 map(Type.STRING); // 4 - Level Type
                 map(Type.VAR_INT); // 5 - View Distance
                 map(Type.BOOLEAN); // 6 - Reduce Debug Info
 
-                create(wrapper -> wrapper.write(Type.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
+                handler(wrapper -> wrapper.write(Type.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
             }
         });
     }

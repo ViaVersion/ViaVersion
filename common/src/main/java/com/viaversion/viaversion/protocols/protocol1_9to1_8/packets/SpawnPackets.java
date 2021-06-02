@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
@@ -53,9 +52,9 @@ public class SpawnPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
 
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
@@ -85,9 +84,9 @@ public class SpawnPackets {
                 map(Type.INT); // 8 - Data
 
                 // Create last 3 shorts
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int data = wrapper.get(Type.INT, 0); // Data (1st Integer)
 
                         short vX = 0, vY = 0, vZ = 0;
@@ -113,9 +112,9 @@ public class SpawnPackets {
                         int typeID = wrapper.get(Type.BYTE, 0);
                         if (Entity1_10Types.getTypeFromId(typeID, true) == Entity1_10Types.EntityType.SPLASH_POTION) {
                             // Convert this to meta data, woo!
-                            PacketWrapper metaPacket = wrapper.create(0x39, new ValueCreator() {
+                            PacketWrapper metaPacket = wrapper.create(0x39, new PacketHandler() {
                                 @Override
-                                public void write(PacketWrapper wrapper) throws Exception {
+                                public void handle(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.VAR_INT, entityID);
                                     List<Metadata> meta = new ArrayList<>();
                                     Item item = new Item(373, (byte) 1, (short) data, null); // Potion
@@ -185,9 +184,9 @@ public class SpawnPackets {
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
 
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
@@ -262,9 +261,9 @@ public class SpawnPackets {
                         tracker.sendMetadataBuffer(entityID);
                     }
                 });
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         int entityID = wrapper.get(Type.VAR_INT, 0);
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         wrapper.write(Type.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID

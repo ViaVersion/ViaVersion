@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
@@ -119,9 +118,9 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.VAR_INT); // 0 - Collected entity id
                 map(Type.VAR_INT); // 1 - Collector entity id
 
-                create(new ValueCreator() {
+                handler(new PacketHandler() {
                     @Override
-                    public void write(PacketWrapper wrapper) throws Exception {
+                    public void handle(PacketWrapper wrapper) throws Exception {
                         wrapper.write(Type.VAR_INT, 1); // 2 - Pickup Count
                     }
                 });
