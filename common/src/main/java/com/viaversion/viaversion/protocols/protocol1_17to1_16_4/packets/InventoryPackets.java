@@ -54,7 +54,6 @@ public class InventoryPackets {
             }
         });
 
-        // This will cause desync issues to clients with a high latency
         protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -93,13 +92,11 @@ public class InventoryPackets {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    // Confirmation packets were removed - just instantly respond with a confirmation back
                     short inventoryId = wrapper.read(Type.UNSIGNED_BYTE);
                     short confirmationId = wrapper.read(Type.SHORT);
                     boolean accepted = wrapper.read(Type.BOOLEAN);
                     if (!accepted) {
                         // Use the new ping packet to replace the removed acknowledgement, extra bit for fast dismissal
-                        // Hope the client actually answers it /shrug
                         int id = (1 << 30) | (inventoryId << 16) | (confirmationId & 0xFFF);
                         wrapper.user().get(InventoryAcknowledgements.class).addId(id);
 
@@ -121,7 +118,7 @@ public class InventoryPackets {
                     int id = wrapper.read(Type.INT);
                     // Check extra bit for fast dismissal
                     if ((id & (1 << 30)) != 0 && wrapper.user().get(InventoryAcknowledgements.class).removeId(id)) {
-                        // Decode inventory acknowledgement
+                        // Decode our requested inventory acknowledgement
                         int inventoryId = (id >> 16) & 0xFF;
                         int confirmationId = id & 0xFFFF;
                         PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
