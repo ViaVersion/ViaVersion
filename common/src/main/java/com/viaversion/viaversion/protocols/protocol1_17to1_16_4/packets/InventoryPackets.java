@@ -97,7 +97,7 @@ public class InventoryPackets {
                     boolean accepted = wrapper.read(Type.BOOLEAN);
                     if (!accepted) {
                         // Use the new ping packet to replace the removed acknowledgement, extra bit for fast dismissal
-                        int id = (1 << 30) | (inventoryId << 16) | (confirmationId & 0xFFF);
+                        int id = (1 << 30) | (inventoryId << 16) | (confirmationId & 0xFFFF);
                         wrapper.user().get(InventoryAcknowledgements.class).addId(id);
 
                         PacketWrapper pingPacket = wrapper.create(ClientboundPackets1_17.PING);
