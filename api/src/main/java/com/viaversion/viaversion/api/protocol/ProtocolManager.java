@@ -152,14 +152,14 @@ public interface ProtocolManager {
      * <p>
      * Negative examples if this returns true:
      * <ul>
-     *     A possible path from 3 to 5 in order of 3->10->5 will be dismissed.
-     *     A possible path from 5 to 3 in order of 5->0->3 will be dismissed.
+     *     A possible path from 3 to 5 in order of 3→10→5 will be dismissed.
+     *     A possible path from 5 to 3 in order of 5→0→3 will be dismissed.
      * </ul>
      * <p>
      * Negative examples if this returns false:
      * <ul>
-     *     While searching for a path from 3 to 5, 3->2->1 could be checked first before 3->4->5 is found.
-     *     While searching for a path from 5 to 3, 5->6->7 could be checked first before 5->4->3 is found.
+     *     While searching for a path from 3 to 5, 3→2→1 could be checked first before 3→4→5 is found.
+     *     While searching for a path from 5 to 3, 5→6→7 could be checked first before 5→4→3 is found.
      * </ul>
      *
      * @return whether protocol path calculation expects the path to come closer to the expected version with each entry
