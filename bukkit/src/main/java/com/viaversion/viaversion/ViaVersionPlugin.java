@@ -300,6 +300,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         return Collections.unmodifiableList(list);
     }
 
+    public boolean isLateBind() {
+        return lateBind;
+    }
+
     public boolean isCompatSpigotBuild() {
         return compatSpigotBuild;
     }
