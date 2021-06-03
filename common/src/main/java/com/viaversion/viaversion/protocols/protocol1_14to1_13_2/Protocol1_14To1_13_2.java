@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
@@ -36,13 +37,13 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPac
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 
 public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {
 
     public static final MappingData MAPPINGS = new MappingData();
+    private final EntityRewriter metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
 
     public Protocol1_14To1_13_2() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_14.class, ServerboundPackets1_13.class, ServerboundPackets1_14.class);
@@ -50,7 +51,6 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
         metadataRewriter.register();
 
         InventoryPackets.register(this);
@@ -59,7 +59,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         PlayerPackets.register(this);
 
         new SoundRewriter(this).registerSound(ClientboundPackets1_13.SOUND);
-        new StatisticsRewriter(this, metadataRewriter::newEntityId).register(ClientboundPackets1_13.STATISTICS);
+        new StatisticsRewriter(this).register(ClientboundPackets1_13.STATISTICS);
 
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
         componentRewriter.registerChatMessage(ClientboundPackets1_13.CHAT_MESSAGE);
@@ -156,5 +156,10 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public MappingData getMappingData() {
         return MAPPINGS;
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return metadataRewriter;
     }
 }

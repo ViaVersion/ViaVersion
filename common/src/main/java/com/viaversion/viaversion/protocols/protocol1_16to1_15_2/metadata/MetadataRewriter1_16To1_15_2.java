@@ -69,7 +69,7 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<Protocol1_16To1
     }
 
     @Override
-    protected EntityType typeFromId(int type) {
+    public EntityType typeFromId(int type) {
         return Entity1_16Types.getTypeFromId(type);
     }
 }

@@ -104,7 +104,7 @@ public interface ProtocolManager {
     }
 
     /**
-     * Register a protocol.
+     * Register and initializes a protocol.
      *
      * @param protocol      protocol to register
      * @param clientVersion supported client protocol versions
@@ -114,7 +114,7 @@ public interface ProtocolManager {
     void registerProtocol(Protocol protocol, ProtocolVersion clientVersion, ProtocolVersion serverVersion);
 
     /**
-     * Register a protocol.
+     * Register and initializes protocol.
      *
      * @param protocol               protocol to register
      * @param supportedClientVersion supported client protocol versions
@@ -124,7 +124,7 @@ public interface ProtocolManager {
     void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion);
 
     /**
-     * Registers a base protocol. Base Protocols registered later have higher priority.
+     * Registers and initializes a base protocol. Base Protocols registered later have higher priority.
      * Only base protocol will always be added to pipeline.
      *
      * @param baseProtocol       base protocol to register

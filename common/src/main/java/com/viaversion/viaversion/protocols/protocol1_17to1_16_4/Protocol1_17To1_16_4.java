@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
@@ -34,7 +35,6 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.EntityPa
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
-import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -44,6 +44,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17", true);
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
+    private final EntityRewriter metadataRewriter = new MetadataRewriter1_17To1_16_4(this);
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
@@ -52,14 +53,13 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_17To1_16_4(this);
         metadataRewriter.register();
 
         EntityPackets.register(this);
         InventoryPackets.register(this);
         WorldPackets.register(this);
 
-        tagRewriter = new TagRewriter(this, null);
+        tagRewriter = new TagRewriter(this);
         registerClientbound(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -90,7 +90,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        new StatisticsRewriter(this, metadataRewriter::newEntityId).register(ClientboundPackets1_16_2.STATISTICS);
+        new StatisticsRewriter(this).register(ClientboundPackets1_16_2.STATISTICS);
 
         SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
@@ -244,5 +244,10 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public MappingData getMappingData() {
         return MAPPINGS;
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return metadataRewriter;
     }
 }

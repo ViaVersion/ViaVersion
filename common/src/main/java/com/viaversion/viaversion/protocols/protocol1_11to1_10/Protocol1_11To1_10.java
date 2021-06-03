@@ -50,14 +50,15 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         }
     };
 
+    private final EntityRewriter entityRewriter = new MetadataRewriter1_11To1_10(this);
+
     public Protocol1_11To1_10() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9_3.class);
     }
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_11To1_10(this);
-        metadataRewriter.register();
+        entityRewriter.register();
 
         InventoryPackets.register(this);
 
@@ -69,7 +70,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.BYTE); // 2 - Type
 
                 // Track Entity
-                handler(metadataRewriter.objectTrackerHandler());
+                handler(entityRewriter.objectTrackerHandler());
             }
         });
 
@@ -103,7 +104,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
                             // Register Type ID
                             wrapper.user().getEntityTracker(Protocol1_11To1_10.class).addEntity(entityId, entType);
-                            metadataRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                            entityRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
                         }
                     }
                 });
@@ -127,7 +128,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_9.METADATA_LIST);
+        entityRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_9.METADATA_LIST);
 
         registerClientbound(ClientboundPackets1_9_3.ENTITY_TELEPORT, new PacketRemapper() {
             @Override
@@ -157,7 +158,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
+        entityRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
 
         registerClientbound(ClientboundPackets1_9_3.TITLE, new PacketRemapper() {
             @Override
@@ -381,5 +382,10 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return entityRewriter;
     }
 }

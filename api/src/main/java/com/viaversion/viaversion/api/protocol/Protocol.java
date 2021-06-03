@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -211,6 +212,13 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
     void put(Object object);
 
     /**
+     * Called with {@link ProtocolManager#registerProtocol} to register packet handlers and automatic packet id remapping.
+     *
+     * @throws IllegalArgumentException if this method has already been called
+     */
+    void initialize();
+
+    /**
      * Returns true if this Protocol's {@link #loadMappingData()} method should be called.
      * <p>
      * This does *not* necessarily mean that {@link #getMappingData()} is non-null, since this may be
@@ -254,6 +262,15 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @return mapping data if present
      */
     default @Nullable MappingData getMappingData() {
+        return null;
+    }
+
+    /**
+     * Returns the protocol's entity rewriter if present.
+     *
+     * @return entity rewriter
+     */
+    default @Nullable EntityRewriter getEntityRewriter() {
         return null;
     }
 

@@ -47,13 +47,14 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
+    private final EntityRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+
     public Protocol1_12To1_11_1() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_12.class, ServerboundPackets1_9_3.class, ServerboundPackets1_12.class);
     }
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
         metadataRewriter.register();
 
         InventoryPackets.register(this);
@@ -261,5 +262,10 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return metadataRewriter;
     }
 }

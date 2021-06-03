@@ -125,17 +125,17 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1
     }
 
     @Override
-    public int newEntityId(final int oldId) {
-        return EntityTypeRewriter.getNewId(oldId);
+    public int newEntityId(final int id) {
+        return EntityTypeRewriter.getNewId(id);
     }
 
     @Override
-    protected EntityType typeFromId(int type) {
+    public EntityType typeFromId(int type) {
         return Entity1_13Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected EntityType objectTypeFromId(int type) {
+    public EntityType objectTypeFromId(int type) {
         return Entity1_13Types.getTypeFromId(type, true);
     }
 }

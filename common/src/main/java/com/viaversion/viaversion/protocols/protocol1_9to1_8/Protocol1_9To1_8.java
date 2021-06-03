@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
@@ -48,7 +49,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlock
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
@@ -58,6 +58,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
             return fixJson(line);
         }
     };
+    private final EntityRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
 
     public Protocol1_9To1_8() {
         super(ClientboundPackets1_8.class, ClientboundPackets1_9.class, ServerboundPackets1_8.class, ServerboundPackets1_9.class);
@@ -108,7 +109,6 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
         metadataRewriter.register();
 
         // Disconnect workaround (JSON!)
@@ -156,5 +156,10 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         userConnection.put(new InventoryTracker());
         // CommandBlock storage
         userConnection.put(new CommandBlockStorage());
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return metadataRewriter;
     }
 }

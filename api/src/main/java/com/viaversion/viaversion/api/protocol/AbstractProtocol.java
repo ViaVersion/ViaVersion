@@ -51,6 +51,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     protected final Class<C2> newClientboundPacketEnum;
     protected final Class<S1> oldServerboundPacketEnum;
     protected final Class<S2> newServerboundPacketEnum;
+    private boolean initialized;
 
     protected AbstractProtocol() {
         this(null, null, null, null);
@@ -65,15 +66,22 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         this.newClientboundPacketEnum = clientboundPacketEnum;
         this.oldServerboundPacketEnum = oldServerboundPacketEnum;
         this.newServerboundPacketEnum = serverboundPacketEnum;
+    }
+
+    @Override
+    public final void initialize() {
+        Preconditions.checkArgument(!initialized);
+        initialized = true;
+
         registerPackets();
 
         // Register the rest of the ids with no handlers if necessary
-        if (oldClientboundPacketEnum != null && clientboundPacketEnum != null
-                && oldClientboundPacketEnum != clientboundPacketEnum) {
+        if (oldClientboundPacketEnum != null && newClientboundPacketEnum != null
+                && oldClientboundPacketEnum != newClientboundPacketEnum) {
             registerClientboundChannelIdChanges();
         }
-        if (oldServerboundPacketEnum != null && serverboundPacketEnum != null
-                && oldServerboundPacketEnum != serverboundPacketEnum) {
+        if (oldServerboundPacketEnum != null && newServerboundPacketEnum != null
+                && oldServerboundPacketEnum != newServerboundPacketEnum) {
             registerServerboundChannelIdChanges();
         }
     }
@@ -146,7 +154,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     protected void onMappingDataLoaded() {
     }
 
-    public void addEntityTracker(UserConnection connection, EntityTracker tracker) {
+    protected void addEntityTracker(UserConnection connection, EntityTracker tracker) {
         connection.addEntityTracker(this.getClass(), tracker);
     }
 

@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
@@ -55,7 +56,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockCon
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -72,6 +72,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     // These are arbitrary rewrite values, it just needs an invalid color code character.
     private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
+    private final EntityRewriter entityRewriter = new MetadataRewriter1_13To1_12_2(this);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put('0', 'g');
@@ -155,8 +156,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_13To1_12_2(this);
-        metadataRewriter.register();
+        entityRewriter.register();
 
         // Register grouped packet changes
         EntityPackets.register(this);
@@ -1102,5 +1102,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public MappingData getMappingData() {
         return MAPPINGS;
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return entityRewriter;
     }
 }

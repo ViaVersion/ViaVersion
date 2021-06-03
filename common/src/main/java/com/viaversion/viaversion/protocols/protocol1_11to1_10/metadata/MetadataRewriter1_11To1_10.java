@@ -146,12 +146,12 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_1
     }
 
     @Override
-    protected com.viaversion.viaversion.api.minecraft.entities.EntityType typeFromId(int type) {
+    public com.viaversion.viaversion.api.minecraft.entities.EntityType typeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, false);
     }
 
     @Override
-    protected com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type) {
+    public com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type) {
         return Entity1_11Types.getTypeFromId(type, true);
     }
 

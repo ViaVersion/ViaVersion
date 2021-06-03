@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T> {
+public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     protected final List<MetaFilter> metadataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
@@ -92,13 +93,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         metadataFilters.add(filter);
     }
 
-    /**
-     * Handles and transforms metadata of an entity.
-     *
-     * @param entityId     entity id
-     * @param metadataList full, mutable list of metadata
-     * @param connection   user connection
-     */
+    @Override
     public void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection) {
         EntityType type = tracker(connection).entityType(entityId);
         int i = 0; // Count index for fast removal
@@ -167,33 +162,9 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     protected void handleMetadata(int entityId, @Nullable EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
     }
 
-    /**
-     * Returns the entity type from the given (mapped) type id.
-     *
-     * @param type mapped type id
-     * @return entity type
-     */
-    protected abstract EntityType typeFromId(int type);
-
-    /**
-     * Returns the entity type from the given id.
-     * From 1.14 and onwards, this is the same exact value as {@link #typeFromId(int)}.
-     *
-     * @param type entity type id
-     * @return EntityType from id
-     */
-    protected EntityType objectTypeFromId(int type) {
-        return typeFromId(type);
-    }
-
-    /**
-     * Returns the mapped entitiy (or the same if it has not changed).
-     *
-     * @param oldId old entity id
-     * @return mapped entity id
-     */
-    public int newEntityId(int oldId) {
-        return typeMappings != null ? typeMappings.getOrDefault(oldId, oldId) : oldId;
+    @Override
+    public int newEntityId(int id) {
+        return typeMappings != null ? typeMappings.getOrDefault(id, id) : id;
     }
 
     /**
@@ -495,17 +466,6 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
-    }
-
-    /**
-     * Returns the entity tracker for the current protocol.
-     *
-     * @param connection user connection
-     * @param <E>        entity tracker type
-     * @return entity tracker
-     */
-    public <E extends EntityTracker> E tracker(UserConnection connection) {
-        return connection.getEntityTracker(protocol.getClass());
     }
 
     private void logException(Exception e, @Nullable EntityType type, List<Metadata> metadataList, Metadata metadata) {

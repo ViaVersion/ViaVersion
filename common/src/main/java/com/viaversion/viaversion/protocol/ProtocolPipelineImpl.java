@@ -48,6 +48,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     public ProtocolPipelineImpl(UserConnection userConnection) {
         this.userConnection = userConnection;
         userConnection.getProtocolInfo().setPipeline(this);
+        registerPackets(); // Not registered as a standard "protocol", so we have to call the method manually
     }
 
     @Override

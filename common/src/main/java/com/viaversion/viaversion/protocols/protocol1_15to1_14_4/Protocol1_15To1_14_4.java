@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
@@ -31,7 +32,6 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPa
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.WorldPackets;
-import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -40,6 +40,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_14, ClientboundPackets1_15, ServerboundPackets1_14, ServerboundPackets1_14> {
 
     public static final MappingData MAPPINGS = new MappingData();
+    private final EntityRewriter metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
     private TagRewriter tagRewriter;
 
     public Protocol1_15To1_14_4() {
@@ -48,7 +49,6 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        EntityRewriter metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
         metadataRewriter.register();
 
         EntityPackets.register(this);
@@ -60,7 +60,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_14.ENTITY_SOUND); // Entity Sound Effect (added somewhere in 1.14)
         soundRewriter.registerSound(ClientboundPackets1_14.SOUND);
 
-        new StatisticsRewriter(this, metadataRewriter::newEntityId).register(ClientboundPackets1_14.STATISTICS);
+        new StatisticsRewriter(this).register(ClientboundPackets1_14.STATISTICS);
 
         registerServerbound(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
@@ -69,7 +69,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        tagRewriter = new TagRewriter(this, EntityPackets::getNewEntityId);
+        tagRewriter = new TagRewriter(this);
         tagRewriter.register(ClientboundPackets1_14.TAGS, RegistryType.ENTITY);
     }
 
@@ -91,5 +91,10 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public MappingData getMappingData() {
         return MAPPINGS;
+    }
+
+    @Override
+    public EntityRewriter getEntityRewriter() {
+        return metadataRewriter;
     }
 }

@@ -169,6 +169,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion) {
+        // Register the protocol's handlers
+        protocol.initialize();
+
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
             pathCache.clear();
@@ -205,6 +208,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
         Preconditions.checkArgument(baseProtocol.isBaseProtocol(), "Protocol is not a base protocol");
+        baseProtocol.initialize();
+
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
         if (Via.getPlatform().isPluginEnabled()) {
             baseProtocol.register(Via.getManager().getProviders());

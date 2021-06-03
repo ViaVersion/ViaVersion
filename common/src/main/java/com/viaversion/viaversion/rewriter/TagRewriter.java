@@ -36,12 +36,10 @@ import java.util.Map;
 public class TagRewriter {
     private static final int[] EMPTY_ARRAY = {};
     private final Protocol protocol;
-    private final IdRewriteFunction entityRewriter;
     private final Map<RegistryType, List<TagData>> newTags = new EnumMap<>(RegistryType.class);
 
-    public TagRewriter(Protocol protocol, @Nullable IdRewriteFunction entityRewriter) {
+    public TagRewriter(Protocol protocol) {
         this.protocol = protocol;
-        this.entityRewriter = entityRewriter;
     }
 
     /**
@@ -178,7 +176,7 @@ public class TagRewriter {
             case ITEM:
                 return mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
             case ENTITY:
-                return entityRewriter;
+                return protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
             case FLUID:
             case GAME_EVENT:
             default:

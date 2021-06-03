@@ -25,12 +25,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StatisticsRewriter {
     private final Protocol protocol;
-    private final IdRewriteFunction entityRewriter;
     private final int customStatsCategory = 8; // Make this changeable if it differs in a future version
 
-    public StatisticsRewriter(Protocol protocol, @Nullable IdRewriteFunction entityRewriter) {
+    public StatisticsRewriter(Protocol protocol) {
         this.protocol = protocol;
-        this.entityRewriter = entityRewriter;
     }
 
     public void register(ClientboundPacketType packetType) {
@@ -81,7 +79,7 @@ public class StatisticsRewriter {
             case ITEM:
                 return protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
             case ENTITY:
-                return entityRewriter;
+                return protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
         }
         throw new IllegalArgumentException("Unknown registry type in statistics packet: " + type);
     }
