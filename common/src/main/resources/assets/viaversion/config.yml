@@ -199,5 +199,5 @@ replacement-piston-id: 0
 force-json-transform: false
 # Minimize the cooldown animation in 1.8 servers
 minimize-cooldown: true
-# Left handed handling on 1.8 servers
+# Allows 1.9+ left-handedness on 1.8 servers
 left-handed-handling: true
