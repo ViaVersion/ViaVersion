@@ -218,12 +218,11 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * @param itemType     item meta type if needed
      * @param blockType    block meta type if needed
      * @param particleType particle meta type if needed
-     * @param itemRewriter itemrewriter if needed
      */
-    public void registerDumMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockType, @Nullable MetaType particleType, ItemRewriter.@Nullable RewriteFunction itemRewriter) {
+    public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockType, @Nullable MetaType particleType) {
         filter().handler((event, meta) -> {
             if (itemType != null && meta.metaType() == itemType) {
-                itemRewriter.rewrite(meta.value());
+                protocol.getItemRewriter().handleItemToClient(meta.value());
             } else if (blockType != null && meta.metaType() == blockType) {
                 int data = meta.value();
                 meta.setValue(protocol.getMappingData().getNewBlockStateId(data));

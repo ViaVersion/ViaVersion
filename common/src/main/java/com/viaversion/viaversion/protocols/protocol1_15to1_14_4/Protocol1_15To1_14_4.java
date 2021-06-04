@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
@@ -41,6 +42,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
     private TagRewriter tagRewriter;
 
     public Protocol1_15To1_14_4() {
@@ -50,11 +52,11 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     protected void registerPackets() {
         metadataRewriter.register();
+        itemRewriter.register();
 
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);
-        InventoryPackets.register(this);
 
         SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_14.ENTITY_SOUND); // Entity Sound Effect (added somewhere in 1.14)
@@ -65,7 +67,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_14.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });
 
@@ -96,5 +98,10 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public EntityRewriter getEntityRewriter() {
         return metadataRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

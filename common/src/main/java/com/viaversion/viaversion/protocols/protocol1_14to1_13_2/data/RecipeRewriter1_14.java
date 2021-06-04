@@ -26,8 +26,8 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public class RecipeRewriter1_14 extends RecipeRewriter1_13_2 {
 
-    public RecipeRewriter1_14(Protocol protocol, ItemRewriter.RewriteFunction rewriter) {
-        super(protocol, rewriter);
+    public RecipeRewriter1_14(Protocol protocol) {
+        super(protocol);
         recipeHandlers.put("stonecutting", this::handleStonecutting);
 
         recipeHandlers.put("blasting", this::handleSmelting);
@@ -39,9 +39,9 @@ public class RecipeRewriter1_14 extends RecipeRewriter1_13_2 {
         wrapper.passthrough(Type.STRING);
         Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
         for (Item item : items) {
-            rewriter.rewrite(item);
+            rewrite(item);
         }
 
-        rewriter.rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
 }

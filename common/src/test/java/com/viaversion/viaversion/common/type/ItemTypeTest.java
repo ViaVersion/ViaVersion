@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.common.type;
 
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 
 public class ItemTypeTest {
@@ -38,7 +38,7 @@ public class ItemTypeTest {
 
         // Test item read
         Assertions.assertEquals(
-                new Item((int) Short.MAX_VALUE, (byte) -128, (short) 257, null),
+                new DataItem((int) Short.MAX_VALUE, (byte) -128, (short) 257, null),
                 Type.ITEM.read(Unpooled.wrappedBuffer(new byte[]{
                         127, -1,
                         -128,
@@ -47,7 +47,7 @@ public class ItemTypeTest {
                 }))
         );
         Assertions.assertEquals(
-                new Item(420, (byte) 53, (short) 0, null),
+                new DataItem(420, (byte) 53, (short) 0, null),
                 Type.FLAT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{
                         1, (byte) 164,
                         53,
@@ -55,7 +55,7 @@ public class ItemTypeTest {
                 }))
         );
         Assertions.assertEquals(
-                new Item(268435456, (byte) 127, (short) 0, null),
+                new DataItem(268435456, (byte) 127, (short) 0, null),
                 Type.FLAT_VAR_INT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{
                         1,
                         -128, -128, -128, -128, 1,
@@ -83,20 +83,20 @@ public class ItemTypeTest {
         ByteBuf buf = Unpooled.buffer();
 
         // Test item write
-        Type.ITEM.write(buf, new Item((int) Short.MAX_VALUE, (byte) -128, (short) 257, null));
+        Type.ITEM.write(buf, new DataItem((int) Short.MAX_VALUE, (byte) -128, (short) 257, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 127, -1,
                 -128,
                 1, 1,
                 0
         });
-        Type.FLAT_ITEM.write(buf, new Item(420, (byte) 53, (short) 0, null));
+        Type.FLAT_ITEM.write(buf, new DataItem(420, (byte) 53, (short) 0, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 1, (byte) 164,
                 53,
                 0
         });
-        Type.FLAT_VAR_INT_ITEM.write(buf, new Item(268435456, (byte) 127, (short) 0, null));
+        Type.FLAT_VAR_INT_ITEM.write(buf, new DataItem(268435456, (byte) 127, (short) 0, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 1,
                 -128, -128, -128, -128, 1,

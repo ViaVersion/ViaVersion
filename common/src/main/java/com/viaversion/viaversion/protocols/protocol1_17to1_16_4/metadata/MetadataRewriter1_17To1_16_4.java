@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public class MetadataRewriter1_17To1_16_4 extends EntityRewriter {
@@ -45,7 +44,7 @@ public class MetadataRewriter1_17To1_16_4 extends EntityRewriter {
                 }
             }
         });
-        registerDumMetaTypeHandler(MetaType1_17.ITEM, MetaType1_17.BLOCK_STATE, MetaType1_17.PARTICLE, InventoryPackets::toClient);
+        registerMetaTypeHandler(MetaType1_17.ITEM, MetaType1_17.BLOCK_STATE, MetaType1_17.PARTICLE);
 
         // Ticks frozen added with id 7
         filter().filterFamily(Entity1_17Types.ENTITY).addIndex(7);

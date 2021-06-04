@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.data.PotionColorMapping;
@@ -51,6 +52,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
     };
 
     private final EntityRewriter entityRewriter = new MetadataRewriter1_11To1_10(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
 
     public Protocol1_11To1_10() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9_3.class);
@@ -59,8 +61,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
     @Override
     protected void registerPackets() {
         entityRewriter.register();
-
-        InventoryPackets.register(this);
+        itemRewriter.register();
 
         registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
             @Override
@@ -387,5 +388,10 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
     @Override
     public EntityRewriter getEntityRewriter() {
         return entityRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

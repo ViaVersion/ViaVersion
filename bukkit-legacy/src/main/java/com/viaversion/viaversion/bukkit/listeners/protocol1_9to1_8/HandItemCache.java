@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -52,7 +53,7 @@ public class HandItemCache extends BukkitRunnable {
     }
 
     public static Item convert(ItemStack itemInHand) {
-        if (itemInHand == null) return new Item(0, (byte) 0, (short) 0, null);
-        return new Item(itemInHand.getTypeId(), (byte) itemInHand.getAmount(), itemInHand.getDurability(), null);
+        if (itemInHand == null) return new DataItem(0, (byte) 0, (short) 0, null);
+        return new DataItem(itemInHand.getTypeId(), (byte) itemInHand.getAmount(), itemInHand.getDurability(), null);
     }
 }

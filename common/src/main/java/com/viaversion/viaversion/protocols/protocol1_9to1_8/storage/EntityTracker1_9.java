@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
@@ -114,7 +115,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         if (!swordInHand || this.itemInSecondHand == null) {
 
             // Update shield in off hand depending if a sword is in the main hand
-            setSecondHand(swordInHand ? new Item(442, (byte) 1, (short) 0, null) : null);
+            setSecondHand(swordInHand ? new DataItem(442, (byte) 1, (short) 0, null) : null);
         }
     }
 
@@ -201,7 +202,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                     if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityId)) {
-                                Item shield = new Item(442, (byte) 1, (short) 0, null);
+                                Item shield = new DataItem(442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityId, shield);
                             } else {
                                 setSecondHand(entityId, null);

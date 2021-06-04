@@ -49,12 +49,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_13To1_12_2.class.getSimpleName();
 
-    public static void register(Protocol1_13To1_12_2 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
+    public InventoryPackets(Protocol1_13To1_12_2 protocol) {
+        super(protocol);
+    }
 
+    @Override
+    public void registerPackets() {
         protocol.registerClientbound(ClientboundPackets1_12_1.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -62,7 +65,7 @@ public class InventoryPackets {
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Slot Value
 
-                handler(itemRewriter.itemToClientHandler(Type.FLAT_ITEM));
+                handler(itemToClientHandler(Type.FLAT_ITEM));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketRemapper() {
@@ -71,7 +74,7 @@ public class InventoryPackets {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.ITEM_ARRAY, Type.FLAT_ITEM_ARRAY); // 1 - Window Values
 
-                handler(itemRewriter.itemArrayHandler(Type.FLAT_ITEM_ARRAY));
+                handler(itemArrayHandler(Type.FLAT_ITEM_ARRAY));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_PROPERTY, new PacketRemapper() {
@@ -142,18 +145,18 @@ public class InventoryPackets {
                             for (int i = 0; i < size; i++) {
                                 // Input Item
                                 Item input = wrapper.read(Type.ITEM);
-                                InventoryPackets.toClient(input);
+                                handleItemToClient(input);
                                 wrapper.write(Type.FLAT_ITEM, input);
                                 // Output Item
                                 Item output = wrapper.read(Type.ITEM);
-                                InventoryPackets.toClient(output);
+                                handleItemToClient(output);
                                 wrapper.write(Type.FLAT_ITEM, output);
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem) {
                                     // Second Item
                                     Item second = wrapper.read(Type.ITEM);
-                                    InventoryPackets.toClient(second);
+                                    handleItemToClient(second);
                                     wrapper.write(Type.FLAT_ITEM, second);
                                 }
 
@@ -203,7 +206,7 @@ public class InventoryPackets {
                 map(Type.VAR_INT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Item
 
-                handler(itemRewriter.itemToClientHandler(Type.FLAT_ITEM));
+                handler(itemToClientHandler(Type.FLAT_ITEM));
             }
         });
 
@@ -218,7 +221,7 @@ public class InventoryPackets {
                 map(Type.VAR_INT); // 4 - Mode
                 map(Type.FLAT_ITEM, Type.ITEM); // 5 - Clicked Item
 
-                handler(itemRewriter.itemToServerHandler(Type.ITEM));
+                handler(itemToServerHandler(Type.ITEM));
             }
         });
 
@@ -263,37 +266,36 @@ public class InventoryPackets {
                 map(Type.SHORT); // 0 - Slot
                 map(Type.FLAT_ITEM, Type.ITEM); // 1 - Clicked Item
 
-                handler(itemRewriter.itemToServerHandler(Type.ITEM));
+                handler(itemToServerHandler(Type.ITEM));
             }
         });
     }
 
-    // TODO CLEANUP / SMARTER REWRITE SYSTEM
-    // TODO Rewrite identifiers
-    public static void toClient(Item item) {
-        if (item == null) return;
-        CompoundTag tag = item.getTag();
+    @Override
+    public Item handleItemToClient(Item item) {
+        if (item == null) return null;
+        CompoundTag tag = item.tag();
 
         // Save original id
-        int originalId = (item.getIdentifier() << 16 | item.getData() & 0xFFFF);
+        int originalId = (item.identifier() << 16 | item.data() & 0xFFFF);
 
-        int rawId = (item.getIdentifier() << 4 | item.getData() & 0xF);
+        int rawId = (item.identifier() << 4 | item.data() & 0xF);
 
         // NBT Additions
-        if (isDamageable(item.getIdentifier())) {
+        if (isDamageable(item.identifier())) {
             if (tag == null) item.setTag(tag = new CompoundTag());
-            tag.put("Damage", new IntTag(item.getData()));
+            tag.put("Damage", new IntTag(item.data()));
         }
-        if (item.getIdentifier() == 358) { // map
+        if (item.identifier() == 358) { // map
             if (tag == null) item.setTag(tag = new CompoundTag());
-            tag.put("map", new IntTag(item.getData()));
+            tag.put("map", new IntTag(item.data()));
         }
 
         // NBT Changes
         if (tag != null) {
             // Invert banner/shield color id
-            boolean banner = item.getIdentifier() == 425;
-            if (banner || item.getIdentifier() == 442) {
+            boolean banner = item.identifier() == 425;
+            if (banner || item.identifier() == 442) {
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
@@ -409,7 +411,7 @@ public class InventoryPackets {
                 tag.put("CanDestroy", newCanDestroy);
             }
             // Handle SpawnEggs
-            if (item.getIdentifier() == 383) {
+            if (item.identifier() == 383) {
                 if (tag.get("EntityTag") instanceof CompoundTag) {
                     CompoundTag entityTag = tag.get("EntityTag");
                     if (entityTag.get("id") instanceof StringTag) {
@@ -437,17 +439,17 @@ public class InventoryPackets {
         }
 
         if (!Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId)) {
-            if (!isDamageable(item.getIdentifier()) && item.getIdentifier() != 358) { // Map
+            if (!isDamageable(item.identifier()) && item.identifier() != 358) { // Map
                 if (tag == null) item.setTag(tag = new CompoundTag());
                 tag.put(NBT_TAG_NAME, new IntTag(originalId)); // Data will be lost, saving original id
             }
-            if (item.getIdentifier() == 31 && item.getData() == 0) { // Shrub was removed
+            if (item.identifier() == 31 && item.data() == 0) { // Shrub was removed
                 rawId = 32 << 4; // Dead Bush
             } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId & ~0xF)) {
                 rawId &= ~0xF; // Remove data
             } else {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.getIdentifier());
+                    Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.identifier());
                 }
                 rawId = 16; // Stone
             }
@@ -455,6 +457,7 @@ public class InventoryPackets {
 
         item.setIdentifier(Protocol1_13To1_12_2.MAPPINGS.getItemMappings().get(rawId));
         item.setData((short) 0);
+        return item;
     }
 
     public static String getNewPluginChannelId(String old) {
@@ -485,13 +488,14 @@ public class InventoryPackets {
         }
     }
 
-    public static void toServer(Item item) {
-        if (item == null) return;
+    @Override
+    public Item handleItemToServer(Item item) {
+        if (item == null) return null;
 
         Integer rawId = null;
         boolean gotRawIdFromTag = false;
 
-        CompoundTag tag = item.getTag();
+        CompoundTag tag = item.tag();
 
         // Use tag to get original ID and data
         if (tag != null) {
@@ -505,7 +509,7 @@ public class InventoryPackets {
         }
 
         if (rawId == null) {
-            int oldId = Protocol1_13To1_12_2.MAPPINGS.getItemMappings().inverse().get(item.getIdentifier());
+            int oldId = Protocol1_13To1_12_2.MAPPINGS.getItemMappings().inverse().get(item.identifier());
             if (oldId != -1) {
                 // Handle spawn eggs
                 Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
@@ -526,7 +530,7 @@ public class InventoryPackets {
 
         if (rawId == null) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.getIdentifier());
+                Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.identifier());
             }
             rawId = 0x10000; // Stone
         }
@@ -536,7 +540,7 @@ public class InventoryPackets {
 
         // NBT changes
         if (tag != null) {
-            if (isDamageable(item.getIdentifier())) {
+            if (isDamageable(item.identifier())) {
                 if (tag.get("Damage") instanceof IntTag) {
                     if (!gotRawIdFromTag) {
                         item.setData((short) (int) tag.get("Damage").getValue());
@@ -545,7 +549,7 @@ public class InventoryPackets {
                 }
             }
 
-            if (item.getIdentifier() == 358) { // map
+            if (item.identifier() == 358) { // map
                 if (tag.get("map") instanceof IntTag) {
                     if (!gotRawIdFromTag) {
                         item.setData((short) (int) tag.get("map").getValue());
@@ -554,7 +558,7 @@ public class InventoryPackets {
                 }
             }
 
-            if (item.getIdentifier() == 442 || item.getIdentifier() == 425) { // shield / banner
+            if (item.identifier() == 442 || item.identifier() == 425) { // shield / banner
                 if (tag.get("BlockEntityTag") instanceof CompoundTag) {
                     CompoundTag blockEntityTag = tag.get("BlockEntityTag");
                     if (blockEntityTag.get("Base") instanceof IntTag) {
@@ -669,6 +673,7 @@ public class InventoryPackets {
                 tag.put("CanDestroy", newCanDestroy);
             }
         }
+        return item;
     }
 
     public static String getOldPluginChannelId(String newId) {

@@ -29,8 +29,8 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
  */
 public class RecipeRewriter1_13_2 extends RecipeRewriter {
 
-    public RecipeRewriter1_13_2(Protocol protocol, ItemRewriter.RewriteFunction rewriter) {
-        super(protocol, rewriter);
+    public RecipeRewriter1_13_2(Protocol protocol) {
+        super(protocol);
         recipeHandlers.put("crafting_shapeless", this::handleCraftingShapeless);
         recipeHandlers.put("crafting_shaped", this::handleCraftingShaped);
         recipeHandlers.put("smelting", this::handleSmelting);
@@ -40,10 +40,10 @@ public class RecipeRewriter1_13_2 extends RecipeRewriter {
         wrapper.passthrough(Type.STRING); // Group
         Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
         for (Item item : items) {
-            rewriter.rewrite(item);
+            rewrite(item);
         }
 
-        rewriter.rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
 
         wrapper.passthrough(Type.FLOAT); // EXP
         wrapper.passthrough(Type.VAR_INT); // Cooking time
@@ -55,10 +55,10 @@ public class RecipeRewriter1_13_2 extends RecipeRewriter {
         for (int j = 0; j < ingredientsNo; j++) {
             Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
             for (Item item : items) {
-                rewriter.rewrite(item);
+                rewrite(item);
             }
         }
-        rewriter.rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
 
     public void handleCraftingShapeless(PacketWrapper wrapper) throws Exception {
@@ -67,9 +67,9 @@ public class RecipeRewriter1_13_2 extends RecipeRewriter {
         for (int j = 0; j < ingredientsNo; j++) {
             Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
             for (Item item : items) {
-                rewriter.rewrite(item);
+                rewrite(item);
             }
         }
-        rewriter.rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
 }

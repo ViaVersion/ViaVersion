@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
@@ -45,6 +46,7 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17", true);
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
     private final EntityRewriter metadataRewriter = new MetadataRewriter1_17To1_16_4(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
     private TagRewriter tagRewriter;
 
     public Protocol1_17To1_16_4() {
@@ -54,9 +56,9 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     protected void registerPackets() {
         metadataRewriter.register();
+        itemRewriter.register();
 
         EntityPackets.register(this);
-        InventoryPackets.register(this);
         WorldPackets.register(this);
 
         tagRewriter = new TagRewriter(this);
@@ -249,5 +251,10 @@ public class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public EntityRewriter getEntityRewriter() {
         return metadataRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

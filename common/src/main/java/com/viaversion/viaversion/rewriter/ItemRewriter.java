@@ -24,18 +24,34 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-// If any of these methods become outdated, just create a new rewriter overriding the methods
-public class ItemRewriter {
-    private final Protocol protocol;
-    private final RewriteFunction toClient;
-    private final RewriteFunction toServer;
+public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
 
-    public ItemRewriter(Protocol protocol, RewriteFunction toClient, RewriteFunction toServer) {
-        this.protocol = protocol;
-        this.toClient = toClient;
-        this.toServer = toServer;
+    public ItemRewriter(T protocol) {
+        super(protocol);
+    }
+
+    // These two methods always return the same item instance *for now*
+    // It is made this way so it's easy to handle new instance creation/implementation changes
+    @Override
+    public @Nullable Item handleItemToClient(@Nullable Item item) {
+        if (item == null) return null;
+        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
+            item.setIdentifier(protocol.getMappingData().getNewItemId(item.identifier()));
+        }
+        return item;
+    }
+
+    @Override
+    public @Nullable Item handleItemToServer(@Nullable Item item) {
+        if (item == null) return null;
+        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
+            item.setIdentifier(protocol.getMappingData().getOldItemId(item.identifier()));
+        }
+        return item;
     }
 
     public void registerWindowItems(ClientboundPacketType packetType, Type<Item[]> type) {
@@ -89,7 +105,7 @@ public class ItemRewriter {
                     do {
                         slot = wrapper.passthrough(Type.BYTE);
                         // & 0x7F into an extra variable if slot is needed
-                        toClient.rewrite(wrapper.passthrough(type));
+                        handleItemToClient(wrapper.passthrough(type));
                     } while ((slot & 0xFFFFFF80) != 0);
                 });
             }
@@ -138,11 +154,11 @@ public class ItemRewriter {
                     int length = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < length; i++) {
                         wrapper.passthrough(Type.SHORT); // Slot
-                        toServer.rewrite(wrapper.passthrough(type));
+                        handleItemToServer(wrapper.passthrough(type));
                     }
 
                     // Carried item
-                    toServer.rewrite(wrapper.passthrough(type));
+                    handleItemToServer(wrapper.passthrough(type));
                 });
             }
         });
@@ -169,11 +185,11 @@ public class ItemRewriter {
                     wrapper.passthrough(Type.VAR_INT);
                     int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                     for (int i = 0; i < size; i++) {
-                        toClient.rewrite(wrapper.passthrough(type)); // Input
-                        toClient.rewrite(wrapper.passthrough(type)); // Output
+                        handleItemToClient(wrapper.passthrough(type)); // Input
+                        handleItemToClient(wrapper.passthrough(type)); // Output
 
                         if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
-                            toClient.rewrite(wrapper.passthrough(type)); // Second Item
+                            handleItemToClient(wrapper.passthrough(type)); // Second Item
                         }
 
                         wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -209,7 +225,7 @@ public class ItemRewriter {
                         if (wrapper.passthrough(Type.BOOLEAN)) {
                             wrapper.passthrough(Type.COMPONENT); // Title
                             wrapper.passthrough(Type.COMPONENT); // Description
-                            toClient.rewrite(wrapper.passthrough(type)); // Icon
+                            handleItemToClient(wrapper.passthrough(type)); // Icon
                             wrapper.passthrough(Type.VAR_INT); // Frame type
                             int flags = wrapper.passthrough(Type.INT); // Flags
                             if ((flags & 1) != 0) {
@@ -261,7 +277,7 @@ public class ItemRewriter {
                 int data = wrapper.passthrough(Type.VAR_INT);
                 wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
             } else if (id == mappings.getItemId()) {
-                toClient.rewrite(wrapper.passthrough(itemType));
+                handleItemToClient(wrapper.passthrough(itemType));
             }
 
             int newId = protocol.getMappingData().getNewParticleId(id);
@@ -276,22 +292,16 @@ public class ItemRewriter {
         return wrapper -> {
             Item[] items = wrapper.get(type, 0);
             for (Item item : items) {
-                toClient.rewrite(item);
+                handleItemToClient(item);
             }
         };
     }
 
     public PacketHandler itemToClientHandler(Type<Item> type) {
-        return wrapper -> toClient.rewrite(wrapper.get(type, 0));
+        return wrapper -> handleItemToClient(wrapper.get(type, 0));
     }
 
     public PacketHandler itemToServerHandler(Type<Item> type) {
-        return wrapper -> toServer.rewrite(wrapper.get(type, 0));
-    }
-
-    @FunctionalInterface
-    public interface RewriteFunction {
-
-        void rewrite(Item item);
+        return wrapper -> handleItemToServer(wrapper.get(type, 0));
     }
 }

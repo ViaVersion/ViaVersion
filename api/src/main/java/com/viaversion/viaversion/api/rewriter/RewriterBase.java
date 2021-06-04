@@ -32,7 +32,7 @@ public abstract class RewriterBase<T extends Protocol> implements Rewriter<T> {
     }
 
     @Override
-    public void register() {
+    public final void register() {
         registerPackets();
         registerRewrites();
     }

@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
@@ -30,7 +31,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -51,7 +51,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
         EntityTracker1_14 tracker = tracker(connection);
 
         if (metadata.metaType() == MetaType1_14.Slot) {
-            InventoryPackets.toClient((Item) metadata.getValue());
+            protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
         } else if (metadata.metaType() == MetaType1_14.BlockID) {
             // Convert to new block id
             int data = (int) metadata.getValue();
@@ -123,11 +123,11 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                 int armorType = (int) metadata.getValue();
                 Item armorItem = null;
                 if (armorType == 1) {  //iron armor
-                    armorItem = new Item(protocol.getMappingData().getNewItemId(727), (byte) 1, (short) 0, null);
+                    armorItem = new DataItem(protocol.getMappingData().getNewItemId(727), (byte) 1, (short) 0, null);
                 } else if (armorType == 2) {  //gold armor
-                    armorItem = new Item(protocol.getMappingData().getNewItemId(728), (byte) 1, (short) 0, null);
+                    armorItem = new DataItem(protocol.getMappingData().getNewItemId(728), (byte) 1, (short) 0, null);
                 } else if (armorType == 3) {  //diamond armor
-                    armorItem = new Item(protocol.getMappingData().getNewItemId(729), (byte) 1, (short) 0, null);
+                    armorItem = new DataItem(protocol.getMappingData().getNewItemId(729), (byte) 1, (short) 0, null);
                 }
 
                 PacketWrapper equipmentPacket = PacketWrapper.create(0x46, null, connection);

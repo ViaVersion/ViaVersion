@@ -23,14 +23,14 @@ public class BedRewriter {
 
     public static void toClientItem(Item item) {
         if (item == null) return;
-        if (item.getIdentifier() == 355 && item.getData() == 0) {
+        if (item.identifier() == 355 && item.data() == 0) {
             item.setData((short) 14);
         }
     }
 
     public static void toServerItem(Item item) {
         if (item == null) return;
-        if (item.getIdentifier() == 355 && item.getData() == 14) {
+        if (item.identifier() == 355 && item.data() == 14) {
             item.setData((short) 0);
         }
     }

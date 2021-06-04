@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -271,6 +272,15 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @return entity rewriter
      */
     default @Nullable EntityRewriter getEntityRewriter() {
+        return null;
+    }
+
+    /**
+     * Returns the protocol's item rewriter if present.
+     *
+     * @return item rewriter
+     */
+    default @Nullable ItemRewriter getItemRewriter() {
         return null;
     }
 

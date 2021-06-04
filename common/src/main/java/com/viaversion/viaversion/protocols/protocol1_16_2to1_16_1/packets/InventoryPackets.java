@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
@@ -26,17 +25,20 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_16_2To1_16_1> {
 
-    public static void register(Protocol1_16_2To1_16_1 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
+    public InventoryPackets(Protocol1_16_2To1_16_1 protocol) {
+        super(protocol);
+    }
 
-        itemRewriter.registerSetCooldown(ClientboundPackets1_16.COOLDOWN);
-        itemRewriter.registerWindowItems(ClientboundPackets1_16.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        itemRewriter.registerTradeList(ClientboundPackets1_16.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerSetSlot(ClientboundPackets1_16.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerEntityEquipmentArray(ClientboundPackets1_16.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerAdvancements(ClientboundPackets1_16.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+    @Override
+    public void registerPackets() {
+        registerSetCooldown(ClientboundPackets1_16.COOLDOWN);
+        registerWindowItems(ClientboundPackets1_16.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerTradeList(ClientboundPackets1_16.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
+        registerSetSlot(ClientboundPackets1_16.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipmentArray(ClientboundPackets1_16.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_16.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerClientbound(ClientboundPackets1_16.UNLOCK_RECIPES, new PacketRemapper() {
             @Override
@@ -56,27 +58,17 @@ public class InventoryPackets {
             }
         });
 
-        new RecipeRewriter1_16(protocol, InventoryPackets::toClient).registerDefaultHandler(ClientboundPackets1_16.DECLARE_RECIPES);
+        new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_16.DECLARE_RECIPES);
 
-        itemRewriter.registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
         protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+                handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });
 
-        itemRewriter.registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
-    }
-
-    public static void toClient(Item item) {
-        if (item == null) return;
-        item.setIdentifier(Protocol1_16_2To1_16_1.MAPPINGS.getNewItemId(item.getIdentifier()));
-    }
-
-    public static void toServer(Item item) {
-        if (item == null) return;
-        item.setIdentifier(Protocol1_16_2To1_16_1.MAPPINGS.getOldItemId(item.getIdentifier()));
+        registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
 }

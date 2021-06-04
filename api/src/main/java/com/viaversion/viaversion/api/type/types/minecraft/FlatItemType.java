@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
@@ -37,7 +38,7 @@ public class FlatItemType extends BaseItemType {
         if (id < 0) {
             return null;
         } else {
-            Item item = new Item();
+            Item item = new DataItem();
             item.setIdentifier(id);
             item.setAmount(buffer.readByte());
             item.setTag(Type.NBT.read(buffer));
@@ -50,9 +51,9 @@ public class FlatItemType extends BaseItemType {
         if (object == null) {
             buffer.writeShort(-1);
         } else {
-            buffer.writeShort(object.getIdentifier());
-            buffer.writeByte(object.getAmount());
-            Type.NBT.write(buffer, object.getTag());
+            buffer.writeShort(object.identifier());
+            buffer.writeByte(object.amount());
+            Type.NBT.write(buffer, object.tag());
         }
     }
 }

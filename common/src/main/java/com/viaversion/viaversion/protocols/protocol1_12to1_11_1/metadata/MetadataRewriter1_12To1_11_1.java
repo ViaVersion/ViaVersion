@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_12Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.BedRewriter;
@@ -36,7 +37,7 @@ public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<Protocol1_12To1
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
-        if (metadata.getValue() instanceof Item) {
+        if (metadata.getValue() instanceof DataItem) {
             // Apply rewrite
             BedRewriter.toClientItem((Item) metadata.getValue());
         }

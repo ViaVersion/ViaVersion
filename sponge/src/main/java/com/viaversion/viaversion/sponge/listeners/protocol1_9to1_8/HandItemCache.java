@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8;
 
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ItemGrabber;
 import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ItemGrabber;
@@ -68,7 +69,7 @@ public class HandItemCache implements Runnable {
     }
 
     public static Item convert(ItemStack itemInHand) {
-        if (itemInHand == null) return new Item(0, (byte) 0, (short) 0, null);
+        if (itemInHand == null) return new DataItem(0, (byte) 0, (short) 0, null);
         if (GET_DAMAGE == null) {
             try {
                 GET_DAMAGE = itemInHand.getClass().getDeclaredField("field_77991_e");
@@ -104,7 +105,7 @@ public class HandItemCache implements Runnable {
                 e.printStackTrace();
             }
         }
-        return new Item(id, (byte) itemInHand.getQuantity(), (short) damage, null);
+        return new DataItem(id, (byte) itemInHand.getQuantity(), (short) damage, null);
     }
 }
 

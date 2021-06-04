@@ -20,40 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.rewriter;
 
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import io.netty.buffer.ByteBuf;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class FlatVarIntItemType extends BaseItemType {
-    public FlatVarIntItemType() {
-        super("FlatVarIntItem");
-    }
+public interface ItemRewriter<T extends Protocol> extends Rewriter<T> {
 
-    @Override
-    public Item read(ByteBuf buffer) throws Exception {
-        boolean present = buffer.readBoolean();
-        if (!present) {
-            return null;
-        } else {
-            Item item = new DataItem();
-            item.setIdentifier(VAR_INT.readPrimitive(buffer));
-            item.setAmount(buffer.readByte());
-            item.setTag(NBT.read(buffer));
-            return item;
-        }
-    }
+    /**
+     * Returns the rewritten item, which may or may not be the same given Item instance.
+     *
+     * @param item item
+     * @return rewritten item
+     */
+    @Nullable Item handleItemToClient(@Nullable Item item);
 
-    @Override
-    public void write(ByteBuf buffer, Item object) throws Exception {
-        if (object == null) {
-            buffer.writeBoolean(false);
-        } else {
-            buffer.writeBoolean(true);
-            VAR_INT.writePrimitive(buffer, object.identifier());
-            buffer.writeByte(object.amount());
-            NBT.write(buffer, object.tag());
-        }
-    }
+    /**
+     * Returns the rewritten item, which may or may not be the same given Item instance.
+     *
+     * @param item item
+     * @return rewritten item
+     */
+    @Nullable Item handleItemToServer(@Nullable Item item);
 }

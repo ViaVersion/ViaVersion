@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
@@ -42,7 +41,7 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<Protocol1_16To1
     @Override
     public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
         if (metadata.metaType() == MetaType1_14.Slot) {
-            InventoryPackets.toClient((Item) metadata.getValue());
+            protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
         } else if (metadata.metaType() == MetaType1_14.BlockID) {
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));

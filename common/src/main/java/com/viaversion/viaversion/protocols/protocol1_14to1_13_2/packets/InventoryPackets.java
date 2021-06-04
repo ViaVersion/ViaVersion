@@ -26,8 +26,8 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -45,7 +45,7 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_14To1_13_2> {
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_14To1_13_2.class.getSimpleName();
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
     private static final ComponentRewriter COMPONENT_REWRITER = new ComponentRewriter() {
@@ -59,11 +59,14 @@ public class InventoryPackets {
         }
     };
 
-    public static void register(Protocol protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
+    public InventoryPackets(Protocol1_14To1_13_2 protocol) {
+        super(protocol);
+    }
 
-        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
-        itemRewriter.registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+    @Override
+    public void registerPackets() {
+        registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
+        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketRemapper() {
             @Override
@@ -141,8 +144,8 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
@@ -165,14 +168,14 @@ public class InventoryPackets {
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
                                 // Input Item
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                                 // Output Item
-                                toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem) {
                                     // Second Item
-                                    toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -197,9 +200,9 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
-        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol, InventoryPackets::toClient);
+        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -224,7 +227,7 @@ public class InventoryPackets {
         });
 
 
-        itemRewriter.registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, new PacketRemapper() {
             @Override
@@ -242,26 +245,27 @@ public class InventoryPackets {
                         resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
                         CompoundTag tag = new CompoundTag();
                         tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
-                        resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new Item(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
+                        resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
                         resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
                     }
                 });
             }
         });
 
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        itemRewriter.registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.FLOAT);
     }
 
-    public static void toClient(Item item) {
-        if (item == null) return;
-        item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getNewItemId(item.getIdentifier()));
+    @Override
+    public Item handleItemToClient(Item item) {
+        if (item == null) return null;
+        item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getNewItemId(item.identifier()));
 
-        if (item.getTag() == null) return;
+        if (item.tag() == null) return item;
 
         // Display Lore now uses JSON
-        Tag displayTag = item.getTag().get("display");
+        Tag displayTag = item.tag().get("display");
         if (displayTag instanceof CompoundTag) {
             CompoundTag display = (CompoundTag) displayTag;
             Tag loreTag = display.get("Lore");
@@ -276,16 +280,18 @@ public class InventoryPackets {
                 }
             }
         }
+        return item;
     }
 
-    public static void toServer(Item item) {
-        if (item == null) return;
-        item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getOldItemId(item.getIdentifier()));
+    @Override
+    public Item handleItemToServer(Item item) {
+        if (item == null) return null;
+        item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getOldItemId(item.identifier()));
 
-        if (item.getTag() == null) return;
+        if (item.tag() == null) return item;
 
         // Display Name now uses JSON
-        Tag displayTag = item.getTag().get("display");
+        Tag displayTag = item.tag().get("display");
         if (displayTag instanceof CompoundTag) {
             CompoundTag display = (CompoundTag) displayTag;
             Tag loreTag = display.get("Lore");
@@ -303,5 +309,6 @@ public class InventoryPackets {
                 }
             }
         }
+        return item;
     }
 }

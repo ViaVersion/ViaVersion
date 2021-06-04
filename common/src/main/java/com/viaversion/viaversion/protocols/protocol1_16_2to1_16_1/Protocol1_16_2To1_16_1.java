@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data.MappingData;
@@ -40,6 +41,7 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
     private TagRewriter tagRewriter;
 
     public Protocol1_16_2To1_16_1() {
@@ -49,10 +51,10 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     @Override
     protected void registerPackets() {
         metadataRewriter.register();
+        itemRewriter.register();
 
         EntityPackets.register(this);
         WorldPackets.register(this);
-        InventoryPackets.register(this);
 
         tagRewriter = new TagRewriter(this);
         tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
@@ -125,5 +127,10 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     @Override
     public EntityRewriter getEntityRewriter() {
         return metadataRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

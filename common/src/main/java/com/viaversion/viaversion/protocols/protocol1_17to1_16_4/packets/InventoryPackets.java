@@ -30,27 +30,30 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
 
-    public static void register(Protocol1_17To1_16_4 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
+    public InventoryPackets(Protocol1_17To1_16_4 protocol) {
+        super(protocol);
+    }
 
-        itemRewriter.registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        itemRewriter.registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        itemRewriter.registerTradeList(ClientboundPackets1_16_2.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerSetSlot(ClientboundPackets1_16_2.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
+    @Override
+    public void registerPackets() {
+        registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
+        registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerTradeList(ClientboundPackets1_16_2.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
+        registerSetSlot(ClientboundPackets1_16_2.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
 
-        new RecipeRewriter1_16(protocol, InventoryPackets::toClient).registerDefaultHandler(ClientboundPackets1_16_2.DECLARE_RECIPES);
+        new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_16_2.DECLARE_RECIPES);
 
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+                handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });
 
@@ -80,7 +83,7 @@ public class InventoryPackets {
                         item = null;
                     } else {
                         // Use the item sent
-                        toServer(item);
+                        handleItemToServer(item);
                     }
 
                     wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
@@ -132,17 +135,5 @@ public class InventoryPackets {
                 });
             }
         });
-    }
-
-    public static void toClient(Item item) {
-        if (item == null) return;
-
-        item.setIdentifier(Protocol1_17To1_16_4.MAPPINGS.getNewItemId(item.getIdentifier()));
-    }
-
-    public static void toServer(Item item) {
-        if (item == null) return;
-
-        item.setIdentifier(Protocol1_17To1_16_4.MAPPINGS.getOldItemId(item.getIdentifier()));
     }
 }

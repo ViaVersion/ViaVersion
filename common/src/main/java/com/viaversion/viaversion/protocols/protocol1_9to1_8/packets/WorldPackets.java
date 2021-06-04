@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -314,7 +315,7 @@ public class WorldPackets {
 
                             // Method to identify the sword in hand
                             boolean isSword = showShieldWhenSwordInHand ? tracker.hasSwordInHand()
-                                    : item != null && Protocol1_9To1_8.isSword(item.getIdentifier());
+                                    : item != null && Protocol1_9To1_8.isSword(item.identifier());
 
                             if (isSword) {
                                 if (hand == 0) {
@@ -325,7 +326,7 @@ public class WorldPackets {
                                         if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
 
                                             // Set shield in offhand when interacting with main hand
-                                            Item shield = new Item(442, (byte) 1, (short) 0, null);
+                                            Item shield = new DataItem(442, (byte) 1, (short) 0, null);
                                             tracker.setSecondHand(shield);
                                         }
                                     }

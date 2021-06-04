@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -29,14 +28,18 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewri
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_13_1To1_13> {
 
-    public static void register(Protocol1_13_1To1_13 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
-        itemRewriter.registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_ITEM);
-        itemRewriter.registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_ITEM_ARRAY);
-        itemRewriter.registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_ITEM);
-        itemRewriter.registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
+    public InventoryPackets(Protocol1_13_1To1_13 protocol) {
+        super(protocol);
+    }
+
+    @Override
+    public void registerPackets() {
+        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_ITEM);
+        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_ITEM_ARRAY);
+        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_ITEM);
+        registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
 
         protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
             @Override
@@ -52,14 +55,14 @@ public class InventoryPackets {
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
                                 // Input Item
-                                toClient(wrapper.passthrough(Type.FLAT_ITEM));
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_ITEM));
                                 // Output Item
-                                InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_ITEM));
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem) {
                                     // Second Item
-                                    InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_ITEM));
+                                    handleItemToClient(wrapper.passthrough(Type.FLAT_ITEM));
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -72,9 +75,9 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
+        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
 
-        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol, InventoryPackets::toClient);
+        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -90,19 +93,9 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW, Type.FLAT_ITEM);
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, Type.FLAT_ITEM);
+        registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW, Type.FLAT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, Type.FLAT_ITEM);
 
-        itemRewriter.registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLAT_ITEM, Type.FLOAT);
-    }
-
-    public static void toClient(Item item) {
-        if (item == null) return;
-        item.setIdentifier(Protocol1_13_1To1_13.MAPPINGS.getNewItemId(item.getIdentifier()));
-    }
-
-    public static void toServer(Item item) {
-        if (item == null) return;
-        item.setIdentifier(Protocol1_13_1To1_13.MAPPINGS.getOldItemId(item.getIdentifier()));
+        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLAT_ITEM, Type.FLOAT);
     }
 }

@@ -18,10 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 
 import java.util.ArrayList;
@@ -143,14 +144,14 @@ public class ParticleRewriter {
             public Particle handler(Particle particle, Integer[] data) {
                 Item item;
                 if (data.length == 1)
-                    item = new Item(data[0], (byte) 1, (short) 0, null);
+                    item = new DataItem(data[0], (byte) 1, (short) 0, null);
                 else if (data.length == 2)
-                    item = new Item(data[0], (byte) 1, data[1].shortValue(), null);
+                    item = new DataItem(data[0], (byte) 1, data[1].shortValue(), null);
                 else
                     return particle;
 
                 // Transform to new Item
-                InventoryPackets.toClient(item);
+                Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(item);
 
                 particle.getArguments().add(new Particle.ParticleData(Type.FLAT_ITEM, item)); // Item Slot	The item that will be used.
                 return particle;

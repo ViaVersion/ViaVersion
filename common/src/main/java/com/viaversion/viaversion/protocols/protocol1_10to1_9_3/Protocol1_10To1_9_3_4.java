@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.packets.InventoryPackets;
@@ -54,6 +55,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
             return metaList;
         }
     };
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
 
     public Protocol1_10To1_9_3_4() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9_3.class);
@@ -61,8 +63,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
 
     @Override
     protected void registerPackets() {
-
-        InventoryPackets.register(this);
+        itemRewriter.register();
 
         // Named sound effect
         registerClientbound(State.PLAY, 0x19, 0x19, new PacketRemapper() {
@@ -195,5 +196,10 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new ResourcePackTracker());
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

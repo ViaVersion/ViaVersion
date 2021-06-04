@@ -17,11 +17,13 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,12 +31,10 @@ import java.util.Map;
 public abstract class RecipeRewriter {
 
     protected final Protocol protocol;
-    protected final ItemRewriter.RewriteFunction rewriter;
     protected final Map<String, RecipeConsumer> recipeHandlers = new HashMap<>();
 
-    protected RecipeRewriter(Protocol protocol, ItemRewriter.RewriteFunction rewriter) {
+    protected RecipeRewriter(Protocol protocol) {
         this.protocol = protocol;
-        this.rewriter = rewriter;
     }
 
     public void handle(PacketWrapper wrapper, String type) throws Exception {
@@ -58,6 +58,12 @@ public abstract class RecipeRewriter {
                 });
             }
         });
+    }
+
+    protected void rewrite(@Nullable Item item) {
+        if (protocol.getItemRewriter() != null) {
+            protocol.getItemRewriter().handleItemToClient(item);
+        }
     }
 
     @FunctionalInterface

@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -34,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
@@ -73,6 +75,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
     private final EntityRewriter entityRewriter = new MetadataRewriter1_13To1_12_2(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put('0', 'g');
@@ -157,11 +160,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     protected void registerPackets() {
         entityRewriter.register();
+        itemRewriter.register();
 
-        // Register grouped packet changes
         EntityPackets.register(this);
         WorldPackets.register(this);
-        InventoryPackets.register(this);
 
         registerClientbound(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
             @Override
@@ -516,11 +518,11 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                                     Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                                     for (int i = 0; i < clone.length; i++) {
                                                         if (clone[i] == null) continue;
-                                                        clone[i] = new Item(clone[i]);
+                                                        clone[i] = new DataItem(clone[i]);
                                                     }
                                                     wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                                 }
-                                                wrapper.write(Type.FLAT_ITEM, new Item(entry.getValue().getResult()));
+                                                wrapper.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
                                                 break;
                                             }
                                             case "crafting_shaped": {
@@ -531,11 +533,11 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                                     Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                                     for (int i = 0; i < clone.length; i++) {
                                                         if (clone[i] == null) continue;
-                                                        clone[i] = new Item(clone[i]);
+                                                        clone[i] = new DataItem(clone[i]);
                                                     }
                                                     wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                                 }
-                                                wrapper.write(Type.FLAT_ITEM, new Item(entry.getValue().getResult()));
+                                                wrapper.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
                                                 break;
                                             }
                                             case "smelting": {
@@ -543,10 +545,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                                 Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
                                                 for (int i = 0; i < clone.length; i++) {
                                                     if (clone[i] == null) continue;
-                                                    clone[i] = new Item(clone[i]);
+                                                    clone[i] = new DataItem(clone[i]);
                                                 }
                                                 wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                                wrapper.write(Type.FLAT_ITEM, new Item(entry.getValue().getResult()));
+                                                wrapper.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
                                                 wrapper.write(Type.FLOAT, entry.getValue().getExperience());
                                                 wrapper.write(Type.VAR_INT, entry.getValue().getCookingTime());
                                                 break;
@@ -731,7 +733,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                 ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)); // Title
                                 ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)); // Description
                                 Item icon = wrapper.read(Type.ITEM);
-                                InventoryPackets.toClient(icon);
+                                itemRewriter.handleItemToClient(icon);
                                 wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
                                 wrapper.passthrough(Type.VAR_INT); // Frame type
                                 int flags = wrapper.passthrough(Type.INT); // Flags
@@ -813,7 +815,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                         Item item = wrapper.read(Type.FLAT_ITEM);
                         boolean isSigning = wrapper.read(Type.BOOLEAN);
 
-                        InventoryPackets.toServer(item);
+                        itemRewriter.handleItemToServer(item);
 
                         wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
                         wrapper.write(Type.ITEM, item);
@@ -1107,5 +1109,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public EntityRewriter getEntityRewriter() {
         return entityRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

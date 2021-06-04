@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
@@ -117,7 +118,7 @@ public class SpawnPackets {
                                 public void handle(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.VAR_INT, entityID);
                                     List<Metadata> meta = new ArrayList<>();
-                                    Item item = new Item(373, (byte) 1, (short) data, null); // Potion
+                                    Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
                                     ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
                                     // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                                     Metadata potion = new Metadata(5, MetaType1_9.Slot, item);
@@ -308,7 +309,7 @@ public class SpawnPackets {
                             PacketWrapper packet = PacketWrapper.create(0x3C, null, wrapper.user());
                             packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             packet.write(Type.VAR_INT, 0);
-                            packet.write(Type.ITEM, new Item(item, (byte) 1, (short) 0, null));
+                            packet.write(Type.ITEM, new DataItem(item, (byte) 1, (short) 0, null));
                             try {
                                 packet.send(Protocol1_9To1_8.class);
                             } catch (Exception e) {

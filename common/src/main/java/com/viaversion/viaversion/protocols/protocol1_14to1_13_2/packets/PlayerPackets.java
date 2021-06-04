@@ -56,12 +56,12 @@ public class PlayerPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                        InventoryPackets.toServer(item);
+                        protocol.getItemRewriter().handleItemToServer(item);
 
                         // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
                         if (Via.getConfig().isTruncate1_14Books()) {
                             if (item == null) return;
-                            CompoundTag tag = item.getTag();
+                            CompoundTag tag = item.tag();
 
                             if (tag == null) return;
                             Tag pages = tag.get("pages");

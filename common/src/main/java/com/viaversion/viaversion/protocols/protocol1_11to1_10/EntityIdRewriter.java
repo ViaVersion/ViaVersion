@@ -139,9 +139,9 @@ public class EntityIdRewriter {
 
     public static void toClientItem(Item item, boolean backwards) {
         if (hasEntityTag(item)) {
-            toClient(item.getTag().get("EntityTag"), backwards);
+            toClient(item.tag().get("EntityTag"), backwards);
         }
-        if (item != null && item.getAmount() <= 0) item.setAmount((byte) 1);
+        if (item != null && item.amount() <= 0) item.setAmount(1);
     }
 
     public static void toServerItem(Item item) {
@@ -151,7 +151,7 @@ public class EntityIdRewriter {
     public static void toServerItem(Item item, boolean backwards) {
         if (!hasEntityTag(item)) return;
 
-        CompoundTag entityTag = item.getTag().get("EntityTag");
+        CompoundTag entityTag = item.tag().get("EntityTag");
         Tag idTag = entityTag.get("id");
         if (idTag instanceof StringTag) {
             StringTag id = (StringTag) idTag;
@@ -163,9 +163,9 @@ public class EntityIdRewriter {
     }
 
     private static boolean hasEntityTag(Item item) {
-        if (item == null || item.getIdentifier() != 383) return false; // Monster Egg
+        if (item == null || item.identifier() != 383) return false; // Monster Egg
 
-        CompoundTag tag = item.getTag();
+        CompoundTag tag = item.tag();
         if (tag == null) return false;
 
         Tag entityTag = tag.get("EntityTag");

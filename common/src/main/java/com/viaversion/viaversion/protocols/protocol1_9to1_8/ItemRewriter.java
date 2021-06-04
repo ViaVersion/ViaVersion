@@ -158,8 +158,8 @@ public class ItemRewriter {
 
     public static void toServer(Item item) {
         if (item != null) {
-            if (item.getIdentifier() == 383 && item.getData() == 0) { // Monster Egg
-                CompoundTag tag = item.getTag();
+            if (item.identifier() == 383 && item.data() == 0) { // Monster Egg
+                CompoundTag tag = item.tag();
                 int data = 0;
                 if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
                     CompoundTag entityTag = tag.get("EntityTag");
@@ -173,8 +173,8 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) data);
             }
-            if (item.getIdentifier() == 373) { // Potion
-                CompoundTag tag = item.getTag();
+            if (item.identifier() == 373) { // Potion
+                CompoundTag tag = item.tag();
                 int data = 0;
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
                     StringTag potion = tag.get("Potion");
@@ -188,8 +188,8 @@ public class ItemRewriter {
                 item.setData((short) data);
             }
             // Splash potion
-            if (item.getIdentifier() == 438) {
-                CompoundTag tag = item.getTag();
+            if (item.identifier() == 438) {
+                CompoundTag tag = item.tag();
                 int data = 0;
                 item.setIdentifier(373); // Potion
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
@@ -204,9 +204,9 @@ public class ItemRewriter {
                 item.setData((short) data);
             }
 
-            boolean newItem = item.getIdentifier() >= 198 && item.getIdentifier() <= 212;
-            newItem |= item.getIdentifier() == 397 && item.getData() == 5;
-            newItem |= item.getIdentifier() >= 432 && item.getIdentifier() <= 448;
+            boolean newItem = item.identifier() >= 198 && item.identifier() <= 212;
+            newItem |= item.identifier() == 397 && item.data() == 5;
+            newItem |= item.identifier() >= 432 && item.identifier() <= 448;
             if (newItem) { // Replace server-side unknown items
                 item.setIdentifier((short) 1);
                 item.setData((short) 0);
@@ -215,11 +215,11 @@ public class ItemRewriter {
     }
 
     public static void rewriteBookToServer(Item item) {
-        int id = item.getIdentifier();
+        int id = item.identifier();
         if (id != 387) {
             return;
         }
-        CompoundTag tag = item.getTag();
+        CompoundTag tag = item.tag();
         ListTag pages = tag.get("pages");
         if (pages == null) { // is this even possible?
             return;
@@ -251,13 +251,13 @@ public class ItemRewriter {
 
     public static void toClient(Item item) {
         if (item != null) {
-            if (item.getIdentifier() == 383 && item.getData() != 0) { // Monster Egg
-                CompoundTag tag = item.getTag();
+            if (item.identifier() == 383 && item.data() != 0) { // Monster Egg
+                CompoundTag tag = item.tag();
                 if (tag == null) {
                     tag = new CompoundTag();
                 }
                 CompoundTag entityTag = new CompoundTag();
-                String entityName = ENTTIY_ID_TO_NAME.get((int) item.getData());
+                String entityName = ENTTIY_ID_TO_NAME.get((int) item.data());
                 if (entityName != null) {
                     StringTag id = new StringTag(entityName);
                     entityTag.put("id", id);
@@ -266,23 +266,23 @@ public class ItemRewriter {
                 item.setTag(tag);
                 item.setData((short) 0);
             }
-            if (item.getIdentifier() == 373) { // Potion
-                CompoundTag tag = item.getTag();
+            if (item.identifier() == 373) { // Potion
+                CompoundTag tag = item.tag();
                 if (tag == null) {
                     tag = new CompoundTag();
                 }
-                if (item.getData() >= 16384) {
+                if (item.data() >= 16384) {
                     item.setIdentifier(438); // splash id
-                    item.setData((short) (item.getData() - 8192));
+                    item.setData((short) (item.data() - 8192));
                 }
-                String name = potionNameFromDamage(item.getData());
+                String name = potionNameFromDamage(item.data());
                 StringTag potion = new StringTag("minecraft:" + name);
                 tag.put("Potion", potion);
                 item.setTag(tag);
                 item.setData((short) 0);
             }
-            if (item.getIdentifier() == 387) { // WRITTEN_BOOK
-                CompoundTag tag = item.getTag();
+            if (item.identifier() == 387) { // WRITTEN_BOOK
+                CompoundTag tag = item.tag();
                 if (tag == null) {
                     tag = new CompoundTag();
                 }

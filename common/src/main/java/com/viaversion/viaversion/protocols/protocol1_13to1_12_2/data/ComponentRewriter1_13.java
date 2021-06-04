@@ -24,11 +24,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 
 import java.io.IOException;
@@ -40,6 +40,7 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
     }
 
     public ComponentRewriter1_13() {
+        super(Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class));
     }
 
     @Override
@@ -70,14 +71,14 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
 
         // Call item converter
         short damage = damageTag != null ? damageTag.asShort() : 0;
-        Item item = new Item();
+        Item item = new DataItem();
         item.setData(damage);
         item.setTag(itemTag);
-        handleItem(item);
+        protocol.getItemRewriter().handleItemToClient(item);
 
         // Serialize again
-        if (damage != item.getData()) {
-            tag.put("Damage", new ShortTag(item.getData()));
+        if (damage != item.data()) {
+            tag.put("Damage", new ShortTag(item.data()));
         }
         if (itemTag != null) {
             tag.put("tag", itemTag);
@@ -95,10 +96,6 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
             Via.getPlatform().getLogger().warning("Error writing NBT in show_item:" + text);
             e.printStackTrace();
         }
-    }
-
-    protected void handleItem(Item item) {
-        InventoryPackets.toClient(item);
     }
 
     protected String findItemNBT(JsonElement element) {

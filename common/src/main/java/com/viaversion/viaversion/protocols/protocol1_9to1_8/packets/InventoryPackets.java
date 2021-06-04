@@ -126,7 +126,7 @@ public class InventoryPackets {
                             short windowId = wrapper.get(Type.BYTE, 0);
 
                             // Store item in slot
-                            inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.getIdentifier());
+                            inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.identifier());
 
                             // Sync shield item in offhand with main hand
                             entityTracker.syncShieldWithSword();
@@ -177,7 +177,7 @@ public class InventoryPackets {
 
                             // Store items in slots
                             if (showShieldWhenSwordInHand) {
-                                inventoryTracker.setItemId(windowId, i, stack == null ? 0 : stack.getIdentifier());
+                                inventoryTracker.setItemId(windowId, i, stack == null ? 0 : stack.identifier());
                             }
 
                             ItemRewriter.toClient(stack);
@@ -269,7 +269,7 @@ public class InventoryPackets {
                             short slotID = wrapper.get(Type.SHORT, 0);
 
                             // Update item in slot
-                            inventoryTracker.setItemId((short) 0, slotID, stack == null ? 0 : stack.getIdentifier());
+                            inventoryTracker.setItemId((short) 0, slotID, stack == null ? 0 : stack.identifier());
 
                             // Sync shield item in offhand with main hand
                             entityTracker.syncShieldWithSword();

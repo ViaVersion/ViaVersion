@@ -30,14 +30,17 @@ import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.Invent
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
 
-    public static void register(Protocol1_12To1_11_1 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, BedRewriter::toClientItem, InventoryPackets::toServerItem);
+    public InventoryPackets(Protocol1_12To1_11_1 protocol) {
+        super(protocol);
+    }
 
-        itemRewriter.registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
-        itemRewriter.registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
-        itemRewriter.registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
+    @Override
+    public void registerPackets() {
+        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
+        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
+        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
 
         // Plugin message Packet -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
@@ -113,17 +116,20 @@ public class InventoryPackets {
         );
 
         // Creative Inventory Action
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+        registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM);
     }
 
-    public static void toServerItem(Item item) {
+    @Override
+    public Item handleItemToServer(Item item) {
+        if (item == null) return null;
         BedRewriter.toServerItem(item);
-        if (item == null) return;
-        boolean newItem = item.getIdentifier() >= 235 && item.getIdentifier() <= 252;
-        newItem |= item.getIdentifier() == 453;
+
+        boolean newItem = item.identifier() >= 235 && item.identifier() <= 252;
+        newItem |= item.identifier() == 453;
         if (newItem) { // Replace server-side unknown items
             item.setIdentifier((short) 1);
             item.setData((short) 0);
         }
+        return item;
     }
 }

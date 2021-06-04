@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.gson.reflect.TypeToken;
-import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.util.GsonUtil;
 
 import java.io.IOException;
@@ -55,9 +55,9 @@ public class RecipeData {
         private int height;
         private float experience;
         private int cookingTime;
-        private Item[] ingredient;
-        private Item[][] ingredients;
-        private Item result;
+        private DataItem[] ingredient;
+        private DataItem[][] ingredients;
+        private DataItem result;
 
         public String getType() {
             return type;
@@ -107,27 +107,27 @@ public class RecipeData {
             this.cookingTime = cookingTime;
         }
 
-        public Item[] getIngredient() {
+        public DataItem[] getIngredient() {
             return ingredient;
         }
 
-        public void setIngredient(Item[] ingredient) {
+        public void setIngredient(DataItem[] ingredient) {
             this.ingredient = ingredient;
         }
 
-        public Item[][] getIngredients() {
+        public DataItem[][] getIngredients() {
             return ingredients;
         }
 
-        public void setIngredients(Item[][] ingredients) {
+        public void setIngredients(DataItem[][] ingredients) {
             this.ingredients = ingredients;
         }
 
-        public Item getResult() {
+        public DataItem getResult() {
             return result;
         }
 
-        public void setResult(Item result) {
+        public void setResult(DataItem result) {
             this.result = result;
         }
     }

@@ -28,14 +28,17 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_11To1_10> {
 
-    public static void register(Protocol1_11To1_10 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, EntityIdRewriter::toClientItem, InventoryPackets::toServerItem);
+    public InventoryPackets(Protocol1_11To1_10 protocol) {
+        super(protocol);
+    }
 
-        itemRewriter.registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
-        itemRewriter.registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
-        itemRewriter.registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
+    @Override
+    public void registerPackets() {
+        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
+        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
+        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
 
         // Plugin message Packet -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
@@ -68,19 +71,26 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW, Type.ITEM);
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+        registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW, Type.ITEM);
+        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
     }
 
-    public static void toServerItem(Item item) {
+    @Override
+    public Item handleItemToClient(Item item) {
+        EntityIdRewriter.toClientItem(item);
+        return item;
+    }
+
+    @Override
+    public Item handleItemToServer(Item item) {
         EntityIdRewriter.toServerItem(item);
-        if (item == null) return;
-        boolean newItem = item.getIdentifier() >= 218 && item.getIdentifier() <= 234;
-        newItem |= item.getIdentifier() == 449 || item.getIdentifier() == 450;
+        if (item == null) return null;
+        boolean newItem = item.identifier() >= 218 && item.identifier() <= 234;
+        newItem |= item.identifier() == 449 || item.identifier() == 450;
         if (newItem) { // Replace server-side unknown items
             item.setIdentifier((short) 1);
             item.setData((short) 0);
         }
+        return item;
     }
-
 }

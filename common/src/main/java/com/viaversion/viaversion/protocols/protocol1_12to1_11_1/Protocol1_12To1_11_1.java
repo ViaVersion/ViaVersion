@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -48,6 +49,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
     private final EntityRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
 
     public Protocol1_12To1_11_1() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_12.class, ServerboundPackets1_9_3.class, ServerboundPackets1_12.class);
@@ -56,8 +58,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
     @Override
     protected void registerPackets() {
         metadataRewriter.register();
-
-        InventoryPackets.register(this);
+        itemRewriter.register();
 
         registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
             @Override
@@ -267,5 +268,10 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
     @Override
     public EntityRewriter getEntityRewriter() {
         return metadataRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

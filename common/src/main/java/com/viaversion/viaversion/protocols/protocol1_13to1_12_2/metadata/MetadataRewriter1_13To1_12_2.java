@@ -28,7 +28,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -69,7 +68,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1
         // 1.13 changed item to flat item (no data)
         if (metadata.metaType() == MetaType1_13.Slot) {
             metadata.setMetaType(MetaType1_13.Slot);
-            InventoryPackets.toClient((Item) metadata.getValue());
+            protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
         } else if (metadata.metaType() == MetaType1_13.BlockID) {
             // Convert to new block id
             metadata.setValue(WorldPackets.toNewId((int) metadata.getValue()));

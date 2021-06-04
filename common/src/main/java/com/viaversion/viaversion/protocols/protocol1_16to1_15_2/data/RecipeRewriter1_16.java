@@ -22,24 +22,23 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
-import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public class RecipeRewriter1_16 extends RecipeRewriter1_14 {
 
-    public RecipeRewriter1_16(Protocol protocol, ItemRewriter.RewriteFunction rewriter) {
-        super(protocol, rewriter);
+    public RecipeRewriter1_16(Protocol protocol) {
+        super(protocol);
         recipeHandlers.put("smithing", this::handleSmithing);
     }
 
     public void handleSmithing(PacketWrapper wrapper) throws Exception {
         Item[] baseIngredients = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
         for (Item item : baseIngredients) {
-            rewriter.rewrite(item);
+            rewrite(item);
         }
         Item[] ingredients = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
         for (Item item : ingredients) {
-            rewriter.rewrite(item);
+            rewrite(item);
         }
-        rewriter.rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
 }

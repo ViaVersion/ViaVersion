@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
@@ -44,6 +45,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
+    private final ItemRewriter itemRewriter = new InventoryPackets(this);
 
     public Protocol1_14To1_13_2() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_14.class, ServerboundPackets1_13.class, ServerboundPackets1_14.class);
@@ -52,8 +54,8 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     protected void registerPackets() {
         metadataRewriter.register();
+        itemRewriter.register();
 
-        InventoryPackets.register(this);
         EntityPackets.register(this);
         WorldPackets.register(this);
         PlayerPackets.register(this);
@@ -161,5 +163,10 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public EntityRewriter getEntityRewriter() {
         return metadataRewriter;
+    }
+
+    @Override
+    public ItemRewriter getItemRewriter() {
+        return itemRewriter;
     }
 }

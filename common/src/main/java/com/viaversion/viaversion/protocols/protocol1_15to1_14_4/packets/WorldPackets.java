@@ -106,7 +106,7 @@ public class WorldPackets {
                             int data = wrapper.passthrough(Type.VAR_INT);
                             wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         } else if (id == 32) {
-                            InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            protocol.getItemRewriter().handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                         }
                     }
                 });

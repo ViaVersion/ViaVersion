@@ -37,11 +37,14 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 import java.util.UUID;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
 
-    public static void register(Protocol1_16To1_15_2 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, InventoryPackets::toClient, InventoryPackets::toServer);
+    public InventoryPackets(Protocol1_16To1_15_2 protocol) {
+        super(protocol);
+    }
 
+    @Override
+    public void registerPackets() {
         protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -92,11 +95,11 @@ public class InventoryPackets {
             }
         });
 
-        itemRewriter.registerSetCooldown(ClientboundPackets1_15.COOLDOWN);
-        itemRewriter.registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        itemRewriter.registerTradeList(ClientboundPackets1_15.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerSetCooldown(ClientboundPackets1_15.COOLDOWN);
+        registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerTradeList(ClientboundPackets1_15.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
+        registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
             @Override
@@ -106,15 +109,15 @@ public class InventoryPackets {
                 handler(wrapper -> {
                     int slot = wrapper.read(Type.VAR_INT);
                     wrapper.write(Type.BYTE, (byte) slot);
-                    InventoryPackets.toClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                 });
             }
         });
 
-        new RecipeRewriter1_14(protocol, InventoryPackets::toClient).registerDefaultHandler(ClientboundPackets1_15.DECLARE_RECIPES);
+        new RecipeRewriter1_14(protocol).registerDefaultHandler(ClientboundPackets1_15.DECLARE_RECIPES);
 
-        itemRewriter.registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
         protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, new PacketRemapper() {
             @Override
@@ -131,18 +134,19 @@ public class InventoryPackets {
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(wrapper -> InventoryPackets.toServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+                handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });
 
-        itemRewriter.registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
 
-    public static void toClient(Item item) {
-        if (item == null) return;
+    @Override
+    public Item handleItemToClient(Item item) {
+        if (item == null) return null;
 
-        if (item.getIdentifier() == 771 && item.getTag() != null) {
-            CompoundTag tag = item.getTag();
+        if (item.identifier() == 771 && item.tag() != null) {
+            CompoundTag tag = item.tag();
             Tag ownerTag = tag.get("SkullOwner");
             if (ownerTag instanceof CompoundTag) {
                 CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
@@ -155,16 +159,18 @@ public class InventoryPackets {
         }
 
         oldToNewAttributes(item);
-        item.setIdentifier(Protocol1_16To1_15_2.MAPPINGS.getNewItemId(item.getIdentifier()));
+        item.setIdentifier(Protocol1_16To1_15_2.MAPPINGS.getNewItemId(item.identifier()));
+        return item;
     }
 
-    public static void toServer(Item item) {
-        if (item == null) return;
+    @Override
+    public Item handleItemToServer(Item item) {
+        if (item == null) return null;
 
-        item.setIdentifier(Protocol1_16To1_15_2.MAPPINGS.getOldItemId(item.getIdentifier()));
+        item.setIdentifier(Protocol1_16To1_15_2.MAPPINGS.getOldItemId(item.identifier()));
 
-        if (item.getIdentifier() == 771 && item.getTag() != null) {
-            CompoundTag tag = item.getTag();
+        if (item.identifier() == 771 && item.tag() != null) {
+            CompoundTag tag = item.tag();
             Tag ownerTag = tag.get("SkullOwner");
             if (ownerTag instanceof CompoundTag) {
                 CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
@@ -177,12 +183,13 @@ public class InventoryPackets {
         }
 
         newToOldAttributes(item);
+        return item;
     }
 
     public static void oldToNewAttributes(Item item) {
-        if (item.getTag() == null) return;
+        if (item.tag() == null) return;
 
-        ListTag attributes = item.getTag().get("AttributeModifiers");
+        ListTag attributes = item.tag().get("AttributeModifiers");
         if (attributes == null) return;
 
         for (Tag tag : attributes) {
@@ -199,9 +206,9 @@ public class InventoryPackets {
     }
 
     public static void newToOldAttributes(Item item) {
-        if (item.getTag() == null) return;
+        if (item.tag() == null) return;
 
-        ListTag attributes = item.getTag().get("AttributeModifiers");
+        ListTag attributes = item.tag().get("AttributeModifiers");
         if (attributes == null) return;
 
         for (Tag tag : attributes) {

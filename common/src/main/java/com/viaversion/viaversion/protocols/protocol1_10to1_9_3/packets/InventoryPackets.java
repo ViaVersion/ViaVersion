@@ -23,21 +23,25 @@ import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.Protocol1_10To1_9
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets {
+public class InventoryPackets extends ItemRewriter<Protocol1_10To1_9_3_4> {
 
-    public static void register(Protocol1_10To1_9_3_4 protocol) {
-        ItemRewriter itemRewriter = new ItemRewriter(protocol, item -> {
-        }, InventoryPackets::toServerItem);
-        itemRewriter.registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+    public InventoryPackets(Protocol1_10To1_9_3_4 protocol) {
+        super(protocol);
     }
 
-    public static void toServerItem(Item item) {
-        if (item == null) return;
-        boolean newItem = item.getIdentifier() >= 213 && item.getIdentifier() <= 217;
+    @Override
+    public void registerPackets() {
+        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+    }
+
+    @Override
+    public Item handleItemToServer(Item item) {
+        if (item == null) return null;
+        boolean newItem = item.identifier() >= 213 && item.identifier() <= 217;
         if (newItem) { // Replace server-side unknown items
             item.setIdentifier((short) 1);
             item.setData((short) 0);
         }
+        return item;
     }
-
 }
