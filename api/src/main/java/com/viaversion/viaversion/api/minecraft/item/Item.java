@@ -27,23 +27,64 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface Item {
 
+    /**
+     * Returns the item identifier.
+     *
+     * @return item identifier
+     */
     int identifier();
 
+    /**
+     * Sets the item identifier.
+     *
+     * @param identifier item identifier
+     */
     void setIdentifier(int identifier);
 
+    /**
+     * Returns the item amount.
+     *
+     * @return item amount
+     */
     int amount();
 
+    /**
+     * Returns the item amount.
+     *
+     * @param amount item amount
+     */
     void setAmount(int amount);
 
+    /**
+     * Returns the item data. Always 0 for 1.13+ items.
+     *
+     * @return item data
+     */
     default short data() {
         return 0;
     }
 
+    /**
+     * Sets the item data used in versions before 1.13.
+     *
+     * @param data item data
+     * @throws UnsupportedOperationException if the item implementation does not store data
+     */
     default void setData(short data) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns the item compound tag if present.
+     *
+     * @return item tag
+     */
     @Nullable CompoundTag tag();
 
+    /**
+     * Sets the item compound tag.
+     *
+     * @param tag item tag
+     */
     void setTag(@Nullable CompoundTag tag);
 }
