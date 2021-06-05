@@ -4,11 +4,13 @@ description: Report a bug or console error
 body:
   - type: markdown
     attributes:
-      value: "**Before reporting a bug, please see if using master/dev builds from https://ci.viaversion.com/ fixes your issue.**"
+      value: |
+        **Before reporting a bug, please see if using master/dev builds from https://ci.viaversion.com/ fixes your issue.**
+        Whenever you see fit, you can upload images or video to any of the textfields.
 
   - type: input
     attributes:
-      label: "'/viaversion dump' Output"
+      label: "`/viaversion dump` Output"
       description: |
         Run `/viaversion dump` in the console or in the chat, then copy and paste the given link here.
       placeholder: |
@@ -87,9 +89,3 @@ body:
           required: true
         - label: I have tried a build from https://ci.viaversion.com/ and the issue still persists.
           required: true
-
-  - type: markdown
-    attributes:
-      value: |
-        ## Comments And Screenshots
-        If needed, add **screenshots to help explain your problem** in the comment field below.
