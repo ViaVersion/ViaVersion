@@ -3,7 +3,7 @@ metadata.format.version = "1.0"
 [versions]
 
 adventure = "4.8.0-SNAPSHOT"
-gson = "2.8.6"
+gson = "2.8.7"
 fastutil = "8.3.1"
 openNBT = "2.0-SNAPSHOT"
 javassist = "3.28.0-GA"
@@ -13,8 +13,8 @@ netty = "4.0.20.Final"
 guava = "17.0"
 snakeYaml = "1.18"
 
-junit = "5.6.3"
-checkerQual = "3.12.0"
+junit = "5.7.2"
+checkerQual = "3.14.0"
 
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
