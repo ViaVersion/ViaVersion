@@ -22,8 +22,12 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.util.Int2IntBiMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.List;
 
 public interface MappingData {
 
@@ -76,6 +80,14 @@ public interface MappingData {
      * @throws NullPointerException if this mappingdata does not hold particle mappings
      */
     int getNewParticleId(int id);
+
+    /**
+     * Returns a list of tags to send if present.
+     *
+     * @param type registry tag type
+     * @return list of tags to send if present, else null
+     */
+    @Nullable List<TagData> getTags(RegistryType type);
 
     @Nullable Int2IntBiMap getItemMappings();
 

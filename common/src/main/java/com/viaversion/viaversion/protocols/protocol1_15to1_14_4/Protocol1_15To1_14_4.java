@@ -33,7 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPa
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.WorldPackets;
-import com.viaversion.viaversion.rewriter.RegistryType;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;

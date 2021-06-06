@@ -467,12 +467,15 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private void shutdownLoaderExecutor() {
         Preconditions.checkArgument(!mappingsLoaded);
 
+        // If this log message is missing, something is wrong
         Via.getPlatform().getLogger().info("Finished mapping loading, shutting down loader executor!");
         mappingsLoaded = true;
         mappingLoaderExecutor.shutdown();
         mappingLoaderExecutor = null;
         mappingLoaderFutures.clear();
         mappingLoaderFutures = null;
+
+        // Clear cached json files
         if (MappingDataLoader.isCacheJsonMappings()) {
             MappingDataLoader.getMappingsCache().clear();
         }

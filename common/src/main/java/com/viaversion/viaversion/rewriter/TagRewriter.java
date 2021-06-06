@@ -18,6 +18,9 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.TagData;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -43,27 +46,74 @@ public class TagRewriter {
     }
 
     /**
-     * Adds an empty tag (since the client crashes if a checked tag is not registered.)
+     * Gets new tags from the protocol's {@link MappingData} instance.
      */
-    public void addEmptyTag(RegistryType tagType, String id) {
-        getOrComputeNewTags(tagType).add(new TagData(id, EMPTY_ARRAY));
+    public void loadFromMappingData() {
+        for (RegistryType type : RegistryType.getValues()) {
+            List<TagData> tags = protocol.getMappingData().getTags(type);
+            if (tags != null) {
+                getOrComputeNewTags(type).addAll(tags);
+            }
+        }
     }
 
-    public void addEmptyTags(RegistryType tagType, String... ids) {
+    /**
+     * Adds an empty tag (since the client crashes if a checked tag is not registered).
+     *
+     * @param tagType registry tag type
+     * @param tagId   tag id
+     */
+    public void addEmptyTag(RegistryType tagType, String tagId) {
+        getOrComputeNewTags(tagType).add(new TagData(tagId, EMPTY_ARRAY));
+    }
+
+    public void addEmptyTags(RegistryType tagType, String... tagIds) {
         List<TagData> tagList = getOrComputeNewTags(tagType);
-        for (String id : ids) {
+        for (String id : tagIds) {
             tagList.add(new TagData(id, EMPTY_ARRAY));
         }
     }
 
-    public void addTag(RegistryType tagType, String id, int... oldIds) {
+    /**
+     * Adds an entity tag type to be filled with the given entity type ids.
+     *
+     * @param tagId          registry tag type
+     * @param entities mapped entity types
+     */
+    public void addEntityTag(String tagId, EntityType... entities) {
+        int[] ids = new int[entities.length];
+        for (int i = 0; i < entities.length; i++) {
+            ids[i] = entities[i].getId();
+        }
+        addTagRaw(RegistryType.ENTITY, tagId, ids);
+    }
+
+    /**
+     * Adds a tag type to be filled with the given type ids after being mapped to new ids.
+     *
+     * @param tagType     registry tag type
+     * @param tagId       tag id
+     * @param unmappedIds unmapped type ids
+     */
+    public void addTag(RegistryType tagType, String tagId, int... unmappedIds) {
         List<TagData> newTags = getOrComputeNewTags(tagType);
         IdRewriteFunction rewriteFunction = getRewriter(tagType);
-        for (int i = 0; i < oldIds.length; i++) {
-            int oldId = oldIds[i];
-            oldIds[i] = rewriteFunction.rewrite(oldId);
+        for (int i = 0; i < unmappedIds.length; i++) {
+            int oldId = unmappedIds[i];
+            unmappedIds[i] = rewriteFunction.rewrite(oldId);
         }
-        newTags.add(new TagData(id, oldIds));
+        newTags.add(new TagData(tagId, unmappedIds));
+    }
+
+    /**
+     * Adds a tag type to be filled with the given raw type ids.
+     *
+     * @param tagType registry tag type
+     * @param tagId   tag id
+     * @param ids     raw type ids
+     */
+    public void addTagRaw(RegistryType tagType, String tagId, int... ids) {
+        getOrComputeNewTags(tagType).add(new TagData(tagId, ids));
     }
 
     /**
@@ -154,8 +204,8 @@ public class TagRewriter {
         // Send new tags if present
         if (newTags != null) {
             for (TagData tag : newTags) {
-                wrapper.write(Type.STRING, tag.identifier);
-                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.entries);
+                wrapper.write(Type.STRING, tag.identifier());
+                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.entries());
             }
         }
     }
@@ -181,24 +231,6 @@ public class TagRewriter {
             case GAME_EVENT:
             default:
                 return null;
-        }
-    }
-
-    public static final class TagData {
-        private final String identifier;
-        private final int[] entries;
-
-        public TagData(String identifier, int[] entries) {
-            this.identifier = identifier;
-            this.entries = entries;
-        }
-
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        public int[] getEntries() {
-            return entries;
         }
     }
 }

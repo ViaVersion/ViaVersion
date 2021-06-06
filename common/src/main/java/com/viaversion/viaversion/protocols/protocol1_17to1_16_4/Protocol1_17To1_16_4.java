@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -35,7 +36,6 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.EntityPa
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
-import com.viaversion.viaversion.rewriter.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -208,8 +208,10 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
+        tagRewriter.loadFromMappingData(); // Load filled extra tags
+
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
-                "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals",
+                "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals", "minecraft:fox_food",
                 "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores",
                 "minecraft:coal_ores", "minecraft:copper_ores", "minecraft:emerald_ores", "minecraft:cluster_max_harvestables");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crystal_sound_blocks", "minecraft:candle_cakes", "minecraft:candles",
@@ -223,15 +225,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
         // Mmmm numbers
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:mineable/axe", 74, 246, 245, 622, 668, 730, 731, 497, 138, 238, 132, 680, 306, 671, 202, 147, 492, 491, 267, 728, 151, 697, 333, 97, 96, 672, 95, 203, 190, 162, 415, 674, 254, 667, 248, 244, 240, 258, 307, 247, 192, 239, 133, 666, 675, 681, 189, 682, 414, 329, 702, 701, 249, 688, 700, 699, 152, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 478, 476, 479, 477, 250, 475, 714, 715, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 131, 130, 410, 411, 413, 412, 40, 52, 45, 58, 35, 47, 46, 53, 39, 51, 44, 57, 37, 49, 42, 55, 38, 50, 43, 56, 36, 48, 41, 54, 692, 693, 694, 695, 683, 684, 685, 686, 13, 14, 15, 16, 17, 18, 704, 705, 19, 20, 21, 22, 23, 24, 155, 156, 157, 158, 159, 160, 722, 723, 165, 166, 167, 168, 169, 170, 724, 725, 308, 309, 310, 311, 312, 313, 718, 719, 161, 485, 486, 487, 488, 489, 720, 721, 191, 483, 484, 480, 481, 482, 710, 711, 174, 175, 176, 177, 178, 179, 708, 709, 452, 453, 454, 455, 456, 457, 706, 707, 146, 274, 275, 276, 375, 376, 716, 717, 226, 224, 227, 225, 222, 223, 712, 713);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:mineable/hoe", 504, 689, 390, 576, 729, 698, 65, 66, 62, 59, 60, 64, 63, 61);
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:mineable/pickaxe", 1, 2, 3, 4, 5, 6, 7, 12, 31, 32, 33, 34, 68, 69, 70, 71, 72, 73, 134, 135, 136, 139, 140, 145, 149, 150, 154, 164, 172, 173, 180, 193, 196, 197, 228, 229, 230, 231, 241, 242, 251, 252, 255, 256, 257, 259, 260, 264, 268, 269, 270, 273, 330, 331, 334, 335, 336, 337, 338, 339, 340, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 407, 408, 448, 449, 450, 451, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 493, 494, 495, 496, 503, 505, 506, 508, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 598, 599, 600, 601, 602, 608, 609, 610, 611, 612, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 669, 670, 673, 676, 677, 678, 679, 687, 696, 734, 735, 736, 737, 742, 743, 744, 746, 747, 748, 749, 750, 751, 752, 754, 755, 756, 757, 760, 761, 762, 185, 409, 619, 183, 100, 93, 101, 233, 237, 236, 232, 235, 234, 279, 280, 654, 655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 665, 745, 753, 759, 509, 525, 521, 522, 519, 517, 523, 513, 518, 515, 512, 511, 516, 520, 524, 510, 514, 326, 327, 328, 261, 163, 91, 92, 341);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:mineable/shovel", 188, 9, 10, 11, 153, 8, 30, 253, 28, 29, 186, 184, 194, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 195);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:needs_stone_tool", 135, 32, 69, 68);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:needs_diamond_tool", 140, 736, 734, 737, 735);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:needs_iron_tool", 150, 149, 269, 273, 134, 31, 180);
-
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:cauldrons", 261);
-        tagRewriter.addTag(RegistryType.ITEM, "minecraft:fox_food", 948);
     }
 
     @Override

@@ -22,12 +22,21 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.util.Int2IntBiHashMap;
 import com.viaversion.viaversion.util.Int2IntBiMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class MappingDataBase implements MappingData {
@@ -40,6 +49,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings blockStateMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
+    protected Map<RegistryType, List<TagData>> tags;
     protected boolean loadItems = true;
 
     public MappingDataBase(String oldVersion, String newVersion) {
@@ -76,7 +86,40 @@ public class MappingDataBase implements MappingData {
                     diffmapping != null ? diffmapping.getAsJsonObject("items") : null);
         }
 
+        if (diffmapping != null && diffmapping.has("tags")) {
+            this.tags = new EnumMap<>(RegistryType.class);
+            JsonObject tags = diffmapping.getAsJsonObject("tags");
+            if (tags.has(RegistryType.ITEM.getResourceLocation())) {
+                loadTags(RegistryType.ITEM, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("items")));
+            }
+            if (tags.has(RegistryType.BLOCK.getResourceLocation())) {
+                loadTags(RegistryType.BLOCK, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("blocks")));
+            }
+        }
+
         loadExtras(oldMappings, newMappings, diffmapping);
+    }
+
+    private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
+        JsonObject tags = object.getAsJsonObject(type.getResourceLocation());
+        List<TagData> tagsList = new ArrayList<>(tags.size());
+        for (Map.Entry<String, JsonElement> entry : tags.entrySet()) {
+            JsonArray array = entry.getValue().getAsJsonArray();
+            int[] entries = new int[array.size()];
+            int i = 0;
+            for (JsonElement element : array) {
+                String stringId = element.getAsString();
+                if (!typeMapping.containsKey(stringId) && !typeMapping.containsKey(stringId = stringId.replace("minecraft:", ""))) { // aaa
+                    getLogger().warning(type + " Tags contains invalid type identifier " + stringId + " in tag " + entry.getKey());
+                    continue;
+                }
+
+                entries[i++] = typeMapping.getInt(stringId);
+            }
+            tagsList.add(new TagData(entry.getKey(), entries));
+        }
+
+        this.tags.put(type, tagsList);
     }
 
     @Override
@@ -104,6 +147,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public int getNewParticleId(int id) {
         return checkValidity(id, particleMappings.getMappings().getNewId(id), "particles");
+    }
+
+    @Override
+    public @Nullable List<TagData> getTags(RegistryType type) {
+        return tags != null ? tags.get(type) : null;
     }
 
     @Override

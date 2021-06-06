@@ -150,7 +150,7 @@ public class MappingDataLoader {
     }
 
     public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
-        Object2IntMap newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
             int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers);
             if (value != -1) {
