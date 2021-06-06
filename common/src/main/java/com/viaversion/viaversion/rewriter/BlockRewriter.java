@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 
-// If any of these methods become outdated, just create a new rewriter overriding the methods
 public class BlockRewriter {
     private final Protocol protocol;
     private final Type<Position> positionType;

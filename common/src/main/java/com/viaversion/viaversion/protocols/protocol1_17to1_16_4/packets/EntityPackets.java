@@ -18,7 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_17;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -28,16 +31,21 @@ import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.metadata.MetadataRewriter1_17To1_16_4;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public class EntityPackets {
+public final class EntityPackets extends EntityRewriter<Protocol1_17To1_16_4> {
 
-    public static void register(Protocol1_17To1_16_4 protocol) {
-        MetadataRewriter1_17To1_16_4 metadataRewriter = protocol.get(MetadataRewriter1_17To1_16_4.class);
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16_2.SPAWN_ENTITY, Entity1_17Types.FALLING_BLOCK);
-        metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_17.METADATA_LIST);
+    public EntityPackets(Protocol1_17To1_16_4 protocol) {
+        super(protocol);
+        mapTypes(Entity1_16_2Types.values(), Entity1_17Types.class);
+    }
+
+    @Override
+    public void registerPackets() {
+        registerTrackerWithData(ClientboundPackets1_16_2.SPAWN_ENTITY, Entity1_17Types.FALLING_BLOCK);
+        registerTracker(ClientboundPackets1_16_2.SPAWN_MOB);
+        registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
+        registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_17.METADATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, new PacketRemapper() {
             @Override
@@ -115,5 +123,38 @@ public class EntityPackets {
 
         // The parent class of the other entity move packets that is never actually used has finally been removed from the id list
         protocol.cancelClientbound(ClientboundPackets1_16_2.ENTITY_MOVEMENT);
+    }
+
+    @Override
+    protected void registerRewrites() {
+        filter().handler((event, meta) -> {
+            meta.setMetaType(MetaType1_17.byId(meta.metaType().typeId()));
+
+            if (meta.metaType() == MetaType1_17.POSE) {
+                int pose = meta.value();
+                if (pose > 5) {
+                    // Added LONG_JUMP at 6
+                    meta.setValue(pose + 1);
+                }
+            }
+        });
+        registerMetaTypeHandler(MetaType1_17.ITEM, MetaType1_17.BLOCK_STATE, MetaType1_17.PARTICLE);
+
+        // Ticks frozen added with id 7
+        filter().filterFamily(Entity1_17Types.ENTITY).addIndex(7);
+
+        filter().filterFamily(Entity1_17Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+            // Convert to new block id
+            int data = (int) meta.getValue();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
+
+        // Attachment position removed
+        filter().type(Entity1_17Types.SHULKER).removeIndex(17);
+    }
+
+    @Override
+    public EntityType typeFromId(int type) {
+        return Entity1_17Types.getTypeFromId(type);
     }
 }

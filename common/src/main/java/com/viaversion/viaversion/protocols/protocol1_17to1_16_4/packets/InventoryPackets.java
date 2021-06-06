@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
+public final class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
 
     public InventoryPackets(Protocol1_17To1_16_4 protocol) {
         super(protocol);

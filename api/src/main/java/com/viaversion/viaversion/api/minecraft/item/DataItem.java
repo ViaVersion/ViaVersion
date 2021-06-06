@@ -66,7 +66,7 @@ public class DataItem implements Item {
 
     @Override
     public void setAmount(int amount) {
-        if (amount > Byte.MAX_VALUE && amount < Byte.MIN_VALUE) {
+        if (amount > Byte.MAX_VALUE || amount < Byte.MIN_VALUE) {
             throw new IllegalArgumentException("Invalid item amount: " + amount);
         }
         this.amount = (byte) amount;

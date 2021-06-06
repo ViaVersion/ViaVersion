@@ -38,13 +38,13 @@ public abstract class RewriterBase<T extends Protocol> implements Rewriter<T> {
     }
 
     /**
-     * To be overriden. Called when initializing the EntityRewriter.
+     * To be overriden. Called when registering the rewriter.
      */
     protected void registerPackets() {
     }
 
     /**
-     * To be overriden. Called when initializing the EntityRewriter.
+     * To be overriden. Called when registering the rewriter.
      */
     protected void registerRewrites() {
     }

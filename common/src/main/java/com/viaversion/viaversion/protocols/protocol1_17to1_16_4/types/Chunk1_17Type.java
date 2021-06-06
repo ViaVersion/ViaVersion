@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-public class Chunk1_17Type extends Type<Chunk> {
+public final class Chunk1_17Type extends Type<Chunk> {
     private static final CompoundTag[] EMPTY_COMPOUNDS = new CompoundTag[0];
     private final int ySectionCount;
 

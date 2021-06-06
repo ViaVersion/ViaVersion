@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-public class WorldPackets {
+public final class WorldPackets {
 
     public static void register(Protocol1_17To1_16_4 protocol) {
         BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);

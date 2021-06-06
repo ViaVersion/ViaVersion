@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
 
-    public ItemRewriter(T protocol) {
+    protected ItemRewriter(T protocol) {
         super(protocol);
     }
 
