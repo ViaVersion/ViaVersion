@@ -121,7 +121,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("taco")
                 || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch"))
                 && serverProtocolVersion < ProtocolVersion.v1_12.getVersion()) {
-            plugin.getLogger().info("Enabling Paper/TacoSpigot/Torch patch: Fixes block placement.");
             storeListener(new PaperPatch(plugin)).register();
         }
 

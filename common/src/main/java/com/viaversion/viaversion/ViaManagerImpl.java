@@ -44,6 +44,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
@@ -140,6 +142,8 @@ public class ViaManagerImpl implements ViaManager {
             }
         }
 
+        checkJavaVersion();
+
         // Check for unsupported plugins/software
         unsupportedSoftwareWarning();
 
@@ -204,7 +208,31 @@ public class ViaManagerImpl implements ViaManager {
         loader.unload();
     }
 
-    private void unsupportedSoftwareWarning() {
+    private final void checkJavaVersion() { // Stolen from Paper
+        String javaVersion = System.getProperty("java.version");
+        Matcher matcher = Pattern.compile("(?:1\\.)?(\\d+)").matcher(javaVersion);
+        if (!matcher.find()) {
+            platform.getLogger().warning("Failed to determine Java version; could not parse: " + javaVersion);
+            return;
+        }
+
+        String versionString = matcher.group(1);
+        int version;
+        try {
+            version = Integer.parseInt(versionString);
+        } catch (NumberFormatException e) {
+            platform.getLogger().warning("Failed to determine Java version; could not parse: " + versionString);
+            e.printStackTrace();
+            return;
+        }
+
+        if (version < 16) {
+            platform.getLogger().warning("You are running an outdated Java version, please consider updating it to at least Java 16 (your version is " + javaVersion + "). "
+                    + "At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
+        }
+    }
+
+    private final void unsupportedSoftwareWarning() {
         boolean found = false;
         for (UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
             if (!software.findMatch()) {
