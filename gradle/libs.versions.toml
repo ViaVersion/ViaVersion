@@ -22,7 +22,7 @@ legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
 bungee = "1.16-R0.5-SNAPSHOT"
 sponge = "5.0.0"
 legacySponge = "4.0.0"
-velocity = "1.1.0-SNAPSHOT"
+velocity = "3.0.0-SNAPSHOT"
 
 
 [libraries]
