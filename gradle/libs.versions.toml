@@ -2,7 +2,7 @@ metadata.format.version = "1.0"
 
 [versions]
 
-adventure = "4.8.0-SNAPSHOT"
+adventure = "4.8.0"
 gson = "2.8.7"
 fastutil = "8.3.1"
 openNBT = "2.0-SNAPSHOT"
