@@ -470,13 +470,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     private void logException(Exception e, @Nullable EntityType type, List<Metadata> metadataList, Metadata metadata) {
         if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
             Logger logger = Via.getPlatform().getLogger();
-            logger.warning("An error occurred with entity metadata handler");
-            logger.warning("This is most likely down to one of your plugins sending bad datawatchers. Please test if this occurs without any plugins except ViaVersion before reporting it on GitHub");
-            logger.warning("Also make sure that all your plugins are compatible with your server version.");
-            logger.warning("Entity type: " + type);
-            logger.warning("Indexed meta: " + metadata);
-            logger.warning(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
-                    .map(Metadata::toString).collect(Collectors.joining("\n", "Metadata: ", "")));
+            logger.severe("An error occurred in metadata handler " + this.getClass().getSimpleName()
+                    + " for " + (type != null ? "untracked" : type.name()) + " entity type: " + metadata);
+            logger.severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
+                    .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
             e.printStackTrace();
         }
     }
