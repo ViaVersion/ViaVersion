@@ -471,7 +471,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
             Logger logger = Via.getPlatform().getLogger();
             logger.severe("An error occurred in metadata handler " + this.getClass().getSimpleName()
-                    + " for " + (type != null ? "untracked" : type.name()) + " entity type: " + metadata);
+                    + " for " + (type != null ? type.name() : "untracked") + " entity type: " + metadata);
             logger.severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
                     .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
             e.printStackTrace();
