@@ -80,7 +80,7 @@ public class DumpSubCmd extends ViaSubCommand {
                     return;
                 }
                 try {
-                    con.setRequestProperty("Content-Type", "text/plain");
+                    con.setRequestProperty("Content-Type", "application/json");
                     con.addRequestProperty("User-Agent", "ViaVersion/" + version.getPluginVersion());
                     con.setRequestMethod("POST");
                     con.setDoOutput(true);
