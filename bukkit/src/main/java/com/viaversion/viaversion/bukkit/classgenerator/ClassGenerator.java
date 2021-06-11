@@ -65,8 +65,8 @@ public class ClassGenerator {
                 }
 
                 if (ViaVersionPlugin.getInstance().isCompatSpigotBuild()) {
-                    Class decodeSuper = NMSUtil.nms("PacketDecoder");
-                    Class encodeSuper = NMSUtil.nms("PacketEncoder");
+                    Class decodeSuper = NMSUtil.nms("PacketDecoder", "net.minecraft.network.PacketDecoder");
+                    Class encodeSuper = NMSUtil.nms("PacketEncoder", "net.minecraft.network.PacketEncoder");
                     // Generate the classes
                     addSpigotCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
                     addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
@@ -209,7 +209,10 @@ public class ClassGenerator {
             pool.importPackage("protocolsupport.api.Connection.PacketListener");
             pool.importPackage("protocolsupport.api.Connection.PacketListener.PacketEvent");
             pool.importPackage("protocolsupport.protocol.ConnectionImpl");
-            pool.importPackage(NMSUtil.nms("PacketHandshakingInSetProtocol").getName());
+            pool.importPackage(NMSUtil.nms(
+                    "PacketHandshakingInSetProtocol",
+                    "net.minecraft.network.protocol.handshake.PacketHandshakingInSetProtocol"
+            ).getName());
             // Add connection reference field
             connectListenerClazz.addField(CtField.make("private ConnectionImpl connection;", connectListenerClazz));
             // Bake constructor
@@ -303,7 +306,10 @@ public class ClassGenerator {
 
     public static boolean shouldUseNewHandshakeVersionMethod() {
         try {
-            NMSUtil.nms("PacketHandshakingInSetProtocol").getMethod("getProtocolVersion");
+            NMSUtil.nms(
+                    "PacketHandshakingInSetProtocol",
+                    "net.minecraft.network.protocol.handshake.PacketHandshakingInSetProtocol"
+            ).getMethod("getProtocolVersion");
             return true;
         } catch (Exception e) {
             return false;

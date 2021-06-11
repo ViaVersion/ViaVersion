@@ -26,7 +26,10 @@ public class NMSUtil {
 
     private static boolean loadDebugProperty() {
         try {
-            Class<?> serverClass = nms("MinecraftServer");
+            Class<?> serverClass = nms(
+                    "MinecraftServer",
+                    "net.minecraft.server.MinecraftServer"
+            );
             Object server = serverClass.getDeclaredMethod("getServer").invoke(null);
             return (boolean) serverClass.getMethod("isDebugging").invoke(server);
         } catch (ReflectiveOperationException e) {
@@ -36,6 +39,14 @@ public class NMSUtil {
 
     public static Class<?> nms(String className) throws ClassNotFoundException {
         return Class.forName(NMS + "." + className);
+    }
+
+    public static Class<?> nms(String className, String fallbackFullClassName) throws ClassNotFoundException {
+        try {
+            return Class.forName(NMS + "." + className);
+        } catch (ClassNotFoundException ignored) {
+            return Class.forName(fallbackFullClassName);
+        }
     }
 
     public static Class<?> obc(String className) throws ClassNotFoundException {

@@ -204,9 +204,15 @@ public class BukkitViaInjector implements ViaInjector {
         }
 
         try {
-            Class<?> serverClazz = NMSUtil.nms("MinecraftServer");
+            // Grab a static instance of the server
+            Class<?> serverClazz = NMSUtil.nms("MinecraftServer", "net.minecraft.server.MinecraftServer");
             Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-            Class<?> pingClazz = NMSUtil.nms("ServerPing");
+
+            // Grab the ping class and find the field to access it
+            Class<?> pingClazz = NMSUtil.nms(
+                    "ServerPing",
+                    "net.minecraft.network.protocol.status.ServerPing"
+            );
             Object ping = null;
             // Search for ping method
             for (Field f : serverClazz.getDeclaredFields()) {
@@ -259,7 +265,10 @@ public class BukkitViaInjector implements ViaInjector {
     }
 
     public static Object getServerConnection() throws Exception {
-        Class<?> serverClazz = NMSUtil.nms("MinecraftServer");
+        Class<?> serverClazz = NMSUtil.nms(
+                "MinecraftServer",
+                "net.minecraft.server.MinecraftServer"
+        );
         Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
         Object connection = null;
         for (Method m : serverClazz.getDeclaredMethods()) {

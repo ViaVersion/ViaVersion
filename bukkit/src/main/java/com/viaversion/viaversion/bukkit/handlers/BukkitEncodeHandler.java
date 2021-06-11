@@ -39,7 +39,12 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaCode
 
     static {
         try {
-            versionField = NMSUtil.nms("PacketEncoder").getDeclaredField("version");
+            // Attempt to get any version info from the handler
+            versionField = NMSUtil.nms(
+                    "PacketEncoder",
+                    "net.minecraft.network.PacketEncoder"
+            ).getDeclaredField("version");
+
             versionField.setAccessible(true);
         } catch (Exception e) {
             // Not compat version
