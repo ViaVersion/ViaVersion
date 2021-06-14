@@ -48,6 +48,7 @@ public class VelocityVersionProvider extends BaseVersionProvider {
     }
 
     private int getBackProtocol(UserConnection user) throws Exception {
+        //TODO use newly added Velocity netty event
         ChannelHandler mcHandler = user.getChannel().pipeline().get("handler");
         return ProtocolDetectorService.getProtocolId(
                 ((ServerConnection) getAssociation.invoke(mcHandler)).getServerInfo().getName());
