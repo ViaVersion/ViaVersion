@@ -70,11 +70,17 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             if (ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
                 // Need to decompress this packet due to bad order
                 ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, buf);
-                try {
-                    buf.clear().writeBytes(decompressed);
-                } finally {
-                    decompressed.release();
+
+                // Ensure the buffer wasn't reused
+                if (buf != decompressed) {
+                    try {
+                        buf.clear().writeBytes(decompressed);
+                    } finally {
+                        decompressed.release();
+                    }
                 }
+
+                // Reorder the pipeline
                 ChannelHandler dec = ctx.pipeline().get("via-decoder");
                 ChannelHandler enc = ctx.pipeline().get("via-encoder");
                 ctx.pipeline().remove(dec);
