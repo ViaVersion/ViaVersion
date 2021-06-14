@@ -32,15 +32,14 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.stream.Collectors;
 
 public class CommonBoss implements BossBar {
     private final UUID uuid;
-    private final Set<UserConnection> connections;
+    private final Map<UUID, UserConnection> connections;
     private final Set<BossFlag> flags;
     private String title;
     private float health;
@@ -57,7 +56,7 @@ public class CommonBoss implements BossBar {
         this.health = health;
         this.color = color == null ? BossColor.PURPLE : color;
         this.style = style == null ? BossStyle.SOLID : style;
-        this.connections = Collections.newSetFromMap(new WeakHashMap<>());
+        this.connections = new WeakHashMap<>();
         this.flags = new HashSet<>();
         visible = true;
     }
@@ -101,12 +100,16 @@ public class CommonBoss implements BossBar {
 
     @Override
     public BossBar addPlayer(UUID player) {
-        return addConnection(Via.getManager().getConnectionManager().getConnectedClient(player));
+        UserConnection client = Via.getManager().getConnectionManager().getConnectedClient(player);
+        if (client != null) {
+            addConnection(client);
+        }
+        return this;
     }
 
     @Override
     public BossBar addConnection(UserConnection conn) {
-        if (connections.add(conn) && visible) {
+        if (connections.put(conn.getProtocolInfo().getUuid(), conn) == null && visible) {
             sendPacketConnection(conn, getPacket(CommonBoss.UpdateAction.ADD, conn));
         }
         return this;
@@ -114,14 +117,16 @@ public class CommonBoss implements BossBar {
 
     @Override
     public BossBar removePlayer(UUID uuid) {
-        return removeConnection(Via.getManager().getConnectionManager().getConnectedClient(uuid));
+        UserConnection client = connections.remove(uuid);
+        if (client != null) {
+            sendPacketConnection(client, getPacket(UpdateAction.REMOVE, client));
+        }
+        return this;
     }
 
     @Override
     public BossBar removeConnection(UserConnection conn) {
-        if (connections.remove(conn)) {
-            sendPacketConnection(conn, getPacket(UpdateAction.REMOVE, conn));
-        }
+        removePlayer(conn.getProtocolInfo().getUuid());
         return this;
     }
 
@@ -153,13 +158,12 @@ public class CommonBoss implements BossBar {
 
     @Override
     public Set<UUID> getPlayers() {
-        return connections.stream().map(conn -> Via.getManager().getConnectionManager().getConnectedClientId(conn)).filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        return Collections.unmodifiableSet(connections.keySet());
     }
 
     @Override
     public Set<UserConnection> getConnections() {
-        return Collections.unmodifiableSet(connections);
+        return Collections.unmodifiableSet(new HashSet<>(connections.values()));
     }
 
     @Override
@@ -215,7 +219,7 @@ public class CommonBoss implements BossBar {
     }
 
     private void sendPacket(UpdateAction action) {
-        for (UserConnection conn : new ArrayList<>(connections)) {
+        for (UserConnection conn : new ArrayList<>(connections.values())) {
             PacketWrapper wrapper = getPacket(action, conn);
             sendPacketConnection(conn, wrapper);
         }
@@ -223,7 +227,7 @@ public class CommonBoss implements BossBar {
 
     private void sendPacketConnection(UserConnection conn, PacketWrapper wrapper) {
         if (conn.getProtocolInfo() == null || !conn.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
-            connections.remove(conn);
+            connections.remove(conn.getProtocolInfo().getUuid());
             return;
         }
         try {
