@@ -25,11 +25,14 @@ import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
@@ -45,6 +48,15 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
 
     @Override
     public void registerPackets() {
+        // clear cursor item to prevent client to try dropping it during navigation between multiple inventories causing arm swing
+        PacketHandler cursorRemapper = wrapper -> {
+            PacketWrapper clearPacket = wrapper.create(ClientboundPackets1_16.SET_SLOT);
+            clearPacket.write(Type.UNSIGNED_BYTE, (short)-1);
+            clearPacket.write(Type.SHORT, (short)-1);
+            clearPacket.write(Type.FLAT_VAR_INT_ITEM, null);
+            clearPacket.send(Protocol1_16To1_15_2.class);
+        };
+
         protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -61,6 +73,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
                     }
                     inventoryTracker.setInventory((short) windowId);
                 });
+                handler(cursorRemapper);
             }
         });
 
@@ -73,6 +86,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
                     inventoryTracker.setInventory((short) -1);
                 });
+                handler(cursorRemapper);
             }
         });
 
