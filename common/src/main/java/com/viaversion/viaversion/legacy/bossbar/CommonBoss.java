@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.legacy.bossbar;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.MapMaker;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
@@ -35,7 +36,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
 public class CommonBoss implements BossBar {
     private final UUID uuid;
@@ -56,9 +56,9 @@ public class CommonBoss implements BossBar {
         this.health = health;
         this.color = color == null ? BossColor.PURPLE : color;
         this.style = style == null ? BossStyle.SOLID : style;
-        this.connections = new WeakHashMap<>();
+        this.connections = new MapMaker().weakValues().makeMap();
         this.flags = new HashSet<>();
-        visible = true;
+        this.visible = true;
     }
 
     @Override
