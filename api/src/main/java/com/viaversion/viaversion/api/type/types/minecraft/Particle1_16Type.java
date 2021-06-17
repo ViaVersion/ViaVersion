@@ -20,15 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ModernMetaListType;
 
-public class MetadataList1_14Type extends ModernMetaListType {
-    @Override
-    protected Type<Metadata> getType() {
-        return Types1_14.METADATA;
+public class Particle1_16Type extends AbstractParticleType {
+
+    public Particle1_16Type() {
+        readers.put(3, blockHandler());
+        readers.put(23, blockHandler());
+        readers.put(14, dustHandler());
+        readers.put(34, itemHandler(Type.FLAT_VAR_INT_ITEM));
     }
 }

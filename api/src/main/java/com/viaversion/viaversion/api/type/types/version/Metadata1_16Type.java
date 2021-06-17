@@ -22,13 +22,14 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ModernMetaListType;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_16;
+import com.viaversion.viaversion.api.type.types.minecraft.ModernMetaType;
 
-public class MetadataList1_9Type extends ModernMetaListType {
+public class Metadata1_16Type extends ModernMetaType {
+
     @Override
-    protected Type<Metadata> getType() {
-        return Types1_9.METADATA;
+    protected MetaType getType(final int index) {
+        return MetaType1_16.byId(index);
     }
 }

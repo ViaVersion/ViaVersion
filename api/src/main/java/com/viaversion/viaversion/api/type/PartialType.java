@@ -32,17 +32,22 @@ public abstract class PartialType<T, X> extends Type<T> {
         this.param = param;
     }
 
+    protected PartialType(X param, String name, Class<T> type) {
+        super(name, type);
+        this.param = param;
+    }
+
     public abstract T read(ByteBuf buffer, X param) throws Exception;
 
     public abstract void write(ByteBuf buffer, X param, T object) throws Exception;
 
     @Override
-    public T read(ByteBuf buffer) throws Exception {
+    public final T read(ByteBuf buffer) throws Exception {
         return read(buffer, this.param);
     }
 
     @Override
-    public void write(ByteBuf buffer, T object) throws Exception {
+    public final void write(ByteBuf buffer, T object) throws Exception {
         write(buffer, this.param, object);
     }
 }
