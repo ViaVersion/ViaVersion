@@ -70,7 +70,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(type); // 2 - Slot Value
 

@@ -106,7 +106,7 @@ public class InventoryPackets {
         protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM); // 2 - Slot Value
                 handler(new PacketHandler() {
@@ -123,7 +123,7 @@ public class InventoryPackets {
                             EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
 
                             short slotID = wrapper.get(Type.SHORT, 0);
-                            short windowId = wrapper.get(Type.BYTE, 0);
+                            short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
 
                             // Store item in slot
                             inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.identifier());

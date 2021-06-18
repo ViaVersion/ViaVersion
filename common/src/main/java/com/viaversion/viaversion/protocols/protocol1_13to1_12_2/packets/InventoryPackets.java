@@ -61,7 +61,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
         protocol.registerClientbound(ClientboundPackets1_12_1.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Slot Value
 

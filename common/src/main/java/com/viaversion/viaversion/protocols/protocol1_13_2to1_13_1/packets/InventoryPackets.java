@@ -31,7 +31,7 @@ public class InventoryPackets {
         protocol.registerClientbound(ClientboundPackets1_13.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BYTE); // 0 - Window ID
+                map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.FLAT_ITEM, Type.FLAT_VAR_INT_ITEM); // 2 - Slot Value
             }
