@@ -75,7 +75,7 @@ public class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPackets1_1
             public void registerMap() {
                 handler(wrapper -> {
                     CompoundTag tag = new CompoundTag();
-                    Item item = new DataItem(825, (byte) 1, (short) 0, tag); // Magic value for writable books
+                    Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books
 
                     // Write the item, edit the tag down the line
                     wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
