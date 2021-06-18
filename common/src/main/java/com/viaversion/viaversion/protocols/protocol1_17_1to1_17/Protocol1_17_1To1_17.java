@@ -43,7 +43,7 @@ public class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_17.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.BYTE); // Container id
+                map(Type.UNSIGNED_BYTE); // Container id
                 create(Type.VAR_INT, 0); // Add arbitrary state id
             }
         });
