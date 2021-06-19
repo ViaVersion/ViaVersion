@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
@@ -286,10 +287,10 @@ public class InventoryPackets {
                         boolean throwItem = (slot == 45);
                         if (throwItem) {
                             // Send a packet wiping the slot
-                            wrapper.create(0x16, new PacketHandler() {
+                            wrapper.create(ClientboundPackets1_9.SET_SLOT, new PacketHandler() {
                                 @Override
                                 public void handle(PacketWrapper wrapper) throws Exception {
-                                    wrapper.write(Type.BYTE, (byte) 0);
+                                    wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);
                                 }
@@ -352,10 +353,10 @@ public class InventoryPackets {
 
                         if (throwItem) {
                             // Send a packet wiping the slot
-                            wrapper.create(0x16, new PacketHandler() {
+                            wrapper.create(ClientboundPackets1_9.SET_SLOT, new PacketHandler() {
                                 @Override
                                 public void handle(PacketWrapper wrapper) throws Exception {
-                                    wrapper.write(Type.BYTE, (byte) windowID);
+                                    wrapper.write(Type.UNSIGNED_BYTE, (short) windowID);
                                     wrapper.write(Type.SHORT, slot);
                                     wrapper.write(Type.ITEM, null);
                                 }
