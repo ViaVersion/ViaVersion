@@ -117,7 +117,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_12.getVersion()) {
+        if (serverProtocolVersion < ProtocolVersion.v1_12.getVersion() && !Boolean.getBoolean("com.viaversion.ignorePaperBlockPlacePatch")) {
             boolean paper = true;
             try {
                 Class.forName("org.github.paperspigot.PaperSpigotConfig"); // Paper 1.8 ?
