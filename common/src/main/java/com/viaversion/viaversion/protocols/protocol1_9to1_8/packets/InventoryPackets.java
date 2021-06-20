@@ -124,7 +124,7 @@ public class InventoryPackets {
                             EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
 
                             short slotID = wrapper.get(Type.SHORT, 0);
-                            short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                            byte windowId = wrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
 
                             // Store item in slot
                             inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.identifier());
