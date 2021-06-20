@@ -39,7 +39,6 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.Metadat
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -276,7 +275,6 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_16Types.PLAYER));
-        userConnection.put(new InventoryTracker1_16());
     }
 
     @Override
