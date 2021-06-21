@@ -102,7 +102,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
                     wrapper.passthrough(Type.STRING);
                     wrapper.passthrough(Type.STRING);
                     wrapper.write(Type.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
-                    wrapper.write(Type.OPTIONAL_COMPONENT, null); // Prompt message
+                    wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
                 });
             }
         });

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.configuration;
 
+import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 public interface ViaVersionConfig {
@@ -414,4 +415,11 @@ public interface ViaVersionConfig {
      * @return true if enabled
      */
     boolean isForcedUse1_17ResourcePack();
+
+    /**
+     *  Get the message that is sent when a user displays a resource pack prompt.
+     *
+     * @return cached serialized component
+     */
+    JsonElement get1_17ResourcePackPrompt();
 }

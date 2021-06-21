@@ -17,7 +17,10 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -205,6 +208,15 @@ public abstract class Config implements ConfigurationProvider {
             return (List<Integer>) o;
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    public @Nullable JsonElement getSerializedComponent(String key) {
+        final Object o = this.config.get(key);
+        if (o != null && !((String) o).isEmpty()) {
+            return GsonComponentSerializer.gson().serializeToTree(LegacyComponentSerializer.legacySection().deserialize((String) o));
+        } else {
+            return null;
         }
     }
 }
