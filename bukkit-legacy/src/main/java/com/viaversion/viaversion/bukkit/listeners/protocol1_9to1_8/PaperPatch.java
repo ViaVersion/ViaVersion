@@ -19,6 +19,7 @@ package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -43,18 +44,20 @@ public class PaperPatch extends ViaBukkitListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlace(BlockPlaceEvent e) {
         if (isOnPipe(e.getPlayer())) {
-            Location location = e.getPlayer().getLocation();
-            Location diff = location.clone().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
             Material block = e.getBlockPlaced().getType();
             if (isPlacable(block)) {
                 return;
             }
-            if (location.getBlock().equals(e.getBlock())) {
+            Location location = e.getPlayer().getLocation();
+            Block locationBlock = location.getBlock();
+
+            if (locationBlock.equals(e.getBlock())) {
                 e.setCancelled(true);
             } else {
-                if (location.getBlock().getRelative(BlockFace.UP).equals(e.getBlock())) {
+                if (locationBlock.getRelative(BlockFace.UP).equals(e.getBlock())) {
                     e.setCancelled(true);
                 } else {
+                    Location diff = location.clone().subtract(e.getBlock().getLocation().add(0.5D, 0, 0.5D));
                     // Within radius of block
                     if (Math.abs(diff.getX()) <= 0.8 && Math.abs(diff.getZ()) <= 0.8D) {
                         // Are they on the edge / shifting ish

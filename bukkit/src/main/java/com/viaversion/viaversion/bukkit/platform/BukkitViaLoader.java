@@ -117,11 +117,20 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if ((Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("paper")
-                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("taco")
-                || Bukkit.getVersion().toLowerCase(Locale.ROOT).contains("torch"))
-                && serverProtocolVersion < ProtocolVersion.v1_12.getVersion()) {
-            storeListener(new PaperPatch(plugin)).register();
+        if (serverProtocolVersion < ProtocolVersion.v1_12.getVersion() && !Boolean.getBoolean("com.viaversion.ignorePaperBlockPlacePatch")) {
+            boolean paper = true;
+            try {
+                Class.forName("org.github.paperspigot.PaperSpigotConfig"); // Paper 1.8 ?
+            } catch (ClassNotFoundException ignored) {
+                try {
+                    Class.forName("com.destroystokyo.paper.PaperConfig"); // Paper 1.9+ ?
+                } catch (ClassNotFoundException alsoIgnored) {
+                    paper = false; // Definitely not Paper
+                }
+            }
+            if (paper) {
+                storeListener(new PaperPatch(plugin)).register();
+            }
         }
 
         /* Providers */

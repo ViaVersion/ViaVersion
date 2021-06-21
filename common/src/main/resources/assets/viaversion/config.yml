@@ -153,6 +153,8 @@ ignore-long-1_16-channel-names: true
 #
 # Force 1.17+ client to accept the server resource pack; they will automatically disconnect if they decline.
 forced-use-1_17-resource-pack: false
+# The message to be displayed at the prompt when the 1.17+ client receives the server resource pack.
+resource-pack-1_17-prompt: ''
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #

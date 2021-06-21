@@ -90,8 +90,8 @@ public interface UserConnection {
     void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
 
     /**
-     * Clear all the stored objects.
-     * Used for bungee when switching servers.
+     * Clear stored objects and entity trackers.
+     * Used for Bungee when switching servers.
      */
     void clearStoredObjects();
 
