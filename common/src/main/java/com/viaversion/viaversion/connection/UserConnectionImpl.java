@@ -114,6 +114,7 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public void clearStoredObjects() {
         storedObjects.clear();
+        entityTrackers.clear();
     }
 
     @Override
