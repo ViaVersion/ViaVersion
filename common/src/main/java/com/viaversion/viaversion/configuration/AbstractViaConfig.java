@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.configuration;
 
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.util.Config;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -75,6 +76,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean instantRespawn;
     private boolean ignoreLongChannelNames;
     private boolean forcedUse1_17ResourcePack;
+    private JsonElement resourcePack1_17PromptMessage;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -136,6 +138,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         instantRespawn = getBoolean("use-1_15-instant-respawn", false);
         ignoreLongChannelNames = getBoolean("ignore-long-1_16-channel-names", true);
         forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
+        resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
     }
 
     @Override
@@ -413,5 +416,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isForcedUse1_17ResourcePack() {
         return forcedUse1_17ResourcePack;
+    }
+
+    @Override
+    public JsonElement get1_17ResourcePackPrompt() {
+        return resourcePack1_17PromptMessage;
     }
 }
