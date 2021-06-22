@@ -117,8 +117,8 @@ public enum MetaIndex {
     WITHER_TARGET2(WITHER, 18, MetaType1_8.Int, 12, MetaType1_9.VarInt),
     WITHER_TARGET3(WITHER, 19, MetaType1_8.Int, 13, MetaType1_9.VarInt),
     WITHER_INVULN_TIME(WITHER, 20, MetaType1_8.Int, 14, MetaType1_9.VarInt),
-    WITHER_PROPERTIES(WITHER, 10, MetaType1_8.Byte, MetaType1_9.Byte),
-    WITHER_UNKNOWN(WITHER, 11, MetaType1_8.Byte, null),
+    WITHER_PROPERTIES(WITHER, 10, MetaType1_8.Byte, null), // Thanks to plugins sending bad metadata
+    WITHER_UNKNOWN(WITHER, 11, MetaType1_8.NonExistent, null), // Thanks to plugins sending bad metadata
     // wither skull
     WITHERSKULL_INVULN(WITHER_SKULL, 10, MetaType1_8.Byte, 5, MetaType1_9.Boolean),
     // guardian
