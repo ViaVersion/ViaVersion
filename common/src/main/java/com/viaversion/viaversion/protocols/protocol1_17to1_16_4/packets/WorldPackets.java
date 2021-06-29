@@ -109,7 +109,7 @@ public final class WorldPackets {
 
             private void writeLightArrays(PacketWrapper wrapper, int bitMask) throws Exception {
                 List<byte[]> light = new ArrayList<>();
-                for (int i = 0; i <= 17; i++) {
+                for (int i = 0; i < 18; i++) {
                     if (isSet(bitMask, i)) {
                         light.add(wrapper.read(Type.BYTE_ARRAY_PRIMITIVE));
                     }
