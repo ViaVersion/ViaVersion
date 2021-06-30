@@ -29,17 +29,28 @@ import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 
-public class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPackets1_17, ClientboundPackets1_17, ServerboundPackets1_17, ServerboundPackets1_17> {
+public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPackets1_17, ClientboundPackets1_17_1, ServerboundPackets1_17, ServerboundPackets1_17> {
 
     private static final StringType PAGE_STRING_TYPE = new StringType(8192);
     private static final StringType TITLE_STRING_TYPE = new StringType(128);
 
     public Protocol1_17_1To1_17() {
-        super(ClientboundPackets1_17.class, ClientboundPackets1_17.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
+        super(ClientboundPackets1_17.class, ClientboundPackets1_17_1.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
     }
 
     @Override
     protected void registerPackets() {
+        registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    // Aaaaand back to an array again!
+                    int entityId = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
+                });
+            }
+        });
+
         registerClientbound(ClientboundPackets1_17.SET_SLOT, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -47,6 +58,7 @@ public class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPackets1_1
                 create(Type.VAR_INT, 0); // Add arbitrary state id
             }
         });
+
         registerClientbound(ClientboundPackets1_17.WINDOW_ITEMS, new PacketRemapper() {
             @Override
             public void registerMap() {
