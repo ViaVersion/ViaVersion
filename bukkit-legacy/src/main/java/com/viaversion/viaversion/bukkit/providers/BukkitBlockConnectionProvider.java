@@ -38,8 +38,8 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
             World world = player.getWorld();
             int x = bx >> 4;
             int z = bz >> 4;
-            if (world.isChunkLoaded(x, z)) {
-                Chunk c = getChunk(world, x, z);
+            Chunk c = getChunkIfLoaded(world, x, z);
+            if (c != null) {
                 Block b = c.getBlock(bx, by, bz);
                 return b.getTypeId() << 4 | b.getData();
             }
@@ -47,10 +47,13 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
         return 0;
     }
 
-    public Chunk getChunk(World world, int x, int z) {
+    public Chunk getChunkIfLoaded(World world, int x, int z) {
         if (lastChunk != null && lastChunk.getX() == x && lastChunk.getZ() == z) {
             return lastChunk;
         }
-        return lastChunk = world.getChunkAt(x, z);
+        if (world.isChunkLoaded(x, z)) {
+            return lastChunk = world.getChunkAt(x, z);
+        }
+        return null;
     }
 }
