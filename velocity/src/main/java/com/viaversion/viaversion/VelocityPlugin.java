@@ -82,6 +82,18 @@ public class VelocityPlugin implements ViaPlatform<Player> {
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
+        if (!hasConnectionEvent()) {
+            // No way to disable the plugin :(
+            Logger logger = this.loggerslf4j;
+            logger.error("      / \\");
+            logger.error("     /   \\");
+            logger.error("    /  |  \\");
+            logger.error("   /   |   \\        VELOCITY 3.0.0 IS REQUIRED");
+            logger.error("  /         \\   VIAVERSION WILL NOT WORK AS INTENDED");
+            logger.error(" /     o     \\");
+            logger.error("/_____________\\");
+        }
+
         PROXY = proxy;
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
         PROXY.getCommandManager().register("viaver", commandHandler, "vvvelocity", "viaversion");
@@ -230,5 +242,14 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public java.util.logging.Logger getLogger() {
         return logger;
+    }
+
+    private boolean hasConnectionEvent() {
+        try {
+            Class.forName("com.velocitypowered.proxy.protocol.VelocityConnectionEvent");
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
     }
 }

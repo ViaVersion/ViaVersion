@@ -57,12 +57,13 @@ public class VelocityViaInjector implements ViaInjector {
 
     @Override
     public void inject() throws Exception {
+        Via.getPlatform().getLogger().info("Replacing channel initializers; you can safely ignore the following two warnings.");
+
         Object connectionManager = ReflectionUtil.get(VelocityPlugin.PROXY, "cm", Object.class);
         Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getServerChannelInitializer");
         ChannelInitializer originalInitializer = getInitializer();
         channelInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
                 .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalInitializer, false));
-
 
         Object backendInitializerHolder = ReflectionUtil.invoke(connectionManager, "getBackendChannelInitializer");
         ChannelInitializer backendInitializer = getBackendInitializer();
@@ -74,7 +75,6 @@ public class VelocityViaInjector implements ViaInjector {
     public void uninject() {
         Via.getPlatform().getLogger().severe("ViaVersion cannot remove itself from Velocity without a reboot!");
     }
-
 
     @Override
     public int getServerProtocolVersion() throws Exception {
