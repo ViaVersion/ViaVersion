@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
         id = "viaversion",
         name = "ViaVersion",
         version = VersionInfo.VERSION,
-        authors = {"_MylesC", "creeper123123321", "Gerrygames", "KennyTV", "Matsv"},
+        authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv"},
         description = "Allow newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
 )

@@ -1,6 +1,6 @@
 name: ViaVersion
 main: com.viaversion.viaversion.ViaVersionPlugin
-authors: [_MylesC, creeper123123321, Gerrygames, KennyTV, Matsv]
+authors: [_MylesC, creeper123123321, Gerrygames, kennytv, Matsv]
 version: ${version}
 description: ${description}
 api-version: 1.13
