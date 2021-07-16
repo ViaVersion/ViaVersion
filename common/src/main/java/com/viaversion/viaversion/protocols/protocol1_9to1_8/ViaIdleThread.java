@@ -35,13 +35,11 @@ public class ViaIdleThread implements Runnable {
         if (movementTracker == null) return;
 
         if (movementTracker.canSendIdle() && info.getChannel().isOpen()) {
-            System.out.println("cccc");
             Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(info);
         }
     }
 
     public void sendPing(UserConnection info) {
-        System.out.println("bbbb");
         PacketWrapper wrapper = new PacketWrapperImpl(ClientboundPackets1_9.WINDOW_CONFIRMATION.getId(), null, info);
         wrapper.write(Type.UNSIGNED_BYTE, (short) 0); // inv id
         wrapper.write(Type.SHORT, ID); // confirm id

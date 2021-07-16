@@ -38,7 +38,7 @@ public class MovementTransmitterProvider implements Provider {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // PlayerPackets will increment idle
+            userConnection.get(MovementTracker.class).incrementIdlePacket();
         }
     }
 
