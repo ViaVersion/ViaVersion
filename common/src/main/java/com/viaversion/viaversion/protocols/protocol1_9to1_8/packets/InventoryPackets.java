@@ -370,6 +370,7 @@ public class InventoryPackets {
                 handler(wrapper -> {
                     if (wrapper.get(Type.UNSIGNED_BYTE, 0) != 0) return;
                     if (wrapper.get(Type.SHORT, 0) != ViaIdleThread.ID) return;
+                    System.out.println("aaa");
                     ViaIdleThread.onReceiveMainThreadPing(wrapper.user());
                 });
             }

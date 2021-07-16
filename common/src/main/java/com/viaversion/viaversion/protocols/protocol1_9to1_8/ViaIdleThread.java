@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
@@ -39,6 +40,7 @@ public class ViaIdleThread implements Runnable {
     }
 
     public void sendPing(UserConnection info) {
+        System.out.println("bbbb");
         PacketWrapper wrapper = new PacketWrapperImpl(ClientboundPackets1_9.WINDOW_CONFIRMATION.getId(), null, info);
         wrapper.write(Type.UNSIGNED_BYTE, (short) 0); // inv id
         wrapper.write(Type.SHORT, ID); // confirm id
@@ -54,7 +56,9 @@ public class ViaIdleThread implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             ProtocolInfo protocolInfo = info.getProtocolInfo();
-            if (protocolInfo == null || !protocolInfo.getPipeline().contains(Protocol1_9To1_8.class)) continue;
+            if (protocolInfo == null
+                    || protocolInfo.getState() != State.PLAY
+                    || !protocolInfo.getPipeline().contains(Protocol1_9To1_8.class)) continue;
 
             sendPing(info);
         }
