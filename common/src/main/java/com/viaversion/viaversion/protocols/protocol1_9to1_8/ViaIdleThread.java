@@ -27,6 +27,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTr
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 
 public class ViaIdleThread implements Runnable {
+    public static final short ID = (short) "via".hashCode();
+
     public static void onReceiveMainThreadPing(UserConnection info) {
         MovementTracker movementTracker = info.get(MovementTracker.class);
         if (movementTracker == null) return;
@@ -36,21 +38,25 @@ public class ViaIdleThread implements Runnable {
         }
     }
 
+    public void sendPing(UserConnection info) {
+        PacketWrapper wrapper = new PacketWrapperImpl(ClientboundPackets1_9.WINDOW_CONFIRMATION.getId(), null, info);
+        wrapper.write(Type.UNSIGNED_BYTE, (short) 0); // inv id
+        wrapper.write(Type.SHORT, ID); // confirm id
+        wrapper.write(Type.BOOLEAN, false); // not accepted, returns a packet
+        try {
+            wrapper.send(Protocol1_9To1_8.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             ProtocolInfo protocolInfo = info.getProtocolInfo();
             if (protocolInfo == null || !protocolInfo.getPipeline().contains(Protocol1_9To1_8.class)) continue;
 
-            PacketWrapper wrapper = new PacketWrapperImpl(ClientboundPackets1_9.WINDOW_CONFIRMATION.getId(), null, info);
-            wrapper.write(Type.UNSIGNED_BYTE, (short) 0); // inv id
-            wrapper.write(Type.SHORT, Short.MIN_VALUE); // confirm id
-            wrapper.write(Type.BOOLEAN, false); // not accepted, returns a packet
-            try {
-                wrapper.send(Protocol1_9To1_8.class);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            sendPing(info);
         }
     }
 }

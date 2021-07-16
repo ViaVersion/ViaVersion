@@ -369,7 +369,7 @@ public class InventoryPackets {
                 map(Type.SHORT); // Transaction id
                 handler(wrapper -> {
                     if (wrapper.get(Type.UNSIGNED_BYTE, 0) != 0) return;
-                    if (wrapper.get(Type.SHORT, 0) != Short.MIN_VALUE) return;
+                    if (wrapper.get(Type.SHORT, 0) != ViaIdleThread.ID) return;
                     ViaIdleThread.onReceiveMainThreadPing(wrapper.user());
                 });
             }
