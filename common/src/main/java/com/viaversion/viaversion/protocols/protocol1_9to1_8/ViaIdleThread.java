@@ -35,6 +35,7 @@ public class ViaIdleThread implements Runnable {
         if (movementTracker == null) return;
 
         if (movementTracker.canSendIdle() && info.getChannel().isOpen()) {
+            System.out.println("cccc");
             Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(info);
         }
     }
