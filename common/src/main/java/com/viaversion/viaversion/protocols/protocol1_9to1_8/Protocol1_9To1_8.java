@@ -141,7 +141,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         providers.register(EntityIdProvider.class, new EntityIdProvider());
         providers.register(BossBarProvider.class, new BossBarProvider());
         providers.register(MainHandProvider.class, new MainHandProvider());
-        providers.require(MovementTransmitterProvider.class);
+        providers.register(MovementTransmitterProvider.class, new MovementTransmitterProvider());
     }
 
     @Override

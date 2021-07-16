@@ -29,7 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
+public class BukkitViaMovementTransmitter extends MovementTransmitterProvider.InternalsBased {
     private static boolean USE_NMS = true;
     // Used for packet mode
     private Object idlePacket;

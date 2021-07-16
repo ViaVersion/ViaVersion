@@ -21,7 +21,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTr
 
 import java.lang.reflect.Field;
 
-public class SpongeViaMovementTransmitter extends MovementTransmitterProvider {
+public class SpongeViaMovementTransmitter extends MovementTransmitterProvider.InternalsBased {
     // Used for packet mode
     private Object idlePacket;
     private Object idlePacket2;

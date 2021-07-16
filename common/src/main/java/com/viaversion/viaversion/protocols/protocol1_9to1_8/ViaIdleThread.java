@@ -20,10 +20,21 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 
 public class ViaIdleThread implements Runnable {
+    public static void onReceiveMainThreadPing(UserConnection info) {
+        MovementTracker movementTracker = info.get(MovementTracker.class);
+        if (movementTracker == null) return;
+
+        if (movementTracker.canSendIdle() && info.getChannel().isOpen()) {
+            Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(info);
+        }
+    }
 
     @Override
     public void run() {
@@ -31,12 +42,14 @@ public class ViaIdleThread implements Runnable {
             ProtocolInfo protocolInfo = info.getProtocolInfo();
             if (protocolInfo == null || !protocolInfo.getPipeline().contains(Protocol1_9To1_8.class)) continue;
 
-            MovementTracker movementTracker = info.get(MovementTracker.class);
-            if (movementTracker == null) continue;
-
-            long nextIdleUpdate = movementTracker.getNextIdlePacket();
-            if (nextIdleUpdate <= System.currentTimeMillis() && info.getChannel().isOpen()) {
-                Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(info);
+            PacketWrapper wrapper = new PacketWrapperImpl(ClientboundPackets1_9.WINDOW_CONFIRMATION.getId(), null, info);
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 0); // inv id
+            wrapper.write(Type.SHORT, Short.MIN_VALUE); // confirm id
+            wrapper.write(Type.BOOLEAN, false); // not accepted, returns a packet
+            try {
+                wrapper.send(Protocol1_9To1_8.class);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

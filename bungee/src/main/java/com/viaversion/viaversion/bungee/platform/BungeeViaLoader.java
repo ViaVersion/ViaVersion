@@ -28,13 +28,11 @@ import com.viaversion.viaversion.bungee.listeners.UpdateListener;
 import com.viaversion.viaversion.bungee.providers.BungeeBossBarProvider;
 import com.viaversion.viaversion.bungee.providers.BungeeEntityIdProvider;
 import com.viaversion.viaversion.bungee.providers.BungeeMainHandProvider;
-import com.viaversion.viaversion.bungee.providers.BungeeMovementTransmitter;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
@@ -74,7 +72,6 @@ public class BungeeViaLoader implements ViaPlatformLoader {
         Via.getManager().getProviders().use(EntityIdProvider.class, new BungeeEntityIdProvider());
 
         if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
-            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BungeeMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
             Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());
         }
