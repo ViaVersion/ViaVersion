@@ -45,7 +45,7 @@ public class BungeeMovementTransmitter extends MovementTransmitterProvider {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // PlayerPackets will increment idle
+            userConnection.get(MovementTracker.class).incrementIdlePacket();
         }
     }
 }
