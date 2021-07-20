@@ -50,13 +50,14 @@ public class MovementTransmitterProvider implements Provider {
         public void sendPlayer(UserConnection userConnection) {
             // Old method using packet pipeline.
             ChannelHandlerContext context = PipelineUtil.getContextBefore("decoder", userConnection.getChannel().pipeline());
+            MovementTracker tracker = userConnection.get(MovementTracker.class);
             if (context != null) {
-                if (userConnection.get(MovementTracker.class).isGround()) {
+                if (tracker.isGround()) {
                     context.fireChannelRead(getGroundPacket());
                 } else {
                     context.fireChannelRead(getFlyingPacket());
                 }
-                userConnection.get(MovementTracker.class).incrementIdlePacket();
+                tracker.incrementIdlePacket();
             }
         }
     }
