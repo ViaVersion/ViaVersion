@@ -24,8 +24,8 @@ public class MovementTracker implements StorableObject {
     private boolean ground = true;
 
     public void incrementIdlePacket() {
-        // Cooldown avoiding some spam
-        this.nextIdlePacket = 40 + System.currentTimeMillis();
+        // This accumulates time ahead if there were some extra packet
+        this.nextIdlePacket = Math.max(System.currentTimeMillis(), nextIdlePacket + 50);
     }
 
     public boolean canSendIdle() {
