@@ -41,11 +41,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Method;
 
 //TODO maybe clean this up a bit 👀
-public class ClassGenerator {
+public final class ClassGenerator {
     private static final boolean useModules = hasModuleMethod();
     private static HandlerConstructor constructor = new BasicHandlerConstructor();
     private static String psPackage;
@@ -75,7 +76,7 @@ public class ClassGenerator {
                     Class encodeSuper;
                     Class decodeSuper;
                     if (isMultiplatformPS()) {
-                        psConnectListener = makePSConnectListener(pool, shouldUseNewHandshakeVersionMethod());
+                        psConnectListener = makePSConnectListener(pool);
                         return;
                     } else {
                         String psPackage = getOldPSPackage();
@@ -106,7 +107,7 @@ public class ClassGenerator {
                         "        return new BukkitDecodeHandler(info, minecraftDecoder);\n" +
                         "    }", generated));
 
-                constructor = (HandlerConstructor) toClass(generated).newInstance();
+                constructor = (HandlerConstructor) toClass(generated).getConstructor().newInstance();
             } catch (ReflectiveOperationException | CannotCompileException | NotFoundException e) {
                 e.printStackTrace();
             }
@@ -195,7 +196,8 @@ public class ClassGenerator {
         }
     }
 
-    private static Class makePSConnectListener(ClassPool pool, boolean newVersionMethod) {
+    private static Class makePSConnectListener(ClassPool pool) {
+        HandshakeProtocolType type = handshakeVersionMethod();
         try {
             // Reference classes
             CtClass toExtend = pool.get("protocolsupport.api.Connection$PacketListener");
@@ -228,11 +230,7 @@ public class ClassGenerator {
                             + "    if (event.getPacket() instanceof PacketHandshakingInSetProtocol) {\n"
                             // Get protocol version.
                             + "        PacketHandshakingInSetProtocol packet = (PacketHandshakingInSetProtocol) event.getPacket();\n"
-                            + (newVersionMethod ? (
-                            "        int protoVersion = packet.getProtocolVersion();\n"
-                    ) : (
-                            "        int protoVersion = packet.b();\n"
-                    ))
+                            + "        int protoVersion = packet." + type.methodName() + "();\n"
                             // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
                             // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.
                             + "        if (connection.getVersion() == ProtocolVersion.MINECRAFT_FUTURE && protoVersion == com.viaversion.viaversion.api.Via.getAPI().getServerVersion().lowestSupportedVersion()) {\n"
@@ -251,16 +249,16 @@ public class ClassGenerator {
     }
 
     public static void registerPSConnectListener(ViaVersionPlugin plugin) {
-        if (getPSConnectListener() != null) {
+        if (psConnectListener != null) {
             try {
                 Class<? extends Event> connectionOpenEvent = (Class<? extends Event>) Class.forName("protocolsupport.api.events.ConnectionOpenEvent");
                 Bukkit.getPluginManager().registerEvent(connectionOpenEvent, new Listener() {
                 }, EventPriority.HIGH, new EventExecutor() {
                     @Override
-                    public void execute(Listener listener, Event event) throws EventException {
+                    public void execute(@NonNull Listener listener, @NonNull Event event) throws EventException {
                         try {
                             Object connection = event.getClass().getMethod("getConnection").invoke(event);
-                            Object connectListener = getPSConnectListener().getConstructor(connection.getClass()).newInstance(connection);
+                            Object connectListener = psConnectListener.getConstructor(connection.getClass()).newInstance(connection);
                             Method addConnectListener = connection.getClass().getMethod("addPacketListener", Class.forName("protocolsupport.api.Connection$PacketListener"));
                             addConnectListener.invoke(connection, connectListener);
                         } catch (Exception e) {
@@ -304,15 +302,31 @@ public class ClassGenerator {
         }
     }
 
-    public static boolean shouldUseNewHandshakeVersionMethod() {
+    public static HandshakeProtocolType handshakeVersionMethod() {
+        Class<?> clazz = null;
+        // Check for the mapped method
         try {
-            NMSUtil.nms(
+            clazz = NMSUtil.nms(
                     "PacketHandshakingInSetProtocol",
                     "net.minecraft.network.protocol.handshake.PacketHandshakingInSetProtocol"
-            ).getMethod("getProtocolVersion");
-            return true;
-        } catch (Exception e) {
-            return false;
+            );
+            clazz.getMethod("getProtocolVersion");
+            return HandshakeProtocolType.MAPPED;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException ignored) {
+        }
+
+        // Check for obfusacted b/c methods
+        try {
+            if (clazz.getMethod("b").getReturnType() == int.class) {
+                return HandshakeProtocolType.OBFUSCATED_OLD;
+            } else if (clazz.getMethod("c").getReturnType() == int.class) {
+                return HandshakeProtocolType.OBFUSCATED_NEW;
+            }
+            throw new UnsupportedOperationException("Protocol version method not found in " + clazz.getSimpleName());
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -327,6 +341,23 @@ public class ClassGenerator {
             return true;
         } catch (NoSuchMethodException e) {
             return false;
+        }
+    }
+
+    private enum HandshakeProtocolType {
+
+        MAPPED("getProtocolVersion"),
+        OBFUSCATED_OLD("b"),
+        OBFUSCATED_NEW("c");
+
+        private final String methodName;
+
+        HandshakeProtocolType(String methodName) {
+            this.methodName = methodName;
+        }
+
+        public String methodName() {
+            return methodName;
         }
     }
 }

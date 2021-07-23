@@ -127,7 +127,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
                         PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
                         packet.write(Type.UNSIGNED_BYTE, inventoryId);
                         packet.write(Type.SHORT, confirmationId);
-                        packet.write(Type.BYTE, (byte) 1); // Accept
+                        packet.write(Type.BOOLEAN, true); // Accept
                         packet.sendToServer(Protocol1_17To1_16_4.class);
                     }
 
