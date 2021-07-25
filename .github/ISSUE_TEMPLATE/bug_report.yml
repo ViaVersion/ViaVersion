@@ -88,5 +88,5 @@ body:
           required: true
         - label: If applicable, I have included a paste (**not a screenshot**) of the error.
           required: true
-        - label: I have tried a build from https://ci.viaversion.com/ and the issue still persists.
+        - label: I have tried the latest build(s) from https://ci.viaversion.com/ and the issue still persists.
           required: true
