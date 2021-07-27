@@ -27,4 +27,9 @@ package com.viaversion.viaversion.api.protocol.packet;
  * representing PLAY state packets, ordered by their packet id.
  */
 public interface ClientboundPacketType extends PacketType {
+
+    @Override
+    default Direction direction() {
+        return Direction.CLIENTBOUND;
+    }
 }

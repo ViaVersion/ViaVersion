@@ -28,10 +28,14 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.VersionedPacketCreator;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
+import com.viaversion.viaversion.protocol.packet.VersionedPacketCreatorImpl;
 import com.viaversion.viaversion.protocols.base.BaseProtocol;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
@@ -261,6 +265,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
         return path;
     }
 
+    @Override
+    public <C extends ClientboundPacketType,
+            S extends ServerboundPacketType
+            > VersionedPacketCreator<C, S> createVersionedPacketCreator(ProtocolVersion inputVersion, Class<C> clientboundPacketsClass, Class<S> serverboundPacketsClass) {
+        Preconditions.checkArgument(clientboundPacketsClass != ClientboundPacketType.class && serverboundPacketsClass != ServerboundPacketType.class);
+        return new VersionedPacketCreatorImpl<>(inputVersion, clientboundPacketsClass, serverboundPacketsClass);
+    }
+
     /**
      * Calculates a path to get from an input protocol to the server's protocol.
      *
@@ -270,7 +282,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @return path that has been generated, null if failed
      */
     private @Nullable Int2ObjectSortedMap<Protocol> getProtocolPath(Int2ObjectSortedMap<Protocol> current, int clientVersion, int serverVersion) {
-        if (current.size() > maxProtocolPathSize) return null; // Fail safe, protocol too complicated.
+        if (current.size() > maxProtocolPathSize) return null; // Fail-safe, protocol too complicated.
 
         // First, check if there is any protocols for this
         Int2ObjectMap<Protocol> toServerProtocolMap = registryMap.get(clientVersion);

@@ -1,5 +1,5 @@
 /*
- * This file is part of ViaBackwards - https://github.com/ViaVersion/ViaBackwards
+ * This file is part of ViaVerion - https://github.com/ViaVersion/ViaBackwards
  * Copyright (C) 2016-2021 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify

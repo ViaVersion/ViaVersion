@@ -24,8 +24,11 @@ package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.VersionedPacketCreator;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import io.netty.buffer.ByteBuf;
@@ -142,6 +145,22 @@ public interface ProtocolManager {
      * @return path generated, or null if not supported or the length exceeds {@link #getMaxProtocolPathSize()}
      */
     @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
+
+    /**
+     * Returns a versioned packet creator to send packets from a given base version to any client version supported by Via.
+     * The used packet types have to match the given protocol version.
+     *
+     * @param inputVersion            input protocol version
+     * @param <C>                     clientbound packet for the given protocol version
+     * @param <S>                     serverbound packet for the given protocol version
+     * @param clientboundPacketsClass clientbound packets class
+     * @param serverboundPacketsClass serverbound packets class
+     * @return versioned packet creator
+     * @throws IllegalArgumentException if either of the packet classes are the base {@link ClientboundPacketType} or {@link ServerboundPacketType} interfaces
+     */
+    <C extends ClientboundPacketType,
+            S extends ServerboundPacketType
+            > VersionedPacketCreator<C, S> createVersionedPacketCreator(ProtocolVersion inputVersion, Class<C> clientboundPacketsClass, Class<S> serverboundPacketsClass);
 
     /**
      * Returns whether protocol path calculation expects the path to come closer to the expected version with each entry, true by default.

@@ -306,15 +306,26 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    @Deprecated
-    public void send() throws Exception {
+    public void sendRaw() throws Exception {
+        sendRaw(true);
+    }
+
+    @Override
+    public void scheduleSendRaw() throws Exception {
+        sendRaw(false);
+    }
+
+    private void sendRaw(boolean currentThread) throws Exception {
         if (isCancelled()) return;
 
-        // Send
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
             writeToBuffer(output);
-            user().sendRawPacket(output.retain());
+            if (currentThread) {
+                user().sendRawPacket(output.retain());
+            } else {
+                user().scheduleSendRawPacket(output.retain());
+            }
         } finally {
             output.release();
         }
@@ -384,14 +395,26 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    @Deprecated
-    public void sendToServer() throws Exception {
+    public void sendToServerRaw() throws Exception {
+        sendToServerRaw(true);
+    }
+
+    @Override
+    public void scheduleSendToServerRaw() throws Exception {
+        sendToServerRaw(false);
+    }
+
+    private void sendToServerRaw(boolean currentThread) throws Exception {
         if (isCancelled()) return;
 
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
             writeToBuffer(output);
-            user().sendRawPacketToServer(output.retain());
+            if (currentThread) {
+                user().sendRawPacketToServer(output.retain());
+            } else {
+                user().scheduleSendRawPacketToServer(output.retain());
+            }
         } finally {
             output.release();
         }

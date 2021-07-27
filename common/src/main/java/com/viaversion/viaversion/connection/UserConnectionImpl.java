@@ -200,12 +200,17 @@ public class UserConnectionImpl implements UserConnection {
             // We'll use passing through because there are some encoder wrappers
             ChannelHandlerContext context = PipelineUtil
                     .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
-            try {
-                Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
-                Type.UUID.write(buf, generatePassthroughToken());
-            } catch (Exception shouldNotHappen) {
-                throw new RuntimeException(shouldNotHappen);
+
+            if (shouldTransformPacket()) {
+                // Bypass serverbound packet decoder transforming
+                try {
+                    Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
+                    Type.UUID.write(buf, generatePassthroughToken());
+                } catch (Exception shouldNotHappen) {
+                    throw new RuntimeException(shouldNotHappen);
+                }
             }
+
             buf.writeBytes(packet);
             Runnable act = () -> {
                 if (context != null) {

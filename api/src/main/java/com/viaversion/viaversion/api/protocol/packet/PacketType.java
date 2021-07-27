@@ -43,4 +43,11 @@ public interface PacketType {
      * @return name of the packet
      */
     String getName();
+
+    /**
+     * Clientbound or serverbound direction.
+     *
+     * @return direction
+     */
+    Direction direction();
 }

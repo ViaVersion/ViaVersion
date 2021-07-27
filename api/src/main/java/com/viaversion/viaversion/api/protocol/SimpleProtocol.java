@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 
 /**
@@ -44,6 +45,11 @@ public interface SimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes
         @Override
         public String getName() {
             return name();
+        }
+
+        @Override
+        public Direction direction() {
+            throw new UnsupportedOperationException();
         }
     }
 }

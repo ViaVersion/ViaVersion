@@ -217,16 +217,27 @@ public interface PacketWrapper {
      */
     ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception;
 
+
+    @Deprecated
+    default void send() throws Exception {
+        sendRaw();
+    }
+
     /**
-     * Send this packet to the associated user.
-     * Be careful not to send packets twice.
-     * (Sends it after current)
-     * <b>This method is no longer used, it's favoured to use {@link #send(Class)} as it will handle the pipeline properly.</b>
+     * Sends this packet to the connection.
+     * <b>Unlike {@link #send(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
      * @throws Exception if it fails to write
      */
-    @Deprecated
-    void send() throws Exception;
+    void sendRaw() throws Exception;
+
+    /**
+     * Sends this packet to the associated user, submitted to netty's event loop.
+     * <b>Unlike {@link #send(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
+     *
+     * @throws Exception if it fails to write
+     */
+    void scheduleSendRaw() throws Exception;
 
     /**
      * Creates a new packet for the target of this packet.
@@ -317,7 +328,25 @@ public interface PacketWrapper {
      * @throws Exception If it failed to write
      */
     @Deprecated
-    void sendToServer() throws Exception;
+    default void sendToServer() throws Exception {
+        sendToServerRaw();
+    }
+
+    /**
+     * Sends this packet to the server.
+     * <b>Unlike {@link #sendToServer(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
+     *
+     * @throws Exception if it fails to write
+     */
+    void sendToServerRaw() throws Exception;
+
+    /**
+     * Sends this packet to the server, submitted to netty's event loop.
+     * <b>Unlike {@link #sendToServer(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
+     *
+     * @throws Exception if it fails to write
+     */
+    void scheduleSendToServerRaw() throws Exception;
 
     /**
      * Send this packet to the server on the current thread, skipping the current protocol.
