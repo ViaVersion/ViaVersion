@@ -263,14 +263,6 @@ public class WorldPackets {
                             }
                         }
                     }
-
-                    private Byte[] fromPrimitiveArray(byte[] bytes) {
-                        Byte[] newArray = new Byte[bytes.length];
-                        for (int i = 0; i < bytes.length; i++) {
-                            newArray[i] = bytes[i];
-                        }
-                        return newArray;
-                    }
                 });
             }
         });

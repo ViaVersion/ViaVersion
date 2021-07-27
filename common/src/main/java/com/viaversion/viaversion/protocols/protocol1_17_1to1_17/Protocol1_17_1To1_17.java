@@ -109,6 +109,9 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
                         String title = wrapper.read(TITLE_STRING_TYPE);
                         tag.put("title", new StringTag(title));
 
+                        // Even if unused, legacy servers check for the author tag
+                        tag.put("author", new StringTag(wrapper.user().getProtocolInfo().getUsername()));
+
                         // Write signing
                         wrapper.write(Type.BOOLEAN, true);
                     } else {
