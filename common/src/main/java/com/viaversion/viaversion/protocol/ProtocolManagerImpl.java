@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.VersionedPacketCreator;
@@ -266,11 +267,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public <C extends ClientboundPacketType,
-            S extends ServerboundPacketType
-            > VersionedPacketCreator<C, S> createVersionedPacketCreator(ProtocolVersion inputVersion, Class<C> clientboundPacketsClass, Class<S> serverboundPacketsClass) {
+    public VersionedPacketCreator createVersionedPacketCreator(ProtocolVersion inputVersion,
+                                                               Class<? extends ClientboundPacketType> clientboundPacketsClass,
+                                                               Class<? extends ServerboundPacketType> serverboundPacketsClass) {
         Preconditions.checkArgument(clientboundPacketsClass != ClientboundPacketType.class && serverboundPacketsClass != ServerboundPacketType.class);
-        return new VersionedPacketCreatorImpl<>(inputVersion, clientboundPacketsClass, serverboundPacketsClass);
+        return new VersionedPacketCreatorImpl(inputVersion, clientboundPacketsClass, serverboundPacketsClass);
     }
 
     /**
@@ -464,6 +465,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
+    public PacketWrapper createPacketWrapper(@Nullable PacketType packetType, @Nullable ByteBuf buf, UserConnection connection) {
+        return new PacketWrapperImpl(packetType, buf, connection);
+    }
+
+    @Override
+    @Deprecated
     public PacketWrapper createPacketWrapper(int packetId, @Nullable ByteBuf buf, UserConnection connection) {
         return new PacketWrapperImpl(packetId, buf, connection);
     }

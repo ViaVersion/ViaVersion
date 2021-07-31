@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -130,7 +131,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                     armorItem = new DataItem(protocol.getMappingData().getNewItemId(729), (byte) 1, (short) 0, null);
                 }
 
-                PacketWrapper equipmentPacket = PacketWrapper.create(0x46, null, connection);
+                PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_14.ENTITY_EQUIPMENT, null, connection);
                 equipmentPacket.write(Type.VAR_INT, entityId);
                 equipmentPacket.write(Type.VAR_INT, 4);
                 equipmentPacket.write(Type.FLAT_VAR_INT_ITEM, armorItem);

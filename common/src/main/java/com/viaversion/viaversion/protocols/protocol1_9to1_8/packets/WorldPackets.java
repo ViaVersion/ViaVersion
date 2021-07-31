@@ -136,7 +136,7 @@ public class WorldPackets {
                         Chunk1_9to1_8Type type = new Chunk1_9to1_8Type(clientChunks);
                         Chunk1_8 chunk = (Chunk1_8) wrapper.read(type);
                         if (chunk.isUnloadPacket()) {
-                            wrapper.setId(ClientboundPackets1_9.UNLOAD_CHUNK);
+                            wrapper.setPacketType(ClientboundPackets1_9.UNLOAD_CHUNK);
 
                             wrapper.write(Type.INT, chunk.getX());
                             wrapper.write(Type.INT, chunk.getZ());
@@ -427,7 +427,7 @@ public class WorldPackets {
                         Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
                         // Send the Update Block Entity packet if present
                         if (tag.isPresent()) {
-                            PacketWrapper updateBlockEntity = PacketWrapper.create(0x09, null, wrapper.user());
+                            PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
 
                             updateBlockEntity.write(Type.POSITION, pos);
                             updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);

@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class BlockEntity {
     }
 
     private static void updateBlockEntity(Position pos, short id, CompoundTag tag, UserConnection connection) throws Exception {
-        PacketWrapper wrapper = PacketWrapper.create(0x09, null, connection);
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, null, connection);
         wrapper.write(Type.POSITION, pos);
         wrapper.write(Type.UNSIGNED_BYTE, id);
         wrapper.write(Type.NBT, tag);

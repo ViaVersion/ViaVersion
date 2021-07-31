@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,7 +56,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
 
         // Cancelling can only be done by updating the player's metadata
         if (event.isGliding() && event.isCancelled()) {
-            PacketWrapper packet = PacketWrapper.create(0x44, null, getUserConnection(player));
+            PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_15.ENTITY_METADATA, null, getUserConnection(player));
             try {
                 packet.write(Type.VAR_INT, player.getEntityId());
 

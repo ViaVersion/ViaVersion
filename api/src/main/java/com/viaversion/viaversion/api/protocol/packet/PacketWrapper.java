@@ -41,34 +41,36 @@ public interface PacketWrapper {
     /**
      * Creates a new packet wrapper instance.
      *
-     * @param packetType packet
+     * @param packetType packet type, or null if none should be written to the buffer (raw id = -1)
      * @param connection user connection
      * @return new packet wrapper
      */
-    static PacketWrapper create(PacketType packetType, UserConnection connection) {
-        return create(packetType.getId(), null, connection);
+    static PacketWrapper create(@Nullable PacketType packetType, UserConnection connection) {
+        return create(packetType, null, connection);
     }
 
     /**
      * Creates a new packet wrapper instance.
      *
-     * @param packetType  packet type
+     * @param packetType  packet type, or null if none should be written to the buffer (raw id = -1)
      * @param inputBuffer input buffer
      * @param connection  user connection
      * @return new packet wrapper
      */
-    static PacketWrapper create(PacketType packetType, @Nullable ByteBuf inputBuffer, UserConnection connection) {
-        return create(packetType.getId(), inputBuffer, connection);
+    static PacketWrapper create(@Nullable PacketType packetType, @Nullable ByteBuf inputBuffer, UserConnection connection) {
+        return Via.getManager().getProtocolManager().createPacketWrapper(packetType, inputBuffer, connection);
     }
 
     /**
      * Creates a new packet wrapper instance.
      *
-     * @param packetId    packet id
+     * @param packetId    packet id, or -1 if none should be written to the buffer
      * @param inputBuffer input buffer
      * @param connection  user connection
      * @return new packet wrapper
+     * @deprecated magic id; prefer using {@link #create(PacketType, ByteBuf, UserConnection)}
      */
+    @Deprecated
     static PacketWrapper create(int packetId, @Nullable ByteBuf inputBuffer, UserConnection connection) {
         return Via.getManager().getProtocolManager().createPacketWrapper(packetId, inputBuffer, connection);
     }
@@ -387,25 +389,45 @@ public interface PacketWrapper {
     void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
 
     /**
-     * Returns the packet id.
+     * Returns the packet type.
+     * Currently only non-null for manually constructed packets before transformation.
      *
-     * @return packet id
+     * @return packet type if set
+     */
+    @Nullable PacketType getPacketType();
+
+    /**
+     * Sets the packet type. If set to null, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.
+     * Setting the type to null also sets the raw packet id to -1.
+     *
+     * @param packetType packet type
+     */
+    void setPacketType(@Nullable PacketType packetType);
+
+    /**
+     * Returns the raw packet id.
+     *
+     * @return raw packet id
      */
     int getId();
 
     /**
-     * Sets the packet id. If set to -1, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.
+     * Sets the packet type.
      *
      * @param packetType packet type
+     * @deprecated use {@link #setPacketType(PacketType)}. This method will be removed in 5.0.0
      */
+    @Deprecated/*(forRemoval = true)*/
     default void setId(PacketType packetType) {
-        setId(packetType.getId());
+        setPacketType(packetType);
     }
 
     /**
      * Sets the packet id. If set to -1, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.
      *
      * @param id packet id
+     * @deprecated magic id, loses packet type info; use {@link #setPacketType(PacketType)}
      */
+    @Deprecated
     void setId(int id);
 }

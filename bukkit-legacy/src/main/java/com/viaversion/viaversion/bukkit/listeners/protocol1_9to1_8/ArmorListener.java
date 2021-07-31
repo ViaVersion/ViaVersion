@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -58,7 +59,7 @@ public class ArmorListener extends ViaBukkitListener {
             armor += ArmorType.findById(stack.getTypeId()).getArmorPoints();
         }
 
-        PacketWrapper wrapper = PacketWrapper.create(0x4B, null, getUserConnection(player));
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_PROPERTIES, null, getUserConnection(player));
         try {
             wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
             wrapper.write(Type.INT, 1); // only 1 property

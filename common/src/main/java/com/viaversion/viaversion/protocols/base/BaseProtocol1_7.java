@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -43,14 +43,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class BaseProtocol1_7 extends AbstractSimpleProtocol {
+public class BaseProtocol1_7 extends AbstractProtocol {
 
     @Override
     protected void registerPackets() {
         /* Outgoing Packets */
 
         // Status Response Packet
-        registerClientbound(State.STATUS, 0x00, 0x00, new PacketRemapper() { // Status Response Packet
+        registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketRemapper() { // Status Response Packet
             @Override
             public void registerMap() {
                 map(Type.STRING);
@@ -124,13 +124,8 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
             }
         });
 
-        registerClientbound(State.STATUS, 0x01, 0x01); // Status Pong Packet
-
-        registerClientbound(State.LOGIN, 0x00, 0x00); // Login Disconnect Packet
-        registerClientbound(State.LOGIN, 0x01, 0x01); // Encryption Request Packet
-
         // Login Success Packet
-        registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+        registerClientbound(ClientboundLoginPackets.GAME_PROFILE, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -165,16 +160,9 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
             }
         });
 
-        registerClientbound(State.LOGIN, 0x03, 0x03); // Login Set Compression Packet
-        registerServerbound(State.LOGIN, 0x04, 0x04); // Plugin Request (1.13)
-
         /* Incoming Packets */
-
-        registerServerbound(State.STATUS, 0x00, 0x00); // Status Request Packet
-        registerServerbound(State.STATUS, 0x01, 0x01); // Status Ping Packet
-
         // Login Start Packet
-        registerServerbound(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
+        registerServerbound(ServerboundLoginPackets.HELLO, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {
@@ -185,7 +173,7 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
                             if (!wrapper.user().getChannel().isOpen()) return;
                             if (!wrapper.user().shouldApplyBlockProtocol()) return;
 
-                            PacketWrapper disconnectPacket = PacketWrapper.create(0x00, null, wrapper.user()); // Disconnect Packet
+                            PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper.user()); // Disconnect Packet
                             Protocol1_9To1_8.FIX_JSON.write(disconnectPacket, ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg()));
                             wrapper.cancel(); // cancel current
 
@@ -196,9 +184,7 @@ public class BaseProtocol1_7 extends AbstractSimpleProtocol {
                     }
                 });
             }
-        }); // Login Start Packet
-        registerServerbound(State.LOGIN, 0x01, 0x01); // Encryption Response Packet
-        registerServerbound(State.LOGIN, 0x02, 0x02); // Plugin Response (1.13)
+        });
     }
 
     @Override

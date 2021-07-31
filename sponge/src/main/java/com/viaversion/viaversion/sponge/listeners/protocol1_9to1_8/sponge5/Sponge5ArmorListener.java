@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ArmorType;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.sponge.listeners.ViaSpongeListener;
 import org.spongepowered.api.data.type.HandTypes;
@@ -58,7 +59,7 @@ public class Sponge5ArmorListener extends ViaSpongeListener {
         armor += calculate(player.getLeggings());
         armor += calculate(player.getBoots());
 
-        PacketWrapper wrapper = PacketWrapper.create(0x4B, null, getUserConnection(player.getUniqueId()));
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_PROPERTIES, null, getUserConnection(player.getUniqueId()));
         try {
             wrapper.write(Type.VAR_INT, getEntityId(player)); // Player ID
             wrapper.write(Type.INT, 1); // only 1 property

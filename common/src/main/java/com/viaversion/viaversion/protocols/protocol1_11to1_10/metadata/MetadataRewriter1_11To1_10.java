@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
@@ -129,7 +130,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_1
                         tracker.addHologram(entityId);
                         try {
                             // Send movement
-                            PacketWrapper wrapper = PacketWrapper.create(0x25, null, connection);
+                            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, connection);
                             wrapper.write(Type.VAR_INT, entityId);
                             wrapper.write(Type.SHORT, (short) 0);
                             wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));

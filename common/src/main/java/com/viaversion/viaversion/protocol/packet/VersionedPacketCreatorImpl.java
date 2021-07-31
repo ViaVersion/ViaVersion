@@ -34,15 +34,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class VersionedPacketCreatorImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketCreator<C, S> {
+public class VersionedPacketCreatorImpl implements VersionedPacketCreator {
 
     private final int inputProtocolVersion;
-    private final Class<C> clientboundPacketsClass;
-    private final Class<S> serverboundPacketsClass;
+    private final Class<? extends ClientboundPacketType> clientboundPacketsClass;
+    private final Class<? extends ServerboundPacketType> serverboundPacketsClass;
 
-    public VersionedPacketCreatorImpl(ProtocolVersion inputVersion, Class<C> clientboundPacketsClass, Class<S> serverboundPacketsClass) {
+    public VersionedPacketCreatorImpl(ProtocolVersion inputVersion,
+                                      Class<? extends ClientboundPacketType> clientboundPacketsClass, Class<? extends ServerboundPacketType> serverboundPacketsClass) {
         Preconditions.checkNotNull(inputVersion);
         Preconditions.checkNotNull(clientboundPacketsClass);
         Preconditions.checkNotNull(serverboundPacketsClass);
@@ -52,57 +52,53 @@ public class VersionedPacketCreatorImpl<C extends ClientboundPacketType, S exten
     }
 
     @Override
-    public boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
-        Preconditions.checkArgument(packetType.getClass() == clientboundPacketsClass);
-        return createAndSend(connection, packetType, packetWriter, true);
+    public boolean send(PacketWrapper packet) throws Exception {
+        validatePacket(packet);
+        return transformAndSendPacket(packet, true);
     }
 
     @Override
-    public boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
-        Preconditions.checkArgument(packetType.getClass() == serverboundPacketsClass);
-        return createAndSend(connection, packetType, packetWriter, true);
+    public boolean scheduleSend(PacketWrapper packet) throws Exception {
+        validatePacket(packet);
+        return transformAndSendPacket(packet, false);
     }
 
     @Override
-    public boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
-        Preconditions.checkArgument(packetType.getClass() == clientboundPacketsClass);
-        return createAndSend(connection, packetType, packetWriter, false);
-    }
-
-    @Override
-    public boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
-        Preconditions.checkArgument(packetType.getClass() == serverboundPacketsClass);
-        return createAndSend(connection, packetType, packetWriter, false);
-    }
-
-    @Override
-    public @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
-        Preconditions.checkArgument(packetType.getClass() == clientboundPacketsClass);
-        PacketWrapper packet = createAndTransform(connection, packetType, packetWriter);
+    public @Nullable PacketWrapper transform(PacketWrapper packet) throws Exception {
+        validatePacket(packet);
+        transformPacket(packet);
         return packet.isCancelled() ? null : packet;
     }
 
-    @Override
-    public @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
-        Preconditions.checkArgument(packetType.getClass() == serverboundPacketsClass);
-        PacketWrapper packet = createAndTransform(connection, packetType, packetWriter);
-        return packet.isCancelled() ? null : packet;
+    private void validatePacket(PacketWrapper packet) {
+        if (packet.user() == null) {
+            throw new IllegalArgumentException("PacketWrapper does not have a targetted UserConnection");
+        }
+        if (packet.getPacketType() == null) {
+            throw new IllegalArgumentException("PacketWrapper does not have a valid packet type");
+        }
+
+        Class<? extends PacketType> expectedPacketClass =
+                packet.getPacketType().direction() == Direction.CLIENTBOUND ? clientboundPacketsClass : serverboundPacketsClass;
+        if (packet.getPacketType().getClass() != expectedPacketClass) {
+            throw new IllegalArgumentException("PacketWrapper packet type is of the wrong packet class");
+        }
     }
 
-    private boolean createAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter, boolean currentThread) throws Exception {
-        PacketWrapper packet = createAndTransform(connection, packetType, packetWriter);
-        if (!packet.isCancelled()) {
+    private boolean transformAndSendPacket(PacketWrapper packet, boolean currentThread) throws Exception {
+        transformPacket(packet);
+        if (packet.isCancelled()) {
             return false;
         }
 
         if (currentThread) {
-            if (packetType.direction() == Direction.CLIENTBOUND) {
+            if (packet.getPacketType().direction() == Direction.CLIENTBOUND) {
                 packet.sendRaw();
             } else {
                 packet.sendToServerRaw();
             }
         } else {
-            if (packetType.direction() == Direction.CLIENTBOUND) {
+            if (packet.getPacketType().direction() == Direction.CLIENTBOUND) {
                 packet.scheduleSendRaw();
             } else {
                 packet.scheduleSendToServerRaw();
@@ -111,9 +107,11 @@ public class VersionedPacketCreatorImpl<C extends ClientboundPacketType, S exten
         return true;
     }
 
-    private PacketWrapper createAndTransform(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    private void transformPacket(PacketWrapper packet) throws Exception {
         // If clientbound: Constructor given inputProtocolVersion → Client version
         // If serverbound: Constructor given inputProtocolVersion → Server version
+        PacketType packetType = packet.getPacketType();
+        UserConnection connection = packet.user();
         boolean clientbound = packetType.direction() == Direction.CLIENTBOUND;
         int serverProtocolVersion = clientbound ? this.inputProtocolVersion : connection.getProtocolInfo().getServerProtocolVersion();
         int clientProtocolVersion = clientbound ? connection.getProtocolInfo().getProtocolVersion() : this.inputProtocolVersion;
@@ -130,8 +128,6 @@ public class VersionedPacketCreatorImpl<C extends ClientboundPacketType, S exten
             throw new RuntimeException("No protocol path between client version " + clientProtocolVersion + " and server version " + serverProtocolVersion);
         }
 
-        PacketWrapper packet = PacketWrapper.create(packetType, connection);
-        packetWriter.accept(packet);
         if (protocolList != null) {
             // Reset reader and apply pipeline
             packet.resetReader();
@@ -143,6 +139,5 @@ public class VersionedPacketCreatorImpl<C extends ClientboundPacketType, S exten
                         + " and server version " + serverProtocolVersion + ". Are you sure you used the correct input version and packet write types?", e);
             }
         }
-        return packet;
     }
 }

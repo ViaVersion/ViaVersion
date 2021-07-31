@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -58,7 +59,7 @@ public class DeathListener extends ViaBukkitListener {
                 // If online
                 UserConnection userConnection = getUserConnection(p);
                 if (userConnection != null) {
-                    PacketWrapper wrapper = PacketWrapper.create(0x2C, null, userConnection);
+                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.COMBAT_EVENT, null, userConnection);
                     try {
                         wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
                         wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID

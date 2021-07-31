@@ -151,16 +151,14 @@ public interface ProtocolManager {
      * The used packet types have to match the given protocol version.
      *
      * @param inputVersion            input protocol version
-     * @param <C>                     clientbound packet for the given protocol version
-     * @param <S>                     serverbound packet for the given protocol version
      * @param clientboundPacketsClass clientbound packets class
      * @param serverboundPacketsClass serverbound packets class
      * @return versioned packet creator
      * @throws IllegalArgumentException if either of the packet classes are the base {@link ClientboundPacketType} or {@link ServerboundPacketType} interfaces
      */
-    <C extends ClientboundPacketType,
-            S extends ServerboundPacketType
-            > VersionedPacketCreator<C, S> createVersionedPacketCreator(ProtocolVersion inputVersion, Class<C> clientboundPacketsClass, Class<S> serverboundPacketsClass);
+    VersionedPacketCreator createVersionedPacketCreator(ProtocolVersion inputVersion,
+                                                        Class<? extends ClientboundPacketType> clientboundPacketsClass,
+                                                        Class<? extends ServerboundPacketType> serverboundPacketsClass);
 
     /**
      * Returns whether protocol path calculation expects the path to come closer to the expected version with each entry, true by default.
@@ -267,11 +265,23 @@ public interface ProtocolManager {
     /**
      * Creates a new packet wrapper instance.
      *
-     * @param packetId   packet id
+     * @param packetType packet type, or null if none should be written to the packet (raw id = -1)
      * @param buf        input buffer
      * @param connection user connection
      * @return new packet wrapper instance
      * @see PacketWrapper#create(PacketType, ByteBuf, UserConnection)
      */
+    PacketWrapper createPacketWrapper(@Nullable PacketType packetType, @Nullable ByteBuf buf, UserConnection connection);
+
+    /**
+     * Creates a new packet wrapper instance.
+     *
+     * @param packetId   packet id
+     * @param buf        input buffer
+     * @param connection user connection
+     * @return new packet wrapper instance
+     * @deprecated magic id; prefer using {@link #createPacketWrapper(PacketType, ByteBuf, UserConnection)}
+     */
+    @Deprecated
     PacketWrapper createPacketWrapper(int packetId, @Nullable ByteBuf buf, UserConnection connection);
 }

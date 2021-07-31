@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
  * @param <E> List Type
  * @deprecated get rid of this at some point
  */
-@Deprecated
+@Deprecated/*(forRemoval = true)*/
 public class ConcurrentList<E> extends ArrayList<E> {
 
     private final Object lock = new Object();

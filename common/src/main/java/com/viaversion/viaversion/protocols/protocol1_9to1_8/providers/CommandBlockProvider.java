@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
@@ -57,7 +58,7 @@ public class CommandBlockProvider implements Provider {
     public void sendPermission(UserConnection user) throws Exception {
         if (!isEnabled())
             return;
-        PacketWrapper wrapper = PacketWrapper.create(0x1B, null, user); // Entity status
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_STATUS, null, user); // Entity status
 
         EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
         wrapper.write(Type.INT, tracker.getProvidedEntityId()); // Entity ID

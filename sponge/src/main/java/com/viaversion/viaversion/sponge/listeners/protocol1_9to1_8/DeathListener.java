@@ -21,6 +21,7 @@ import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.sponge.listeners.ViaSpongeListener;
 import org.spongepowered.api.entity.living.player.Player;
@@ -64,7 +65,7 @@ public class DeathListener extends ViaSpongeListener {
         Via.getPlatform().runSync(new Runnable() {
             @Override
             public void run() {
-                PacketWrapper wrapper = PacketWrapper.create(0x2C, null, getUserConnection(p.getUniqueId()));
+                PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.COMBAT_EVENT, null, getUserConnection(p.getUniqueId()));
                 try {
                     int entityId = getEntityId(p);
                     wrapper.write(Type.VAR_INT, 2); // Event - Entity dead

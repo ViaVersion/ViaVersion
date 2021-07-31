@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -48,12 +49,21 @@ public class PacketWrapperImpl implements PacketWrapper {
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
-    private int id = -1;
+    /** Only non-null if specifically set and gotten before packet transformation */
+    private PacketType packetType;
+    private int id;
     private final Deque<Pair<Type, Object>> readableObjects = new ArrayDeque<>();
     private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
 
     public PacketWrapperImpl(int packetId, @Nullable ByteBuf inputBuffer, UserConnection userConnection) {
         this.id = packetId;
+        this.inputBuffer = inputBuffer;
+        this.userConnection = userConnection;
+    }
+
+    public PacketWrapperImpl(@Nullable PacketType packetType, @Nullable ByteBuf inputBuffer, UserConnection userConnection) {
+        this.packetType = packetType;
+        this.id = packetType != null ? packetType.getId() : -1;
         this.inputBuffer = inputBuffer;
         this.userConnection = userConnection;
     }
@@ -70,7 +80,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
-        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId()).set("Data", packetValues);
+        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
     }
 
     @Override
@@ -112,7 +122,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             currentIndex++;
         }
         Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
-        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId());
+        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId()).set("Packet Type", packetType);
     }
 
     @Override
@@ -124,7 +134,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 return type.read(inputBuffer);
             } catch (Exception e) {
-                throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
+                throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
             }
         }
 
@@ -138,7 +148,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return read(type); // retry
         } else {
             Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
-            throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
+            throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
         }
     }
 
@@ -199,7 +209,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 packetValue.getKey().write(buffer, packetValue.getValue());
             } catch (Exception e) {
-                throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId()).set("Data", packetValues);
+                throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
             }
             index++;
         }
@@ -448,12 +458,26 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
+    public @Nullable PacketType getPacketType() {
+        return packetType;
+    }
+
+    @Override
+    public void setPacketType(PacketType packetType) {
+        this.packetType = packetType;
+        this.id = packetType != null ? packetType.getId() : -1;
+    }
+
+    @Override
     public int getId() {
         return id;
     }
 
     @Override
+    @Deprecated
     public void setId(int id) {
+        // Loses packet type info
+        this.packetType = null;
         this.id = id;
     }
 
@@ -467,6 +491,7 @@ public class PacketWrapperImpl implements PacketWrapper {
                 "packetValues=" + packetValues +
                 ", readableObjects=" + readableObjects +
                 ", id=" + id +
+                ", packetType" + packetType +
                 '}';
     }
 }

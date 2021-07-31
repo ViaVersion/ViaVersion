@@ -66,7 +66,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         itemRewriter.register();
 
         // Named sound effect
-        registerClientbound(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.NAMED_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - Sound name
@@ -80,7 +80,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Sound effect
-        registerClientbound(State.PLAY, 0x46, 0x46, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Sound name
@@ -102,7 +102,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Metadata packet
-        registerClientbound(State.PLAY, 0x39, 0x39, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.ENTITY_METADATA, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -111,7 +111,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Spawn Mob
-        registerClientbound(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -131,7 +131,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Spawn Player
-        registerClientbound(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_PLAYER, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -146,7 +146,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Packet Send ResourcePack
-        registerClientbound(State.PLAY, 0x32, 0x32, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESOURCE_PACK, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // 0 - URL
@@ -163,7 +163,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Packet ResourcePack status
-        registerServerbound(State.PLAY, 0x16, 0x16, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_9_3.RESOURCE_PACK_STATUS, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(new PacketHandler() {

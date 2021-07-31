@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4;
 
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -60,7 +61,7 @@ public class Sponge4ArmorListener extends ViaListener {
         armor += calculate(player.getLeggings());
         armor += calculate(player.getBoots());
 
-        PacketWrapper wrapper = PacketWrapper.create(0x4B, null, getUserConnection(player.getUniqueId()));
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_PROPERTIES, null, getUserConnection(player.getUniqueId()));
         try {
             wrapper.write(Type.VAR_INT, getEntityId(player)); // Player ID
             wrapper.write(Type.INT, 1); // only 1 property

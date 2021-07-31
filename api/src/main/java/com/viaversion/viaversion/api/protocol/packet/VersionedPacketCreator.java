@@ -23,100 +23,48 @@
 package com.viaversion.viaversion.api.protocol.packet;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.function.Consumer;
 
 /**
  * Utility to send packets from a given base version to or from any client version supported by Via.
- *
- * @param <C> clientbound packet type
- * @param <S> serverbound packet type
  */
-public interface VersionedPacketCreator<C extends ClientboundPacketType, S extends ServerboundPacketType> {
+public interface VersionedPacketCreator {
 
     /**
-     * Sends a packet to the given user.
+     * Sends a packet to the user or server, depending on the packet type given by {@link PacketWrapper#getPacketType()}.
      * Returns false if the packet has been cancelled at some point, but does not indicate whether a replacement has been constructed.
      *
-     * @param connection   user connection
-     * @param packetType   clientbound packet type
-     * @param packetWriter consumer filling the packet with data
      * @return whether this packet specifically has been sent, false if cancelled
-     * @throws IllegalArgumentException if the packet type is not of the expected clientbound packets class
+     * @throws IllegalArgumentException if the packet type is not of the expected clientbound or serverbound packets class
+     * @throws IllegalArgumentException if {@link PacketWrapper#user()} returns null
      * @throws RuntimeException         if no path from the input version to the required client version exists
      * @throws Exception                if an error occurred while constructing the packet or sending it
      */
-    boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    boolean send(PacketWrapper packet) throws Exception;
 
     /**
-     * Sends a packet to the server.
+     * Sends a packet to the user or server, depending on the packet type given by {@link PacketWrapper#getPacketType()}, submitted to the netty event loop.
      * Returns false if the packet has been cancelled at some point, but does not indicate whether a replacement has been constructed.
      *
-     * @param connection   user connection
-     * @param packetType   serverbound packet type
-     * @param packetWriter consumer filling the packet with data
-     * @return whether this packet specifically has been sent, false if cancelled
-     * @throws IllegalArgumentException if the packet type is not of the expected serverbound packets class
-     * @throws RuntimeException         if no path from the input version to the required server version exists
-     * @throws Exception                if an error occurred while constructing the packet or sending it
-     */
-    boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
-
-    /**
-     * Sends a packet to the given user, submitted to the netty event loop.
-     * Returns false if the packet has been cancelled at some point, but does not indicate whether a replacement has been constructed.
-     *
-     * @param connection   user connection
-     * @param packetType   clientbound packet type
-     * @param packetWriter consumer filling the packet with data
+     * @param packet packet wrapper
      * @return whether this packet specifically has been sent, false if cancelled
      * @throws IllegalArgumentException if the packet type is not of the expected clientbound packets class
+     * @throws IllegalArgumentException if {@link PacketWrapper#user()} returns null
      * @throws RuntimeException         if no path from the input version to the required client version exists
      * @throws Exception                if an error occurred while constructing the packet or sending it
      */
-    boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    boolean scheduleSend(PacketWrapper packet) throws Exception;
 
     /**
-     * Sends a packet to the server, submitted to the netty event loop.
-     * Returns false if the packet has been cancelled at some point, but does not indicate whether a replacement has been constructed.
+     * Transforms a packet to the protocol version of the given connection or server, or null if cancelled at some point.
+     * The target version is given by {@link ProtocolInfo#getProtocolVersion()} or {@link ProtocolInfo#getServerProtocolVersion()}.
      *
-     * @param connection   user connection
-     * @param packetType   serverbound packet type
-     * @param packetWriter consumer filling the packet with data
-     * @return whether this packet specifically has been sent, false if cancelled
-     * @throws IllegalArgumentException if the packet type is not of the expected serverbound packets class
-     * @throws RuntimeException         if no path from the input version to the required server version exists
-     * @throws Exception                if an error occurred while constructing the packet or sending it
-     */
-    boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
-
-    /**
-     * Transforms a packet to the protocol version of the given connection, or null if cancelled at some point.
-     * The target version is given by {@link ProtocolInfo#getProtocolVersion()} with the connection as the receiver.
-     *
-     * @param connection   user connection
-     * @param packetType   clientbound packet type
-     * @param packetWriter consumer filling the packet with data
+     * @param packet packet wrapper
      * @return created and transformed packet wrapper, or null if cancelled at some point
      * @throws IllegalArgumentException if the packet type is not of the expected clientbound packets class
+     * @throws IllegalArgumentException if {@link PacketWrapper#user()} returns null
      * @throws RuntimeException         if no path from the input version to the required client version exists
      * @throws Exception                if an error occurred while constructing the packet
      */
-    @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
-
-    /**
-     * Transforms a packet to the server protocol version the connection is on, or null if cancelled at some point.
-     * The target version is given by {@link ProtocolInfo#getServerProtocolVersion()} with the connection as the sender.
-     *
-     * @param connection   user connection
-     * @param packetType   serverbound packet type
-     * @param packetWriter consumer filling the packet with data
-     * @return created and transformed packet wrapper, or null if cancelled at some point
-     * @throws IllegalArgumentException if the packet type is not of the expected serverbound packets class
-     * @throws RuntimeException         if no path from the input version to the required server version exists
-     * @throws Exception                if an error occurred while constructing the packet
-     */
-    @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    @Nullable PacketWrapper transform(PacketWrapper packet) throws Exception;
 }

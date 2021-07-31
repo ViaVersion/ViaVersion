@@ -50,4 +50,13 @@ public interface PacketType {
      * @return direction
      */
     Direction direction();
+
+    /**
+     * Returns the protocol state the packet belongs to.
+     *
+     * @return protocol state
+     */
+    default State state() {
+        return State.PLAY;
+    }
 }

@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 
 public class TabCompleteTracker implements StorableObject {
@@ -31,7 +32,7 @@ public class TabCompleteTracker implements StorableObject {
 
     public void sendPacketToServer(UserConnection connection) {
         if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) return;
-        PacketWrapper wrapper = PacketWrapper.create(0x01, null, connection);
+        PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.TAB_COMPLETE, null, connection);
         wrapper.write(Type.STRING, lastTabComplete);
         wrapper.write(Type.BOOLEAN, false);
         wrapper.write(Type.OPTIONAL_POSITION, null);

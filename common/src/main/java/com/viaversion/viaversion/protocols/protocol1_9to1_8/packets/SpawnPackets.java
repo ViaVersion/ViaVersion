@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -306,7 +307,7 @@ public class SpawnPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         short item = wrapper.read(Type.SHORT);
                         if (item != 0) {
-                            PacketWrapper packet = PacketWrapper.create(0x3C, null, wrapper.user());
+                            PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, wrapper.user());
                             packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                             packet.write(Type.VAR_INT, 0);
                             packet.write(Type.ITEM, new DataItem(item, (byte) 1, (short) 0, null));

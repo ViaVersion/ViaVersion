@@ -25,7 +25,7 @@ import java.util.ListIterator;
 /**
  * @deprecated scary
  */
-@Deprecated
+@Deprecated/*(forRemoval = true)*/
 public abstract class ListWrapper implements List {
     private final List list;
 

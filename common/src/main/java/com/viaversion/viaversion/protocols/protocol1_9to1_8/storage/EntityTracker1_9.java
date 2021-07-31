@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.GameMode;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
@@ -89,7 +90,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public void setSecondHand(int entityID, Item item) {
-        PacketWrapper wrapper = PacketWrapper.create(0x3C, null, user());
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, user());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM, this.itemInSecondHand = item);
@@ -234,7 +235,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                             knownHolograms.add(entityId);
                             try {
                                 // Send movement
-                                PacketWrapper wrapper = PacketWrapper.create(0x25, null, user());
+                                PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_POSITION, null, user());
                                 wrapper.write(Type.VAR_INT, entityId);
                                 wrapper.write(Type.SHORT, (short) 0);
                                 wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
@@ -296,7 +297,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public void sendTeamPacket(boolean add, boolean now) {
-        PacketWrapper wrapper = PacketWrapper.create(0x41, null, user());
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.TEAMS, null, user());
         wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
         if (add) {
             // add
@@ -340,7 +341,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     public void sendMetadataBuffer(int entityId) {
         List<Metadata> metadataList = metadataBuffer.get(entityId);
         if (metadataList != null) {
-            PacketWrapper wrapper = PacketWrapper.create(0x39, null, user());
+            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_METADATA, null, user());
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, metadataList);
             Via.getManager().getProtocolManager().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)

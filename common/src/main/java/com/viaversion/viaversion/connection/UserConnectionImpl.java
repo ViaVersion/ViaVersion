@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -290,7 +291,7 @@ public class UserConnectionImpl implements UserConnection {
             return;
         }
 
-        PacketWrapper wrapper = PacketWrapper.create(id, buf, this);
+        PacketWrapper wrapper = new PacketWrapperImpl(id, buf, this);
         try {
             protocolInfo.getPipeline().transform(direction, protocolInfo.getState(), wrapper);
         } catch (CancelException ex) {
