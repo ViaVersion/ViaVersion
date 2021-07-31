@@ -87,14 +87,14 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     }
 
     protected void registerClientboundChannelIdChanges() {
-        ClientboundPacketType[] newConstants = newClientboundPacketEnum.getEnumConstants();
-        Map<String, ClientboundPacketType> newClientboundPackets = new HashMap<>(newConstants.length);
-        for (ClientboundPacketType newConstant : newConstants) {
+        C2[] newConstants = newClientboundPacketEnum.getEnumConstants();
+        Map<String, C2> newClientboundPackets = new HashMap<>(newConstants.length);
+        for (C2 newConstant : newConstants) {
             newClientboundPackets.put(newConstant.getName(), newConstant);
         }
 
         for (C1 packet : oldClientboundPacketEnum.getEnumConstants()) {
-            C2 mappedPacket = (C2) newClientboundPackets.get(packet.getName());
+            C2 mappedPacket = newClientboundPackets.get(packet.getName());
             if (mappedPacket == null) {
                 // Packet doesn't exist on new client
                 Preconditions.checkArgument(hasRegisteredClientbound(packet),
@@ -109,14 +109,14 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     }
 
     protected void registerServerboundChannelIdChanges() {
-        ServerboundPacketType[] oldConstants = oldServerboundPacketEnum.getEnumConstants();
-        Map<String, ServerboundPacketType> oldServerboundConstants = new HashMap<>(oldConstants.length);
-        for (ServerboundPacketType oldConstant : oldConstants) {
+        S1[] oldConstants = oldServerboundPacketEnum.getEnumConstants();
+        Map<String, S1> oldServerboundConstants = new HashMap<>(oldConstants.length);
+        for (S1 oldConstant : oldConstants) {
             oldServerboundConstants.put(oldConstant.getName(), oldConstant);
         }
 
         for (S2 packet : newServerboundPacketEnum.getEnumConstants()) {
-            S1 mappedPacket = (S1) oldServerboundConstants.get(packet.getName());
+            S1 mappedPacket = oldServerboundConstants.get(packet.getName());
             if (mappedPacket == null) {
                 // Packet doesn't exist on old server
                 Preconditions.checkArgument(hasRegisteredServerbound(packet),
@@ -200,13 +200,13 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public void registerClientbound(C1 packetType, @Nullable PacketRemapper packetRemapper) {
-        checkPacketType(packetType, packetType.getClass() == oldClientboundPacketEnum);
+        checkPacketType(packetType, oldClientboundPacketEnum == null || packetType.getClass() == oldClientboundPacketEnum);
 
-        ClientboundPacketType mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? packetType
+        C2 mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? (C2) packetType
                 : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.getName().equals(packetType.getName())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
 
-        registerClientbound(packetType, (C2) mappedPacket, packetRemapper);
+        registerClientbound(packetType, mappedPacket, packetRemapper);
     }
 
     @Override
@@ -226,13 +226,13 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public void registerServerbound(S2 packetType, @Nullable PacketRemapper packetRemapper) {
-        checkPacketType(packetType, packetType.getClass() == newServerboundPacketEnum);
+        checkPacketType(packetType, newServerboundPacketEnum == null || packetType.getClass() == newServerboundPacketEnum);
 
-        ServerboundPacketType mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? packetType
+        S1 mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? (S1) packetType
                 : Arrays.stream(oldServerboundPacketEnum.getEnumConstants()).filter(en -> en.getName().equals(packetType.getName())).findAny().orElse(null);
         Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
 
-        registerServerbound(packetType, (S1) mappedPacket, packetRemapper);
+        registerServerbound(packetType, mappedPacket, packetRemapper);
     }
 
     @Override
@@ -253,8 +253,8 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     private void register(Map<Packet, ProtocolPacket> packetMap, PacketType packetType, @Nullable PacketType mappedPacketType,
                           Class<? extends PacketType> unmappedPacketEnum, Class<? extends PacketType> mappedPacketEnum,
                           @Nullable PacketRemapper remapper, boolean override) {
-        checkPacketType(packetType, packetType.getClass() == unmappedPacketEnum);
-        checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketType.getClass() == mappedPacketEnum);
+        checkPacketType(packetType, unmappedPacketEnum == null || packetType.getClass() == unmappedPacketEnum);
+        checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketEnum == null || mappedPacketType.getClass() == mappedPacketEnum);
         Preconditions.checkArgument(mappedPacketType == null || packetType.state() == mappedPacketType.state(), "Packet type state does not match mapped packet type state");
 
         ProtocolPacket protocolPacket = new ProtocolPacket(packetType.state(), packetType, mappedPacketType, remapper);
@@ -277,8 +277,8 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     }
 
     @Override
-    public boolean hasRegisteredClientbound(State state, int unmappedPacketid) {
-        Packet packet = new Packet(state, unmappedPacketid);
+    public boolean hasRegisteredClientbound(State state, int unmappedPacketId) {
+        Packet packet = new Packet(state, unmappedPacketId);
         return clientbound.containsKey(packet);
     }
 
@@ -291,7 +291,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
         Packet statePacket = new Packet(state, packetWrapper.getId());
-        Map<Packet, ProtocolPacket> packetMap = (direction == Direction.CLIENTBOUND ? this.clientbound : serverbound);
+        Map<Packet, ProtocolPacket> packetMap = direction == Direction.CLIENTBOUND ? clientbound : serverbound;
         ProtocolPacket protocolPacket = packetMap.get(statePacket);
         if (protocolPacket == null) {
             return;

@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.protocol.packet.VersionedPacketCreator;
+import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import io.netty.buffer.ByteBuf;
@@ -147,18 +147,34 @@ public interface ProtocolManager {
     @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
 
     /**
-     * Returns a versioned packet creator to send packets from a given base version to any client version supported by Via.
+     * Returns a versioned packet transformer to transform and send packets from a given base version to any client version supported by Via.
      * The used packet types have to match the given protocol version.
+     * <p>
+     * It is important the correct packet type classes are passed. The ViaVersion given packet type enums
+     * are found in the common module. Examples for correct invocations are:
+     * <pre>
+     * createPacketTransformer(ProtocolVersion.v1_17_1, ClientboundPackets1_17_1.class, ServerboundPackets1_17.class);
+     * createPacketTransformer(ProtocolVersion.v1_12_2, ClientboundPackets1_12_1.class, ServerboundPackets1_12_1.class);
+     * createPacketTransformer(ProtocolVersion.v1_8, ClientboundPackets1_8.class, ServerboundPackets1_8.class);
+     * </pre>
+     * If only clientbound <b>or</b> serverbound packets are used, the other class can be passed as null, see:
+     * <pre>
+     * VersionedPacketTransformer&lt;?, ServerboundHandshakePackets&gt; creator
+     *     = createPacketTransformer(ProtocolVersion.v1_17_1, null, ServerboundHandshakePackets.class);
+     * </pre>
      *
      * @param inputVersion            input protocol version
-     * @param clientboundPacketsClass clientbound packets class
-     * @param serverboundPacketsClass serverbound packets class
-     * @return versioned packet creator
+     * @param clientboundPacketsClass clientbound packets class, or null if no clientbound packets will be sent or transformed with this
+     * @param serverboundPacketsClass serverbound packets class, or null if no serverbound packets will be sent or transformed with this
+     * @return versioned packet transformer to transform and send packets from a given protocol version
      * @throws IllegalArgumentException if either of the packet classes are the base {@link ClientboundPacketType} or {@link ServerboundPacketType} interfaces
+     * @throws IllegalArgumentException if both packet classes are null
      */
-    VersionedPacketCreator createVersionedPacketCreator(ProtocolVersion inputVersion,
-                                                        Class<? extends ClientboundPacketType> clientboundPacketsClass,
-                                                        Class<? extends ServerboundPacketType> serverboundPacketsClass);
+    <C extends ClientboundPacketType,
+            S extends ServerboundPacketType
+            > VersionedPacketTransformer<C, S> createPacketTransformer(ProtocolVersion inputVersion,
+                                                                       @Nullable Class<C> clientboundPacketsClass,
+                                                                       @Nullable Class<S> serverboundPacketsClass);
 
     /**
      * Returns whether protocol path calculation expects the path to come closer to the expected version with each entry, true by default.

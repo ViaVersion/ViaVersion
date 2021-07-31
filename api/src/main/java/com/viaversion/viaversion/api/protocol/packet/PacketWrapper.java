@@ -219,8 +219,10 @@ public interface PacketWrapper {
      */
     ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception;
 
-
-    @Deprecated
+    /**
+     * @deprecated misleading; use {@link #sendRaw()}. This method will be removed in 5.0.0
+     */
+    @Deprecated/*(forRemoval = true)*/
     default void send() throws Exception {
         sendRaw();
     }
@@ -328,8 +330,9 @@ public interface PacketWrapper {
      * (Ensure the ID is suitable for viaversion)
      *
      * @throws Exception If it failed to write
+     * @deprecated misleading; use {@link #sendToServerRaw()}. This method will be removed in 5.0.0
      */
-    @Deprecated
+    @Deprecated/*(forRemoval = true)*/
     default void sendToServer() throws Exception {
         sendToServerRaw();
     }

@@ -28,24 +28,24 @@ import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.packet.VersionedPacketCreator;
+import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class VersionedPacketCreatorImpl implements VersionedPacketCreator {
+public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketTransformer<C, S> {
 
     private final int inputProtocolVersion;
-    private final Class<? extends ClientboundPacketType> clientboundPacketsClass;
-    private final Class<? extends ServerboundPacketType> serverboundPacketsClass;
+    private final Class<C> clientboundPacketsClass;
+    private final Class<S> serverboundPacketsClass;
 
-    public VersionedPacketCreatorImpl(ProtocolVersion inputVersion,
-                                      Class<? extends ClientboundPacketType> clientboundPacketsClass, Class<? extends ServerboundPacketType> serverboundPacketsClass) {
+    public VersionedPacketTransformerImpl(ProtocolVersion inputVersion, @Nullable Class<C> clientboundPacketsClass, @Nullable Class<S> serverboundPacketsClass) {
         Preconditions.checkNotNull(inputVersion);
-        Preconditions.checkNotNull(clientboundPacketsClass);
-        Preconditions.checkNotNull(serverboundPacketsClass);
+        Preconditions.checkArgument(clientboundPacketsClass != null || serverboundPacketsClass != null,
+                "Either the clientbound or serverbound packets class has to be non-null");
         this.inputProtocolVersion = inputVersion.getVersion();
         this.clientboundPacketsClass = clientboundPacketsClass;
         this.serverboundPacketsClass = serverboundPacketsClass;
@@ -58,9 +58,29 @@ public class VersionedPacketCreatorImpl implements VersionedPacketCreator {
     }
 
     @Override
+    public boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        return createAndSend(connection, packetType, packetWriter);
+    }
+
+    @Override
+    public boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        return createAndSend(connection, packetType, packetWriter);
+    }
+
+    @Override
     public boolean scheduleSend(PacketWrapper packet) throws Exception {
         validatePacket(packet);
         return transformAndSendPacket(packet, false);
+    }
+
+    @Override
+    public boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        return scheduleCreateAndSend(connection, packetType, packetWriter);
+    }
+
+    @Override
+    public boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        return scheduleCreateAndSend(connection, packetType, packetWriter);
     }
 
     @Override
@@ -68,6 +88,16 @@ public class VersionedPacketCreatorImpl implements VersionedPacketCreator {
         validatePacket(packet);
         transformPacket(packet);
         return packet.isCancelled() ? null : packet;
+    }
+
+    @Override
+    public @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        return createAndTransform(connection, packetType, packetWriter);
+    }
+
+    @Override
+    public @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        return createAndTransform(connection, packetType, packetWriter);
     }
 
     private void validatePacket(PacketWrapper packet) {
@@ -139,5 +169,23 @@ public class VersionedPacketCreatorImpl implements VersionedPacketCreator {
                         + " and server version " + serverProtocolVersion + ". Are you sure you used the correct input version and packet write types?", e);
             }
         }
+    }
+
+    private boolean createAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        PacketWrapper packet = PacketWrapper.create(packetType, connection);
+        packetWriter.accept(packet);
+        return send(packet);
+    }
+
+    private boolean scheduleCreateAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        PacketWrapper packet = PacketWrapper.create(packetType, connection);
+        packetWriter.accept(packet);
+        return scheduleSend(packet);
+    }
+
+    private @Nullable PacketWrapper createAndTransform(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+        PacketWrapper packet = PacketWrapper.create(packetType, connection);
+        packetWriter.accept(packet);
+        return transform(packet);
     }
 }

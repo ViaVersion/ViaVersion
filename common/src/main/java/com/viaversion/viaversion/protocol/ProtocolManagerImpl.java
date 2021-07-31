@@ -32,11 +32,11 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.protocol.packet.VersionedPacketCreator;
+import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
-import com.viaversion.viaversion.protocol.packet.VersionedPacketCreatorImpl;
+import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
 import com.viaversion.viaversion.protocols.base.BaseProtocol;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
@@ -267,11 +267,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public VersionedPacketCreator createVersionedPacketCreator(ProtocolVersion inputVersion,
-                                                               Class<? extends ClientboundPacketType> clientboundPacketsClass,
-                                                               Class<? extends ServerboundPacketType> serverboundPacketsClass) {
+    public <C extends ClientboundPacketType,
+            S extends ServerboundPacketType
+            > VersionedPacketTransformer<C, S> createPacketTransformer(ProtocolVersion inputVersion,
+                                                                       @Nullable Class<C> clientboundPacketsClass,
+                                                                       @Nullable Class<S> serverboundPacketsClass) {
         Preconditions.checkArgument(clientboundPacketsClass != ClientboundPacketType.class && serverboundPacketsClass != ServerboundPacketType.class);
-        return new VersionedPacketCreatorImpl(inputVersion, clientboundPacketsClass, serverboundPacketsClass);
+        return new VersionedPacketTransformerImpl<>(inputVersion, clientboundPacketsClass, serverboundPacketsClass);
     }
 
     /**
