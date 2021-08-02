@@ -105,9 +105,3 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 .nb-gradle/
-
-
-
-### Git ###
-# Don't exclude the .gitignore itself
-!.gitignore
