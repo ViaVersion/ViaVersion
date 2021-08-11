@@ -102,6 +102,11 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
                         pagesTag.add(new StringTag(page));
                     }
 
+                    // Legacy servers don't like an empty pages list
+                    if (pagesTag.size() == 0) {
+                        pagesTag.add(new StringTag(""));
+                    }
+
                     tag.put("pages", pagesTag);
 
                     if (wrapper.read(Type.BOOLEAN)) {
