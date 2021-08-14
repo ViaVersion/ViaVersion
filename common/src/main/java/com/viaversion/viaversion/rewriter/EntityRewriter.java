@@ -130,7 +130,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             }
 
             if (event != null && event.extraMeta() != null) {
-                // Finally add newly created meta
+                // Finally, add newly created meta
                 metadataList.addAll(event.extraMeta());
             }
             i++;

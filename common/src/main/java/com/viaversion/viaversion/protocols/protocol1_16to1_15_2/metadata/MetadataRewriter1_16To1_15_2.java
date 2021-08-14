@@ -66,6 +66,14 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<Protocol1_16To1
                 metadata.setId(metadata.id() - 1);
             }
         }
+
+        if (type == Entity1_16Types.WOLF) {
+            if (metadata.id() == 16) {
+                byte mask = metadata.value();
+                int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
+                metadatas.add(new Metadata(20, MetaType1_16.VAR_INT, angerTime));
+            }
+        }
     }
 
     @Override
