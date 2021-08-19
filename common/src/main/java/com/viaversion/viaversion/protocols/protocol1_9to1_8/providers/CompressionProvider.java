@@ -22,7 +22,7 @@ public class CompressionProvider implements Provider {
 
         ChannelPipeline pipe = user.getChannel().pipeline();
 
-        if (threshold <= 0) {
+        if (threshold < 0) {
             if (pipe.get("compress") != null) {
                 pipe.remove("compress");
                 pipe.remove("decompress");
