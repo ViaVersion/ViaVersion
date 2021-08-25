@@ -54,7 +54,6 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         // Check if the chunk is an unload packet and return early
         if (fullChunk && bitmask == 0) {
-            System.out.println("special chunk");
             return new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
         }
 
