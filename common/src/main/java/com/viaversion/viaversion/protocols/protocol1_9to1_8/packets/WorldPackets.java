@@ -20,8 +20,11 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -45,6 +48,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class WorldPackets {
@@ -148,10 +152,36 @@ public class WorldPackets {
                             provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
 
                             clientChunks.getLoadedChunks().remove(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
+
+                            // Unload the empty chunks
+                            if (Via.getConfig().isChunkBorderFix()) {
+                                for (BlockFace face : BlockFace.values()) {
+                                    if (face.getAxis().equals(BlockFace.EnumAxis.Y)) continue;
+                                    if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunk.getX() + face.getModX(), chunk.getZ() + face.getModZ()))) {
+                                        PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.UNLOAD_CHUNK);
+                                        unloadChunk.write(Type.INT, chunk.getX() + face.getModX());
+                                        unloadChunk.write(Type.INT, chunk.getZ() + face.getModZ());
+                                        unloadChunk.send(Protocol1_9To1_8.class);
+                                    }
+                                }
+                            }
                         } else {
                             wrapper.write(new Chunk1_9_1_2Type(clientWorld), chunk);
 
                             clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
+
+                            // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
+                            if (Via.getConfig().isChunkBorderFix()) {
+                                for (BlockFace face : BlockFace.values()) {
+                                    if (face.getAxis().equals(BlockFace.EnumAxis.Y)) continue;
+                                    if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunk.getX() + face.getModX(), chunk.getZ() + face.getModZ()))) {
+                                        PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                                        Chunk c = new BaseChunk(chunk.getX() + face.getModX(), chunk.getZ() + face.getModZ(), true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
+                                        emptyChunk.write(new Chunk1_9_1_2Type(wrapper.user().get(ClientWorld.class)), c);
+                                        emptyChunk.send(Protocol1_9To1_8.class);
+                                    }
+                                }
+                            }
                         }
                     }
                 });
@@ -174,6 +204,19 @@ public class WorldPackets {
                         chunkData.send(Protocol1_9To1_8.class);
 
                         clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
+
+                        // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
+                        if (Via.getConfig().isChunkBorderFix()) {
+                            for (BlockFace face : BlockFace.values()) {
+                                if (face.getAxis().equals(BlockFace.EnumAxis.Y)) continue;
+                                if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunk.getX() + face.getModX(), chunk.getZ() + face.getModZ()))) {
+                                    PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                                    Chunk c = new BaseChunk(chunk.getX() + face.getModX(), chunk.getZ() + face.getModZ(), true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
+                                    emptyChunk.write(new Chunk1_9_1_2Type(wrapper.user().get(ClientWorld.class)), c);
+                                    emptyChunk.send(Protocol1_9To1_8.class);
+                                }
+                            }
+                        }
                     }
                 });
             }

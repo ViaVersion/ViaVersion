@@ -52,6 +52,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean nmsPlayerTicking;
     private boolean replacePistons;
     private int pistonReplacementId;
+    private boolean chunkBorderFix;
     private boolean autoTeam;
     private boolean forceJsonTransform;
     private boolean nbtArrayFix;
@@ -114,6 +115,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         nmsPlayerTicking = getBoolean("nms-player-ticking", true);
         replacePistons = getBoolean("replace-pistons", false);
         pistonReplacementId = getInt("replacement-piston-id", 0);
+        chunkBorderFix = getBoolean("chunk-border-fix", false);
         autoTeam = getBoolean("auto-team", true);
         forceJsonTransform = getBoolean("force-json-transform", false);
         nbtArrayFix = getBoolean("chat-nbt-fix", true);
@@ -275,6 +277,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public int getPistonReplacementId() {
         return pistonReplacementId;
+    }
+
+    @Override
+    public boolean isChunkBorderFix() {
+        return chunkBorderFix;
     }
 
     @Override

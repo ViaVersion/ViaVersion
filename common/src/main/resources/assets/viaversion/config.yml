@@ -197,6 +197,8 @@ anti-xray-patch: true
 replace-pistons: false
 # What id should we replace with, default is air. (careful of players getting stuck standing on them)
 replacement-piston-id: 0
+# Fix 1.9+ clients not rendering the far away chunks and improve chunk rendering when moving fast (Increases network usage and decreases client fps slightly)
+chunk-border-fix: false
 # Force the string -> json transform
 force-json-transform: false
 # Minimize the cooldown animation in 1.8 servers
