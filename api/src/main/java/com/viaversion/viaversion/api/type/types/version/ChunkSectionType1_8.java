@@ -55,6 +55,15 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        throw new UnsupportedOperationException();
+        for (int y = 0; y < 16; y++) {
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++) {
+                    int block = chunkSection.getFlatBlock(x, y, z);
+                    buffer.writeByte(block);
+                    buffer.writeByte(block >> 8);
+                }
+            }
+        }
     }
+
 }
