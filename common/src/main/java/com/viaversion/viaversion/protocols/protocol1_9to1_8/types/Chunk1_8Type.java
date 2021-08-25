@@ -51,6 +51,13 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         final int dataLength = Type.VAR_INT.readPrimitive(input);
         final byte[] data = new byte[dataLength];
         input.readBytes(data);
+
+        // Check if the chunk is an unload packet and return early
+        if (fullChunk && bitmask == 0) {
+            System.out.println("special chunk");
+            return new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
+        }
+
         return deserialize(chunkX, chunkZ, fullChunk, world.getEnvironment() == Environment.NORMAL, bitmask, data);
     }
 
