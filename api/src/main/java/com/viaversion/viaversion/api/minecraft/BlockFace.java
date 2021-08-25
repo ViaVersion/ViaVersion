@@ -33,6 +33,8 @@ public enum BlockFace {
     TOP((byte) 0, (byte) 1, (byte) 0, EnumAxis.Y),
     BOTTOM((byte) 0, (byte) -1, (byte) 0, EnumAxis.Y);
 
+    public static final BlockFace[] HORIZONTAL = new BlockFace[]{NORTH, SOUTH, EAST, WEST};
+
     private static final Map<BlockFace, BlockFace> opposites = new HashMap<>();
 
     static {
