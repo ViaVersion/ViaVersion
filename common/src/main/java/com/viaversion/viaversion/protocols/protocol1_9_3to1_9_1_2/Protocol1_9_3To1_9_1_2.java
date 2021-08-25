@@ -137,9 +137,9 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                         int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
+                        clientWorld.setEnvironment(dimensionId);
                     }
                 });
             }
