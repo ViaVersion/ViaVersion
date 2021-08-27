@@ -70,12 +70,14 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public @Nullable StoredEntityData entityData(int id) {
+        Preconditions.checkArgument(entityData != null, "Entity data storage has to be explicitly enabled via the constructor");
         EntityType type = entityType(id);
         return type != null ? entityData.computeIfAbsent(id, s -> new StoredEntityImpl(type)) : null;
     }
 
     @Override
     public @Nullable StoredEntityData entityDataIfPresent(int id) {
+        Preconditions.checkArgument(entityData != null, "Entity data storage has to be explicitly enabled via the constructor");
         return entityData.get(id);
     }
 

@@ -73,6 +73,7 @@ public interface EntityTracker {
      *
      * @param id entity id
      * @return stored entity data if an entity with the id is tracked, else null
+     * @throws IllegalArgumentException if entitiy data storage has not been enabled via the implementation
      */
     @Nullable StoredEntityData entityData(int id);
 
@@ -81,6 +82,7 @@ public interface EntityTracker {
      *
      * @param id entity id
      * @return stored entity data if it has previously been initialized by {@link #entityData(int)}
+     * @throws IllegalArgumentException if entitiy data storage has not been enabled via the implementation
      */
     @Nullable StoredEntityData entityDataIfPresent(int id);
 
