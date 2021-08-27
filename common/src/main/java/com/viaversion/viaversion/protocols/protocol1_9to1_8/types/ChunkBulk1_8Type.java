@@ -27,6 +27,11 @@ import io.netty.buffer.ByteBuf;
 
 public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
 
+    private static final int BLOCKS_PER_SECTION = 16 * 16 * 16;
+    private static final int BLOCKS_BYTES = BLOCKS_PER_SECTION * 2;
+    private static final int LIGHT_BYTES = BLOCKS_PER_SECTION / 2;
+    private static final int BIOME_BYTES = 16 * 16;
+
     public ChunkBulk1_8Type(final ClientWorld clientWorld) {
         super(clientWorld, Chunk[].class);
     }
@@ -94,8 +99,8 @@ public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
             this.chunkX = input.readInt();
             this.chunkZ = input.readInt();
             this.bitmask = input.readUnsignedShort();
-            final int bitCount = Integer.bitCount(this.bitmask);
-            this.data = new byte[(bitCount * ((4096 * 2) + 2048)) + (skyLight ? bitCount * 2048 : 0) + 256];
+            final int setSections = Integer.bitCount(this.bitmask);
+            this.data = new byte[setSections * (BLOCKS_BYTES + (skyLight ? 2 * LIGHT_BYTES : LIGHT_BYTES)) + BIOME_BYTES];
         }
 
         public void readData(final ByteBuf input) {
