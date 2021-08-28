@@ -52,7 +52,7 @@ public abstract class DynamicType<T extends IdHolder> extends Type<T> {
         return new DataFiller(protocol, useMappedNames);
     }
 
-    protected void readData(final ByteBuf buffer, final T value) throws Exception {
+    protected void readData(final ByteBuf buffer, final T value) {
         final DataReader<T> reader = readers.get(value.id());
         if (reader != null) {
             reader.read(buffer, value);
@@ -98,8 +98,7 @@ public abstract class DynamicType<T extends IdHolder> extends Type<T> {
          *
          * @param buf   buffer
          * @param value value
-         * @throws Exception if an error occurs during buffer reading
          */
-        void read(ByteBuf buf, T value) throws Exception;
+        void read(ByteBuf buf, T value);
     }
 }

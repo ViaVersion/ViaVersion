@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class DebugSubCmd extends ViaSubCommand {
+public class DebugSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "debug";

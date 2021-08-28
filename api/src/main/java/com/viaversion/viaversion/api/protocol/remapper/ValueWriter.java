@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.exception.InformativeException;
 
 @FunctionalInterface
 public interface ValueWriter<T> {
@@ -32,7 +33,6 @@ public interface ValueWriter<T> {
      *
      * @param wrapper    The packet wrapper to write to
      * @param inputValue The value to write
-     * @throws Exception Throws exception if it fails to write
      */
-    void write(PacketWrapper wrapper, T inputValue) throws Exception;
+    void write(PacketWrapper wrapper, T inputValue) throws InformativeException;
 }

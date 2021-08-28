@@ -29,14 +29,14 @@ import io.netty.buffer.ByteBuf;
 public final class SoundEventType extends HolderType<SoundEvent> {
 
     @Override
-    public SoundEvent readDirect(final ByteBuf buffer) throws Exception {
+    public SoundEvent readDirect(final ByteBuf buffer) {
         final String resourceLocation = Type.STRING.read(buffer);
         final Float fixedRange = Type.OPTIONAL_FLOAT.read(buffer);
         return new SoundEvent(resourceLocation, fixedRange);
     }
 
     @Override
-    public void writeDirect(final ByteBuf buffer, final SoundEvent value) throws Exception {
+    public void writeDirect(final ByteBuf buffer, final SoundEvent value) {
         Type.STRING.write(buffer, value.identifier());
         Type.OPTIONAL_FLOAT.write(buffer, value.fixedRange());
     }

@@ -24,23 +24,7 @@ package com.viaversion.viaversion.api.minecraft;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class SoundEvent {
-
-    private final String identifier;
-    private final Float fixedRange;
-
-    public SoundEvent(final String identifier, @Nullable final Float fixedRange) {
-        this.identifier = identifier;
-        this.fixedRange = fixedRange;
-    }
-
-    public String identifier() {
-        return identifier;
-    }
-
-    public @Nullable Float fixedRange() {
-        return fixedRange;
-    }
+public record SoundEvent(String identifier, @Nullable Float fixedRange) {
 
     public SoundEvent withIdentifier(final String identifier) {
         return new SoundEvent(identifier, this.fixedRange);

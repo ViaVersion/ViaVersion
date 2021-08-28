@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import java.util.List;
 
-public interface EntityRewriter<T extends Protocol> extends Rewriter<T> {
+public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T> {
 
     /**
      * Returns the entity type from the given (mapped) type id.

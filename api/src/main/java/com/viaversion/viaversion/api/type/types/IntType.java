@@ -43,11 +43,11 @@ public class IntType extends Type<Integer> implements TypeConverter<Integer> {
 
     @Override
     public Integer from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).intValue();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o) ? 1 : 0;
+        if (o instanceof Number number) {
+            return number.intValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? 1 : 0;
         }
-        return (Integer) o;
+        throw new UnsupportedOperationException();
     }
 }

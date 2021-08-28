@@ -26,9 +26,9 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public final class SuspiciousStewEffect {
+public record SuspiciousStewEffect(int mobEffect, int duration) {
 
-    public static final Type<SuspiciousStewEffect> TYPE = new Type<SuspiciousStewEffect>(SuspiciousStewEffect.class) {
+    public static final Type<SuspiciousStewEffect> TYPE = new Type<>(SuspiciousStewEffect.class) {
         @Override
         public SuspiciousStewEffect read(final ByteBuf buffer) {
             final int effect = Type.VAR_INT.readPrimitive(buffer);
@@ -38,25 +38,10 @@ public final class SuspiciousStewEffect {
 
         @Override
         public void write(final ByteBuf buffer, final SuspiciousStewEffect value) {
-            Type.VAR_INT.writePrimitive(buffer, value.effect);
+            Type.VAR_INT.writePrimitive(buffer, value.mobEffect);
             Type.VAR_INT.writePrimitive(buffer, value.duration);
         }
     };
     public static final Type<SuspiciousStewEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final int effect;
-    private final int duration;
-
-    public SuspiciousStewEffect(final int effect, final int duration) {
-        this.effect = effect;
-        this.duration = duration;
-    }
-
-    public int mobEffect() {
-        return effect;
-    }
-
-    public int duration() {
-        return duration;
-    }
 }

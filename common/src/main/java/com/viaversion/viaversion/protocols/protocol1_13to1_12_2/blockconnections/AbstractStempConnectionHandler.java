@@ -26,7 +26,7 @@ import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
 
-public abstract class AbstractStempConnectionHandler extends ConnectionHandler {
+public abstract class AbstractStempConnectionHandler implements ConnectionHandler {
     private static final BlockFace[] BLOCK_FACES = {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
 
     private final IntSet blockId = new IntOpenHashSet();

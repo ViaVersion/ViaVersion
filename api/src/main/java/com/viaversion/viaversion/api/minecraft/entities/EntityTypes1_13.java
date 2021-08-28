@@ -37,7 +37,7 @@ public class EntityTypes1_13 {
         else
             type = EntityType.findById(typeID);
 
-        if (!type.isPresent()) {
+        if (type.isEmpty()) {
             Via.getPlatform().getLogger().severe("Could not find 1.13 type id " + typeID + " isObject=" + isObject);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
@@ -326,9 +326,7 @@ public class EntityTypes1_13 {
 
         public static Optional<EntityType> getPCEntity(int id) {
             Optional<ObjectType> output = findById(id);
-            if (!output.isPresent())
-                return Optional.empty();
-            return Optional.of(output.get().type);
+            return output.map(objectType -> objectType.type);
         }
 
         public static Optional<ObjectType> fromEntityType(EntityType type) {

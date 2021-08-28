@@ -20,46 +20,7 @@ package com.viaversion.viaversion.protocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import java.util.Objects;
 
-public class ProtocolPathEntryImpl implements ProtocolPathEntry {
-    private final ProtocolVersion outputProtocolVersion;
-    private final Protocol<?, ?, ?, ?> protocol;
-
-    public ProtocolPathEntryImpl(ProtocolVersion outputProtocolVersion, Protocol<?, ?, ?, ?> protocol) {
-        this.outputProtocolVersion = outputProtocolVersion;
-        this.protocol = protocol;
-    }
-
-    @Override
-    public ProtocolVersion outputProtocolVersion() {
-        return outputProtocolVersion;
-    }
-
-    @Override
-    public Protocol<?, ?, ?, ?> protocol() {
-        return protocol;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final ProtocolPathEntryImpl that = (ProtocolPathEntryImpl) o;
-        if (outputProtocolVersion != that.outputProtocolVersion) return false;
-        return protocol.equals(that.protocol);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(outputProtocolVersion, protocol);
-    }
-
-    @Override
-    public String toString() {
-        return "ProtocolPathEntryImpl{" +
-                "outputProtocolVersion=" + outputProtocolVersion +
-                ", protocol=" + protocol +
-                '}';
-    }
+public record ProtocolPathEntryImpl(ProtocolVersion outputProtocolVersion,
+                                    Protocol<?, ?, ?, ?> protocol) implements ProtocolPathEntry {
 }

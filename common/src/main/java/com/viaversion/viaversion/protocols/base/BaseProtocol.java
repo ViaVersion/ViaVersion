@@ -33,6 +33,9 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
@@ -68,7 +71,13 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             }
 
             // Choose the pipe
-            ProtocolVersion serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+            ProtocolVersion serverProtocol;
+            try {
+                serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+            } catch (final Exception e) {
+                throw new RuntimeException("Error getting server protocol", e);
+            }
+
             info.setServerProtocolVersion(serverProtocol);
             List<ProtocolPathEntry> protocolPath = null;
 
@@ -137,7 +146,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
     }
 
     @Override
-    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException {
         super.transform(direction, state, packetWrapper);
         if (direction == Direction.SERVERBOUND && state == State.HANDSHAKE) {
             // Disable if it isn't a handshake packet.

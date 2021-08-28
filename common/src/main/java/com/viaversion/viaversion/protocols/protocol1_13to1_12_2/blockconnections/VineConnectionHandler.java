@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
-class VineConnectionHandler extends ConnectionHandler {
+class VineConnectionHandler implements ConnectionHandler {
     private static final IntSet VINES = new IntOpenHashSet();
 
     static ConnectionData.ConnectorInitAction init() {

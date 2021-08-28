@@ -31,6 +31,7 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.SocketAddress;
 
+@Deprecated
 public class ChannelHandlerContextWrapper implements ChannelHandlerContext {
     private final ChannelHandlerContext base;
     private final ViaCodecHandler handler;
@@ -187,16 +188,16 @@ public class ChannelHandlerContextWrapper implements ChannelHandlerContext {
 
     @Override
     public ChannelFuture write(Object o) {
-        if (o instanceof ByteBuf) {
-            if (transform((ByteBuf) o)) return base.newFailedFuture(new Throwable());
+        if (o instanceof ByteBuf buf && transform(buf)) {
+            return base.newFailedFuture(new Throwable());
         }
         return base.write(o);
     }
 
     @Override
     public ChannelFuture write(Object o, ChannelPromise channelPromise) {
-        if (o instanceof ByteBuf) {
-            if (transform((ByteBuf) o)) return base.newFailedFuture(new Throwable());
+        if (o instanceof ByteBuf buf && transform(buf)) {
+            return base.newFailedFuture(new Throwable());
         }
         return base.write(o, channelPromise);
     }

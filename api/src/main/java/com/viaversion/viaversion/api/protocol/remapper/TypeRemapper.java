@@ -24,21 +24,17 @@ package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.InformativeException;
 
-public class TypeRemapper<T> implements ValueReader<T>, ValueWriter<T> {
-    private final Type<T> type;
-
-    public TypeRemapper(Type<T> type) {
-        this.type = type;
-    }
+public record TypeRemapper<T>(Type<T> type) implements ValueReader<T>, ValueWriter<T> {
 
     @Override
-    public T read(PacketWrapper wrapper) throws Exception {
+    public T read(PacketWrapper wrapper) throws InformativeException {
         return wrapper.read(type);
     }
 
     @Override
-    public void write(PacketWrapper output, T inputValue) {
+    public void write(PacketWrapper output, T inputValue) throws InformativeException {
         output.write(type, inputValue);
     }
 }

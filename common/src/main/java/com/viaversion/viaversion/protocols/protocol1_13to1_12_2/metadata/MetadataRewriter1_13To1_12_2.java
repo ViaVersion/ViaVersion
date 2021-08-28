@@ -83,7 +83,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
                 int parameter2 = parameter2Meta != null ? parameter2Meta.value() : 0;
 
                 Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
-                if (particle != null && particle.getId() != -1) {
+                if (particle != null && particle.id() != -1) {
                     event.createExtraMeta(new Metadata(9, Types1_13.META_TYPES.particleType, particle));
                 }
             }

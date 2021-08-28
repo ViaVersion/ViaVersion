@@ -22,56 +22,5 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public class Vector {
-    private int blockX;
-    private int blockY;
-    private int blockZ;
-
-    public Vector(int blockX, int blockY, int blockZ) {
-        this.blockX = blockX;
-        this.blockY = blockY;
-        this.blockZ = blockZ;
-    }
-
-    public int blockX() {
-        return blockX;
-    }
-
-    public int blockY() {
-        return blockY;
-    }
-
-    public int blockZ() {
-        return blockZ;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getBlockX() {
-        return blockX;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getBlockY() {
-        return blockY;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getBlockZ() {
-        return blockZ;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public void setBlockX(int blockX) {
-        this.blockX = blockX;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public void setBlockY(int blockY) {
-        this.blockY = blockY;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public void setBlockZ(int blockZ) {
-        this.blockZ = blockZ;
-    }
+public record Vector(int blockX, int blockY, int blockZ) {
 }

@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersionRange;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ProtocolVersionTest {
+class ProtocolVersionTest {
 
     @Test
     void testVersionWildcard() {

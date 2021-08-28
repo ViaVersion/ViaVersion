@@ -67,14 +67,13 @@ public final class TagUtil {
     }
 
     private static Tag handleDeep(@Nullable final String key, final Tag tag, final TagUpdater consumer) {
-        if (tag instanceof CompoundTag) {
-            final CompoundTag compoundTag = (CompoundTag) tag;
+        if (tag instanceof final CompoundTag compoundTag) {
             for (final Map.Entry<String, Tag> entry : compoundTag.entrySet()) {
                 final Tag updatedTag = handleDeep(entry.getKey(), entry.getValue(), consumer);
                 entry.setValue(updatedTag);
             }
-        } else if (tag instanceof ListTag) {
-            handleListTag((ListTag<?>) tag, consumer);
+        } else if (tag instanceof ListTag<?> listTag) {
+            handleListTag(listTag, consumer);
         }
         return consumer.update(key, tag);
     }

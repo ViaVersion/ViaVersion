@@ -26,11 +26,11 @@ import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class ArmorTrim {
+public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPattern> pattern, boolean showInTooltip) {
 
-    public static final Type<ArmorTrim> TYPE = new Type<ArmorTrim>(ArmorTrim.class) {
+    public static final Type<ArmorTrim> TYPE = new Type<>(ArmorTrim.class) {
         @Override
-        public ArmorTrim read(final ByteBuf buffer) throws Exception {
+        public ArmorTrim read(final ByteBuf buffer) {
             final Holder<ArmorTrimMaterial> material = ArmorTrimMaterial.TYPE.read(buffer);
             final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
@@ -38,32 +38,11 @@ public final class ArmorTrim {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ArmorTrim value) throws Exception {
+        public void write(final ByteBuf buffer, final ArmorTrim value) {
             ArmorTrimMaterial.TYPE.write(buffer, value.material);
             ArmorTrimPattern.TYPE.write(buffer, value.pattern);
             buffer.writeBoolean(value.showInTooltip);
         }
     };
 
-    private final Holder<ArmorTrimMaterial> material;
-    private final Holder<ArmorTrimPattern> pattern;
-    private final boolean showInTooltip;
-
-    public ArmorTrim(final Holder<ArmorTrimMaterial> material, final Holder<ArmorTrimPattern> pattern, final boolean showInTooltip) {
-        this.material = material;
-        this.pattern = pattern;
-        this.showInTooltip = showInTooltip;
-    }
-
-    public Holder<ArmorTrimMaterial> material() {
-        return material;
-    }
-
-    public Holder<ArmorTrimPattern> pattern() {
-        return pattern;
-    }
-
-    public boolean showInTooltip() {
-        return showInTooltip;
-    }
 }

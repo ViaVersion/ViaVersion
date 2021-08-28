@@ -35,7 +35,7 @@ public class ItemType1_20_2 extends Type<Item> {
     }
 
     @Override
-    public @Nullable Item read(final ByteBuf buffer) throws Exception {
+    public @Nullable Item read(final ByteBuf buffer) {
         if (!buffer.readBoolean()) {
             return null;
         }
@@ -48,7 +48,7 @@ public class ItemType1_20_2 extends Type<Item> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, @Nullable final Item object) throws Exception {
+    public void write(final ByteBuf buffer, @Nullable final Item object) {
         if (object == null) {
             buffer.writeBoolean(false);
         } else {

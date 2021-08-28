@@ -97,7 +97,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             return null;
         }
         InventoryView inv = p.getOpenInventory();
-        short slotId = storage.getSlotId();
+        short slotId = storage.slotId();
         Inventory tinv = inv.getTopInventory();
         InventoryType tinvtype = tinv == null ? null : tinv.getType(); // can this even be null?
         if (tinvtype != null) {
@@ -125,10 +125,10 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         try {
             packet = windowClickPacketClass.getDeclaredConstructor().newInstance();
             Object nmsItem = itemstack == null ? null : nmsItemMethod.invoke(null, itemstack);
-            ReflectionUtil.set(packet, "a", (int) storage.getWindowId());
+            ReflectionUtil.set(packet, "a", (int) storage.windowId());
             ReflectionUtil.set(packet, "slot", (int) slotId);
             ReflectionUtil.set(packet, "button", 0); // shift + left mouse click
-            ReflectionUtil.set(packet, "d", storage.getActionId());
+            ReflectionUtil.set(packet, "d", storage.actionId());
             ReflectionUtil.set(packet, "item", nmsItem);
             final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
             if (protocol.equalTo(ProtocolVersion.v1_8)) {

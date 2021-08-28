@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class SpawnPackets {
-    public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
+    public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<>(Type.DOUBLE) {
         @Override
         public Double transform(PacketWrapper wrapper, Integer inputValue) {
             return inputValue / 32D;
@@ -267,11 +267,7 @@ public class SpawnPackets {
                         packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                         packet.write(Type.VAR_INT, 0);
                         packet.write(Type.ITEM1_8, new DataItem(item, (byte) 1, (short) 0, null));
-                        try {
-                            packet.send(Protocol1_9To1_8.class);
-                        } catch (Exception e) {
-                            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to send entity equipment packet", e);
-                        }
+                        packet.send(Protocol1_9To1_8.class);
                     }
                 });
 

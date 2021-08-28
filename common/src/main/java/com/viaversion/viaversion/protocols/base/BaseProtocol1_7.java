@@ -99,7 +99,13 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                             return;
                         }
 
-                        ProtocolVersion closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+                        ProtocolVersion closestServerProtocol;
+                        try {
+                            closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
                         List<ProtocolPathEntry> protocols = null;
                         if (info.protocolVersion().newerThanOrEqualTo(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
                             protocols = Via.getManager().getProtocolManager()
@@ -198,7 +204,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
         return idBuff.toString();
     }
 
-    protected UUID passthroughLoginUUID(PacketWrapper wrapper) throws Exception {
+    protected UUID passthroughLoginUUID(PacketWrapper wrapper) {
         String uuidString = wrapper.passthrough(Type.STRING);
         if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
             // Trimmed

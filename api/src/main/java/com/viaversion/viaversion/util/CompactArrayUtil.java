@@ -48,7 +48,7 @@ public final class CompactArrayUtil {
     };
 
     private CompactArrayUtil() {
-        throw new AssertionError();
+        throw new UnsupportedOperationException();
     }
 
     public static long[] createCompactArrayWithPadding(int bitsPerEntry, int entries, IntToLongFunction valueGetter) {

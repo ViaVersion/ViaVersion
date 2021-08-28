@@ -26,11 +26,11 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public final class AttributeModifier {
+public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {
 
-    public static final Type<AttributeModifier> TYPE = new Type<AttributeModifier>(AttributeModifier.class) {
+    public static final Type<AttributeModifier> TYPE = new Type<>(AttributeModifier.class) {
         @Override
-        public AttributeModifier read(final ByteBuf buffer) throws Exception {
+        public AttributeModifier read(final ByteBuf buffer) {
             final int attribute = Type.VAR_INT.readPrimitive(buffer);
             final ModifierData modifier = ModifierData.TYPE.read(buffer);
             final int slot = Type.VAR_INT.readPrimitive(buffer);
@@ -38,7 +38,7 @@ public final class AttributeModifier {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final AttributeModifier value) throws Exception {
+        public void write(final ByteBuf buffer, final AttributeModifier value) {
             Type.VAR_INT.writePrimitive(buffer, value.attribute);
             ModifierData.TYPE.write(buffer, value.modifier);
             Type.VAR_INT.writePrimitive(buffer, value.slotType);
@@ -46,25 +46,4 @@ public final class AttributeModifier {
     };
     public static final Type<AttributeModifier[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final int attribute;
-    private final ModifierData modifier;
-    private final int slotType;
-
-    public AttributeModifier(final int attribute, final ModifierData modifier, final int slotType) {
-        this.attribute = attribute;
-        this.modifier = modifier;
-        this.slotType = slotType;
-    }
-
-    public int attribute() {
-        return attribute;
-    }
-
-    public ModifierData modifier() {
-        return modifier;
-    }
-
-    public int slotType() {
-        return slotType;
-    }
 }

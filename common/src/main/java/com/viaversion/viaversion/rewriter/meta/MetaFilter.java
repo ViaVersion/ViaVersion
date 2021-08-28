@@ -27,20 +27,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class MetaFilter {
-    private final MetaHandler handler;
-    private final EntityType type;
-    private final MetaType metaType;
-    private final int index;
-    private final boolean filterFamily;
+public record MetaFilter(@Nullable EntityType type, boolean filterFamily,
+                         @Nullable MetaType metaType, int index, MetaHandler handler) {
 
-    public MetaFilter(@Nullable EntityType type, boolean filterFamily, @Nullable MetaType metaType, int index, MetaHandler handler) {
+    public MetaFilter {
         Preconditions.checkNotNull(handler, "MetaHandler cannot be null");
-        this.type = type;
-        this.metaType = metaType;
-        this.filterFamily = filterFamily;
-        this.index = index;
-        this.handler = handler;
     }
 
     /**

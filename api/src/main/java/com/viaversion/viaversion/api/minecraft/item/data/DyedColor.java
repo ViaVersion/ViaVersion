@@ -25,9 +25,9 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class DyedColor {
+public record DyedColor(int rgb, boolean showInTooltip) {
 
-    public static final Type<DyedColor> TYPE = new Type<DyedColor>(DyedColor.class) {
+    public static final Type<DyedColor> TYPE = new Type<>(DyedColor.class) {
         @Override
         public DyedColor read(final ByteBuf buffer) {
             final int rgb = buffer.readInt();
@@ -42,19 +42,4 @@ public final class DyedColor {
         }
     };
 
-    private final int rgb;
-    private final boolean showInTooltip;
-
-    public DyedColor(final int rgb, final boolean showInTooltip) {
-        this.rgb = rgb;
-        this.showInTooltip = showInTooltip;
-    }
-
-    public int rgb() {
-        return this.rgb;
-    }
-
-    public boolean showInTooltip() {
-        return this.showInTooltip;
-    }
 }

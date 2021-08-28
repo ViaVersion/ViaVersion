@@ -49,12 +49,8 @@ public class PlayerPackets {
                 map(Type.BYTE); // 1 - Chat Position
 
                 handler(wrapper -> {
-                    try {
-                        JsonObject obj = (JsonObject) wrapper.get(Type.COMPONENT, 0);
-                        ChatRewriter.toClient(obj, wrapper.user());
-                    } catch (Exception e) {
-                        Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to transform chat component", e);
-                    }
+                    JsonObject obj = (JsonObject) wrapper.get(Type.COMPONENT, 0);
+                    ChatRewriter.toClient(obj, wrapper.user());
                 });
             }
         });
@@ -101,9 +97,7 @@ public class PlayerPackets {
 
                 map(Type.BYTE); // 5 - Player Flags
 
-                handler(wrapper -> {
-                    wrapper.write(Type.VAR_INT, 0); // 6 - Teleport ID was added
-                });
+                create(Type.VAR_INT, 0); // 6 - Teleport ID was added
             }
         });
 

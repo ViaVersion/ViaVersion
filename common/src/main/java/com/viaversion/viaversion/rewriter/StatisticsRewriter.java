@@ -68,32 +68,23 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
     }
 
     protected @Nullable IdRewriteFunction getRewriter(RegistryType type) {
-        switch (type) {
-            case BLOCK:
-                return protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
-            case ITEM:
-                return protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
-            case ENTITY:
-                return protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
-        }
-        throw new IllegalArgumentException("Unknown registry type in statistics packet: " + type);
+        return switch (type) {
+            case BLOCK ->
+                    protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
+            case ITEM ->
+                    protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
+            case ENTITY ->
+                    protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
+            default -> throw new IllegalArgumentException("Unknown registry type in statistics packet: " + type);
+        };
     }
 
     public @Nullable RegistryType getRegistryTypeForStatistic(int statisticsId) {
-        switch (statisticsId) {
-            case 0:
-                return RegistryType.BLOCK;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return RegistryType.ITEM;
-            case 6:
-            case 7:
-                return RegistryType.ENTITY;
-            default:
-                return null;
-        }
+        return switch (statisticsId) {
+            case 0 -> RegistryType.BLOCK;
+            case 1, 2, 3, 4, 5 -> RegistryType.ITEM;
+            case 6, 7 -> RegistryType.ENTITY;
+            default -> null;
+        };
     }
 }

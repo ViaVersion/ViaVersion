@@ -26,7 +26,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FireConnectionHandler extends ConnectionHandler {
+public class FireConnectionHandler implements ConnectionHandler {
     private static final String[] WOOD_TYPES = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak"};
     private static final int[] CONNECTED_BLOCKS = new int[32];
     private static final IntSet FLAMMABLE_BLOCKS = new IntOpenHashSet();

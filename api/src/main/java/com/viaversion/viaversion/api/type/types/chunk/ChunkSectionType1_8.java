@@ -37,7 +37,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     }
 
     @Override
-    public ChunkSection read(ByteBuf buffer) throws Exception {
+    public ChunkSection read(ByteBuf buffer) {
         ChunkSection chunkSection = new ChunkSectionImpl(true);
         DataPalette blocks = chunkSection.palette(PaletteType.BLOCKS);
 
@@ -53,7 +53,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     }
 
     @Override
-    public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
+    public void write(ByteBuf buffer, ChunkSection chunkSection) {
         DataPalette blocks = chunkSection.palette(PaletteType.BLOCKS);
 
         ByteBuf littleEndianView = buffer.order(ByteOrder.LITTLE_ENDIAN);

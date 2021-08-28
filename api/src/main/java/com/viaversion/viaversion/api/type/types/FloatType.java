@@ -61,12 +61,12 @@ public class FloatType extends Type<Float> implements TypeConverter<Float> {
 
     @Override
     public Float from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).floatValue();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o) ? 1F : 0;
+        if (o instanceof Number number) {
+            return number.floatValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? 1F : 0;
         }
-        return (Float) o;
+        throw new UnsupportedOperationException();
     }
 
     public static final class OptionalFloatType extends OptionalType<Float> {

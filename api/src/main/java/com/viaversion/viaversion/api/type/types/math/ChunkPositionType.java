@@ -33,13 +33,13 @@ public class ChunkPositionType extends Type<ChunkPosition> {
     }
 
     @Override
-    public ChunkPosition read(ByteBuf buffer) throws Exception {
+    public ChunkPosition read(ByteBuf buffer) {
         final long chunkKey = Type.LONG.readPrimitive(buffer);
         return new ChunkPosition(chunkKey);
     }
 
     @Override
-    public void write(ByteBuf buffer, ChunkPosition chunkPosition) throws Exception {
+    public void write(ByteBuf buffer, ChunkPosition chunkPosition) {
         Type.LONG.writePrimitive(buffer, chunkPosition.chunkKey());
     }
 }

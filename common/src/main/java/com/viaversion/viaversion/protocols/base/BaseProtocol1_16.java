@@ -24,7 +24,7 @@ import java.util.UUID;
 public class BaseProtocol1_16 extends BaseProtocol1_7 {
 
     @Override
-    protected UUID passthroughLoginUUID(final PacketWrapper wrapper) throws Exception {
+    protected UUID passthroughLoginUUID(final PacketWrapper wrapper) {
         return wrapper.passthrough(Type.UUID);
     }
 }

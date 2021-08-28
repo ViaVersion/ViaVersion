@@ -54,7 +54,7 @@ public interface StructuredData<T> extends IdHolder {
 
     void setValue(final T value);
 
-    void write(final ByteBuf buffer) throws Exception;
+    void write(final ByteBuf buffer);
 
     void setId(final int id);
 

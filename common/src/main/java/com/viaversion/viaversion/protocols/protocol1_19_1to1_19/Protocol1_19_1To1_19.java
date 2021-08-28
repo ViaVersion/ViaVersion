@@ -46,6 +46,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPacke
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.TagUtil;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +123,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
 
                         final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                         final DecoratableMessage decoratableMessage = new DecoratableMessage(message);
-                        final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage);
+                        final byte[] signature;
+                        try {
+                            signature = chatSession.signChatMessage(metadata, decoratableMessage);
+                        } catch (final SignatureException e) {
+                            throw new RuntimeException(e);
+                        }
 
                         wrapper.set(Type.BYTE_ARRAY_PRIMITIVE, 0, signature); // Signature
                         wrapper.set(Type.BOOLEAN, 0, decoratableMessage.isDecorated()); // Signed preview
@@ -161,7 +167,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                             final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                             final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
 
-                            final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage);
+                            final byte[] signature;
+                            try {
+                                signature = chatSession.signChatMessage(metadata, decoratableMessage);
+                            } catch (final SignatureException e) {
+                                throw new RuntimeException(e);
+                            }
 
                             wrapper.write(Type.STRING, argument.key()); // Argument name
                             wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature

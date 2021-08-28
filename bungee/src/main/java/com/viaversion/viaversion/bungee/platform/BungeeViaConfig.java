@@ -57,8 +57,8 @@ public class BungeeViaConfig extends AbstractViaConfig {
         // Convert any bad Protocol Ids
         for (Map.Entry<String, Object> entry : new HashSet<>(servers.entrySet())) {
             if (!(entry.getValue() instanceof Integer)) {
-                if (entry.getValue() instanceof String) {
-                    ProtocolVersion found = ProtocolVersion.getClosest((String) entry.getValue());
+                if (entry.getValue() instanceof String stringValue) {
+                    ProtocolVersion found = ProtocolVersion.getClosest(stringValue);
                     if (found != null) {
                         servers.put(entry.getKey(), found.getVersion());
                     } else {

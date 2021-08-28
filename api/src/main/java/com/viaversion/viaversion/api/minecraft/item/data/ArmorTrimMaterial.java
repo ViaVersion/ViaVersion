@@ -29,11 +29,12 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public final class ArmorTrimMaterial {
+public record ArmorTrimMaterial(String assetName, int itemId, float itemModelIndex,
+                                Int2ObjectMap<String> overrideArmorMaterials, Tag description) {
 
-    public static final HolderType<ArmorTrimMaterial> TYPE = new HolderType<ArmorTrimMaterial>() {
+    public static final HolderType<ArmorTrimMaterial> TYPE = new HolderType<>() {
         @Override
-        public ArmorTrimMaterial readDirect(final ByteBuf buffer) throws Exception {
+        public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
             final String assetName = Type.STRING.read(buffer);
             final int item = Type.VAR_INT.readPrimitive(buffer);
             final float itemModelIndex = buffer.readFloat();
@@ -51,7 +52,7 @@ public final class ArmorTrimMaterial {
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) throws Exception {
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) {
             Type.STRING.write(buffer, value.assetName());
             Type.VAR_INT.writePrimitive(buffer, value.itemId());
             buffer.writeFloat(value.itemModelIndex());
@@ -66,37 +67,4 @@ public final class ArmorTrimMaterial {
         }
     };
 
-    private final String assetName;
-    private final int itemId;
-    private final float itemModelIndex;
-    private final Int2ObjectMap<String> overrideArmorMaterials;
-    private final Tag description;
-
-    public ArmorTrimMaterial(final String assetName, final int itemId, final float itemModelIndex, final Int2ObjectMap<String> overrideArmorMaterials, final Tag description) {
-        this.assetName = assetName;
-        this.itemId = itemId;
-        this.itemModelIndex = itemModelIndex;
-        this.overrideArmorMaterials = overrideArmorMaterials;
-        this.description = description;
-    }
-
-    public String assetName() {
-        return assetName;
-    }
-
-    public int itemId() {
-        return itemId;
-    }
-
-    public float itemModelIndex() {
-        return itemModelIndex;
-    }
-
-    public Int2ObjectMap<String> overrideArmorMaterials() {
-        return overrideArmorMaterials;
-    }
-
-    public Tag description() {
-        return description;
-    }
 }

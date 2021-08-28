@@ -40,19 +40,19 @@ public class SpongeEncodeHandler extends MessageToByteEncoder<Object> implements
     @Override
     protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
         // handle the packet type
-        if (!(o instanceof ByteBuf)) {
+        if (!(o instanceof ByteBuf buf)) {
             // call minecraft encoder
             try {
                 PipelineUtil.callEncode(this.minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, bytebuf);
             } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                } else if (e.getCause() instanceof Error) {
-                    throw (Error) e.getCause();
+                if (e.getCause() instanceof Exception cause) {
+                    throw cause;
+                } else if (e.getCause() instanceof Error cause) {
+                    throw cause;
                 }
             }
         } else {
-            bytebuf.writeBytes((ByteBuf) o);
+            bytebuf.writeBytes(buf);
         }
         transform(bytebuf);
     }

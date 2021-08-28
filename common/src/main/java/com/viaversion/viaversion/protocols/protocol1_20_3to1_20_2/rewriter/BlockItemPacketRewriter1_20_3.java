@@ -95,9 +95,9 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             }
         });
 
-        new RecipeRewriter1_20_2<ClientboundPacket1_20_2>(protocol) {
+        new RecipeRewriter1_20_2<>(protocol) {
             @Override
-            public void handleCraftingShaped(final PacketWrapper wrapper) throws Exception {
+            public void handleCraftingShaped(final PacketWrapper wrapper) {
                 // Move width and height down
                 final int width = wrapper.read(Type.VAR_INT);
                 final int height = wrapper.read(Type.VAR_INT);

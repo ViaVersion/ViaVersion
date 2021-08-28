@@ -273,7 +273,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
         });
     }
 
-    private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) throws Exception {
+    private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) {
         // Find dimension key by data
         final CompoundTag currentDimension = wrapper.read(Type.NAMED_COMPOUND_TAG);
         addMonsterSpawnData(currentDimension);
@@ -298,19 +298,14 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
     }
 
     private static int to3dId(final int id) {
-        switch (id) {
-            case -1: // Both up and down
-                return 1; // Up
-            case 2: // North
-                return 2;
-            case 0: // South
-                return 3;
-            case 1: // West
-                return 4;
-            case 3: // East
-                return 5;
-        }
-        throw new IllegalArgumentException("Unknown 2d id: " + id);
+        return switch (id) {
+            case -1 -> 1; // Up/down -> Up
+            case 2 -> 2; // North
+            case 0 -> 3; // South
+            case 1 -> 4; // West
+            case 3 -> 5; // East
+            default -> throw new IllegalArgumentException("Unknown 2d id: " + id);
+        };
     }
 
     private static void addMonsterSpawnData(final CompoundTag dimension) {
@@ -325,7 +320,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
         filter().metaType(Types1_19.META_TYPES.particleType).handler((event, meta) -> {
             final Particle particle = (Particle) meta.getValue();
             final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
-            if (particle.getId() == particleMappings.id("vibration")) {
+            if (particle.id() == particleMappings.id("vibration")) {
                 // Remove the position
                 particle.getArguments().remove(0);
 

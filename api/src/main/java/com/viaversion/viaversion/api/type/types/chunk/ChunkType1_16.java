@@ -43,7 +43,7 @@ public class ChunkType1_16 extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(ByteBuf input) throws Exception {
+    public Chunk read(ByteBuf input) {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
@@ -77,7 +77,7 @@ public class ChunkType1_16 extends Type<Chunk> {
     }
 
     @Override
-    public void write(ByteBuf output, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Chunk chunk) {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 

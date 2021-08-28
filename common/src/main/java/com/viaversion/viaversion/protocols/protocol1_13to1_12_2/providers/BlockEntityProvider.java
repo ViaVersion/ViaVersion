@@ -56,9 +56,8 @@ public class BlockEntityProvider implements Provider {
      * @param tag        BlockEntity NBT
      * @param sendUpdate send a block change update
      * @return new block id
-     * @throws Exception Gotta throw that exception
      */
-    public int transform(UserConnection user, Position position, CompoundTag tag, boolean sendUpdate) throws Exception {
+    public int transform(UserConnection user, Position position, CompoundTag tag, boolean sendUpdate) {
         StringTag idTag = tag.getStringTag("id");
         if (idTag == null) return -1;
 
@@ -79,7 +78,7 @@ public class BlockEntityProvider implements Provider {
         return newBlock;
     }
 
-    private void sendBlockChange(UserConnection user, Position position, int blockId) throws Exception {
+    private void sendBlockChange(UserConnection user, Position position, int blockId) {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
         wrapper.write(Type.POSITION1_8, position);
         wrapper.write(Type.VAR_INT, blockId);

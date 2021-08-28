@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.util.DumpUtil;
 
-public class DumpSubCmd extends ViaSubCommand {
+public class DumpSubCmd implements ViaSubCommand {
 
     @Override
     public String name() {

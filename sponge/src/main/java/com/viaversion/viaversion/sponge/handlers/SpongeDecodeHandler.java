@@ -24,7 +24,6 @@ import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class SpongeDecodeHandler extends ByteToMessageDecoder {
@@ -51,15 +50,7 @@ public class SpongeDecodeHandler extends ByteToMessageDecoder {
                 info.transformServerbound(transformedBuf, CancelDecoderException::generate);
             }
 
-            try {
-                list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, transformedBuf == null ? bytebuf : transformedBuf));
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                } else if (e.getCause() instanceof Error) {
-                    throw (Error) e.getCause();
-                }
-            }
+            list.addAll(PipelineUtil.callDecode(this.minecraftDecoder, ctx, transformedBuf == null ? bytebuf : transformedBuf));
         } finally {
             if (transformedBuf != null) {
                 transformedBuf.release();

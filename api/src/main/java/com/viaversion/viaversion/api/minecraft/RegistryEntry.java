@@ -25,22 +25,7 @@ package com.viaversion.viaversion.api.minecraft;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class RegistryEntry {
-    private final String key;
-    private final Tag tag;
-
-    public RegistryEntry(String key, @Nullable Tag tag) {
-        this.key = key;
-        this.tag = tag;
-    }
-
-    public String key() {
-        return key;
-    }
-
-    public @Nullable Tag tag() {
-        return tag;
-    }
+public record RegistryEntry(String key, @Nullable Tag tag) {
 
     public RegistryEntry withKey(final String key) {
         return new RegistryEntry(key, tag != null ? tag.copy() : null);

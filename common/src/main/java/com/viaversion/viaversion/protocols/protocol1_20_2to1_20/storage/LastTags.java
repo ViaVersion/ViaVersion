@@ -31,7 +31,7 @@ public class LastTags implements StorableObject {
 
     private final List<RegistryTags> registryTags = new ArrayList<>();
 
-    public LastTags(final PacketWrapper wrapper) throws Exception {
+    public LastTags(final PacketWrapper wrapper) {
         final int length = wrapper.passthrough(Type.VAR_INT);
         for (int i = 0; i < length; i++) {
             final List<Tag> tags = new ArrayList<>();
@@ -47,7 +47,7 @@ public class LastTags implements StorableObject {
         }
     }
 
-    public void sendLastTags(final UserConnection connection) throws Exception {
+    public void sendLastTags(final UserConnection connection) {
         if (registryTags.isEmpty()) {
             return;
         }
@@ -65,23 +65,9 @@ public class LastTags implements StorableObject {
         packet.send(Protocol1_20_2To1_20.class);
     }
 
-    private static final class RegistryTags {
-        private final String registryKey;
-        private final List<Tag> tags;
-
-        private RegistryTags(final String registryKey, final List<Tag> tags) {
-            this.registryKey = registryKey;
-            this.tags = tags;
-        }
+    private record RegistryTags(String registryKey, List<Tag> tags) {
     }
 
-    private static final class Tag {
-        private final String key;
-        private final int[] ids;
-
-        private Tag(final String key, final int[] ids) {
-            this.key = key;
-            this.ids = ids;
-        }
+    private record Tag(String key, int[] ids) {
     }
 }

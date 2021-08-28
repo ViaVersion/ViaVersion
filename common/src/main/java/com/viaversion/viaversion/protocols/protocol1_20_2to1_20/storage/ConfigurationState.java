@@ -70,11 +70,11 @@ public class ConfigurationState implements StorableObject {
         this.clientInformation = clientInformation;
     }
 
-    public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) throws Exception {
+    public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) {
         packetQueue.add(toQueuedPacket(wrapper, clientbound, false));
     }
 
-    private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skipCurrentPipeline) throws Exception {
+    private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skipCurrentPipeline) {
         // Caching packet buffers is cursed, copy to heap buffers to make sure we don't start leaking in dumb cases
         final ByteBuf copy = Unpooled.buffer();
         final PacketType packetType = wrapper.getPacketType();
@@ -86,7 +86,7 @@ public class ConfigurationState implements StorableObject {
         return new QueuedPacket(copy, clientbound, packetType, packetId, skipCurrentPipeline);
     }
 
-    public void setJoinGamePacket(final PacketWrapper wrapper) throws Exception {
+    public void setJoinGamePacket(final PacketWrapper wrapper) {
         this.joinGamePacket = toQueuedPacket(wrapper, true, true);
         queuedJoinGame = true;
     }
@@ -106,7 +106,7 @@ public class ConfigurationState implements StorableObject {
         }
     }
 
-    public void sendQueuedPackets(final UserConnection connection) throws Exception {
+    public void sendQueuedPackets(final UserConnection connection) {
         final boolean hasJoinGamePacket = joinGamePacket != null;
         if (hasJoinGamePacket) {
             packetQueue.add(0, joinGamePacket);

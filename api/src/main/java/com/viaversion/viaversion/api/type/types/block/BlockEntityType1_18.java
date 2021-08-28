@@ -35,7 +35,7 @@ public class BlockEntityType1_18 extends Type<BlockEntity> {
     }
 
     @Override
-    public BlockEntity read(final ByteBuf buffer) throws Exception {
+    public BlockEntity read(final ByteBuf buffer) {
         final byte xz = buffer.readByte();
         final short y = buffer.readShort();
         final int typeId = Type.VAR_INT.readPrimitive(buffer);
@@ -44,7 +44,7 @@ public class BlockEntityType1_18 extends Type<BlockEntity> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final BlockEntity entity) throws Exception {
+    public void write(final ByteBuf buffer, final BlockEntity entity) {
         buffer.writeByte(entity.packedXZ());
         buffer.writeShort(entity.y());
         Type.VAR_INT.writePrimitive(buffer, entity.typeId());

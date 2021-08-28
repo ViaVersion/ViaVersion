@@ -219,32 +219,17 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 } else if (split.length > 2) {
                     String category = split[1];
                     //TODO convert string ids (blocks, items, entities)
-                    switch (category) {
-                        case "mineBlock":
-                            categoryId = 0;
-                            break;
-                        case "craftItem":
-                            categoryId = 1;
-                            break;
-                        case "useItem":
-                            categoryId = 2;
-                            break;
-                        case "breakItem":
-                            categoryId = 3;
-                            break;
-                        case "pickup":
-                            categoryId = 4;
-                            break;
-                        case "drop":
-                            categoryId = 5;
-                            break;
-                        case "killEntity":
-                            categoryId = 6;
-                            break;
-                        case "entityKilledBy":
-                            categoryId = 7;
-                            break;
-                    }
+                    categoryId = switch (category) {
+                        case "mineBlock" -> 0;
+                        case "craftItem" -> 1;
+                        case "useItem" -> 2;
+                        case "breakItem" -> 3;
+                        case "pickup" -> 4;
+                        case "drop" -> 5;
+                        case "killEntity" -> 6;
+                        case "entityKilledBy" -> 7;
+                        default -> categoryId;
+                    };
                 }
                 if (newId != -1)
                     remappedStats.add(new StatisticData(categoryId, newId, value));
@@ -252,9 +237,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
             wrapper.write(Type.VAR_INT, remappedStats.size()); // size
             for (StatisticData stat : remappedStats) {
-                wrapper.write(Type.VAR_INT, stat.getCategoryId()); // category id
-                wrapper.write(Type.VAR_INT, stat.getNewId()); // statistics id
-                wrapper.write(Type.VAR_INT, stat.getValue()); // value
+                wrapper.write(Type.VAR_INT, stat.categoryId()); // category id
+                wrapper.write(Type.VAR_INT, stat.newId()); // statistics id
+                wrapper.write(Type.VAR_INT, stat.value()); // value
             }
         });
 
@@ -574,7 +559,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);
                 });
                 // Prepend /
-                map(Type.STRING, new ValueTransformer<String, String>(Type.STRING) {
+                map(Type.STRING, new ValueTransformer<>(Type.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, String inputValue) {
                         wrapper.user().get(TabCompleteTracker.class).setInput(inputValue);
@@ -671,9 +656,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> {
-                    wrapper.write(Type.STRING, "MC|TrSel"); // Channel
-                });
+                create(Type.STRING, "MC|TrSel"); // Channel
                 map(Type.VAR_INT, Type.INT); // Slot
             }
         });
@@ -682,9 +665,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.SET_BEACON_EFFECT, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> {
-                    wrapper.write(Type.STRING, "MC|Beacon"); // Channel
-                });
+                create(Type.STRING, "MC|Beacon"); // Channel
                 map(Type.VAR_INT, Type.INT); // Primary Effect
                 map(Type.VAR_INT, Type.INT); // Secondary Effect
             }
@@ -694,7 +675,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> wrapper.write(Type.STRING, "MC|AutoCmd"));
+                create(Type.STRING, "MC|AutoCmd"); // Channel
                 handler(POS_TO_3_INT);
                 map(Type.STRING); // Command
                 handler(wrapper -> {
@@ -721,7 +702,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     wrapper.write(Type.STRING, "MC|AdvCmd");
                     wrapper.write(Type.BYTE, (byte) 1); // Type 1 for Entity
                 });
-                map(Type.VAR_INT, Type.INT); // Entity Id
+                map(Type.VAR_INT, Type.INT); // Entity id
             }
         });
 
@@ -731,19 +712,17 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.UPDATE_STRUCTURE_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> {
-                    wrapper.write(Type.STRING, "MC|Struct"); // Channel
-                });
+                create(Type.STRING, "MC|Struct"); // Channel
                 handler(POS_TO_3_INT);
-                map(Type.VAR_INT, new ValueTransformer<Integer, Byte>(Type.BYTE) { // Action
+                map(Type.VAR_INT, new ValueTransformer<>(Type.BYTE) { // Action
                     @Override
-                    public Byte transform(PacketWrapper wrapper, Integer action) throws Exception {
+                    public Byte transform(PacketWrapper wrapper, Integer action) {
                         return (byte) (action + 1);
                     }
                 }); // Action
-                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) {
+                map(Type.VAR_INT, new ValueTransformer<>(Type.STRING) {
                     @Override
-                    public String transform(PacketWrapper wrapper, Integer mode) throws Exception {
+                    public String transform(PacketWrapper wrapper, Integer mode) {
                         return mode == 0 ? "SAVE"
                                 : mode == 1 ? "LOAD"
                                 : mode == 2 ? "CORNER"
@@ -757,17 +736,17 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 map(Type.BYTE, Type.INT); // Size X
                 map(Type.BYTE, Type.INT); // Size Y
                 map(Type.BYTE, Type.INT); // Size Z
-                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) { // Mirror
+                map(Type.VAR_INT, new ValueTransformer<>(Type.STRING) { // Mirror
                     @Override
-                    public String transform(PacketWrapper wrapper, Integer mirror) throws Exception {
+                    public String transform(PacketWrapper wrapper, Integer mirror) {
                         return mirror == 0 ? "NONE"
                                 : mirror == 1 ? "LEFT_RIGHT"
                                 : "FRONT_BACK";
                     }
                 });
-                map(Type.VAR_INT, new ValueTransformer<Integer, String>(Type.STRING) { // Rotation
+                map(Type.VAR_INT, new ValueTransformer<>(Type.STRING) { // Rotation
                     @Override
-                    public String transform(PacketWrapper wrapper, Integer rotation) throws Exception {
+                    public String transform(PacketWrapper wrapper, Integer rotation) {
                         return rotation == 0 ? "NONE"
                                 : rotation == 1 ? "CLOCKWISE_90"
                                 : rotation == 2 ? "CLOCKWISE_180"

@@ -33,11 +33,12 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.TagRewriter;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -62,11 +63,6 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
         registerServerbound(state, packetType.getId(), packetType.getId(), handler, false);
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
-    }
-
     default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
         registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
     }
@@ -84,11 +80,6 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler, boolean override);
 
     void cancelServerbound(State state, int mappedPacketId);
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
-    }
 
     default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
         registerClientbound(state, unmappedPacketId, mappedPacketId, handler, false);
@@ -126,7 +117,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param mappedPacketType clientbound packet type after transforming for the client
      */
     default void registerClientbound(CU packetType, @Nullable CM mappedPacketType) {
-        registerClientbound(packetType, mappedPacketType, (PacketHandler) null);
+        registerClientbound(packetType, mappedPacketType, null);
     }
 
     /**
@@ -165,7 +156,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param mappedPacketType serverbound packet type after transforming for the client
      */
     default void registerServerbound(SU packetType, @Nullable SM mappedPacketType) {
-        registerServerbound(packetType, mappedPacketType, (PacketHandler) null);
+        registerServerbound(packetType, mappedPacketType, null);
     }
 
     /**
@@ -270,9 +261,8 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param direction     The direction the packet is going in
      * @param state         The current protocol state
      * @param packetWrapper The packet wrapper to transform
-     * @throws Exception Throws exception if it fails to transform
      */
-    void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception;
+    void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException;
 
     /**
      * Returns a packet type provider for this protocol to get packet types by id.
@@ -391,73 +381,5 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      */
     default boolean isBaseProtocol() {
         return false;
-    }
-
-    // ---------------------------------------------------------
-
-    /**
-     * @deprecated use {@link #cancelServerbound(State, int)}
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default void cancelServerbound(State state, int unmappedPacketId, int mappedPacketId) {
-        cancelServerbound(state, unmappedPacketId);
-    }
-
-    /**
-     * @deprecated use {@link #cancelClientbound(State, int)}
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default void cancelClientbound(State state, int unmappedPacketId, int mappedPacketId) {
-        cancelClientbound(state, unmappedPacketId);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), false);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper, boolean override) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), override);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerClientbound(CU packetType, @Nullable PacketRemapper packetRemapper) {
-        registerClientbound(packetType, packetRemapper.asPacketHandler());
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerClientbound(CU packetType, @Nullable CM mappedPacketType, @Nullable PacketRemapper packetRemapper) {
-        registerClientbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), false);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerClientbound(CU packetType, @Nullable CM mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
-        registerClientbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), override);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), false);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper, boolean override) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), override);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerServerbound(SU packetType, @Nullable PacketRemapper packetRemapper) {
-        registerServerbound(packetType, packetRemapper.asPacketHandler());
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerServerbound(SU packetType, @Nullable SM mappedPacketType, @Nullable PacketRemapper packetRemapper) {
-        registerServerbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), false);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default void registerServerbound(SU packetType, @Nullable SM mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
-        registerServerbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), override);
     }
 }

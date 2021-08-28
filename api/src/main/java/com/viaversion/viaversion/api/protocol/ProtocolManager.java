@@ -92,7 +92,7 @@ public interface ProtocolManager {
     /**
      * @deprecated use Protocol#isBaseProtocol()
      */
-    @Deprecated/*(forRemoval = true)*/
+    @Deprecated(forRemoval = true)
     default boolean isBaseProtocol(Protocol protocol) {
         return protocol.isBaseProtocol();
     }
@@ -180,7 +180,6 @@ public interface ProtocolManager {
      * If set to -1, no distance checks will be applied (1→20→10 is ok).
      *
      * @param maxPathDeltaIncrease the max delta the path calculation allows the distance to the target protocol version to increase
-     * @see #onlyCheckLoweringPathEntries()
      */
     void setMaxPathDeltaIncrease(int maxPathDeltaIncrease);
 
@@ -206,16 +205,6 @@ public interface ProtocolManager {
      * @return max delta the path calculation allows the distance to the target protocol version to increase
      */
     int getMaxPathDeltaIncrease();
-
-    @Deprecated/*(forRemoval = true)*/
-    default void setOnlyCheckLoweringPathEntries(final boolean onlyCheckLoweringPathEntries) {
-        setMaxPathDeltaIncrease(onlyCheckLoweringPathEntries ? 0 : -1);
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default boolean onlyCheckLoweringPathEntries() {
-        return getMaxPathDeltaIncrease() != -1;
-    }
 
     /**
      * Returns the maximum protocol path size applied to {@link #getProtocolPath(ProtocolVersion, ProtocolVersion)}.
@@ -251,7 +240,7 @@ public interface ProtocolManager {
      *
      * @param protocolClass protocol class
      */
-    void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception;
+    void completeMappingDataLoading(Class<? extends Protocol> protocolClass);
 
     /**
      * Shuts down the executor and uncaches mappings if all futures have been completed.

@@ -34,13 +34,13 @@ public class ShortByteArrayType extends Type<byte[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, byte[] object) throws Exception {
+    public void write(ByteBuf buffer, byte[] object) {
         buffer.writeShort(object.length);
         buffer.writeBytes(object);
     }
 
     @Override
-    public byte[] read(ByteBuf buffer) throws Exception {
+    public byte[] read(ByteBuf buffer) {
         byte[] array = new byte[buffer.readShort()];
         buffer.readBytes(array);
         return array;

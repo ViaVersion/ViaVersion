@@ -87,7 +87,7 @@ public final class DumpUtil {
 
             try {
                 con.setRequestProperty("Content-Type", "application/json");
-                con.addRequestProperty("User-Agent", "ViaVersion-" + platform.getPlatformName() + "/" + version.getPluginVersion());
+                con.addRequestProperty("User-Agent", "ViaVersion-" + platform.getPlatformName() + "/" + version.pluginVersion());
                 con.setRequestMethod("POST");
                 con.setDoOutput(true);
 

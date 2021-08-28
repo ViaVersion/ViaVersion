@@ -25,7 +25,7 @@ package com.viaversion.viaversion.exception;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InformativeException extends Exception {
+public class InformativeException extends RuntimeException {
     private final Map<String, Object> info = new HashMap<>();
     private boolean shouldBePrinted = true;
     private int sources;

@@ -223,10 +223,10 @@ public final class StructuredDataConverter {
             final CompoundTag positionTag = new CompoundTag();
             tag.put("LodestonePos", positionTag);
             tag.putBoolean("LodestoneTracked", data.tracked());
-            tag.putString("LodestoneDimension", data.pos().dimension());
-            positionTag.putInt("X", data.pos().x());
-            positionTag.putInt("Y", data.pos().y());
-            positionTag.putInt("Z", data.pos().z());
+            tag.putString("LodestoneDimension", data.position().dimension());
+            positionTag.putInt("X", data.position().x());
+            positionTag.putInt("Y", data.position().y());
+            positionTag.putInt("Z", data.position().z());
         });
         register(StructuredDataKey.FIREWORKS, (data, tag) -> {
             final CompoundTag fireworksTag = new CompoundTag();

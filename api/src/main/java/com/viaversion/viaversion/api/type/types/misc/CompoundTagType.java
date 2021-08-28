@@ -42,13 +42,21 @@ public class CompoundTagType extends Type<CompoundTag> {
     }
 
     @Override
-    public CompoundTag read(final ByteBuf buffer) throws IOException {
-        return NamedCompoundTagType.read(buffer, false);
+    public CompoundTag read(final ByteBuf buffer) {
+        try {
+            return NamedCompoundTagType.read(buffer, false);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void write(final ByteBuf buffer, final CompoundTag object) throws IOException {
-        NamedCompoundTagType.write(buffer, object, null);
+    public void write(final ByteBuf buffer, final CompoundTag object) {
+        try {
+            NamedCompoundTagType.write(buffer, object, null);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static final class OptionalCompoundTagType extends OptionalType<CompoundTag> {

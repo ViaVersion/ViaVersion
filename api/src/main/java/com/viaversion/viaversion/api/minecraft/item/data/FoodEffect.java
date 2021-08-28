@@ -26,37 +26,22 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public final class FoodEffect {
+public record FoodEffect(PotionEffect effect, float probability) {
 
-    public static final Type<FoodEffect> TYPE = new Type<FoodEffect>(FoodEffect.class) {
+    public static final Type<FoodEffect> TYPE = new Type<>(FoodEffect.class) {
         @Override
-        public FoodEffect read(final ByteBuf buffer) throws Exception {
+        public FoodEffect read(final ByteBuf buffer) {
             final PotionEffect effect = PotionEffect.TYPE.read(buffer);
             final float probability = buffer.readFloat();
             return new FoodEffect(effect, probability);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final FoodEffect value) throws Exception {
+        public void write(final ByteBuf buffer, final FoodEffect value) {
             PotionEffect.TYPE.write(buffer, value.effect);
             buffer.writeFloat(value.probability);
         }
     };
     public static final Type<FoodEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final PotionEffect effect;
-    private final float probability;
-
-    public FoodEffect(final PotionEffect effect, final float probability) {
-        this.effect = effect;
-        this.probability = probability;
-    }
-
-    public PotionEffect effect() {
-        return effect;
-    }
-
-    public float probability() {
-        return probability;
-    }
 }

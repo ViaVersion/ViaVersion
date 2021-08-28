@@ -22,26 +22,5 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public final class ProfileKey {
-    private final long expiresAt;
-    private final byte[] publicKey;
-    private final byte[] keySignature;
-
-    public ProfileKey(final long expiresAt, final byte[] publicKey, final byte[] keySignature) {
-        this.expiresAt = expiresAt;
-        this.publicKey = publicKey;
-        this.keySignature = keySignature;
-    }
-
-    public long expiresAt() {
-        return expiresAt;
-    }
-
-    public byte[] publicKey() {
-        return publicKey;
-    }
-
-    public byte[] keySignature() {
-        return keySignature;
-    }
+public record ProfileKey(long expiresAt, byte[] publicKey, byte[] keySignature) {
 }

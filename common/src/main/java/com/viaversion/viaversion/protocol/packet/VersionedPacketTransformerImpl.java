@@ -27,13 +27,13 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketTransformer<C, S> {
@@ -52,51 +52,51 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
     }
 
     @Override
-    public boolean send(PacketWrapper packet) throws Exception {
+    public boolean send(PacketWrapper packet) throws InformativeException {
         validatePacket(packet);
         return transformAndSendPacket(packet, true);
     }
 
     @Override
-    public boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    public boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException {
         return createAndSend(connection, packetType, packetWriter);
     }
 
     @Override
-    public boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    public boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException {
         return createAndSend(connection, packetType, packetWriter);
     }
 
     @Override
-    public boolean scheduleSend(PacketWrapper packet) throws Exception {
+    public boolean scheduleSend(PacketWrapper packet) throws InformativeException {
         validatePacket(packet);
         return transformAndSendPacket(packet, false);
     }
 
     @Override
-    public boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    public boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException {
         return scheduleCreateAndSend(connection, packetType, packetWriter);
     }
 
     @Override
-    public boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    public boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException {
         return scheduleCreateAndSend(connection, packetType, packetWriter);
     }
 
     @Override
-    public @Nullable PacketWrapper transform(PacketWrapper packet) throws Exception {
+    public @Nullable PacketWrapper transform(PacketWrapper packet) {
         validatePacket(packet);
         transformPacket(packet);
         return packet.isCancelled() ? null : packet;
     }
 
     @Override
-    public @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    public @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) {
         return createAndTransform(connection, packetType, packetWriter);
     }
 
     @Override
-    public @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    public @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) {
         return createAndTransform(connection, packetType, packetWriter);
     }
 
@@ -115,7 +115,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         }
     }
 
-    private boolean transformAndSendPacket(PacketWrapper packet, boolean currentThread) throws Exception {
+    private boolean transformAndSendPacket(PacketWrapper packet, boolean currentThread) throws InformativeException {
         transformPacket(packet);
         if (packet.isCancelled()) {
             return false;
@@ -137,7 +137,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         return true;
     }
 
-    private void transformPacket(PacketWrapper packet) throws Exception {
+    private void transformPacket(PacketWrapper packet) {
         // If clientbound: Constructor given inputProtocolVersion → Client version
         // If serverbound: Constructor given inputProtocolVersion → Server version
         UserConnection connection = packet.user();
@@ -171,25 +171,26 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
 
         try {
             packet.apply(packetType.direction(), packetType.state(), protocolList);
+        } catch (CancelException ignored) {
         } catch (Exception e) {
-            throw new Exception("Exception trying to transform packet between client version " + clientProtocolVersion
+            throw new RuntimeException("Exception trying to transform packet between client version " + clientProtocolVersion
                 + " and server version " + serverProtocolVersion + ". Are you sure you used the correct input version and packet write types?", e);
         }
     }
 
-    private boolean createAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    private boolean createAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException {
         PacketWrapper packet = PacketWrapper.create(packetType, connection);
         packetWriter.accept(packet);
         return send(packet);
     }
 
-    private boolean scheduleCreateAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    private boolean scheduleCreateAndSend(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException {
         PacketWrapper packet = PacketWrapper.create(packetType, connection);
         packetWriter.accept(packet);
         return scheduleSend(packet);
     }
 
-    private @Nullable PacketWrapper createAndTransform(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) throws Exception {
+    private @Nullable PacketWrapper createAndTransform(UserConnection connection, PacketType packetType, Consumer<PacketWrapper> packetWriter) {
         PacketWrapper packet = PacketWrapper.create(packetType, connection);
         packetWriter.accept(packet);
         return transform(packet);

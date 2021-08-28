@@ -18,16 +18,17 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ParticleRewriter {
     private static final List<NewParticle> particles = new ArrayList<>();
@@ -159,30 +160,17 @@ public class ParticleRewriter {
 
     @FunctionalInterface
     interface ParticleDataHandler {
+
         Particle handler(Particle particle, Integer[] data);
     }
 
-    private static class NewParticle {
-        private final int id;
-        private final ParticleDataHandler handler;
-
-        public NewParticle(int id, ParticleDataHandler handler) {
-            this.id = id;
-            this.handler = handler;
-        }
+    private record NewParticle(int id, @Nullable ParticleDataHandler handler) {
 
         public Particle handle(Particle particle, Integer[] data) {
-            if (handler != null)
+            if (handler != null) {
                 return handler.handler(particle, data);
+            }
             return particle;
-        }
-
-        public int id() {
-            return id;
-        }
-
-        public ParticleDataHandler handler() {
-            return handler;
         }
     }
 }

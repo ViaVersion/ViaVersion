@@ -25,11 +25,11 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class MapDecoration {
+public record MapDecoration(String type, double x, double z, float rotation) {
 
-    public static final Type<MapDecoration> TYPE = new Type<MapDecoration>(MapDecoration.class) {
+    public static final Type<MapDecoration> TYPE = new Type<>(MapDecoration.class) {
         @Override
-        public MapDecoration read(final ByteBuf buffer) throws Exception {
+        public MapDecoration read(final ByteBuf buffer) {
             final String type = Type.STRING.read(buffer);
             final double x = Type.DOUBLE.readPrimitive(buffer);
             final double z = Type.DOUBLE.readPrimitive(buffer);
@@ -38,40 +38,11 @@ public final class MapDecoration {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final MapDecoration value) throws Exception {
+        public void write(final ByteBuf buffer, final MapDecoration value) {
             Type.STRING.write(buffer, value.type);
             buffer.writeDouble(value.x);
             buffer.writeDouble(value.z);
             buffer.writeFloat(value.rotation);
         }
     };
-
-    private final String type;
-    private final double x;
-    private final double z;
-    private final float rotation;
-
-    public MapDecoration(final String type, final double x, final double z, final float rotation) {
-        this.type = type;
-        this.x = x;
-        this.z = z;
-        this.rotation = rotation;
-    }
-
-    public String type() {
-        return type;
-    }
-
-    public double x() {
-        return x;
-    }
-
-    public double z() {
-        return z;
-    }
-
-    public float rotation() {
-        return rotation;
-    }
-
 }

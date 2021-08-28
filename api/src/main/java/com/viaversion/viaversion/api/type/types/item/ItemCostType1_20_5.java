@@ -33,6 +33,7 @@ import io.netty.buffer.ByteBuf;
 // Very similar to normal items (and just results in an item), except it allows non-positive amounts and has id/amount swapped because ???
 public final class ItemCostType1_20_5 extends Type<Item> {
 
+    private static final StructuredData<?>[] EMPTY_DATA_ARRAY = new StructuredData[0];
     private final Type<StructuredData<?>[]> dataArrayType;
 
     public ItemCostType1_20_5(final Type<StructuredData<?>[]> dataArrayType) {
@@ -41,7 +42,7 @@ public final class ItemCostType1_20_5 extends Type<Item> {
     }
 
     @Override
-    public Item read(final ByteBuf buffer) throws Exception {
+    public Item read(final ByteBuf buffer) {
         final int id = Type.VAR_INT.readPrimitive(buffer);
         final int amount = Type.VAR_INT.readPrimitive(buffer);
         final StructuredData<?>[] dataArray = dataArrayType.read(buffer);
@@ -49,10 +50,10 @@ public final class ItemCostType1_20_5 extends Type<Item> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Item object) throws Exception {
+    public void write(final ByteBuf buffer, final Item object) {
         Type.VAR_INT.writePrimitive(buffer, object.identifier());
         Type.VAR_INT.writePrimitive(buffer, object.amount());
-        dataArrayType.write(buffer, object.structuredData().data().values().toArray(new StructuredData[0]));
+        dataArrayType.write(buffer, object.structuredData().data().values().toArray(EMPTY_DATA_ARRAY));
     }
 
     public static final class OptionalItemCostType extends OptionalType<Item> {

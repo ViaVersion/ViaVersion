@@ -27,8 +27,8 @@ public class InventoryTracker implements StorableObject {
     private String inventory;
 
     private final Map<Short, Map<Short, Integer>> windowItemCache = new HashMap<>();
-    private int itemIdInCursor = 0;
-    private boolean dragging = false;
+    private int itemIdInCursor;
+    private boolean dragging;
 
     public String getInventory() {
         return inventory;
@@ -144,12 +144,10 @@ public class InventoryTracker implements StorableObject {
                 break;
             case 5: // Mouse dragging
                 switch (button) {
-                    case 0: // Start left dragging
-                    case 4: // Start right dragging
+                    case 0, 4: // Start left/right dragging
                         this.dragging = true;
                         break;
-                    case 1: // Place item during left dragging
-                    case 5: // Place item during right dragging
+                    case 1, 5: // Place item during left/right dragging
                         // Check dragging mode and item on cursor
                         if (this.dragging && this.itemIdInCursor != 0 && !isArmorOrResultSlot) {
                             int previousItem = getItemId(windowId, hoverSlot);
@@ -161,8 +159,7 @@ public class InventoryTracker implements StorableObject {
                             this.itemIdInCursor = previousItem;
                         }
                         break;
-                    case 2: // Stop left dragging
-                    case 6: // Stop right dragging
+                    case 2, 6: // Stop left/right dragging
                         this.dragging = false;
                         break;
                 }

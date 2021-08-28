@@ -65,21 +65,11 @@ public class EntityPackets {
                     // Fix ItemFrame hitbox
                     if (entType.is(EntityTypes1_13.EntityType.ITEM_FRAME)) {
                         int data = wrapper.get(Type.INT, 0);
-
                         switch (data) {
-                            // South
-                            case 0:
-                                data = 3;
-                                break;
-                            // West
-                            case 1:
-                                data = 4;
-                                break;
+                            case 0 -> data = 3; // South
+                            case 1 -> data = 4; // West
                             // North is the same
-                            // East
-                            case 3:
-                                data = 5;
-                                break;
+                            case 3 -> data = 5; // East
                         }
 
                         wrapper.set(Type.INT, 0, data);

@@ -62,14 +62,14 @@ public abstract class Filterable<T> {
         }
 
         @Override
-        public F read(final ByteBuf buffer) throws Exception {
+        public F read(final ByteBuf buffer) {
             final T raw = elementType.read(buffer);
             final T filtered = optionalElementType.read(buffer);
             return create(raw, filtered);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final F value) throws Exception {
+        public void write(final ByteBuf buffer, final F value) {
             elementType.write(buffer, value.raw());
             optionalElementType.write(buffer, value.filtered());
         }

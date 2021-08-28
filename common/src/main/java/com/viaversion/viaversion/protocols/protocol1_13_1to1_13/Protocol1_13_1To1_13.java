@@ -61,7 +61,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             @Override
             public void register() {
                 map(Type.VAR_INT);
-                map(Type.STRING, new ValueTransformer<String, String>(Type.STRING) {
+                map(Type.STRING, new ValueTransformer<>(Type.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, String inputValue) {
                         // 1.13 starts sending slash at start, so we remove it for compatibility

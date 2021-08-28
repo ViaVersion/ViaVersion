@@ -32,13 +32,13 @@ public class OptionalVarIntType extends Type<Integer> {
     }
 
     @Override
-    public Integer read(final ByteBuf buffer) throws Exception {
+    public Integer read(final ByteBuf buffer) {
         final int value = Type.VAR_INT.readPrimitive(buffer);
         return value == 0 ? null : value - 1;
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Integer object) throws Exception {
+    public void write(final ByteBuf buffer, final Integer object) {
         if (object == null) {
             Type.VAR_INT.writePrimitive(buffer, 0);
         } else {

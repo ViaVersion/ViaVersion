@@ -42,7 +42,7 @@ public class ByteArrayType extends Type<byte[]> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final byte[] object) throws Exception {
+    public void write(final ByteBuf buffer, final byte[] object) {
         if (this.length != -1) {
             Preconditions.checkArgument(length == object.length, "Length does not match expected length");
         } else {
@@ -52,7 +52,7 @@ public class ByteArrayType extends Type<byte[]> {
     }
 
     @Override
-    public byte[] read(final ByteBuf buffer) throws Exception {
+    public byte[] read(final ByteBuf buffer) {
         final int length = this.length == -1 ? Type.VAR_INT.readPrimitive(buffer) : this.length;
         Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
         final byte[] array = new byte[length];

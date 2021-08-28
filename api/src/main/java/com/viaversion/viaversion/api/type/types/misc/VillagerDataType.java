@@ -32,12 +32,12 @@ public class VillagerDataType extends Type<VillagerData> {
     }
 
     @Override
-    public VillagerData read(ByteBuf buffer) throws Exception {
+    public VillagerData read(ByteBuf buffer) {
         return new VillagerData(Type.VAR_INT.readPrimitive(buffer), Type.VAR_INT.readPrimitive(buffer), Type.VAR_INT.readPrimitive(buffer));
     }
 
     @Override
-    public void write(ByteBuf buffer, VillagerData object) throws Exception {
+    public void write(ByteBuf buffer, VillagerData object) {
         Type.VAR_INT.writePrimitive(buffer, object.type());
         Type.VAR_INT.writePrimitive(buffer, object.profession());
         Type.VAR_INT.writePrimitive(buffer, object.level());

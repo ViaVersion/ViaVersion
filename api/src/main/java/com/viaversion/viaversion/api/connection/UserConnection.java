@@ -27,11 +27,11 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.CodecException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -205,11 +205,10 @@ public interface UserConnection {
      *
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier function called with original CancelException for generating the Exception when the packet is cancelled
-     * @throws CancelException      if the packet should be cancelled
+     * @throws CodecException       if the packet should be cancelled (by netty)
      * @throws InformativeException if packet transforming failed
-     * @throws Exception            if any other processing outside of transforming fails
      */
-    void transformClientbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception;
+    void transformClientbound(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException;
 
     /**
      * Transforms the serverbound packet contained in ByteBuf.
@@ -217,11 +216,10 @@ public interface UserConnection {
      * @param buf            ByteBuf with packet id and packet contents
      * @param cancelSupplier Function called with original CancelException for generating the Exception used when
      *                       packet is cancelled
-     * @throws CancelException      if the packet should be cancelled
+     * @throws CodecException       if the packet should be cancelled (by netty)
      * @throws InformativeException if packet transforming failed
-     * @throws Exception            if any other processing outside of transforming fails
      */
-    void transformServerbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception;
+    void transformServerbound(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException;
 
     /**
      * Transforms the packet depending on whether the connection is clientside or not.
@@ -229,7 +227,7 @@ public interface UserConnection {
      * @see #transformClientbound(ByteBuf, Function)
      * @see #transformServerbound(ByteBuf, Function)
      */
-    default void transformOutgoing(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+    default void transformOutgoing(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException {
         if (isClientSide()) {
             transformServerbound(buf, cancelSupplier);
         } else {
@@ -243,7 +241,7 @@ public interface UserConnection {
      * @see #transformClientbound(ByteBuf, Function)
      * @see #transformServerbound(ByteBuf, Function)
      */
-    default void transformIncoming(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+    default void transformIncoming(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException {
         if (isClientSide()) {
             transformClientbound(buf, cancelSupplier);
         } else {
@@ -314,20 +312,6 @@ public interface UserConnection {
      * @return whether blocked protocols should be applied
      */
     boolean shouldApplyBlockProtocol();
-
-    /**
-     * Returns whether the packet limiter applies to this user.
-     *
-     * @return whether the packet limiter applies to this user
-     */
-    boolean isPacketLimiterEnabled();
-
-    /**
-     * Sets the status of the packet limiter.
-     *
-     * @param packetLimiterEnabled whether the packet limiter should be enabled
-     */
-    void setPacketLimiterEnabled(boolean packetLimiterEnabled);
 
     /**
      * Returns a newly generated uuid that will let a packet be passed through without

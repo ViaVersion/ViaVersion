@@ -32,7 +32,6 @@ public interface ByteBufReader<T> {
      *
      * @param buffer buffer to read from
      * @return type based on the class type
-     * @throws Exception if it failed reading
      */
-    T read(ByteBuf buffer) throws Exception;
+    T read(ByteBuf buffer);
 }

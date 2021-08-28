@@ -22,41 +22,5 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public class VillagerData {
-    private final int type;
-    private final int profession;
-    private final int level;
-
-    public VillagerData(final int type, final int profession, final int level) {
-        this.type = type;
-        this.profession = profession;
-        this.level = level;
-    }
-
-    public int type() {
-        return type;
-    }
-
-    public int profession() {
-        return profession;
-    }
-
-    public int level() {
-        return level;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getType() {
-        return type;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getProfession() {
-        return profession;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getLevel() {
-        return level;
-    }
+public record VillagerData(int type, int profession, int level) {
 }

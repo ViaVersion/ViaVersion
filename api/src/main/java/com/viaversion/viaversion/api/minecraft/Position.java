@@ -38,11 +38,6 @@ public class Position {
         this(x, (int) y, z);
     }
 
-    @Deprecated/*(forRemoval=true)*/
-    public Position(Position toCopy) {
-        this(toCopy.x(), toCopy.y(), toCopy.z());
-    }
-
     public Position getRelative(BlockFace face) {
         return new Position(x + face.modX(), (short) (y + face.modY()), z + face.modZ());
     }
@@ -61,21 +56,6 @@ public class Position {
 
     public GlobalPosition withDimension(String dimension) {
         return new GlobalPosition(dimension, x, y, z);
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getX() {
-        return x;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getY() {
-        return y;
-    }
-
-    @Deprecated/*(forRemoval=true)*/
-    public int getZ() {
-        return z;
     }
 
     @Override

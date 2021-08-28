@@ -38,7 +38,7 @@ public final class MetaListType extends MetaListTypeTemplate {
     }
 
     @Override
-    public List<Metadata> read(final ByteBuf buffer) throws Exception {
+    public List<Metadata> read(final ByteBuf buffer) {
         final List<Metadata> list = new ArrayList<>();
         Metadata meta;
         do {
@@ -51,7 +51,7 @@ public final class MetaListType extends MetaListTypeTemplate {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final List<Metadata> object) throws Exception {
+    public void write(final ByteBuf buffer, final List<Metadata> object) {
         for (final Metadata metadata : object) {
             this.type.write(buffer, metadata);
         }

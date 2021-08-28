@@ -32,7 +32,7 @@ public class LongArrayType extends Type<long[]> {
     }
 
     @Override
-    public long[] read(ByteBuf buffer) throws Exception {
+    public long[] read(ByteBuf buffer) {
         int length = Type.VAR_INT.readPrimitive(buffer);
         long[] array = new long[length];
         for (int i = 0; i < array.length; i++) {
@@ -42,7 +42,7 @@ public class LongArrayType extends Type<long[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, long[] object) throws Exception {
+    public void write(ByteBuf buffer, long[] object) {
         Type.VAR_INT.writePrimitive(buffer, object.length);
         for (long l : object) {
             buffer.writeLong(l);

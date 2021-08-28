@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
@@ -212,7 +213,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public void transform(final Direction direction, final State state, final PacketWrapper packetWrapper) throws Exception {
+    public void transform(final Direction direction, final State state, final PacketWrapper packetWrapper) throws InformativeException, CancelException {
         if (direction == Direction.SERVERBOUND) {
             // The client will have the correct state set
             super.transform(direction, state, packetWrapper);
@@ -288,7 +289,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         super.transform(direction, State.CONFIGURATION, packetWrapper);
     }
 
-    public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry, @Nullable final LastResourcePack lastResourcePack) throws Exception {
+    public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry, @Nullable final LastResourcePack lastResourcePack) {
         final ProtocolInfo protocolInfo = connection.getProtocolInfo();
         protocolInfo.setServerState(State.CONFIGURATION);
 

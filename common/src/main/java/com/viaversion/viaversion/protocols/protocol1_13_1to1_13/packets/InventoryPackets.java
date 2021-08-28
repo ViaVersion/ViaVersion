@@ -73,7 +73,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
 
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT);
 
-        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<ClientboundPackets1_13>(protocol) {
+        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol) {
             @Override
             protected Type<Item> itemType() {
                 return Type.ITEM1_13;

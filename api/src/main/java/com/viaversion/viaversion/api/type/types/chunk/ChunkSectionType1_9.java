@@ -38,7 +38,7 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
     }
 
     @Override
-    public ChunkSection read(ByteBuf buffer) throws Exception {
+    public ChunkSection read(ByteBuf buffer) {
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
         if (bitsPerBlock < 4) {
@@ -74,7 +74,7 @@ public class ChunkSectionType1_9 extends Type<ChunkSection> {
     }
 
     @Override
-    public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
+    public void write(ByteBuf buffer, ChunkSection chunkSection) {
         int bitsPerBlock = 4;
         DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
         while (blockPalette.size() > 1 << bitsPerBlock) {

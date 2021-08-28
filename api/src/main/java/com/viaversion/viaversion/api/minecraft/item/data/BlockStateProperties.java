@@ -27,11 +27,11 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 
-public final class BlockStateProperties {
+public record BlockStateProperties(Map<String, String> properties) {
 
-    public static final Type<BlockStateProperties> TYPE = new Type<BlockStateProperties>(BlockStateProperties.class) {
+    public static final Type<BlockStateProperties> TYPE = new Type<>(BlockStateProperties.class) {
         @Override
-        public BlockStateProperties read(final ByteBuf buffer) throws Exception {
+        public BlockStateProperties read(final ByteBuf buffer) {
             final int size = Type.VAR_INT.readPrimitive(buffer);
             final Map<String, String> properties = new Object2ObjectOpenHashMap<>(size);
             for (int i = 0; i < size; i++) {
@@ -41,7 +41,7 @@ public final class BlockStateProperties {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final BlockStateProperties value) throws Exception {
+        public void write(final ByteBuf buffer, final BlockStateProperties value) {
             Type.VAR_INT.writePrimitive(buffer, value.properties.size());
             for (final Map.Entry<String, String> entry : value.properties.entrySet()) {
                 Type.STRING.write(buffer, entry.getKey());
@@ -50,13 +50,4 @@ public final class BlockStateProperties {
         }
     };
 
-    private final Map<String, String> properties;
-
-    public BlockStateProperties(final Map<String, String> properties) {
-        this.properties = properties;
-    }
-
-    public Map<String, String> properties() {
-        return properties;
-    }
 }

@@ -39,7 +39,6 @@ public class CancelDecoderException extends DecoderException implements CancelCo
     };
 
     public CancelDecoderException() {
-        super();
     }
 
     public CancelDecoderException(String message, Throwable cause) {
@@ -61,6 +60,6 @@ public class CancelDecoderException extends DecoderException implements CancelCo
      * @return a CancelDecoderException instance
      */
     public static CancelDecoderException generate(Throwable cause) {
-        return Via.getManager().isDebug() ? new CancelDecoderException(cause) : CACHED;
+        return Via.getManager().debugHandler().enabled() ? new CancelDecoderException(cause) : CACHED;
     }
 }

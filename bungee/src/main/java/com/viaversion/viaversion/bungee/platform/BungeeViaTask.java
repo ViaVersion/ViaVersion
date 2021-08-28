@@ -20,17 +20,7 @@ package com.viaversion.viaversion.bungee.platform;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-public class BungeeViaTask implements PlatformTask<ScheduledTask> {
-    private final ScheduledTask task;
-
-    public BungeeViaTask(ScheduledTask task) {
-        this.task = task;
-    }
-
-    @Override
-    public ScheduledTask getObject() {
-        return task;
-    }
+public record BungeeViaTask(ScheduledTask task) implements PlatformTask<ScheduledTask> {
 
     @Override
     public void cancel() {

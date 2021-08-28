@@ -64,52 +64,8 @@ public final class ChunkLightStorage implements StorableObject {
         return ((x & 0x3FFFFFFL) << 38) | (z & 0x3FFFFFFL);
     }
 
-    public static final class ChunkLight {
-        private final boolean trustEdges;
-        private final long[] skyLightMask;
-        private final long[] blockLightMask;
-        private final long[] emptySkyLightMask;
-        private final long[] emptyBlockLightMask;
-        private final byte[][] skyLight;
-        private final byte[][] blockLight;
-
-        public ChunkLight(final boolean trustEdges, final long[] skyLightMask, final long[] blockLightMask,
-                          final long[] emptySkyLightMask, final long[] emptyBlockLightMask, final byte[][] skyLight, final byte[][] blockLight) {
-            this.trustEdges = trustEdges;
-            this.skyLightMask = skyLightMask;
-            this.emptySkyLightMask = emptySkyLightMask;
-            this.blockLightMask = blockLightMask;
-            this.emptyBlockLightMask = emptyBlockLightMask;
-            this.skyLight = skyLight;
-            this.blockLight = blockLight;
-        }
-
-        public boolean trustEdges() {
-            return trustEdges;
-        }
-
-        public long[] skyLightMask() {
-            return skyLightMask;
-        }
-
-        public long[] emptySkyLightMask() {
-            return emptySkyLightMask;
-        }
-
-        public long[] blockLightMask() {
-            return blockLightMask;
-        }
-
-        public long[] emptyBlockLightMask() {
-            return emptyBlockLightMask;
-        }
-
-        public byte[][] skyLight() {
-            return skyLight;
-        }
-
-        public byte[][] blockLight() {
-            return blockLight;
-        }
+    public record ChunkLight(boolean trustEdges, long[] skyLightMask, long[] blockLightMask,
+                             long[] emptySkyLightMask, long[] emptyBlockLightMask,
+                             byte[][] skyLight, byte[][] blockLight) {
     }
 }

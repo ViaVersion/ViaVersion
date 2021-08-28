@@ -309,72 +309,53 @@ public class ItemRewriter {
 
         String id;
         switch (effect) {
-            case 1:
-                id = "regeneration";
-                break;
-            case 2:
-                id = "swiftness";
-                break;
-            case 3:
+            case 1 -> id = "regeneration";
+            case 2 -> id = "swiftness";
+            case 3 -> {
                 id = "fire_resistance";
                 canEnhance = false;
-                break;
-            case 4:
-                id = "poison";
-                break;
-            case 5:
+            }
+            case 4 -> id = "poison";
+            case 5 -> {
                 id = "healing";
                 canExtend = false;
-                break;
-            case 6:
+            }
+            case 6 -> {
                 id = "night_vision";
                 canEnhance = false;
-                break;
-
-            case 8:
+            }
+            case 8 -> {
                 id = "weakness";
                 canEnhance = false;
-                break;
-            case 9:
-                id = "strength";
-                break;
-            case 10:
+            }
+            case 9 -> id = "strength";
+            case 10 -> {
                 id = "slowness";
                 canEnhance = false;
-                break;
-            case 11:
-                id = "leaping";
-                break;
-            case 12:
+            }
+            case 11 -> id = "leaping";
+            case 12 -> {
                 id = "harming";
                 canExtend = false;
-                break;
-            case 13:
+            }
+            case 13 -> {
                 id = "water_breathing";
                 canEnhance = false;
-                break;
-            case 14:
+            }
+            case 14 -> {
                 id = "invisibility";
                 canEnhance = false;
-                break;
-
-
-            default:
+            }
+            default -> {
                 canEnhance = false;
                 canExtend = false;
-                switch (name) {
-                    case 0:
-                        id = "mundane";
-                        break;
-                    case 16:
-                        id = "awkward";
-                        break;
-                    case 32:
-                        id = "thick";
-                        break;
-                    default:
-                        id = "empty";
-                }
+                id = switch (name) {
+                    case 0 -> "mundane";
+                    case 16 -> "awkward";
+                    case 32 -> "thick";
+                    default -> "empty";
+                };
+            }
         }
 
         if (effect > 0) {

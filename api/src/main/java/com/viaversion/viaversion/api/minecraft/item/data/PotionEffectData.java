@@ -27,11 +27,12 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class PotionEffectData {
+public record PotionEffectData(int amplifier, int duration, boolean ambient, boolean showParticles,
+                               boolean showIcon, @Nullable PotionEffectData hiddenEffect) {
 
-    public static final Type<PotionEffectData> TYPE = new Type<PotionEffectData>(PotionEffectData.class) {
+    public static final Type<PotionEffectData> TYPE = new Type<>(PotionEffectData.class) {
         @Override
-        public PotionEffectData read(final ByteBuf buffer) throws Exception {
+        public PotionEffectData read(final ByteBuf buffer) {
             final int amplifier = Type.VAR_INT.readPrimitive(buffer);
             final int duration = Type.VAR_INT.readPrimitive(buffer);
             final boolean ambient = buffer.readBoolean();
@@ -42,7 +43,7 @@ public final class PotionEffectData {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final PotionEffectData value) throws Exception {
+        public void write(final ByteBuf buffer, final PotionEffectData value) {
             Type.VAR_INT.writePrimitive(buffer, value.amplifier);
             Type.VAR_INT.writePrimitive(buffer, value.duration);
             buffer.writeBoolean(value.ambient);
@@ -51,47 +52,6 @@ public final class PotionEffectData {
             OPTIONAL_TYPE.write(buffer, value.hiddenEffect);
         }
     };
-    public static final Type<PotionEffectData> OPTIONAL_TYPE = new OptionalType<PotionEffectData>(TYPE) {
+    public static final Type<PotionEffectData> OPTIONAL_TYPE = new OptionalType<>(TYPE) {
     };
-
-    private final int amplifier;
-    private final int duration;
-    private final boolean ambient;
-    private final boolean showParticles;
-    private final boolean showIcon;
-    private final PotionEffectData hiddenEffect;
-
-    public PotionEffectData(final int amplifier, final int duration, final boolean ambient, final boolean showParticles,
-                            final boolean showIcon, @Nullable final PotionEffectData hiddenEffect) {
-        this.amplifier = amplifier;
-        this.duration = duration;
-        this.ambient = ambient;
-        this.showParticles = showParticles;
-        this.showIcon = showIcon;
-        this.hiddenEffect = hiddenEffect;
-    }
-
-    public int amplifier() {
-        return amplifier;
-    }
-
-    public int duration() {
-        return duration;
-    }
-
-    public boolean ambient() {
-        return ambient;
-    }
-
-    public boolean showParticles() {
-        return showParticles;
-    }
-
-    public boolean showIcon() {
-        return showIcon;
-    }
-
-    public @Nullable PotionEffectData hiddenEffect() {
-        return hiddenEffect;
-    }
 }

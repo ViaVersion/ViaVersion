@@ -26,7 +26,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_
 
 public class AckSequenceProvider implements Provider {
 
-    public void handleSequence(final UserConnection connection, final int sequence) throws Exception {
+    public void handleSequence(final UserConnection connection, final int sequence) {
         final PacketWrapper ackPacket = PacketWrapper.create(ClientboundPackets1_19.BLOCK_CHANGED_ACK, connection);
         ackPacket.write(Type.VAR_INT, sequence);
         ackPacket.send(Protocol1_19To1_18_2.class);

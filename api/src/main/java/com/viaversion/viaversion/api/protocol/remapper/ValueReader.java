@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.exception.InformativeException;
 
 @FunctionalInterface
 public interface ValueReader<T> {
@@ -32,7 +33,6 @@ public interface ValueReader<T> {
      *
      * @param wrapper The wrapper to read from
      * @return Returns the desired type
-     * @throws Exception Throws exception if it fails to read
      */
-    T read(PacketWrapper wrapper) throws Exception;
+    T read(PacketWrapper wrapper) throws InformativeException;
 }

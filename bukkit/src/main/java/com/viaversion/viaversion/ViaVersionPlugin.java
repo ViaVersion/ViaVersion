@@ -46,12 +46,14 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static final boolean FOLIA = PaperViaInjector.hasClass("io.papermc.paper.threadedregions.RegionizedServer");
@@ -282,7 +284,10 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         return protocolSupport;
     }
 
-    @Deprecated/*(forRemoval = true)*/
+    /**
+     * @deprecated use {@link Via#getAPI()} instead
+     */
+    @Deprecated(forRemoval = true)
     public static ViaVersionPlugin getInstance() {
         return instance;
     }

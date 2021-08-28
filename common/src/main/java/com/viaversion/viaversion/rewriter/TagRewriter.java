@@ -163,11 +163,11 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
         };
     }
 
-    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags) throws Exception {
+    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags) {
         handle(wrapper, rewriteFunction, newTags, null);
     }
 
-    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags, @Nullable Map<String, String> tagsToRename) throws Exception {
+    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags, @Nullable Map<String, String> tagsToRename) {
         int tagsSize = wrapper.read(Type.VAR_INT);
         wrapper.write(Type.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
 
@@ -220,17 +220,14 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
 
     public @Nullable IdRewriteFunction getRewriter(RegistryType tagType) {
         MappingData mappingData = protocol.getMappingData();
-        switch (tagType) {
-            case BLOCK:
-                return mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
-            case ITEM:
-                return mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
-            case ENTITY:
-                return protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
-            case FLUID:
-            case GAME_EVENT:
-            default:
-                return null;
-        }
+        return switch (tagType) {
+            case BLOCK ->
+                    mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
+            case ITEM ->
+                    mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
+            case ENTITY ->
+                    protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
+            case FLUID, GAME_EVENT -> null;
+        };
     }
 }

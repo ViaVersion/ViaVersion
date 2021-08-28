@@ -83,27 +83,15 @@ public class EntityPackets {
                         if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
                             wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         } else if (type1_14.is(EntityTypes1_14.MINECART)) {
-                            // default is 0 = rideable minecart
-                            switch (data) {
-                                case 1:
-                                    typeId = EntityTypes1_14.CHEST_MINECART.getId();
-                                    break;
-                                case 2:
-                                    typeId = EntityTypes1_14.FURNACE_MINECART.getId();
-                                    break;
-                                case 3:
-                                    typeId = EntityTypes1_14.TNT_MINECART.getId();
-                                    break;
-                                case 4:
-                                    typeId = EntityTypes1_14.SPAWNER_MINECART.getId();
-                                    break;
-                                case 5:
-                                    typeId = EntityTypes1_14.HOPPER_MINECART.getId();
-                                    break;
-                                case 6:
-                                    typeId = EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
-                                    break;
-                            }
+                            typeId = switch (data) {
+                                case 1 -> EntityTypes1_14.CHEST_MINECART.getId();
+                                case 2 -> EntityTypes1_14.FURNACE_MINECART.getId();
+                                case 3 -> EntityTypes1_14.TNT_MINECART.getId();
+                                case 4 -> EntityTypes1_14.SPAWNER_MINECART.getId();
+                                case 5 -> EntityTypes1_14.HOPPER_MINECART.getId();
+                                case 6 -> EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
+                                default -> typeId; // default 0 = rideable minecart
+                            };
                         } else if ((type1_14.is(EntityTypes1_14.ITEM) && data > 0)
                                 || type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
                             if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {

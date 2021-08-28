@@ -138,8 +138,8 @@ public abstract class LegacyViaInjector implements ViaInjector {
 
             try {
                 ChannelInitializer<Channel> initializer = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                if (initializer instanceof WrappedChannelInitializer) {
-                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((WrappedChannelInitializer) initializer).original());
+                if (initializer instanceof WrappedChannelInitializer wrappedChannelInitializer) {
+                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", wrappedChannelInitializer.original());
                 }
             } catch (Exception e) {
                 Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to remove injection handler, reload won't work with connections, please reboot!", e);
@@ -203,8 +203,8 @@ public abstract class LegacyViaInjector implements ViaInjector {
                 try {
                     Object child = ReflectionUtil.get(channelHandler, "childHandler", ChannelInitializer.class);
                     handlerInfo.addProperty("childClass", child.getClass().getName());
-                    if (child instanceof WrappedChannelInitializer) {
-                        handlerInfo.addProperty("oldInit", ((WrappedChannelInitializer) child).original().getClass().getName());
+                    if (child instanceof WrappedChannelInitializer wrappedChannelInitializer) {
+                        handlerInfo.addProperty("oldInit", wrappedChannelInitializer.original().getClass().getName());
                     }
                 } catch (ReflectiveOperationException ignored) {
                     // Don't display
@@ -222,8 +222,8 @@ public abstract class LegacyViaInjector implements ViaInjector {
                 // Note down the current value (could be overridden by another plugin)
                 currentLists.addProperty(field.getName(), list.getClass().getName());
                 // Also, if it's not overridden we can display what's inside our list (possibly another plugin)
-                if (list instanceof SynchronizedListWrapper) {
-                    wrappedLists.addProperty(field.getName(), ((SynchronizedListWrapper) list).originalList().getClass().getName());
+                if (list instanceof SynchronizedListWrapper<?> wrapper) {
+                    wrappedLists.addProperty(field.getName(), wrapper.originalList().getClass().getName());
                 }
             }
             data.add("wrappedLists", wrappedLists);

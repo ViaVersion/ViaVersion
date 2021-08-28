@@ -28,11 +28,11 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 
-public final class MapDecorations {
+public record MapDecorations(Map<String, MapDecoration> decorations) {
 
-    public static final Type<MapDecorations> TYPE = new Type<MapDecorations>(MapDecorations.class) {
+    public static final Type<MapDecorations> TYPE = new Type<>(MapDecorations.class) {
         @Override
-        public MapDecorations read(final ByteBuf buffer) throws Exception {
+        public MapDecorations read(final ByteBuf buffer) {
             final Object2ObjectMap<String, MapDecoration> decorations = new Object2ObjectOpenHashMap<>();
             final int size = Type.VAR_INT.readPrimitive(buffer);
             for (int i = 0; i < size; i++) {
@@ -44,7 +44,7 @@ public final class MapDecorations {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final MapDecorations value) throws Exception {
+        public void write(final ByteBuf buffer, final MapDecorations value) {
             Type.VAR_INT.writePrimitive(buffer, value.decorations.size());
             for (final Map.Entry<String, MapDecoration> entry : value.decorations.entrySet()) {
                 Type.STRING.write(buffer, entry.getKey());
@@ -52,14 +52,4 @@ public final class MapDecorations {
             }
         }
     };
-
-    private final Map<String, MapDecoration> decorations;
-
-    public MapDecorations(final Map<String, MapDecoration> decorations) {
-        this.decorations = decorations;
-    }
-
-    public Map<String, MapDecoration> decorations() {
-        return decorations;
-    }
 }

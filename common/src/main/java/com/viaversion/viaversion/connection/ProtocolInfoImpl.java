@@ -19,14 +19,12 @@ package com.viaversion.viaversion.connection;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.UUID;
 
 public class ProtocolInfoImpl implements ProtocolInfo {
-    private final UserConnection connection;
     private State clientState = State.HANDSHAKE;
     private State serverState = State.HANDSHAKE;
     private ProtocolVersion serverProtocolVersion = ProtocolVersion.unknown;
@@ -34,10 +32,6 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     private String username;
     private UUID uuid;
     private ProtocolPipeline pipeline;
-
-    public ProtocolInfoImpl(final UserConnection connection) {
-        this.connection = connection;
-    }
 
     @Override
     public State getClientState() {
@@ -113,11 +107,6 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     @Override
     public void setPipeline(ProtocolPipeline pipeline) {
         this.pipeline = pipeline;
-    }
-
-    @Override
-    public UserConnection getUser() {
-        return connection;
     }
 
     @Override

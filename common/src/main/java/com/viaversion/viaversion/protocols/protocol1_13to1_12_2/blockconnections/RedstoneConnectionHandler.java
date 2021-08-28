@@ -25,7 +25,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
-public class RedstoneConnectionHandler extends ConnectionHandler {
+public class RedstoneConnectionHandler implements ConnectionHandler {
     private static final IntSet REDSTONE = new IntOpenHashSet();
     private static final Int2IntMap CONNECTED_BLOCK_STATES = new Int2IntOpenHashMap(1296);
     private static final Int2IntMap POWER_MAPPINGS = new Int2IntOpenHashMap(1296);
@@ -57,15 +57,11 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
     }
 
     private static int getState(String value) {
-        switch (value) {
-            case "none":
-            default:
-                return 0;
-            case "side":
-                return 1;
-            case "up":
-                return 2;
-        }
+        return switch (value) {
+            case "side" -> 1;
+            case "up" -> 2;
+            default -> 0; // Implicit "none"
+        };
     }
 
     @Override

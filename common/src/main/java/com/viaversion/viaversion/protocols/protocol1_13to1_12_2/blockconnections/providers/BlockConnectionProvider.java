@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class BlockConnectionProvider implements Provider {
+public abstract class BlockConnectionProvider implements Provider {
 
     public int getBlockData(UserConnection connection, int x, int y, int z) {
         int oldId = getWorldBlockData(connection, x, y, z);
@@ -35,15 +35,12 @@ public class BlockConnectionProvider implements Provider {
     }
 
     public void storeBlock(UserConnection connection, int x, int y, int z, int blockState) {
-
     }
 
     public void removeBlock(UserConnection connection, int x, int y, int z) {
-
     }
 
     public void clearStorage(UserConnection connection) {
-
     }
 
     public void modifiedBlock(UserConnection connection, Position position) {
@@ -51,7 +48,6 @@ public class BlockConnectionProvider implements Provider {
     }
 
     public void unloadChunk(UserConnection connection, int x, int z) {
-
     }
 
     public void unloadChunkSection(UserConnection connection, int chunkX, int chunkY, int chunkZ) {
@@ -63,7 +59,7 @@ public class BlockConnectionProvider implements Provider {
      * If the client has modified the position (ie: placed or broken a block) this should return false.
      *
      * @param position The position at which block reliability should be checked, null for general-purpose
-     * @return true if the block & its neighbors are known to be correct
+     * @return true if the block and its neighbors are known to be correct
      */
     public boolean storesBlocks(UserConnection user, @Nullable Position position) {
         return false;

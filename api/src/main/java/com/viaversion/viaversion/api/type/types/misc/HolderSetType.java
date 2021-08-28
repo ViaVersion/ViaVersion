@@ -34,7 +34,7 @@ public class HolderSetType extends Type<HolderSet> {
     }
 
     @Override
-    public HolderSet read(final ByteBuf buffer) throws Exception {
+    public HolderSet read(final ByteBuf buffer) {
         final int size = Type.VAR_INT.readPrimitive(buffer) - 1;
         if (size == -1) {
             final String tag = Type.STRING.read(buffer);
@@ -49,7 +49,7 @@ public class HolderSetType extends Type<HolderSet> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final HolderSet object) throws Exception {
+    public void write(final ByteBuf buffer, final HolderSet object) {
         if (object.hasTagKey()) {
             Type.VAR_INT.writePrimitive(buffer, 0);
             Type.STRING.write(buffer, object.tagKey());

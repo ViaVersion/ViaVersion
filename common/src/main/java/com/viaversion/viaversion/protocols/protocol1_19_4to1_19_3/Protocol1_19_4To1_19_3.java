@@ -62,9 +62,9 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.ENTITY_SOUND);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND);
 
-        new CommandRewriter<ClientboundPackets1_19_3>(this) {
+        new CommandRewriter<>(this) {
             @Override
-            public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
+            public void handleArgument(final PacketWrapper wrapper, final String argumentType) {
                 if (argumentType.equals("minecraft:time")) {
                     // Minimum
                     wrapper.write(Type.INT, 0);

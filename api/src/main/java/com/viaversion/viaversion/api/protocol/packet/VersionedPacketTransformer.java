@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.protocol.packet;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.exception.InformativeException;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -43,19 +44,19 @@ public interface VersionedPacketTransformer<C extends ClientboundPacketType, S e
      * @throws IllegalArgumentException if the packet type is not of the expected clientbound or serverbound packets class
      * @throws IllegalArgumentException if {@link PacketWrapper#user()} returns null
      * @throws RuntimeException         if no path from the input version to the required client version exists
-     * @throws Exception                if an error occurred while transforming or sending the packet
+     * @throws InformativeException     if an error occurred while transforming or sending the packet
      */
-    boolean send(PacketWrapper packet) throws Exception;
+    boolean send(PacketWrapper packet) throws InformativeException;
 
     /**
      * @see #send(PacketWrapper)
      */
-    boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    boolean send(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException;
 
     /**
      * @see #send(PacketWrapper)
      */
-    boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    boolean send(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException;
 
     /**
      * Sends a packet to the user or server, depending on the packet type given by {@link PacketWrapper#getPacketType()}, submitted to the netty event loop.
@@ -66,19 +67,19 @@ public interface VersionedPacketTransformer<C extends ClientboundPacketType, S e
      * @throws IllegalArgumentException if the packet type is not of the expected clientbound or serverbound packets class
      * @throws IllegalArgumentException if {@link PacketWrapper#user()} returns null
      * @throws RuntimeException         if no path from the input version to the required client version exists
-     * @throws Exception                if an error occurred while transforming or sending the packet
+     * @throws InformativeException     if an error occurred while transforming or sending the packet
      */
-    boolean scheduleSend(PacketWrapper packet) throws Exception;
+    boolean scheduleSend(PacketWrapper packet) throws InformativeException;
 
     /**
      * @see #scheduleSend(PacketWrapper)
      */
-    boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    boolean scheduleSend(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException;
 
     /**
      * @see #scheduleSend(PacketWrapper)
      */
-    boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    boolean scheduleSend(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException;
 
     /**
      * Transforms a packet to the protocol version of the given connection or server, or null if cancelled at some point.
@@ -89,17 +90,17 @@ public interface VersionedPacketTransformer<C extends ClientboundPacketType, S e
      * @throws IllegalArgumentException if the packet type is not of the expected clientbound or serverbound packets class
      * @throws IllegalArgumentException if {@link PacketWrapper#user()} returns null
      * @throws RuntimeException         if no path from the input version to the required client version exists
-     * @throws Exception                if an error occurred while transforming the packet
+     * @throws InformativeException     if an error occurred while transforming the packet
      */
-    @Nullable PacketWrapper transform(PacketWrapper packet) throws Exception;
+    @Nullable PacketWrapper transform(PacketWrapper packet) throws InformativeException;
 
     /**
      * @see #transform(PacketWrapper)
      */
-    @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    @Nullable PacketWrapper transform(UserConnection connection, C packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException;
 
     /**
      * @see #transform(PacketWrapper)
      */
-    @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws Exception;
+    @Nullable PacketWrapper transform(UserConnection connection, S packetType, Consumer<PacketWrapper> packetWriter) throws InformativeException;
 }

@@ -52,7 +52,7 @@ public class ChunkType1_8 extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(ByteBuf input) throws Exception {
+    public Chunk read(ByteBuf input) {
         final int chunkX = input.readInt();
         final int chunkZ = input.readInt();
         final boolean fullChunk = input.readBoolean();
@@ -75,7 +75,7 @@ public class ChunkType1_8 extends Type<Chunk> {
     }
 
     @Override
-    public void write(ByteBuf output, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Chunk chunk) {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
         output.writeBoolean(chunk.isFullChunk());
@@ -86,7 +86,7 @@ public class ChunkType1_8 extends Type<Chunk> {
     }
 
     // Used for normal and bulk chunks
-    public static Chunk deserialize(final int chunkX, final int chunkZ, final boolean fullChunk, final boolean skyLight, final int bitmask, final byte[] data) throws Exception {
+    public static Chunk deserialize(final int chunkX, final int chunkZ, final boolean fullChunk, final boolean skyLight, final int bitmask, final byte[] data) {
         final ByteBuf input = Unpooled.wrappedBuffer(data);
 
         final ChunkSection[] sections = new ChunkSection[16];
@@ -125,7 +125,7 @@ public class ChunkType1_8 extends Type<Chunk> {
     }
 
     // Used for normal and bulk chunks
-    public static byte[] serialize(final Chunk chunk) throws Exception {
+    public static byte[] serialize(final Chunk chunk) {
         final ByteBuf output = Unpooled.buffer();
 
         // Write blocks

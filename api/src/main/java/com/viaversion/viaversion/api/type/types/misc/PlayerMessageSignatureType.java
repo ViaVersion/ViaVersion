@@ -34,12 +34,12 @@ public class PlayerMessageSignatureType extends Type<PlayerMessageSignature> {
     }
 
     @Override
-    public PlayerMessageSignature read(final ByteBuf buffer) throws Exception {
+    public PlayerMessageSignature read(final ByteBuf buffer) {
         return new PlayerMessageSignature(Type.UUID.read(buffer), Type.BYTE_ARRAY_PRIMITIVE.read(buffer));
     }
 
     @Override
-    public void write(final ByteBuf buffer, final PlayerMessageSignature value) throws Exception {
+    public void write(final ByteBuf buffer, final PlayerMessageSignature value) {
         Type.UUID.write(buffer, value.uuid());
         Type.BYTE_ARRAY_PRIMITIVE.write(buffer, value.signatureBytes());
     }

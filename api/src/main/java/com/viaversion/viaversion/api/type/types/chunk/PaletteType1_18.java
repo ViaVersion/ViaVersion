@@ -41,7 +41,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
     }
 
     @Override
-    public DataPalette read(final ByteBuf buffer) throws Exception {
+    public DataPalette read(final ByteBuf buffer) {
         int bitsPerValue = buffer.readByte();
         final DataPaletteImpl palette;
         if (bitsPerValue == 0) {
@@ -83,7 +83,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final DataPalette palette) throws Exception {
+    public void write(final ByteBuf buffer, final DataPalette palette) {
         final int size = palette.size();
         if (size == 1) {
             // Single value palette

@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import java.util.logging.Level;
 
-@Beta
 public interface DebugHandler {
 
     /**
@@ -51,6 +50,7 @@ public interface DebugHandler {
      *
      * @param packetTypeName packet type name
      */
+    @Beta
     void addPacketTypeNameToLog(String packetTypeName);
 
     /**
@@ -59,6 +59,7 @@ public interface DebugHandler {
      *
      * @param packetType packet type
      */
+    @Beta
     void addPacketTypeToLog(PacketType packetType);
 
     /**
@@ -66,11 +67,13 @@ public interface DebugHandler {
      *
      * @param packetTypeName packet type name
      */
+    @Beta
     boolean removePacketTypeNameToLog(String packetTypeName);
 
     /**
      * Resets packet type filters.
      */
+    @Beta
     void clearPacketTypesToLog();
 
     /**
@@ -79,6 +82,7 @@ public interface DebugHandler {
      *
      * @return whether packets should be logged after being transformed
      */
+    @Beta
     boolean logPostPacketTransform();
 
     /**
@@ -86,6 +90,7 @@ public interface DebugHandler {
      *
      * @param logPostPacketTransform whether packets should be logged after being transformed
      */
+    @Beta
     void setLogPostPacketTransform(boolean logPostPacketTransform);
 
     /**
@@ -98,6 +103,7 @@ public interface DebugHandler {
      */
     boolean shouldLog(PacketWrapper wrapper, Direction direction);
 
+    @Beta
     default void enableAndLogIds(final PacketType... packetTypes) {
         setEnabled(true);
         for (final PacketType packetType : packetTypes) {

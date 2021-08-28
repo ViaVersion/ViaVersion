@@ -34,14 +34,14 @@ public class VarLongBlockChangeRecordType extends Type<BlockChangeRecord> {
     }
 
     @Override
-    public BlockChangeRecord read(ByteBuf buffer) throws Exception {
+    public BlockChangeRecord read(ByteBuf buffer) {
         long data = Type.VAR_LONG.readPrimitive(buffer);
         short position = (short) (data & 0xFFFL);
         return new BlockChangeRecord1_16_2(position >>> 8 & 0xF, position & 0xF, position >>> 4 & 0xF, (int) (data >>> 12));
     }
 
     @Override
-    public void write(ByteBuf buffer, BlockChangeRecord object) throws Exception {
+    public void write(ByteBuf buffer, BlockChangeRecord object) {
         short position = (short) (object.getSectionX() << 8 | object.getSectionZ() << 4 | object.getSectionY());
         Type.VAR_LONG.writePrimitive(buffer, (long) object.getBlockId() << 12 | position);
     }

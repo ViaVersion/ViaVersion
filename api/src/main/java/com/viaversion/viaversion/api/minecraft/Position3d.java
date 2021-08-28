@@ -22,26 +22,5 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public class Position3d {
-    private final double x;
-    private final double y;
-    private final double z;
-
-    public Position3d(final double x, final double y, final double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public double x() {
-        return x;
-    }
-
-    public double y() {
-        return y;
-    }
-
-    public double z() {
-        return z;
-    }
+public record Position3d(double x, double y, double z) {
 }

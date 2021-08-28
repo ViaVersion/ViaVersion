@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface ItemRewriter<T extends Protocol> extends Rewriter<T> {
+public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T> {
 
     /**
      * Returns the rewritten item, which may or may not be the same given Item instance.

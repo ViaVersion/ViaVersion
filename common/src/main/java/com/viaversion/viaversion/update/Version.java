@@ -100,7 +100,7 @@ public class Version implements Comparable<Version> {
 
     @Override
     public boolean equals(Object that) {
-        return that instanceof Version && equals(this, (Version) that);
+        return that instanceof Version version && equals(this, version);
     }
 
     @Override

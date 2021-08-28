@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.protocol.remapper;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.InformativeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -76,7 +77,7 @@ public abstract class PacketHandlers implements PacketHandler {
      * @param transformer transformer to produce the new type
      */
     public <T1, T2> void map(Type<T1> oldType, Type<T2> newType, Function<T1, T2> transformer) {
-        map(oldType, new ValueTransformer<T1, T2>(newType) {
+        map(oldType, new ValueTransformer<>(newType) {
             @Override
             public T2 transform(PacketWrapper wrapper, T1 inputValue) {
                 return transformer.apply(inputValue);
@@ -173,7 +174,7 @@ public abstract class PacketHandlers implements PacketHandler {
     protected abstract void register();
 
     @Override
-    public final void handle(PacketWrapper wrapper) throws Exception {
+    public final void handle(PacketWrapper wrapper) throws InformativeException {
         for (PacketHandler handler : packetHandlers) {
             handler.handle(wrapper);
         }

@@ -60,34 +60,23 @@ public class ArmorListener extends ViaBukkitListener {
         }
 
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_PROPERTIES, null, getUserConnection(player));
-        try {
-            wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
-            wrapper.write(Type.INT, 1); // only 1 property
-            wrapper.write(Type.STRING, "generic.armor");
-            wrapper.write(Type.DOUBLE, 0D); //default 0 armor
-            wrapper.write(Type.VAR_INT, 1); // 1 modifier
-            wrapper.write(Type.UUID, ARMOR_ATTRIBUTE); // armor modifier uuid
-            wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
-            wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 is add number
-
-            wrapper.scheduleSend(Protocol1_9To1_8.class);
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send armor update", e);
-        }
+        wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
+        wrapper.write(Type.INT, 1); // only 1 property
+        wrapper.write(Type.STRING, "generic.armor");
+        wrapper.write(Type.DOUBLE, 0D); //default 0 armor
+        wrapper.write(Type.VAR_INT, 1); // 1 modifier
+        wrapper.write(Type.UUID, ARMOR_ATTRIBUTE); // armor modifier uuid
+        wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
+        wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 = add number
+        wrapper.scheduleSend(Protocol1_9To1_8.class);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent e) {
         HumanEntity human = e.getWhoClicked();
-        if (human instanceof Player && e.getInventory() instanceof CraftingInventory) {
-            final Player player = (Player) human;
-            if (e.getCurrentItem() != null) {
-                if (ArmorType.isArmor(e.getCurrentItem().getTypeId())) {
-                    sendDelayedArmorUpdate(player);
-                    return;
-                }
-            }
-            if (e.getRawSlot() >= 5 && e.getRawSlot() <= 8) {
+        if (human instanceof final Player player && e.getInventory() instanceof CraftingInventory) {
+            if ((e.getCurrentItem() != null && ArmorType.isArmor(e.getCurrentItem().getTypeId()))
+                    || (e.getRawSlot() >= 5 && e.getRawSlot() <= 8)) {
                 sendDelayedArmorUpdate(player);
             }
         }
@@ -95,12 +84,13 @@ public class ArmorListener extends ViaBukkitListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent e) {
-        if (e.getItem() != null) {
-            if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                final Player player = e.getPlayer();
-                // Due to odd bugs it's 3 ticks later
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> sendArmorUpdate(player), 3L);
-            }
+        if (e.getItem() == null) {
+            return;
+        }
+        if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            final Player player = e.getPlayer();
+            // Due to odd bugs it's 3 ticks later
+            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> sendArmorUpdate(player), 3L);
         }
     }
 

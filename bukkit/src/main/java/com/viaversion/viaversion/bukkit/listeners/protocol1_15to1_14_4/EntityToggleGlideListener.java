@@ -49,45 +49,40 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void entityToggleGlide(EntityToggleGlideEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
 
-        Player player = (Player) event.getEntity();
         if (!isOnPipe(player)) return;
 
         // Cancelling can only be done by updating the player's metadata
         if (event.isGliding() && event.isCancelled()) {
             PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_15.ENTITY_METADATA, null, getUserConnection(player));
-            try {
-                packet.write(Type.VAR_INT, player.getEntityId());
+            packet.write(Type.VAR_INT, player.getEntityId());
 
-                byte bitmask = 0;
-                // Collect other metadata for the mitmask
-                if (player.getFireTicks() > 0) {
-                    bitmask |= 0x01;
-                }
-                if (player.isSneaking()) {
-                    bitmask |= 0x02;
-                }
-                // 0x04 is unused
-                if (player.isSprinting()) {
-                    bitmask |= 0x08;
-                }
-                if (swimmingMethodExists && player.isSwimming()) {
-                    bitmask |= 0x10;
-                }
-                if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    bitmask |= 0x20;
-                }
-                if (player.isGlowing()) {
-                    bitmask |= 0x40;
-                }
-
-                // leave 0x80 as 0 to stop gliding
-                packet.write(Types1_14.METADATA_LIST, Arrays.asList(new Metadata(0, Types1_14.META_TYPES.byteType, bitmask)));
-                packet.scheduleSend(Protocol1_15To1_14_4.class);
-            } catch (Exception e) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send entity glide fix metadata", e);
+            byte bitmask = 0;
+            // Collect other metadata for the mitmask
+            if (player.getFireTicks() > 0) {
+                bitmask |= 0x01;
             }
+            if (player.isSneaking()) {
+                bitmask |= 0x02;
+            }
+            // 0x04 is unused
+            if (player.isSprinting()) {
+                bitmask |= 0x08;
+            }
+            if (swimmingMethodExists && player.isSwimming()) {
+                bitmask |= 0x10;
+            }
+            if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                bitmask |= 0x20;
+            }
+            if (player.isGlowing()) {
+                bitmask |= 0x40;
+            }
+
+            // leave 0x80 as 0 to stop gliding
+            packet.write(Types1_14.METADATA_LIST, Arrays.asList(new Metadata(0, Types1_14.META_TYPES.byteType, bitmask)));
+            packet.scheduleSend(Protocol1_15To1_14_4.class);
         }
     }
 }

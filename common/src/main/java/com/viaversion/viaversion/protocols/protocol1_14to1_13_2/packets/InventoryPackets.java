@@ -48,7 +48,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_14, Protocol1_14To1_13_2> {
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
-    private static final ComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new ComponentRewriter<ClientboundPackets1_13>(null, ComponentRewriter.ReadType.JSON) {
+    private static final ComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new ComponentRewriter<>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             super.handleTranslate(object, translate);
@@ -93,8 +93,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                     case "minecraft:furnace":
                         typeId = 13;
                         break;
-                    case "minecraft:dropper":
-                    case "minecraft:dispenser":
+                    case "minecraft:dropper", "minecraft:dispenser":
                         typeId = 6;
                         break;
                     case "minecraft:enchanting_table":
@@ -118,8 +117,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                     case "minecraft:shulker_box":
                         typeId = 19;
                         break;
-                    case "minecraft:container":
-                    case "minecraft:chest":
+                    case "minecraft:container", "minecraft:chest":
                     default:
                         if (slots > 0 && slots <= 54) {
                             typeId = slots / 9 - 1;

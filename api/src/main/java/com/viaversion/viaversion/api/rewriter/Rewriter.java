@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
 
-public interface Rewriter<T extends Protocol> extends MappingDataListener {
+public interface Rewriter<T extends Protocol<?, ?, ?, ?>> extends MappingDataListener {
 
     /**
      * Registers any packet handlers or rewrites needed.

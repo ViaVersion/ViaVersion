@@ -1,6 +1,5 @@
 dependencies {
     api(projects.viaversionApi)
-    api(projects.viaversionApiLegacy)
     api(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")
     }

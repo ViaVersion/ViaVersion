@@ -115,7 +115,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         if (args.length == 1) {
             if (!args[0].isEmpty()) {
                 for (ViaSubCommand sub : allowed) {
-                    if (sub.name().toLowerCase().startsWith(args[0].toLowerCase(Locale.ROOT))) {
+                    if (sub.name().toLowerCase(Locale.ROOT).startsWith(args[0].toLowerCase(Locale.ROOT))) {
                         output.add(sub.name());
                     }
                 }

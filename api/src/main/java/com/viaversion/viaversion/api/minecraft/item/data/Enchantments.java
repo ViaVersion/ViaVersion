@@ -27,9 +27,9 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
-public final class Enchantments {
+public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) {
 
-    public static final Type<Enchantments> TYPE = new Type<Enchantments>(Enchantments.class) {
+    public static final Type<Enchantments> TYPE = new Type<>(Enchantments.class) {
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
@@ -54,28 +54,12 @@ public final class Enchantments {
         }
     };
 
-    private final Int2IntMap enchantments;
-    private final boolean showInTooltip;
-
-    public Enchantments(final Int2IntMap enchantments, final boolean showInTooltip) {
-        this.enchantments = enchantments;
-        this.showInTooltip = showInTooltip;
-    }
-
     public Enchantments(final boolean showInTooltip) {
         this(new Int2IntOpenHashMap(), showInTooltip);
     }
 
-    public Int2IntMap enchantments() {
-        return enchantments;
-    }
-
     public int size() {
         return enchantments.size();
-    }
-
-    public boolean showInTooltip() {
-        return showInTooltip;
     }
 
     public void add(final int id, final int level) {

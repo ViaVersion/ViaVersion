@@ -31,17 +31,17 @@ import java.util.Optional;
 
 public class CommandBlockProvider implements Provider {
 
-    public void addOrUpdateBlock(UserConnection user, Position position, CompoundTag tag) throws Exception {
+    public void addOrUpdateBlock(UserConnection user, Position position, CompoundTag tag) {
         checkPermission(user);
         getStorage(user).addOrUpdateBlock(position, tag);
     }
 
-    public Optional<CompoundTag> get(UserConnection user, Position position) throws Exception {
+    public Optional<CompoundTag> get(UserConnection user, Position position) {
         checkPermission(user);
         return getStorage(user).getCommandBlock(position);
     }
 
-    public void unloadChunk(UserConnection user, int x, int z) throws Exception {
+    public void unloadChunk(UserConnection user, int x, int z) {
         checkPermission(user);
         getStorage(user).unloadChunk(x, z);
     }
@@ -50,7 +50,7 @@ public class CommandBlockProvider implements Provider {
         return connection.get(CommandBlockStorage.class);
     }
 
-    public void sendPermission(UserConnection user) throws Exception {
+    public void sendPermission(UserConnection user) {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_STATUS, null, user); // Entity status
 
         EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
@@ -63,7 +63,7 @@ public class CommandBlockProvider implements Provider {
     }
 
     // Fix for Bungee since the join game is not sent after the first one
-    private void checkPermission(UserConnection user) throws Exception {
+    private void checkPermission(UserConnection user) {
         CommandBlockStorage storage = getStorage(user);
         if (!storage.isPermissions()) {
             sendPermission(user);

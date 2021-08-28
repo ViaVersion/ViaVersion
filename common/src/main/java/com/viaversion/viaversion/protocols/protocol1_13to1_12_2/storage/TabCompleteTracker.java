@@ -41,11 +41,7 @@ public class TabCompleteTracker implements StorableObject {
         wrapper.write(Type.BOOLEAN, false);
         final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
         wrapper.write(Type.OPTIONAL_POSITION1_8, playerLookTarget);
-        try {
-            wrapper.scheduleSendToServer(Protocol1_13To1_12_2.class);
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send tab complete packet", e);
-        }
+        wrapper.scheduleSendToServer(Protocol1_13To1_12_2.class);
         lastTabComplete = null;
     }
 

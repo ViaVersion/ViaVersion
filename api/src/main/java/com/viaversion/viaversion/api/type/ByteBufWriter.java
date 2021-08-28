@@ -32,7 +32,6 @@ public interface ByteBufWriter<T> {
      *
      * @param buffer buffer to write to
      * @param value  value to write
-     * @throws Exception if it failed to write
      */
-    void write(ByteBuf buffer, T value) throws Exception;
+    void write(ByteBuf buffer, T value);
 }

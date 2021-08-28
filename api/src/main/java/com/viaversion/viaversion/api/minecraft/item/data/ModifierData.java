@@ -26,11 +26,11 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 
-public final class ModifierData {
+public record ModifierData(UUID uuid, String name, double amount, int operation) {
 
-    public static final Type<ModifierData> TYPE = new Type<ModifierData>(ModifierData.class) {
+    public static final Type<ModifierData> TYPE = new Type<>(ModifierData.class) {
         @Override
-        public ModifierData read(final ByteBuf buffer) throws Exception {
+        public ModifierData read(final ByteBuf buffer) {
             final UUID uuid = Type.UUID.read(buffer);
             final String name = Type.STRING.read(buffer);
             final double amount = buffer.readDouble();
@@ -39,7 +39,7 @@ public final class ModifierData {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ModifierData value) throws Exception {
+        public void write(final ByteBuf buffer, final ModifierData value) {
             Type.UUID.write(buffer, value.uuid);
             Type.STRING.write(buffer, value.name);
             buffer.writeDouble(value.amount);
@@ -47,31 +47,4 @@ public final class ModifierData {
         }
     };
 
-    private final UUID uuid;
-    private final String name;
-    private final double amount;
-    private final int operation;
-
-    public ModifierData(final UUID uuid, final String name, final double amount, final int operation) {
-        this.uuid = uuid;
-        this.name = name;
-        this.amount = amount;
-        this.operation = operation;
-    }
-
-    public UUID uuid() {
-        return uuid;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public double amount() {
-        return amount;
-    }
-
-    public int operation() {
-        return operation;
-    }
 }

@@ -22,12 +22,7 @@ import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import java.util.SortedSet;
 
-public class ServerProtocolVersionSingleton implements ServerProtocolVersion {
-    private final ProtocolVersion protocolVersion;
-
-    public ServerProtocolVersionSingleton(ProtocolVersion protocolVersion) {
-        this.protocolVersion = protocolVersion;
-    }
+public record ServerProtocolVersionSingleton(ProtocolVersion protocolVersion) implements ServerProtocolVersion {
 
     @Override
     public ProtocolVersion lowestSupportedProtocolVersion() {

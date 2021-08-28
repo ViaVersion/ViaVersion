@@ -39,7 +39,7 @@ public class ParticleType extends DynamicType<Particle> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Particle object) throws Exception {
+    public void write(final ByteBuf buffer, final Particle object) {
         Type.VAR_INT.writePrimitive(buffer, object.id());
         for (final Particle.ParticleData<?> data : object.getArguments()) {
             data.write(buffer);
@@ -47,7 +47,7 @@ public class ParticleType extends DynamicType<Particle> {
     }
 
     @Override
-    public Particle read(final ByteBuf buffer) throws Exception {
+    public Particle read(final ByteBuf buffer) {
         final int type = Type.VAR_INT.readPrimitive(buffer);
         final Particle particle = new Particle(type);
         readData(buffer, particle);

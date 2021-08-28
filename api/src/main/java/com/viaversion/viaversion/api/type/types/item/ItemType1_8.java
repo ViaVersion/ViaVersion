@@ -35,7 +35,7 @@ public class ItemType1_8 extends Type<Item> {
     }
 
     @Override
-    public @Nullable Item read(ByteBuf buffer) throws Exception {
+    public @Nullable Item read(ByteBuf buffer) {
         short id = buffer.readShort();
         if (id < 0) {
             return null;
@@ -50,7 +50,7 @@ public class ItemType1_8 extends Type<Item> {
     }
 
     @Override
-    public void write(ByteBuf buffer, @Nullable Item object) throws Exception {
+    public void write(ByteBuf buffer, @Nullable Item object) {
         if (object == null) {
             buffer.writeShort(-1);
         } else {

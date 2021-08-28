@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.util.Config;
 
-public class AutoTeamSubCmd extends ViaSubCommand {
+public class AutoTeamSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "autoteam";

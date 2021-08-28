@@ -27,14 +27,12 @@ import com.viaversion.viaversion.util.SerializerVersion;
 public final class ChatItemRewriter {
 
     public static void toClient(JsonElement element) {
-        if (element instanceof JsonObject) {
-            JsonObject obj = (JsonObject) element;
+        if (element instanceof final JsonObject obj) {
             if (obj.has("hoverEvent")) {
-                if (!(obj.get("hoverEvent") instanceof JsonObject)) {
+                if (!(obj.get("hoverEvent") instanceof final JsonObject hoverEvent)) {
                     return;
                 }
 
-                final JsonObject hoverEvent = (JsonObject) obj.get("hoverEvent");
                 if (!hoverEvent.has("action") || !hoverEvent.has("value")) {
                     return;
                 }
@@ -49,8 +47,7 @@ public final class ChatItemRewriter {
             } else if (obj.has("extra")) {
                 toClient(obj.get("extra"));
             }
-        } else if (element instanceof JsonArray) {
-            JsonArray array = (JsonArray) element;
+        } else if (element instanceof final JsonArray array) {
             for (JsonElement value : array) {
                 toClient(value);
             }

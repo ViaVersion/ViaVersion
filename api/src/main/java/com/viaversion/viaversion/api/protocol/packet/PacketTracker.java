@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 
 public class PacketTracker {
     private final UserConnection connection;
+    private boolean packetLimiterEnabled = true;
     private long sentPackets;
     private long receivedPackets;
     // Used for tracking pps
@@ -161,5 +162,13 @@ public class PacketTracker {
 
     public void setWarnings(int warnings) {
         this.warnings = warnings;
+    }
+
+    public boolean isPacketLimiterEnabled() {
+        return packetLimiterEnabled;
+    }
+
+    public void setPacketLimiterEnabled(boolean packetLimiterEnabled) {
+        this.packetLimiterEnabled = packetLimiterEnabled;
     }
 }

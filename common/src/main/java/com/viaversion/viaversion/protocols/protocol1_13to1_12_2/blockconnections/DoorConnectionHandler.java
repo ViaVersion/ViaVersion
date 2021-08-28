@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class DoorConnectionHandler extends ConnectionHandler {
+public class DoorConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<DoorData> DOOR_DATA_MAP = new Int2ObjectOpenHashMap<>();
     private static final Map<Short, Integer> CONNECTED_STATES = new HashMap<>();
 
@@ -68,12 +68,12 @@ public class DoorConnectionHandler extends ConnectionHandler {
 
     private static short getStates(DoorData doorData) {
         short s = 0;
-        if (doorData.isLower()) s |= 1;
-        if (doorData.isOpen()) s |= 2;
-        if (doorData.isPowered()) s |= 4;
-        if (doorData.isRightHinge()) s |= 8;
-        s |= doorData.getFacing().ordinal() << 4;
-        s |= (doorData.getType() & 0x7) << 6;
+        if (doorData.lower()) s |= 1;
+        if (doorData.open()) s |= 2;
+        if (doorData.powered()) s |= 4;
+        if (doorData.rightHinge()) s |= 8;
+        s |= doorData.facing().ordinal() << 4;
+        s |= (doorData.type() & 0x7) << 6;
         return s;
     }
 
@@ -82,64 +82,29 @@ public class DoorConnectionHandler extends ConnectionHandler {
         DoorData doorData = DOOR_DATA_MAP.get(blockState);
         if (doorData == null) return blockState;
         short s = 0;
-        s |= (doorData.getType() & 0x7) << 6;
-        if (doorData.isLower()) {
+        s |= (doorData.type() & 0x7) << 6;
+        if (doorData.lower()) {
             DoorData upperHalf = DOOR_DATA_MAP.get(getBlockData(user, position.getRelative(BlockFace.TOP)));
             if (upperHalf == null) return blockState;
             s |= 1;
-            if (doorData.isOpen()) s |= 2;
-            if (upperHalf.isPowered()) s |= 4;
-            if (upperHalf.isRightHinge()) s |= 8;
-            s |= doorData.getFacing().ordinal() << 4;
+            if (doorData.open()) s |= 2;
+            if (upperHalf.powered()) s |= 4;
+            if (upperHalf.rightHinge()) s |= 8;
+            s |= doorData.facing().ordinal() << 4;
         } else {
             DoorData lowerHalf = DOOR_DATA_MAP.get(getBlockData(user, position.getRelative(BlockFace.BOTTOM)));
             if (lowerHalf == null) return blockState;
-            if (lowerHalf.isOpen()) s |= 2;
-            if (doorData.isPowered()) s |= 4;
-            if (doorData.isRightHinge()) s |= 8;
-            s |= lowerHalf.getFacing().ordinal() << 4;
+            if (lowerHalf.open()) s |= 2;
+            if (doorData.powered()) s |= 4;
+            if (doorData.rightHinge()) s |= 8;
+            s |= lowerHalf.facing().ordinal() << 4;
         }
 
         Integer newBlockState = CONNECTED_STATES.get(s);
         return newBlockState == null ? blockState : newBlockState;
     }
 
-    private static final class DoorData {
-        private final boolean lower, rightHinge, powered, open;
-        private final BlockFace facing;
-        private final int type;
-
-        private DoorData(boolean lower, boolean rightHinge, boolean powered, boolean open, BlockFace facing, int type) {
-            this.lower = lower;
-            this.rightHinge = rightHinge;
-            this.powered = powered;
-            this.open = open;
-            this.facing = facing;
-            this.type = type;
-        }
-
-        public boolean isLower() {
-            return lower;
-        }
-
-        public boolean isRightHinge() {
-            return rightHinge;
-        }
-
-        public boolean isPowered() {
-            return powered;
-        }
-
-        public boolean isOpen() {
-            return open;
-        }
-
-        public BlockFace getFacing() {
-            return facing;
-        }
-
-        public int getType() {
-            return type;
-        }
+    private record DoorData(boolean lower, boolean rightHinge, boolean powered,
+                            boolean open, BlockFace facing, int type) {
     }
 }

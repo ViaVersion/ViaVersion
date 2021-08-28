@@ -82,11 +82,11 @@ public class VarLongType extends Type<Long> implements TypeConverter<Long> {
 
     @Override
     public Long from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).longValue();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o) ? 1L : 0L;
+        if (o instanceof Number number) {
+            return number.longValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? 1L : 0L;
         }
-        return (Long) o;
+        throw new UnsupportedOperationException();
     }
 }

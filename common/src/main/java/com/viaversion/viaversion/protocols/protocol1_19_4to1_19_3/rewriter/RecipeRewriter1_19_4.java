@@ -30,7 +30,7 @@ public class RecipeRewriter1_19_4<C extends ClientboundPacketType> extends Recip
     }
 
     @Override
-    public void handleCraftingShaped(final PacketWrapper wrapper) throws Exception {
+    public void handleCraftingShaped(final PacketWrapper wrapper) {
         super.handleCraftingShaped(wrapper);
         wrapper.passthrough(Type.BOOLEAN); // Show notification
     }

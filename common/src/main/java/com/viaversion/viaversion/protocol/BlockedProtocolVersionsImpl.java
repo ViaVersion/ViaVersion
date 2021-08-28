@@ -21,36 +21,13 @@ import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.Set;
 
-public class BlockedProtocolVersionsImpl implements BlockedProtocolVersions {
-    private final Set<ProtocolVersion> singleBlockedVersions;
-    private final ProtocolVersion blocksBelow;
-    private final ProtocolVersion blocksAbove;
-
-    public BlockedProtocolVersionsImpl(final Set<ProtocolVersion> singleBlockedVersions, final ProtocolVersion blocksBelow, final ProtocolVersion blocksAbove) {
-        this.singleBlockedVersions = singleBlockedVersions;
-        this.blocksBelow = blocksBelow;
-        this.blocksAbove = blocksAbove;
-    }
+public record BlockedProtocolVersionsImpl(Set<ProtocolVersion> singleBlockedVersions, ProtocolVersion blocksBelow,
+                                          ProtocolVersion blocksAbove) implements BlockedProtocolVersions {
 
     @Override
     public boolean contains(final ProtocolVersion protocolVersion) {
         return blocksBelow.isKnown() && protocolVersion.olderThan(blocksBelow)
                 || blocksAbove.isKnown() && protocolVersion.newerThan(blocksAbove)
                 || singleBlockedVersions.contains(protocolVersion);
-    }
-
-    @Override
-    public ProtocolVersion blocksBelow() {
-        return blocksBelow;
-    }
-
-    @Override
-    public ProtocolVersion blocksAbove() {
-        return blocksAbove;
-    }
-
-    @Override
-    public Set<ProtocolVersion> singleBlockedVersions() {
-        return singleBlockedVersions;
     }
 }

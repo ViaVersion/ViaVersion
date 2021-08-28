@@ -335,11 +335,11 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         };
     }
 
-    private void convertComponent(final PacketWrapper wrapper) throws Exception {
+    private void convertComponent(final PacketWrapper wrapper) {
         wrapper.write(Type.TAG, ComponentUtil.jsonToTag(wrapper.read(Type.COMPONENT)));
     }
 
-    private void convertOptionalComponent(final PacketWrapper wrapper) throws Exception {
+    private void convertOptionalComponent(final PacketWrapper wrapper) {
         wrapper.write(Type.OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Type.OPTIONAL_COMPONENT)));
     }
 

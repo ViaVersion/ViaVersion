@@ -165,10 +165,6 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<CompoundTag> NBT = NAMED_COMPOUND_TAG;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<CompoundTag[]> NBT_ARRAY = NAMED_COMPOUND_TAG_ARRAY;
 
     public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();
@@ -215,22 +211,6 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Item[]> ITEM1_13_ARRAY = new ArrayType<>(ITEM1_13);
     public static final Type<Item[]> ITEM1_13_2_ARRAY = new ArrayType<>(ITEM1_13_2);
     public static final Type<Item[]> ITEM1_20_2_ARRAY = new ArrayType<>(ITEM1_20_2);
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item> ITEM = ITEM1_8;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item> FLAT_ITEM = ITEM1_13;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item> FLAT_VAR_INT_ITEM = ITEM1_13_2;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item[]> ITEM_ARRAY = ITEM1_8_SHORT_ARRAY;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item[]> FLAT_ITEM_ARRAY = ITEM1_13_SHORT_ARRAY;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item[]> FLAT_VAR_INT_ITEM_ARRAY = ITEM1_13_2_SHORT_ARRAY;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item[]> FLAT_ITEM_ARRAY_VAR_INT = ITEM1_13_ARRAY;
-    @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item[]> FLAT_VAR_INT_ITEM_ARRAY_VAR_INT = ITEM1_13_2_ARRAY;
 
     /* Actual Class */
     private final Class<? super T> outputClass;

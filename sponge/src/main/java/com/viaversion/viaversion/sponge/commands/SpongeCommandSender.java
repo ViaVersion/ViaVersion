@@ -43,8 +43,8 @@ public class SpongeCommandSender implements ViaCommandSender {
 
     @Override
     public UUID getUUID() {
-        if (source instanceof Identifiable) {
-            return ((Identifiable) source).uniqueId();
+        if (source instanceof Identifiable identifiable) {
+            return identifiable.uniqueId();
         } else {
             return new UUID(0, 0);
         }

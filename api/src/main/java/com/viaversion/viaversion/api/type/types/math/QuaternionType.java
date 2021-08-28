@@ -33,7 +33,7 @@ public class QuaternionType extends Type<Quaternion> {
     }
 
     @Override
-    public Quaternion read(final ByteBuf buffer) throws Exception {
+    public Quaternion read(final ByteBuf buffer) {
         final float x = buffer.readFloat();
         final float y = buffer.readFloat();
         final float z = buffer.readFloat();
@@ -42,7 +42,7 @@ public class QuaternionType extends Type<Quaternion> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Quaternion object) throws Exception {
+    public void write(final ByteBuf buffer, final Quaternion object) {
         buffer.writeFloat(object.x());
         buffer.writeFloat(object.y());
         buffer.writeFloat(object.z());

@@ -25,9 +25,9 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class Unbreakable {
+public record Unbreakable(boolean showInTooltip) {
 
-    public static final Type<Unbreakable> TYPE = new Type<Unbreakable>(Unbreakable.class) {
+    public static final Type<Unbreakable> TYPE = new Type<>(Unbreakable.class) {
         @Override
         public Unbreakable read(final ByteBuf buffer) {
             return new Unbreakable(buffer.readBoolean());
@@ -39,13 +39,4 @@ public final class Unbreakable {
         }
     };
 
-    private final boolean showInTooltip;
-
-    public Unbreakable(final boolean showInTooltip) {
-        this.showInTooltip = showInTooltip;
-    }
-
-    public boolean showInTooltip() {
-        return showInTooltip;
-    }
 }

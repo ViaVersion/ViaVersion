@@ -383,7 +383,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     }
 
     @Override
-    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException {
         PacketMappings mappings = direction == Direction.CLIENTBOUND ? clientboundMappings : serverboundMappings;
         int unmappedId = packetWrapper.getId();
         PacketMapping packetMapping = mappings.mappedPacket(state, unmappedId);
@@ -397,8 +397,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         if (handler != null) {
             try {
                 handler.handle(packetWrapper);
-            } catch (CancelException e) {
-                throw e; // Pass through CancelExceptions
             } catch (InformativeException e) {
                 e.addSource(handler.getClass());
                 printRemapError(direction, state, unmappedId, packetWrapper.getId(), e);

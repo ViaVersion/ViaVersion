@@ -23,12 +23,7 @@ import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import java.util.UUID;
 
-public class VelocityCommandSender implements ViaCommandSender {
-    private final CommandSource source;
-
-    public VelocityCommandSender(CommandSource source) {
-        this.source = source;
-    }
+public record VelocityCommandSender(CommandSource source) implements ViaCommandSender {
 
     @Override
     public boolean hasPermission(String permission) {
@@ -42,16 +37,16 @@ public class VelocityCommandSender implements ViaCommandSender {
 
     @Override
     public UUID getUUID() {
-        if (source instanceof Player) {
-            return ((Player) source).getUniqueId();
+        if (source instanceof Player player) {
+            return player.getUniqueId();
         }
         return new UUID(0, 0);
     }
 
     @Override
     public String getName() {
-        if (source instanceof Player) {
-            return ((Player) source).getUsername();
+        if (source instanceof Player player) {
+            return player.getUsername();
         }
         return "?"; // :(
     }

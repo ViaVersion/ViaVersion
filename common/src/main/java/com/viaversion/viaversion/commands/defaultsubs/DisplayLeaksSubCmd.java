@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import io.netty.util.ResourceLeakDetector;
 
-public class DisplayLeaksSubCmd extends ViaSubCommand {
+public class DisplayLeaksSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "displayleaks";

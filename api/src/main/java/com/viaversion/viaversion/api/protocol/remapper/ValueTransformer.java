@@ -46,12 +46,11 @@ public abstract class ValueTransformer<T1, T2> implements ValueWriter<T1> {
      * @param wrapper    The current packet
      * @param inputValue The input value
      * @return The value to write to the wrapper
-     * @throws Exception Throws exception if it fails to transform a value
      */
-    public abstract T2 transform(PacketWrapper wrapper, T1 inputValue) throws Exception;
+    public abstract T2 transform(PacketWrapper wrapper, T1 inputValue) throws InformativeException;
 
     @Override
-    public void write(PacketWrapper writer, T1 inputValue) throws Exception {
+    public void write(PacketWrapper writer, T1 inputValue) throws InformativeException {
         try {
             writer.write(outputType, transform(writer, inputValue));
         } catch (InformativeException e) {

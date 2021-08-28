@@ -106,8 +106,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                     metadata.setValue(value);
                 }
                 break;
-            case Float:
-            case String:
+            case Float, String:
                 metadata.setValue(value);
                 break;
             case Boolean:

@@ -82,7 +82,7 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
         this.chatSession = new ChatSession(sessionId, profileKey);
     }
 
-    public void sendQueuedChatSession(final PacketWrapper wrapper) throws Exception {
+    public void sendQueuedChatSession(final PacketWrapper wrapper) {
         if (chatSession == null) {
             return;
         }
@@ -94,22 +94,7 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
         chatSession = null;
     }
 
-    public static final class ChatSession {
-        private final UUID sessionId;
-        private final ProfileKey profileKey;
-
-        public ChatSession(final UUID sessionId, final ProfileKey profileKey) {
-            this.sessionId = sessionId;
-            this.profileKey = profileKey;
-        }
-
-        public UUID sessionId() {
-            return sessionId;
-        }
-
-        public ProfileKey profileKey() {
-            return profileKey;
-        }
+    public record ChatSession(UUID sessionId, ProfileKey profileKey) {
     }
 
     public void clear() {

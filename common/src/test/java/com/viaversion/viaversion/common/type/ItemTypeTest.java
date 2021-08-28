@@ -24,9 +24,10 @@ import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ItemTypeTest {
+class ItemTypeTest {
+
     @Test
-    public void testEmptyItemRead() throws Exception {
+    void testEmptyItemRead() {
         // Test empty item read
         Assertions.assertNull(Type.ITEM1_8.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
         Assertions.assertNull(Type.ITEM1_13.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
@@ -34,8 +35,7 @@ public class ItemTypeTest {
     }
 
     @Test
-    public void testNormalItemRead() throws Exception {
-
+    void testNormalItemRead() {
         // Test item read
         Assertions.assertEquals(
                 new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null),
@@ -66,7 +66,7 @@ public class ItemTypeTest {
     }
 
     @Test
-    public void testEmptyItemWrite() throws Exception {
+    void testEmptyItemWrite() {
         ByteBuf buf = Unpooled.buffer();
 
         // Test item empty write
@@ -79,7 +79,7 @@ public class ItemTypeTest {
     }
 
     @Test
-    public void testNormalItemWrite() throws Exception {
+    void testNormalItemWrite() {
         ByteBuf buf = Unpooled.buffer();
 
         // Test item write

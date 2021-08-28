@@ -54,7 +54,7 @@ import com.viaversion.viaversion.util.SerializerVersion;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
 
-    public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<String, JsonElement>(Type.COMPONENT) {
+    public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<>(Type.COMPONENT) {
         @Override
         public JsonElement transform(PacketWrapper wrapper, String line) {
             return ComponentUtil.convertJsonOrEmpty(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
@@ -71,16 +71,15 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     }
 
     public static boolean isSword(int id) {
-        switch (id) {
-            case 267: // Iron sword
-            case 268: // Wooden sword
-            case 272: // Stone sword
-            case 276: // Diamond sword
-            case 283: // Gold sword
-                return true;
-            default:
-                return false;
-        }
+        return switch (id) {
+            case 267, // Iron sword
+                 268, // Wooden sword
+                 272, // Stone sword
+                 276, // Diamond sword
+                 283  // Gold sword
+                -> true;
+            default -> false;
+        };
     }
 
     @Override

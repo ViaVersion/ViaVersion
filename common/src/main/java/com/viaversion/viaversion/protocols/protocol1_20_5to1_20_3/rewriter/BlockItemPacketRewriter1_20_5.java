@@ -320,7 +320,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         });
 
-        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<ClientboundPacket1_20_3>(protocol) {
+        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol) {
             @Override
             protected Item rewrite(final UserConnection connection, @Nullable Item item) {
                 item = super.rewrite(connection, item);
@@ -704,8 +704,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final List<ToolRule> rules = new ArrayList<>();
         for (final CompoundTag tag : rulesTag) {
             HolderSet blocks = null;
-            if (tag.get("blocks") instanceof StringTag) {
-                blocks = HolderSet.of(tag.getString("blocks"));
+            if (tag.get("blocks") instanceof StringTag blocksTag) {
+                blocks = HolderSet.of(blocksTag.getValue());
             } else {
                 final IntArrayTag blockIds = tag.getIntArrayTag("blocks");
                 if (blockIds != null) {
@@ -912,16 +912,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateArmorTrim(final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial> materialHolder;
-        if (materialTag instanceof StringTag) {
+        if (materialTag instanceof StringTag materialStringTag) {
             // Would technically have to be stored and retrieved from registry data, but that'd mean a lot of work
-            final int id = TrimMaterials1_20_3.keyToId(((StringTag) materialTag).getValue());
+            final int id = TrimMaterials1_20_3.keyToId(materialStringTag.getValue());
             if (id == -1) {
                 return;
             }
 
             materialHolder = Holder.of(id);
-        } else if (materialTag instanceof CompoundTag) {
-            final CompoundTag materialCompoundTag = (CompoundTag) materialTag;
+        } else if (materialTag instanceof CompoundTag materialCompoundTag) {
             final StringTag assetNameTag = materialCompoundTag.getStringTag("asset_name");
             final StringTag ingredientTag = materialCompoundTag.getStringTag("ingredient");
             if (assetNameTag == null || ingredientTag == null) {
@@ -940,12 +939,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>();
             if (overrideArmorMaterialsTag != null) {
                 for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
-                    if (!(entry.getValue() instanceof StringTag)) {
+                    if (!(entry.getValue() instanceof StringTag valueTag)) {
                         continue;
                     }
                     try {
                         final int id = Integer.parseInt(entry.getKey());
-                        overrideArmorMaterials.put(id, ((StringTag) entry.getValue()).getValue());
+                        overrideArmorMaterials.put(id, valueTag.getValue());
                     } catch (NumberFormatException ignored) {
                     }
                 }
@@ -962,15 +961,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final Tag patternTag = trimTag.get("pattern");
         final Holder<ArmorTrimPattern> patternHolder;
-        if (patternTag instanceof StringTag) {
+        if (patternTag instanceof StringTag patternStringTag) {
             // Would technically have to be stored and retrieved from registry data, but that'd mean a lot of work
-            final int id = TrimPatterns1_20_3.keyToId(((StringTag) patternTag).getValue());
+            final int id = TrimPatterns1_20_3.keyToId(patternStringTag.getValue());
             if (id == -1) {
                 return;
             }
             patternHolder = Holder.of(id);
-        } else if (patternTag instanceof CompoundTag) {
-            final CompoundTag patternCompoundTag = (CompoundTag) patternTag;
+        } else if (patternTag instanceof CompoundTag patternCompoundTag) {
             final String assetId = patternCompoundTag.getString("assetId");
             final String templateItem = patternCompoundTag.getString("templateItem");
             if (assetId == null || templateItem == null) {
@@ -1014,10 +1012,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         for (final Map.Entry<String, Tag> entry : blockState.entrySet()) {
             // Only String and IntTags are valid
             final Tag value = entry.getValue();
-            if (value instanceof StringTag) {
-                properties.put(entry.getKey(), ((StringTag) value).getValue());
-            } else if (value instanceof IntTag) {
-                properties.put(entry.getKey(), Integer.toString(((NumberTag) value).asInt()));
+            if (value instanceof StringTag valueStringTag) {
+                properties.put(entry.getKey(), valueStringTag.getValue());
+            } else if (value instanceof IntTag valueIntTag) {
+                properties.put(entry.getKey(), Integer.toString(valueIntTag.asInt()));
             }
         }
         data.set(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
@@ -1224,13 +1222,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateProfile(final StructuredDataContainer data, final Tag skullOwnerTag) {
-        if (skullOwnerTag instanceof StringTag) {
-            final String name = ((StringTag) skullOwnerTag).getValue();
+        if (skullOwnerTag instanceof StringTag nameTag) {
+            final String name = nameTag.getValue();
             if (isValidName(name)) {
                 data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
             }
-        } else if (skullOwnerTag instanceof CompoundTag) {
-            final CompoundTag skullOwner = (CompoundTag) skullOwnerTag;
+        } else if (skullOwnerTag instanceof CompoundTag skullOwner) {
             String name = skullOwner.getString("Name", "");
             if (!isValidName(name)) {
                 name = null;
@@ -1277,16 +1274,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     private void updateProperties(final CompoundTag propertiesTag, final List<GameProfile.Property> properties) {
         for (final Map.Entry<String, Tag> entry : propertiesTag.entrySet()) {
-            if (!(entry.getValue() instanceof ListTag)) {
+            if (!(entry.getValue() instanceof ListTag<?> listTag)) {
                 continue;
             }
 
-            for (final Tag propertyTag : (ListTag<?>) entry.getValue()) {
-                if (!(propertyTag instanceof CompoundTag)) {
+            for (final Tag propertyTag : listTag) {
+                if (!(propertyTag instanceof CompoundTag compoundTag)) {
                     continue;
                 }
 
-                final CompoundTag compoundTag = (CompoundTag) propertyTag;
                 final String value = compoundTag.getString("Value", "");
                 final String signature = compoundTag.getString("Signature");
                 properties.add(new GameProfile.Property(
@@ -1419,20 +1415,20 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
 
             final Tag baseColorTag = tag.remove("Base");
-            if (baseColorTag instanceof NumberTag) {
-                data.set(StructuredDataKey.BASE_COLOR, ((NumberTag) baseColorTag).asInt());
+            if (baseColorTag instanceof NumberTag baseColorIntTag) {
+                data.set(StructuredDataKey.BASE_COLOR, baseColorIntTag.asInt());
             }
 
             updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER, true);
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");
-        if (skullOwnerTag instanceof StringTag) {
+        if (skullOwnerTag instanceof StringTag nameTag) {
             final CompoundTag profileTag = new CompoundTag();
-            profileTag.putString("name", ((StringTag) skullOwnerTag).getValue());
+            profileTag.putString("name", nameTag.getValue());
             tag.put("profile", profileTag);
-        } else if (skullOwnerTag instanceof CompoundTag) {
-            updateSkullOwnerTag(tag, (CompoundTag) skullOwnerTag);
+        } else if (skullOwnerTag instanceof CompoundTag skullOwnerCompoundTag) {
+            updateSkullOwnerTag(tag, skullOwnerCompoundTag);
         }
 
         final ListTag<CompoundTag> patternsTag = tag.getListTag("Patterns", CompoundTag.class);
@@ -1493,25 +1489,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             profileTag.put("id", idTag);
         }
 
-        final Tag propertiesTag = skullOwnerTag.remove("Properties");
-        if (!(propertiesTag instanceof CompoundTag)) {
+        if (!(skullOwnerTag.remove("Properties") instanceof CompoundTag propertiesTag)) {
             return;
         }
 
         final ListTag<CompoundTag> propertiesListTag = new ListTag<>(CompoundTag.class);
-        for (final Map.Entry<String, Tag> entry : ((CompoundTag) propertiesTag).entrySet()) {
-            if (!(entry.getValue() instanceof ListTag<?>)) {
+        for (final Map.Entry<String, Tag> entry : propertiesTag.entrySet()) {
+            if (!(entry.getValue() instanceof ListTag<?> entryValue)) {
                 continue;
             }
 
-            final ListTag<?> entryValue = (ListTag<?>) entry.getValue();
             for (final Tag propertyTag : entryValue) {
-                if (!(propertyTag instanceof CompoundTag)) {
+                if (!(propertyTag instanceof CompoundTag propertyCompoundTag)) {
                     continue;
                 }
 
                 final CompoundTag updatedPropertyTag = new CompoundTag();
-                final CompoundTag propertyCompoundTag = (CompoundTag) propertyTag;
                 final String value = propertyCompoundTag.getString("Value", "");
                 final String signature = propertyCompoundTag.getString("Signature");
                 updatedPropertyTag.putString("name", entry.getKey());

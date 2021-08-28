@@ -33,7 +33,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
     }
 
     @Override
-    public Holder<T> read(final ByteBuf buffer) throws Exception {
+    public Holder<T> read(final ByteBuf buffer) {
         final int id = Type.VAR_INT.readPrimitive(buffer) - 1; // Normalize id
         if (id == -1) {
             return Holder.of(readDirect(buffer));
@@ -42,7 +42,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Holder<T> object) throws Exception {
+    public void write(final ByteBuf buffer, final Holder<T> object) {
         if (object.hasId()) {
             Type.VAR_INT.writePrimitive(buffer, object.id() + 1); // Normalize id
         } else {
@@ -51,7 +51,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
         }
     }
 
-    public abstract T readDirect(final ByteBuf buffer) throws Exception;
+    public abstract T readDirect(final ByteBuf buffer);
 
-    public abstract void writeDirect(final ByteBuf buffer, final T object) throws Exception;
+    public abstract void writeDirect(final ByteBuf buffer, final T object);
 }

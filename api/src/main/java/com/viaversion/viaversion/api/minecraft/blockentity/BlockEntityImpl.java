@@ -24,38 +24,7 @@ package com.viaversion.viaversion.api.minecraft.blockentity;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 
-public final class BlockEntityImpl implements BlockEntity {
-    private final byte packedXZ;
-    private final short y;
-    private final int typeId;
-    private final CompoundTag tag;
-
-    public BlockEntityImpl(final byte packedXZ, final short y, final int typeId, final CompoundTag tag) {
-        this.packedXZ = packedXZ;
-        this.y = y;
-        this.typeId = typeId;
-        this.tag = tag;
-    }
-
-    @Override
-    public byte packedXZ() {
-        return packedXZ;
-    }
-
-    @Override
-    public short y() {
-        return y;
-    }
-
-    @Override
-    public int typeId() {
-        return typeId;
-    }
-
-    @Override
-    public CompoundTag tag() {
-        return tag;
-    }
+public record BlockEntityImpl(byte packedXZ, short y, int typeId, CompoundTag tag) implements BlockEntity {
 
     @Override
     public BlockEntity withTypeId(int typeId) {
