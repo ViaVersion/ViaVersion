@@ -157,7 +157,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void passthroughAndProcess(final PacketWrapper wrapper) throws Exception {
+    public void passthroughAndProcess(final PacketWrapper wrapper) {
         switch (type) {
             case JSON:
                 processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));

@@ -38,19 +38,27 @@ public class TagType extends Type<Tag> {
     }
 
     @Override
-    public Tag read(final ByteBuf buffer) throws IOException {
+    public Tag read(final ByteBuf buffer) {
         final byte id = buffer.readByte();
         if (id == 0) {
             return null;
         }
 
         final TagLimiter tagLimiter = TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
-        return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
+        try {
+            return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Tag tag) throws IOException {
-        NamedCompoundTagType.write(buffer, tag, null);
+    public void write(final ByteBuf buffer, final Tag tag) {
+        try {
+            NamedCompoundTagType.write(buffer, tag, null);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static final class OptionalTagType extends OptionalType<Tag> {

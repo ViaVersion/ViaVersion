@@ -60,11 +60,11 @@ public class DoubleType extends Type<Double> implements TypeConverter<Double> {
 
     @Override
     public Double from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else if (o instanceof Boolean) {
-            return (Boolean) o ? (byte) 1D : 0D;
+        if (o instanceof Number number) {
+            return number.doubleValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? (byte) 1D : 0D;
         }
-        return (Double) o;
+        throw new UnsupportedOperationException();
     }
 }

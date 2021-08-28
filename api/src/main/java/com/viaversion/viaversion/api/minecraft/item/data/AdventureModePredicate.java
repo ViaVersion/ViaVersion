@@ -25,36 +25,21 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class AdventureModePredicate {
+public record AdventureModePredicate(BlockPredicate[] predicates, boolean showInTooltip) {
 
-    public static final Type<AdventureModePredicate> TYPE = new Type<AdventureModePredicate>(AdventureModePredicate.class) {
+    public static final Type<AdventureModePredicate> TYPE = new Type<>(AdventureModePredicate.class) {
         @Override
-        public AdventureModePredicate read(final ByteBuf buffer) throws Exception {
+        public AdventureModePredicate read(final ByteBuf buffer) {
             final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
             return new AdventureModePredicate(predicates, showInTooltip);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final AdventureModePredicate value) throws Exception {
+        public void write(final ByteBuf buffer, final AdventureModePredicate value) {
             BlockPredicate.ARRAY_TYPE.write(buffer, value.predicates);
             buffer.writeBoolean(value.showInTooltip);
         }
     };
 
-    private final BlockPredicate[] predicates;
-    private final boolean showInTooltip;
-
-    public AdventureModePredicate(final BlockPredicate[] predicates, final boolean showInTooltip) {
-        this.predicates = predicates;
-        this.showInTooltip = showInTooltip;
-    }
-
-    public BlockPredicate[] predicates() {
-        return predicates;
-    }
-
-    public boolean showInTooltip() {
-        return showInTooltip;
-    }
 }

@@ -26,7 +26,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Arrays;
 import java.util.Locale;
 
-public class TripwireConnectionHandler extends ConnectionHandler {
+public class TripwireConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<TripwireData> TRIPWIRE_DATA_MAP = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<BlockFace> TRIPWIRE_HOOKS = new Int2ObjectArrayMap<>();
     private static final int[] CONNECTED_BLOCKS = new int[128];
@@ -69,9 +69,9 @@ public class TripwireConnectionHandler extends ConnectionHandler {
         TripwireData tripwireData = TRIPWIRE_DATA_MAP.get(blockState);
         if (tripwireData == null) return blockState;
         byte b = 0;
-        if (tripwireData.isAttached()) b |= 1;
-        if (tripwireData.isDisarmed()) b |= 2;
-        if (tripwireData.isPowered()) b |= 4;
+        if (tripwireData.attached()) b |= 1;
+        if (tripwireData.disarmed()) b |= 2;
+        if (tripwireData.powered()) b |= 4;
 
         int east = getBlockData(user, position.getRelative(BlockFace.EAST));
         int north = getBlockData(user, position.getRelative(BlockFace.NORTH));
@@ -95,25 +95,6 @@ public class TripwireConnectionHandler extends ConnectionHandler {
         return newBlockState == -1 ? blockState : newBlockState;
     }
 
-    private static final class TripwireData {
-        private final boolean attached, disarmed, powered;
-
-        private TripwireData(final boolean attached, final boolean disarmed, final boolean powered) {
-            this.attached = attached;
-            this.disarmed = disarmed;
-            this.powered = powered;
-        }
-
-        public boolean isAttached() {
-            return attached;
-        }
-
-        public boolean isDisarmed() {
-            return disarmed;
-        }
-
-        public boolean isPowered() {
-            return powered;
-        }
+    private record TripwireData(boolean attached, boolean disarmed, boolean powered) {
     }
 }

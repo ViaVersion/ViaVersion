@@ -24,9 +24,9 @@ import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class StringTypeTest {
+class StringTypeTest {
     @Test
-    public void testStringWrite() throws Exception {
+    void testStringWrite() {
         // Write
         final ByteBuf buf = Unpooled.buffer();
         Type.STRING.write(buf, "\uD83E\uDDFD"); // Sponge Emoji
@@ -34,7 +34,7 @@ public class StringTypeTest {
     }
 
     @Test
-    public void testStringRead() throws Exception {
+    void testStringRead() throws Exception {
         // Write
         final ByteBuf buf = Unpooled.buffer();
         Type.STRING.write(buf, new String(new char[Short.MAX_VALUE]));
@@ -48,7 +48,7 @@ public class StringTypeTest {
     }
 
     @Test
-    public void testStringReadOverflowException() {
+    void testStringReadOverflowException() {
         // Read exception
         final ByteBuf buf = Unpooled.buffer();
         Type.VAR_INT.writePrimitive(buf, (Short.MAX_VALUE + 1) * 4);
@@ -59,7 +59,7 @@ public class StringTypeTest {
     }
 
     @Test
-    public void testStringWriteOverflowException() {
+    void testStringWriteOverflowException() {
         // Write exceptions
         final ByteBuf buf = Unpooled.buffer();
         Assertions.assertThrows(IllegalArgumentException.class, () -> Type.STRING.write(buf, new String(new char[Short.MAX_VALUE / 2 + 1]).replace("\0", "\uD83E\uDDFD")));

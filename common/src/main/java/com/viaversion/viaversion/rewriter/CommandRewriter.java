@@ -144,7 +144,7 @@ public class CommandRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void handleArgument(PacketWrapper wrapper, String argumentType) throws Exception {
+    public void handleArgument(PacketWrapper wrapper, String argumentType) {
         CommandArgumentConsumer handler = parserHandlers.get(argumentType);
         if (handler != null) {
             handler.accept(wrapper);
@@ -189,6 +189,6 @@ public class CommandRewriter<C extends ClientboundPacketType> {
     @FunctionalInterface
     public interface CommandArgumentConsumer {
 
-        void accept(PacketWrapper wrapper) throws Exception;
+        void accept(PacketWrapper wrapper);
     }
 }

@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
 
-public abstract class RewriterBase<T extends Protocol> implements Rewriter<T> {
+public abstract class RewriterBase<T extends Protocol<?, ?, ?, ?>> implements Rewriter<T> {
     protected final T protocol;
 
     protected RewriterBase(final T protocol) {

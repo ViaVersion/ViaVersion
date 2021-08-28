@@ -56,7 +56,7 @@ public interface ViaAPI<T> {
      * @since 4.0.2
      */
     default int majorVersion() {
-        return 4;
+        return 5;
     }
 
     /**

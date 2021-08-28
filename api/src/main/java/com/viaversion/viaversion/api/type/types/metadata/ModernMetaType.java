@@ -31,7 +31,7 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
     private static final int END = 255;
 
     @Override
-    public Metadata read(final ByteBuf buffer) throws Exception {
+    public Metadata read(final ByteBuf buffer) {
         final short index = buffer.readUnsignedByte();
         if (index == END) return null; // End of metadata
         final MetaType type = this.getType(Type.VAR_INT.readPrimitive(buffer));
@@ -41,7 +41,7 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
     protected abstract MetaType getType(final int index);
 
     @Override
-    public void write(final ByteBuf buffer, final Metadata object) throws Exception {
+    public void write(final ByteBuf buffer, final Metadata object) {
         if (object == null) {
             buffer.writeByte(END);
         } else {

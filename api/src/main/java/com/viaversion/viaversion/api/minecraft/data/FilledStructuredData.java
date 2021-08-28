@@ -45,7 +45,7 @@ final class FilledStructuredData<T> implements StructuredData<T> {
     }
 
     @Override
-    public void write(final ByteBuf buffer) throws Exception {
+    public void write(final ByteBuf buffer) {
         key.type().write(buffer, value);
     }
 

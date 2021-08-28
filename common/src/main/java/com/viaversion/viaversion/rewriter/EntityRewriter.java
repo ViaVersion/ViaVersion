@@ -593,7 +593,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
     }
 
-    public void rewriteParticle(PacketWrapper wrapper, Type<Particle> from, Type<Particle> to) throws Exception {
+    public void rewriteParticle(PacketWrapper wrapper, Type<Particle> from, Type<Particle> to) {
         final Particle particle = wrapper.read(from);
         rewriteParticle(wrapper.user(), particle);
         wrapper.write(to, particle);

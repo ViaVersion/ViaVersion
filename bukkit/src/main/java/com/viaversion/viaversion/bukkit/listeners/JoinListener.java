@@ -50,11 +50,10 @@ public class JoinListener implements Listener {
             connectionField = findField(true, gamePacketListenerField.getType(), "NetworkManager", "Connection");
             channelField = findField(connectionField.getType(), Class.forName("io.netty.channel.Channel"));
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
-            Via.getPlatform().getLogger().log(
-                    Level.WARNING,
-                    "Couldn't find reflection methods/fields to access Channel from player.\n" +
-                            "Login race condition fixer will be disabled.\n" +
-                            " Some plugins that use ViaAPI on join event may work incorrectly.", e);
+            Via.getPlatform().getLogger().log(Level.WARNING, """
+                Couldn't find reflection methods/fields to access Channel from player.
+                Login race condition fixer will be disabled.
+                Some plugins that use ViaAPI on join event may work incorrectly.""", e);
         }
         GET_HANDLE = getHandleMethod;
         CONNECTION = gamePacketListenerField;
@@ -109,7 +108,7 @@ public class JoinListener implements Listener {
             channel = getChannel(player);
         } catch (Exception ex) {
             Via.getPlatform().getLogger().log(Level.WARNING, ex,
-                    () -> "Could not find Channel for logging-in player " + player.getUniqueId());
+                () -> "Could not find Channel for logging-in player " + player.getUniqueId());
             return;
         }
         // The connection has already closed, that was a quick leave
@@ -118,8 +117,8 @@ public class JoinListener implements Listener {
         UserConnection user = getUserConnection(channel);
         if (user == null) {
             Via.getPlatform().getLogger().log(Level.WARNING,
-                    "Could not find UserConnection for logging-in player {0}",
-                    player.getUniqueId());
+                "Could not find UserConnection for logging-in player {0}",
+                player.getUniqueId());
             return;
         }
         ProtocolInfo info = user.getProtocolInfo();

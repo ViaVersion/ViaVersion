@@ -94,9 +94,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         registerCreativeInvAction(ServerboundPackets1_19_4.CREATIVE_INVENTORY_ACTION);
         registerClickWindow1_17_1(ServerboundPackets1_19_4.CLICK_WINDOW);
 
-        new RecipeRewriter1_19_3<ClientboundPackets1_19_3>(protocol) {
+        new RecipeRewriter1_19_3<>(protocol) {
             @Override
-            public void handleCraftingShaped(final PacketWrapper wrapper) throws Exception {
+            public void handleCraftingShaped(final PacketWrapper wrapper) {
                 super.handleCraftingShaped(wrapper);
                 wrapper.write(Type.BOOLEAN, true); // Show notification
             }

@@ -226,8 +226,7 @@ public abstract class Config {
 
     public <T> List<T> getListSafe(String key, Class<T> type, String invalidValueMessage) {
         Object o = this.config.get(key);
-        if (o instanceof List) {
-            List<?> list = (List<?>) o;
+        if (o instanceof List<?> list) {
             List<T> filteredValues = new ArrayList<>();
             for (Object o1 : list) {
                 if (type.isInstance(o1)) {

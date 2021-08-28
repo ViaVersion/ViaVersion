@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableComponent extends Filterable<Tag> {
 
-    public static final Type<FilterableComponent> TYPE = new FilterableType<Tag, FilterableComponent>(Type.TAG, Type.OPTIONAL_TAG, FilterableComponent.class) {
+    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Type.TAG, Type.OPTIONAL_TAG, FilterableComponent.class) {
         @Override
         protected FilterableComponent create(final Tag raw, final Tag filtered) {
             return new FilterableComponent(raw, filtered);

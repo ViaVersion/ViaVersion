@@ -24,7 +24,7 @@ import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ViaListener {
-    private final Class<? extends Protocol> requiredPipeline;
+    protected final Class<? extends Protocol> requiredPipeline;
     private boolean registered;
 
     protected ViaListener(Class<? extends Protocol> requiredPipeline) {
@@ -57,10 +57,6 @@ public abstract class ViaListener {
      * Register the event
      */
     public abstract void register();
-
-    protected Class<? extends Protocol> getRequiredPipeline() {
-        return requiredPipeline;
-    }
 
     protected boolean isRegistered() {
         return registered;

@@ -51,9 +51,13 @@ public class BungeeViaInjector implements ViaInjector {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void inject() throws ReflectiveOperationException {
         Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
+
+        // Iterate through current list
+        for (Channel channel : listeners) {
+            injectChannel(channel);
+        }
 
         // Inject the list
         Set<Channel> wrapper = new SetWrapper<>(listeners, channel -> {
@@ -65,11 +69,6 @@ public class BungeeViaInjector implements ViaInjector {
         });
 
         LISTENERS_FIELD.set(ProxyServer.getInstance(), wrapper);
-
-        // Iterate through current list
-        for (Channel channel : listeners) {
-            injectChannel(channel);
-        }
     }
 
     @Override
@@ -106,18 +105,18 @@ public class BungeeViaInjector implements ViaInjector {
 
             ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
             this.injectedChannels.add(channel);
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException ignored) {
             throw new RuntimeException("Unable to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
         }
     }
 
     @Override
-    public ProtocolVersion getServerProtocolVersion() throws Exception {
+    public ProtocolVersion getServerProtocolVersion() throws ReflectiveOperationException {
         return ProtocolVersion.getProtocol(getBungeeSupportedVersions().get(0));
     }
 
     @Override
-    public SortedSet<ProtocolVersion> getServerProtocolVersions() throws Exception {
+    public SortedSet<ProtocolVersion> getServerProtocolVersions() throws ReflectiveOperationException {
         final SortedSet<ProtocolVersion> versions = new ObjectLinkedOpenHashSet<>();
         for (final Integer version : getBungeeSupportedVersions()) {
             versions.add(ProtocolVersion.getProtocol(version));
@@ -125,8 +124,7 @@ public class BungeeViaInjector implements ViaInjector {
         return versions;
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Integer> getBungeeSupportedVersions() throws Exception {
+    private List<Integer> getBungeeSupportedVersions() throws ReflectiveOperationException {
         return ReflectionUtil.getStatic(Class.forName("net.md_5.bungee.protocol.ProtocolConstants"), "SUPPORTED_VERSION_IDS", List.class);
     }
 
@@ -157,8 +155,8 @@ public class BungeeViaInjector implements ViaInjector {
                 try {
                     Object child = ReflectionUtil.get(channelHandler, "childHandler", ChannelInitializer.class);
                     handlerInfo.addProperty("childClass", child.getClass().getName());
-                    if (child instanceof BungeeChannelInitializer) {
-                        handlerInfo.addProperty("oldInit", ((BungeeChannelInitializer) child).getOriginal().getClass().getName());
+                    if (child instanceof BungeeChannelInitializer bungeeChannelInitializer) {
+                        handlerInfo.addProperty("oldInit", bungeeChannelInitializer.getOriginal().getClass().getName());
                     }
                 } catch (ReflectiveOperationException e) {
                     // Don't display
@@ -176,8 +174,8 @@ public class BungeeViaInjector implements ViaInjector {
         try {
             Object list = LISTENERS_FIELD.get(ProxyServer.getInstance());
             data.addProperty("currentList", list.getClass().getName());
-            if (list instanceof SetWrapper) {
-                data.addProperty("wrappedList", ((SetWrapper<?>) list).originalSet().getClass().getName());
+            if (list instanceof SetWrapper<?> wrapper) {
+                data.addProperty("wrappedList", wrapper.originalSet().getClass().getName());
             }
         } catch (ReflectiveOperationException ignored) {
             // Ignored

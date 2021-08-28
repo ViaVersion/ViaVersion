@@ -32,7 +32,7 @@ public class VarIntArrayType extends Type<int[]> {
     }
 
     @Override
-    public int[] read(ByteBuf buffer) throws Exception {
+    public int[] read(ByteBuf buffer) {
         int length = Type.VAR_INT.readPrimitive(buffer);
         Preconditions.checkArgument(buffer.isReadable(length)); // Sanity check, at least 1 byte will be used for each varint
         int[] array = new int[length];
@@ -43,7 +43,7 @@ public class VarIntArrayType extends Type<int[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, int[] object) throws Exception {
+    public void write(ByteBuf buffer, int[] object) {
         Type.VAR_INT.writePrimitive(buffer, object.length);
         for (int i : object) {
             Type.VAR_INT.writePrimitive(buffer, i);

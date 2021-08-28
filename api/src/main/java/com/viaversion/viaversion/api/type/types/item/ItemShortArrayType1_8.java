@@ -29,7 +29,7 @@ import io.netty.buffer.ByteBuf;
 public class ItemShortArrayType1_8 extends BaseItemArrayType {
 
     @Override
-    public Item[] read(ByteBuf buffer) throws Exception {
+    public Item[] read(ByteBuf buffer) {
         int amount = Type.SHORT.readPrimitive(buffer);
         Item[] array = new Item[amount];
         for (int i = 0; i < amount; i++) {
@@ -39,7 +39,7 @@ public class ItemShortArrayType1_8 extends BaseItemArrayType {
     }
 
     @Override
-    public void write(ByteBuf buffer, Item[] object) throws Exception {
+    public void write(ByteBuf buffer, Item[] object) {
         Type.SHORT.writePrimitive(buffer, (short) object.length);
         for (Item o : object) {
             Type.ITEM1_8.write(buffer, o);

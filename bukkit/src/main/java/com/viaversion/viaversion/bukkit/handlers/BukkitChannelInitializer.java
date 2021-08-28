@@ -75,7 +75,7 @@ public final class BukkitChannelInitializer extends ChannelInitializer<Channel> 
         new ProtocolPipelineImpl(connection);
 
         if (PaperViaInjector.PAPER_PACKET_LIMITER) {
-            connection.setPacketLimiterEnabled(false);
+            connection.getPacketTracker().setPacketLimiterEnabled(false);
         }
 
         // Add our transformers

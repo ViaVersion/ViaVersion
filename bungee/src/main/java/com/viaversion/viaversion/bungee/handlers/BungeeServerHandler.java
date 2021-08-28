@@ -35,14 +35,15 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -54,32 +55,37 @@ import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 
 // All of this is madness
 public class BungeeServerHandler implements Listener {
-    private static final Method getHandshake;
-    private static final Method getRegisteredChannels;
-    private static final Method getBrandMessage;
-    private static final Method setProtocol;
-    private static final Method getEntityMap;
-    private static final Method setVersion;
-    private static final Field entityRewrite;
-    private static final Field channelWrapper;
+    private static final MethodHandle GET_HANDSHAKE;
+    private static final MethodHandle GET_REGISTERED_CHANNELS;
+    private static final MethodHandle GET_BRAND_MESSAGE;
+    private static final MethodHandle GET_ENTITY_MAP;
+    private static final MethodHandle SET_VERSION;
+    private static final MethodHandle SET_ENTITY_REWRITE;
+    private static final MethodHandle GET_CHANNEL_WRAPPER;
 
     static {
         try {
-            getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
-            getRegisteredChannels = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getRegisteredChannels");
-            getBrandMessage = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getBrandMessage");
-            setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
-            getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
-            setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
-            channelWrapper = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("ch");
-            channelWrapper.setAccessible(true);
-            entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
-            entityRewrite.setAccessible(true);
-        } catch (ReflectiveOperationException e) {
+            final MethodHandles.Lookup lookup = MethodHandles.lookup();
+            final Class<?> initialHandlerClass = Class.forName("net.md_5.bungee.connection.InitialHandler");
+            GET_HANDSHAKE = lookup.findVirtual(initialHandlerClass, "getHandshake", MethodType.methodType(Handshake.class));
+            GET_REGISTERED_CHANNELS = lookup.findVirtual(initialHandlerClass, "getRegisteredChannels", MethodType.methodType(Set.class));
+            GET_BRAND_MESSAGE = lookup.findVirtual(initialHandlerClass, "getBrandMessage", MethodType.methodType(PluginMessage.class));
+
+            final Class<?> entityMapClass = Class.forName("net.md_5.bungee.entitymap.EntityMap");
+            final Class<?> channelWrapperClass = Class.forName("net.md_5.bungee.netty.ChannelWrapper");
+            GET_ENTITY_MAP = lookup.findStatic(entityMapClass, "getEntityMap", MethodType.methodType(entityMapClass, int.class));
+            SET_VERSION = lookup.findVirtual(channelWrapperClass, "setVersion", MethodType.methodType(void.class, int.class));
+
+            final Class<?> userConnectionClass = Class.forName("net.md_5.bungee.UserConnection");
+            final MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(userConnectionClass, lookup);
+            GET_CHANNEL_WRAPPER = privateLookup.findGetter(userConnectionClass, "ch", channelWrapperClass);
+            SET_ENTITY_REWRITE = privateLookup.findSetter(userConnectionClass, "entityRewrite", entityMapClass);
+        } catch (final ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             throw new RuntimeException(e);
         }
@@ -107,9 +113,9 @@ public class BungeeServerHandler implements Listener {
 
         // Check if ViaVersion can support that version
         try {
-            Object handshake = getHandshake.invoke(event.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion.getVersion() : serverProtocolVersion.getVersion());
-        } catch (InvocationTargetException | IllegalAccessException e) {
+            Handshake handshake = (Handshake) GET_HANDSHAKE.invoke(event.getPlayer().getPendingConnection());
+            handshake.setProtocolVersion(protocols == null ? clientProtocolVersion.getVersion() : serverProtocolVersion.getVersion());
+        } catch (Throwable e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error setting handshake version", e);
         }
     }
@@ -118,7 +124,7 @@ public class BungeeServerHandler implements Listener {
     public void onServerConnected(ServerConnectedEvent event) {
         try {
             checkServerChange(event, Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to handle server switch", e);
         }
     }
@@ -144,13 +150,13 @@ public class BungeeServerHandler implements Listener {
 
         // For ViaRewind
         for (StorableObject object : userConnection.getStoredObjects().values()) {
-            if (object instanceof ClientEntityIdChangeListener) {
-                ((ClientEntityIdChangeListener) object).setClientEntityId(playerId);
+            if (object instanceof ClientEntityIdChangeListener listener) {
+                listener.setClientEntityId(playerId);
             }
         }
     }
 
-    public void checkServerChange(ServerConnectedEvent event, UserConnection user) throws Exception {
+    public void checkServerChange(ServerConnectedEvent event, UserConnection user) throws Throwable {
         if (user == null) {
             return;
         }
@@ -212,7 +218,7 @@ public class BungeeServerHandler implements Listener {
         boolean toNewId = previousServerProtocol.olderThan(ProtocolVersion.v1_13) && serverProtocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_13);
         boolean toOldId = previousServerProtocol.newerThanOrEqualTo(ProtocolVersion.v1_13) && serverProtocolVersion.olderThan(ProtocolVersion.v1_13);
         if (previousServerProtocol.isKnown() && (toNewId || toOldId)) {
-            Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(event.getPlayer().getPendingConnection());
+            Collection<String> registeredChannels = (Collection<String>) GET_REGISTERED_CHANNELS.invoke(event.getPlayer().getPendingConnection());
             if (!registeredChannels.isEmpty()) {
                 Collection<String> newChannels = new HashSet<>();
                 for (Iterator<String> iterator = registeredChannels.iterator(); iterator.hasNext(); ) {
@@ -235,7 +241,7 @@ public class BungeeServerHandler implements Listener {
                 registeredChannels.addAll(newChannels);
             }
 
-            PluginMessage brandMessage = (PluginMessage) getBrandMessage.invoke(event.getPlayer().getPendingConnection());
+            PluginMessage brandMessage = (PluginMessage) GET_BRAND_MESSAGE.invoke(event.getPlayer().getPendingConnection());
             if (brandMessage != null) {
                 String channel = brandMessage.getTag();
                 if (toNewId) {
@@ -276,10 +282,10 @@ public class BungeeServerHandler implements Listener {
             }
         }
 
-        Object wrapper = channelWrapper.get(player);
-        setVersion.invoke(wrapper, serverProtocolVersion.getVersion());
+        Object wrapper = GET_CHANNEL_WRAPPER.invoke(player);
+        SET_VERSION.invoke(wrapper, serverProtocolVersion.getVersion());
 
-        Object entityMap = getEntityMap.invoke(null, serverProtocolVersion.getVersion());
-        entityRewrite.set(player, entityMap);
+        Object entityMap = GET_ENTITY_MAP.invoke(serverProtocolVersion.getVersion());
+        SET_ENTITY_REWRITE.invoke(player, entityMap);
     }
 }

@@ -45,8 +45,8 @@ public class BooleanType extends Type<Boolean> implements TypeConverter<Boolean>
 
     @Override
     public Boolean from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).intValue() == 1;
+        if (o instanceof Number number) {
+            return number.intValue() == 1;
         }
         return (Boolean) o;
     }

@@ -40,7 +40,7 @@ public class BulkChunkType1_8 extends Type<Chunk[]> {
     }
 
     @Override
-    public Chunk[] read(ByteBuf input) throws Exception {
+    public Chunk[] read(ByteBuf input) {
         final boolean skyLight = input.readBoolean();
         final int count = Type.VAR_INT.readPrimitive(input);
         final Chunk[] chunks = new Chunk[count];
@@ -61,7 +61,7 @@ public class BulkChunkType1_8 extends Type<Chunk[]> {
     }
 
     @Override
-    public void write(ByteBuf output, Chunk[] chunks) throws Exception {
+    public void write(ByteBuf output, Chunk[] chunks) {
         boolean skyLight = false;
         loop1:
         for (Chunk chunk : chunks) {

@@ -229,7 +229,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
-    private void replaceChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) throws Exception {
+    private void replaceChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
         wrapper.read(Type.VAR_INT); // Offset
         wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
         writeChatAck(wrapper, storage);

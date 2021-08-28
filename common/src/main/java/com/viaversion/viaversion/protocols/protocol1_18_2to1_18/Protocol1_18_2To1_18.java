@@ -85,8 +85,7 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
 
     private void addTagPrefix(CompoundTag tag) {
         final Tag infiniburnTag = tag.get("infiniburn");
-        if (infiniburnTag instanceof StringTag) {
-            final StringTag infiniburn = (StringTag) infiniburnTag;
+        if (infiniburnTag instanceof final StringTag infiniburn) {
             infiniburn.setValue("#" + infiniburn.getValue());
         }
     }

@@ -34,13 +34,13 @@ public class GlobalPositionType extends Type<GlobalPosition> {
     }
 
     @Override
-    public GlobalPosition read(ByteBuf buffer) throws Exception {
+    public GlobalPosition read(ByteBuf buffer) {
         final String dimension = Type.STRING.read(buffer);
         return Type.POSITION1_14.read(buffer).withDimension(dimension);
     }
 
     @Override
-    public void write(ByteBuf buffer, GlobalPosition object) throws Exception {
+    public void write(ByteBuf buffer, GlobalPosition object) {
         Type.STRING.write(buffer, object.dimension());
         Type.POSITION1_14.write(buffer, object);
     }

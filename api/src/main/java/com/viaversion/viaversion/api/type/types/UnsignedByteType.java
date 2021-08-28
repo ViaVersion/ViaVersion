@@ -43,11 +43,11 @@ public class UnsignedByteType extends Type<Short> implements TypeConverter<Short
 
     @Override
     public Short from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).shortValue();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o) ? (short) 1 : 0;
+        if (o instanceof Number number) {
+            return number.shortValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? (short) 1 : 0;
         }
-        return (Short) o;
+        throw new UnsupportedOperationException();
     }
 }

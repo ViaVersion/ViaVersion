@@ -33,11 +33,11 @@ public final class EmptyType extends Type<Unit> {
     }
 
     @Override
-    public Unit read(final ByteBuf buffer) throws Exception {
+    public Unit read(final ByteBuf buffer) {
         return Unit.INSTANCE;
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Unit value) throws Exception {
+    public void write(final ByteBuf buffer, final Unit value) {
     }
 }

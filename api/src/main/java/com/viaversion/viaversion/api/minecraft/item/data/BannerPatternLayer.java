@@ -27,37 +27,22 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public final class BannerPatternLayer {
+public record BannerPatternLayer(Holder<BannerPattern> pattern, int dyeColor) {
 
-    public static final Type<BannerPatternLayer> TYPE = new Type<BannerPatternLayer>(BannerPatternLayer.class) {
+    public static final Type<BannerPatternLayer> TYPE = new Type<>(BannerPatternLayer.class) {
         @Override
-        public BannerPatternLayer read(final ByteBuf buffer) throws Exception {
+        public BannerPatternLayer read(final ByteBuf buffer) {
             final Holder<BannerPattern> pattern = BannerPattern.TYPE.read(buffer);
             final int color = Type.VAR_INT.readPrimitive(buffer);
             return new BannerPatternLayer(pattern, color);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final BannerPatternLayer value) throws Exception {
+        public void write(final ByteBuf buffer, final BannerPatternLayer value) {
             BannerPattern.TYPE.write(buffer, value.pattern);
             Type.VAR_INT.writePrimitive(buffer, value.dyeColor);
         }
     };
     public static final Type<BannerPatternLayer[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final Holder<BannerPattern> pattern;
-    private final int dyeColor;
-
-    public BannerPatternLayer(final Holder<BannerPattern> pattern, final int dyeColor) {
-        this.pattern = pattern;
-        this.dyeColor = dyeColor;
-    }
-
-    public Holder<BannerPattern> pattern() {
-        return pattern;
-    }
-
-    public int dyeColor() {
-        return dyeColor;
-    }
 }

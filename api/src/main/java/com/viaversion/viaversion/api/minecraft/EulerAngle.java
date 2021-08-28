@@ -22,41 +22,5 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public class EulerAngle {
-    private final float x;
-    private final float y;
-    private final float z;
-
-    public EulerAngle(final float x, final float y, final float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public float x() {
-        return x;
-    }
-
-    public float y() {
-        return y;
-    }
-
-    public float z() {
-        return z;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public float getX() {
-        return x;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public float getY() {
-        return y;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public float getZ() {
-        return z;
-    }
+public record EulerAngle(float x, float y, float z) {
 }

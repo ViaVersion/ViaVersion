@@ -64,7 +64,7 @@ public final class ConnectionData {
         KEY_TO_ID.defaultReturnValue(-1);
     }
 
-    public static void update(UserConnection user, Position position) throws Exception {
+    public static void update(UserConnection user, Position position) {
         Boolean inSync = null;
 
         for (BlockFace face : BlockFace.values()) {
@@ -669,7 +669,7 @@ public final class ConnectionData {
             this.userBlockData = blockConnectionProvider.forUser(user);
         }
 
-        public void updateChunkSectionNeighbours(int chunkX, int chunkZ, int chunkSectionY) throws Exception {
+        public void updateChunkSectionNeighbours(int chunkX, int chunkZ, int chunkSectionY) {
             int chunkMinY = chunkSectionY << 4;
             List<BlockChangeRecord1_8> updates = new ArrayList<>();
             for (int chunkDeltaX = -1; chunkDeltaX <= 1; chunkDeltaX++) {

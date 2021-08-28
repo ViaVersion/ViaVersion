@@ -63,6 +63,6 @@ public class CancelException extends Exception {
      * @return a CancelException instance
      */
     public static CancelException generate() {
-        return Via.getManager().isDebug() ? new CancelException() : CACHED;
+        return Via.getManager().debugHandler().enabled() ? new CancelException() : CACHED;
     }
 }

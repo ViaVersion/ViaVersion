@@ -28,7 +28,7 @@ package com.viaversion.viaversion.api.protocol.packet;
  * @see ClientboundPacketType
  * @see ServerboundPacketType
  */
-public interface PacketType {
+public sealed interface PacketType permits ClientboundPacketType, ServerboundPacketType {
 
     /**
      * Returns the packet id for the implemented protocol.

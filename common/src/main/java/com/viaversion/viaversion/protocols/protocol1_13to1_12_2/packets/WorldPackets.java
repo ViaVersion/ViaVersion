@@ -89,7 +89,7 @@ public class WorldPackets {
 
                     Optional<Integer> id = provider.getIntByIdentifier(motive);
 
-                    if (!id.isPresent() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
+                    if (id.isEmpty() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
                         Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
                     }
                     wrapper.write(Type.VAR_INT, id.orElse(0));
@@ -500,13 +500,13 @@ public class WorldPackets {
                     Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
 
                     // Cancel if null or completely removed
-                    if (particle == null || particle.getId() == -1) {
+                    if (particle == null || particle.id() == -1) {
                         wrapper.cancel();
                         return;
                     }
 
                     // Handle reddust particle color
-                    if (particle.getId() == 11) {
+                    if (particle.id() == 11) {
                         int count = wrapper.get(Type.INT, 1);
                         float speed = wrapper.get(Type.FLOAT, 6);
                         // Only handle for count = 0
@@ -527,7 +527,7 @@ public class WorldPackets {
                         }
                     }
 
-                    wrapper.set(Type.INT, 0, particle.getId());
+                    wrapper.set(Type.INT, 0, particle.id());
                     for (Particle.ParticleData<?> particleData : particle.getArguments())
                         particleData.write(wrapper);
 

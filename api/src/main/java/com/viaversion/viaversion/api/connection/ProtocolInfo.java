@@ -32,17 +32,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface ProtocolInfo {
 
     /**
-     * Returns the protocol state the user is currently in.
-     *
-     * @return protocol state
-     * @deprecated server and client can be in different states, use {@link #getClientState()} or {@link #getServerState()}
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default State getState() {
-        return this.getServerState();
-    }
-
-    /**
      * Returns the protocol state the client is currently in.
      *
      * @return the client protocol state
@@ -153,12 +142,4 @@ public interface ProtocolInfo {
     ProtocolPipeline getPipeline();
 
     void setPipeline(ProtocolPipeline pipeline);
-
-    /**
-     * Returns the user connection this info represents.
-     *
-     * @return user connection
-     */
-    @Deprecated/*(forRemoval = true)*/
-    UserConnection getUser();
 }

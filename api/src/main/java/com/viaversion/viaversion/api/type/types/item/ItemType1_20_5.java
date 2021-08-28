@@ -44,7 +44,7 @@ public class ItemType1_20_5 extends Type<Item> {
     }
 
     @Override
-    public @Nullable Item read(final ByteBuf buffer) throws Exception {
+    public @Nullable Item read(final ByteBuf buffer) {
         final int amount = Type.VAR_INT.readPrimitive(buffer);
         if (amount <= 0) {
             return null;
@@ -55,7 +55,7 @@ public class ItemType1_20_5 extends Type<Item> {
         return new StructuredItem(id, amount, new StructuredDataContainer(data));
     }
 
-    private Map<StructuredDataKey<?>, StructuredData<?>> readData(final ByteBuf buffer) throws Exception {
+    private Map<StructuredDataKey<?>, StructuredData<?>> readData(final ByteBuf buffer) {
         final int valuesSize = Type.VAR_INT.readPrimitive(buffer);
         final int markersSize = Type.VAR_INT.readPrimitive(buffer);
         if (valuesSize == 0 && markersSize == 0) {
@@ -80,7 +80,7 @@ public class ItemType1_20_5 extends Type<Item> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, @Nullable final Item object) throws Exception {
+    public void write(final ByteBuf buffer, @Nullable final Item object) {
         if (object == null) {
             Type.VAR_INT.writePrimitive(buffer, 0);
             return;

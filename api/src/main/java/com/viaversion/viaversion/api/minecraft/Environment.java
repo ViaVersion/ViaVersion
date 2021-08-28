@@ -38,20 +38,11 @@ public enum Environment {
         return id;
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public int getId() {
-        return id;
-    }
-
     public static Environment getEnvironmentById(int id) {
-        switch (id) {
-            default:
-            case -1:
-                return NETHER;
-            case 0:
-                return NORMAL;
-            case 1:
-                return END;
-        }
+        return switch (id) {
+            case 0 -> NORMAL;
+            case 1 -> END;
+            default -> NETHER; // -1 implicitly
+        };
     }
 }

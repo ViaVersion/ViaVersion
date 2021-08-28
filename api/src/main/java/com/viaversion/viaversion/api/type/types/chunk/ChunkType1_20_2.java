@@ -45,7 +45,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(final ByteBuf buffer) throws Exception {
+    public Chunk read(final ByteBuf buffer) {
         final int chunkX = buffer.readInt();
         final int chunkZ = buffer.readInt();
         final CompoundTag heightMap = Type.COMPOUND_TAG.read(buffer);
@@ -71,7 +71,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Chunk chunk) throws Exception {
+    public void write(final ByteBuf buffer, final Chunk chunk) {
         buffer.writeInt(chunk.getX());
         buffer.writeInt(chunk.getZ());
 

@@ -313,7 +313,7 @@ public class WorldPackets {
         });
     }
 
-    static void sendViewDistancePacket(UserConnection connection) throws Exception {
+    static void sendViewDistancePacket(UserConnection connection) {
         PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, connection);
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         setViewDistance.send(Protocol1_14To1_13_2.class);
@@ -394,9 +394,5 @@ public class WorldPackets {
         if (blockLight != 0) {
             section.getLight().getBlockLightNibbleArray().set(x, y, z, blockLight);
         }
-    }
-
-    private static long getChunkIndex(int x, int z) {
-        return ((x & 0x3FFFFFFL) << 38) | (z & 0x3FFFFFFL);
     }
 }

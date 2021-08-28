@@ -73,7 +73,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 }
 
                 // Ensure we're the only ones writing to the config
-                synchronized (Via.getPlatform().getConfigurationProvider()) {
+                synchronized (Via.getManager().getConfigurationProvider()) {
                     servers.put(serverName, serverPing.getVersion().getProtocol());
                 }
                 config.save();

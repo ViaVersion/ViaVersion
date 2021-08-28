@@ -118,7 +118,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         if (!originalSource.isEmpty()) {
                             flags |= 1;
                             Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
-                            if (!finalSource.isPresent()) {
+                            if (finalSource.isEmpty()) {
                                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                                     Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                 }

@@ -25,36 +25,21 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class AttributeModifiers {
+public record AttributeModifiers(AttributeModifier[] modifiers, boolean showInTooltip) {
 
-    public static final Type<AttributeModifiers> TYPE = new Type<AttributeModifiers>(AttributeModifiers.class) {
+    public static final Type<AttributeModifiers> TYPE = new Type<>(AttributeModifiers.class) {
         @Override
-        public AttributeModifiers read(final ByteBuf buffer) throws Exception {
+        public AttributeModifiers read(final ByteBuf buffer) {
             final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
             return new AttributeModifiers(modifiers, showInTooltip);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final AttributeModifiers value) throws Exception {
+        public void write(final ByteBuf buffer, final AttributeModifiers value) {
             AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
             buffer.writeBoolean(value.showInTooltip());
         }
     };
 
-    private final AttributeModifier[] modifiers;
-    private final boolean showInTooltip;
-
-    public AttributeModifiers(final AttributeModifier[] modifiers, final boolean showInTooltip) {
-        this.modifiers = modifiers;
-        this.showInTooltip = showInTooltip;
-    }
-
-    public AttributeModifier[] modifiers() {
-        return modifiers;
-    }
-
-    public boolean showInTooltip() {
-        return showInTooltip;
-    }
 }

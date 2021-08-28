@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.velocity.platform.VelocityViaConfig;
 
-public class ProbeSubCmd extends ViaSubCommand {
+public class ProbeSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "probe";

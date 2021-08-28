@@ -26,11 +26,11 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class PotionContents {
+public record PotionContents(@Nullable Integer potion, @Nullable Integer customColor, PotionEffect[] customEffects) {
 
-    public static final Type<PotionContents> TYPE = new Type<PotionContents>(PotionContents.class) {
+    public static final Type<PotionContents> TYPE = new Type<>(PotionContents.class) {
         @Override
-        public PotionContents read(final ByteBuf buffer) throws Exception {
+        public PotionContents read(final ByteBuf buffer) {
             final Integer potion = buffer.readBoolean() ? Type.VAR_INT.readPrimitive(buffer) : null;
             final Integer customColor = buffer.readBoolean() ? buffer.readInt() : null;
             final PotionEffect[] customEffects = PotionEffect.ARRAY_TYPE.read(buffer);
@@ -38,7 +38,7 @@ public final class PotionContents {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final PotionContents value) throws Exception {
+        public void write(final ByteBuf buffer, final PotionContents value) {
             buffer.writeBoolean(value.potion != null);
             if (value.potion != null) {
                 Type.VAR_INT.writePrimitive(buffer, value.potion);
@@ -52,26 +52,4 @@ public final class PotionContents {
             PotionEffect.ARRAY_TYPE.write(buffer, value.customEffects);
         }
     };
-
-    private final Integer potion;
-    private final Integer customColor;
-    private final PotionEffect[] customEffects;
-
-    public PotionContents(@Nullable final Integer potion, @Nullable final Integer customColor, final PotionEffect[] customEffects) {
-        this.potion = potion;
-        this.customColor = customColor;
-        this.customEffects = customEffects;
-    }
-
-    public @Nullable Integer potion() {
-        return potion;
-    }
-
-    public @Nullable Integer customColor() {
-        return customColor;
-    }
-
-    public PotionEffect[] customEffects() {
-        return customEffects;
-    }
 }

@@ -25,7 +25,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Arrays;
 
-public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
+public abstract class AbstractFenceConnectionHandler implements ConnectionHandler {
     private static final StairConnectionHandler STAIR_CONNECTION_HANDLER = new StairConnectionHandler();
     private final IntSet blockStates = new IntOpenHashSet();
     private final int[] connectedBlockStates = new int[statesSize()];
@@ -61,7 +61,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         return states;
     }
 
-    protected byte getStates(UserConnection user, Position position, int blockState) {
+    protected byte getStates(UserConnection user, Position position) {
         byte states = 0;
         boolean pre1_12 = user.getProtocolInfo().serverProtocolVersion().olderThan(ProtocolVersion.v1_12);
         if (connects(BlockFace.EAST, getBlockData(user, position.getRelative(BlockFace.EAST)), pre1_12)) states |= 1;
@@ -77,12 +77,12 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
 
     @Override
     public int getBlockData(UserConnection user, Position position) {
-        return STAIR_CONNECTION_HANDLER.connect(user, position, super.getBlockData(user, position));
+        return STAIR_CONNECTION_HANDLER.connect(user, position, ConnectionHandler.super.getBlockData(user, position));
     }
 
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
-        final int newBlockState = connectedBlockStates[getStates(user, position, blockState)];
+        final int newBlockState = connectedBlockStates[getStates(user, position)];
         return newBlockState == -1 ? blockState : newBlockState;
     }
 

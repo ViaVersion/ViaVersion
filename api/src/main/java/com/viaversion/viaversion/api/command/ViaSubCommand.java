@@ -26,21 +26,21 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class ViaSubCommand {
+public interface ViaSubCommand {
 
     /**
      * Subcommand name
      *
      * @return The commands name
      */
-    public abstract String name();
+    String name();
 
     /**
      * subcommand description, this'll show in /viaversion list
      *
      * @return The commands description
      */
-    public abstract String description();
+    String description();
 
     /**
      * Usage example:
@@ -48,7 +48,7 @@ public abstract class ViaSubCommand {
      *
      * @return The commands usage
      */
-    public String usage() {
+    default String usage() {
         return name();
     }
 
@@ -57,7 +57,7 @@ public abstract class ViaSubCommand {
      *
      * @return The permission required to use the commands
      */
-    public String permission() {
+    default String permission() {
         return "viaversion.admin." + name();
     }
 
@@ -68,7 +68,7 @@ public abstract class ViaSubCommand {
      * @param args   Arguments
      * @return commands executed succesfully if false, show usage
      */
-    public abstract boolean execute(ViaCommandSender sender, String[] args);
+    boolean execute(ViaCommandSender sender, String[] args);
 
     /**
      * Yay, possibility to implement tab-completion
@@ -77,7 +77,7 @@ public abstract class ViaSubCommand {
      * @param args   args
      * @return tab complete possibilities
      */
-    public List<String> onTabComplete(ViaCommandSender sender, String[] args) {
+    default List<String> onTabComplete(ViaCommandSender sender, String[] args) {
         return Collections.emptyList();
     }
 
@@ -87,7 +87,7 @@ public abstract class ViaSubCommand {
      * @param s string to replace
      * @return output String
      */
-    public static String color(String s) {
+    static String color(String s) {
         return ChatColorUtil.translateAlternateColorCodes(s);
     }
 
@@ -98,7 +98,7 @@ public abstract class ViaSubCommand {
      * @param message message
      * @param args    objects to replace
      */
-    public static void sendMessage(ViaCommandSender sender, String message, Object... args) {
+    default void sendMessage(ViaCommandSender sender, String message, Object... args) {
         sender.sendMessage(color(args == null ? message : String.format(message, args)));
     }
 }

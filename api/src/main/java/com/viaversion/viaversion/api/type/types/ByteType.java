@@ -53,11 +53,11 @@ public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
 
     @Override
     public Byte from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).byteValue();
-        } else if (o instanceof Boolean) {
-            return (Boolean) o ? (byte) 1 : 0;
+        if (o instanceof Number number) {
+            return number.byteValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? (byte) 1 : 0;
         }
-        return (Byte) o;
+        throw new UnsupportedOperationException();
     }
 }

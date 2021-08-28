@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class ListSubCmd extends ViaSubCommand {
+public class ListSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "list";

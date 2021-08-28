@@ -42,9 +42,9 @@ import java.util.List;
 
 public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_9_3, ServerboundPackets1_9, ServerboundPackets1_9_3> {
 
-    public static final ValueTransformer<Short, Short> ADJUST_PITCH = new ValueTransformer<Short, Short>(Type.UNSIGNED_BYTE, Type.UNSIGNED_BYTE) {
+    public static final ValueTransformer<Short, Short> ADJUST_PITCH = new ValueTransformer<>(Type.UNSIGNED_BYTE, Type.UNSIGNED_BYTE) {
         @Override
-        public Short transform(PacketWrapper wrapper, Short inputValue) throws Exception {
+        public Short transform(PacketWrapper wrapper, Short inputValue) {
             return (short) Math.round(inputValue / 63.5F * 63.0F);
         }
     };

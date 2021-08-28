@@ -21,35 +21,8 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class LastResourcePack implements StorableObject {
-
-    private final String url;
-    private final String hash;
-    private final boolean required;
-    private final JsonElement prompt;
-
-    public LastResourcePack(final String url, final String hash, final boolean required, @Nullable final JsonElement prompt) {
-        this.url = url;
-        this.hash = hash;
-        this.required = required;
-        this.prompt = prompt;
-    }
-
-    public String url() {
-        return url;
-    }
-
-    public String hash() {
-        return hash;
-    }
-
-    public boolean required() {
-        return required;
-    }
-
-    public @Nullable JsonElement prompt() {
-        return prompt;
-    }
+public record LastResourcePack(String url, String hash, boolean required,
+                               @Nullable JsonElement prompt) implements StorableObject {
 
     @Override
     public boolean clearOnServerSwitch() {

@@ -28,12 +28,12 @@ import com.viaversion.viaversion.util.Either;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class StatePropertyMatcher {
+public record StatePropertyMatcher(String name, Either<String, RangedMatcher> matcher) {
 
     // TODO Abstract Either reading
-    public static final Type<StatePropertyMatcher> TYPE = new Type<StatePropertyMatcher>(StatePropertyMatcher.class) {
+    public static final Type<StatePropertyMatcher> TYPE = new Type<>(StatePropertyMatcher.class) {
         @Override
-        public StatePropertyMatcher read(final ByteBuf buffer) throws Exception {
+        public StatePropertyMatcher read(final ByteBuf buffer) {
             final String name = Type.STRING.read(buffer);
             if (buffer.readBoolean()) {
                 final String value = Type.STRING.read(buffer);
@@ -46,7 +46,7 @@ public final class StatePropertyMatcher {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final StatePropertyMatcher value) throws Exception {
+        public void write(final ByteBuf buffer, final StatePropertyMatcher value) {
             Type.STRING.write(buffer, value.name);
             if (value.matcher.isLeft()) {
                 buffer.writeBoolean(true);
@@ -60,37 +60,6 @@ public final class StatePropertyMatcher {
     };
     public static final Type<StatePropertyMatcher[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final String name;
-    private final Either<String, RangedMatcher> matcher;
-
-    public StatePropertyMatcher(final String name, final Either<String, RangedMatcher> matcher) {
-        this.name = name;
-        this.matcher = matcher;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public Either<String, RangedMatcher> matcher() {
-        return matcher;
-    }
-
-    public static final class RangedMatcher {
-        private final String minValue;
-        private final String maxValue;
-
-        public RangedMatcher(@Nullable final String minValue, @Nullable final String maxValue) {
-            this.minValue = minValue;
-            this.maxValue = maxValue;
-        }
-
-        public @Nullable String minValue() {
-            return minValue;
-        }
-
-        public @Nullable String maxValue() {
-            return maxValue;
-        }
+    public record RangedMatcher(@Nullable String minValue, @Nullable String maxValue) {
     }
 }

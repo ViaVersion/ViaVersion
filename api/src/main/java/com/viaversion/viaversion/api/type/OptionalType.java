@@ -34,12 +34,12 @@ public abstract class OptionalType<T> extends Type<T> {
     }
 
     @Override
-    public @Nullable T read(ByteBuf buffer) throws Exception {
+    public @Nullable T read(ByteBuf buffer) {
         return buffer.readBoolean() ? type.read(buffer) : null;
     }
 
     @Override
-    public void write(final ByteBuf buffer, @Nullable final T value) throws Exception {
+    public void write(final ByteBuf buffer, @Nullable final T value) {
         if (value == null) {
             buffer.writeBoolean(false);
         } else {

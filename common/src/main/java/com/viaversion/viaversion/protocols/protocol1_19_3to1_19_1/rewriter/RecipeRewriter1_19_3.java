@@ -45,7 +45,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
     }
 
     @Override
-    public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
+    public void handleCraftingShapeless(final PacketWrapper wrapper) {
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredients(wrapper);
@@ -54,7 +54,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
     }
 
     @Override
-    public void handleCraftingShaped(final PacketWrapper wrapper) throws Exception {
+    public void handleCraftingShaped(final PacketWrapper wrapper) {
         final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
@@ -66,7 +66,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
     }
 
     @Override
-    public void handleSmelting(final PacketWrapper wrapper) throws Exception {
+    public void handleSmelting(final PacketWrapper wrapper) {
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredient(wrapper);

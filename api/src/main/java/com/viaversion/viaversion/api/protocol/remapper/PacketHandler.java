@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.exception.InformativeException;
 
 @FunctionalInterface
 public interface PacketHandler {
@@ -31,9 +32,8 @@ public interface PacketHandler {
      * Handles a packet.
      *
      * @param wrapper packet wrapper
-     * @throws Exception if an error occurs during the packet handling
      */
-    void handle(PacketWrapper wrapper) throws Exception;
+    void handle(PacketWrapper wrapper) throws InformativeException;
 
     /**
      * Returns a new packet handler that runs the provided handler after this one.

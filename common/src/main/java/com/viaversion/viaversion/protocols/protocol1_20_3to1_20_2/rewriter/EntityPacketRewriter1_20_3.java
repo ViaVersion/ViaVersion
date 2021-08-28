@@ -90,7 +90,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_20_2.WORLD_BORDER_INIT, this::sendChunksSentGameEvent);
     }
 
-    private void sendChunksSentGameEvent(final PacketWrapper wrapper) throws Exception {
+    private void sendChunksSentGameEvent(final PacketWrapper wrapper) {
         wrapper.send(Protocol1_20_3To1_20_2.class);
         wrapper.cancel();
 
@@ -116,7 +116,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
         filter().metaType(Types1_20_3.META_TYPES.particleType).handler((event, meta) -> {
             final Particle particle = meta.value();
             final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
-            if (particle.getId() == particleMappings.id("vibration")) {
+            if (particle.id() == particleMappings.id("vibration")) {
                 // Change the type of the resource key argument
                 final String resourceLocation = particle.<String>removeArgument(0).getValue();
                 if (Key.stripMinecraftNamespace(resourceLocation).equals("block")) {

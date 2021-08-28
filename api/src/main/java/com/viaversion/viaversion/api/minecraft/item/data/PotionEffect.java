@@ -26,37 +26,22 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public final class PotionEffect {
+public record PotionEffect(int effect, PotionEffectData effectData) {
 
-    public static final Type<PotionEffect> TYPE = new Type<PotionEffect>(PotionEffect.class) {
+    public static final Type<PotionEffect> TYPE = new Type<>(PotionEffect.class) {
         @Override
-        public PotionEffect read(final ByteBuf buffer) throws Exception {
+        public PotionEffect read(final ByteBuf buffer) {
             final int effect = Type.VAR_INT.readPrimitive(buffer);
             final PotionEffectData effectData = PotionEffectData.TYPE.read(buffer);
             return new PotionEffect(effect, effectData);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final PotionEffect value) throws Exception {
+        public void write(final ByteBuf buffer, final PotionEffect value) {
             Type.VAR_INT.writePrimitive(buffer, value.effect);
             PotionEffectData.TYPE.write(buffer, value.effectData);
         }
     };
     public static final Type<PotionEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final int effect;
-    private final PotionEffectData effectData;
-
-    public PotionEffect(final int effect, final PotionEffectData effectData) {
-        this.effect = effect;
-        this.effectData = effectData;
-    }
-
-    public int effect() {
-        return effect;
-    }
-
-    public PotionEffectData effectData() {
-        return effectData;
-    }
 }

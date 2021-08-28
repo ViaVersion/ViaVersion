@@ -43,9 +43,9 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
 
 public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
-    private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
+    private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<>(Type.UNSIGNED_BYTE) {
         @Override
-        public Short transform(PacketWrapper wrapper, Float inputValue) throws Exception {
+        public Short transform(PacketWrapper wrapper, Float inputValue) {
             return (short) (inputValue * 16);
         }
     };
@@ -306,7 +306,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             public void register() {
                 map(Type.STRING); // 0 - Message
                 handler(wrapper -> {
-                    // 100 character limit on older servers
+                    // 100-character limit on older servers
                     String msg = wrapper.get(Type.STRING, 0);
                     if (msg.length() > 100) {
                         wrapper.set(Type.STRING, 0, msg.substring(0, 100));

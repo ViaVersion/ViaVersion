@@ -32,11 +32,12 @@ import java.util.logging.Level;
 
 public class BlockIdData {
     public static final String[] PREVIOUS = new String[0];
-    public static Map<String, String[]> blockIdMapping;
-    public static Map<String, String[]> fallbackReverseMapping;
-    public static Int2ObjectMap<String> numberIdToString;
+    public static final Map<String, String[]> blockIdMapping = new HashMap<>();
+    public static final Map<String, String[]> fallbackReverseMapping = new HashMap<>();
+    public static final Int2ObjectMap<String> numberIdToString = new Int2ObjectOpenHashMap<>();
 
     public static void init() {
+        // Data from https://minecraft.gamepedia.com/1.13/Flattening
         InputStream stream = MappingData.class.getClassLoader()
                 .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
         try (InputStreamReader reader = new InputStreamReader(stream)) {
@@ -44,8 +45,7 @@ public class BlockIdData {
                     reader,
                     new TypeToken<Map<String, String[]>>() {
                     }.getType());
-            blockIdMapping = new HashMap<>(map);
-            fallbackReverseMapping = new HashMap<>();
+            blockIdMapping.putAll(map);
             for (Map.Entry<String, String[]> entry : blockIdMapping.entrySet()) {
                 for (String val : entry.getValue()) {
                     String[] previous = fallbackReverseMapping.get(val);
@@ -65,10 +65,9 @@ public class BlockIdData {
                     new TypeToken<Map<Integer, String>>() {
                     }.getType()
             );
-            numberIdToString = new Int2ObjectOpenHashMap<>(map);
+            numberIdToString.putAll(map);
         } catch (IOException e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to load block number to string mappings (1.12.2)", e);
         }
-        // Ignored
     }
 }

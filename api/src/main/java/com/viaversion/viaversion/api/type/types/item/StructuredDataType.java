@@ -40,13 +40,13 @@ public class StructuredDataType extends Type<StructuredData<?>> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final StructuredData<?> object) throws Exception {
+    public void write(final ByteBuf buffer, final StructuredData<?> object) {
         Type.VAR_INT.writePrimitive(buffer, object.id());
         object.write(buffer);
     }
 
     @Override
-    public StructuredData<?> read(final ByteBuf buffer) throws Exception {
+    public StructuredData<?> read(final ByteBuf buffer) {
         Preconditions.checkNotNull(types, "StructuredDataType has not been initialized");
         final int id = Type.VAR_INT.readPrimitive(buffer);
         final StructuredDataKey<?> key = this.types[id];
@@ -60,7 +60,7 @@ public class StructuredDataType extends Type<StructuredData<?>> {
         return id >= 0 && id < types.length ? types[id] : null;
     }
 
-    private <T> StructuredData<T> readData(final ByteBuf buffer, final StructuredDataKey<T> key, final int id) throws Exception {
+    private <T> StructuredData<T> readData(final ByteBuf buffer, final StructuredDataKey<T> key, final int id) {
         return StructuredData.of(key, key.type().read(buffer), id);
     }
 

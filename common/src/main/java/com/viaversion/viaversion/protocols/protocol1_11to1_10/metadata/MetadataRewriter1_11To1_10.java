@@ -112,19 +112,15 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
                 EntityTracker1_11 tracker = tracker(event.user());
                 int entityId = event.entityId();
                 if (tracker.addHologram(entityId)) {
-                    try {
-                        // Send movement
-                        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, event.user());
-                        wrapper.write(Type.VAR_INT, entityId);
-                        wrapper.write(Type.SHORT, (short) 0);
-                        wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
-                        wrapper.write(Type.SHORT, (short) 0);
-                        wrapper.write(Type.BOOLEAN, true);
+                    // Send movement
+                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, event.user());
+                    wrapper.write(Type.VAR_INT, entityId);
+                    wrapper.write(Type.SHORT, (short) 0);
+                    wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
+                    wrapper.write(Type.SHORT, (short) 0);
+                    wrapper.write(Type.BOOLEAN, true);
 
-                        wrapper.send(Protocol1_11To1_10.class);
-                    } catch (Exception e) {
-                        Via.getPlatform().getLogger().log(Level.WARNING, "Failed to update hologram position", e);
-                    }
+                    wrapper.send(Protocol1_11To1_10.class);
                 }
             }
         });
@@ -142,7 +138,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
 
     public static EntityType rewriteEntityType(int numType, List<Metadata> metadata) {
         Optional<EntityType> optType = EntityType.findById(numType);
-        if (!optType.isPresent()) {
+        if (optType.isEmpty()) {
             Via.getManager().getPlatform().getLogger().severe("Error: could not find Entity type " + numType + " with metadata: " + metadata);
             return null;
         }

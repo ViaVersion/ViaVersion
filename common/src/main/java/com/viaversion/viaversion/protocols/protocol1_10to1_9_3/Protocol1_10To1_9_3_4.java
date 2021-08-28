@@ -40,15 +40,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
-    public static final ValueTransformer<Short, Float> TO_NEW_PITCH = new ValueTransformer<Short, Float>(Type.FLOAT) {
+    public static final ValueTransformer<Short, Float> TO_NEW_PITCH = new ValueTransformer<>(Type.FLOAT) {
         @Override
-        public Float transform(PacketWrapper wrapper, Short inputValue) throws Exception {
+        public Float transform(PacketWrapper wrapper, Short inputValue) {
             return inputValue / 63.0F;
         }
     };
-    public static final ValueTransformer<List<Metadata>, List<Metadata>> TRANSFORM_METADATA = new ValueTransformer<List<Metadata>, List<Metadata>>(Types1_9.METADATA_LIST) {
+    public static final ValueTransformer<List<Metadata>, List<Metadata>> TRANSFORM_METADATA = new ValueTransformer<>(Types1_9.METADATA_LIST) {
         @Override
-        public List<Metadata> transform(PacketWrapper wrapper, List<Metadata> inputValue) throws Exception {
+        public List<Metadata> transform(PacketWrapper wrapper, List<Metadata> inputValue) {
             List<Metadata> metaList = new CopyOnWriteArrayList<>(inputValue);
             for (Metadata m : metaList) {
                 if (m.id() >= 5)

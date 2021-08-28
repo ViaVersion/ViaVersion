@@ -22,15 +22,7 @@
  */
 package com.viaversion.viaversion.api.data;
 
-public class IdentityMappings implements Mappings {
-
-    private final int size;
-    private final int mappedSize;
-
-    public IdentityMappings(final int size, final int mappedSize) {
-        this.size = size;
-        this.mappedSize = mappedSize;
-    }
+public record IdentityMappings(int size, int mappedSize) implements Mappings {
 
     @Override
     public int getNewId(final int id) {
@@ -40,16 +32,6 @@ public class IdentityMappings implements Mappings {
     @Override
     public void setNewId(final int id, final int mappedId) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int size() {
-        return size;
-    }
-
-    @Override
-    public int mappedSize() {
-        return mappedSize;
     }
 
     @Override

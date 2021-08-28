@@ -106,7 +106,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 public class ProtocolManagerImpl implements ProtocolManager {
     private static final Protocol BASE_PROTOCOL = new BaseProtocol();
@@ -384,8 +383,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public void setServerProtocol(ServerProtocolVersion serverProtocolVersion) {
         this.serverProtocolVersion = serverProtocolVersion;
-        //noinspection deprecation
-        ProtocolRegistry.SERVER_PROTOCOL = serverProtocolVersion.lowestSupportedVersion();
     }
 
     @Override
@@ -431,13 +428,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
+    public void completeMappingDataLoading(Class<? extends Protocol> protocolClass) {
         if (mappingsLoaded) return;
 
         CompletableFuture<Void> future = getMappingLoaderFuture(protocolClass);
         if (future != null) {
             // Wait for completion
-            future.get();
+            future.join();
         }
     }
 

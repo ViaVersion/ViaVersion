@@ -40,7 +40,7 @@ public final class ChunkSectionType1_18 extends Type<ChunkSection> {
     }
 
     @Override
-    public ChunkSection read(final ByteBuf buffer) throws Exception {
+    public ChunkSection read(final ByteBuf buffer) {
         final ChunkSection chunkSection = new ChunkSectionImpl();
         chunkSection.setNonAirBlocksCount(buffer.readShort());
         chunkSection.addPalette(PaletteType.BLOCKS, blockPaletteType.read(buffer));
@@ -49,7 +49,7 @@ public final class ChunkSectionType1_18 extends Type<ChunkSection> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final ChunkSection section) throws Exception {
+    public void write(final ByteBuf buffer, final ChunkSection section) {
         buffer.writeShort(section.getNonAirBlocksCount());
         blockPaletteType.write(buffer, section.palette(PaletteType.BLOCKS));
         biomePaletteType.write(buffer, section.palette(PaletteType.BIOMES));

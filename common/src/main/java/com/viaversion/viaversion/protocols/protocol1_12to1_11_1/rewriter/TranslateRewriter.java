@@ -30,7 +30,7 @@ import java.util.logging.Level;
 
 public class TranslateRewriter {
 
-    private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<ClientboundPackets1_9_3>(null, ComponentRewriter.ReadType.JSON) {
+    private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             String text = AchievementTranslationMapping.get(translate);
@@ -101,15 +101,11 @@ public class TranslateRewriter {
     };
 
     public static void toClient(UserConnection connection, JsonElement element) {
-        if (element instanceof JsonObject) {
-            JsonObject obj = (JsonObject) element;
+        if (element instanceof JsonObject obj) {
             JsonElement translate = obj.get("translate");
-            if (translate != null) {
-                if (translate.getAsString().startsWith("chat.type.achievement")) {
-                    ACHIEVEMENT_TEXT_REWRITER.processText(connection, obj);
-                }
+            if (translate != null && translate.getAsString().startsWith("chat.type.achievement")) {
+                ACHIEVEMENT_TEXT_REWRITER.processText(connection, obj);
             }
         }
     }
-
 }

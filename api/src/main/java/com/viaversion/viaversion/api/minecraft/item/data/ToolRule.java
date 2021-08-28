@@ -28,11 +28,11 @@ import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class ToolRule {
+public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolean correctForDrops) {
 
-    public static final Type<ToolRule> TYPE = new Type<ToolRule>(ToolRule.class) {
+    public static final Type<ToolRule> TYPE = new Type<>(ToolRule.class) {
         @Override
-        public ToolRule read(final ByteBuf buffer) throws Exception {
+        public ToolRule read(final ByteBuf buffer) {
             final HolderSet blocks = Type.HOLDER_SET.read(buffer);
             final Float speed = Type.OPTIONAL_FLOAT.read(buffer);
             final Boolean correctForDrops = Type.OPTIONAL_BOOLEAN.read(buffer);
@@ -40,7 +40,7 @@ public final class ToolRule {
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ToolRule value) throws Exception {
+        public void write(final ByteBuf buffer, final ToolRule value) {
             Type.HOLDER_SET.write(buffer, value.blocks);
             Type.OPTIONAL_FLOAT.write(buffer, value.speed);
             Type.OPTIONAL_BOOLEAN.write(buffer, value.correctForDrops);
@@ -48,25 +48,4 @@ public final class ToolRule {
     };
     public static final Type<ToolRule[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final HolderSet blocks;
-    private final Float speed;
-    private final Boolean correctForDrops;
-
-    public ToolRule(final HolderSet blocks, @Nullable final Float speed, @Nullable final Boolean correctForDrops) {
-        this.blocks = blocks;
-        this.speed = speed;
-        this.correctForDrops = correctForDrops;
-    }
-
-    public HolderSet blocks() {
-        return blocks;
-    }
-
-    public @Nullable Float speed() {
-        return speed;
-    }
-
-    public @Nullable Boolean correctForDrops() {
-        return correctForDrops;
-    }
 }

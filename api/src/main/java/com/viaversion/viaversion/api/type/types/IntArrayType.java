@@ -42,7 +42,7 @@ public class IntArrayType extends Type<int[]> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final int[] object) throws Exception {
+    public void write(final ByteBuf buffer, final int[] object) {
         if (this.length != -1) {
             Preconditions.checkArgument(length == object.length, "Length does not match expected length");
         } else {
@@ -54,7 +54,7 @@ public class IntArrayType extends Type<int[]> {
     }
 
     @Override
-    public int[] read(final ByteBuf buffer) throws Exception {
+    public int[] read(final ByteBuf buffer) {
         final int length = this.length == -1 ? Type.VAR_INT.readPrimitive(buffer) : this.length;
         Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
         final int[] array = new int[length];

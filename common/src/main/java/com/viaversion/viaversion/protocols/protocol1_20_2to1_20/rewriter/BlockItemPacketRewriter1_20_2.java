@@ -257,9 +257,9 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
         });
 
-        new RecipeRewriter1_19_4<ClientboundPackets1_19_4>(protocol) {
+        new RecipeRewriter1_19_4<>(protocol) {
             @Override
-            public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
+            public void handleCraftingShapeless(final PacketWrapper wrapper) {
                 wrapper.passthrough(Type.STRING); // Group
                 wrapper.passthrough(Type.VAR_INT); // Crafting book category
                 handleIngredients(wrapper);
@@ -270,7 +270,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
 
             @Override
-            public void handleSmelting(final PacketWrapper wrapper) throws Exception {
+            public void handleSmelting(final PacketWrapper wrapper) {
                 wrapper.passthrough(Type.STRING); // Group
                 wrapper.passthrough(Type.VAR_INT); // Crafting book category
                 handleIngredient(wrapper);
@@ -284,7 +284,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
 
             @Override
-            public void handleCraftingShaped(final PacketWrapper wrapper) throws Exception {
+            public void handleCraftingShaped(final PacketWrapper wrapper) {
                 final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
                 wrapper.passthrough(Type.STRING); // Group
                 wrapper.passthrough(Type.VAR_INT); // Crafting book category
@@ -300,7 +300,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
 
             @Override
-            public void handleStonecutting(final PacketWrapper wrapper) throws Exception {
+            public void handleStonecutting(final PacketWrapper wrapper) {
                 wrapper.passthrough(Type.STRING); // Group
                 handleIngredient(wrapper);
 
@@ -310,7 +310,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
 
             @Override
-            public void handleSmithing(final PacketWrapper wrapper) throws Exception {
+            public void handleSmithing(final PacketWrapper wrapper) {
                 handleIngredient(wrapper); // Base
                 handleIngredient(wrapper); // Addition
 
@@ -320,7 +320,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
 
             @Override
-            public void handleSmithingTransform(final PacketWrapper wrapper) throws Exception {
+            public void handleSmithingTransform(final PacketWrapper wrapper) {
                 handleIngredient(wrapper); // Template
                 handleIngredient(wrapper); // Base
                 handleIngredient(wrapper); // Additions
@@ -331,7 +331,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
 
             @Override
-            protected void handleIngredient(final PacketWrapper wrapper) throws Exception {
+            protected void handleIngredient(final PacketWrapper wrapper) {
                 final Item[] items = wrapper.read(itemArrayType());
                 wrapper.write(Type.ITEM1_20_2_ARRAY, items);
                 for (final Item item : items) {
@@ -369,16 +369,14 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
     public static void to1_20_2Effects(final Item item) {
         final Tag customPotionEffectsTag = item.tag().remove("CustomPotionEffects");
-        if (customPotionEffectsTag instanceof ListTag) {
-            final ListTag<?> effectsTag = (ListTag<?>) customPotionEffectsTag;
+        if (customPotionEffectsTag instanceof ListTag<?> effectsTag) {
             item.tag().put("custom_potion_effects", customPotionEffectsTag);
 
             for (final Tag tag : effectsTag) {
-                if (!(tag instanceof CompoundTag)) {
+                if (!(tag instanceof CompoundTag effectTag)) {
                     continue;
                 }
 
-                final CompoundTag effectTag = (CompoundTag) tag;
                 final Tag idTag = effectTag.remove("Id");
                 if (idTag instanceof NumberTag) {
                     // Empty effect removed
@@ -401,19 +399,16 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
     public static void to1_20_1Effects(final Item item) {
         final Tag customPotionEffectsTag = item.tag().remove("custom_potion_effects");
-        if (customPotionEffectsTag instanceof ListTag) {
-            final ListTag<?> effectsTag = (ListTag<?>) customPotionEffectsTag;
+        if (customPotionEffectsTag instanceof ListTag<?> effectsTag) {
             item.tag().put("CustomPotionEffects", effectsTag);
 
             for (final Tag tag : effectsTag) {
-                if (!(tag instanceof CompoundTag)) {
+                if (!(tag instanceof CompoundTag effectTag)) {
                     continue;
                 }
 
-                final CompoundTag effectTag = (CompoundTag) tag;
-                final Tag idTag = effectTag.remove("id");
-                if (idTag instanceof StringTag) {
-                    final int id = PotionEffects1_20_2.keyToId(((StringTag) idTag).getValue());
+                if (effectTag.remove("id") instanceof StringTag idTag) {
+                    final int id = PotionEffects1_20_2.keyToId(idTag.getValue());
                     effectTag.putInt("Id", id + 1); // Account for empty effect at id 0
                 }
 

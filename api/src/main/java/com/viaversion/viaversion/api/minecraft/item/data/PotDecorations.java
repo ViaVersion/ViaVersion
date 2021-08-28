@@ -27,14 +27,14 @@ import io.netty.buffer.ByteBuf;
 
 public final class PotDecorations {
 
-    public static final Type<PotDecorations> TYPE = new Type<PotDecorations>(PotDecorations.class) {
+    public static final Type<PotDecorations> TYPE = new Type<>(PotDecorations.class) {
         @Override
-        public PotDecorations read(final ByteBuf buffer) throws Exception {
+        public PotDecorations read(final ByteBuf buffer) {
             return new PotDecorations(Type.VAR_INT_ARRAY_PRIMITIVE.read(buffer));
         }
 
         @Override
-        public void write(final ByteBuf buffer, final PotDecorations value) throws Exception {
+        public void write(final ByteBuf buffer, final PotDecorations value) {
             Type.VAR_INT_ARRAY_PRIMITIVE.write(buffer, value.itemIds());
         }
     };

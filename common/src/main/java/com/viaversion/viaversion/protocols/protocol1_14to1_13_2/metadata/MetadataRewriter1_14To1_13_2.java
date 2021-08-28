@@ -195,22 +195,15 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
 
     private static int getNewProfessionId(int old) {
         // profession -> career
-        switch (old) {
-            case 0: // farmer
-                return 5;
-            case 1: // librarian
-                return 9;
-            case 2: // priest
-                return 4; // cleric
-            case 3: // blacksmith
-                return 1; // armorer
-            case 4: // butcher
-                return 2;
-            case 5: // nitwit
-                return 11;
-            default:
-                return 0; // none
-        }
+        return switch (old) {
+            case 0 -> 5; // farmer
+            case 1 -> 9; // librarian
+            case 2 -> 4; // priest ->cleric
+            case 3 -> 1; // blacksmith -> armorer
+            case 4 -> 2; // butcher
+            case 5 -> 11; // nitwit
+            default -> 0; // none
+        };
     }
 
     private static boolean isFallFlying(int entityFlags) {

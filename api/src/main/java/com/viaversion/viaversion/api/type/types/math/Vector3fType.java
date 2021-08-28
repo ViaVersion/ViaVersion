@@ -33,7 +33,7 @@ public class Vector3fType extends Type<Vector3f> {
     }
 
     @Override
-    public Vector3f read(final ByteBuf buffer) throws Exception {
+    public Vector3f read(final ByteBuf buffer) {
         final float x = buffer.readFloat();
         final float y = buffer.readFloat();
         final float z = buffer.readFloat();
@@ -41,7 +41,7 @@ public class Vector3fType extends Type<Vector3f> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Vector3f object) throws Exception {
+    public void write(final ByteBuf buffer, final Vector3f object) {
         buffer.writeFloat(object.x());
         buffer.writeFloat(object.y());
         buffer.writeFloat(object.z());

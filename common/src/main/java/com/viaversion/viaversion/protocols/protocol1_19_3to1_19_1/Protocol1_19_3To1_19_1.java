@@ -55,6 +55,7 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Pair;
+import java.security.SignatureException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -105,38 +106,26 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);
 
-        final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<ClientboundPackets1_19_1>(this) {
+        final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {
             @Override
-            public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
+            public void handleArgument(final PacketWrapper wrapper, final String argumentType) {
                 switch (argumentType) {
-                    case "minecraft:item_enchantment":
-                        wrapper.write(Type.STRING, "minecraft:enchantment");
-                        break;
-                    case "minecraft:mob_effect":
-                        wrapper.write(Type.STRING, "minecraft:mob_effect");
-                        break;
-                    case "minecraft:entity_summon":
-                        wrapper.write(Type.STRING, "minecraft:entity_type");
-                        break;
-                    default:
-                        super.handleArgument(wrapper, argumentType);
-                        break;
+                    case "minecraft:item_enchantment" -> wrapper.write(Type.STRING, "minecraft:enchantment");
+                    case "minecraft:mob_effect" -> wrapper.write(Type.STRING, "minecraft:mob_effect");
+                    case "minecraft:entity_summon" -> wrapper.write(Type.STRING, "minecraft:entity_type");
+                    default -> super.handleArgument(wrapper, argumentType);
                 }
             }
 
             @Override
             public String handleArgumentType(final String argumentType) {
-                switch (argumentType) {
-                    case "minecraft:resource":
-                        return "minecraft:resource_key";
-                    case "minecraft:resource_or_tag":
-                        return "minecraft:resource_or_tag_key";
-                    case "minecraft:entity_summon":
-                    case "minecraft:item_enchantment":
-                    case "minecraft:mob_effect":
-                        return "minecraft:resource";
-                }
-                return argumentType;
+                return switch (argumentType) {
+                    case "minecraft:resource" -> "minecraft:resource_key";
+                    case "minecraft:resource_or_tag" -> "minecraft:resource_or_tag_key";
+                    case "minecraft:entity_summon", "minecraft:item_enchantment", "minecraft:mob_effect" ->
+                            "minecraft:resource";
+                    default -> argumentType;
+                };
             }
         };
         commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.DECLARE_COMMANDS);
@@ -229,7 +218,12 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                             final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                             final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
 
-                            final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+                            final byte[] signature;
+                            try {
+                                signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+                            } catch (final SignatureException e) {
+                                throw new RuntimeException(e);
+                            }
 
                             wrapper.write(Type.STRING, argument.key()); // Argument name
                             wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
@@ -267,7 +261,12 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
                         final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                         final DecoratableMessage decoratableMessage = new DecoratableMessage(message);
-                        final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+                        final byte[] signature;
+                        try {
+                            signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+                        } catch (final SignatureException e) {
+                            throw new RuntimeException(e);
+                        }
 
                         wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
                         wrapper.write(Type.BOOLEAN, decoratableMessage.isDecorated()); // Signed preview
@@ -319,10 +318,15 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.BOOLEAN, chatSession == null); // Is nonce
                     if (chatSession != null) {
                         final long salt = ThreadLocalRandom.current().nextLong();
-                        final byte[] signature = chatSession.sign(signer -> {
-                            signer.accept(wrapper.user().remove(NonceStorage.class).nonce());
-                            signer.accept(Longs.toByteArray(salt));
-                        });
+                        final byte[] signature;
+                        try {
+                            signature = chatSession.sign(signer -> {
+                                signer.accept(wrapper.user().remove(NonceStorage.class).nonce());
+                                signer.accept(Longs.toByteArray(salt));
+                            });
+                        } catch (final SignatureException e) {
+                            throw new RuntimeException(e);
+                        }
                         wrapper.write(Type.LONG, salt); // Salt
                         wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
                     } else {

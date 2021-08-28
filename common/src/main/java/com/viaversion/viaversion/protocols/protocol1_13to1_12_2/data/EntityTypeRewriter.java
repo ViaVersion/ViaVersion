@@ -117,4 +117,8 @@ public class EntityTypeRewriter {
     public static int getNewId(int type1_12) {
         return ENTITY_TYPES.getOrDefault(type1_12, type1_12);
     }
+
+    public static Int2IntMap getEntityTypes() {
+        return ENTITY_TYPES;
+    }
 }

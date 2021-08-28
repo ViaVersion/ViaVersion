@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class FlowerConnectionHandler extends ConnectionHandler {
+public class FlowerConnectionHandler implements ConnectionHandler {
     private static final Int2IntMap FLOWERS = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {

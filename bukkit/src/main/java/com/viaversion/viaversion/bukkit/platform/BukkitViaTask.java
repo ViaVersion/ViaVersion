@@ -22,17 +22,7 @@ import com.viaversion.viaversion.api.platform.PlatformTask;
 import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class BukkitViaTask implements PlatformTask<BukkitTask> {
-    private final BukkitTask task;
-
-    public BukkitViaTask(@Nullable BukkitTask task) {
-        this.task = task;
-    }
-
-    @Override
-    public @Nullable BukkitTask getObject() {
-        return task;
-    }
+public record BukkitViaTask(BukkitTask task) implements PlatformTask<BukkitTask> {
 
     @Override
     public void cancel() {

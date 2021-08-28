@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 
-public class DontBugMeSubCmd extends ViaSubCommand {
+public class DontBugMeSubCmd implements ViaSubCommand {
 
     @Override
     public String name() {

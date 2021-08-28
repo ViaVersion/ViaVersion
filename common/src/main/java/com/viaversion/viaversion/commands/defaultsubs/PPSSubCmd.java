@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class PPSSubCmd extends ViaSubCommand {
+public class PPSSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "pps";

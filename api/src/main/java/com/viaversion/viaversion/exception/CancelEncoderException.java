@@ -39,7 +39,6 @@ public class CancelEncoderException extends EncoderException implements CancelCo
     };
 
     public CancelEncoderException() {
-        super();
     }
 
     public CancelEncoderException(String message, Throwable cause) {
@@ -61,6 +60,6 @@ public class CancelEncoderException extends EncoderException implements CancelCo
      * @return a CancelEncoderException instance
      */
     public static CancelEncoderException generate(Throwable cause) {
-        return Via.getManager().isDebug() ? new CancelEncoderException(cause) : CACHED;
+        return Via.getManager().debugHandler().enabled() ? new CancelEncoderException(cause) : CACHED;
     }
 }

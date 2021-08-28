@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.protocol.packet;
 /**
  * Interface to be implemented by server incoming packet types.
  */
-public interface ServerboundPacketType extends PacketType {
+public non-sealed interface ServerboundPacketType extends PacketType {
 
     @Override
     default Direction direction() {

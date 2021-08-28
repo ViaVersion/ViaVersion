@@ -30,7 +30,6 @@ includeBuild("build-logic")
 include("compat", "compat:snakeyaml-compat-common", "compat:snakeyaml2-compat", "compat:snakeyaml1-compat", "compat:protocolsupport-compat")
 
 setupViaSubproject("api")
-setupViaSubproject("api-legacy")
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
 setupViaSubproject("bukkit-legacy")

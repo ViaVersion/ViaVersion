@@ -27,41 +27,10 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.Map;
 
-public final class SimplePacketTypesProvider<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements PacketTypesProvider<CU, CM, SM, SU> {
-    private final Map<State, PacketTypeMap<CU>> unmappedClientboundPacketTypes;
-    private final Map<State, PacketTypeMap<CM>> mappedClientboundPacketTypes;
-    private final Map<State, PacketTypeMap<SM>> mappedServerboundPacketTypes;
-    private final Map<State, PacketTypeMap<SU>> unmappedServerboundPacketTypes;
-
-    public SimplePacketTypesProvider(
-            Map<State, PacketTypeMap<CU>> unmappedClientboundPacketTypes,
-            Map<State, PacketTypeMap<CM>> mappedClientboundPacketTypes,
-            Map<State, PacketTypeMap<SM>> mappedServerboundPacketTypes,
-            Map<State, PacketTypeMap<SU>> unmappedServerboundPacketTypes
-    ) {
-        this.unmappedClientboundPacketTypes = unmappedClientboundPacketTypes;
-        this.mappedClientboundPacketTypes = mappedClientboundPacketTypes;
-        this.mappedServerboundPacketTypes = mappedServerboundPacketTypes;
-        this.unmappedServerboundPacketTypes = unmappedServerboundPacketTypes;
-    }
-
-    @Override
-    public Map<State, PacketTypeMap<CU>> unmappedClientboundPacketTypes() {
-        return unmappedClientboundPacketTypes;
-    }
-
-    @Override
-    public Map<State, PacketTypeMap<CM>> mappedClientboundPacketTypes() {
-        return mappedClientboundPacketTypes;
-    }
-
-    @Override
-    public Map<State, PacketTypeMap<SM>> mappedServerboundPacketTypes() {
-        return mappedServerboundPacketTypes;
-    }
-
-    @Override
-    public Map<State, PacketTypeMap<SU>> unmappedServerboundPacketTypes() {
-        return unmappedServerboundPacketTypes;
-    }
+public record SimplePacketTypesProvider<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType>(
+        Map<State, PacketTypeMap<CU>> unmappedClientboundPacketTypes,
+        Map<State, PacketTypeMap<CM>> mappedClientboundPacketTypes,
+        Map<State, PacketTypeMap<SM>> mappedServerboundPacketTypes,
+        Map<State, PacketTypeMap<SU>> unmappedServerboundPacketTypes
+) implements PacketTypesProvider<CU, CM, SM, SU> {
 }

@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypeMap;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -66,7 +67,7 @@ public final class ProtocolUtil {
      * @return packet id as a nice hex string
      */
     public static String toNiceHex(int id) {
-        final String hex = Integer.toHexString(id).toUpperCase();
+        final String hex = Integer.toHexString(id).toUpperCase(Locale.ROOT);
         return (hex.length() == 1 ? "0x0" : "0x") + hex;
     }
 }

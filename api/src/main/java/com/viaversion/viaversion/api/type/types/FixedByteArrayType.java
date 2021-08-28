@@ -35,7 +35,7 @@ public class FixedByteArrayType extends Type<byte[]> {
     }
 
     @Override
-    public byte[] read(final ByteBuf byteBuf) throws Exception {
+    public byte[] read(final ByteBuf byteBuf) {
         if (byteBuf.readableBytes() < this.arrayLength) {
             throw new RuntimeException("Readable bytes does not match expected!");
         }
@@ -46,7 +46,7 @@ public class FixedByteArrayType extends Type<byte[]> {
     }
 
     @Override
-    public void write(final ByteBuf byteBuf, final byte[] bytes) throws Exception {
+    public void write(final ByteBuf byteBuf, final byte[] bytes) {
         byteBuf.writeBytes(bytes);
     }
 }

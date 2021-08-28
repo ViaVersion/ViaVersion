@@ -519,12 +519,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         };
     }
 
-    private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
+    private void handleClientboundItem(final PacketWrapper wrapper) {
         final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType));
         wrapper.write(mappedItemType, item);
     }
 
-    private void handleServerboundItem(final PacketWrapper wrapper) throws Exception {
+    private void handleServerboundItem(final PacketWrapper wrapper) {
         final Item item = handleItemToServer(wrapper.user(), wrapper.read(mappedItemType));
         wrapper.write(itemType, item);
     }

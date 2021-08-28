@@ -24,28 +24,21 @@ package com.viaversion.viaversion.api.minecraft;
 
 import java.util.Arrays;
 
-public final class TagData {
-    private final String identifier;
-    private final int[] entries;
+public record TagData(String identifier, int[] entries) {
 
-    public TagData(final String identifier, final int[] entries) {
-        this.identifier = identifier;
-        this.entries = entries;
-    }
-
-    public String identifier() {
-        return identifier;
-    }
-
-    public int[] entries() {
-        return entries;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final TagData tagData = (TagData) o;
+        if (!identifier.equals(tagData.identifier)) return false;
+        return Arrays.equals(entries, tagData.entries);
     }
 
     @Override
-    public String toString() {
-        return "TagData{" +
-            "identifier='" + identifier + '\'' +
-            ", entries=" + Arrays.toString(entries) +
-            '}';
+    public int hashCode() {
+        int result = identifier.hashCode();
+        result = 31 * result + Arrays.hashCode(entries);
+        return result;
     }
 }

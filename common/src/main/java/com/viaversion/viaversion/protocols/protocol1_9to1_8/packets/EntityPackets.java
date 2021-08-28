@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EntityPackets {
-    public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
+    public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<>(Type.SHORT) {
         @Override
         public Short transform(PacketWrapper wrapper, Byte inputValue) {
             return (short) (inputValue * 128);
@@ -148,9 +148,9 @@ public class EntityPackets {
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 // 1 - Slot ID
-                map(Type.SHORT, new ValueTransformer<Short, Integer>(Type.VAR_INT) {
+                map(Type.SHORT, new ValueTransformer<>(Type.VAR_INT) {
                     @Override
-                    public Integer transform(PacketWrapper wrapper, Short slot) throws Exception {
+                    public Integer transform(PacketWrapper wrapper, Short slot) {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         int receiverId = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId();
 

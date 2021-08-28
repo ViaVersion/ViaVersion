@@ -207,20 +207,14 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
     }
 
     private int damageTypeFromEntityEvent(byte entityEvent) {
-        switch (entityEvent) {
-            case 33: // Thorned
-                return 36;
-            case 36: // Drowned
-                return 5;
-            case 37: // Burned
-                return 27;
-            case 57: // Frozen
-                return 15;
-            case 44: // Poked
-            case 2: // Generic hurt
-                return 16;
-        }
-        return -1;
+        return switch (entityEvent) {
+            case 33 -> 36; // Thorned
+            case 36 -> 5; // Drowned
+            case 37 -> 27; // Burned
+            case 57 -> 15; // Frozen -> Poked
+            case 44, 2 -> 16; // Generic hurt
+            default -> -1;
+        };
     }
 
     @Override

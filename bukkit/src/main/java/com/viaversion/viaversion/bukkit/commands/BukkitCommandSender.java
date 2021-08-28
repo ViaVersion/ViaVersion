@@ -22,12 +22,7 @@ import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
-public class BukkitCommandSender implements ViaCommandSender {
-    private final CommandSender sender;
-
-    public BukkitCommandSender(CommandSender sender) {
-        this.sender = sender;
-    }
+public record BukkitCommandSender(CommandSender sender) implements ViaCommandSender {
 
     @Override
     public boolean hasPermission(String permission) {
@@ -41,8 +36,8 @@ public class BukkitCommandSender implements ViaCommandSender {
 
     @Override
     public UUID getUUID() {
-        if (sender instanceof Entity) {
-            return ((Entity) sender).getUniqueId();
+        if (sender instanceof Entity entity) {
+            return entity.getUniqueId();
         } else {
             return new UUID(0, 0);
         }

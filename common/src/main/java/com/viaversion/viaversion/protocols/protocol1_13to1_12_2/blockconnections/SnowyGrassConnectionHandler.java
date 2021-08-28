@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SnowyGrassConnectionHandler extends ConnectionHandler {
+public class SnowyGrassConnectionHandler implements ConnectionHandler {
     private static final Object2IntMap<GrassBlock> GRASS_BLOCKS = new Object2IntOpenHashMap<>();
     private static final IntSet SNOWY_GRASS_BLOCKS = new IntOpenHashSet();
 
@@ -61,29 +61,6 @@ public class SnowyGrassConnectionHandler extends ConnectionHandler {
         return newId != -1 ? newId : blockState;
     }
 
-    private static final class GrassBlock {
-        private final int blockStateId;
-        private final boolean snowy;
-
-        private GrassBlock(final int blockStateId, final boolean snowy) {
-            this.blockStateId = blockStateId;
-            this.snowy = snowy;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            final GrassBlock that = (GrassBlock) o;
-            if (blockStateId != that.blockStateId) return false;
-            return snowy == that.snowy;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = blockStateId;
-            result = 31 * result + (snowy ? 1 : 0);
-            return result;
-        }
+    private record GrassBlock(int blockStateId, boolean snowy) {
     }
 }

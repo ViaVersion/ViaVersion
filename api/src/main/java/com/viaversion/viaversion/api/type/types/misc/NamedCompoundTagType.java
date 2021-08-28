@@ -43,13 +43,21 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
     }
 
     @Override
-    public CompoundTag read(final ByteBuf buffer) throws IOException {
-        return read(buffer, true);
+    public CompoundTag read(final ByteBuf buffer) {
+        try {
+            return read(buffer, true);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void write(final ByteBuf buffer, final CompoundTag object) throws IOException {
-        write(buffer, object, "");
+    public void write(final ByteBuf buffer, final CompoundTag object) {
+        try {
+            write(buffer, object, "");
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws IOException {

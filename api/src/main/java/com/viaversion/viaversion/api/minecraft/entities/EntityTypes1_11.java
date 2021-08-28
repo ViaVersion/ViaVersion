@@ -38,7 +38,7 @@ public class EntityTypes1_11 {
         else
             type = EntityType.findById(typeID);
 
-        if (!type.isPresent()) {
+        if (type.isEmpty()) {
             Via.getPlatform().getLogger().severe("Could not find 1.11 type id " + typeID + " isObject=" + isObject);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
@@ -50,8 +50,8 @@ public class EntityTypes1_11 {
         ENTITY(-1),
         DROPPED_ITEM(1, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
-        LEASH_HITCH(8, ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
-        PAINTING(9, ENTITY), // Actually entity hanging but it doesn't make a lot of difference for metadata
+        LEASH_HITCH(8, ENTITY), // Actually entity hanging, but it doesn't make a lot of difference for metadata
+        PAINTING(9, ENTITY), // Actually entity hanging but, it doesn't make a lot of difference for metadata
         ARROW(10, ENTITY),
         SNOWBALL(11, ENTITY), // Actually EntityProjectile
         FIREBALL(12, ENTITY),
@@ -272,10 +272,7 @@ public class EntityTypes1_11 {
 
         public static Optional<EntityType> getPCEntity(int id) {
             Optional<ObjectType> output = findById(id);
-
-            if (!output.isPresent())
-                return Optional.empty();
-            return Optional.of(output.get().type);
+            return output.map(objectType -> objectType.type);
         }
     }
 }

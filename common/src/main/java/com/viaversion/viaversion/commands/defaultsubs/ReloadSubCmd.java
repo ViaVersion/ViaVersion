@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 
-public class ReloadSubCmd extends ViaSubCommand {
+public class ReloadSubCmd implements ViaSubCommand {
     @Override
     public String name() {
         return "reload";
@@ -34,7 +34,7 @@ public class ReloadSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        Via.getPlatform().getConfigurationProvider().reloadConfigs();
+        Via.getManager().getConfigurationProvider().reloadConfigs();
         sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
         return true;
     }

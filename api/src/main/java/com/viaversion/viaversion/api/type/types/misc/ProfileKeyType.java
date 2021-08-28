@@ -34,12 +34,12 @@ public class ProfileKeyType extends Type<ProfileKey> {
     }
 
     @Override
-    public ProfileKey read(final ByteBuf buffer) throws Exception {
+    public ProfileKey read(final ByteBuf buffer) {
         return new ProfileKey(buffer.readLong(), Type.BYTE_ARRAY_PRIMITIVE.read(buffer), Type.BYTE_ARRAY_PRIMITIVE.read(buffer));
     }
 
     @Override
-    public void write(final ByteBuf buffer, final ProfileKey object) throws Exception {
+    public void write(final ByteBuf buffer, final ProfileKey object) {
         buffer.writeLong(object.expiresAt());
         Type.BYTE_ARRAY_PRIMITIVE.write(buffer, object.publicKey());
         Type.BYTE_ARRAY_PRIMITIVE.write(buffer, object.keySignature());

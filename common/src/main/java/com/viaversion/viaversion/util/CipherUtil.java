@@ -36,11 +36,15 @@ public final class CipherUtil {
         }
     }
 
-    public static byte[] encryptNonce(final byte[] publicKeyBytes, final byte[] nonceBytes) throws Exception {
-        final EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
-        final PublicKey key = RSA_FACTORY.generatePublic(keySpec);
-        final Cipher cipher = Cipher.getInstance(key.getAlgorithm());
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(nonceBytes);
+    public static byte[] encryptNonce(final byte[] publicKeyBytes, final byte[] nonceBytes) {
+        try {
+            final EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+            final PublicKey key = RSA_FACTORY.generatePublic(keySpec);
+            final Cipher cipher = Cipher.getInstance(key.getAlgorithm());
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            return cipher.doFinal(nonceBytes);
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

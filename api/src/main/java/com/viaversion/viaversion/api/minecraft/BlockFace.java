@@ -34,7 +34,6 @@ public enum BlockFace {
     BOTTOM((byte) 0, (byte) -1, (byte) 0, EnumAxis.Y);
 
     public static final BlockFace[] HORIZONTAL = {NORTH, SOUTH, EAST, WEST};
-
     private static final Map<BlockFace, BlockFace> opposites = new EnumMap<>(BlockFace.class);
 
     static {
@@ -75,26 +74,6 @@ public enum BlockFace {
     }
 
     public EnumAxis axis() {
-        return axis;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public byte getModX() {
-        return modX;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public byte getModY() {
-        return modY;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public byte getModZ() {
-        return modZ;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public EnumAxis getAxis() {
         return axis;
     }
 

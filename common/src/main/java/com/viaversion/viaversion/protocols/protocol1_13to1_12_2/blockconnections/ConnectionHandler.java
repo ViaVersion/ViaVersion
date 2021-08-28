@@ -20,11 +20,12 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 
-public abstract class ConnectionHandler {
+@FunctionalInterface
+public interface ConnectionHandler {
 
-    public abstract int connect(UserConnection user, Position position, int blockState);
+    int connect(UserConnection user, Position position, int blockState);
 
-    public int getBlockData(UserConnection user, Position position) {
+    default int getBlockData(UserConnection user, Position position) {
         return ConnectionData.blockConnectionProvider.getBlockData(user, position.x(), position.y(), position.z());
     }
 }

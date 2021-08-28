@@ -26,36 +26,21 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
 
-public final class BannerPattern {
+public record BannerPattern(String assetId, String translationKey) {
 
-    public static final HolderType<BannerPattern> TYPE = new HolderType<BannerPattern>() {
+    public static final HolderType<BannerPattern> TYPE = new HolderType<>() {
         @Override
-        public BannerPattern readDirect(final ByteBuf buffer) throws Exception {
+        public BannerPattern readDirect(final ByteBuf buffer) {
             final String assetId = Type.STRING.read(buffer);
             final String translationKey = Type.STRING.read(buffer);
             return new BannerPattern(assetId, translationKey);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final BannerPattern value) throws Exception {
+        public void writeDirect(final ByteBuf buffer, final BannerPattern value) {
             Type.STRING.write(buffer, value.assetId);
             Type.STRING.write(buffer, value.translationKey);
         }
     };
 
-    private final String assetId;
-    private final String translationKey;
-
-    public BannerPattern(final String assetId, final String translationKey) {
-        this.assetId = assetId;
-        this.translationKey = translationKey;
-    }
-
-    public String assetId() {
-        return assetId;
-    }
-
-    public String translationKey() {
-        return translationKey;
-    }
 }

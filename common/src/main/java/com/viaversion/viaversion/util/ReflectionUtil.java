@@ -20,12 +20,8 @@ package com.viaversion.viaversion.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class ReflectionUtil {
+public final class ReflectionUtil {
 
     public static Object invokeStatic(Class<?> clazz, String method) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method m = clazz.getDeclaredMethod(method);
@@ -77,75 +73,5 @@ public class ReflectionUtil {
         Field field = o.getClass().getDeclaredField(f);
         field.setAccessible(true);
         field.set(o, value);
-    }
-
-    public static final class ClassReflection {
-        private final Class<?> handle;
-        private final Map<String, Field> fields = new ConcurrentHashMap<>();
-        private final Map<String, Method> methods = new ConcurrentHashMap<>();
-
-        public ClassReflection(Class<?> handle) {
-            this(handle, true);
-        }
-
-        public ClassReflection(Class<?> handle, boolean recursive) {
-            this.handle = handle;
-            scanFields(handle, recursive);
-            scanMethods(handle, recursive);
-        }
-
-        private void scanFields(Class<?> host, boolean recursive) {
-            if (recursive && host.getSuperclass() != null && host.getSuperclass() != Object.class) {
-                scanFields(host.getSuperclass(), true);
-            }
-
-            for (Field field : host.getDeclaredFields()) {
-                field.setAccessible(true);
-                fields.put(field.getName(), field);
-            }
-        }
-
-        private void scanMethods(Class<?> host, boolean recursive) {
-            if (recursive && host.getSuperclass() != null && host.getSuperclass() != Object.class) {
-                scanMethods(host.getSuperclass(), true);
-            }
-
-            for (Method method : host.getDeclaredMethods()) {
-                method.setAccessible(true);
-                methods.put(method.getName(), method);
-            }
-        }
-
-        public Object newInstance() throws ReflectiveOperationException {
-            return handle.getConstructor().newInstance();
-        }
-
-        public Field getField(String name) {
-            return fields.get(name);
-        }
-
-        public void setFieldValue(String fieldName, Object instance, Object value) throws IllegalAccessException {
-            getField(fieldName).set(instance, value);
-        }
-
-        public <T> T getFieldValue(String fieldName, Object instance, Class<T> type) throws IllegalAccessException {
-            return type.cast(getField(fieldName).get(instance));
-        }
-
-        public <T> T invokeMethod(Class<T> type, String methodName, Object instance, Object... args) throws InvocationTargetException, IllegalAccessException {
-            return type.cast(getMethod(methodName).invoke(instance, args));
-        }
-
-        public Method getMethod(String name) {
-            return methods.get(name);
-        }
-
-        public Collection<Field> getFields() {
-            return Collections.unmodifiableCollection(fields.values());
-        }
-
-        public Collection<Method> getMethods() {
-            return Collections.unmodifiableCollection(methods.values());
-        }
     }
 }

@@ -366,24 +366,12 @@ public class WorldPackets {
                     int y = p.y();
                     int z = p.z();
                     switch (face) {
-                        case 0:
-                            y--;
-                            break;
-                        case 1:
-                            y++;
-                            break;
-                        case 2:
-                            z--;
-                            break;
-                        case 3:
-                            z++;
-                            break;
-                        case 4:
-                            x--;
-                            break;
-                        case 5:
-                            x++;
-                            break;
+                        case 0 -> y--;
+                        case 1 -> y++;
+                        case 2 -> z--;
+                        case 3 -> z++;
+                        case 4 -> x--;
+                        case 5 -> x++;
                     }
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                     tracker.addBlockInteraction(new Position(x, y, z));

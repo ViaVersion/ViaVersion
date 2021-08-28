@@ -770,8 +770,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
     protected CompoundTag convertLodestoneTracker(final LodestoneTracker value) {
         final CompoundTag tag = new CompoundTag();
-        if (value.pos() != null) {
-            convertGlobalPos(tag, value.pos());
+        if (value.position() != null) {
+            convertGlobalPos(tag, value.position());
         }
         if (!value.tracked()) {
             tag.putBoolean("tracked", false);
@@ -1158,13 +1158,6 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         T convert(final Tag tag);
     }
 
-    private static final class ConverterPair<T> {
-        private final DataConverter<T> dataConverter;
-        private final TagConverter<T> tagConverter;
-
-        ConverterPair(final DataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
-            this.dataConverter = dataConverter;
-            this.tagConverter = tagConverter;
-        }
+    private record ConverterPair<T>(DataConverter<T> dataConverter, TagConverter<T> tagConverter) {
     }
 }

@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
@@ -37,6 +38,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.CodecException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,12 +60,11 @@ public class UserConnectionImpl implements UserConnection {
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .<UUID, Boolean>build().asMap());
-    private final ProtocolInfo protocolInfo = new ProtocolInfoImpl(this);
+    private final ProtocolInfo protocolInfo = new ProtocolInfoImpl();
     private final Channel channel;
     private final boolean clientSide;
     private boolean active = true;
     private boolean pendingDisconnect;
-    private boolean packetLimiterEnabled = true;
 
     /**
      * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
@@ -236,12 +237,8 @@ public class UserConnectionImpl implements UserConnection {
 
             if (shouldTransformPacket()) {
                 // Bypass serverbound packet decoder transforming
-                try {
-                    Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
-                    Type.UUID.write(buf, generatePassthroughToken());
-                } catch (Exception shouldNotHappen) {
-                    throw new RuntimeException(shouldNotHappen);
-                }
+                Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
+                Type.UUID.write(buf, generatePassthroughToken());
             }
 
             buf.writeBytes(packet);
@@ -289,7 +286,7 @@ public class UserConnectionImpl implements UserConnection {
             return false;
         }
         // Increment received + Check PPS
-        return !packetLimiterEnabled || !packetTracker.incrementReceived() || !packetTracker.exceedsMaxPPS();
+        return !packetTracker.isPacketLimiterEnabled() || !packetTracker.incrementReceived() || !packetTracker.exceedsMaxPPS();
     }
 
     @Override
@@ -304,17 +301,19 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public void transformClientbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+    public void transformClientbound(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException, CodecException {
         transform(buf, Direction.CLIENTBOUND, cancelSupplier);
     }
 
     @Override
-    public void transformServerbound(ByteBuf buf, Function<Throwable, Exception> cancelSupplier) throws Exception {
+    public void transformServerbound(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException, CodecException {
         transform(buf, Direction.SERVERBOUND, cancelSupplier);
     }
 
-    private void transform(ByteBuf buf, Direction direction, Function<Throwable, Exception> cancelSupplier) throws Exception {
-        if (!buf.isReadable()) return;
+    private void transform(ByteBuf buf, Direction direction, Function<Throwable, CodecException> cancelSupplier) throws InformativeException, CodecException {
+        if (!buf.isReadable()) {
+            return;
+        }
 
         int id = Type.VAR_INT.readPrimitive(buf);
         if (id == PacketWrapper.PASSTHROUGH_ID) {
@@ -389,16 +388,6 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public boolean shouldApplyBlockProtocol() {
         return !clientSide; // Don't apply protocol blocking on client-side
-    }
-
-    @Override
-    public boolean isPacketLimiterEnabled() {
-        return packetLimiterEnabled;
-    }
-
-    @Override
-    public void setPacketLimiterEnabled(boolean packetLimiterEnabled) {
-        this.packetLimiterEnabled = packetLimiterEnabled;
     }
 
     @Override

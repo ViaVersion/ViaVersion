@@ -32,7 +32,7 @@ public class VectorType extends Type<Vector> {
     }
 
     @Override
-    public Vector read(ByteBuf buffer) throws Exception {
+    public Vector read(ByteBuf buffer) {
         int x = Type.INT.read(buffer);
         int y = Type.INT.read(buffer);
         int z = Type.INT.read(buffer);
@@ -41,7 +41,7 @@ public class VectorType extends Type<Vector> {
     }
 
     @Override
-    public void write(ByteBuf buffer, Vector object) throws Exception {
+    public void write(ByteBuf buffer, Vector object) {
         Type.INT.write(buffer, object.blockX());
         Type.INT.write(buffer, object.blockY());
         Type.INT.write(buffer, object.blockZ());

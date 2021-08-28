@@ -27,6 +27,8 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -107,7 +109,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     }
 
     @Override
-    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException {
         int originalID = packetWrapper.getId();
 
         DebugHandler debugHandler = Via.getManager().debugHandler();

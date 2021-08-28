@@ -362,7 +362,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         }
     }
 
-    private void sendRangeAttributes(final UserConnection connection, final boolean creativeMode) throws Exception {
+    private void sendRangeAttributes(final UserConnection connection, final boolean creativeMode) {
         final PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_20_5.ENTITY_PROPERTIES, connection);
         wrapper.write(Type.VAR_INT, tracker(connection).clientEntityId());
         wrapper.write(Type.VAR_INT, 2); // Number of attributes

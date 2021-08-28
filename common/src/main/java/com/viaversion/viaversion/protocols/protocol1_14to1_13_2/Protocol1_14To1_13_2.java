@@ -65,7 +65,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         ComponentRewriter<ClientboundPackets1_13> componentRewriter = new ComponentRewriter1_14<>(this);
         componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT_MESSAGE);
 
-        CommandRewriter<ClientboundPackets1_13> commandRewriter = new CommandRewriter<ClientboundPackets1_13>(this) {
+        CommandRewriter<ClientboundPackets1_13> commandRewriter = new CommandRewriter<>(this) {
             @Override
             public @Nullable String handleArgumentType(String argumentType) {
                 if (argumentType.equals("minecraft:nbt")) {

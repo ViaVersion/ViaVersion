@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class StairConnectionHandler extends ConnectionHandler {
+public class StairConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<StairData> STAIR_DATA_MAP = new Int2ObjectOpenHashMap<>();
     private static final Map<Short, Integer> CONNECTED_BLOCKS = new HashMap<>();
 
@@ -95,10 +95,10 @@ public class StairConnectionHandler extends ConnectionHandler {
 
     private static short getStates(StairData stairData) {
         short s = 0;
-        if (stairData.isBottom()) s |= 1;
-        s |= stairData.getShape() << 1;
-        s |= stairData.getType() << 4;
-        s |= stairData.getFacing().ordinal() << 9;
+        if (stairData.bottom()) s |= 1;
+        s |= stairData.shape() << 1;
+        s |= stairData.type() << 4;
+        s |= stairData.facing().ordinal() << 9;
         return s;
     }
 
@@ -108,29 +108,29 @@ public class StairConnectionHandler extends ConnectionHandler {
         if (stairData == null) return blockState;
 
         short s = 0;
-        if (stairData.isBottom()) s |= 1;
+        if (stairData.bottom()) s |= 1;
         s |= getShape(user, position, stairData) << 1;
-        s |= stairData.getType() << 4;
-        s |= stairData.getFacing().ordinal() << 9;
+        s |= stairData.type() << 4;
+        s |= stairData.facing().ordinal() << 9;
 
         Integer newBlockState = CONNECTED_BLOCKS.get(s);
         return newBlockState == null ? blockState : newBlockState;
     }
 
     private int getShape(UserConnection user, Position position, StairData stair) {
-        BlockFace facing = stair.getFacing();
+        BlockFace facing = stair.facing();
 
         StairData relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(facing)));
-        if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
-            BlockFace facing2 = relativeStair.getFacing();
+        if (relativeStair != null && relativeStair.bottom() == stair.bottom()) {
+            BlockFace facing2 = relativeStair.facing();
             if (facing.axis() != facing2.axis() && checkOpposite(user, stair, position, facing2.opposite())) {
                 return facing2 == rotateAntiClockwise(facing) ? 3 : 4; // outer_left : outer_right
             }
         }
 
         relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(facing.opposite())));
-        if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
-            BlockFace facing2 = relativeStair.getFacing();
+        if (relativeStair != null && relativeStair.bottom() == stair.bottom()) {
+            BlockFace facing2 = relativeStair.facing();
             if (facing.axis() != facing2.axis() && checkOpposite(user, stair, position, facing2)) {
                 return facing2 == rotateAntiClockwise(facing) ? 1 : 2; // inner_left : inner_right
             }
@@ -141,50 +141,19 @@ public class StairConnectionHandler extends ConnectionHandler {
 
     private boolean checkOpposite(UserConnection user, StairData stair, Position position, BlockFace face) {
         StairData relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(face)));
-        return relativeStair == null || relativeStair.getFacing() != stair.getFacing() || relativeStair.isBottom() != stair.isBottom();
+        return relativeStair == null || relativeStair.facing() != stair.facing() || relativeStair.bottom() != stair.bottom();
     }
 
     private BlockFace rotateAntiClockwise(BlockFace face) {
-        switch (face) {
-            case NORTH:
-                return BlockFace.WEST;
-            case SOUTH:
-                return BlockFace.EAST;
-            case EAST:
-                return BlockFace.NORTH;
-            case WEST:
-                return BlockFace.SOUTH;
-            default:
-                return face;
-        }
+        return switch (face) {
+            case NORTH -> BlockFace.WEST;
+            case SOUTH -> BlockFace.EAST;
+            case EAST -> BlockFace.NORTH;
+            case WEST -> BlockFace.SOUTH;
+            default -> face;
+        };
     }
 
-    private static final class StairData {
-        private final boolean bottom;
-        private final byte shape, type;
-        private final BlockFace facing;
-
-        private StairData(boolean bottom, byte shape, byte type, BlockFace facing) {
-            this.bottom = bottom;
-            this.shape = shape;
-            this.type = type;
-            this.facing = facing;
-        }
-
-        public boolean isBottom() {
-            return bottom;
-        }
-
-        public byte getShape() {
-            return shape;
-        }
-
-        public byte getType() {
-            return type;
-        }
-
-        public BlockFace getFacing() {
-            return facing;
-        }
+    private record StairData(boolean bottom, byte shape, byte type, BlockFace facing) {
     }
 }

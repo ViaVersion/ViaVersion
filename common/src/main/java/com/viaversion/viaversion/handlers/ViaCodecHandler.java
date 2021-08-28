@@ -20,6 +20,7 @@ package com.viaversion.viaversion.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
+@Deprecated
 public interface ViaCodecHandler {
 
     void transform(ByteBuf bytebuf) throws Exception;

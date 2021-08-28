@@ -28,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableString extends Filterable<String> {
 
-    public static final Type<FilterableString> TYPE = new FilterableType<String, FilterableString>(Type.STRING, Type.OPTIONAL_STRING, FilterableString.class) {
+    public static final Type<FilterableString> TYPE = new FilterableType<>(Type.STRING, Type.OPTIONAL_STRING, FilterableString.class) {
         @Override
         protected FilterableString create(final String raw, final String filtered) {
             return new FilterableString(raw, filtered);

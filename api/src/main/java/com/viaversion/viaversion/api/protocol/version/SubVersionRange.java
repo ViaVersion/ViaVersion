@@ -24,10 +24,7 @@ package com.viaversion.viaversion.api.protocol.version;
 
 import com.google.common.base.Preconditions;
 
-public class SubVersionRange {
-    private final String baseVersion;
-    private final int rangeFrom;
-    private final int rangeTo;
+public record SubVersionRange(String baseVersion, int rangeFrom, int rangeTo) {
 
     /**
      * Creates a new version range. Giving "1.7", 0, and 5 for example would represent the range from 1.7-1.7.5.
@@ -36,13 +33,10 @@ public class SubVersionRange {
      * @param rangeFrom   minor version the range begins at, must be greater than or equal to 0
      * @param rangeTo     minor version the range ends at, must be greater than {@code rangeFrom}
      */
-    public SubVersionRange(String baseVersion, int rangeFrom, int rangeTo) {
+    public SubVersionRange {
         Preconditions.checkNotNull(baseVersion);
         Preconditions.checkArgument(rangeFrom >= 0);
         Preconditions.checkArgument(rangeTo > rangeFrom);
-        this.baseVersion = baseVersion;
-        this.rangeFrom = rangeFrom;
-        this.rangeTo = rangeTo;
     }
 
     /**

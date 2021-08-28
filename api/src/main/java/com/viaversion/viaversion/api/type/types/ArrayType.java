@@ -40,7 +40,7 @@ public class ArrayType<T> extends Type<T[]> {
     }
 
     @Override
-    public T[] read(ByteBuf buffer) throws Exception {
+    public T[] read(ByteBuf buffer) {
         int amount = Type.VAR_INT.readPrimitive(buffer);
         T[] array = (T[]) Array.newInstance(elementType.getOutputClass(), amount);
 
@@ -51,7 +51,7 @@ public class ArrayType<T> extends Type<T[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, T[] object) throws Exception {
+    public void write(ByteBuf buffer, T[] object) {
         Type.VAR_INT.writePrimitive(buffer, object.length);
         for (T o : object) {
             elementType.write(buffer, o);

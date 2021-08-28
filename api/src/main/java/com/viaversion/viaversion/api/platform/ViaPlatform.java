@@ -181,11 +181,6 @@ public interface ViaPlatform<T> {
      */
     ViaVersionConfig getConf();
 
-    @Deprecated/*(forRemoval = true)*/
-    default ConfigurationProvider getConfigurationProvider() {
-        return Via.getManager().getConfigurationProvider();
-    }
-
     /**
      * Get ViaVersions's data folder.
      *

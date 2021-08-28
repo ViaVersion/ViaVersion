@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
@@ -83,7 +84,7 @@ public interface PacketWrapper {
      * @return The requested type or throws ArrayIndexOutOfBounds
      * @throws InformativeException If it fails to find it, an exception will be thrown.
      */
-    <T> T get(Type<T> type, int index) throws Exception;
+    <T> T get(Type<T> type, int index) throws InformativeException;
 
     /**
      * Check if a type is at an index
@@ -113,7 +114,7 @@ public interface PacketWrapper {
      * @param value The value of the part you wish to set it to.
      * @throws InformativeException If it fails to set it, an exception will be thrown.
      */
-    <T> void set(Type<T> type, int index, T value) throws Exception;
+    <T> void set(Type<T> type, int index, @Nullable T value) throws InformativeException;
 
     /**
      * Read a type from the input.
@@ -123,7 +124,7 @@ public interface PacketWrapper {
      * @return The requested type
      * @throws InformativeException If it fails to read
      */
-    <T> T read(Type<T> type) throws Exception;
+    <T> T read(Type<T> type) throws InformativeException;
 
     /**
      * Write a type to the output.
@@ -132,7 +133,7 @@ public interface PacketWrapper {
      * @param <T>   The return type of the type you wish to write.
      * @param value The value of the type to write.
      */
-    <T> void write(Type<T> type, T value);
+    <T> void write(Type<T> type, @Nullable T value);
 
     /**
      * Take a value from the input and write to the output.
@@ -140,16 +141,16 @@ public interface PacketWrapper {
      * @param type The type to read and write.
      * @param <T>  The return type of the type you wish to pass through.
      * @return The type which was read/written.
-     * @throws Exception If it failed to read or write
+     * @throws InformativeException If it failed to read or write
      */
-    <T> T passthrough(Type<T> type) throws Exception;
+    <T> T passthrough(Type<T> type) throws InformativeException;
 
     /**
      * Take all the inputs and write them to the output.
      *
-     * @throws Exception If it failed to read or write
+     * @throws InformativeException If it failed to read or write
      */
-    void passthroughAll() throws Exception;
+    void passthroughAll() throws InformativeException;
 
     /**
      * Write the current output to a buffer.
@@ -157,7 +158,7 @@ public interface PacketWrapper {
      * @param buffer The buffer to write to.
      * @throws InformativeException Throws an exception if it fails to write a value.
      */
-    void writeToBuffer(ByteBuf buffer) throws Exception;
+    void writeToBuffer(ByteBuf buffer) throws InformativeException;
 
     /**
      * Clear the input buffer / readable objects
@@ -173,9 +174,9 @@ public interface PacketWrapper {
      * Send this packet to the connection on the current thread, skipping the current protocol.
      *
      * @param protocol protocol to be sent through
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    default void send(Class<? extends Protocol> protocol) throws Exception {
+    default void send(Class<? extends Protocol> protocol) throws InformativeException {
         send(protocol, true);
     }
 
@@ -184,17 +185,17 @@ public interface PacketWrapper {
      *
      * @param protocol            protocol to be sent through
      * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+    void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException;
 
     /**
      * Send this packet to the connection, submitted to netty's event loop and skipping the current protocol.
      *
      * @param protocol protocol to be sent through
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    default void scheduleSend(Class<? extends Protocol> protocol) throws Exception {
+    default void scheduleSend(Class<? extends Protocol> protocol) throws InformativeException {
         scheduleSend(protocol, true);
     }
 
@@ -203,45 +204,33 @@ public interface PacketWrapper {
      *
      * @param protocol            protocol to be sent through
      * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
-     * @throws Exception if it fails to write
      */
-    void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+    void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException;
 
     /**
-     * Send this packet to the associated user.
-     * Be careful not to send packets twice.
-     * (Sends it after current)
-     * Also returns the packets ChannelFuture
+     * Sends this packet to the associated user.
+     * The ChannelFuture fails exceptionally if the packet is cancelled during construction.
      *
      * @param protocolClass the protocol class to start from in the pipeline
      * @return new ChannelFuture for the write operation
-     * @throws Exception if it fails to write
      */
-    ChannelFuture sendFuture(Class<? extends Protocol> protocolClass) throws Exception;
-
-    /**
-     * @deprecated misleading; use {@link #sendRaw()}. This method will be removed in 5.0.0
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default void send() throws Exception {
-        sendRaw();
-    }
+    ChannelFuture sendFuture(Class<? extends Protocol> protocolClass) throws InformativeException;
 
     /**
      * Sends this packet to the connection.
      * <b>Unlike {@link #send(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void sendRaw() throws Exception;
+    void sendRaw() throws InformativeException;
 
     /**
      * Sends this packet to the associated user, submitted to netty's event loop.
      * <b>Unlike {@link #send(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void scheduleSendRaw() throws Exception;
+    void scheduleSendRaw() throws InformativeException;
 
     /**
      * Creates a new packet for the target of this packet.
@@ -259,9 +248,8 @@ public interface PacketWrapper {
      * @param packetType packet type of the new packet
      * @param handler    handler to write to the packet
      * @return newly created packet wrapper
-     * @throws Exception if it failed to write the values from the ValueCreator
      */
-    default PacketWrapper create(PacketType packetType, PacketHandler handler) throws Exception {
+    default PacketWrapper create(PacketType packetType, PacketHandler handler) throws InformativeException {
         return create(packetType.getId(), handler);
     }
 
@@ -279,9 +267,8 @@ public interface PacketWrapper {
      * @param packetId id of the packet
      * @param handler  handler to write to the packet
      * @return newly created packet wrapper
-     * @throws Exception if it failed to write the values from the ValueCreator
      */
-    PacketWrapper create(int packetId, PacketHandler handler) throws Exception;
+    PacketWrapper create(int packetId, PacketHandler handler) throws InformativeException;
 
     /**
      * Applies a pipeline from an index to the wrapper.
@@ -289,23 +276,8 @@ public interface PacketWrapper {
      * @param direction protocol direction
      * @param state     protocol state
      * @param pipeline  protocol pipeline
-     * @throws Exception If it fails to transform a packet, exception will be thrown
      */
-    void apply(Direction direction, State state, List<Protocol> pipeline) throws Exception;
-
-    /**
-     * @deprecated use {@link #apply(Direction, State, List)}
-     */
-    @Deprecated
-    PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline, boolean reverse) throws Exception;
-
-    /**
-     * @deprecated use {@link #apply(Direction, State, List)}
-     */
-    @Deprecated
-    default PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
-        return apply(direction, state, index, pipeline, false);
-    }
+    void apply(Direction direction, State state, List<Protocol> pipeline) throws InformativeException, CancelException;
 
     /**
      * Check if this packet is cancelled.
@@ -341,40 +313,28 @@ public interface PacketWrapper {
     void resetReader();
 
     /**
-     * Send the current packet to the server.
-     * (Ensure the ID is suitable for viaversion)
-     *
-     * @throws Exception If it failed to write
-     * @deprecated misleading; use {@link #sendToServerRaw()}. This method will be removed in 5.0.0
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default void sendToServer() throws Exception {
-        sendToServerRaw();
-    }
-
-    /**
      * Sends this packet to the server.
      * <b>Unlike {@link #sendToServer(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void sendToServerRaw() throws Exception;
+    void sendToServerRaw() throws InformativeException;
 
     /**
      * Sends this packet to the server, submitted to netty's event loop.
      * <b>Unlike {@link #sendToServer(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void scheduleSendToServerRaw() throws Exception;
+    void scheduleSendToServerRaw() throws InformativeException;
 
     /**
      * Send this packet to the server on the current thread, skipping the current protocol.
      *
      * @param protocol protocol to be sent through
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    default void sendToServer(Class<? extends Protocol> protocol) throws Exception {
+    default void sendToServer(Class<? extends Protocol> protocol) throws InformativeException {
         sendToServer(protocol, true);
     }
 
@@ -383,17 +343,17 @@ public interface PacketWrapper {
      *
      * @param protocol            protocol to be sent through
      * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+    void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException;
 
     /**
      * Send this packet to the server, submitted to netty's event loop and skipping the current protocol.
      *
      * @param protocol protocol to be sent through
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    default void scheduleSendToServer(Class<? extends Protocol> protocol) throws Exception {
+    default void scheduleSendToServer(Class<? extends Protocol> protocol) throws InformativeException {
         scheduleSendToServer(protocol, true);
     }
 
@@ -402,13 +362,12 @@ public interface PacketWrapper {
      *
      * @param protocol            protocol to be sent through
      * @param skipCurrentPipeline whether transformation of the current protocol should be skipped
-     * @throws Exception if it fails to write
+     * @throws InformativeException if it fails to write
      */
-    void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception;
+    void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException;
 
     /**
-     * Returns the packet type.
-     * Currently only non-null for manually constructed packets before transformation.
+     * Returns the packet type, or null if not transformed or manually unset.
      *
      * @return packet type if set
      */
@@ -428,17 +387,6 @@ public interface PacketWrapper {
      * @return raw packet id
      */
     int getId();
-
-    /**
-     * Sets the packet type.
-     *
-     * @param packetType packet type
-     * @deprecated use {@link #setPacketType(PacketType)}. This method will be removed in 5.0.0
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default void setId(PacketType packetType) {
-        setPacketType(packetType);
-    }
 
     /**
      * Sets the packet id. If set to -1, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.

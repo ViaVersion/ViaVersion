@@ -44,6 +44,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17");
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
+    private static final int[] EMPTY_ARRAY = new int[0];
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
     private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
@@ -80,7 +81,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
             for (String tag : NEW_GAME_EVENT_TAGS) {
                 wrapper.write(Type.STRING, tag);
-                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]);
+                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, EMPTY_ARRAY);
             }
         });
 
@@ -104,7 +105,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             wrapper.passthrough(Type.BOOLEAN);
 
             int size = wrapper.read(Type.VAR_INT);
-            // Write whether markers exists or not
+            // Write whether markers exist or not
             if (size != 0) {
                 wrapper.write(Type.BOOLEAN, true);
                 wrapper.write(Type.VAR_INT, size);
@@ -118,28 +119,19 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             int type = wrapper.read(Type.VAR_INT);
             ClientboundPacketType packetType;
             switch (type) {
-                case 0:
-                    packetType = ClientboundPackets1_17.TITLE_TEXT;
-                    break;
-                case 1:
-                    packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
-                    break;
-                case 2:
-                    packetType = ClientboundPackets1_17.ACTIONBAR;
-                    break;
-                case 3:
-                    packetType = ClientboundPackets1_17.TITLE_TIMES;
-                    break;
-                case 4:
+                case 0 -> packetType = ClientboundPackets1_17.TITLE_TEXT;
+                case 1 -> packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
+                case 2 -> packetType = ClientboundPackets1_17.ACTIONBAR;
+                case 3 -> packetType = ClientboundPackets1_17.TITLE_TIMES;
+                case 4 -> {
                     packetType = ClientboundPackets1_17.CLEAR_TITLES;
                     wrapper.write(Type.BOOLEAN, false); // Reset times
-                    break;
-                case 5:
+                }
+                case 5 -> {
                     packetType = ClientboundPackets1_17.CLEAR_TITLES;
                     wrapper.write(Type.BOOLEAN, true); // Reset times
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid title type received: " + type);
+                }
+                default -> throw new IllegalArgumentException("Invalid title type received: " + type);
             }
 
             wrapper.setPacketType(packetType);
@@ -152,10 +144,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
                 map(Type.FLOAT); // Y
                 map(Type.FLOAT); // Z
                 map(Type.FLOAT); // Strength
-                handler(wrapper -> {
-                    // Collection length is now a var int
-                    wrapper.write(Type.VAR_INT, wrapper.read(Type.INT));
-                });
+                handler(wrapper -> wrapper.write(Type.VAR_INT, wrapper.read(Type.INT))); // Collection length is now a var int
             }
         });
 
@@ -163,10 +152,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             @Override
             public void register() {
                 map(Type.POSITION1_14);
-                handler(wrapper -> {
-                    // Angle (which Mojang just forgot to write to the buffer, lol)
-                    wrapper.write(Type.FLOAT, 0f);
-                });
+                handler(wrapper -> wrapper.write(Type.FLOAT, 0f)); // Angle (which Mojang just forgot to write to the buffer, lol)
             }
         });
 
@@ -179,9 +165,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
                 map(Type.BOOLEAN); // Chat colors
                 map(Type.UNSIGNED_BYTE); // Chat flags
                 map(Type.VAR_INT); // Main hand
-                handler(wrapper -> {
-                    wrapper.read(Type.BOOLEAN); // Text filtering
-                });
+                read(Type.BOOLEAN); // Text filtering
             }
         });
     }

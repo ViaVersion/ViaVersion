@@ -25,51 +25,8 @@ package com.viaversion.viaversion.api.minecraft;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class GameProfile {
+public record GameProfile(@Nullable String name, @Nullable UUID id, Property[] properties) {
 
-    private final String name;
-    private final UUID id;
-    private final Property[] properties;
-
-    public GameProfile(@Nullable final String name, @Nullable final UUID id, final Property[] properties) {
-        this.name = name;
-        this.id = id;
-        this.properties = properties;
-    }
-
-    public @Nullable String name() {
-        return name;
-    }
-
-    public @Nullable UUID id() {
-        return id;
-    }
-
-    public Property[] properties() {
-        return properties;
-    }
-
-    public static final class Property {
-        private final String name;
-        private final String value;
-        private final String signature;
-
-        public Property(final String name, final String value, @Nullable final String signature) {
-            this.name = name;
-            this.value = value;
-            this.signature = signature;
-        }
-
-        public String name() {
-            return name;
-        }
-
-        public String value() {
-            return value;
-        }
-
-        public @Nullable String signature() {
-            return signature;
-        }
+    public record Property(String name, String value, @Nullable String signature) {
     }
 }

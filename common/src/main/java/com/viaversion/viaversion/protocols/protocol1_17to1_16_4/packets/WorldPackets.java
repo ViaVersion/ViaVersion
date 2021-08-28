@@ -50,29 +50,15 @@ public final class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_16_2.WORLD_BORDER, null, wrapper -> {
             // Border packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Type.VAR_INT);
-            ClientboundPacketType packetType;
-            switch (type) {
-                case 0:
-                    packetType = ClientboundPackets1_17.WORLD_BORDER_SIZE;
-                    break;
-                case 1:
-                    packetType = ClientboundPackets1_17.WORLD_BORDER_LERP_SIZE;
-                    break;
-                case 2:
-                    packetType = ClientboundPackets1_17.WORLD_BORDER_CENTER;
-                    break;
-                case 3:
-                    packetType = ClientboundPackets1_17.WORLD_BORDER_INIT;
-                    break;
-                case 4:
-                    packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DELAY;
-                    break;
-                case 5:
-                    packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DISTANCE;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid world border type received: " + type);
-            }
+            ClientboundPacketType packetType = switch (type) {
+                case 0 -> ClientboundPackets1_17.WORLD_BORDER_SIZE;
+                case 1 -> ClientboundPackets1_17.WORLD_BORDER_LERP_SIZE;
+                case 2 -> ClientboundPackets1_17.WORLD_BORDER_CENTER;
+                case 3 -> ClientboundPackets1_17.WORLD_BORDER_INIT;
+                case 4 -> ClientboundPackets1_17.WORLD_BORDER_WARNING_DELAY;
+                case 5 -> ClientboundPackets1_17.WORLD_BORDER_WARNING_DISTANCE;
+                default -> throw new IllegalArgumentException("Invalid world border type received: " + type);
+            };
 
             wrapper.setPacketType(packetType);
         });
@@ -97,7 +83,7 @@ public final class WorldPackets {
                 });
             }
 
-            private void writeLightArrays(PacketWrapper wrapper, int bitMask) throws Exception {
+            private void writeLightArrays(PacketWrapper wrapper, int bitMask) {
                 List<byte[]> light = new ArrayList<>();
                 for (int i = 0; i < 18; i++) {
                     if (isSet(bitMask, i)) {
@@ -156,7 +142,7 @@ public final class WorldPackets {
         blockRewriter.registerEffect(ClientboundPackets1_16_2.EFFECT, 1010, 2001);
     }
 
-    private static void writeMultiBlockChangePacket(PacketWrapper wrapper, Chunk chunk) throws Exception {
+    private static void writeMultiBlockChangePacket(PacketWrapper wrapper, Chunk chunk) {
         long chunkPosition = (chunk.getX() & 0x3FFFFFL) << 42;
         chunkPosition |= (chunk.getZ() & 0x3FFFFFL) << 20;
 

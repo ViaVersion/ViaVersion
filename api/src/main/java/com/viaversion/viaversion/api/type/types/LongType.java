@@ -52,12 +52,12 @@ public class LongType extends Type<Long> implements TypeConverter<Long> {
 
     @Override
     public Long from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).longValue();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o) ? 1L : 0;
+        if (o instanceof Number number) {
+            return number.longValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? 1L : 0;
         }
-        return (Long) o;
+        throw new UnsupportedOperationException();
     }
 
     public long readPrimitive(ByteBuf buffer) {

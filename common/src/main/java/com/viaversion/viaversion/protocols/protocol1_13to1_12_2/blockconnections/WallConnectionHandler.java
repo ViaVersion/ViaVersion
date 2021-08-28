@@ -47,8 +47,8 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
     }
 
     @Override
-    protected byte getStates(UserConnection user, Position position, int blockState) {
-        byte states = super.getStates(user, position, blockState);
+    protected byte getStates(UserConnection user, Position position) {
+        byte states = super.getStates(user, position);
         if (up(user, position)) states |= 16;
         return states;
     }

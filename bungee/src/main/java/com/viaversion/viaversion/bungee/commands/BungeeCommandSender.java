@@ -22,12 +22,7 @@ import java.util.UUID;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class BungeeCommandSender implements ViaCommandSender {
-    private final CommandSender sender;
-
-    public BungeeCommandSender(CommandSender sender) {
-        this.sender = sender;
-    }
+public record BungeeCommandSender(CommandSender sender) implements ViaCommandSender {
 
     @Override
     public boolean hasPermission(String permission) {
@@ -41,8 +36,8 @@ public class BungeeCommandSender implements ViaCommandSender {
 
     @Override
     public UUID getUUID() {
-        if (sender instanceof ProxiedPlayer) {
-            return ((ProxiedPlayer) sender).getUniqueId();
+        if (sender instanceof ProxiedPlayer player) {
+            return player.getUniqueId();
         } else {
             return new UUID(0, 0);
         }

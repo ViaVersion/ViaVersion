@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Arrays;
 import java.util.Locale;
 
-class ChestConnectionHandler extends ConnectionHandler {
+class ChestConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<BlockFace> CHEST_FACINGS = new Int2ObjectOpenHashMap<>();
     private static final int[] CONNECTED_STATES = new int[32];
     private static final IntSet TRAPPED_CHESTS = new IntOpenHashSet();

@@ -98,10 +98,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
-                handler(wrapper -> {
-                    // Collection length is now a var int
-                    wrapper.write(Type.VAR_INT, wrapper.read(Type.INT));
-                });
+                handler(wrapper -> wrapper.write(Type.VAR_INT, wrapper.read(Type.INT))); // Collection length is now a var int
             }
         });
 
@@ -115,30 +112,19 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 map(Type.FLOAT);
                 map(Type.BYTE);
                 map(Type.VAR_INT);
-                handler(wrapper -> {
-                    // Dismount vehicle
-                    wrapper.write(Type.BOOLEAN, false);
-                });
+                create(Type.BOOLEAN, false); // Dismount vehicle
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, wrapper -> {
             // Combat packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Type.VAR_INT);
-            ClientboundPacketType packetType;
-            switch (type) {
-                case 0:
-                    packetType = ClientboundPackets1_17.COMBAT_ENTER;
-                    break;
-                case 1:
-                    packetType = ClientboundPackets1_17.COMBAT_END;
-                    break;
-                case 2:
-                    packetType = ClientboundPackets1_17.COMBAT_KILL;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid combat type received: " + type);
-            }
+            ClientboundPacketType packetType = switch (type) {
+                case 0 -> ClientboundPackets1_17.COMBAT_ENTER;
+                case 1 -> ClientboundPackets1_17.COMBAT_END;
+                case 2 -> ClientboundPackets1_17.COMBAT_KILL;
+                default -> throw new IllegalArgumentException("Invalid combat type received: " + type);
+            };
 
             wrapper.setPacketType(packetType);
         });

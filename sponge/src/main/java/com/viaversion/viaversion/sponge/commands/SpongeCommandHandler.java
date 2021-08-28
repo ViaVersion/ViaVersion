@@ -33,7 +33,7 @@ public class SpongeCommandHandler extends ViaCommandHandler implements Command.R
 
     @Override
     public CommandResult process(CommandCause cause, ArgumentReader.Mutable arguments) {
-        String[] args = arguments.input().length() > 0 ? arguments.input().split(" ") : new String[0];
+        String[] args = !arguments.input().isEmpty() ? arguments.input().split(" ") : new String[0];
         onCommand(new SpongeCommandSender(cause), args);
         return CommandResult.success();
     }

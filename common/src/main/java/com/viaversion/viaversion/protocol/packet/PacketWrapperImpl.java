@@ -68,7 +68,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public <T> T get(Type<T> type, int index) throws Exception {
+    public <T> T get(Type<T> type, int index) throws InformativeException {
         int currentIndex = 0;
         for (PacketValue<?> packetValue : packetValues) {
             if (packetValue.type() != type) {
@@ -115,7 +115,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
 
     @Override
-    public <T> void set(Type<T> type, int index, T value) throws Exception {
+    public <T> void set(Type<T> type, int index, @Nullable T value) throws InformativeException {
         int currentIndex = 0;
         for (PacketValue packetValue : packetValues) {
             if (packetValue.type() != type) {
@@ -131,7 +131,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public <T> T read(Type<T> type) throws Exception {
+    public <T> T read(Type<T> type) {
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
@@ -180,14 +180,14 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public <T> T passthrough(Type<T> type) throws Exception {
+    public <T> T passthrough(Type<T> type) throws InformativeException {
         T value = read(type);
         write(type, value);
         return value;
     }
 
     @Override
-    public void passthroughAll() throws Exception {
+    public void passthroughAll() throws InformativeException {
         // Copy previous objects
         packetValues.addAll(readableObjects);
         readableObjects.clear();
@@ -198,7 +198,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public void writeToBuffer(ByteBuf buffer) throws Exception {
+    public void writeToBuffer(ByteBuf buffer) throws InformativeException {
         if (id != -1) {
             Type.VAR_INT.writePrimitive(buffer, id);
         }
@@ -248,16 +248,16 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+    public void send(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException {
         send0(protocol, skipCurrentPipeline, true);
     }
 
     @Override
-    public void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+    public void scheduleSend(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException {
         send0(protocol, skipCurrentPipeline, false);
     }
 
-    private void send0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+    private void send0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws InformativeException {
         if (isCancelled()) {
             return;
         }
@@ -267,9 +267,12 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
                 connection.sendRawPacket(output);
-            } catch (final Exception e) {
+            } catch (InformativeException e) {
+                throw e;
+            } catch (CancelException ignored) {
+            } catch (Exception e) {
                 if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw e;
+                    throw new InformativeException(e);
                 }
             }
             return;
@@ -279,13 +282,12 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
                 connection.sendRawPacket(output);
-            } catch (final RuntimeException e) {
+            } catch (InformativeException e) {
+                throw e;
+            } catch (CancelException ignored) {
+            } catch (Exception e) {
                 if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw e;
-                }
-            } catch (final Exception e) {
-                if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw new RuntimeException(e);
+                    throw new InformativeException(e);
                 }
             }
         });
@@ -297,9 +299,8 @@ public class PacketWrapperImpl implements PacketWrapper {
      * @param protocolClass       protocol class to send the packet from, or null to go through the full pipeline
      * @param skipCurrentPipeline whether to start from the next protocol in the pipeline, or the provided one
      * @return created packet buffer
-     * @throws Exception if it fails to write
      */
-    private ByteBuf constructPacket(@Nullable Class<? extends Protocol> protocolClass, boolean skipCurrentPipeline, Direction direction) throws Exception {
+    private ByteBuf constructPacket(@Nullable Class<? extends Protocol> protocolClass, boolean skipCurrentPipeline, Direction direction) throws InformativeException, CancelException {
         resetReader(); // Reset reader before we start
 
         final ProtocolInfo protocolInfo = user().getProtocolInfo();
@@ -315,25 +316,30 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public ChannelFuture sendFuture(Class<? extends Protocol> protocolClass) throws Exception {
+    public ChannelFuture sendFuture(Class<? extends Protocol> protocolClass) throws InformativeException {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(protocolClass, true, Direction.CLIENTBOUND);
+            final ByteBuf output;
+            try {
+                output = constructPacket(protocolClass, true, Direction.CLIENTBOUND);
+            } catch (final CancelException e) {
+                return user().getChannel().newFailedFuture(new RuntimeException("Cancelled packet"));
+            }
             return user().sendRawPacketFuture(output);
         }
-        return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
+        return user().getChannel().newFailedFuture(new RuntimeException("Tried to send cancelled packet"));
     }
 
     @Override
-    public void sendRaw() throws Exception {
+    public void sendRaw() throws InformativeException {
         sendRaw(true);
     }
 
     @Override
-    public void scheduleSendRaw() throws Exception {
+    public void scheduleSendRaw() throws InformativeException {
         sendRaw(false);
     }
 
-    private void sendRaw(boolean currentThread) throws Exception {
+    private void sendRaw(boolean currentThread) throws InformativeException {
         if (isCancelled()) {
             return;
         }
@@ -357,14 +363,14 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public PacketWrapperImpl create(int packetId, PacketHandler handler) throws Exception {
+    public PacketWrapperImpl create(int packetId, PacketHandler handler) throws InformativeException {
         PacketWrapperImpl wrapper = create(packetId);
         handler.handle(wrapper);
         return wrapper;
     }
 
     @Override
-    public void apply(Direction direction, State state, List<Protocol> pipeline) throws Exception {
+    public void apply(Direction direction, State state, List<Protocol> pipeline) throws InformativeException, CancelException {
         // Indexed loop to allow additions to the tail
         for (int i = 0, size = pipeline.size(); i < size; i++) {
             Protocol<?, ?, ?, ?> protocol = pipeline.get(i);
@@ -374,30 +380,6 @@ public class PacketWrapperImpl implements PacketWrapper {
                 state = this.packetType.state();
             }
         }
-    }
-
-    @Override
-    @Deprecated
-    public PacketWrapperImpl apply(Direction direction, State state, int index, List<Protocol> pipeline, boolean reverse) throws Exception {
-        // Reset the reader after every transformation for the packetWrapper, so it can be recycled across packets
-        if (reverse) {
-            for (int i = index; i >= 0; i--) {
-                pipeline.get(i).transform(direction, state, this);
-                resetReader();
-                if (this.packetType != null) {
-                    state = this.packetType.state();
-                }
-            }
-        } else {
-            for (int i = index; i < pipeline.size(); i++) {
-                pipeline.get(i).transform(direction, state, this);
-                resetReader();
-                if (this.packetType != null) {
-                    state = this.packetType.state();
-                }
-            }
-        }
-        return this;
     }
 
     @Override
@@ -425,16 +407,16 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public void sendToServerRaw() throws Exception {
+    public void sendToServerRaw() throws InformativeException {
         sendToServerRaw(true);
     }
 
     @Override
-    public void scheduleSendToServerRaw() throws Exception {
+    public void scheduleSendToServerRaw() throws InformativeException {
         sendToServerRaw(false);
     }
 
-    private void sendToServerRaw(boolean currentThread) throws Exception {
+    private void sendToServerRaw(boolean currentThread) throws InformativeException {
         if (isCancelled()) {
             return;
         }
@@ -453,16 +435,16 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+    public void sendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException {
         sendToServer0(protocol, skipCurrentPipeline, true);
     }
 
     @Override
-    public void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws Exception {
+    public void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException {
         sendToServer0(protocol, skipCurrentPipeline, false);
     }
 
-    private void sendToServer0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+    private void sendToServer0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws InformativeException {
         if (isCancelled()) {
             return;
         }
@@ -472,9 +454,12 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
                 connection.sendRawPacketToServer(output);
-            } catch (final Exception e) {
+            } catch (InformativeException e) {
+                throw e;
+            } catch (CancelException ignored) {
+            } catch (Exception e) {
                 if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw e;
+                    throw new InformativeException(e);
                 }
             }
             return;
@@ -484,13 +469,12 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
                 connection.sendRawPacketToServer(output);
-            } catch (final RuntimeException e) {
+            } catch (InformativeException e) {
+                throw e;
+            } catch (CancelException ignored) {
+            } catch (Exception e) {
                 if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw e;
-                }
-            } catch (final Exception e) {
-                if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw new RuntimeException(e);
+                    throw new InformativeException(e);
                 }
             }
         });

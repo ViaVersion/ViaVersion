@@ -64,27 +64,21 @@ public class EntityTracker1_9 extends EntityTrackerBase {
             .expireAfterAccess(250, TimeUnit.MILLISECONDS)
             .<Position, Boolean>build()
             .asMap());
-    private boolean blocking = false;
-    private boolean autoTeam = false;
-    private Position currentlyDigging = null;
-    private boolean teamExists = false;
+    private boolean blocking;
+    private boolean autoTeam;
+    private Position currentlyDigging;
+    private boolean teamExists;
     private GameMode gameMode;
     private String currentTeam;
     private int heldItemSlot;
-    private Item itemInSecondHand = null;
+    private Item itemInSecondHand;
 
     public EntityTracker1_9(UserConnection user) {
         super(user, EntityType.PLAYER);
     }
 
     public UUID getEntityUUID(int id) {
-        UUID uuid = uuidMap.get(id);
-        if (uuid == null) {
-            uuid = UUID.randomUUID();
-            uuidMap.put(id, uuid);
-        }
-
-        return uuid;
+        return uuidMap.computeIfAbsent(id, k -> UUID.randomUUID());
     }
 
     public void setSecondHand(Item item) {
@@ -96,11 +90,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM1_8, this.itemInSecondHand = item);
-        try {
-            wrapper.scheduleSend(Protocol1_9To1_8.class);
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send second hand item", e);
-        }
+        wrapper.scheduleSend(Protocol1_9To1_8.class);
     }
 
     public Item getItemInSecondHand() {
@@ -221,17 +211,14 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                             && (displayNameVisible = getMetaByIndex(metadataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
                         if (!knownHolograms.contains(entityId)) {
                             knownHolograms.add(entityId);
-                            try {
-                                // Send movement
-                                PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_POSITION, null, user());
-                                wrapper.write(Type.VAR_INT, entityId);
-                                wrapper.write(Type.SHORT, (short) 0);
-                                wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
-                                wrapper.write(Type.SHORT, (short) 0);
-                                wrapper.write(Type.BOOLEAN, true);
-                                wrapper.scheduleSend(Protocol1_9To1_8.class);
-                            } catch (Exception ignored) {
-                            }
+                            // Send movement
+                            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_POSITION, null, user());
+                            wrapper.write(Type.VAR_INT, entityId);
+                            wrapper.write(Type.SHORT, (short) 0);
+                            wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
+                            wrapper.write(Type.SHORT, (short) 0);
+                            wrapper.write(Type.BOOLEAN, true);
+                            wrapper.scheduleSend(Protocol1_9To1_8.class);
                         }
                     }
                 }
@@ -306,14 +293,10 @@ public class EntityTracker1_9 extends EntityTrackerBase {
             wrapper.write(Type.BYTE, (byte) 1); // remove team
         }
         teamExists = add;
-        try {
-            if (now) {
-                wrapper.send(Protocol1_9To1_8.class);
-            } else {
-                wrapper.scheduleSend(Protocol1_9To1_8.class);
-            }
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send team packet", e);
+        if (now) {
+            wrapper.send(Protocol1_9To1_8.class);
+        } else {
+            wrapper.scheduleSend(Protocol1_9To1_8.class);
         }
     }
 
