@@ -231,6 +231,13 @@ public interface ViaVersionConfig {
     int getPistonReplacementId();
 
     /**
+     * Fix 1.9+ clients not rendering the far away chunks
+     *
+     * @return true to fix chunk borders
+     */
+    boolean isChunkBorderFix();
+
+    /**
      * Force json transform
      *
      * @return true if enabled
@@ -417,7 +424,7 @@ public interface ViaVersionConfig {
     boolean isForcedUse1_17ResourcePack();
 
     /**
-     *  Get the message that is sent when a user displays a resource pack prompt.
+     * Get the message that is sent when a user displays a resource pack prompt.
      *
      * @return cached serialized component
      */

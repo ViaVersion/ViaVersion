@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -189,12 +190,18 @@ public class PlayerPackets {
                     tracker.setGameMode(GameMode.getById(wrapper.get(Type.UNSIGNED_BYTE, 0))); //Set player gamemode
                 });
 
+                // Track player's dimension
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.BYTE, 0);
+                    clientWorld.setEnvironment(dimensionId);
+                });
+
                 // Gotta fake their op
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                     provider.sendPermission(wrapper.user());
-                }
-                );
+                });
 
                 // Scoreboard will be cleared when join game is received
                 handler(wrapper -> {
@@ -300,22 +307,6 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_HEALTH, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.FLOAT); // 0 - Health
-                handler(wrapper -> {
-                    float health = wrapper.get(Type.FLOAT, 0);
-                    if (health <= 0) {
-                        // Client unloads chunks on respawn, take note
-                        ClientChunks cc = wrapper.user().get(ClientChunks.class);
-                        cc.getBulkChunks().clear();
-                        cc.getLoadedChunks().clear();
-                    }
-                });
-            }
-        });
-
         protocol.registerClientbound(ClientboundPackets1_8.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -324,11 +315,19 @@ public class PlayerPackets {
                 map(Type.UNSIGNED_BYTE); // 2 - GameMode
                 map(Type.STRING); // 3 - Level Type
 
+                // Track player's dimension
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                        int dimensionId = wrapper.get(Type.INT, 0);
+                        clientWorld.setEnvironment(dimensionId);
+                    }
+                });
+
                 handler(wrapper -> {
-                    // Client unloads chunks on respawn, take note
-                    ClientChunks cc = wrapper.user().get(ClientChunks.class);
-                    cc.getBulkChunks().clear();
-                    cc.getLoadedChunks().clear();
+                    // Client unloads chunks on respawn
+                    wrapper.user().get(ClientChunks.class).getLoadedChunks().clear();
 
                     int gamemode = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
