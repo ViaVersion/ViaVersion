@@ -29,12 +29,22 @@ public interface ProtocolPathKey {
      *
      * @return client protocol version
      */
-    int getClientProtocolVersion();
+    int clientProtocolVersion();
 
     /**
      * Returns the server protocol version.
      *
      * @return server protocol version
      */
-    int getServerProtocolVersion();
+    int serverProtocolVersion();
+
+    @Deprecated/*(forRemoval = true)*/
+    default int getClientProtocolVersion() {
+        return clientProtocolVersion();
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default int getServerProtocolVersion() {
+        return serverProtocolVersion();
+    }
 }

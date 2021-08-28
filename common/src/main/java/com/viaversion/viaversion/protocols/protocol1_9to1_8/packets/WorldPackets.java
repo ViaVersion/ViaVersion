@@ -156,8 +156,8 @@ public class WorldPackets {
                             // Unload the empty chunks
                             if (Via.getConfig().isChunkBorderFix()) {
                                 for (BlockFace face : BlockFace.HORIZONTAL) {
-                                    int chunkX = chunk.getX() + face.getModX();
-                                    int chunkZ = chunk.getZ() + face.getModZ();
+                                    int chunkX = chunk.getX() + face.modX();
+                                    int chunkZ = chunk.getZ() + face.modZ();
                                     if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
                                         PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.UNLOAD_CHUNK);
                                         unloadChunk.write(Type.INT, chunkX);
@@ -174,8 +174,8 @@ public class WorldPackets {
                             // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
                             if (Via.getConfig().isChunkBorderFix()) {
                                 for (BlockFace face : BlockFace.HORIZONTAL) {
-                                    int chunkX = chunk.getX() + face.getModX();
-                                    int chunkZ = chunk.getZ() + face.getModZ();
+                                    int chunkX = chunk.getX() + face.modX();
+                                    int chunkZ = chunk.getZ() + face.modZ();
                                     if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
                                         PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
                                         Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
@@ -210,8 +210,8 @@ public class WorldPackets {
                         // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
                         if (Via.getConfig().isChunkBorderFix()) {
                             for (BlockFace face : BlockFace.HORIZONTAL) {
-                                int chunkX = chunk.getX() + face.getModX();
-                                int chunkZ = chunk.getZ() + face.getModZ();
+                                int chunkX = chunk.getX() + face.modX();
+                                int chunkZ = chunk.getZ() + face.modZ();
                                 if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
                                     PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
                                     Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
@@ -406,9 +406,9 @@ public class WorldPackets {
                         if (face == 255)
                             return;
                         Position p = wrapper.get(Type.POSITION, 0);
-                        int x = p.getX();
-                        int y = p.getY();
-                        int z = p.getZ();
+                        int x = p.x();
+                        int y = p.y();
+                        int z = p.z();
                         switch (face) {
                             case 0:
                                 y--;

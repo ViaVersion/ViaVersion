@@ -58,7 +58,7 @@ public class ConnectionData {
     public static void update(UserConnection user, Position position) {
         for (BlockFace face : BlockFace.values()) {
             Position pos = position.getRelative(face);
-            int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
+            int blockState = blockConnectionProvider.getBlockData(user, pos.x(), pos.y(), pos.z());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) continue;
 
@@ -151,12 +151,12 @@ public class ConnectionData {
     }
 
     public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord1_8> records) {
-        int blockState = blockConnectionProvider.getBlockData(user, pos.getX(), pos.getY(), pos.getZ());
+        int blockState = blockConnectionProvider.getBlockData(user, pos.x(), pos.y(), pos.z());
         ConnectionHandler handler = getConnectionHandler(blockState);
         if (handler == null) return;
 
         int newBlockState = handler.connect(user, pos, blockState);
-        records.add(new BlockChangeRecord1_8(pos.getX() & 0xF, pos.getY(), pos.getZ() & 0xF, newBlockState));
+        records.add(new BlockChangeRecord1_8(pos.x() & 0xF, pos.y(), pos.z() & 0xF, newBlockState));
     }
 
     public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {

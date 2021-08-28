@@ -72,10 +72,10 @@ public class BaseProtocol extends AbstractProtocol {
                     if (protocolPath != null) {
                         List<Protocol> protocols = new ArrayList<>(protocolPath.size());
                         for (ProtocolPathEntry entry : protocolPath) {
-                            protocols.add(entry.getProtocol());
+                            protocols.add(entry.protocol());
 
                             // Ensure mapping data has already been loaded
-                            Via.getManager().getProtocolManager().completeMappingDataLoading(entry.getProtocol().getClass());
+                            Via.getManager().getProtocolManager().completeMappingDataLoading(entry.protocol().getClass());
                         }
 
                         // Add protocols to pipeline

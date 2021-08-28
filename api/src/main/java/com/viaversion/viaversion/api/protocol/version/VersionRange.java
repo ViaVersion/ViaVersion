@@ -50,7 +50,7 @@ public class VersionRange {
      *
      * @return major version name
      */
-    public String getBaseVersion() {
+    public String baseVersion() {
         return baseVersion;
     }
 
@@ -59,7 +59,7 @@ public class VersionRange {
      *
      * @return lowest included minor version
      */
-    public int getRangeFrom() {
+    public int rangeFrom() {
         return rangeFrom;
     }
 
@@ -68,6 +68,21 @@ public class VersionRange {
      *
      * @return highest included minor version
      */
+    public int rangeTo() {
+        return rangeTo;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    public String getBaseVersion() {
+        return baseVersion;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    public int getRangeFrom() {
+        return rangeFrom;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public int getRangeTo() {
         return rangeTo;
     }

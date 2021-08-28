@@ -133,7 +133,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     private long getChunkSectionIndex(Position position) {
-        return getChunkSectionIndex(position.getX(), position.getY(), position.getZ());
+        return getChunkSectionIndex(position.x(), position.y(), position.z());
     }
 
     private short encodeBlockPos(int x, int y, int z) {
@@ -141,7 +141,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     private short encodeBlockPos(Position pos) {
-        return encodeBlockPos(pos.getX(), pos.getY(), pos.getZ());
+        return encodeBlockPos(pos.x(), pos.y(), pos.z());
     }
 
     private <T> Map<Long, T> createLongObjectMap() {

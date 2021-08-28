@@ -62,18 +62,38 @@ public enum BlockFace {
         return opposites.get(this);
     }
 
+    public byte modX() {
+        return modX;
+    }
+
+    public byte modY() {
+        return modY;
+    }
+
+    public byte modZ() {
+        return modZ;
+    }
+
+    public EnumAxis axis() {
+        return axis;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public byte getModX() {
         return modX;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public byte getModY() {
         return modY;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public byte getModZ() {
         return modZ;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public EnumAxis getAxis() {
         return axis;
     }

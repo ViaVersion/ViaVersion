@@ -108,9 +108,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     public static final PacketHandler POS_TO_3_INT = wrapper -> {
         Position position = wrapper.read(Type.POSITION);
-        wrapper.write(Type.INT, position.getX());
-        wrapper.write(Type.INT, position.getY());
-        wrapper.write(Type.INT, position.getZ());
+        wrapper.write(Type.INT, position.x());
+        wrapper.write(Type.INT, position.y());
+        wrapper.write(Type.INT, position.z());
     };
 
     private static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =

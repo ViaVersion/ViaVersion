@@ -22,20 +22,20 @@ import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 
 public class ProtocolPathEntryImpl implements ProtocolPathEntry {
     private final int outputProtocolVersion;
-    private final Protocol protocol;
+    private final Protocol<?, ?, ?, ?> protocol;
 
-    public ProtocolPathEntryImpl(int outputProtocolVersion, Protocol protocol) {
+    public ProtocolPathEntryImpl(int outputProtocolVersion, Protocol<?, ?, ?, ?> protocol) {
         this.outputProtocolVersion = outputProtocolVersion;
         this.protocol = protocol;
     }
 
     @Override
-    public int getOutputProtocolVersion() {
+    public int outputProtocolVersion() {
         return outputProtocolVersion;
     }
 
     @Override
-    public Protocol getProtocol() {
+    public Protocol<?, ?, ?, ?> protocol() {
         return protocol;
     }
 

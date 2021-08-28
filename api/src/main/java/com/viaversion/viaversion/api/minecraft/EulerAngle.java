@@ -33,14 +33,29 @@ public class EulerAngle {
         this.z = z;
     }
 
+    public float x() {
+        return x;
+    }
+
+    public float y() {
+        return y;
+    }
+
+    public float z() {
+        return z;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public float getX() {
         return x;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public float getY() {
         return y;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public float getZ() {
         return z;
     }

@@ -27,6 +27,6 @@ public abstract class ConnectionHandler {
     public abstract int connect(UserConnection user, Position position, int blockState);
 
     public int getBlockData(UserConnection user, Position position) {
-        return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, position.getX(), position.getY(), position.getZ());
+        return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, position.x(), position.y(), position.z());
     }
 }

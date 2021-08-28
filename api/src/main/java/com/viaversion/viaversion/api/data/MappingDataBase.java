@@ -89,10 +89,10 @@ public class MappingDataBase implements MappingData {
         if (diffmapping != null && diffmapping.has("tags")) {
             this.tags = new EnumMap<>(RegistryType.class);
             JsonObject tags = diffmapping.getAsJsonObject("tags");
-            if (tags.has(RegistryType.ITEM.getResourceLocation())) {
+            if (tags.has(RegistryType.ITEM.resourceLocation())) {
                 loadTags(RegistryType.ITEM, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("items")));
             }
-            if (tags.has(RegistryType.BLOCK.getResourceLocation())) {
+            if (tags.has(RegistryType.BLOCK.resourceLocation())) {
                 loadTags(RegistryType.BLOCK, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("blocks")));
             }
         }
@@ -101,7 +101,7 @@ public class MappingDataBase implements MappingData {
     }
 
     private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
-        JsonObject tags = object.getAsJsonObject(type.getResourceLocation());
+        JsonObject tags = object.getAsJsonObject(type.resourceLocation());
         List<TagData> tagsList = new ArrayList<>(tags.size());
         for (Map.Entry<String, JsonElement> entry : tags.entrySet()) {
             JsonArray array = entry.getValue().getAsJsonArray();

@@ -46,13 +46,25 @@ import java.util.UUID;
 public interface ViaAPI<T> {
 
     /**
-     * Returns the API version incremented with meaningful API changes.
+     * Returns the <b>major version</b> matching {@link #getVersion()}.
+     * It is highly advised to check against the major version and to disable/not initiate
+     * any hooks into ViaVersion if given and expected versions do not match.
+     *
+     * @return major plugin version
+     * @since 4.0.2
+     */
+    default int majorVersion() {
+        return 4;
+    }
+
+    /**
+     * Returns an <b>internally based API version</b> incremented with meaningful API changes.
      * This includes breaking changes to existing API and larger additions.
      *
      * @return API version incremented with meaningful API changes
      */
     default int apiVersion() {
-        return 4;
+        return 5;
     }
 
     /**

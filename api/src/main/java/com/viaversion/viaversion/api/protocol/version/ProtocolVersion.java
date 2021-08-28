@@ -215,12 +215,12 @@ public class ProtocolVersion {
         Preconditions.checkArgument(!versionWildcard || versionRange == null, "A version cannot be a wildcard and a range at the same time!");
         if (versionRange != null) {
             includedVersions = new LinkedHashSet<>();
-            for (int i = versionRange.getRangeFrom(); i <= versionRange.getRangeTo(); i++) {
+            for (int i = versionRange.rangeFrom(); i <= versionRange.rangeTo(); i++) {
                 if (i == 0) {
-                    includedVersions.add(versionRange.getBaseVersion()); // Keep both the base version and with ".0" appended
+                    includedVersions.add(versionRange.baseVersion()); // Keep both the base version and with ".0" appended
                 }
 
-                includedVersions.add(versionRange.getBaseVersion() + "." + i);
+                includedVersions.add(versionRange.baseVersion() + "." + i);
             }
         } else {
             includedVersions = Collections.singleton(name);

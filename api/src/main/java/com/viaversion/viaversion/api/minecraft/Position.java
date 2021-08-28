@@ -33,28 +33,43 @@ public class Position {
         this.z = z;
     }
 
+    @Deprecated/*(forRemoval=true)*/
     public Position(int x, short y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this(x, (int) y, z);
     }
 
+    @Deprecated/*(forRemoval=true)*/
     public Position(Position toCopy) {
-        this(toCopy.getX(), toCopy.getY(), toCopy.getZ());
+        this(toCopy.x(), toCopy.y(), toCopy.z());
     }
 
     public Position getRelative(BlockFace face) {
-        return new Position(x + face.getModX(), (short) (y + face.getModY()), z + face.getModZ());
+        return new Position(x + face.modX(), (short) (y + face.modY()), z + face.modZ());
     }
 
+    public int x() {
+        return x;
+    }
+
+    public int y() {
+        return y;
+    }
+
+    public int z() {
+        return z;
+    }
+
+    @Deprecated/*(forRemoval=true)*/
     public int getX() {
         return x;
     }
 
+    @Deprecated/*(forRemoval=true)*/
     public int getY() {
         return y;
     }
 
+    @Deprecated/*(forRemoval=true)*/
     public int getZ() {
         return z;
     }

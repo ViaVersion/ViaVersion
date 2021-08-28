@@ -236,7 +236,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
             supportedVersions.add(version.getVersion());
             for (ProtocolPathEntry pathEntry : protocolPath) {
-                supportedVersions.add(pathEntry.getOutputProtocolVersion());
+                supportedVersions.add(pathEntry.outputProtocolVersion());
             }
         }
     }

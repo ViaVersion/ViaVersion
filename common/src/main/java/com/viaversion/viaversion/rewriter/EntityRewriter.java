@@ -276,12 +276,12 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * @param entityType entity type
      * @param intType    int type of the entity id
      */
-    public void registerTracker(ClientboundPacketType packetType, EntityType entityType, Type<? extends Integer> intType) {
+    public void registerTracker(ClientboundPacketType packetType, EntityType entityType, Type<Integer> intType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    int entityId = (int) wrapper.passthrough(intType);
+                    int entityId = wrapper.passthrough(intType);
                     tracker(wrapper.user()).addEntity(entityId, entityType);
                 });
             }

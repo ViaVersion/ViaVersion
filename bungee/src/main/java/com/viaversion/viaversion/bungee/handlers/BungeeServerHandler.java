@@ -194,7 +194,7 @@ public class BungeeServerHandler implements Listener {
                     } else {
                         List<Protocol> protocols = new ArrayList<>(protocolPath.size());
                         for (ProtocolPathEntry entry : protocolPath) {
-                            protocols.add(entry.getProtocol());
+                            protocols.add(entry.protocol());
                         }
                         pipeline.add(protocols);
                     }

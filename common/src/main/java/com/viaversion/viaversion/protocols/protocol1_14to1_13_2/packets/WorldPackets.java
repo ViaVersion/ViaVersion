@@ -410,14 +410,14 @@ public class WorldPackets {
         for (BlockFace blockFace : BlockFace.values()) {
             NibbleArray skyLightArray = section.getLight().getSkyLightNibbleArray();
             NibbleArray blockLightArray = section.getLight().getBlockLightNibbleArray();
-            int neighbourX = x + blockFace.getModX();
-            int neighbourY = y + blockFace.getModY();
-            int neighbourZ = z + blockFace.getModZ();
+            int neighbourX = x + blockFace.modX();
+            int neighbourY = y + blockFace.modY();
+            int neighbourZ = z + blockFace.modZ();
 
-            if (blockFace.getModX() != 0) {
+            if (blockFace.modX() != 0) {
                 // Another chunk, nothing we can do without an unnecessary amount of caching
                 if (neighbourX == 16 || neighbourX == -1) continue;
-            } else if (blockFace.getModY() != 0) {
+            } else if (blockFace.modY() != 0) {
                 if (neighbourY == 16 || neighbourY == -1) {
                     if (neighbourY == 16) {
                         ySection += 1;
@@ -435,7 +435,7 @@ public class WorldPackets {
                     skyLightArray = newSection.getLight().getSkyLightNibbleArray();
                     blockLightArray = newSection.getLight().getBlockLightNibbleArray();
                 }
-            } else if (blockFace.getModZ() != 0) {
+            } else if (blockFace.modZ() != 0) {
                 // Another chunk, nothing we can do without an unnecessary amount of caching
                 if (neighbourZ == 16 || neighbourZ == -1) continue;
             }
@@ -451,7 +451,7 @@ public class WorldPackets {
             if (skyLightArray != null && skyLight != 15) {
                 int neighbourSkyLight = skyLightArray.get(neighbourX, neighbourY, neighbourZ);
                 if (neighbourSkyLight == 15) {
-                    if (blockFace.getModY() == 1) {
+                    if (blockFace.modY() == 1) {
                         // Keep 15 if block is exposed to sky
                         skyLight = 15;
                         continue;

@@ -26,16 +26,26 @@ public interface ProtocolPathEntry {
 
     /**
      * Returns the resulting protocol after transformation using
-     * the {@link #getProtocol()} protocol handlers.
+     * the {@link #protocol()} protocol handlers.
      *
      * @return output protocol version after transformation
      */
-    int getOutputProtocolVersion();
+    int outputProtocolVersion();
 
     /**
      * Returns the protocol to be applied with this entry.
      *
      * @return protocol to be applied with this entry
      */
-    Protocol getProtocol();
+    Protocol<?, ?, ?, ?> protocol();
+
+    @Deprecated/*(forRemoval = true)*/
+    default int getOutputProtocolVersion() {
+        return outputProtocolVersion();
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default Protocol getProtocol() {
+        return protocol();
+    }
 }

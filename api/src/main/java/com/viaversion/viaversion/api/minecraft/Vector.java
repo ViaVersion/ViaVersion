@@ -33,26 +33,44 @@ public class Vector {
         this.blockZ = blockZ;
     }
 
+    public int blockX() {
+        return blockX;
+    }
+
+    public int blockY() {
+        return blockY;
+    }
+
+    public int blockZ() {
+        return blockZ;
+    }
+
+    @Deprecated/*(forRemoval=true)*/
     public int getBlockX() {
         return blockX;
     }
 
-    public void setBlockX(int blockX) {
-        this.blockX = blockX;
-    }
-
+    @Deprecated/*(forRemoval=true)*/
     public int getBlockY() {
         return blockY;
     }
 
-    public void setBlockY(int blockY) {
-        this.blockY = blockY;
-    }
-
+    @Deprecated/*(forRemoval=true)*/
     public int getBlockZ() {
         return blockZ;
     }
 
+    @Deprecated/*(forRemoval=true)*/
+    public void setBlockX(int blockX) {
+        this.blockX = blockX;
+    }
+
+    @Deprecated/*(forRemoval=true)*/
+    public void setBlockY(int blockY) {
+        this.blockY = blockY;
+    }
+
+    @Deprecated/*(forRemoval=true)*/
     public void setBlockZ(int blockZ) {
         this.blockZ = blockZ;
     }

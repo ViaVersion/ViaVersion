@@ -34,6 +34,11 @@ public enum Environment {
         this.id = id;
     }
 
+    public int id() {
+        return id;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public int getId() {
         return id;
     }

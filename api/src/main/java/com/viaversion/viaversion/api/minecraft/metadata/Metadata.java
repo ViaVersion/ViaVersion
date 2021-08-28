@@ -121,7 +121,7 @@ public final class Metadata {
         if (o == null || getClass() != o.getClass()) return false;
         Metadata metadata = (Metadata) o;
         if (id != metadata.id) return false;
-        if (metaType != metaType) return false;
+        if (metaType != metadata.metaType) return false;
         return Objects.equals(value, metadata.value);
     }
 

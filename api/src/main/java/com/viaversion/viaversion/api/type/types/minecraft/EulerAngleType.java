@@ -42,8 +42,8 @@ public class EulerAngleType extends Type<EulerAngle> {
 
     @Override
     public void write(ByteBuf buffer, EulerAngle object) throws Exception {
-        Type.FLOAT.writePrimitive(buffer, object.getX());
-        Type.FLOAT.writePrimitive(buffer, object.getY());
-        Type.FLOAT.writePrimitive(buffer, object.getZ());
+        Type.FLOAT.writePrimitive(buffer, object.x());
+        Type.FLOAT.writePrimitive(buffer, object.y());
+        Type.FLOAT.writePrimitive(buffer, object.z());
     }
 }

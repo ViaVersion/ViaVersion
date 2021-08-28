@@ -42,8 +42,8 @@ public class VectorType extends Type<Vector> {
 
     @Override
     public void write(ByteBuf buffer, Vector object) throws Exception {
-        Type.INT.write(buffer, object.getBlockX());
-        Type.INT.write(buffer, object.getBlockY());
-        Type.INT.write(buffer, object.getBlockZ());
+        Type.INT.write(buffer, object.blockX());
+        Type.INT.write(buffer, object.blockY());
+        Type.INT.write(buffer, object.blockZ());
     }
 }

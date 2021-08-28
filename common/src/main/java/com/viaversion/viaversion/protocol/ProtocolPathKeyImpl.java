@@ -29,12 +29,12 @@ public class ProtocolPathKeyImpl implements ProtocolPathKey {
     }
 
     @Override
-    public int getClientProtocolVersion() {
+    public int clientProtocolVersion() {
         return clientProtocolVersion;
     }
 
     @Override
-    public int getServerProtocolVersion() {
+    public int serverProtocolVersion() {
         return serverProtocolVersion;
     }
 

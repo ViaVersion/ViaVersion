@@ -58,7 +58,12 @@ public enum RegistryType {
         this.resourceLocation = resourceLocation;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public String getResourceLocation() {
+        return resourceLocation;
+    }
+
+    public String resourceLocation() {
         return resourceLocation;
     }
 }

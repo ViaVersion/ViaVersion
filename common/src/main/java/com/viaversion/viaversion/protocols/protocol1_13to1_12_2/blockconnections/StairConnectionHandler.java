@@ -122,7 +122,7 @@ public class StairConnectionHandler extends ConnectionHandler {
         StairData relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing)));
         if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
             BlockFace facing2 = relativeStair.getFacing();
-            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2.opposite())) {
+            if (facing.axis() != facing2.axis() && checkOpposite(user, stair, position, facing2.opposite())) {
                 return facing2 == rotateAntiClockwise(facing) ? 3 : 4; // outer_left : outer_right
             }
         }
@@ -130,7 +130,7 @@ public class StairConnectionHandler extends ConnectionHandler {
         relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing.opposite())));
         if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
             BlockFace facing2 = relativeStair.getFacing();
-            if (facing.getAxis() != facing2.getAxis() && checkOpposite(user, stair, position, facing2)) {
+            if (facing.axis() != facing2.axis() && checkOpposite(user, stair, position, facing2)) {
                 return facing2 == rotateAntiClockwise(facing) ? 1 : 2; // inner_left : inner_right
             }
         }

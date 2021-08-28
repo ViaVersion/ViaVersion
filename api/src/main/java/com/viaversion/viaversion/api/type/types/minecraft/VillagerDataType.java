@@ -38,8 +38,8 @@ public class VillagerDataType extends Type<VillagerData> {
 
     @Override
     public void write(ByteBuf buffer, VillagerData object) throws Exception {
-        Type.VAR_INT.writePrimitive(buffer, object.getType());
-        Type.VAR_INT.writePrimitive(buffer, object.getProfession());
-        Type.VAR_INT.writePrimitive(buffer, object.getLevel());
+        Type.VAR_INT.writePrimitive(buffer, object.type());
+        Type.VAR_INT.writePrimitive(buffer, object.profession());
+        Type.VAR_INT.writePrimitive(buffer, object.level());
     }
 }

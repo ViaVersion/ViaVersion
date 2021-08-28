@@ -167,7 +167,7 @@ public class WorldPackets {
 
                         if (blockId == 73) { // Note block
                             PacketWrapper blockChange = wrapper.create(0x0B); // block change
-                            blockChange.write(Type.POSITION, new Position(pos)); // Clone because position is mutable
+                            blockChange.write(Type.POSITION, pos);
                             blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                             blockChange.send(Protocol1_13To1_12_2.class);
                         }
@@ -191,7 +191,7 @@ public class WorldPackets {
                         UserConnection userConnection = wrapper.user();
                         if (Via.getConfig().isServersideBlockConnections()) {
 
-                            ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), newId);
+                            ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newId);
                             newId = ConnectionData.connect(userConnection, position, newId);
                         }
                         wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
@@ -229,7 +229,7 @@ public class WorldPackets {
                                     record.getSectionZ() + (chunkZ * 16));
 
                             if (Via.getConfig().isServersideBlockConnections()) {
-                                ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), newBlock);
+                                ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newBlock);
                             }
                             record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         }
@@ -297,7 +297,7 @@ public class WorldPackets {
                             records[i] = position;
 
                             // Set to air
-                            ConnectionData.updateBlockStorage(userConnection, position.getX(), position.getY(), position.getZ(), 0);
+                            ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), 0);
                         }
 
                         // Workaround for packet order issue

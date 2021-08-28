@@ -152,7 +152,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         if (path != null) {
             protocolList = new ArrayList<>(path.size());
             for (ProtocolPathEntry entry : path) {
-                protocolList.add(entry.getProtocol());
+                protocolList.add(entry.protocol());
             }
         } else if (serverProtocolVersion != clientProtocolVersion) {
             throw new RuntimeException("No protocol path between client version " + clientProtocolVersion + " and server version " + serverProtocolVersion);
