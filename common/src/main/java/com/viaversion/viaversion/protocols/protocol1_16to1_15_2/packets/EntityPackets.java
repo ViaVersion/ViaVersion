@@ -60,10 +60,9 @@ public class EntityPackets {
         }
 
         wrapper.write(Type.STRING, dimensionName); // dimension
-        wrapper.write(Type.STRING, dimensionName); // world
+        wrapper.write(Type.STRING, Via.getConfig().get1_16WorldNamesMap().getOrDefault(dimensionName, dimensionName)); // world
     };
     public static final CompoundTag DIMENSIONS_TAG = new CompoundTag();
-    private static final String[] WORLD_NAMES = {"minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"};
 
     static {
         ListTag list = new ListTag(CompoundTag.class);
@@ -201,7 +200,7 @@ public class EntityPackets {
                 map(Type.UNSIGNED_BYTE); //  Gamemode
                 handler(wrapper -> {
                     wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
-                    wrapper.write(Type.STRING_ARRAY, WORLD_NAMES); // World list - only used for command completion
+                    wrapper.write(Type.STRING_ARRAY, Via.getConfig().get1_16WorldNamesMap().values().toArray(new String[0])); // World list - only used for command completion
                     wrapper.write(Type.NBT, DIMENSIONS_TAG); // Dimension registry
                 });
                 handler(DIMENSION_HANDLER); // Dimension

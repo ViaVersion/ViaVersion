@@ -18,12 +18,15 @@
 package com.viaversion.viaversion.configuration;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.util.Config;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
 
@@ -78,6 +81,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean ignoreLongChannelNames;
     private boolean forcedUse1_17ResourcePack;
     private JsonElement resourcePack1_17PromptMessage;
+    private Map<String, String> map1_16WorldNames = new HashMap<String, String>();
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -141,6 +145,15 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         ignoreLongChannelNames = getBoolean("ignore-long-1_16-channel-names", true);
         forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
         resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
+        map1_16WorldNames.clear();
+        JsonElement maybeMap = getSerializedComponent("map-1_16-world-names");
+        if (maybeMap != null){
+            JsonObject elems = (JsonObject) maybeMap;
+            for (String key : elems.keySet()) {
+                String value =  elems.getAsJsonPrimitive(key).getAsString();
+                map1_16WorldNames.put(key, value);
+            }
+        }
     }
 
     @Override
@@ -429,4 +442,9 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     public JsonElement get1_17ResourcePackPrompt() {
         return resourcePack1_17PromptMessage;
     }
+
+    @Override
+    public Map<String, String> get1_16WorldNamesMap(){
+        return map1_16WorldNames;
+    };
 }

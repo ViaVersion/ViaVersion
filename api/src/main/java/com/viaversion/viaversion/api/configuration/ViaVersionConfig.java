@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.configuration;
 
+import java.util.Map;
+
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -429,4 +431,11 @@ public interface ViaVersionConfig {
      * @return cached serialized component
      */
     JsonElement get1_17ResourcePackPrompt();
+
+    /***
+     * Get the world names which should be returned for each vanilla dimension
+     * 
+     * @return a map from vanilla dimensions to world name
+     */
+    Map<String, String> get1_16WorldNamesMap();
 }
