@@ -145,15 +145,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         ignoreLongChannelNames = getBoolean("ignore-long-1_16-channel-names", true);
         forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
         resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
-        map1_16WorldNames.clear();
-        JsonElement maybeMap = getSerializedComponent("map-1_16-world-names");
-        if (maybeMap != null){
-            JsonObject elems = (JsonObject) maybeMap;
-            for (String key : elems.keySet()) {
-                String value =  elems.getAsJsonPrimitive(key).getAsString();
-                map1_16WorldNames.put(key, value);
-            }
-        }
+        map1_16WorldNames = get("map-1_16-world-names", Map.class, new HashMap<String, String>());
     }
 
     @Override
