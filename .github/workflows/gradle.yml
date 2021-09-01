@@ -10,16 +10,21 @@ jobs:
     # Only run on PRs if the source branch is on a different repo. We do not need run everything twice.
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        java-version: [ 11 ]
+        distro: [ 'zulu', 'temurin' ]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
     - uses: gradle/wrapper-validation-action@v1
-    - name: Set up JDK 11
+    - name: Set up JDK ${{ matrix.java-version }} ${{ matrix.distro }}
       uses: actions/setup-java@v2
       with:
-        distribution: 'adopt'
-        java-version: 11
+        distribution: ${{ matrix.distro }}
+        java-version: ${{ matrix.java-version }}
     - name: Build with Gradle
       run: ./gradlew build
     - uses: actions/upload-artifact@v2
