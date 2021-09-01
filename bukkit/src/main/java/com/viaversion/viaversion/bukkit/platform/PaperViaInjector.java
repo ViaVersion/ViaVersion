@@ -27,6 +27,7 @@ import java.lang.reflect.Proxy;
 public final class PaperViaInjector {
     public static final boolean PAPER_INJECTION_METHOD = hasPaperInjectionMethod();
     public static final boolean PAPER_PROTOCOL_METHOD = hasServerProtocolMethod();
+    public static final boolean PAPER_PACKET_LIMITER = hasPacketLimiter();
 
     private PaperViaInjector() {
     }
@@ -64,8 +65,16 @@ public final class PaperViaInjector {
     }
 
     private static boolean hasPaperInjectionMethod() {
+        return hasClass("io.papermc.paper.network.ChannelInitializeListener");
+    }
+
+    private static boolean hasPacketLimiter() {
+        return hasClass("com.destroystokyo.paper.PaperConfig$PacketLimit") || hasClass("io.papermc.paper.PaperConfig$PacketLimit");
+    }
+
+    private static boolean hasClass(final String className) {
         try {
-            Class.forName("io.papermc.paper.network.ChannelInitializeListener");
+            Class.forName(className);
             return true;
         } catch (ReflectiveOperationException e) {
             return false;

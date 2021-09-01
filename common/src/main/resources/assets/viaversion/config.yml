@@ -72,7 +72,7 @@ velocity-servers: {}
 #----------------------------------------------------------#
 #                  GLOBAL PACKET LIMITER                   #
 #----------------------------------------------------------#
-#
+# THIS FEATURE IS DISABLED ON 1.17.1+ PAPER SERVERS, SINCE IT HAS A BETTER PACKET-LIMITER INBUILT
 #
 # Packets Per Second (PPS) limiter (Use -1 on max-pps and tracking-period to disable)
 # Clients by default send around 20-90 packets per second.

@@ -19,6 +19,7 @@ package com.viaversion.viaversion.bukkit.handlers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
+import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.classgenerator.generated.HandlerConstructor;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
@@ -58,6 +59,10 @@ public class BukkitChannelInitializer extends ChannelInitializer<Channel> {
     public static void afterChannelInitialize(Channel channel) {
         UserConnection connection = new UserConnectionImpl(channel);
         new ProtocolPipelineImpl(connection);
+
+        if (PaperViaInjector.PAPER_PACKET_LIMITER) {
+            connection.setPacketLimiterEnabled(false);
+        }
 
         // Add our transformers
         HandlerConstructor constructor = ClassGenerator.getConstructor();

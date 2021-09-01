@@ -298,6 +298,20 @@ public interface UserConnection {
     boolean shouldApplyBlockProtocol();
 
     /**
+     * Returns whether the packet limiter applies to this user.
+     *
+     * @return whether the packet limiter applies to this user
+     */
+    boolean isPacketLimiterEnabled();
+
+    /**
+     * Sets the status of the packet limiter.
+     *
+     * @param packetLimiterEnabled whether the packet limiter should be enabled
+     */
+    void setPacketLimiterEnabled(boolean packetLimiterEnabled);
+
+    /**
      * Returns a newly generated uuid that will let a packet be passed through without
      * transformig its contents if used together with {@link PacketWrapper#PASSTHROUGH_ID}.
      *

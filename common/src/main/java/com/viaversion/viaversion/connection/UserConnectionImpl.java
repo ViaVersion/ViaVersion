@@ -63,6 +63,7 @@ public class UserConnectionImpl implements UserConnection {
     private final boolean clientSide;
     private boolean active = true;
     private boolean pendingDisconnect;
+    private boolean packetLimiterEnabled = true;
 
     /**
      * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
@@ -253,8 +254,9 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public boolean checkServerboundPacket() {
-        // Ignore if pending disconnect
-        if (pendingDisconnect) return false;
+        if (pendingDisconnect || !packetLimiterEnabled) {
+            return false;
+        }
         // Increment received + Check PPS
         return !packetTracker.incrementReceived() || !packetTracker.exceedsMaxPPS();
     }
@@ -355,6 +357,16 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public boolean shouldApplyBlockProtocol() {
         return !clientSide; // Don't apply protocol blocking on client-side
+    }
+
+    @Override
+    public boolean isPacketLimiterEnabled() {
+        return packetLimiterEnabled;
+    }
+
+    @Override
+    public void setPacketLimiterEnabled(boolean packetLimiterEnabled) {
+        this.packetLimiterEnabled = packetLimiterEnabled;
     }
 
     @Override
