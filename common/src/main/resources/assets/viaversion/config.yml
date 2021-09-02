@@ -207,6 +207,6 @@ minimize-cooldown: true
 left-handed-handling: true
 # Get the world names which should be returned for each vanilla dimension
 map-1_16-world-names:
-  "minecraft:the_nether": "minecraft:the_nether"
-  "minecraft:overworld": "minecraft:overworld"
-  "minecraft:the_end": "minecraft:the_end"
+  overworld: "minecraft:overworld"
+  nether: "minecraft:the_nether"
+  end: "minecraft:the_end"

@@ -22,10 +22,9 @@
  */
 package com.viaversion.viaversion.api.configuration;
 
-import java.util.Map;
-
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 
 public interface ViaVersionConfig {
 
@@ -435,7 +434,9 @@ public interface ViaVersionConfig {
     /***
      * Get the world names which should be returned for each vanilla dimension
      * 
-     * @return a map from vanilla dimensions to world name
+     * @return the global map from vanilla dimensions to world name
+     * Note that this can be overriden per-user by using {@link com.viaversion.viaversion.api.connection.UserConnection#put} with
+     * a custom instance of {@link WorldIdentifiers} for the user's {@link UserConnection}
      */
-    Map<String, String> get1_16WorldNamesMap();
+    WorldIdentifiers get1_16WorldNamesMap();
 }

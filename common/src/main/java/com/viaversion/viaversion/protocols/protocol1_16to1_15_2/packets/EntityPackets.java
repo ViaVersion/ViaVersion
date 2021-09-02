@@ -25,6 +25,7 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.LongTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -42,25 +43,35 @@ import java.util.UUID;
 public class EntityPackets {
 
     private static final PacketHandler DIMENSION_HANDLER = wrapper -> {
+        WorldIdentifiers map = Via.getConfig().get1_16WorldNamesMap();
+        WorldIdentifiers userMap = wrapper.user().get(WorldIdentifiers.class);
+        if (userMap!=null){
+            map = userMap;
+        }
         int dimension = wrapper.read(Type.INT);
         String dimensionName;
+        String outputName;
         switch (dimension) {
             case -1:
                 dimensionName = "minecraft:the_nether";
+                outputName = map.nether;
                 break;
             case 0:
                 dimensionName = "minecraft:overworld";
+                outputName = map.overworld;
                 break;
             case 1:
                 dimensionName = "minecraft:the_end";
+                outputName = map.end;
                 break;
             default:
                 Via.getPlatform().getLogger().warning("Invalid dimension id: " + dimension);
                 dimensionName = "minecraft:overworld";
+                outputName = map.overworld;
         }
 
         wrapper.write(Type.STRING, dimensionName); // dimension
-        wrapper.write(Type.STRING, Via.getConfig().get1_16WorldNamesMap().getOrDefault(dimensionName, dimensionName)); // world
+        wrapper.write(Type.STRING, outputName); // world
     };
     public static final CompoundTag DIMENSIONS_TAG = new CompoundTag();
     private static final String[] WORLD_NAMES = {"minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"};

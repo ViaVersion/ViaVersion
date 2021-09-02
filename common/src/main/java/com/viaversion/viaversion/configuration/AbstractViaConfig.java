@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.util.Config;
+import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -81,7 +82,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean ignoreLongChannelNames;
     private boolean forcedUse1_17ResourcePack;
     private JsonElement resourcePack1_17PromptMessage;
-    private Map<String, String> map1_16WorldNames = new HashMap<String, String>();
+    private WorldIdentifiers map1_16WorldNames;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -145,7 +146,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         ignoreLongChannelNames = getBoolean("ignore-long-1_16-channel-names", true);
         forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
         resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
-        map1_16WorldNames = get("map-1_16-world-names", Map.class, new HashMap<String, String>());
+        Map<String, String> worlds = get("map-1_16-world-names", Map.class, new HashMap<String, String>());
+        map1_16WorldNames = new WorldIdentifiers(worlds.getOrDefault("overworld", WorldIdentifiers.overworldDefault),
+                worlds.getOrDefault("nether", WorldIdentifiers.netherDefault),
+                worlds.getOrDefault("end", WorldIdentifiers.endDefault));
     }
 
     @Override
@@ -436,7 +440,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public Map<String, String> get1_16WorldNamesMap(){
+    public WorldIdentifiers get1_16WorldNamesMap() {
         return map1_16WorldNames;
     };
 }
