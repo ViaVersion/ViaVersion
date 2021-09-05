@@ -67,11 +67,13 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      */
     void registerServerbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
 
+    /**
+     * @deprecated use {@link #cancelServerbound(State, int)}
+     */
+    @Deprecated/*(forRemoval = true)*/
     void cancelServerbound(State state, int oldPacketID, int newPacketID);
 
-    default void cancelServerbound(State state, int newPacketID) {
-        cancelServerbound(state, -1, newPacketID);
-    }
+    void cancelServerbound(State state, int newPacketID);
 
     default void registerClientbound(State state, int oldPacketID, int newPacketID) {
         registerClientbound(state, oldPacketID, newPacketID, null);
@@ -81,11 +83,13 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
         registerClientbound(state, oldPacketID, newPacketID, packetRemapper, false);
     }
 
+    /**
+     * @deprecated use {@link #cancelClientbound(State, int)}
+     */
+    @Deprecated/*(forRemoval = true)*/
     void cancelClientbound(State state, int oldPacketID, int newPacketID);
 
-    default void cancelClientbound(State state, int oldPacketID) {
-        cancelClientbound(state, oldPacketID, -1);
-    }
+    void cancelClientbound(State state, int oldPacketID);
 
     /**
      * Registers a clientbound packet, with id transformation and remapper.

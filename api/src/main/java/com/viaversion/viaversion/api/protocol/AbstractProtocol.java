@@ -177,6 +177,11 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     }
 
     @Override
+    public void cancelServerbound(State state, int newPacketID) {
+        cancelServerbound(state, -1, newPacketID);
+    }
+
+    @Override
     public void cancelClientbound(State state, int oldPacketID, int newPacketID) {
         registerClientbound(state, oldPacketID, newPacketID, new PacketRemapper() {
             @Override
@@ -184,6 +189,11 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
                 handler(PacketWrapper::cancel);
             }
         });
+    }
+
+    @Override
+    public void cancelClientbound(State state, int oldPacketID) {
+        cancelClientbound(state, oldPacketID, -1);
     }
 
     @Override
