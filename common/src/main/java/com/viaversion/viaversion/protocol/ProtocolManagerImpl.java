@@ -442,8 +442,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public @Nullable CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
         CompletableFuture<Void> future = internalGetMappingLoaderFuture(protocolClass);
-        if (future != null)
+        if (future != null) {
             return future;
+        }
 
         //Force loading
         protocols.get(protocolClass).get();
