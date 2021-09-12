@@ -37,6 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public interface ProtocolManager {
 
@@ -125,6 +126,28 @@ public interface ProtocolManager {
      * @throws IllegalArgumentException if a supported client protocol version is equal to the server protocol version
      */
     void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion);
+
+    /**
+     * Registers a protocol for later initialisation.
+     *
+     * @param protocolClass          class of the protocol to register
+     * @param provider               supplier of a protocol for initialisation on demand
+     * @param clientVersion supported client protocol versions
+     * @param serverVersion output server protocol version the protocol converts to
+     * @throws IllegalArgumentException if a supported client protocol version is equal to the server protocol version
+     */
+    void registerProtocolSupplier(Class<? extends Protocol> protocolClass, Supplier<Protocol> provider, ProtocolVersion clientVersion, ProtocolVersion serverVersion);
+
+    /**
+     * Registers a protocol for later initialisation.
+     *
+     * @param protocolClass          class of the protocol to register
+     * @param provider               supplier of a protocol for initialisation on demand
+     * @param supportedClientVersion supported client protocol versions
+     * @param serverVersion          output server protocol version the protocol converts to
+     * @throws IllegalArgumentException if a supported client protocol version is equal to the server protocol version
+     */
+    void registerProtocolSupplier(Class<? extends Protocol> protocolClass, Supplier<Protocol> provider, List<Integer> supportedClientVersion, int serverVersion);
 
     /**
      * Registers and initializes a base protocol. Base Protocols registered later have higher priority.

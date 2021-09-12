@@ -88,31 +88,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ProtocolManagerImpl implements ProtocolManager {
     private static final Protocol BASE_PROTOCOL = new BaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
-    private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
-    private final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
+    private final Int2ObjectMap<Int2ObjectMap<CachedProtocolSupplier>> registryMap = new Int2ObjectOpenHashMap<>(32);
+    private final Map<Class<? extends Protocol>, CachedProtocolSupplier> protocols = new HashMap<>();
     private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
     private final Set<Integer> supportedVersions = new HashSet<>();
     private final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
     private final List<Protocol> registerList = new ArrayList<>();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
-    private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
-    private ThreadPoolExecutor mappingLoaderExecutor;
-    private boolean mappingsLoaded;
+    private final Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
+    private final ThreadPoolExecutor mappingLoaderExecutor;
 
     private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(-1);
     private boolean onlyCheckLoweringPathEntries = true;
@@ -120,7 +115,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public ProtocolManagerImpl() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Via-Mappingloader-%d").build();
-        mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
+        mappingLoaderExecutor = new ThreadPoolExecutor(4, 16, 5L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
         mappingLoaderExecutor.allowCoreThreadTimeOut(true);
     }
 
@@ -130,43 +125,43 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerBaseProtocol(new BaseProtocol1_7(), Range.lessThan(ProtocolVersion.v1_16.getVersion()));
         registerBaseProtocol(new BaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16.getVersion()));
 
-        registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
-        registerProtocol(new Protocol1_9_1To1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getVersion(), ProtocolVersion.v1_9_2.getVersion()), ProtocolVersion.v1_9.getVersion());
-        registerProtocol(new Protocol1_9_3To1_9_1_2(), ProtocolVersion.v1_9_3, ProtocolVersion.v1_9_2);
+        registerProtocolSupplier(Protocol1_9To1_8.class, Protocol1_9To1_8::new, ProtocolVersion.v1_9, ProtocolVersion.v1_8);
+        registerProtocolSupplier(Protocol1_9_1To1_9.class, Protocol1_9_1To1_9::new, Arrays.asList(ProtocolVersion.v1_9_1.getVersion(), ProtocolVersion.v1_9_2.getVersion()), ProtocolVersion.v1_9.getVersion());
+        registerProtocolSupplier(Protocol1_9_3To1_9_1_2.class, Protocol1_9_3To1_9_1_2::new, ProtocolVersion.v1_9_3, ProtocolVersion.v1_9_2);
 
-        registerProtocol(new Protocol1_9To1_9_1(), ProtocolVersion.v1_9, ProtocolVersion.v1_9_1);
-        registerProtocol(new Protocol1_9_1_2To1_9_3_4(), Arrays.asList(ProtocolVersion.v1_9_1.getVersion(), ProtocolVersion.v1_9_2.getVersion()), ProtocolVersion.v1_9_3.getVersion());
-        registerProtocol(new Protocol1_10To1_9_3_4(), ProtocolVersion.v1_10, ProtocolVersion.v1_9_3);
+        registerProtocolSupplier(Protocol1_9To1_9_1.class, Protocol1_9To1_9_1::new, ProtocolVersion.v1_9, ProtocolVersion.v1_9_1);
+        registerProtocolSupplier(Protocol1_9_1_2To1_9_3_4.class, Protocol1_9_1_2To1_9_3_4::new, Arrays.asList(ProtocolVersion.v1_9_1.getVersion(), ProtocolVersion.v1_9_2.getVersion()), ProtocolVersion.v1_9_3.getVersion());
+        registerProtocolSupplier(Protocol1_10To1_9_3_4.class, Protocol1_10To1_9_3_4::new, ProtocolVersion.v1_10, ProtocolVersion.v1_9_3);
 
-        registerProtocol(new Protocol1_11To1_10(), ProtocolVersion.v1_11, ProtocolVersion.v1_10);
-        registerProtocol(new Protocol1_11_1To1_11(), ProtocolVersion.v1_11_1, ProtocolVersion.v1_11);
+        registerProtocolSupplier(Protocol1_11To1_10.class, Protocol1_11To1_10::new, ProtocolVersion.v1_11, ProtocolVersion.v1_10);
+        registerProtocolSupplier(Protocol1_11_1To1_11.class, Protocol1_11_1To1_11::new, ProtocolVersion.v1_11_1, ProtocolVersion.v1_11);
 
-        registerProtocol(new Protocol1_12To1_11_1(), ProtocolVersion.v1_12, ProtocolVersion.v1_11_1);
-        registerProtocol(new Protocol1_12_1To1_12(), ProtocolVersion.v1_12_1, ProtocolVersion.v1_12);
-        registerProtocol(new Protocol1_12_2To1_12_1(), ProtocolVersion.v1_12_2, ProtocolVersion.v1_12_1);
+        registerProtocolSupplier(Protocol1_12To1_11_1.class, Protocol1_12To1_11_1::new, ProtocolVersion.v1_12, ProtocolVersion.v1_11_1);
+        registerProtocolSupplier(Protocol1_12_1To1_12.class, Protocol1_12_1To1_12::new, ProtocolVersion.v1_12_1, ProtocolVersion.v1_12);
+        registerProtocolSupplier(Protocol1_12_2To1_12_1.class, Protocol1_12_2To1_12_1::new, ProtocolVersion.v1_12_2, ProtocolVersion.v1_12_1);
 
-        registerProtocol(new Protocol1_13To1_12_2(), ProtocolVersion.v1_13, ProtocolVersion.v1_12_2);
-        registerProtocol(new Protocol1_13_1To1_13(), ProtocolVersion.v1_13_1, ProtocolVersion.v1_13);
-        registerProtocol(new Protocol1_13_2To1_13_1(), ProtocolVersion.v1_13_2, ProtocolVersion.v1_13_1);
+        registerProtocolSupplier(Protocol1_13To1_12_2.class, Protocol1_13To1_12_2::new, ProtocolVersion.v1_13, ProtocolVersion.v1_12_2);
+        registerProtocolSupplier(Protocol1_13_1To1_13.class, Protocol1_13_1To1_13::new, ProtocolVersion.v1_13_1, ProtocolVersion.v1_13);
+        registerProtocolSupplier(Protocol1_13_2To1_13_1.class, Protocol1_13_2To1_13_1::new, ProtocolVersion.v1_13_2, ProtocolVersion.v1_13_1);
 
-        registerProtocol(new Protocol1_14To1_13_2(), ProtocolVersion.v1_14, ProtocolVersion.v1_13_2);
-        registerProtocol(new Protocol1_14_1To1_14(), ProtocolVersion.v1_14_1, ProtocolVersion.v1_14);
-        registerProtocol(new Protocol1_14_2To1_14_1(), ProtocolVersion.v1_14_2, ProtocolVersion.v1_14_1);
-        registerProtocol(new Protocol1_14_3To1_14_2(), ProtocolVersion.v1_14_3, ProtocolVersion.v1_14_2);
-        registerProtocol(new Protocol1_14_4To1_14_3(), ProtocolVersion.v1_14_4, ProtocolVersion.v1_14_3);
+        registerProtocolSupplier(Protocol1_14To1_13_2.class, Protocol1_14To1_13_2::new, ProtocolVersion.v1_14, ProtocolVersion.v1_13_2);
+        registerProtocolSupplier(Protocol1_14_1To1_14.class, Protocol1_14_1To1_14::new, ProtocolVersion.v1_14_1, ProtocolVersion.v1_14);
+        registerProtocolSupplier(Protocol1_14_2To1_14_1.class, Protocol1_14_2To1_14_1::new, ProtocolVersion.v1_14_2, ProtocolVersion.v1_14_1);
+        registerProtocolSupplier(Protocol1_14_3To1_14_2.class, Protocol1_14_3To1_14_2::new, ProtocolVersion.v1_14_3, ProtocolVersion.v1_14_2);
+        registerProtocolSupplier(Protocol1_14_4To1_14_3.class, Protocol1_14_4To1_14_3::new, ProtocolVersion.v1_14_4, ProtocolVersion.v1_14_3);
 
-        registerProtocol(new Protocol1_15To1_14_4(), ProtocolVersion.v1_15, ProtocolVersion.v1_14_4);
-        registerProtocol(new Protocol1_15_1To1_15(), ProtocolVersion.v1_15_1, ProtocolVersion.v1_15);
-        registerProtocol(new Protocol1_15_2To1_15_1(), ProtocolVersion.v1_15_2, ProtocolVersion.v1_15_1);
+        registerProtocolSupplier(Protocol1_15To1_14_4.class, Protocol1_15To1_14_4::new, ProtocolVersion.v1_15, ProtocolVersion.v1_14_4);
+        registerProtocolSupplier(Protocol1_15_1To1_15.class, Protocol1_15_1To1_15::new, ProtocolVersion.v1_15_1, ProtocolVersion.v1_15);
+        registerProtocolSupplier(Protocol1_15_2To1_15_1.class, Protocol1_15_2To1_15_1::new, ProtocolVersion.v1_15_2, ProtocolVersion.v1_15_1);
 
-        registerProtocol(new Protocol1_16To1_15_2(), ProtocolVersion.v1_16, ProtocolVersion.v1_15_2);
-        registerProtocol(new Protocol1_16_1To1_16(), ProtocolVersion.v1_16_1, ProtocolVersion.v1_16);
-        registerProtocol(new Protocol1_16_2To1_16_1(), ProtocolVersion.v1_16_2, ProtocolVersion.v1_16_1);
-        registerProtocol(new Protocol1_16_3To1_16_2(), ProtocolVersion.v1_16_3, ProtocolVersion.v1_16_2);
-        registerProtocol(new Protocol1_16_4To1_16_3(), ProtocolVersion.v1_16_4, ProtocolVersion.v1_16_3);
+        registerProtocolSupplier(Protocol1_16To1_15_2.class, Protocol1_16To1_15_2::new, ProtocolVersion.v1_16, ProtocolVersion.v1_15_2);
+        registerProtocolSupplier(Protocol1_16_1To1_16.class, Protocol1_16_1To1_16::new, ProtocolVersion.v1_16_1, ProtocolVersion.v1_16);
+        registerProtocolSupplier(Protocol1_16_2To1_16_1.class, Protocol1_16_2To1_16_1::new, ProtocolVersion.v1_16_2, ProtocolVersion.v1_16_1);
+        registerProtocolSupplier(Protocol1_16_3To1_16_2.class, Protocol1_16_3To1_16_2::new, ProtocolVersion.v1_16_3, ProtocolVersion.v1_16_2);
+        registerProtocolSupplier(Protocol1_16_4To1_16_3.class, Protocol1_16_4To1_16_3::new, ProtocolVersion.v1_16_4, ProtocolVersion.v1_16_3);
 
-        registerProtocol(new Protocol1_17To1_16_4(), ProtocolVersion.v1_17, ProtocolVersion.v1_16_4);
-        registerProtocol(new Protocol1_17_1To1_17(), ProtocolVersion.v1_17_1, ProtocolVersion.v1_17);
+        registerProtocolSupplier(Protocol1_17To1_16_4.class, Protocol1_17To1_16_4::new, ProtocolVersion.v1_17, ProtocolVersion.v1_16_4);
+        registerProtocolSupplier(Protocol1_17_1To1_17.class, Protocol1_17_1To1_17::new, ProtocolVersion.v1_17_1, ProtocolVersion.v1_17);
     }
 
     @Override
@@ -176,39 +171,32 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion) {
-        // Register the protocol's handlers
-        protocol.initialize();
+        registerProtocolSupplier(protocol.getClass(), () -> protocol, supportedClientVersion, serverVersion);
+        getProtocol(protocol.getClass());  // Api guarantees initialisation
+    }
+
+    @Override
+    public void registerProtocolSupplier(Class<? extends Protocol> protocolClass, Supplier<Protocol> provider, ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
+        registerProtocolSupplier(protocolClass, provider, Collections.singletonList(clientVersion.getVersion()), serverVersion.getVersion());
+    }
+
+    @Override
+    public void registerProtocolSupplier(Class<? extends Protocol> protocolClass, Supplier<Protocol> provider, List<Integer> supportedClientVersion, int serverVersion) {
+        CachedProtocolSupplier wrapped = new CachedProtocolSupplier(provider);
 
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
             pathCache.clear();
         }
 
-        protocols.put(protocol.getClass(), protocol);
+        protocols.put(protocolClass, wrapped);
 
         for (int clientVersion : supportedClientVersion) {
             // Throw an error if supported client version = server version
             Preconditions.checkArgument(clientVersion != serverVersion);
 
-            Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(clientVersion, s -> new Int2ObjectOpenHashMap<>(2));
-            protocolMap.put(serverVersion, protocol);
-        }
-
-        if (Via.getPlatform().isPluginEnabled()) {
-            protocol.register(Via.getManager().getProviders());
-            refreshVersions();
-        } else {
-            registerList.add(protocol);
-        }
-
-        if (protocol.hasMappingDataToLoad()) {
-            if (mappingLoaderExecutor != null) {
-                // Submit mapping data loading
-                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
-            } else {
-                // Late protocol adding - just do it on the current thread
-                protocol.loadMappingData();
-            }
+            Int2ObjectMap<CachedProtocolSupplier> protocolMap = registryMap.computeIfAbsent(clientVersion, s -> new Int2ObjectOpenHashMap<>(2));
+            protocolMap.put(serverVersion, wrapped);
         }
     }
 
@@ -218,27 +206,22 @@ public class ProtocolManagerImpl implements ProtocolManager {
         baseProtocol.initialize();
 
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
+        registerProtocol(baseProtocol);
+    }
+
+    private void registerProtocol(Protocol protocol) {
         if (Via.getPlatform().isPluginEnabled()) {
-            baseProtocol.register(Via.getManager().getProviders());
+            protocol.register(Via.getManager().getProviders());
             refreshVersions();
         } else {
-            registerList.add(baseProtocol);
+            registerList.add(protocol);
         }
     }
 
     public void refreshVersions() {
         supportedVersions.clear();
-
         supportedVersions.add(serverProtocolVersion.lowestSupportedVersion());
-        for (ProtocolVersion version : ProtocolVersion.getProtocols()) {
-            List<ProtocolPathEntry> protocolPath = getProtocolPath(version.getVersion(), serverProtocolVersion.lowestSupportedVersion());
-            if (protocolPath == null) continue;
-
-            supportedVersions.add(version.getVersion());
-            for (ProtocolPathEntry pathEntry : protocolPath) {
-                supportedVersions.add(pathEntry.outputProtocolVersion());
-            }
-        }
+        supportedVersions.addAll(registryMap.keySet()); // Assuming all registered versions lead to a supported server version
     }
 
     @Override
@@ -253,14 +236,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
 
         // Calculate path
-        Int2ObjectSortedMap<Protocol> outputPath = getProtocolPath(new Int2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
+        Int2ObjectSortedMap<CachedProtocolSupplier> outputPath = getProtocolPath(new Int2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
         if (outputPath == null) {
             return null;
         }
 
         List<ProtocolPathEntry> path = new ArrayList<>(outputPath.size());
-        for (Int2ObjectMap.Entry<Protocol> entry : outputPath.int2ObjectEntrySet()) {
-            path.add(new ProtocolPathEntryImpl(entry.getIntKey(), entry.getValue()));
+        for (Int2ObjectMap.Entry<CachedProtocolSupplier> entry : outputPath.int2ObjectEntrySet()) {
+            path.add(new ProtocolPathEntryImpl(entry.getIntKey(), entry.getValue().get()));
         }
         pathCache.put(protocolKey, path);
         return path;
@@ -284,25 +267,25 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @param serverVersion desired output version
      * @return path that has been generated, null if failed
      */
-    private @Nullable Int2ObjectSortedMap<Protocol> getProtocolPath(Int2ObjectSortedMap<Protocol> current, int clientVersion, int serverVersion) {
+    private @Nullable Int2ObjectSortedMap<CachedProtocolSupplier> getProtocolPath(Int2ObjectSortedMap<CachedProtocolSupplier> current, int clientVersion, int serverVersion) {
         if (current.size() > maxProtocolPathSize) return null; // Fail-safe, protocol too complicated.
 
         // First, check if there is any protocols for this
-        Int2ObjectMap<Protocol> toServerProtocolMap = registryMap.get(clientVersion);
+        Int2ObjectMap<CachedProtocolSupplier> toServerProtocolMap = registryMap.get(clientVersion);
         if (toServerProtocolMap == null) {
             return null; // Not supported
         }
 
         // Next, check if there is a direct, single Protocol path
-        Protocol protocol = toServerProtocolMap.get(serverVersion);
+        CachedProtocolSupplier protocol = toServerProtocolMap.get(serverVersion);
         if (protocol != null) {
             current.put(serverVersion, protocol);
             return current; // Easy solution
         }
 
         // There might be a more advanced solution... So we'll see if any of the others can get us there
-        Int2ObjectSortedMap<Protocol> shortest = null;
-        for (Int2ObjectMap.Entry<Protocol> entry : toServerProtocolMap.int2ObjectEntrySet()) {
+        Int2ObjectSortedMap<CachedProtocolSupplier> shortest = null;
+        for (Int2ObjectMap.Entry<CachedProtocolSupplier> entry : toServerProtocolMap.int2ObjectEntrySet()) {
             // Ensure we don't go back to already contained versions
             int translatedToVersion = entry.getIntKey();
             if (current.containsKey(translatedToVersion)) continue;
@@ -313,7 +296,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
             }
 
             // Create a copy
-            Int2ObjectSortedMap<Protocol> newCurrent = new Int2ObjectLinkedOpenHashMap<>(current);
+            Int2ObjectSortedMap<CachedProtocolSupplier> newCurrent = new Int2ObjectLinkedOpenHashMap<>(current);
             newCurrent.put(translatedToVersion, entry.getValue());
 
             // Calculate the rest of the protocol starting from translatedToVersion and take the shortest
@@ -328,13 +311,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public @Nullable <T extends Protocol> T getProtocol(Class<T> protocolClass) {
-        return (T) protocols.get(protocolClass);
+        return (T) protocols.get(protocolClass).get();
     }
 
     @Override
     public @Nullable Protocol getProtocol(int clientVersion, int serverVersion) {
-        Int2ObjectMap<Protocol> map = registryMap.get(clientVersion);
-        return map != null ? map.get(serverVersion) : null;
+        Int2ObjectMap<CachedProtocolSupplier> map = registryMap.get(clientVersion);
+        return map != null ? map.get(serverVersion).get() : null;
     }
 
     @Override
@@ -360,7 +343,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public boolean isWorkingPipe() {
-        for (Int2ObjectMap<Protocol> map : registryMap.values()) {
+        for (Int2ObjectMap<CachedProtocolSupplier> map : registryMap.values()) {
             for (int protocolVersion : serverProtocolVersion.supportedVersions()) {
                 if (map.containsKey(protocolVersion)) {
                     return true;
@@ -402,8 +385,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception {
-        if (mappingsLoaded) return;
-
         CompletableFuture<Void> future = getMappingLoaderFuture(protocolClass);
         if (future != null) {
             // Wait for completion
@@ -415,8 +396,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public boolean checkForMappingCompletion() {
         mappingLoaderLock.readLock().lock();
         try {
-            if (mappingsLoaded) return false;
-
             for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
                 // Return if any future hasn't completed yet
                 if (!future.isDone()) {
@@ -424,7 +403,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
                 }
             }
 
-            shutdownLoaderExecutor();
+            // Clear cached json files
+            if (MappingDataLoader.isCacheJsonMappings()) {
+                MappingDataLoader.getMappingsCache().clear();
+            }
             return true;
         } finally {
             mappingLoaderLock.readLock().unlock();
@@ -458,9 +440,19 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public @Nullable CompletableFuture<Void> getMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
+        CompletableFuture<Void> future = internalGetMappingLoaderFuture(protocolClass);
+        if (future != null)
+            return future;
+
+        //Force loading
+        protocols.get(protocolClass).get();
+        return internalGetMappingLoaderFuture(protocolClass);
+    }
+
+    private CompletableFuture<Void> internalGetMappingLoaderFuture(Class<? extends Protocol> protocolClass) {
         mappingLoaderLock.readLock().lock();
         try {
-            return mappingsLoaded ? null : mappingLoaderFutures.get(protocolClass);
+            return mappingLoaderFutures.get(protocolClass);
         } finally {
             mappingLoaderLock.readLock().unlock();
         }
@@ -487,28 +479,45 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerList.clear();
     }
 
-    private void shutdownLoaderExecutor() {
-        Preconditions.checkArgument(!mappingsLoaded);
-
-        // If this log message is missing, something is wrong
-        Via.getPlatform().getLogger().info("Finished mapping loading, shutting down loader executor!");
-        mappingsLoaded = true;
-        mappingLoaderExecutor.shutdown();
-        mappingLoaderExecutor = null;
-        mappingLoaderFutures.clear();
-        mappingLoaderFutures = null;
-
-        // Clear cached json files
-        if (MappingDataLoader.isCacheJsonMappings()) {
-            MappingDataLoader.getMappingsCache().clear();
-        }
-    }
-
     private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
         return throwable -> {
             Via.getPlatform().getLogger().severe("Error during mapping loading of " + protocolClass.getSimpleName());
             throwable.printStackTrace();
             return null;
         };
+    }
+
+    private class CachedProtocolSupplier implements Supplier<Protocol> {
+        private final Supplier<Protocol> provider;
+        private Protocol protocol = null;
+
+        public CachedProtocolSupplier(Supplier<Protocol> provider) {
+            this.provider = provider;
+        }
+
+        @Override
+        public Protocol get() {
+            synchronized (provider) {
+                if (protocol == null) {
+                    protocol = provider.get();
+
+                    // Register the protocol's handlers
+                    protocol.initialize();
+                    registerProtocol(protocol);
+
+                    if (protocol.hasMappingDataToLoad()) {
+                        // Submit mapping data loading
+                        addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
+                        try {
+                            completeMappingDataLoading(protocol.getClass());
+                        } catch (Exception e) {
+                            Via.getPlatform().getLogger().severe("Could not wait for mapping loading of " + protocol.getClass().getSimpleName());
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            return protocol;
+        }
     }
 }

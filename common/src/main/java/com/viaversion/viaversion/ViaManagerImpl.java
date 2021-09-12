@@ -57,7 +57,6 @@ public class ViaManagerImpl implements ViaManager {
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
     private List<Runnable> enableListeners = new ArrayList<>();
-    private PlatformTask mappingLoadingTask;
     private boolean debug;
 
     public ViaManagerImpl(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
@@ -153,12 +152,7 @@ public class ViaManagerImpl implements ViaManager {
         // Load Platform
         loader.load();
         // Common tasks
-        mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
-            if (protocolManager.checkForMappingCompletion()) {
-                mappingLoadingTask.cancel();
-                mappingLoadingTask = null;
-            }
-        }, 10L);
+        Via.getPlatform().runRepeatingSync(protocolManager::checkForMappingCompletion, 10L);
 
         int serverProtocolVersion = protocolManager.getServerProtocolVersion().lowestSupportedVersion();
         if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
