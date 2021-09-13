@@ -20,7 +20,6 @@ package com.viaversion.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
-import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
@@ -151,9 +150,8 @@ public class ViaManagerImpl implements ViaManager {
 
         // Load Platform
         loader.load();
-        // Common tasks
-        Via.getPlatform().runRepeatingSync(protocolManager::checkForMappingCompletion, 10L);
 
+        // Common tasks
         int serverProtocolVersion = protocolManager.getServerProtocolVersion().lowestSupportedVersion();
         if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
             if (Via.getConfig().isSimulatePlayerTick()) {

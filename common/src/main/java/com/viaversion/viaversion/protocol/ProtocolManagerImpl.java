@@ -210,12 +210,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
         if (protocol.hasMappingDataToLoad()) {
             // Submit mapping data loading
             addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
-            try {
-                completeMappingDataLoading(protocol.getClass());
-            } catch (Exception e) {
-                Via.getPlatform().getLogger().severe("Could not wait for mapping loading of " + protocol.getClass().getSimpleName());
-                e.printStackTrace();
-            }
         }
     }
 
@@ -408,27 +402,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
         if (future != null) {
             // Wait for completion
             future.get();
-        }
-    }
-
-    @Override
-    public boolean checkForMappingCompletion() {
-        mappingLoaderLock.readLock().lock();
-        try {
-            for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
-                // Return if any future hasn't completed yet
-                if (!future.isDone()) {
-                    return false;
-                }
-            }
-
-            // Clear cached json files
-            if (MappingDataLoader.isCacheJsonMappings()) {
-                MappingDataLoader.getMappingsCache().clear();
-            }
-            return true;
-        } finally {
-            mappingLoaderLock.readLock().unlock();
         }
     }
 

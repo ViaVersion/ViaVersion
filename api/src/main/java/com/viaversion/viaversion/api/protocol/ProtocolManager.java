@@ -267,13 +267,6 @@ public interface ProtocolManager {
     void completeMappingDataLoading(Class<? extends Protocol> protocolClass) throws Exception;
 
     /**
-     * Shuts down the executor and uncaches mappings if all futures have been completed.
-     *
-     * @return true if the executor has now been shut down
-     */
-    boolean checkForMappingCompletion();
-
-    /**
      * Executes the given runnable asynchronously, adding a {@link CompletableFuture}
      * to the list of data to load bound to their protocols.
      *
