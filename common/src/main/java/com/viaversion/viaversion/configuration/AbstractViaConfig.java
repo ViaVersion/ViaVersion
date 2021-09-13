@@ -147,9 +147,9 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
         resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
         Map<String, String> worlds = get("map-1_16-world-names", Map.class, new HashMap<String, String>());
-        map1_16WorldNames = new WorldIdentifiers(worlds.getOrDefault("overworld", WorldIdentifiers.overworldDefault),
-                worlds.getOrDefault("nether", WorldIdentifiers.netherDefault),
-                worlds.getOrDefault("end", WorldIdentifiers.endDefault));
+        map1_16WorldNames = new WorldIdentifiers(worlds.getOrDefault("overworld", WorldIdentifiers.OVERWORLD_DEFAULT),
+                worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
+                worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
     }
 
     @Override
