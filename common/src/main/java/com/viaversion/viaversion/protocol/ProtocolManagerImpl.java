@@ -340,8 +340,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public Protocol getBaseProtocol(int serverVersion) {
         for (Pair<Range<Integer>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
-            if (rangeProtocol.getKey().contains(serverVersion)) {
-                return rangeProtocol.getValue();
+            if (rangeProtocol.key().contains(serverVersion)) {
+                return rangeProtocol.value();
             }
         }
         throw new IllegalStateException("No Base Protocol for " + serverVersion);

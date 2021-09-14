@@ -325,12 +325,12 @@ public class EntityPackets {
                         wrapper.write(Type.INT, properties.size());
                         for (Map.Entry<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> entry : properties.entrySet()) {
                             wrapper.write(Type.STRING, entry.getKey()); // Key
-                            wrapper.write(Type.DOUBLE, entry.getValue().getKey()); // Value
-                            wrapper.write(Type.VAR_INT, entry.getValue().getValue().size());
-                            for (Triple<UUID, Double, Byte> modifier : entry.getValue().getValue()) {
-                                wrapper.write(Type.UUID, modifier.getFirst());
-                                wrapper.write(Type.DOUBLE, modifier.getSecond()); // Amount
-                                wrapper.write(Type.BYTE, modifier.getThird()); // Operation
+                            wrapper.write(Type.DOUBLE, entry.getValue().key()); // Value
+                            wrapper.write(Type.VAR_INT, entry.getValue().value().size());
+                            for (Triple<UUID, Double, Byte> modifier : entry.getValue().value()) {
+                                wrapper.write(Type.UUID, modifier.first());
+                                wrapper.write(Type.DOUBLE, modifier.second()); // Amount
+                                wrapper.write(Type.BYTE, modifier.third()); // Operation
                             }
                         }
                     }

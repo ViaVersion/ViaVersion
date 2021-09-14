@@ -63,8 +63,8 @@ public class BlockConnectionStorage implements StorableObject {
         long pair = getChunkSectionIndex(x, y, z);
         Pair<byte[], NibbleArray> map = getChunkSection(pair, (blockState & 0xF) != 0);
         int blockIndex = encodeBlockPos(x, y, z);
-        map.getKey()[blockIndex] = (byte) (blockState >> 4);
-        NibbleArray nibbleArray = map.getValue();
+        map.key()[blockIndex] = (byte) (blockState >> 4);
+        NibbleArray nibbleArray = map.value();
         if (nibbleArray != null) {
             nibbleArray.set(blockIndex, blockState);
         }
@@ -75,9 +75,9 @@ public class BlockConnectionStorage implements StorableObject {
         Pair<byte[], NibbleArray> map = blockStorage.get(pair);
         if (map == null) return 0;
         short blockPosition = encodeBlockPos(x, y, z);
-        NibbleArray nibbleArray = map.getValue();
+        NibbleArray nibbleArray = map.value();
         return WorldPackets.toNewId(
-                ((map.getKey()[blockPosition] & 0xFF) << 4)
+                ((map.key()[blockPosition] & 0xFF) << 4)
                         | (nibbleArray == null ? 0 : nibbleArray.get(blockPosition))
         );
     }
@@ -87,7 +87,7 @@ public class BlockConnectionStorage implements StorableObject {
         Pair<byte[], NibbleArray> map = blockStorage.get(pair);
         if (map == null) return;
         int blockIndex = encodeBlockPos(x, y, z);
-        NibbleArray nibbleArray = map.getValue();
+        NibbleArray nibbleArray = map.value();
         if (nibbleArray != null) {
             nibbleArray.set(blockIndex, 0);
             boolean allZero = true;
@@ -99,8 +99,8 @@ public class BlockConnectionStorage implements StorableObject {
             }
             if (allZero) map.setValue(null);
         }
-        map.getKey()[blockIndex] = 0;
-        for (short entry : map.getKey()) {
+        map.key()[blockIndex] = 0;
+        for (short entry : map.key()) {
             if (entry != 0) return;
         }
         blockStorage.remove(pair);
@@ -122,7 +122,7 @@ public class BlockConnectionStorage implements StorableObject {
             map = new Pair<>(new byte[4096], null);
             blockStorage.put(index, map);
         }
-        if (map.getValue() == null && requireNibbleArray) {
+        if (map.value() == null && requireNibbleArray) {
             map.setValue(new NibbleArray(4096));
         }
         return map;

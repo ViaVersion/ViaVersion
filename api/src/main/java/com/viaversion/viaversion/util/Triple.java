@@ -37,14 +37,29 @@ public class Triple<A, B, C> {
         this.third = third;
     }
 
+    public @Nullable A first() {
+        return first;
+    }
+
+    public @Nullable B second() {
+        return second;
+    }
+
+    public @Nullable C third() {
+        return third;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public @Nullable A getFirst() {
         return first;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public @Nullable B getSecond() {
         return second;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public @Nullable C getThird() {
         return third;
     }

@@ -35,14 +35,28 @@ public class Pair<X, Y> {
         this.value = value;
     }
 
+    public @Nullable X key() {
+        return key;
+    }
+
+    public @Nullable Y value() {
+        return value;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public @Nullable X getKey() {
         return key;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public @Nullable Y getValue() {
         return value;
     }
 
+    /**
+     * @deprecated don't count on this continuing to be mutable
+     */
+    @Deprecated/*(forRemoval = true)*/
     public void setValue(@Nullable Y value) {
         this.value = value;
     }

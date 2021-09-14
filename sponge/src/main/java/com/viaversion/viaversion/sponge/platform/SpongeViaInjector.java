@@ -162,9 +162,9 @@ public class SpongeViaInjector implements ViaInjector {
 
         for (Pair<Field, Object> pair : injectedLists) {
             try {
-                Object o = pair.getKey().get(pair.getValue());
+                Object o = pair.key().get(pair.value());
                 if (o instanceof ListWrapper) {
-                    pair.getKey().set(pair.getValue(), ((ListWrapper) o).getOriginalList());
+                    pair.key().set(pair.value(), ((ListWrapper) o).getOriginalList());
                 }
             } catch (IllegalAccessException e) {
                 Via.getPlatform().getLogger().severe("Failed to remove injection, reload won't work with connections, please reboot!");
@@ -257,12 +257,12 @@ public class SpongeViaInjector implements ViaInjector {
         JsonObject currentLists = new JsonObject();
         try {
             for (Pair<Field, Object> pair : injectedLists) {
-                Object list = pair.getKey().get(pair.getValue());
+                Object list = pair.key().get(pair.value());
                 // Note down the current value (could be overridden by another plugin)
-                currentLists.addProperty(pair.getKey().getName(), list.getClass().getName());
+                currentLists.addProperty(pair.key().getName(), list.getClass().getName());
                 // Also if it's not overridden we can display what's inside our list (possibly another plugin)
                 if (list instanceof ListWrapper) {
-                    wrappedLists.addProperty(pair.getKey().getName(), ((ListWrapper) list).getOriginalList().getClass().getName());
+                    wrappedLists.addProperty(pair.key().getName(), ((ListWrapper) list).getOriginalList().getClass().getName());
                 }
             }
             data.add("wrappedLists", wrappedLists);

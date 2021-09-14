@@ -299,8 +299,8 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                             Via.getPlatform().getLogger().warning("Received unknown 1.11 -> 1.10.2 potion data (" + data + ")");
                             data = 0;
                         } else {
-                            data = newData.getKey();
-                            isInstant = newData.getValue();
+                            data = newData.key();
+                            isInstant = newData.value();
                         }
                         if (isInstant) {
                             packetWrapper.set(Type.INT, 0, 2007);

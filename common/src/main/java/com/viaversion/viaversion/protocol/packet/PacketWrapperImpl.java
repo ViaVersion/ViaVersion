@@ -72,9 +72,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.getKey() != type) continue;
+            if (packetValue.key() != type) continue;
             if (currentIndex == index) {
-                return (T) packetValue.getValue();
+                return (T) packetValue.value();
             }
             currentIndex++;
         }
@@ -87,7 +87,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     public boolean is(Type type, int index) {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.getKey() != type) continue;
+            if (packetValue.key() != type) continue;
             if (currentIndex == index) {
                 return true;
             }
@@ -100,7 +100,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     public boolean isReadable(Type type, int index) {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : readableObjects) {
-            if (packetValue.getKey().getBaseClass() != type.getBaseClass()) continue;
+            if (packetValue.key().getBaseClass() != type.getBaseClass()) continue;
             if (currentIndex == index) {
                 return true;
             }
@@ -114,7 +114,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.getKey() != type) continue;
+            if (packetValue.key() != type) continue;
             if (currentIndex == index) {
                 packetValue.setValue(attemptTransform(type, value));
                 return;
@@ -139,15 +139,15 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         Pair<Type, Object> read = readableObjects.poll();
-        Type rtype = read.getKey();
+        Type rtype = read.key();
         if (rtype == type
                 || (type.getBaseClass() == rtype.getBaseClass()
                 && type.getOutputClass() == rtype.getOutputClass())) {
-            return (T) read.getValue();
+            return (T) read.value();
         } else if (rtype == Type.NOTHING) {
             return read(type); // retry
         } else {
-            Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.getKey().getTypeName());
+            Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.key().getTypeName());
             throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
         }
     }
@@ -207,9 +207,9 @@ public class PacketWrapperImpl implements PacketWrapper {
         int index = 0;
         for (Pair<Type, Object> packetValue : packetValues) {
             try {
-                packetValue.getKey().write(buffer, packetValue.getValue());
+                packetValue.key().write(buffer, packetValue.value());
             } catch (Exception e) {
-                throw new InformativeException(e).set("Index", index).set("Type", packetValue.getKey().getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
+                throw new InformativeException(e).set("Index", index).set("Type", packetValue.key().getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
             }
             index++;
         }
