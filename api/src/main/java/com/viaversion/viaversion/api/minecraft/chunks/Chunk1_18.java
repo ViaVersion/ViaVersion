@@ -29,44 +29,24 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.BitSet;
 import java.util.List;
 
-//TODO Move methods from distinctly different versions to different objects/interfaces
-public class BaseChunk implements Chunk {
+public class Chunk1_18 implements Chunk {
     protected final int x;
     protected final int z;
-    protected final boolean fullChunk;
-    protected boolean ignoreOldLightData;
-    protected BitSet chunkSectionBitSet;
-    protected int bitmask;
     protected ChunkSection[] sections;
-    protected int[] biomeData;
     protected CompoundTag heightMap;
-    protected final List<CompoundTag> blockEntities;
+    protected final List<BlockEntity> blockEntities;
 
-    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, @Nullable BitSet chunkSectionBitSet,
-                     ChunkSection[] sections, int @Nullable [] biomeData, @Nullable CompoundTag heightMap, List<CompoundTag> blockEntities) {
+    public Chunk1_18(int x, int z, ChunkSection[] sections, CompoundTag heightMap, List<BlockEntity> blockEntities) {
         this.x = x;
         this.z = z;
-        this.fullChunk = fullChunk;
-        this.ignoreOldLightData = ignoreOldLightData;
-        this.chunkSectionBitSet = chunkSectionBitSet;
         this.sections = sections;
-        this.biomeData = biomeData;
         this.heightMap = heightMap;
         this.blockEntities = blockEntities;
     }
 
-    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, int bitmask, ChunkSection[] sections, int[] biomeData, CompoundTag heightMap, List<CompoundTag> blockEntities) {
-        this(x, z, fullChunk, ignoreOldLightData, null, sections, biomeData, heightMap, blockEntities);
-        this.bitmask = bitmask;
-    }
-
-    public BaseChunk(int x, int z, boolean fullChunk, boolean ignoreOldLightData, int bitmask, ChunkSection[] sections, int[] biomeData, List<CompoundTag> blockEntities) {
-        this(x, z, fullChunk, ignoreOldLightData, bitmask, sections, biomeData, null, blockEntities);
-    }
-
     @Override
     public boolean isBiomeData() {
-        return biomeData != null;
+        return false;
     }
 
     @Override
@@ -81,37 +61,37 @@ public class BaseChunk implements Chunk {
 
     @Override
     public boolean isFullChunk() {
-        return fullChunk;
+        return true;
     }
 
     @Override
     public boolean isIgnoreOldLightData() {
-        return ignoreOldLightData;
+        return false;
     }
 
     @Override
     public void setIgnoreOldLightData(boolean ignoreOldLightData) {
-        this.ignoreOldLightData = ignoreOldLightData;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getBitmask() {
-        return bitmask;
+        return -1;
     }
 
     @Override
     public void setBitmask(int bitmask) {
-        this.bitmask = bitmask;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @Nullable BitSet getChunkMask() {
-        return chunkSectionBitSet;
+        return null;
     }
 
     @Override
     public void setChunkMask(BitSet chunkSectionMask) {
-        this.chunkSectionBitSet = chunkSectionMask;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -126,12 +106,12 @@ public class BaseChunk implements Chunk {
 
     @Override
     public int @Nullable [] getBiomeData() {
-        return biomeData;
+        return null;
     }
 
     @Override
     public void setBiomeData(int @Nullable [] biomeData) {
-        this.biomeData = biomeData;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -146,11 +126,11 @@ public class BaseChunk implements Chunk {
 
     @Override
     public List<CompoundTag> getBlockEntities() {
-        return blockEntities;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<BlockEntity> blockEntities() {
-        throw new UnsupportedOperationException();
+        return blockEntities;
     }
 }

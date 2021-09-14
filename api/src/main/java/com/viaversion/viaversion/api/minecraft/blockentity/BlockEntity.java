@@ -20,44 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft.blockentity;
 
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.TypeConverter;
-import io.netty.buffer.ByteBuf;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
-    public ByteType() {
-        super(Byte.class);
+public interface BlockEntity {
+
+    default byte relX() {
+        return -1; //TODO
     }
 
-    public byte readPrimitive(ByteBuf buffer) {
-        return buffer.readByte();
+    default byte relZ() {
+        return -1; //TODO
     }
 
-    public void writePrimitive(ByteBuf buffer, byte object) {
-        buffer.writeByte(object);
-    }
+    byte packedXZ();
 
-    @Override
-    @Deprecated
-    public Byte read(ByteBuf buffer) {
-        return buffer.readByte();
-    }
+    short y();
 
-    @Override
-    @Deprecated
-    public void write(ByteBuf buffer, Byte object) {
-        buffer.writeByte(object);
-    }
+    int typeId();
 
-    @Override
-    public Byte from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).byteValue();
-        } else if (o instanceof Boolean) {
-            return (Boolean) o ? (byte) 1 : 0;
-        }
-        return (Byte) o;
-    }
+    @Nullable CompoundTag tag();
 }

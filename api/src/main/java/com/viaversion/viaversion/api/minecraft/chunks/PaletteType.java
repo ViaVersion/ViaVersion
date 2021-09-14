@@ -20,44 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft.chunks;
 
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.TypeConverter;
-import io.netty.buffer.ByteBuf;
+public enum PaletteType {
+    BLOCKS(8),
+    BIOMES(2);
 
-public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
-    public ByteType() {
-        super(Byte.class);
+    private final int highestBitsPerValue;
+
+    PaletteType(final int highestBitsPerValue) {
+        this.highestBitsPerValue = highestBitsPerValue;
     }
 
-    public byte readPrimitive(ByteBuf buffer) {
-        return buffer.readByte();
-    }
-
-    public void writePrimitive(ByteBuf buffer, byte object) {
-        buffer.writeByte(object);
-    }
-
-    @Override
-    @Deprecated
-    public Byte read(ByteBuf buffer) {
-        return buffer.readByte();
-    }
-
-    @Override
-    @Deprecated
-    public void write(ByteBuf buffer, Byte object) {
-        buffer.writeByte(object);
-    }
-
-    @Override
-    public Byte from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).byteValue();
-        } else if (o instanceof Boolean) {
-            return (Boolean) o ? (byte) 1 : 0;
-        }
-        return (Byte) o;
+    public int highestBitsPerValue() {
+        return highestBitsPerValue;
     }
 }

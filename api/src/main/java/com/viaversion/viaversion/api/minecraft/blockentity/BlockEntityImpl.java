@@ -20,44 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft.blockentity;
 
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.TypeConverter;
-import io.netty.buffer.ByteBuf;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 
-public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
-    public ByteType() {
-        super(Byte.class);
-    }
+public final class BlockEntityImpl implements BlockEntity {
+    private final byte packedXZ;
+    private final short y;
+    private final int typeId;
+    private final CompoundTag tag;
 
-    public byte readPrimitive(ByteBuf buffer) {
-        return buffer.readByte();
-    }
-
-    public void writePrimitive(ByteBuf buffer, byte object) {
-        buffer.writeByte(object);
-    }
-
-    @Override
-    @Deprecated
-    public Byte read(ByteBuf buffer) {
-        return buffer.readByte();
+    public BlockEntityImpl(final byte packedXZ, final short y, final int typeId, final CompoundTag tag) {
+        this.packedXZ = packedXZ;
+        this.y = y;
+        this.typeId = typeId;
+        this.tag = tag;
     }
 
     @Override
-    @Deprecated
-    public void write(ByteBuf buffer, Byte object) {
-        buffer.writeByte(object);
+    public byte packedXZ() {
+        return packedXZ;
     }
 
     @Override
-    public Byte from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).byteValue();
-        } else if (o instanceof Boolean) {
-            return (Boolean) o ? (byte) 1 : 0;
-        }
-        return (Byte) o;
+    public short y() {
+        return y;
+    }
+
+    @Override
+    public int typeId() {
+        return typeId;
+    }
+
+    @Override
+    public CompoundTag tag() {
+        return tag;
     }
 }

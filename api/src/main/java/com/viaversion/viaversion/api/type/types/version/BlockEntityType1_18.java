@@ -20,44 +20,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.type.types.version;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.TypeConverter;
 import io.netty.buffer.ByteBuf;
 
-public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
-    public ByteType() {
-        super(Byte.class);
-    }
+public class BlockEntityType1_18 extends Type<BlockEntity> {
 
-    public byte readPrimitive(ByteBuf buffer) {
-        return buffer.readByte();
-    }
-
-    public void writePrimitive(ByteBuf buffer, byte object) {
-        buffer.writeByte(object);
+    public BlockEntityType1_18() {
+        super(BlockEntity.class);
     }
 
     @Override
-    @Deprecated
-    public Byte read(ByteBuf buffer) {
-        return buffer.readByte();
+    public BlockEntity read(final ByteBuf buffer) throws Exception {
+        final byte xz = buffer.readByte();
+        final short y = buffer.readShort();
+        final int typeId = Type.VAR_INT.readPrimitive(buffer);
+        final CompoundTag tag = Type.NBT.read(buffer);
+        return new BlockEntityImpl(xz, y, typeId, tag);
     }
 
     @Override
-    @Deprecated
-    public void write(ByteBuf buffer, Byte object) {
-        buffer.writeByte(object);
-    }
-
-    @Override
-    public Byte from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).byteValue();
-        } else if (o instanceof Boolean) {
-            return (Boolean) o ? (byte) 1 : 0;
-        }
-        return (Byte) o;
+    public void write(final ByteBuf buffer, final BlockEntity entity) throws Exception {
+        buffer.writeByte(entity.packedXZ());
+        buffer.writeShort(entity.y());
+        Type.VAR_INT.writePrimitive(buffer, entity.typeId());
+        Type.NBT.write(buffer, entity.tag());
     }
 }

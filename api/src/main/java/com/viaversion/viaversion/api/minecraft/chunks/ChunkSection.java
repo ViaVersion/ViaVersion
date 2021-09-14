@@ -31,144 +31,89 @@ public interface ChunkSection {
      */
     int SIZE = 16 * 16 * 16; // width * depth * height
 
-    /**
-     * Returns the block index of the given coordinates within a section.
-     *
-     * @param x section x
-     * @param y section y
-     * @param z section z
-     * @return section block index
-     */
     static int index(int x, int y, int z) {
         return y << 8 | z << 4 | x;
     }
 
-    /**
-     * Returns the block state of the given index.
-     *
-     * @param idx block index within the section
-     * @return block state of the given index
-     */
-    int getFlatBlock(int idx);
+    @Deprecated/*(forRemoval = true)*/
+    default int getFlatBlock(int idx) {
+        return palette(PaletteType.BLOCKS).value(idx);
+    }
 
-    /**
-     * Returns the block state of the section coordinate.
-     *
-     * @param x section x
-     * @param y section y
-     * @param z section z
-     * @return block state of the given section coordinate
-     */
+    @Deprecated/*(forRemoval = true)*/
     default int getFlatBlock(int x, int y, int z) {
         return getFlatBlock(index(x, y, z));
     }
 
-    /**
-     * Set a block state in the chunk section.
-     * This method will not update non-air blocks count.
-     *
-     * @param idx block index within the section
-     * @param id  raw or flat id of the block state
-     */
-    void setFlatBlock(int idx, int id);
+    @Deprecated/*(forRemoval = true)*/
+    default void setFlatBlock(int idx, int id) {
+        palette(PaletteType.BLOCKS).setValue(idx, id);
+    }
 
-    /**
-     * Set a block state in the chunk section.
-     * This method will not update non-air blocks count.
-     *
-     * @param x  section x
-     * @param y  section y
-     * @param z  section z
-     * @param id raw or flat id of the block state
-     */
+    @Deprecated/*(forRemoval = true)*/
     default void setFlatBlock(int x, int y, int z, int id) {
         setFlatBlock(index(x, y, z), id);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     default int getBlockWithoutData(int x, int y, int z) {
         return getFlatBlock(x, y, z) >> 4;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     default int getBlockData(int x, int y, int z) {
         return getFlatBlock(x, y, z) & 0xF;
     }
 
-    /**
-     * Set a block in the chunks.
-     * This method will not update non-air blocks count.
-     *
-     * @param x    Block X
-     * @param y    Block Y
-     * @param z    Block Z
-     * @param type The type of the block
-     * @param data The data value of the block
-     */
+    @Deprecated/*(forRemoval = true)*/
     default void setBlockWithData(int x, int y, int z, int type, int data) {
         setFlatBlock(index(x, y, z), type << 4 | (data & 0xF));
     }
 
+    @Deprecated/*(forRemoval = true)*/
     default void setBlockWithData(int idx, int type, int data) {
         setFlatBlock(idx, type << 4 | (data & 0xF));
     }
 
-    /**
-     * Sets a block to the given palette index.
-     *
-     * @param idx   block index
-     * @param index palette index
-     */
-    void setPaletteIndex(int idx, int index);
+    @Deprecated/*(forRemoval = true)*/
+    default void setPaletteIndex(int idx, int index) {
+        palette(PaletteType.BLOCKS).setIndex(idx, index);
+    }
 
-    /**
-     * Returns the palette index of the given block index.
-     *
-     * @param idx block index
-     * @return palette index of the given block index
-     */
-    int getPaletteIndex(int idx);
+    @Deprecated/*(forRemoval = true)*/
+    default int getPaletteIndex(int idx) {
+        return palette(PaletteType.BLOCKS).index(idx);
+    }
 
-    /**
-     * Returns the size of the palette.
-     *
-     * @return palette size
-     */
-    int getPaletteSize();
+    @Deprecated/*(forRemoval = true)*/
+    default int getPaletteSize() {
+        return palette(PaletteType.BLOCKS).size();
+    }
 
-    /**
-     * Returns the block state assigned to the given palette index.
-     *
-     * @param index palette index
-     * @return block state assigned to the given palette index
-     */
-    int getPaletteEntry(int index);
+    @Deprecated/*(forRemoval = true)*/
+    default int getPaletteEntry(int index) {
+        return palette(PaletteType.BLOCKS).entry(index);
+    }
 
-    /**
-     * Assigns a block state assigned to the given palette index.
-     *
-     * @param index palette index
-     * @param id    block state
-     */
-    void setPaletteEntry(int index, int id);
+    @Deprecated/*(forRemoval = true)*/
+    default void setPaletteEntry(int index, int id) {
+        palette(PaletteType.BLOCKS).setEntry(index, id);
+    }
 
-    /**
-     * Replaces a block state in the palette.
-     *
-     * @param oldId old block state
-     * @param newId new block state
-     */
-    void replacePaletteEntry(int oldId, int newId);
+    @Deprecated/*(forRemoval = true)*/
+    default void replacePaletteEntry(int oldId, int newId) {
+        palette(PaletteType.BLOCKS).replaceEntry(oldId, newId);
+    }
 
-    /**
-     * Adds a new block state to the palette.
-     *
-     * @param id block state
-     */
-    void addPaletteEntry(int id);
+    @Deprecated/*(forRemoval = true)*/
+    default void addPaletteEntry(int id) {
+        palette(PaletteType.BLOCKS).addEntry(id);
+    }
 
-    /**
-     * Clears the palette.
-     */
-    void clearPalette();
+    @Deprecated/*(forRemoval = true)*/
+    default void clearPalette() {
+        palette(PaletteType.BLOCKS).clear();
+    }
 
     /**
      * Returns the number of non-air blocks in this section.
@@ -198,4 +143,16 @@ public interface ChunkSection {
     @Nullable ChunkSectionLight getLight();
 
     void setLight(@Nullable ChunkSectionLight light);
+
+    /**
+     * Returns the palette of the given type if present.
+     *
+     * @param type type of the palette
+     * @return palette
+     */
+    @Nullable DataPalette palette(PaletteType type);
+
+    void addPalette(DataPalette blockPalette);
+
+    void removePalette(PaletteType type);
 }

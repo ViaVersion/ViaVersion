@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.BitSet;
@@ -115,4 +116,11 @@ public interface Chunk {
      * @return list of block entities
      */
     List<CompoundTag> getBlockEntities();
+
+    /**
+     * Returns a list of block entities.
+     *
+     * @return list of block entities
+     */
+    List<BlockEntity> blockEntities();
 }
