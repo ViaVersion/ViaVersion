@@ -362,7 +362,14 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         return trackerAndRewriterHandler(null);
     }
 
-    protected PacketHandler worldDataTrackerHandler(int nbtIndex) {
+    /**
+     * Returns a packet handler storing height, min_y, and name of the current world.
+     * If the client changes to a new world, the stored entity data will be cleared.
+     *
+     * @param nbtIndex index of the current world's nbt
+     * @return packet handler
+     */
+    public PacketHandler worldDataTrackerHandler(int nbtIndex) {
         return wrapper -> {
             EntityTracker tracker = tracker(wrapper.user());
 
@@ -381,6 +388,12 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             } else {
                 Via.getPlatform().getLogger().warning("Min Y missing in dimension data: " + registryData);
             }
+
+            String world = wrapper.get(Type.STRING, 0);
+            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+                tracker.clearEntities();
+            }
+            tracker.setCurrentWorld(world);
         };
     }
 

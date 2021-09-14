@@ -37,6 +37,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     private int clientEntityId = -1;
     private int currentWorldSectionHeight = 16;
     private int currentMinY;
+    private String currentWorld;
 
     public EntityTrackerBase(UserConnection connection, @Nullable EntityType playerType) {
         this(connection, playerType, false);
@@ -81,11 +82,20 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         return entityData.get(id);
     }
 
+    //TODO Soft memory leak: Remove entities on respawn in protocols prior to 1.18 (1.16+ only when the worldname is different)
     @Override
     public void removeEntity(int id) {
         entityTypes.remove(id);
         if (entityData != null) {
             entityData.remove(id);
+        }
+    }
+
+    @Override
+    public void clearEntities() {
+        entityTypes.clear();
+        if (entityData != null) {
+            entityData.clear();
         }
     }
 
@@ -108,9 +118,6 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         this.clientEntityId = clientEntityId;
     }
 
-    /**
-     * @return amount of chunk sections of the current world (block height / 16)
-     */
     @Override
     public int currentWorldSectionHeight() {
         return currentWorldSectionHeight;
@@ -121,9 +128,6 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         this.currentWorldSectionHeight = currentWorldSectionHeight;
     }
 
-    /**
-     * @return absolute minimum y coordinate of the current world
-     */
     @Override
     public int currentMinY() {
         return currentMinY;
@@ -132,5 +136,15 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     @Override
     public void setCurrentMinY(int currentMinY) {
         this.currentMinY = currentMinY;
+    }
+
+    @Override
+    public @Nullable String currentWorld() {
+        return currentWorld;
+    }
+
+    @Override
+    public void setCurrentWorld(final String currentWorld) {
+        this.currentWorld = currentWorld;
     }
 }
