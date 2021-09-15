@@ -18,24 +18,23 @@
 package com.viaversion.viaversion.protocols.protocol1_18to1_17_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
+import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPackets1_17_1, ClientboundPackets1_17_1, ServerboundPackets1_17, ServerboundPackets1_17> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.17", "1.18");
+    public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter<Protocol1_18To1_17_1> entityRewriter = new EntityPackets(this);
 
     public Protocol1_18To1_17_1() {
@@ -45,13 +44,9 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_17_1.NAMED_SOUND);
 
-        registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.POSITION1_14);
-                map(Type.UNSIGNED_BYTE, Type.VAR_INT);
-            }
-        });
+        final TagRewriter tagRewriter = new TagRewriter(this);
+        tagRewriter.registerGeneric(ClientboundPackets1_17_1.TAGS);
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace");
     }
 
     @Override

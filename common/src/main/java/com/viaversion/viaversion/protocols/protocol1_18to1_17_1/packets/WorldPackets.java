@@ -19,19 +19,26 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
+import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.BlockEntityIds;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +46,17 @@ import java.util.List;
 public final class WorldPackets {
 
     public static void register(final Protocol1_18To1_17_1 protocol) {
+        protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION1_14);
+                handler(wrapper -> {
+                    final short id = wrapper.read(Type.UNSIGNED_BYTE);
+                    wrapper.write(Type.VAR_INT, BlockEntityIds.newId(id));
+                });
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_17_1.UPDATE_LIGHT, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -83,7 +101,7 @@ public final class WorldPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-                    Chunk chunk = wrapper.read(new Chunk1_17Type(tracker.currentWorldSectionHeight()));
+                    final Chunk oldChunk = wrapper.read(new Chunk1_17Type(tracker.currentWorldSectionHeight()));
                     /*for (int s = 0; s < chunk.getSections().length; s++) {
                         ChunkSection section = chunk.getSections()[s];
                         if (section == null) continue;
@@ -93,16 +111,50 @@ public final class WorldPackets {
                         }
                     }*/
 
-                    final List<BlockEntity> blockEntities = new ArrayList<>(chunk.getBlockEntities().size());
-                    for (final CompoundTag tag : chunk.getBlockEntities()) {
+                    final List<BlockEntity> blockEntities = new ArrayList<>(oldChunk.getBlockEntities().size());
+                    for (final CompoundTag tag : oldChunk.getBlockEntities()) {
                         final int x = ((NumberTag) tag.get("x")).asInt();
                         final int z = ((NumberTag) tag.get("z")).asInt();
+                        final byte packedXZ = (byte) ((x & 15) << 4 | (z & 15));
+
                         final short y = ((NumberTag) tag.get("y")).asShort();
-                        final int typeId; //TODO :smolBoi:
-                        blockEntities.add(new BlockEntityImpl((x & 15) << 4 | (z & 15), y, typeId, tag));
+                        final String id = ((StringTag) tag.get("id")).getValue();
+                        final int typeId = protocol.getMappingData().blockEntityIds().getInt(id.replace("minecraft:", ""));
+                        if (typeId == -1) {
+                            Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
+                        }
+
+                        blockEntities.add(new BlockEntityImpl(packedXZ, y, typeId, tag));
                     }
 
-                    chunk = new Chunk1_18(chunk.getX(), chunk.getZ(), chunk.getSections(), chunk.getHeightMap(), blockEntities);
+                    final int[] biomeData = oldChunk.getBiomeData();
+                    final ChunkSection[] sections = oldChunk.getSections();
+                    for (int i = 0; i < sections.length; i++) {
+                        final ChunkSection section = sections[i];
+                        if (section == null) {
+                            // There's no section mask anymore
+                            final ChunkSectionImpl emptySection = new ChunkSectionImpl(false);
+                            sections[i] = emptySection;
+                            emptySection.setNonAirBlocksCount(0);
+                            emptySection.addPalette(new DataPaletteImpl(PaletteType.BIOMES));
+                            continue;
+                        }
+
+                        // Fill biome palette
+                        final DataPaletteImpl biomePalette = new DataPaletteImpl(PaletteType.BIOMES);
+                        //TODO
+                        for (int x = 0; x < 16; x++) {
+                            for (int y = 0; y < 16; y++) {
+                                for (int z = 0; z < 16; z++) {
+                                    biomePalette.setValue(x, y, z, 0);
+                                }
+                            }
+                        }
+                        //TODO
+                        section.addPalette(biomePalette);
+                    }
+
+                    final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), oldChunk.getSections(), oldChunk.getHeightMap(), blockEntities);
                     wrapper.write(new Chunk1_18Type(tracker.currentWorldSectionHeight()), chunk);
 
                     // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
@@ -113,6 +165,8 @@ public final class WorldPackets {
                         wrapper.cancel();
                         return;
                     }
+
+                    lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
                     // Append light data to chunk packet
                     wrapper.write(Type.BOOLEAN, light.trustEdges());

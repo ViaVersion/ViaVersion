@@ -95,6 +95,8 @@ public interface MappingData {
 
     @Nullable Mappings getBlockMappings();
 
+    @Nullable Mappings getBlockEntityMappings();
+
     @Nullable Mappings getBlockStateMappings();
 
     @Nullable Mappings getSoundMappings();
