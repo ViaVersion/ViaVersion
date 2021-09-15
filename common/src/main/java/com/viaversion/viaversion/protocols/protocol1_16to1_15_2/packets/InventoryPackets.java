@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 import java.util.UUID;
@@ -63,13 +64,16 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
                 map(Type.VAR_INT); // Window Type
                 map(Type.COMPONENT); // Window Title
 
+                handler(cursorRemapper);
                 handler(wrapper -> {
+                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+                    int windowId = wrapper.get(Type.VAR_INT, 0);
                     int windowType = wrapper.get(Type.VAR_INT, 1);
                     if (windowType >= 20) { // smithing added with id 20
                         wrapper.set(Type.VAR_INT, 1, ++windowType);
                     }
+                    inventoryTracker.setInventory((short) windowId);
                 });
-                handler(cursorRemapper);
             }
         });
 
@@ -77,6 +81,10 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
             @Override
             public void registerMap() {
                 handler(cursorRemapper);
+                handler(wrapper -> {
+                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+                    inventoryTracker.setInventory((short) -1);
+                });
             }
         });
 
@@ -122,6 +130,16 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
 
         registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+
+        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+                    inventoryTracker.setInventory((short) -1);
+                });
+            }
+        });
 
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
             @Override
