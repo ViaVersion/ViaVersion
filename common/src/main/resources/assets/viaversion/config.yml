@@ -205,3 +205,8 @@ force-json-transform: false
 minimize-cooldown: true
 # Allows 1.9+ left-handedness (main hand) on 1.8 servers
 left-handed-handling: true
+# Get the world names which should be returned for each vanilla dimension
+map-1_16-world-names:
+  overworld: "minecraft:overworld"
+  nether: "minecraft:the_nether"
+  end: "minecraft:the_end"

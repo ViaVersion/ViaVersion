@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.configuration;
 
 import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 
 public interface ViaVersionConfig {
 
@@ -429,4 +430,13 @@ public interface ViaVersionConfig {
      * @return cached serialized component
      */
     JsonElement get1_17ResourcePackPrompt();
+
+    /***
+     * Get the world names which should be returned for each vanilla dimension
+     * 
+     * @return the global map from vanilla dimensions to world name
+     * Note that this can be overriden per-user by using {@link com.viaversion.viaversion.api.connection.UserConnection#put} with
+     * a custom instance of {@link WorldIdentifiers} for the user's {@link UserConnection}
+     */
+    WorldIdentifiers get1_16WorldNamesMap();
 }
