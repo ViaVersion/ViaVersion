@@ -54,20 +54,20 @@ public class EntityPackets {
         switch (dimension) {
             case -1:
                 dimensionName = "minecraft:the_nether";
-                outputName = map.nether;
+                outputName = map.nether();
                 break;
             case 0:
                 dimensionName = "minecraft:overworld";
-                outputName = map.overworld;
+                outputName = map.overworld();
                 break;
             case 1:
                 dimensionName = "minecraft:the_end";
-                outputName = map.end;
+                outputName = map.end();
                 break;
             default:
                 Via.getPlatform().getLogger().warning("Invalid dimension id: " + dimension);
                 dimensionName = "minecraft:overworld";
-                outputName = map.overworld;
+                outputName = map.overworld();
         }
 
         wrapper.write(Type.STRING, dimensionName); // dimension
