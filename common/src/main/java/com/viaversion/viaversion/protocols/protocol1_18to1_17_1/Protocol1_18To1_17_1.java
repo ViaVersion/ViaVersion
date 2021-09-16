@@ -42,7 +42,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
         final SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_17_1.NAMED_SOUND);
+        soundRewriter.registerSound(ClientboundPackets1_17_1.ENTITY_SOUND);
 
         final TagRewriter tagRewriter = new TagRewriter(this);
         tagRewriter.registerGeneric(ClientboundPackets1_17_1.TAGS);

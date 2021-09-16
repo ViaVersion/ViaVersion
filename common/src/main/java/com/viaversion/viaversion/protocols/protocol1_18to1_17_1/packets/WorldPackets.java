@@ -108,6 +108,10 @@ public final class WorldPackets {
 
                     final List<BlockEntity> blockEntities = new ArrayList<>(oldChunk.getBlockEntities().size());
                     for (final CompoundTag tag : oldChunk.getBlockEntities()) {
+                        if (!tag.contains("x") || !tag.contains("y") || !tag.contains("z") || !tag.contains("id")) {
+                            continue;
+                        }
+
                         final int x = ((NumberTag) tag.get("x")).asInt();
                         final int z = ((NumberTag) tag.get("z")).asInt();
                         final byte packedXZ = (byte) ((x & 15) << 4 | (z & 15));
