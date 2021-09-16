@@ -58,7 +58,7 @@ public final class Chunk1_18Type extends Type<Chunk> {
                 sections[i] = sectionType.read(sectionsBuf);
             }
         } finally {
-            if (sectionsBuf.readableBytes() > 0) {
+            if (sectionsBuf.readableBytes() > 0 && Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Found " + sectionsBuf.readableBytes() + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
             }
             sectionsBuf.release();
