@@ -42,28 +42,28 @@ public final class Chunk1_18Type extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(final ByteBuf input) throws Exception {
-        final int chunkX = input.readInt();
-        final int chunkZ = input.readInt();
-        final CompoundTag heightMap = Type.NBT.read(input);
+    public Chunk read(final ByteBuf buffer) throws Exception {
+        final int chunkX = buffer.readInt();
+        final int chunkZ = buffer.readInt();
+        final CompoundTag heightMap = Type.NBT.read(buffer);
 
-        Type.VAR_INT.readPrimitive(input); // Data size in bytes
+        Type.VAR_INT.readPrimitive(buffer); // Data size in bytes
 
         // Read sections
         final ChunkSection[] sections = new ChunkSection[ySectionCount];
         for (int i = 0; i < ySectionCount; i++) {
-            sections[i] = Types1_18.CHUNK_SECTION.read(input);
+            sections[i] = Types1_18.CHUNK_SECTION.read(buffer);
         }
 
-        final int blockEntitiesLength = Type.VAR_INT.readPrimitive(input);
+        final int blockEntitiesLength = Type.VAR_INT.readPrimitive(buffer);
         final List<BlockEntity> blockEntities = new ArrayList<>(blockEntitiesLength);
         for (int i = 0; i < blockEntitiesLength; i++) {
-            blockEntities.add(Types1_18.BLOCK_ENTITY.read(input));
+            blockEntities.add(Types1_18.BLOCK_ENTITY.read(buffer));
         }
 
         // Read all the remaining bytes (workaround for #681)
-        if (input.readableBytes() > 0) {
-            final byte[] array = Type.REMAINING_BYTES.read(input);
+        if (buffer.readableBytes() > 0) {
+            final byte[] array = Type.REMAINING_BYTES.read(buffer);
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
             }
@@ -73,26 +73,27 @@ public final class Chunk1_18Type extends Type<Chunk> {
     }
 
     @Override
-    public void write(final ByteBuf output, final Chunk chunk) throws Exception {
-        output.writeInt(chunk.getX());
-        output.writeInt(chunk.getZ());
+    public void write(final ByteBuf buffer, final Chunk chunk) throws Exception {
+        buffer.writeInt(chunk.getX());
+        buffer.writeInt(chunk.getZ());
 
-        Type.NBT.write(output, chunk.getHeightMap());
+        Type.NBT.write(buffer, chunk.getHeightMap());
 
-        final ByteBuf buf = output.alloc().buffer();
+        final ByteBuf sectionBuffer = buffer.alloc().buffer();
         try {
             for (final ChunkSection section : chunk.getSections()) {
-                Types1_18.CHUNK_SECTION.write(buf, section);
+                Types1_18.CHUNK_SECTION.write(sectionBuffer, section);
             }
-            buf.readerIndex(0);
-            Type.VAR_INT.writePrimitive(output, buf.readableBytes());
-            output.writeBytes(buf);
+            sectionBuffer.readerIndex(0);
+            Type.VAR_INT.writePrimitive(buffer, sectionBuffer.readableBytes());
+            buffer.writeBytes(sectionBuffer);
         } finally {
-            buf.release(); // release buffer
+            sectionBuffer.release(); // release buffer
         }
 
+        Type.VAR_INT.writePrimitive(buffer, chunk.blockEntities().size());
         for (final BlockEntity blockEntity : chunk.blockEntities()) {
-            Types1_18.BLOCK_ENTITY.write(output, blockEntity);
+            Types1_18.BLOCK_ENTITY.write(buffer, blockEntity);
         }
     }
 

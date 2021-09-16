@@ -38,12 +38,15 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.BlockEntityIds;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class WorldPackets {
+
+    private static final int WIDTH_BITS = 2;
+    private static final int HORIZONTAL_MASK = 3;
+    private static final int BIOMES_PER_CHUNK = 4 * 4 * 4;
 
     public static void register(final Protocol1_18To1_17_1 protocol) {
         protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
@@ -61,8 +64,8 @@ public final class WorldPackets {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    final int chunkX = wrapper.read(Type.VAR_INT);
-                    final int chunkZ = wrapper.read(Type.VAR_INT);
+                    final int chunkX = wrapper.passthrough(Type.VAR_INT);
+                    final int chunkZ = wrapper.passthrough(Type.VAR_INT);
                     if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
                         // Light packets updating already sent chunks are the same as before
                         return;
@@ -130,28 +133,35 @@ public final class WorldPackets {
                     final int[] biomeData = oldChunk.getBiomeData();
                     final ChunkSection[] sections = oldChunk.getSections();
                     for (int i = 0; i < sections.length; i++) {
-                        final ChunkSection section = sections[i];
+                        ChunkSection section = sections[i];
                         if (section == null) {
                             // There's no section mask anymore
-                            final ChunkSectionImpl emptySection = new ChunkSectionImpl(false);
-                            sections[i] = emptySection;
-                            emptySection.setNonAirBlocksCount(0);
-                            emptySection.addPalette(new DataPaletteImpl(PaletteType.BIOMES));
-                            continue;
+                            section = new ChunkSectionImpl();
+                            sections[i] = section;
+                            section.setNonAirBlocksCount(0);
+
+                            final DataPaletteImpl blockPalette = new DataPaletteImpl(PaletteType.BLOCKS);
+                            blockPalette.addEntry(0);
+                            section.addPalette(blockPalette);
                         }
 
                         // Fill biome palette
+                        //TODO Use single value palette if given the possibility
                         final DataPaletteImpl biomePalette = new DataPaletteImpl(PaletteType.BIOMES);
-                        //TODO
-                        for (int x = 0; x < 16; x++) {
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    biomePalette.setValue(x, y, z, 0);
+                        section.addPalette(biomePalette);
+                        for (int biomeIndex = i * BIOMES_PER_CHUNK; biomeIndex < (i * BIOMES_PER_CHUNK) + BIOMES_PER_CHUNK; biomeIndex++) {
+                            final int biome = biomeData[biomeIndex];
+                            final int minX = (biomeIndex & HORIZONTAL_MASK) << 2;
+                            final int minY = ((biomeIndex >> WIDTH_BITS + WIDTH_BITS) << 2) & 15;
+                            final int minZ = (biomeIndex >> WIDTH_BITS & HORIZONTAL_MASK) << 2;
+                            for (int x = minX; x < minX + 4; x++) {
+                                for (int y = minY; y < minY + 4; y++) {
+                                    for (int z = minZ; z < minZ + 4; z++) {
+                                        biomePalette.setValue(x, y, z, biome);
+                                    }
                                 }
                             }
                         }
-                        //TODO
-                        section.addPalette(biomePalette);
                     }
 
                     final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), oldChunk.getSections(), oldChunk.getHeightMap(), blockEntities);

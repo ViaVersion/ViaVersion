@@ -101,13 +101,6 @@ public class ChunkSectionType1_18 extends Type<ChunkSection> {
     }
 
     private void writePalette(final ByteBuf buffer, final DataPalette palette) {
-        // Make sure this works for 1.17 chunk sections //TODO ?
-        if (palette.size() == 0) {
-            buffer.writeByte(GLOBAL_PALETTE);
-            Type.VAR_INT.writePrimitive(buffer, 0);
-            return;
-        }
-
         int bitsPerValue = 0;
         while (palette.size() > 1 << bitsPerValue) {
             bitsPerValue += 1;
@@ -121,7 +114,7 @@ public class ChunkSectionType1_18 extends Type<ChunkSection> {
 
         if (bitsPerValue == 0) {
             // Write single value
-            Type.VAR_INT.writePrimitive(buffer, palette.entry(0)); //TODO right?
+            Type.VAR_INT.writePrimitive(buffer, palette.entry(0));
             Type.VAR_INT.writePrimitive(buffer, 0); // Empty values length
             return;
         }
