@@ -132,9 +132,9 @@ public final class WorldPackets {
                             sections[i] = section;
                             section.setNonAirBlocksCount(0);
 
-                            final DataPaletteImpl blockPalette = new DataPaletteImpl(PaletteType.BLOCKS);
-                            blockPalette.addEntry(0);
-                            section.addPalette(blockPalette);
+                            final DataPaletteImpl blockPalette = new DataPaletteImpl();
+                            blockPalette.addId(0);
+                            section.addPalette(PaletteType.BLOCKS, blockPalette);
                         } else {
                             /*final DataPalette blockpalette = section.palette(PaletteType.BLOCKS);
                             for (int j = 0; j < blockpalette.size(); j++) {
@@ -145,8 +145,8 @@ public final class WorldPackets {
 
                         // Fill biome palette
                         //TODO Use single value palette if given the possibility
-                        final DataPaletteImpl biomePalette = new DataPaletteImpl(PaletteType.BIOMES);
-                        section.addPalette(biomePalette);
+                        final DataPaletteImpl biomePalette = new DataPaletteImpl();
+                        section.addPalette(PaletteType.BIOMES, biomePalette);
                         for (int biomeIndex = i * BIOMES_PER_CHUNK; biomeIndex < (i * BIOMES_PER_CHUNK) + BIOMES_PER_CHUNK; biomeIndex++) {
                             final int biome = biomeData[biomeIndex];
                             final int minX = (biomeIndex & HORIZONTAL_MASK) << 2;
@@ -155,7 +155,7 @@ public final class WorldPackets {
                             for (int x = minX; x < minX + 4; x++) {
                                 for (int y = minY; y < minY + 4; y++) {
                                     for (int z = minZ; z < minZ + 4; z++) {
-                                        biomePalette.setValue(x, y, z, biome);
+                                        biomePalette.setIdAt(x, y, z, biome);
                                     }
                                 }
                             }

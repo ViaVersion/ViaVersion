@@ -36,14 +36,14 @@ public class ChunkSectionImpl implements ChunkSection {
     }
 
     public ChunkSectionImpl(final boolean holdsLight) {
-        addPalette(new DataPaletteImpl(PaletteType.BLOCKS));
+        addPalette(PaletteType.BLOCKS, new DataPaletteImpl());
         if (holdsLight) {
             this.light = new ChunkSectionLightImpl();
         }
     }
 
     public ChunkSectionImpl(final boolean holdsLight, final int expectedPaletteLength) {
-        addPalette(new DataPaletteImpl(PaletteType.BLOCKS, expectedPaletteLength));
+        addPalette(PaletteType.BLOCKS, new DataPaletteImpl(expectedPaletteLength));
         if (holdsLight) {
             this.light = new ChunkSectionLightImpl();
         }
@@ -75,8 +75,8 @@ public class ChunkSectionImpl implements ChunkSection {
     }
 
     @Override
-    public void addPalette(final DataPalette palette) {
-        palettes.put(palette.type(), palette);
+    public void addPalette(final PaletteType type, final DataPalette palette) {
+        palettes.put(type, palette);
     }
 
     @Override

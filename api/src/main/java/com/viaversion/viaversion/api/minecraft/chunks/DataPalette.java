@@ -25,82 +25,93 @@ package com.viaversion.viaversion.api.minecraft.chunks;
 public interface DataPalette {
 
     /**
-     * Returns the block state of the given index.
+     * Returns the value of the given chunk coordinate.
      *
-     * @param idx block index within the section
+     * @param sectionCoordinate block index within the section
      * @return block state of the given index
      */
-    int value(int idx);
+    int idAt(int sectionCoordinate);
 
     /**
-     * Returns the block state of the section coordinate.
+     * Returns the value of the section coordinate.
      *
-     * @param x section x
-     * @param y section y
-     * @param z section z
+     * @param sectionX section x
+     * @param sectionY section y
+     * @param sectionZ section z
      * @return block state of the given section coordinate
      */
-    default int value(final int x, final int y, final int z) {
-        return value(ChunkSection.index(x, y, z));
+    default int idAt(final int sectionX, final int sectionY, final int sectionZ) {
+        return idAt(ChunkSection.index(sectionX, sectionY, sectionZ));
     }
 
     /**
-     * Set a block state in the chunk section.
-     * This method will not update non-air blocks count.
+     * Set a value in the chunk section.
+     * This method does not update non-air blocks count.
      *
-     * @param idx block index within the section
-     * @param id  raw or flat id of the block state
+     * @param sectionCoordinate block index within the section
+     * @param id                id value
      */
-    void setValue(int idx, int id);
+    void setIdAt(int sectionCoordinate, int id);
 
     /**
-     * Set a block state in the chunk section.
-     * This method will not update non-air blocks count.
+     * Set a value in the chunk section.
+     * This method does not update non-air blocks count.
      *
-     * @param x  section x
-     * @param y  section y
-     * @param z  section z
-     * @param id raw or flat id of the block state
+     * @param sectionX section x
+     * @param sectionY section y
+     * @param sectionZ section z
+     * @param id       id value
      */
-    default void setValue(final int x, final int y, final int z, final int id) {
-        setValue(ChunkSection.index(x, y, z), id);
+    default void setIdAt(final int sectionX, final int sectionY, final int sectionZ, final int id) {
+        setIdAt(ChunkSection.index(sectionX, sectionY, sectionZ), id);
     }
-
-    // ----------------------------------------------------------------------------
-
-    default int rawDataBlock(final int x, final int y, final int z) {
-        return value(x, y, z) >> 4;
-    }
-
-    default int dataBlock(final int x, final int y, final int z) {
-        return value(x, y, z) & 0xF;
-    }
-
-    default void setDataBlock(final int x, final int y, final int z, final int type, final int data) {
-        setValue(ChunkSection.index(x, y, z), type << 4 | (data & 0xF));
-    }
-
-    default void setDataBlock(final int idx, final int type, final int data) {
-        setValue(idx, type << 4 | (data & 0xF));
-    }
-
-    // ----------------------------------------------------------------------------
 
     /**
-     * Sets a block to the given palette index.
+     * Returns the id assigned to the given palette index.
      *
-     * @param idx   block index
      * @param index palette index
+     * @return id assigned to the given palette index
      */
-    void setIndex(int idx, int index);
+    int idByIndex(int index);
+
+    /**
+     * Assigns an id assigned to the given palette index.
+     *
+     * @param index palette index
+     * @param id    id value
+     */
+    void setIdByIndex(int index, int id);
 
     /**
      * Returns the palette index of the given block index.
      *
-     * @param idx block index
+     * @param packedCoordinate block index
      * @return palette index of the given block index
      */
-    int index(int idx);
+    int paletteIndexAt(int packedCoordinate);
+
+    /**
+     * Sets the index of the given section coordinate.
+     *
+     * @param sectionCoordinate block index
+     * @param index             palette index
+     */
+    void setPaletteIndexAt(int sectionCoordinate, int index);
+
+    /**
+     * Adds a new id to the palette.
+     *
+     * @param id id value
+     */
+    void addId(int id);
+
+    /**
+     * Replaces an id in the palette.
+     *
+     * @param oldId old id
+     * @param newId new id
+     */
+    void replaceId(int oldId, int newId);
 
     /**
      * Returns the size of the palette.
@@ -110,45 +121,7 @@ public interface DataPalette {
     int size();
 
     /**
-     * Returns the block state assigned to the given palette index.
-     *
-     * @param index palette index
-     * @return block state assigned to the given palette index
-     */
-    int entry(int index);
-
-    /**
-     * Assigns a block state assigned to the given palette index.
-     *
-     * @param index palette index
-     * @param id    block state
-     */
-    void setEntry(int index, int id);
-
-    /**
-     * Replaces a block state in the palette.
-     *
-     * @param oldId old block state
-     * @param newId new block state
-     */
-    void replaceEntry(int oldId, int newId);
-
-    /**
-     * Adds a new block state to the palette.
-     *
-     * @param id block state
-     */
-    void addEntry(int id);
-
-    /**
      * Clears the palette.
      */
     void clear();
-
-    /**
-     * Returns the type of data this palette holds.
-     *
-     * @return type of data this palette holds
-     */
-    PaletteType type();
 }

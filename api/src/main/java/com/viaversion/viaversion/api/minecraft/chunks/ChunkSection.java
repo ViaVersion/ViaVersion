@@ -37,7 +37,7 @@ public interface ChunkSection {
 
     @Deprecated/*(forRemoval = true)*/
     default int getFlatBlock(int idx) {
-        return palette(PaletteType.BLOCKS).value(idx);
+        return palette(PaletteType.BLOCKS).idAt(idx);
     }
 
     @Deprecated/*(forRemoval = true)*/
@@ -47,7 +47,7 @@ public interface ChunkSection {
 
     @Deprecated/*(forRemoval = true)*/
     default void setFlatBlock(int idx, int id) {
-        palette(PaletteType.BLOCKS).setValue(idx, id);
+        palette(PaletteType.BLOCKS).setIdAt(idx, id);
     }
 
     @Deprecated/*(forRemoval = true)*/
@@ -77,12 +77,12 @@ public interface ChunkSection {
 
     @Deprecated/*(forRemoval = true)*/
     default void setPaletteIndex(int idx, int index) {
-        palette(PaletteType.BLOCKS).setIndex(idx, index);
+        palette(PaletteType.BLOCKS).setPaletteIndexAt(idx, index);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default int getPaletteIndex(int idx) {
-        return palette(PaletteType.BLOCKS).index(idx);
+        return palette(PaletteType.BLOCKS).paletteIndexAt(idx);
     }
 
     @Deprecated/*(forRemoval = true)*/
@@ -92,22 +92,22 @@ public interface ChunkSection {
 
     @Deprecated/*(forRemoval = true)*/
     default int getPaletteEntry(int index) {
-        return palette(PaletteType.BLOCKS).entry(index);
+        return palette(PaletteType.BLOCKS).idByIndex(index);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void setPaletteEntry(int index, int id) {
-        palette(PaletteType.BLOCKS).setEntry(index, id);
+        palette(PaletteType.BLOCKS).setIdByIndex(index, id);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void replacePaletteEntry(int oldId, int newId) {
-        palette(PaletteType.BLOCKS).replaceEntry(oldId, newId);
+        palette(PaletteType.BLOCKS).replaceId(oldId, newId);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void addPaletteEntry(int id) {
-        palette(PaletteType.BLOCKS).addEntry(id);
+        palette(PaletteType.BLOCKS).addId(id);
     }
 
     @Deprecated/*(forRemoval = true)*/
@@ -152,7 +152,7 @@ public interface ChunkSection {
      */
     @Nullable DataPalette palette(PaletteType type);
 
-    void addPalette(DataPalette blockPalette);
+    void addPalette(PaletteType type, DataPalette blockPalette);
 
     void removePalette(PaletteType type);
 }

@@ -32,18 +32,15 @@ public final class DataPaletteImpl implements DataPalette {
     private final IntList palette;
     private final Int2IntMap inversePalette;
     private final int[] values;
-    private final PaletteType type;
 
-    public DataPaletteImpl(final PaletteType type) {
-        this.type = type;
+    public DataPaletteImpl() {
         this.values = new int[ChunkSection.SIZE];
         palette = new IntArrayList();
         inversePalette = new Int2IntOpenHashMap();
         inversePalette.defaultReturnValue(-1);
     }
 
-    public DataPaletteImpl(final PaletteType type, final int expectedPaletteLength) {
-        this.type = type;
+    public DataPaletteImpl(final int expectedPaletteLength) {
         this.values = new int[ChunkSection.SIZE];
         // Pre-size the palette array/map
         palette = new IntArrayList(expectedPaletteLength);
@@ -52,13 +49,13 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     @Override
-    public int value(final int idx) {
-        final int index = values[idx];
+    public int idAt(final int sectionCoordinate) {
+        final int index = values[sectionCoordinate];
         return palette.getInt(index);
     }
 
     @Override
-    public void setValue(final int idx, final int id) {
+    public void setIdAt(final int sectionCoordinate, final int id) {
         int index = inversePalette.get(id);
         if (index == -1) {
             index = palette.size();
@@ -66,17 +63,17 @@ public final class DataPaletteImpl implements DataPalette {
             inversePalette.put(id, index);
         }
 
-        values[idx] = index;
+        values[sectionCoordinate] = index;
     }
 
     @Override
-    public int index(final int idx) {
-        return values[idx];
+    public int paletteIndexAt(final int packedCoordinate) {
+        return values[packedCoordinate];
     }
 
     @Override
-    public void setIndex(final int idx, final int index) {
-        values[idx] = index;
+    public void setPaletteIndexAt(final int sectionCoordinate, final int index) {
+        values[sectionCoordinate] = index;
     }
 
     @Override
@@ -85,12 +82,12 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     @Override
-    public int entry(final int index) {
+    public int idByIndex(final int index) {
         return palette.getInt(index);
     }
 
     @Override
-    public void setEntry(final int index, final int id) {
+    public void setIdByIndex(final int index, final int id) {
         final int oldId = palette.set(index, id);
         if (oldId == id) return;
 
@@ -107,7 +104,7 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     @Override
-    public void replaceEntry(final int oldId, final int newId) {
+    public void replaceId(final int oldId, final int newId) {
         final int index = inversePalette.remove(oldId);
         if (index == -1) return;
 
@@ -120,7 +117,7 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     @Override
-    public void addEntry(final int id) {
+    public void addId(final int id) {
         inversePalette.put(id, palette.size());
         palette.add(id);
     }
@@ -129,10 +126,5 @@ public final class DataPaletteImpl implements DataPalette {
     public void clear() {
         palette.clear();
         inversePalette.clear();
-    }
-
-    @Override
-    public PaletteType type() {
-        return type;
     }
 }

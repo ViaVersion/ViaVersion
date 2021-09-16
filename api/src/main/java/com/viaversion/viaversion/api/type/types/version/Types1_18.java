@@ -24,10 +24,14 @@ package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 
 public final class Types1_18 {
 
     public static final Type<ChunkSection> CHUNK_SECTION = new ChunkSectionType1_18();
     public static final Type<BlockEntity> BLOCK_ENTITY = new BlockEntityType1_18();
+    public static final Type<DataPalette> BLOCK_PALETTE_TYPE = new PaletteType1_18(PaletteType.BLOCKS);
+    public static final Type<DataPalette> BIOME_PALETTE_TYPE = new PaletteType1_18(PaletteType.BIOMES);
 }
