@@ -101,13 +101,18 @@ public class ChunkSectionType1_18 extends Type<ChunkSection> {
     }
 
     private void writePalette(final ByteBuf buffer, final DataPalette palette) {
-        int bitsPerValue = 0;
-        while (palette.size() > 1 << bitsPerValue) {
-            bitsPerValue += 1;
-        }
+        int bitsPerValue;
+        if (palette.size() > 1) {
+            bitsPerValue = palette.type() == PaletteType.BLOCKS ? 4 : 2; //TODO implement linear palette
+            while (palette.size() > 1 << bitsPerValue) {
+                bitsPerValue += 1;
+            }
 
-        if (bitsPerValue > palette.type().highestBitsPerValue()) {
-            bitsPerValue = GLOBAL_PALETTE;
+            if (bitsPerValue > palette.type().highestBitsPerValue()) {
+                bitsPerValue = GLOBAL_PALETTE;
+            }
+        } else {
+            bitsPerValue = 0;
         }
 
         buffer.writeByte(bitsPerValue);

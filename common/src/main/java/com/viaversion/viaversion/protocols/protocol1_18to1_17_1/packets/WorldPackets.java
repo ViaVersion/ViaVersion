@@ -105,14 +105,6 @@ public final class WorldPackets {
                 handler(wrapper -> {
                     final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
                     final Chunk oldChunk = wrapper.read(new Chunk1_17Type(tracker.currentWorldSectionHeight()));
-                    /*for (int s = 0; s < chunk.getSections().length; s++) {
-                        ChunkSection section = chunk.getSections()[s];
-                        if (section == null) continue;
-                        for (int i = 0; i < section.getPaletteSize(); i++) {
-                            int old = section.getPaletteEntry(i);
-                            section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(old));
-                        }
-                    }*/
 
                     final List<BlockEntity> blockEntities = new ArrayList<>(oldChunk.getBlockEntities().size());
                     for (final CompoundTag tag : oldChunk.getBlockEntities()) {
@@ -143,6 +135,12 @@ public final class WorldPackets {
                             final DataPaletteImpl blockPalette = new DataPaletteImpl(PaletteType.BLOCKS);
                             blockPalette.addEntry(0);
                             section.addPalette(blockPalette);
+                        } else {
+                            /*final DataPalette blockpalette = section.palette(PaletteType.BLOCKS);
+                            for (int j = 0; j < blockpalette.size(); j++) {
+                                final int old = blockpalette.entry(j);
+                                blockpalette.setEntry(j, protocol.getMappingData().getNewBlockStateId(old));
+                            }*/
                         }
 
                         // Fill biome palette
