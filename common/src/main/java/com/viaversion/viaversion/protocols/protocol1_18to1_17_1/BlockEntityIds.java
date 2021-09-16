@@ -50,4 +50,8 @@ public final class BlockEntityIds {
         }
         return newId;
     }
+
+    public static int[] getIds() {
+        return IDS;
+    }
 }

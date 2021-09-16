@@ -144,7 +144,6 @@ public final class WorldPackets {
                         }
 
                         // Fill biome palette
-                        //TODO Use single value palette if given the possibility
                         final DataPaletteImpl biomePalette = new DataPaletteImpl();
                         section.addPalette(PaletteType.BIOMES, biomePalette);
                         for (int biomeIndex = i * BIOMES_PER_CHUNK; biomeIndex < (i * BIOMES_PER_CHUNK) + BIOMES_PER_CHUNK; biomeIndex++) {

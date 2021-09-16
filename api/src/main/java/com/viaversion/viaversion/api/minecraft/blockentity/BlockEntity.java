@@ -27,12 +27,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface BlockEntity {
 
-    default byte relX() {
-        return -1; //TODO
+    default byte sectionX() {
+        return (byte) ((packedXZ() >> 4) & 15);
     }
 
-    default byte relZ() {
-        return -1; //TODO
+    default byte sectionZ() {
+        return (byte) (packedXZ() & 15);
     }
 
     byte packedXZ();
