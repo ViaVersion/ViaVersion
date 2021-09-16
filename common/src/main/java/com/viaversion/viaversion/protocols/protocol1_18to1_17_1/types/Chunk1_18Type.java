@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
@@ -47,26 +46,21 @@ public final class Chunk1_18Type extends Type<Chunk> {
         final int chunkZ = buffer.readInt();
         final CompoundTag heightMap = Type.NBT.read(buffer);
 
-        Type.VAR_INT.readPrimitive(buffer); // Data size in bytes
-
         // Read sections
+        final ByteBuf sectionsBuf = buffer.readBytes(Type.VAR_INT.readPrimitive(buffer));
         final ChunkSection[] sections = new ChunkSection[ySectionCount];
-        for (int i = 0; i < ySectionCount; i++) {
-            sections[i] = Types1_18.CHUNK_SECTION.read(buffer);
+        try {
+            for (int i = 0; i < ySectionCount; i++) {
+                sections[i] = Types1_18.CHUNK_SECTION.read(sectionsBuf);
+            }
+        } finally {
+            sectionsBuf.release();
         }
 
         final int blockEntitiesLength = Type.VAR_INT.readPrimitive(buffer);
         final List<BlockEntity> blockEntities = new ArrayList<>(blockEntitiesLength);
         for (int i = 0; i < blockEntitiesLength; i++) {
             blockEntities.add(Types1_18.BLOCK_ENTITY.read(buffer));
-        }
-
-        // Read all the remaining bytes (workaround for #681)
-        if (buffer.readableBytes() > 0) {
-            final byte[] array = Type.REMAINING_BYTES.read(buffer);
-            if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
-            }
         }
 
         return new Chunk1_18(chunkX, chunkZ, sections, heightMap, blockEntities);
