@@ -30,23 +30,28 @@ import io.netty.buffer.ByteBuf;
 
 public final class ChunkSectionType1_18 extends Type<ChunkSection> {
 
-    public ChunkSectionType1_18() {
+    private final PaletteType1_18 blockPaletteType;
+    private final PaletteType1_18 biomePaletteType;
+
+    public ChunkSectionType1_18(final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
         super("Chunk Section Type", ChunkSection.class);
+        this.blockPaletteType = new PaletteType1_18(PaletteType.BLOCKS, globalPaletteBlockBits);
+        this.biomePaletteType = new PaletteType1_18(PaletteType.BIOMES, globalPaletteBiomeBits);
     }
 
     @Override
     public ChunkSection read(final ByteBuf buffer) throws Exception {
         final ChunkSection chunkSection = new ChunkSectionImpl();
         chunkSection.setNonAirBlocksCount(buffer.readShort());
-        chunkSection.addPalette(PaletteType.BLOCKS, Types1_18.BLOCK_PALETTE_TYPE.read(buffer));
-        chunkSection.addPalette(PaletteType.BIOMES, Types1_18.BIOME_PALETTE_TYPE.read(buffer));
+        chunkSection.addPalette(PaletteType.BLOCKS, blockPaletteType.read(buffer));
+        chunkSection.addPalette(PaletteType.BIOMES, biomePaletteType.read(buffer));
         return chunkSection;
     }
 
     @Override
     public void write(final ByteBuf buffer, final ChunkSection section) throws Exception {
         buffer.writeShort(section.getNonAirBlocksCount());
-        Types1_18.BLOCK_PALETTE_TYPE.write(buffer, section.palette(PaletteType.BLOCKS));
-        Types1_18.BIOME_PALETTE_TYPE.write(buffer, section.palette(PaletteType.BIOMES));
+        blockPaletteType.write(buffer, section.palette(PaletteType.BLOCKS));
+        biomePaletteType.write(buffer, section.palette(PaletteType.BIOMES));
     }
 }

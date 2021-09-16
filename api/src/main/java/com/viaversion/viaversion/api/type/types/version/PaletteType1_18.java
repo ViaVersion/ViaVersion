@@ -22,29 +22,30 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import io.netty.buffer.ByteBuf;
 
-public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType> {
-    private static final int GLOBAL_PALETTE = 15;
+public final class PaletteType1_18 extends Type<DataPalette> {
+    private final int globalPaletteBits;
+    private final PaletteType type;
 
-    public PaletteType1_18(final PaletteType type) {
-        super(type, DataPalette.class);
+    public PaletteType1_18(final PaletteType type, final int globalPaletteBits) {
+        super(DataPalette.class);
+        this.globalPaletteBits = globalPaletteBits;
+        this.type = type;
     }
 
     @Override
-    public DataPalette read(final ByteBuf buffer, final PaletteType type) throws Exception {
+    public DataPalette read(final ByteBuf buffer) throws Exception {
         int bitsPerValue = buffer.readByte();
         final int originalBitsPerValue = bitsPerValue;
 
         if (bitsPerValue > type.highestBitsPerValue()) {
-            bitsPerValue = GLOBAL_PALETTE;
+            bitsPerValue = globalPaletteBits;
         }
 
         // Read palette
@@ -57,7 +58,7 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
             return palette;
         }
 
-        if (bitsPerValue != GLOBAL_PALETTE) {
+        if (bitsPerValue != globalPaletteBits) {
             final int paletteLength = Type.VAR_INT.readPrimitive(buffer);
             palette = new DataPaletteImpl(paletteLength);
             for (int i = 0; i < paletteLength; i++) {
@@ -71,7 +72,7 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
         final long[] values = new long[Type.VAR_INT.readPrimitive(buffer)];
         if (values.length > 0) {
             final char valuesPerLong = (char) (64 / bitsPerValue);
-            final int expectedLength = (ChunkSection.SIZE + valuesPerLong - 1) / valuesPerLong;
+            final int expectedLength = (type.maxSize() + valuesPerLong - 1) / valuesPerLong;
             if (values.length != expectedLength) {
                 throw new IllegalStateException("Palette data length (" + values.length + ") does not match expected length (" + expectedLength + ")! bitsPerValue=" + bitsPerValue + ", originalBitsPerValue=" + originalBitsPerValue);
             }
@@ -79,14 +80,14 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
             for (int i = 0; i < values.length; i++) {
                 values[i] = buffer.readLong();
             }
-            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, ChunkSection.SIZE, values,
-                    bitsPerValue == GLOBAL_PALETTE ? palette::setIdAt : palette::setPaletteIndexAt);
+            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.maxSize(), values,
+                    bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
         }
         return palette;
     }
 
     @Override
-    public void write(final ByteBuf buffer, final PaletteType type, final DataPalette palette) throws Exception {
+    public void write(final ByteBuf buffer, final DataPalette palette) throws Exception {
         int bitsPerValue;
         if (palette.size() > 1) {
             // 1, 2, and 3 bit linear palettes can't be read by the client
@@ -96,7 +97,7 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
             }
 
             if (bitsPerValue > type.highestBitsPerValue()) {
-                bitsPerValue = GLOBAL_PALETTE;
+                bitsPerValue = globalPaletteBits;
             }
         } else {
             bitsPerValue = 0;
@@ -111,7 +112,7 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
             return;
         }
 
-        if (bitsPerValue != GLOBAL_PALETTE) {
+        if (bitsPerValue != globalPaletteBits) {
             // Write pallete
             Type.VAR_INT.writePrimitive(buffer, palette.size());
             for (int i = 0; i < palette.size(); i++) {
@@ -119,7 +120,7 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
             }
         }
 
-        final long[] data = CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, ChunkSection.SIZE, bitsPerValue == GLOBAL_PALETTE ? palette::idAt : palette::paletteIndexAt);
+        final long[] data = CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.maxSize(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt);
         Type.VAR_INT.writePrimitive(buffer, data.length);
         for (final long l : data) {
             buffer.writeLong(l);

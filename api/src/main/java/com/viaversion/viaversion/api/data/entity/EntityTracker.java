@@ -147,4 +147,8 @@ public interface EntityTracker {
      * @param currentWorld name of the current world
      */
     void setCurrentWorld(String currentWorld);
+
+    int biomesSent();
+
+    void setBiomesSent(int biomesSent);
 }

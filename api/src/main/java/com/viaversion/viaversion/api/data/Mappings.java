@@ -40,4 +40,6 @@ public interface Mappings {
      * @throws IndexOutOfBoundsException if the unmapped id is invalid
      */
     void setNewId(int id, int newId);
+
+    int size();
 }

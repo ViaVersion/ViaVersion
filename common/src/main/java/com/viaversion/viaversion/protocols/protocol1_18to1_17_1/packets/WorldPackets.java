@@ -38,6 +38,7 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.BlockEntityIds;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.util.MathUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +167,9 @@ public final class WorldPackets {
                     }
 
                     final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), oldChunk.getSections(), oldChunk.getHeightMap(), blockEntities);
-                    wrapper.write(new Chunk1_18Type(tracker.currentWorldSectionHeight()), chunk);
+                    wrapper.write(new Chunk1_18Type(tracker.currentWorldSectionHeight(),
+                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
+                            MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 
                     // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);

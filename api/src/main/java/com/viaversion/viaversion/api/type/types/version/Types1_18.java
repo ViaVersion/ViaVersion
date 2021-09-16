@@ -30,8 +30,5 @@ import com.viaversion.viaversion.api.type.Type;
 
 public final class Types1_18 {
 
-    public static final Type<ChunkSection> CHUNK_SECTION = new ChunkSectionType1_18();
     public static final Type<BlockEntity> BLOCK_ENTITY = new BlockEntityType1_18();
-    public static final Type<DataPalette> BLOCK_PALETTE_TYPE = new PaletteType1_18(PaletteType.BLOCKS);
-    public static final Type<DataPalette> BIOME_PALETTE_TYPE = new PaletteType1_18(PaletteType.BIOMES);
 }

@@ -54,6 +54,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
                 map(Type.NBT); // Current dimension data
                 map(Type.STRING); // World
                 handler(worldDataTrackerHandler(1));
+                handler(biomeSizeTracker());
             }
         });
 
