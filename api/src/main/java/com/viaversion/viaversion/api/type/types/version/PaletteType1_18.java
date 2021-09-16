@@ -89,7 +89,8 @@ public final class PaletteType1_18 extends PartialType<DataPalette, PaletteType>
     public void write(final ByteBuf buffer, final PaletteType type, final DataPalette palette) throws Exception {
         int bitsPerValue;
         if (palette.size() > 1) {
-            bitsPerValue = type == PaletteType.BLOCKS ? 4 : 2; //TODO implement linear palette
+            // 1, 2, and 3 bit linear palettes can't be read by the client
+            bitsPerValue = type == PaletteType.BLOCKS ? 4 : 1;
             while (palette.size() > 1 << bitsPerValue) {
                 bitsPerValue += 1;
             }
