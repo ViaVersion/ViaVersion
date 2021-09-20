@@ -291,7 +291,7 @@ public interface UserConnection {
     boolean isClientSide();
 
     /**
-     * Returns whether {@link ViaVersionConfig#getBlockedProtocols()} should be checked for this connection.
+     * Returns whether {@link ViaVersionConfig#blockedProtocolVersions()} should be checked for this connection.
      *
      * @return whether blocked protocols should be applied
      */

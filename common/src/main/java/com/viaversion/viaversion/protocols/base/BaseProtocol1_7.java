@@ -111,7 +111,7 @@ public class BaseProtocol1_7 extends AbstractProtocol {
                                 wrapper.user().setActive(false);
                             }
 
-                            if (Via.getConfig().getBlockedProtocols().contains(info.getProtocolVersion())) {
+                            if (Via.getConfig().blockedProtocolVersions().contains(info.getProtocolVersion())) {
                                 version.addProperty("protocol", -1); // Show blocked versions as outdated
                             }
 
@@ -169,7 +169,7 @@ public class BaseProtocol1_7 extends AbstractProtocol {
                     @Override
                     public void handle(final PacketWrapper wrapper) throws Exception {
                         int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
-                        if (Via.getConfig().getBlockedProtocols().contains(protocol)) {
+                        if (Via.getConfig().blockedProtocolVersions().contains(protocol)) {
                             if (!wrapper.user().getChannel().isOpen()) return;
                             if (!wrapper.user().shouldApplyBlockProtocol()) return;
 

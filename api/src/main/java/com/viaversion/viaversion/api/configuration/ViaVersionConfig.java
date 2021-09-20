@@ -23,8 +23,11 @@
 package com.viaversion.viaversion.api.configuration;
 
 import com.google.gson.JsonElement;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
+import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 public interface ViaVersionConfig {
 
@@ -267,11 +270,22 @@ public interface ViaVersionConfig {
     boolean is1_12QuickMoveActionFix();
 
     /**
+     * API to check for blocked protocol versions.
+     *
+     * @return blocked protocol versions
+     */
+    BlockedProtocolVersions blockedProtocolVersions();
+
+    /**
      * Get the blocked protocols
      *
      * @return An Integer list
+     * @deprecated use {@link #blockedProtocolVersions()}
      */
-    IntSet getBlockedProtocols();
+    @Deprecated/*(forRemoval = true)*/
+    default IntSet getBlockedProtocols() {
+        return blockedProtocolVersions().singleBlockedVersions();
+    }
 
     /**
      * Get the custom disconnect message
@@ -432,11 +446,11 @@ public interface ViaVersionConfig {
     JsonElement get1_17ResourcePackPrompt();
 
     /***
-     * Get the world names which should be returned for each vanilla dimension
-     * 
+     * Get the world names that should be returned for each Vanilla dimension.
+     * Note that this can be overriden per-user by using {@link UserConnection#put(StorableObject)} with
+     * a custom instance of {@link WorldIdentifiers} for the user's {@link UserConnection}.
+     *
      * @return the global map from vanilla dimensions to world name
-     * Note that this can be overriden per-user by using {@link com.viaversion.viaversion.api.connection.UserConnection#put} with
-     * a custom instance of {@link WorldIdentifiers} for the user's {@link UserConnection}
      */
     WorldIdentifiers get1_16WorldNamesMap();
 }
