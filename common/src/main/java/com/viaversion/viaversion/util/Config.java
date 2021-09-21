@@ -204,11 +204,12 @@ public abstract class Config implements ConfigurationProvider {
 
     public List<Integer> getIntegerList(String key) {
         Object o = this.config.get(key);
-        if (o != null) {
-            return (List<Integer>) o;
-        } else {
-            return new ArrayList<>();
-        }
+        return o != null ? (List<Integer>) o : new ArrayList<>();
+    }
+
+    public List<String> getStringList(String key) {
+        Object o = this.config.get(key);
+        return o != null ? (List<String>) o : new ArrayList<>();
     }
 
     public @Nullable JsonElement getSerializedComponent(String key) {

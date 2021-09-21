@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.LegacyViaAPI;
+import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.legacy.LegacyAPI;
 import io.netty.buffer.ByteBuf;
@@ -73,7 +74,8 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
     @Override
     public SortedSet<Integer> getSupportedVersions() {
         SortedSet<Integer> outputSet = new TreeSet<>(Via.getManager().getProtocolManager().getSupportedVersions());
-        outputSet.removeAll(Via.getPlatform().getConf().getBlockedProtocols());
+        BlockedProtocolVersions blockedVersions = Via.getPlatform().getConf().blockedProtocolVersions();
+        outputSet.removeIf(blockedVersions::contains);
         return outputSet;
     }
 

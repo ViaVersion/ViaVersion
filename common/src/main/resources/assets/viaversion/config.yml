@@ -13,8 +13,12 @@
 checkforupdates: true
 # Send the supported versions with the Status (Ping) response packet
 send-supported-versions: false
-# Block specific Minecraft protocols that ViaVersion allows
-# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers or use a generator: https://via.krusic22.com
+# Easier to configure alternative to 'block-protocols'. Uses readable version strings with possible '<' and '>' prefixes.
+# An example to block 1.16.4, everything below 1.16, as well as everything above 1.17.1 would be: ["<1.16", "1.16.4", ">1.17.1"]
+# You can use both this and the block-protocols option at the same time as well.
+block-versions: []
+# Block specific Minecraft protocol version numbers.
+# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers, or use a generator: https://via.krusic22.com
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"

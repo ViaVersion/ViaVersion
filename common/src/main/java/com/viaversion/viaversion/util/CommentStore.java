@@ -150,7 +150,11 @@ public class CommentStore {
         }
 
         for (String line : yaml.split("\n")) {
-            if (line.isEmpty()) continue; // Skip empty lines
+            if (line.isEmpty() || line.trim().charAt(0) == '-') {
+                fileData.append(line).append('\n');
+                continue;
+            }
+
             int indent = getSuccessiveCharCount(line, ' ');
             int indents = indent / indentLength;
             String indentText = indent > 0 ? line.substring(0, indent) : "";
@@ -162,7 +166,7 @@ public class CommentStore {
             }
 
             // Add new section to key
-            String separator = key.length() > 0 ? pathSeparator : "";
+            String separator = !key.isEmpty() ? pathSeparator : "";
             String lineKey = line.contains(":") ? line.split(Pattern.quote(":"))[0] : line;
             key += separator + lineKey.substring(indent);
 
