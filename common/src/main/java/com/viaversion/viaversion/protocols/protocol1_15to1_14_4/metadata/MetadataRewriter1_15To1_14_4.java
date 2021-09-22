@@ -60,7 +60,7 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<Protocol1_15To1
 
         // Metadata 12 added to abstract_living
         if (metadata.id() > 11 && type.isOrHasParent(Entity1_15Types.LIVINGENTITY)) {
-            metadata.setId(metadata.id() + 1); //TODO is it 11 or 12? what is it for?
+            metadata.setId(metadata.id() + 1);
         }
 
         //NOTES:

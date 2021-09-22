@@ -242,7 +242,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
     }
 
-    public int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
+    public int getNewSoundId(int id) {
         int newId = id;
         if (id >= 24) //Blame the enchantment table sound
             newId += 1;

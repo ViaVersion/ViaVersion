@@ -86,6 +86,9 @@ public class EntityPackets {
     private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, EntityRewriter rewriter) throws Exception {
         // Meta is no longer included in the spawn packets, but sent separately
         List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
+        if (metadata.isEmpty()) {
+            return;
+        }
 
         // Send the spawn packet manually
         wrapper.send(Protocol1_15To1_14_4.class);

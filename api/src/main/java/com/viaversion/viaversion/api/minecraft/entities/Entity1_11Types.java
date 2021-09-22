@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-// 1.11 Entity / Object ids TODO maybe in the future instead of copying it, some api.
+// 1.11 Entity / Object ids
 public class Entity1_11Types {
 
     public static EntityType getTypeFromId(int typeID, boolean isObject) {

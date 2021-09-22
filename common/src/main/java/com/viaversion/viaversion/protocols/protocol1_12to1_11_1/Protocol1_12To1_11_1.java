@@ -229,7 +229,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         cancelServerbound(ServerboundPackets1_12.ADVANCEMENT_TAB);
     }
 
-    private int getNewSoundId(int id) { //TODO Make it better, suggestions are welcome. It's ugly and hardcoded now.
+    private int getNewSoundId(int id) {
         int newId = id;
         if (id >= 26) // End Portal Sounds
             newId += 2;

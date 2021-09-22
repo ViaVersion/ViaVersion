@@ -106,7 +106,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
-                        // Handle stopsound change TODO change location of this remap to other class?
+                        // Handle stopsound change
                         if (channel.equalsIgnoreCase("MC|StopSound")) {
                             String originalSource = wrapper.read(Type.STRING);
                             String originalSound = wrapper.read(Type.STRING);
@@ -194,7 +194,6 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                         }
                         wrapper.set(Type.STRING, 0, channel);
                     }
-                    // TODO Fix trading GUI
                 });
             }
         });
