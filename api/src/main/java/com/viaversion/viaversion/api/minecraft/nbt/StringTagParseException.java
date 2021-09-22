@@ -39,8 +39,6 @@ import java.io.IOException;
         this.position = position;
     }
 
-    // TODO: Provide more specific position information
-
     @Override
     public String getMessage() {
         return super.getMessage() + "(at position " + this.position + ")";

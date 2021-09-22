@@ -272,7 +272,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             plugins.add(new PluginInfo(p.isEnabled(), p.getDescription().getName(), p.getDescription().getVersion(), p.getDescription().getMain(), p.getDescription().getAuthors()));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
-        // TODO more? ProtocolLib things etc?
 
         return platformSpecific;
     }

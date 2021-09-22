@@ -166,7 +166,6 @@ public class BungeeServerHandler implements Listener {
 
                     if (protocolId <= ProtocolVersion.v1_8.getVersion()) { // 1.8 doesn't have BossBar packet
                         if (storage.getBossbar() != null) {
-                            // TODO: Verify whether this packet needs to be sent when 1.8 -> 1.9 protocol isn't present in the pipeline
                             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
                             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                                 for (UUID uuid : storage.getBossbar()) {

@@ -25,6 +25,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {
     private static final IntSet WHITELIST = new IntOpenHashSet(46, 1F);
     private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
@@ -81,8 +82,8 @@ public class BlockStorage implements StorableObject {
         return blocks.remove(position);
     }
 
-    public static class ReplacementData {
-        private int original;
+    public static final class ReplacementData {
+        private final int original;
         private int replacement;
 
         public ReplacementData(int original, int replacement) {
@@ -92,10 +93,6 @@ public class BlockStorage implements StorableObject {
 
         public int getOriginal() {
             return original;
-        }
-
-        public void setOriginal(int original) {
-            this.original = original;
         }
 
         public int getReplacement() {

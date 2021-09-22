@@ -46,7 +46,7 @@ import java.util.Map;
  */
 /* package */ final class TagStringWriter implements AutoCloseable {
     private final Appendable out;
-    private final String indent = "  "; // TODO: pretty-printing
+    private final String indent = "  ";
     private int level;
     /**
      * Whether a {@link Tokens#VALUE_SEPARATOR} needs to be printed before the beginning of the next object.
@@ -165,7 +165,7 @@ import java.util.Map;
     public TagStringWriter key(final String key) throws IOException {
         this.printAndResetSeparator();
         this.writeMaybeQuoted(key, false);
-        this.out.append(Tokens.COMPOUND_KEY_TERMINATOR); // TODO: spacing/pretty-printing
+        this.out.append(Tokens.COMPOUND_KEY_TERMINATOR);
         return this;
     }
 
@@ -216,7 +216,7 @@ import java.util.Map;
                 }
             }
         }
-        if (requireQuotes) { // TODO: single quotes
+        if (requireQuotes) {
             this.out.append(Tokens.DOUBLE_QUOTE);
             this.out.append(escape(content, Tokens.DOUBLE_QUOTE));
             this.out.append(Tokens.DOUBLE_QUOTE);

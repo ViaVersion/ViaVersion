@@ -42,7 +42,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
     public MetadataRewriter1_14To1_13_2(Protocol1_14To1_13_2 protocol) {
         super(protocol);
         mapTypes(Entity1_13Types.EntityType.values(), Entity1_14Types.class);
-        mapEntityType(Entity1_13Types.EntityType.OCELOT, Entity1_14Types.CAT); //TODO remap untamed ocelots to ocelots?
+        mapEntityType(Entity1_13Types.EntityType.OCELOT, Entity1_14Types.CAT);
     }
 
     @Override
@@ -176,9 +176,8 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
             }
         }
 
-        // TODO Are witch and ravager also abstract illagers? They all inherit the new metadata 14 added in 19w13a
         if (type.is(Entity1_14Types.WITCH) || type.is(Entity1_14Types.RAVAGER) || type.isOrHasParent(Entity1_14Types.ABSTRACT_ILLAGER_BASE)) {
-            if (metadata.id() >= 14) {  // TODO 19w13 added a new boolean (raid participant - is celebrating) with id 14
+            if (metadata.id() >= 14) {  // 19w13 added a new boolean (raid participant - is celebrating) with id 14
                 metadata.setId(metadata.id() + 1);
             }
         }

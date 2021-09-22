@@ -86,7 +86,6 @@ import java.util.stream.IntStream;
             }
 
             final Tag next = this.tag();
-            // TODO: validate type
             listTag.add(next);
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
                 return listTag;
@@ -128,7 +127,7 @@ import java.util.stream.IntStream;
 
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
                 final byte[] result = new byte[bytes.size()];
-                for (int i = 0; i < bytes.size(); ++i) { // todo yikes, let's do less boxing
+                for (int i = 0; i < bytes.size(); ++i) {
                     result[i] = bytes.get(i);
                 }
                 return result;
@@ -164,7 +163,7 @@ import java.util.stream.IntStream;
 
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
                 final long[] result = new long[longs.size()];
-                for (int i = 0; i < longs.size(); ++i) { // todo yikes
+                for (int i = 0; i < longs.size(); ++i) {
                     result[i] = longs.get(i);
                 }
                 return result;

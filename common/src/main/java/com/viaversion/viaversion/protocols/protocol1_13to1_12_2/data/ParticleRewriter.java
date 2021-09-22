@@ -62,7 +62,7 @@ public class ParticleRewriter {
         add(15); // (25->15) enchantmenttable -> minecraft:enchant
         add(23); // (26->23) flame -> minecraft:flame
         add(31); // (27->31) lava -> minecraft:lava
-        add(-1); // (28->-1) footstap -> REMOVED (TODO REPLACEMENT/CLIENT_SIDED?)
+        add(-1); // (28->-1) footstap -> REMOVED
         add(5); // (29->5) cloud -> minecraft:cloud
         add(11, reddustHandler()); // (30->11) reddust -> minecraft:dust
         //    Red	Float	Red value, 0-1
@@ -81,7 +81,7 @@ public class ParticleRewriter {
         add(3, blockHandler()); // (38->3) blockdust_(id)               -> minecraft:block
         // BlockState	VarInt	The ID of the block state.
         add(36); // (39->36) droplet -> minecraft:rain
-        add(-1); // (40->-1) take -> REMOVED (TODO REPLACENT/CLIENT_SIDED?)
+        add(-1); // (40->-1) take -> REMOVED
         add(13); // (41->13) mobappearance -> minecraft:elder_guardian
         add(8); // (42->8) dragonbreath -> minecraft:dragon_breath
         add(16); // (43->16) endrod -> minecraft:end_rod
