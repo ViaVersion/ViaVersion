@@ -22808,6 +22808,7 @@
     "block.gravel.place",
     "block.gravel.step",
     "block.grindstone.use",
+    "block.growing_plant.crop",
     "entity.guardian.ambient",
     "entity.guardian.ambient_land",
     "entity.guardian.attack",
