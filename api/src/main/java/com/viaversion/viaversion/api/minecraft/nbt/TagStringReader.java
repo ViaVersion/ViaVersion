@@ -47,6 +47,8 @@ import java.util.stream.LongStream;
 // - Use OpenNBT tags
 // - Small byteArray() optimization
 // - acceptLegacy = true by default
+// - Don't parse value as DoubleTag when possiblyNumeric
+// - Fix trailing comma reading in compounds, lists, and arrays
 final class TagStringReader {
     private static final int MAX_DEPTH = 512;
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
@@ -54,7 +56,7 @@ final class TagStringReader {
     private static final long[] EMPTY_LONG_ARRAY = new long[0];
 
     private final CharBuffer buffer;
-    private boolean acceptLegacy = true;
+    private boolean acceptLegacy = true; // Via - always true
     private int depth;
 
     TagStringReader(final CharBuffer buffer) {
@@ -125,11 +127,11 @@ final class TagStringReader {
             return EMPTY_BYTE_ARRAY;
         }
 
-        final IntList bytes = new IntArrayList();
+        final IntList bytes = new IntArrayList(); // Via - no boxing
         while (this.buffer.hasMore()) {
             final CharSequence value = this.buffer.skipWhitespace().takeUntil(Tokens.TYPE_BYTE);
             try {
-                bytes.add(Byte.parseByte(value.toString()));
+                bytes.add(Byte.parseByte(value.toString())); // Via
             } catch (final NumberFormatException ex) {
                 throw this.buffer.makeError("All elements of a byte array must be bytes!");
             }
@@ -137,7 +139,7 @@ final class TagStringReader {
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
                 final byte[] result = new byte[bytes.size()];
                 for (int i = 0; i < bytes.size(); ++i) {
-                    result[i] = (byte) bytes.getInt(i);
+                    result[i] = (byte) bytes.getInt(i); // Via
                 }
                 return result;
             }
@@ -303,12 +305,8 @@ final class TagStringReader {
         if (possiblyNumeric) {
             try {
                 return new IntTag(Integer.parseInt(built));
-            } catch (final NumberFormatException ex) {
-                try {
-                    return new DoubleTag(Double.parseDouble(built));
-                } catch (final NumberFormatException ex2) {
-                    // ignore
-                }
+            } catch (final NumberFormatException ignored) {
+                // Via - don't try to parse as DoubleTag here
             }
         }
 
@@ -326,7 +324,7 @@ final class TagStringReader {
             return true;
         }
         this.buffer.expect(Tokens.VALUE_SEPARATOR);
-        return false;
+        return this.buffer.takeIf(endCharacter); // Via - trailing commas are allowed
     }
 
     /**
