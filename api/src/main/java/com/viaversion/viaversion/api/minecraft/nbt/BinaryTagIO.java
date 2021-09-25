@@ -39,8 +39,12 @@ import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+// Specific Via changes:
+// - Use OpenNBT tags
+// - Added readString/writeString methods from TagStringIO
+// - Has not been updated for the sake of keeping the class simple
 /**
- * See https://github.com/KyoriPowered/adventure.
+ * Serialization operations for binary tags.
  */
 public final class BinaryTagIO {
     private BinaryTagIO() {
