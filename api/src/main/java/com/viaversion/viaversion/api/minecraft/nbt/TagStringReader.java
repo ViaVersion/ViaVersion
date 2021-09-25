@@ -1,7 +1,7 @@
 /*
  * This file is part of adventure, licensed under the MIT License.
  *
- * Copyright (c) 2017-2020 KyoriPowered
+ * Copyright (c) 2017-2021 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,33 +37,39 @@ import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
-/**
- * See https://github.com/KyoriPowered/adventure.
- */
-/* package */ final class TagStringReader {
+// Specific Via changes:
+// - Use OpenNBT tags
+// - Small byteArray() optimization
+// - acceptLegacy = true by default
+final class TagStringReader {
+    private static final int MAX_DEPTH = 512;
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+    private static final int[] EMPTY_INT_ARRAY = new int[0];
+    private static final long[] EMPTY_LONG_ARRAY = new long[0];
+
     private final CharBuffer buffer;
+    private boolean acceptLegacy = true;
+    private int depth;
 
-    public TagStringReader(final CharBuffer buffer) {
+    TagStringReader(final CharBuffer buffer) {
         this.buffer = buffer;
     }
 
     public CompoundTag compound() throws StringTagParseException {
         this.buffer.expect(Tokens.COMPOUND_BEGIN);
         final CompoundTag compoundTag = new CompoundTag();
-        if (this.buffer.peek() == Tokens.COMPOUND_END) {
-            this.buffer.take();
+        if (this.buffer.takeIf(Tokens.COMPOUND_END)) {
             return compoundTag;
         }
 
         while (this.buffer.hasMore()) {
-            final String key = this.key();
-            final Tag tag = this.tag();
-            compoundTag.put(key, tag);
+            compoundTag.put(this.key(), this.tag());
             if (this.separatorOrCompleteWith(Tokens.COMPOUND_END)) {
                 return compoundTag;
             }
@@ -74,13 +80,11 @@ import java.util.stream.IntStream;
     public ListTag list() throws StringTagParseException {
         final ListTag listTag = new ListTag();
         this.buffer.expect(Tokens.ARRAY_BEGIN);
-        final boolean prefixedIndex = this.buffer.peek() == '0' && this.buffer.peek(1) == ':';
+        final boolean prefixedIndex = this.acceptLegacy && this.buffer.peek() == '0' && this.buffer.peek(1) == ':';
+        if (!prefixedIndex && this.buffer.takeIf(Tokens.ARRAY_END)) {
+            return listTag;
+        }
         while (this.buffer.hasMore()) {
-            if (this.buffer.peek() == Tokens.ARRAY_END) {
-                this.buffer.advance();
-                return listTag;
-            }
-
             if (prefixedIndex) {
                 this.buffer.takeUntil(':');
             }
@@ -99,11 +103,12 @@ import java.util.stream.IntStream;
      *
      * @return array-typed tag
      */
-    public Tag array(final char elementType) throws StringTagParseException {
+    public Tag array(char elementType) throws StringTagParseException {
         this.buffer.expect(Tokens.ARRAY_BEGIN)
                 .expect(elementType)
                 .expect(Tokens.ARRAY_SIGNATURE_SEPARATOR);
 
+        elementType = Character.toLowerCase(elementType);
         if (elementType == Tokens.TYPE_BYTE) {
             return new ByteArrayTag(this.byteArray());
         } else if (elementType == Tokens.TYPE_INT) {
@@ -116,11 +121,15 @@ import java.util.stream.IntStream;
     }
 
     private byte[] byteArray() throws StringTagParseException {
-        final List<Byte> bytes = new ArrayList<>();
+        if (this.buffer.takeIf(Tokens.ARRAY_END)) {
+            return EMPTY_BYTE_ARRAY;
+        }
+
+        final IntList bytes = new IntArrayList();
         while (this.buffer.hasMore()) {
             final CharSequence value = this.buffer.skipWhitespace().takeUntil(Tokens.TYPE_BYTE);
             try {
-                bytes.add(Byte.valueOf(value.toString()));
+                bytes.add(Byte.parseByte(value.toString()));
             } catch (final NumberFormatException ex) {
                 throw this.buffer.makeError("All elements of a byte array must be bytes!");
             }
@@ -128,7 +137,7 @@ import java.util.stream.IntStream;
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
                 final byte[] result = new byte[bytes.size()];
                 for (int i = 0; i < bytes.size(); ++i) {
-                    result[i] = bytes.get(i);
+                    result[i] = (byte) bytes.getInt(i);
                 }
                 return result;
             }
@@ -137,6 +146,10 @@ import java.util.stream.IntStream;
     }
 
     private int[] intArray() throws StringTagParseException {
+        if (this.buffer.takeIf(Tokens.ARRAY_END)) {
+            return EMPTY_INT_ARRAY;
+        }
+
         final IntStream.Builder builder = IntStream.builder();
         while (this.buffer.hasMore()) {
             final Tag value = this.tag();
@@ -152,21 +165,21 @@ import java.util.stream.IntStream;
     }
 
     private long[] longArray() throws StringTagParseException {
-        final List<Long> longs = new ArrayList<>();
+        if (this.buffer.takeIf(Tokens.ARRAY_END)) {
+            return EMPTY_LONG_ARRAY;
+        }
+
+        final LongStream.Builder longs = LongStream.builder();
         while (this.buffer.hasMore()) {
             final CharSequence value = this.buffer.skipWhitespace().takeUntil(Tokens.TYPE_LONG);
             try {
-                longs.add(Long.valueOf(value.toString()));
+                longs.add(Long.parseLong(value.toString()));
             } catch (final NumberFormatException ex) {
                 throw this.buffer.makeError("All elements of a long array must be longs!");
             }
 
             if (this.separatorOrCompleteWith(Tokens.ARRAY_END)) {
-                final long[] result = new long[longs.size()];
-                for (int i = 0; i < longs.size(); ++i) {
-                    result[i] = longs.get(i);
-                }
-                return result;
+                return longs.build().toArray();
             }
         }
         throw this.buffer.makeError("Reached end of document without array close");
@@ -181,7 +194,21 @@ import java.util.stream.IntStream;
             }
 
             final StringBuilder builder = new StringBuilder();
-            while (this.buffer.peek() != ':') { // DO NOT CHECK FOR CHARACTER VALIDITY; LEGACY NBT ALLOWS ANY CHARACTER, EVEN WHEN UNQUOTED
+            while (this.buffer.hasMore()) {
+                final char peek = this.buffer.peek();
+                if (!Tokens.id(peek)) {
+                    if (this.acceptLegacy) {
+                        // In legacy format, a key is any non-colon character, with escapes allowed
+                        if (peek == Tokens.ESCAPE_MARKER) {
+                            this.buffer.take(); // skip
+                            continue;
+                        } else if (peek != Tokens.COMPOUND_KEY_TERMINATOR) {
+                            builder.append(this.buffer.take());
+                            continue;
+                        }
+                    }
+                    break;
+                }
                 builder.append(this.buffer.take());
             }
             return builder.toString();
@@ -191,30 +218,38 @@ import java.util.stream.IntStream;
     }
 
     public Tag tag() throws StringTagParseException {
-        final char startToken = this.buffer.skipWhitespace().peek();
-        switch (startToken) {
-            case Tokens.COMPOUND_BEGIN:
-                return this.compound();
-            case Tokens.ARRAY_BEGIN:
-                if (this.buffer.peek(2) == ';') { // we know we're an array tag
-                    return this.array(this.buffer.peek(1));
-                } else {
-                    return this.list();
-                }
-            case Tokens.SINGLE_QUOTE:
-            case Tokens.DOUBLE_QUOTE:
-                // definitely a string tag
-                this.buffer.advance();
-                return new StringTag(unescape(this.buffer.takeUntil(startToken).toString()));
-            default: // scalar
-                return this.scalar();
+        if (this.depth++ > MAX_DEPTH) {
+            throw this.buffer.makeError("Exceeded maximum allowed depth of " + MAX_DEPTH + " when reading tag");
+        }
+        try {
+            final char startToken = this.buffer.skipWhitespace().peek();
+            switch (startToken) {
+                case Tokens.COMPOUND_BEGIN:
+                    return this.compound();
+                case Tokens.ARRAY_BEGIN:
+                    // Maybe add in a legacy-only mode to read those?
+                    if (this.buffer.hasMore(2) && this.buffer.peek(2) == ';') { // we know we're an array tag
+                        return this.array(this.buffer.peek(1));
+                    } else {
+                        return this.list();
+                    }
+                case Tokens.SINGLE_QUOTE:
+                case Tokens.DOUBLE_QUOTE:
+                    // definitely a string tag
+                    this.buffer.advance();
+                    return new StringTag(unescape(this.buffer.takeUntil(startToken).toString()));
+                default: // scalar
+                    return this.scalar();
+            }
+        } finally {
+            this.depth--;
         }
     }
 
     /**
-     * A tag that is definitely some sort of scalar
+     * A tag that is definitely some sort of scalar.
      *
-     * <p>Does not detect quoted strings, so </p>
+     * <p>Does not detect quoted strings, so those should have been parsed already.</p>
      *
      * @return a parsed tag
      */
@@ -227,7 +262,7 @@ import java.util.stream.IntStream;
                 if (builder.length() != 0) {
                     Tag result = null;
                     try {
-                        switch (Character.toUpperCase(current)) { // try to read and return as a number
+                        switch (Character.toLowerCase(current)) { // try to read and return as a number
                             // case Tokens.TYPE_INTEGER: // handled below, ints are ~special~
                             case Tokens.TYPE_BYTE:
                                 result = new ByteTag(Byte.parseByte(builder.toString()));
@@ -269,29 +304,33 @@ import java.util.stream.IntStream;
             try {
                 return new IntTag(Integer.parseInt(built));
             } catch (final NumberFormatException ex) {
-                // ignore
+                try {
+                    return new DoubleTag(Double.parseDouble(built));
+                } catch (final NumberFormatException ex2) {
+                    // ignore
+                }
             }
+        }
+
+        if (built.equalsIgnoreCase(Tokens.LITERAL_TRUE)) {
+            return new ByteTag((byte) 1);
+        } else if (built.equalsIgnoreCase(Tokens.LITERAL_FALSE)) {
+            return new ByteTag((byte) 0);
         }
         return new StringTag(built);
 
     }
 
     private boolean separatorOrCompleteWith(final char endCharacter) throws StringTagParseException {
-        if (this.buffer.skipWhitespace().peek() == endCharacter) {
-            this.buffer.take();
+        if (this.buffer.takeIf(endCharacter)) {
             return true;
         }
         this.buffer.expect(Tokens.VALUE_SEPARATOR);
-        if (this.buffer.skipWhitespace().peek() == endCharacter) {
-            this.buffer.take();
-            return true;
-        }
         return false;
     }
 
-
     /**
-     * Remove simple escape sequences from a string
+     * Remove simple escape sequences from a string.
      *
      * @param withEscapes input string with escapes
      * @return string with escapes processed
@@ -309,5 +348,9 @@ import java.util.stream.IntStream;
         } while ((escapeIdx = withEscapes.indexOf(Tokens.ESCAPE_MARKER, lastEscape + 1)) != -1); // add one extra character to make sure we don't include escaped backslashes
         output.append(withEscapes.substring(lastEscape));
         return output.toString();
+    }
+
+    public void legacy(final boolean acceptLegacy) {
+        this.acceptLegacy = acceptLegacy;
     }
 }

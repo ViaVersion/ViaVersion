@@ -33,6 +33,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.LongTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
@@ -41,12 +42,16 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+// Specific Via changes:
+// - Use OpenNBT tags
+// - Has not been updated to support pretty printing and legacy writing since that is not needed
 /**
- * See https://github.com/KyoriPowered/adventure.
+ * An emitter for the SNBT format.
+ *
+ * <p>Details on the format are described in the package documentation.</p>
  */
-/* package */ final class TagStringWriter implements AutoCloseable {
+final class TagStringWriter implements AutoCloseable {
     private final Appendable out;
-    private final String indent = "  ";
     private int level;
     /**
      * Whether a {@link Tokens#VALUE_SEPARATOR} needs to be printed before the beginning of the next object.
@@ -73,17 +78,17 @@ import java.util.Map;
         } else if (tag instanceof StringTag) {
             return this.value(((StringTag) tag).getValue(), Tokens.EOF);
         } else if (tag instanceof ByteTag) {
-            return this.value(Byte.toString(((ByteTag) tag).asByte()), Tokens.TYPE_BYTE);
+            return this.value(Byte.toString(((NumberTag) tag).asByte()), Tokens.TYPE_BYTE);
         } else if (tag instanceof ShortTag) {
-            return this.value(Short.toString(((ShortTag) tag).asShort()), Tokens.TYPE_SHORT);
+            return this.value(Short.toString(((NumberTag) tag).asShort()), Tokens.TYPE_SHORT);
         } else if (tag instanceof IntTag) {
-            return this.value(Integer.toString(((IntTag) tag).asInt()), Tokens.TYPE_INT);
+            return this.value(Integer.toString(((NumberTag) tag).asInt()), Tokens.TYPE_INT);
         } else if (tag instanceof LongTag) {
-            return this.value(Long.toString(((LongTag) tag).asLong()), Tokens.TYPE_LONG);
+            return this.value(Long.toString(((NumberTag) tag).asLong()), Character.toUpperCase(Tokens.TYPE_LONG)); // special case
         } else if (tag instanceof FloatTag) {
-            return this.value(Float.toString(((FloatTag) tag).asFloat()), Tokens.TYPE_FLOAT);
+            return this.value(Float.toString(((NumberTag) tag).asFloat()), Tokens.TYPE_FLOAT);
         } else if (tag instanceof DoubleTag) {
-            return this.value(Double.toString(((DoubleTag) tag).asDouble()), Tokens.TYPE_DOUBLE);
+            return this.value(Double.toString(((NumberTag) tag).asDouble()), Tokens.TYPE_DOUBLE);
         } else {
             throw new IOException("Unknown tag type: " + tag.getClass().getSimpleName());
             // unknown!
@@ -92,7 +97,7 @@ import java.util.Map;
 
     private TagStringWriter writeCompound(final CompoundTag tag) throws IOException {
         this.beginCompound();
-        for (Map.Entry<String, Tag> entry : tag.entrySet()) {
+        for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
             this.key(entry.getKey());
             this.writeTag(entry.getValue());
         }
@@ -243,7 +248,6 @@ import java.util.Map;
             this.needsSeparator = false;
         }
     }
-
 
     @Override
     public void close() throws IOException {
