@@ -48,7 +48,6 @@ import java.util.stream.LongStream;
 // - Small byteArray() optimization
 // - acceptLegacy = true by default
 // - Don't parse value as DoubleTag when possiblyNumeric
-// - Fix trailing comma reading in compounds, lists, and arrays
 final class TagStringReader {
     private static final int MAX_DEPTH = 512;
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
@@ -324,7 +323,7 @@ final class TagStringReader {
             return true;
         }
         this.buffer.expect(Tokens.VALUE_SEPARATOR);
-        return this.buffer.takeIf(endCharacter); // Via - trailing commas are allowed
+        return this.buffer.takeIf(endCharacter);
     }
 
     /**
