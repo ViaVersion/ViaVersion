@@ -80,16 +80,6 @@ public class BungeeViaInjector implements ViaInjector {
         return ReflectionUtil.getStatic(Class.forName("net.md_5.bungee.protocol.ProtocolConstants"), "SUPPORTED_VERSION_IDS", List.class);
     }
 
-    @Override
-    public String getEncoderName() {
-        return "via-encoder";
-    }
-
-    @Override
-    public String getDecoderName() {
-        return "via-decoder";
-    }
-
     private ChannelInitializer<Channel> getChannelInitializer() throws Exception {
         Class<?> pipelineUtils = Class.forName("net.md_5.bungee.netty.PipelineUtils");
         Field field = pipelineUtils.getDeclaredField("SERVER_CHILD");
