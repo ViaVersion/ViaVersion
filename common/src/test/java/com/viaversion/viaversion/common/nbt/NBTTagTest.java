@@ -17,28 +17,37 @@
  */
 package com.viaversion.viaversion.common.nbt;
 
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO.readString;
+
 public class NBTTagTest {
 
     @Test
     void test() throws IOException {
-        BinaryTagIO.readString("{id:test,test:1}");
-        BinaryTagIO.readString("{id:test,test:1,}");
+        readString("{id:5}");
+        readString("{id:5b}");
+        readString("{id:test,test:1,}");
+        readString("{id:[3.2,64.5,129.5]}");
+        readString("{id:[I;1,2, 3, 4,5]}"); // >=1.11
+        readString("{id:1b,b:true}");
+        readString("{id:[L;1l,2L,3L]}"); // >=1.11
+        readString("{id:'minecraft:stone'}"); // >=1.13
+        readString("{id:1,id:2}");
+        readString("{id:-20b,test:3.19f}");
+        readString("{id:[I;1,2,3,]}");
+        readString("{id:[1,2,3,]}");
 
-        BinaryTagIO.readString("{id:[1,2,3,]}");
+        Assertions.assertEquals("2147483649", readString("{id:9000b,thisisastring:2147483649}").get("thisisastring").getValue());
+        Assertions.assertEquals((byte) 1, readString("{thisisabyte:true}").get("thisisabyte").getValue());
+        Assertions.assertEquals((byte) 0, readString("{thisisabyte:false}").get("thisisabyte").getValue());
 
-        BinaryTagIO.readString("{id:[I;1,2,3]}");
-        BinaryTagIO.readString("{id:[I;1,2,3,]}");
-
-        Assertions.assertTrue(BinaryTagIO.readString("{id:9000b,num:2147483649}").get("num") instanceof StringTag);
-
-        //TODO fix legacy
-        // BinaryTagIO.readString("{id:minecraft:stone}");
+        //TODO fix legacy < 1.12
+        // readString("{id:minecraft:stone}");
+        // readString("{id:[I;1i,2I,3I]}");
+        // readString("{id:[1,2, 3, 4,5]}");
     }
 }

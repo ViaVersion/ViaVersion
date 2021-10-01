@@ -20,6 +20,7 @@ package com.viaversion.viaversion.sponge.handlers;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
+import com.viaversion.viaversion.platform.WrappedChannelInitializer;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -29,21 +30,23 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.lang.reflect.Method;
 
-public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
+public class SpongeChannelInitializer extends ChannelInitializer<Channel> implements WrappedChannelInitializer {
 
+    private static final Method INIT_CHANNEL_METHOD;
     private final ChannelInitializer<Channel> original;
-    private Method method;
 
-    public SpongeChannelInitializer(ChannelInitializer<Channel> oldInit) {
-        this.original = oldInit;
+    static {
         try {
-            this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
-            this.method.setAccessible(true);
+            INIT_CHANNEL_METHOD = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
+            INIT_CHANNEL_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
+    public SpongeChannelInitializer(ChannelInitializer<Channel> oldInit) {
+        this.original = oldInit;
+    }
 
     @Override
     protected void initChannel(Channel channel) throws Exception {
@@ -54,7 +57,7 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
             // init protocol
             new ProtocolPipelineImpl(info);
             // Add originals
-            this.method.invoke(this.original, channel);
+            INIT_CHANNEL_METHOD.invoke(this.original, channel);
             // Add our transformers
             MessageToByteEncoder encoder = new SpongeEncodeHandler(info, (MessageToByteEncoder) channel.pipeline().get("encoder"));
             ByteToMessageDecoder decoder = new SpongeDecodeHandler(info, (ByteToMessageDecoder) channel.pipeline().get("decoder"));
@@ -62,11 +65,17 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> {
             channel.pipeline().replace("encoder", "encoder", encoder);
             channel.pipeline().replace("decoder", "decoder", decoder);
         } else {
-            this.method.invoke(this.original, channel);
+            INIT_CHANNEL_METHOD.invoke(this.original, channel);
         }
     }
 
+    /*@Deprecated(forRemoval = true)*/
     public ChannelInitializer<Channel> getOriginal() {
+        return original;
+    }
+
+    @Override
+    public ChannelInitializer<Channel> original() {
         return original;
     }
 }

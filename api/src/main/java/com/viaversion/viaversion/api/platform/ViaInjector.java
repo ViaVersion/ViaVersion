@@ -78,14 +78,18 @@ public interface ViaInjector {
      *
      * @return The name
      */
-    String getEncoderName();
+    default String getEncoderName() {
+        return "via-encoder";
+    }
 
     /**
      * Get the name of the decoder for then netty pipeline for this platform.
      *
      * @return The name
      */
-    String getDecoderName();
+    default String getDecoderName() {
+        return "via-decoder";
+    }
 
     /**
      * Get any relevant data for debugging injection issues.
