@@ -105,3 +105,6 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 .nb-gradle/
+
+### MacOS ###
+.DS_Store
