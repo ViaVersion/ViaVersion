@@ -238,9 +238,27 @@ public abstract class LegacyViaInjector implements ViaInjector {
         return "decoder";
     }
 
+    /**
+     * Returns the Vanilla server connection object the channels to be injected should be searched in.
+     *
+     * @return server connection object, or null if failed
+     */
     protected abstract @Nullable Object getServerConnection() throws ReflectiveOperationException;
 
+    /**
+     * Returns a new Via channel initializer wrapping the original one.
+     *
+     * @param oldInitializer original channel initializer
+     * @return wrapped Via channel initializer
+     */
     protected abstract WrappedChannelInitializer createChannelInitializer(ChannelInitializer<Channel> oldInitializer);
 
+    /**
+     * Should throw a {@link RuntimeException} with information on what/who might have caused an issue.
+     * Called when injection fails.
+     *
+     * @param bootstrapAcceptor head channel handler to be used when blaming
+     * @throws ReflectiveOperationException during reflective operation
+     */
     protected abstract void blame(ChannelHandler bootstrapAcceptor) throws ReflectiveOperationException;
 }

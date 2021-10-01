@@ -46,9 +46,7 @@ public final class SynchronizedListWrapper<E> implements List<E> {
     }
 
     private void handleAdd(E o) {
-        synchronized (this) {
-            addHandler.accept(o);
-        }
+        addHandler.accept(o);
     }
 
     @Override
