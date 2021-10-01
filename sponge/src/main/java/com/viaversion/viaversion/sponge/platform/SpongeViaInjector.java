@@ -17,260 +17,47 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.platform.LegacyViaInjector;
+import com.viaversion.viaversion.platform.WrappedChannelInitializer;
 import com.viaversion.viaversion.sponge.handlers.SpongeChannelInitializer;
-import com.viaversion.viaversion.util.ListWrapper;
-import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.util.ReflectionUtil;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
-//TODO screams
-public class SpongeViaInjector implements ViaInjector {
-    private List<ChannelFuture> injectedFutures = new ArrayList<>();
-    private List<Pair<Field, Object>> injectedLists = new ArrayList<>();
+public class SpongeViaInjector extends LegacyViaInjector {
 
     @Override
-    public void inject() throws Exception {
-        try {
-            Object connection = getServerConnection();
-            if (connection == null) {
-                throw new Exception("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
-            }
-            for (Field field : connection.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                final Object value = field.get(connection);
-                if (value instanceof List) {
-                    // Inject the list
-                    List wrapper = new ListWrapper((List) value) {
-                        @Override
-                        public void handleAdd(Object o) {
-                            if (o instanceof ChannelFuture) {
-                                try {
-                                    injectChannelFuture((ChannelFuture) o);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    };
-                    injectedLists.add(new Pair<>(field, connection));
-                    field.set(connection, wrapper);
-                    // Iterate through current list
-                    synchronized (wrapper) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                injectChannelFuture((ChannelFuture) o);
-                            } else {
-                                break; // not the right list.
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("Unable to inject ViaVersion, please post these details on our GitHub and ensure you're using a compatible server version.");
-            throw e;
-        }
-    }
-
-    private void injectChannelFuture(ChannelFuture future) throws Exception {
-        try {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
-            // Pick best
-            for (String name : names) {
-                ChannelHandler handler = future.channel().pipeline().get(name);
-                try {
-                    ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
-                    bootstrapAcceptor = handler;
-                } catch (Exception e) {
-                    // Not this one
-                }
-            }
-            // Default to first (Also allows blame to work)
-            if (bootstrapAcceptor == null) {
-                bootstrapAcceptor = future.channel().pipeline().first();
-            }
-            try {
-                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                ChannelInitializer newInit = new SpongeChannelInitializer(oldInit);
-
-                ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
-                injectedFutures.add(future);
-            } catch (NoSuchFieldException e) {
-                throw new Exception("Unable to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
-
-            }
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("We failed to inject ViaVersion, have you got late-bind enabled with something else?");
-            throw e;
-        }
+    public int getServerProtocolVersion() throws ReflectiveOperationException {
+        MinecraftVersion version = Sponge.getPlatform().getMinecraftVersion();
+        return (int) version.getClass().getDeclaredMethod("getProtocol").invoke(version);
     }
 
     @Override
-    public boolean lateProtocolVersionSetting() {
-        return true;
-    }
-
-    @Override
-    public void uninject() {
-        // TODO: Uninject from players currently online
-        for (ChannelFuture future : injectedFutures) {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
-            // Pick best
-            for (String name : names) {
-                ChannelHandler handler = future.channel().pipeline().get(name);
-                try {
-                    ChannelInitializer<Channel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
-                    if (oldInit instanceof SpongeChannelInitializer) {
-                        bootstrapAcceptor = handler;
-                    }
-                } catch (Exception e) {
-                    // Not this one
-                }
-            }
-            // Default to first
-            if (bootstrapAcceptor == null) {
-                bootstrapAcceptor = future.channel().pipeline().first();
-            }
-
-            try {
-                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                if (oldInit instanceof SpongeChannelInitializer) {
-                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((SpongeChannelInitializer) oldInit).getOriginal());
-                }
-            } catch (Exception e) {
-                Via.getPlatform().getLogger().severe("Failed to remove injection handler, reload won't work with connections, please reboot!");
-            }
-        }
-        injectedFutures.clear();
-
-        for (Pair<Field, Object> pair : injectedLists) {
-            try {
-                Object o = pair.key().get(pair.value());
-                if (o instanceof ListWrapper) {
-                    pair.key().set(pair.value(), ((ListWrapper) o).getOriginalList());
-                }
-            } catch (IllegalAccessException e) {
-                Via.getPlatform().getLogger().severe("Failed to remove injection, reload won't work with connections, please reboot!");
-            }
-        }
-
-        injectedLists.clear();
-    }
-
-    public static Object getServer() throws Exception {
-        return Sponge.getServer();
-    }
-
-    @Override
-    public int getServerProtocolVersion() throws Exception {
-        MinecraftVersion mcv = Sponge.getPlatform().getMinecraftVersion();
-        try {
-            return (int) mcv.getClass().getDeclaredMethod("getProtocol").invoke(mcv);
-        } catch (Exception e) {
-            throw new Exception("Failed to get server protocol", e);
-        }
-    }
-
-    @Override
-    public String getEncoderName() {
-        return "encoder";
-    }
-
-    @Override
-    public String getDecoderName() {
-        return "decoder";
-    }
-
-    public static Object getServerConnection() throws Exception {
+    protected @Nullable Object getServerConnection() throws ReflectiveOperationException {
         Class<?> serverClazz = Class.forName("net.minecraft.server.MinecraftServer");
-        Object server = getServer();
-        Object connection = null;
-        for (Method m : serverClazz.getDeclaredMethods()) {
-            if (m.getReturnType() != null) {
-                if (m.getReturnType().getSimpleName().equals("NetworkSystem")) {
-                    if (m.getParameterTypes().length == 0) {
-                        connection = m.invoke(server);
-                    }
+        for (Method method : serverClazz.getDeclaredMethods()) {
+            if (method.getReturnType().getSimpleName().equals("NetworkSystem") && method.getParameterTypes().length == 0) {
+                Object connection = method.invoke(Sponge.getServer());
+                if (connection != null) {
+                    return connection;
                 }
             }
         }
-        return connection;
+        return null;
     }
 
     @Override
-    public JsonObject getDump() {
-        JsonObject data = new JsonObject();
+    protected WrappedChannelInitializer createChannelInitializer(ChannelInitializer<Channel> oldInitializer) {
+        return new SpongeChannelInitializer(oldInitializer);
+    }
 
-        // Generate information about current injections
-        JsonArray injectedChannelInitializers = new JsonArray();
-        for (ChannelFuture cf : injectedFutures) {
-            JsonObject info = new JsonObject();
-            info.addProperty("futureClass", cf.getClass().getName());
-            info.addProperty("channelClass", cf.channel().getClass().getName());
-
-            // Get information about the pipes for this channel future
-            JsonArray pipeline = new JsonArray();
-            for (String pipeName : cf.channel().pipeline().names()) {
-                JsonObject pipe = new JsonObject();
-                pipe.addProperty("name", pipeName);
-                if (cf.channel().pipeline().get(pipeName) != null) {
-                    pipe.addProperty("class", cf.channel().pipeline().get(pipeName).getClass().getName());
-                    try {
-                        Object child = ReflectionUtil.get(cf.channel().pipeline().get(pipeName), "childHandler", ChannelInitializer.class);
-                        pipe.addProperty("childClass", child.getClass().getName());
-                        if (child instanceof SpongeChannelInitializer) {
-                            pipe.addProperty("oldInit", ((SpongeChannelInitializer) child).getOriginal().getClass().getName());
-                        }
-                    } catch (Exception e) {
-                        // Don't display
-                    }
-                }
-                // Add to the pipeline array
-                pipeline.add(pipe);
-            }
-            info.add("pipeline", pipeline);
-
-            // Add to the list
-            injectedChannelInitializers.add(info);
-        }
-        data.add("injectedChannelInitializers", injectedChannelInitializers);
-
-        // Generate information about lists we've injected into
-        JsonObject wrappedLists = new JsonObject();
-        JsonObject currentLists = new JsonObject();
-        try {
-            for (Pair<Field, Object> pair : injectedLists) {
-                Object list = pair.key().get(pair.value());
-                // Note down the current value (could be overridden by another plugin)
-                currentLists.addProperty(pair.key().getName(), list.getClass().getName());
-                // Also if it's not overridden we can display what's inside our list (possibly another plugin)
-                if (list instanceof ListWrapper) {
-                    wrappedLists.addProperty(pair.key().getName(), ((ListWrapper) list).getOriginalList().getClass().getName());
-                }
-            }
-            data.add("wrappedLists", wrappedLists);
-            data.add("currentLists", currentLists);
-        } catch (Exception e) {
-            // Ignored, fields won't be present
-        }
-
-        return data;
+    @Override
+    protected void blame(ChannelHandler bootstrapAcceptor) {
+        throw new RuntimeException("Unable to find core component 'childHandler', please check your plugins. Issue: " + bootstrapAcceptor.getClass().getName());
     }
 }

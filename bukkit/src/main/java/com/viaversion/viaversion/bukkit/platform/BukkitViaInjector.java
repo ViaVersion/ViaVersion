@@ -17,15 +17,10 @@
  */
 package com.viaversion.viaversion.bukkit.platform;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
-import com.viaversion.viaversion.util.ConcurrentList;
-import com.viaversion.viaversion.util.ListWrapper;
-import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.platform.LegacyViaInjector;
+import com.viaversion.viaversion.platform.WrappedChannelInitializer;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -33,230 +28,88 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-//TODO screams
-public class BukkitViaInjector implements ViaInjector {
-    private final List<ChannelFuture> injectedFutures = new ArrayList<>();
-    private final List<Pair<Field, Object>> injectedLists = new ArrayList<>();
-
+public class BukkitViaInjector extends LegacyViaInjector {
     private boolean protocolLib;
 
     @Override
-    public void inject() throws Exception {
+    public void inject() throws ReflectiveOperationException {
         if (PaperViaInjector.PAPER_INJECTION_METHOD) {
             PaperViaInjector.setPaperChannelInitializeListener();
             return;
         }
 
-        try {
-            Object connection = getServerConnection();
-            if (connection == null) {
-                throw new Exception("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
-            }
-            for (Field field : connection.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                Object value = field.get(connection);
-                if (value instanceof List) {
-                    // Inject the list
-                    List wrapper = new ListWrapper((List) value) {
-                        @Override
-                        public void handleAdd(Object o) {
-                            if (o instanceof ChannelFuture) {
-                                try {
-                                    injectChannelFuture((ChannelFuture) o);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    };
-                    injectedLists.add(new Pair<>(field, connection));
-                    field.set(connection, wrapper);
-                    // Iterate through current list
-                    synchronized (wrapper) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                injectChannelFuture((ChannelFuture) o);
-                            } else {
-                                break; // not the right list.
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("Unable to inject ViaVersion, please post these details on our GitHub and ensure you're using a compatible server version.");
-            throw e;
-        }
-    }
-
-    private void injectChannelFuture(ChannelFuture future) throws Exception {
-        try {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
-            // Pick best
-            for (String name : names) {
-                ChannelHandler handler = future.channel().pipeline().get(name);
-                try {
-                    ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
-                    bootstrapAcceptor = handler;
-                } catch (Exception e) {
-                    // Not this one
-                }
-            }
-            // Default to first (Also allows blame to work)
-            if (bootstrapAcceptor == null) {
-                bootstrapAcceptor = future.channel().pipeline().first();
-            }
-            try {
-                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                ChannelInitializer newInit = new BukkitChannelInitializer(oldInit);
-
-                ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
-                injectedFutures.add(future);
-            } catch (NoSuchFieldException e) {
-                // let's find who to blame!
-                ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
-                if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
-                    PluginDescriptionFile yaml = ReflectionUtil.get(cl, "description", PluginDescriptionFile.class);
-                    throw new Exception("Unable to inject, due to " + bootstrapAcceptor.getClass().getName() + ", try without the plugin " + yaml.getName() + "?");
-                } else {
-                    throw new Exception("Unable to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
-                }
-
-            }
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("We failed to inject ViaVersion, have you got late-bind enabled with something else?");
-            throw e;
-        }
+        super.inject();
     }
 
     @Override
-    public void uninject() throws Exception {
-        // TODO: Uninject from players currently online to prevent protocol lib issues.
+    public void uninject() throws ReflectiveOperationException {
         if (PaperViaInjector.PAPER_INJECTION_METHOD) {
             PaperViaInjector.removePaperChannelInitializeListener();
             return;
         }
 
-        for (ChannelFuture future : injectedFutures) {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
-            // Pick best
-            for (String name : names) {
-                ChannelHandler handler = future.channel().pipeline().get(name);
-                try {
-                    ChannelInitializer<Channel> oldInit = ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
-                    if (oldInit instanceof BukkitChannelInitializer) {
-                        bootstrapAcceptor = handler;
-                    }
-                } catch (Exception e) {
-                    // Not this one
-                }
-            }
-            // Default to first
-            if (bootstrapAcceptor == null) {
-                bootstrapAcceptor = future.channel().pipeline().first();
-            }
-
-            try {
-                ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
-                if (oldInit instanceof BukkitChannelInitializer) {
-                    ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((BukkitChannelInitializer) oldInit).getOriginal());
-                }
-            } catch (Exception e) {
-                Via.getPlatform().getLogger().severe("Failed to remove injection handler, reload won't work with connections, please reboot!");
-            }
-        }
-        injectedFutures.clear();
-
-        for (Pair<Field, Object> pair : injectedLists) {
-            try {
-                Object o = pair.key().get(pair.value());
-                if (o instanceof ListWrapper) {
-                    pair.key().set(pair.value(), ((ListWrapper) o).getOriginalList());
-                }
-            } catch (IllegalAccessException e) {
-                Via.getPlatform().getLogger().severe("Failed to remove injection, reload won't work with connections, please reboot!");
-            }
-        }
-
-        injectedLists.clear();
+        super.uninject();
     }
 
     @Override
-    public boolean lateProtocolVersionSetting() {
-        return true;
-    }
-
-    @Override
-    public int getServerProtocolVersion() throws Exception {
+    public int getServerProtocolVersion() throws ReflectiveOperationException {
         if (PaperViaInjector.PAPER_PROTOCOL_METHOD) {
             //noinspection deprecation
             return Bukkit.getUnsafe().getProtocolVersion();
         }
 
-        try {
-            // Grab a static instance of the server
-            Class<?> serverClazz = NMSUtil.nms("MinecraftServer", "net.minecraft.server.MinecraftServer");
-            Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
+        // Time to go on a journey! The protocol version is hidden inside an int in ServerPing.ServerData
+        // Grab a static instance of the server
+        Class<?> serverClazz = NMSUtil.nms("MinecraftServer", "net.minecraft.server.MinecraftServer");
+        Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
 
-            // Grab the ping class and find the field to access it
-            Class<?> pingClazz = NMSUtil.nms(
-                    "ServerPing",
-                    "net.minecraft.network.protocol.status.ServerPing"
-            );
-            Object ping = null;
-            // Search for ping method
-            for (Field f : serverClazz.getDeclaredFields()) {
-                if (f.getType() != null) {
-                    if (f.getType().getSimpleName().equals("ServerPing")) {
-                        f.setAccessible(true);
-                        ping = f.get(server);
-                    }
-                }
+        // Grab the ping class and find the field to access it
+        Class<?> pingClazz = NMSUtil.nms(
+                "ServerPing",
+                "net.minecraft.network.protocol.status.ServerPing"
+        );
+        Object ping = null;
+        for (Field field : serverClazz.getDeclaredFields()) {
+            if (field.getType() == pingClazz) {
+                field.setAccessible(true);
+                ping = field.get(server);
+                break;
             }
-            if (ping != null) {
-                Object serverData = null;
-                for (Field f : pingClazz.getDeclaredFields()) {
-                    if (f.getType() != null) {
-                        if (f.getType().getSimpleName().endsWith("ServerData")) {
-                            f.setAccessible(true);
-                            serverData = f.get(ping);
-                        }
-                    }
-                }
-                if (serverData != null) {
-                    int protocolVersion = -1;
-                    for (Field f : serverData.getClass().getDeclaredFields()) {
-                        if (f.getType() != null) {
-                            if (f.getType() == int.class) {
-                                f.setAccessible(true);
-                                protocolVersion = (int) f.get(serverData);
-                            }
-                        }
-                    }
-                    if (protocolVersion != -1) {
-                        return protocolVersion;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new Exception("Failed to get server", e);
         }
-        throw new Exception("Failed to get server");
-    }
 
-    @Override
-    public String getEncoderName() {
-        return "encoder";
+        // Now get the ServerData inside ServerPing
+        Class<?> serverDataClass = NMSUtil.nms(
+                "ServerPing$ServerData",
+                "net.minecraft.network.protocol.status.ServerPing$ServerData"
+        );
+        Object serverData = null;
+        for (Field field : pingClazz.getDeclaredFields()) {
+            if (field.getType() == serverDataClass) {
+                field.setAccessible(true);
+                serverData = field.get(ping);
+                break;
+            }
+        }
+
+        // Get protocol version field
+        for (Field field : serverDataClass.getDeclaredFields()) {
+            if (field.getType() != int.class) {
+                continue;
+            }
+
+            field.setAccessible(true);
+            int protocolVersion = (int) field.get(serverData);
+            if (protocolVersion != -1) {
+                return protocolVersion;
+            }
+        }
+        throw new RuntimeException("Failed to get server");
     }
 
     @Override
@@ -264,133 +117,77 @@ public class BukkitViaInjector implements ViaInjector {
         return protocolLib ? "protocol_lib_decoder" : "decoder";
     }
 
-    public static Object getServerConnection() throws Exception {
-        Class<?> serverClazz = NMSUtil.nms(
+    @Override
+    protected @Nullable Object getServerConnection() throws ReflectiveOperationException {
+        Class<?> serverClass = NMSUtil.nms(
                 "MinecraftServer",
                 "net.minecraft.server.MinecraftServer"
         );
-        Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
-        Object connection = null;
-        for (Method m : serverClazz.getDeclaredMethods()) {
-            if (m.getReturnType() != null) {
-                if (m.getReturnType().getSimpleName().equals("ServerConnection")) {
-                    if (m.getParameterTypes().length == 0) {
-                        connection = m.invoke(server);
-                    }
-                }
+        Class<?> connectionClass = NMSUtil.nms(
+                "ServerConnection",
+                "net.minecraft.server.network.ServerConnection"
+        );
+
+        Object server = ReflectionUtil.invokeStatic(serverClass, "getServer");
+        for (Method method : serverClass.getDeclaredMethods()) {
+            if (method.getReturnType() != connectionClass || method.getParameterTypes().length != 0) {
+                continue;
+            }
+
+            // We need the method that initiates the connection if not yet set
+            Object connection = method.invoke(server);
+            if (connection != null) {
+                return connection;
             }
         }
-        return connection;
+        return null;
     }
 
-    public static boolean isBinded() {
-        if (PaperViaInjector.PAPER_INJECTION_METHOD) return true;
+    @Override
+    protected WrappedChannelInitializer createChannelInitializer(ChannelInitializer<Channel> oldInitializer) {
+        return new BukkitChannelInitializer(oldInitializer);
+    }
+
+    @Override
+    protected void blame(ChannelHandler bootstrapAcceptor) throws ReflectiveOperationException {
+        // Let's find who to blame!
+        ClassLoader classLoader = bootstrapAcceptor.getClass().getClassLoader();
+        if (classLoader.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
+            PluginDescriptionFile description = ReflectionUtil.get(classLoader, "description", PluginDescriptionFile.class);
+            throw new RuntimeException("Unable to inject, due to " + bootstrapAcceptor.getClass().getName() + ", try without the plugin " + description.getName() + "?");
+        } else {
+            throw new RuntimeException("Unable to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
+        }
+    }
+
+    public boolean isBinded() {
+        if (PaperViaInjector.PAPER_INJECTION_METHOD) {
+            return true;
+        }
         try {
             Object connection = getServerConnection();
             if (connection == null) {
                 return false;
             }
+
             for (Field field : connection.getClass().getDeclaredFields()) {
+                if (!List.class.isAssignableFrom(field.getType())) {
+                    continue;
+                }
+
                 field.setAccessible(true);
-                final Object value = field.get(connection);
-                if (value instanceof List) {
-                    // Inject the list
-                    synchronized (value) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
-                                return true;
-                            } else {
-                                break; // not the right list.
-                            }
-                        }
+                List<?> value = (List<?>) field.get(connection);
+                // Check if the list has at least one element
+                synchronized (value) {
+                    if (!value.isEmpty() && value.get(0) instanceof ChannelFuture) {
+                        return true;
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
         }
         return false;
-    }
-
-    @Override
-    public JsonObject getDump() {
-        JsonObject data = new JsonObject();
-
-        // Generate information about current injections
-        JsonArray injectedChannelInitializers = new JsonArray();
-        for (ChannelFuture cf : injectedFutures) {
-            JsonObject info = new JsonObject();
-            info.addProperty("futureClass", cf.getClass().getName());
-            info.addProperty("channelClass", cf.channel().getClass().getName());
-
-            // Get information about the pipes for this channel future
-            JsonArray pipeline = new JsonArray();
-            for (String pipeName : cf.channel().pipeline().names()) {
-                JsonObject pipe = new JsonObject();
-                pipe.addProperty("name", pipeName);
-                if (cf.channel().pipeline().get(pipeName) != null) {
-                    pipe.addProperty("class", cf.channel().pipeline().get(pipeName).getClass().getName());
-                    try {
-                        Object child = ReflectionUtil.get(cf.channel().pipeline().get(pipeName), "childHandler", ChannelInitializer.class);
-                        pipe.addProperty("childClass", child.getClass().getName());
-                        if (child instanceof BukkitChannelInitializer) {
-                            pipe.addProperty("oldInit", ((BukkitChannelInitializer) child).getOriginal().getClass().getName());
-                        }
-                    } catch (Exception e) {
-                        // Don't display
-                    }
-                }
-                // Add to the pipeline array
-                pipeline.add(pipe);
-            }
-            info.add("pipeline", pipeline);
-
-            // Add to the list
-            injectedChannelInitializers.add(info);
-        }
-        data.add("injectedChannelInitializers", injectedChannelInitializers);
-
-        // Generate information about lists we've injected into
-        JsonObject wrappedLists = new JsonObject();
-        JsonObject currentLists = new JsonObject();
-        try {
-            for (Pair<Field, Object> pair : injectedLists) {
-                Object list = pair.key().get(pair.value());
-                // Note down the current value (could be overridden by another plugin)
-                currentLists.addProperty(pair.key().getName(), list.getClass().getName());
-                // Also if it's not overridden we can display what's inside our list (possibly another plugin)
-                if (list instanceof ListWrapper) {
-                    wrappedLists.addProperty(pair.key().getName(), ((ListWrapper) list).getOriginalList().getClass().getName());
-                }
-            }
-            data.add("wrappedLists", wrappedLists);
-            data.add("currentLists", currentLists);
-        } catch (Exception e) {
-            // Ignored, fields won't be present
-        }
-
-        data.addProperty("binded", isBinded());
-        return data;
-    }
-
-    public static void patchLists() throws Exception {
-        if (PaperViaInjector.PAPER_INJECTION_METHOD) return;
-
-        Object connection = getServerConnection();
-        if (connection == null) {
-            Via.getPlatform().getLogger().warning("We failed to find the core component 'ServerConnection', please file an issue on our GitHub.");
-            return;
-        }
-
-        for (Field field : connection.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = field.get(connection);
-            if (!(value instanceof List)) continue;
-            if (value instanceof ConcurrentList) continue;
-
-            ConcurrentList list = new ConcurrentList();
-            list.addAll((Collection) value);
-            field.set(connection, list);
-        }
     }
 
     public void setProtocolLib(boolean protocolLib) {

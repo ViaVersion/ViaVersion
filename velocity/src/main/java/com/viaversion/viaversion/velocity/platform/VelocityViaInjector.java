@@ -107,16 +107,6 @@ public class VelocityViaInjector implements ViaInjector {
     }
 
     @Override
-    public String getEncoderName() {
-        return "via-encoder";
-    }
-
-    @Override
-    public String getDecoderName() {
-        return "via-decoder";
-    }
-
-    @Override
     public JsonObject getDump() {
         JsonObject data = new JsonObject();
         try {

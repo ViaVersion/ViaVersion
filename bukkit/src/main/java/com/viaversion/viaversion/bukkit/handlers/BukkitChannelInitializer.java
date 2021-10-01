@@ -22,6 +22,7 @@ import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.classgenerator.generated.HandlerConstructor;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
+import com.viaversion.viaversion.platform.WrappedChannelInitializer;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -30,21 +31,25 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.lang.reflect.Method;
 
-public class BukkitChannelInitializer extends ChannelInitializer<Channel> {
+public class BukkitChannelInitializer extends ChannelInitializer<Channel> implements WrappedChannelInitializer {
 
+    private static final Method INIT_CHANNEL_METHOD;
     private final ChannelInitializer<Channel> original;
-    private Method method;
 
-    public BukkitChannelInitializer(ChannelInitializer<Channel> oldInit) {
-        this.original = oldInit;
+    static {
         try {
-            this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
-            this.method.setAccessible(true);
+            INIT_CHANNEL_METHOD = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
+            INIT_CHANNEL_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
+    public BukkitChannelInitializer(ChannelInitializer<Channel> oldInit) {
+        this.original = oldInit;
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public ChannelInitializer<Channel> getOriginal() {
         return original;
     }
@@ -52,7 +57,7 @@ public class BukkitChannelInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel channel) throws Exception {
         // Add originals
-        this.method.invoke(this.original, channel);
+        INIT_CHANNEL_METHOD.invoke(this.original, channel);
         afterChannelInitialize(channel);
     }
 
@@ -71,5 +76,10 @@ public class BukkitChannelInitializer extends ChannelInitializer<Channel> {
 
         channel.pipeline().replace("encoder", "encoder", encoder);
         channel.pipeline().replace("decoder", "decoder", decoder);
+    }
+
+    @Override
+    public ChannelInitializer<Channel> original() {
+        return original;
     }
 }
