@@ -35,6 +35,7 @@ public class NBTTagTest {
         readString("{id:[I;1,2, 3, 4,5]}"); // >=1.11
         readString("{id:1b,b:true}");
         readString("{id:[L;1l,2L,3L]}"); // >=1.11
+        readString("{id:[I;1i,2I,3I]}");
         readString("{id:'minecraft:stone'}"); // >=1.13
         readString("{id:1,id:2}");
         readString("{id:-20b,test:3.19f}");
@@ -47,7 +48,6 @@ public class NBTTagTest {
 
         //TODO fix legacy < 1.12
         // readString("{id:minecraft:stone}");
-        // readString("{id:[I;1i,2I,3I]}");
         // readString("{id:[1,2, 3, 4,5]}");
     }
 }
